@@ -11,6 +11,8 @@
     <modules>
         <module>wxdgaming.boot2.starter</module>
         <module>wxdgaming.boot2.core</module>
+        <module>wxdgaming.boot2.starter.net</module>
+        <module>wxdgaming.boot2.starter.net.server</module>
     </modules>
 
     <properties>
@@ -352,6 +354,11 @@
                 <artifactId>jjwt-jackson</artifactId>
                 <version>0.12.6</version>
             </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.16.1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -384,6 +391,11 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <!--日志框架-->
+        <!--计算对象占用内存大小-->
+        <dependency>
+            <groupId>org.openjdk.jol</groupId>
+            <artifactId>jol-core</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
@@ -407,6 +419,18 @@
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.carrotsearch</groupId>
+            <artifactId>hppc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
         </dependency>
     </dependencies>
 

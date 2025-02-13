@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.reflect.ReflectContext;
 
 /**
  * 基础模块
@@ -15,7 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 abstract class BaseModule extends AbstractModule {
 
-    public BaseModule() {
+    final ReflectContext reflectContext;
+
+    public BaseModule(ReflectContext reflectContext) {
+        this.reflectContext = reflectContext;
     }
 
     public void bindSingleton(Class<?> clazz) {

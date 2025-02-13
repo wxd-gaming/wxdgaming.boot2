@@ -134,7 +134,10 @@ public class MethodUtil {
                         }
                     }
                 } catch (Exception e) {
-                    log.warn("类：" + cls.getName() + ", 无法解析的方法：" + method.getName() + ", 第 " + (i + 1) + " 个类型参数名：" + parameterizedType.toString(), e);
+                    log.warn(
+                            "类：{}, 无法解析的方法：{}, 第 {} 个类型参数名：{}",
+                            cls.getName(), method.getName(), i + 1, parameterizedType.toString(), e
+                    );
                 }
             }
 
@@ -173,7 +176,7 @@ public class MethodUtil {
             Method[] declaredMethods = cls.getDeclaredMethods();
             readAllMethods0(declaredMethods, methodList);
         } catch (Throwable throwable) {
-            throw Throw.as(cls.getName(), throwable);
+            throw Throw.of(cls.getName(), throwable);
         }
     }
 

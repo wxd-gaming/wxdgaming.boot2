@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 import org.slf4j.LoggerFactory;
 import wxdgaming.boot2.core.AnnUtil;
 import wxdgaming.boot2.core.Throw;
+import wxdgaming.boot2.core.io.FileReadUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -42,7 +43,7 @@ public class ReflectContext {
             Constructor<R> constructor = cls.getConstructor(parameterTypes);
             return constructor.newInstance(args);
         } catch (Exception e) {
-            throw Throw.as(e);
+            throw Throw.of(e);
         }
     }
 
@@ -327,7 +328,7 @@ public class ReflectContext {
                     }
                 }
             } catch (Throwable e) {
-                throw Throw.as(e);
+                throw Throw.of(e);
             }
         }
 
@@ -419,7 +420,7 @@ public class ReflectContext {
                     }
                 }
             } catch (Throwable e) {
-                throw Throw.as(jarPath, e);
+                throw Throw.of(jarPath, e);
             }
         }
 
