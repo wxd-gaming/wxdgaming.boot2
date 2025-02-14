@@ -2,7 +2,7 @@ package wxdgaming.boot2.core.threading;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wxdgaming.boot2.core.GlobalUtil;
+import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.core.chatset.StringUtils;
 
 import java.util.List;

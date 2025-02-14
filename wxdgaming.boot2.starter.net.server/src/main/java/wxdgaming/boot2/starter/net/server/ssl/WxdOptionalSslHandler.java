@@ -20,6 +20,8 @@ import java.util.List;
  **/
 public class WxdOptionalSslHandler extends ByteToMessageDecoder implements Serializable {
 
+    public static final String SSL_KEY = "WXD_SSL_KEY";
+
     static final short DTLS_1_0 = (short) 0xFEFF;
     static final short DTLS_1_2 = (short) 0xFEFD;
     static final short DTLS_1_3 = (short) 0xFEFC;
@@ -72,7 +74,7 @@ public class WxdOptionalSslHandler extends ByteToMessageDecoder implements Seria
             sslHandler = new WxdSslHandler(sslEngine);
             ctx.pipeline().replace(this, newSslHandlerName(), sslHandler);
             sslHandler = null;
-            ChannelUtil.attr(ctx.channel(), "ssl", true);
+            ChannelUtil.attr(ctx.channel(), SSL_KEY, true);
         } finally {
             // Since the SslHandler was not inserted into the pipeline the ownership of the SSLEngine was not
             // transferred to the SslHandler.

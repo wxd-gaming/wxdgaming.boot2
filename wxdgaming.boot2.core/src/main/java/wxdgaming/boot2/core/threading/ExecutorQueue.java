@@ -1,7 +1,7 @@
 package wxdgaming.boot2.core.threading;
 
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.GlobalUtil;
+import wxdgaming.boot2.core.util.GlobalUtil;
 
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicBoolean;

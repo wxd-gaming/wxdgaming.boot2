@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  **/
 @Getter
 @Setter
-public class SocketConfig extends ObjectBase {
+public class SocketServerConfig extends ObjectBase {
 
     private boolean debug = false;
     private int port = 8080;

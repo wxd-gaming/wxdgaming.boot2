@@ -6,8 +6,11 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.NioFactory;
+import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
+import wxdgaming.boot2.starter.net.server.rpc.RpcListenerFactory;
 import wxdgaming.boot2.starter.net.server.ssl.WxdOptionalSslHandler;
 
 import java.io.Closeable;
@@ -24,16 +27,20 @@ import java.io.IOException;
 @Getter
 public class SocketServer implements Closeable, AutoCloseable {
 
-    protected SocketConfig socketConfig;
+    protected SocketServerConfig socketServerConfig;
     protected ServerBootstrap bootstrap;
     protected ChannelFuture future;
     protected Channel serverChannel;
 
-    public SocketServer(SocketConfig socketConfig) {
-        this.socketConfig = socketConfig;
+    public SocketServer(SocketServerConfig socketServerConfig) {
+        if (log.isDebugEnabled()) {
+            log.debug("socket server config: {}", socketServerConfig.toJsonString());
+        }
+        this.socketServerConfig = socketServerConfig;
     }
 
-    public void start() {
+    @Start
+    public void start(HttpListenerFactory httpListenerFactory, RpcListenerFactory rpcListenerFactory) {
         bootstrap = new ServerBootstrap().group(NioFactory.bossThreadGroup(), NioFactory.workThreadGroup())
                 /*channel方法用来创建通道实例(NioServerSocketChannel类来实例化一个进来的链接)*/
                 .channel(NioFactory.serverSocketChannelClass())
@@ -57,20 +64,20 @@ public class SocketServer implements Closeable, AutoCloseable {
                     @Override
                     public void initChannel(SocketChannel socketChannel) throws Exception {
                         ChannelPipeline pipeline = socketChannel.pipeline();
-                        if (socketConfig.isDebug()) {
+                        if (socketServerConfig.isDebug()) {
                             pipeline.addLast("logging", new LoggingHandler("DEBUG"));// 设置log监听器，并且日志级别为debug，方便观察运行流程
                         }
 
-                        pipeline.addFirst(new WxdOptionalSslHandler(socketConfig.sslContext()));
+                        pipeline.addFirst(new WxdOptionalSslHandler(socketServerConfig.sslContext()));
 
                         /*设置读取空闲*/
-                        pipeline.addLast("idleHandler", socketConfig.idleStateHandler());
+                        pipeline.addLast("idleHandler", socketServerConfig.idleStateHandler());
                         /* socket 选择器 区分是tcp websocket http*/
-                        pipeline.addLast("socket-choose-handler", new SocketServerChooseHandler(socketConfig));
+                        pipeline.addLast("socket-choose-handler", new SocketServerChooseHandler(socketServerConfig));
                         /*处理链接*/
-                        pipeline.addLast("device-handler", new SocketServerDeviceHandler(socketConfig));
+                        pipeline.addLast("device-handler", new SocketServerDeviceHandler(socketServerConfig));
                         /*解码消息*/
-                        pipeline.addLast("decode", new MessageDecode(socketConfig) {});
+                        pipeline.addLast("decode", new MessageDecode(socketServerConfig, httpListenerFactory) {});
                         /*解码消息*/
                         pipeline.addLast("encode", new MessageEncode() {});
                         addChanelHandler(socketChannel, pipeline);
@@ -78,9 +85,10 @@ public class SocketServer implements Closeable, AutoCloseable {
 
                 });
 
-        future = bootstrap.bind(socketConfig.getPort());
+        future = bootstrap.bind(socketServerConfig.getPort());
         future.syncUninterruptibly();
         serverChannel = future.channel();
+        log.info("SocketServer started at port {}", socketServerConfig.getPort());
     }
 
     @Override public void close() throws IOException {

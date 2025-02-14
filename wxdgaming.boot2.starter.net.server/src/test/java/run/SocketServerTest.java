@@ -2,8 +2,10 @@ package run;
 
 import wxdgaming.boot2.core.threading.ExecutorConfig;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
-import wxdgaming.boot2.starter.net.server.SocketConfig;
 import wxdgaming.boot2.starter.net.server.SocketServer;
+import wxdgaming.boot2.starter.net.server.SocketServerConfig;
+import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
+import wxdgaming.boot2.starter.net.server.rpc.RpcListenerFactory;
 
 import java.util.Scanner;
 
@@ -14,13 +16,15 @@ import java.util.Scanner;
  * @version: 2025-02-13 16:18
  **/
 public class SocketServerTest {
+
     public static void main(String[] args) {
         ExecutorUtil.init(new ExecutorConfig());
-        SocketConfig socketConfig = new SocketConfig();
-        socketConfig.setEnabledHttp(false);
-        SocketServer socketServer = new SocketServer(socketConfig);
-        socketServer.start();
+        SocketServerConfig socketServerConfig = new SocketServerConfig();
+        socketServerConfig.setEnabledHttp(false);
+        SocketServer socketServer = new SocketServer(socketServerConfig);
+        socketServer.start(new HttpListenerFactory(), new RpcListenerFactory());
         Scanner scanner = new Scanner(System.in);
         String s = scanner.nextLine();
     }
+
 }

@@ -1,0 +1,26 @@
+{
+  "executor": {
+    "defaultCoreSize": 2,
+    "defaultMaxSize": 4,
+    "logicCoreSize": 10,
+    "logicMaxSize": 32,
+    "virtualCoreSize": 100,
+    "virtualMaxSize": 200
+  },
+  "socket.server": {
+    "debug": false,
+    "port": 8080,
+    "enabledHttp": true,
+    "enabledWebSocket": false,
+    "idleTimeout": 0,
+    "maxAggregatorLength": 64,
+    "maxFrameBytes": -1,
+    "maxFrameLength": -1,
+    "readTimeout": 0,
+    "sslKeyStorePath": "",
+    "sslPasswordPath": "",
+    "sslProtocolType": null,
+    "webSocketPrefix": "",
+    "writeTimeout": 0
+  }
+}

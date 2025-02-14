@@ -1,8 +1,9 @@
 package wxdgaming.boot2.starter.net.server;
 
 
+import wxdgaming.boot2.core.BootConfig;
+import wxdgaming.boot2.core.ServiceModule;
 import wxdgaming.boot2.core.reflect.ReflectContext;
-import wxdgaming.boot2.starter.ServiceModule;
 
 /**
  * socket 模块
@@ -17,7 +18,13 @@ public class SocketModule extends ServiceModule {
     }
 
     @Override protected void bind() throws Throwable {
+        SocketServerConfig serverConfig = BootConfig.getIns().getObject("socket.server", SocketServerConfig.class);
+        if (serverConfig != null) {
+            SocketServer server = new SocketServer(serverConfig);
+            bindSingleton(SocketServer.class, server);
 
+
+        }
     }
 
 }

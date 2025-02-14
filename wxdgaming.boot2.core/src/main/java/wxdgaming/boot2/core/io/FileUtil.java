@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wxdgaming.boot2.core.JvmUtil;
+import wxdgaming.boot2.core.util.JvmUtil;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.lang.Tuple2;
 import wxdgaming.boot2.core.reflect.ReflectContext;
@@ -116,6 +116,7 @@ public class FileUtil implements Serializable {
         return resources;
     }
 
+    /** 所有jar包的资源名称 */
     public static List<String> jarResources() throws Exception {
         List<String> resourcesPath = new ArrayList<>();
         String x = JvmUtil.javaClassPath();

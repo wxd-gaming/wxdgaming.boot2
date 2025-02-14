@@ -15,7 +15,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.JvmUtil;
 
 import java.io.Serializable;
 import java.net.InetSocketAddress;

@@ -2,7 +2,6 @@ package wxdgaming.boot2.core.util;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.GlobalUtil;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.function.*;
 import wxdgaming.boot2.core.reflect.MethodUtil;

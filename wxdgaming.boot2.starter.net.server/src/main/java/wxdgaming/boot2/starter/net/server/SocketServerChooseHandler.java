@@ -27,10 +27,10 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
     /** WebSocket握手的协议前缀 */
     private static final String WEBSOCKET_PREFIX = "GET /";
 
-    final SocketConfig socketConfig;
+    final SocketServerConfig socketServerConfig;
 
-    public SocketServerChooseHandler(SocketConfig socketConfig) {
-        this.socketConfig = socketConfig;
+    public SocketServerChooseHandler(SocketServerConfig socketServerConfig) {
+        this.socketServerConfig = socketServerConfig;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
     }
 
     public void websocketAdd(ChannelHandlerContext ctx) {
-        int maxContentLength = (int) BytesUnit.Mb.toBytes(socketConfig.getMaxAggregatorLength());
+        int maxContentLength = (int) BytesUnit.Mb.toBytes(socketServerConfig.getMaxAggregatorLength());
         // HttpServerCodec：将请求和应答消息解码为HTTP消息
         ctx.pipeline().addBefore("device-handler", "http-codec", new HttpServerCodec());
         /*接受完整的http消息 64mb*/
@@ -69,7 +69,7 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
         ctx.pipeline().addBefore(
                 "device-handler",
                 "ProtocolHandler",
-                new WebSocketServerProtocolHandler(socketConfig.getWebSocketPrefix(), null, false, maxContentLength)
+                new WebSocketServerProtocolHandler(socketServerConfig.getWebSocketPrefix(), null, false, maxContentLength)
         );
         ChannelUtil.session(ctx.channel()).setWebSocket(true);
     }

@@ -2,18 +2,16 @@ package wxdgaming.boot2.starter.net.server;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.AttributeKey;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.net.ByteBufUtil;
-import wxdgaming.boot2.starter.net.HttpHeadValueType;
-
-import java.nio.charset.StandardCharsets;
+import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 
 /**
  * 消息解码，收到消息处理
@@ -27,10 +25,12 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
 
     public static final AttributeKey<ByteBuf> byteBufAttributeKey = AttributeKey.<ByteBuf>valueOf("__ctx_byteBuf__");
 
-    final SocketConfig socketConfig;
+    final SocketServerConfig socketServerConfig;
+    final HttpListenerFactory httpListenerFactory;
 
-    public MessageDecode(SocketConfig socketConfig) {
-        this.socketConfig = socketConfig;
+    public MessageDecode(SocketServerConfig socketServerConfig, HttpListenerFactory httpListenerFactory) {
+        this.socketServerConfig = socketServerConfig;
+        this.httpListenerFactory = httpListenerFactory;
     }
 
     @Override
@@ -51,7 +51,7 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
     protected void channelRead0(ChannelHandlerContext ctx, Object object) throws Exception {
         switch (object) {
             case WebSocketFrame webSocketFrame -> {
-                if (!socketConfig.isEnabledWebSocket()) {
+                if (!socketServerConfig.isEnabledWebSocket()) {
                     if (log.isDebugEnabled()) {
                         log.debug("{} 不支持 WebSocket 服务 {}", ChannelUtil.ctxTostring(ctx), object.getClass().getName());
                     }
@@ -65,7 +65,7 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
             }
             case HttpRequest httpRequest -> {
                 FullHttpRequest fullHttpRequest = (FullHttpRequest) object;
-                if (!socketConfig.isEnabledHttp()) {
+                if (!socketServerConfig.isEnabledHttp()) {
                     if (log.isDebugEnabled()) {
                         log.debug("{} 不支持 Http 服务 {}", ChannelUtil.ctxTostring(ctx), fullHttpRequest.uri());
                     }
@@ -73,25 +73,7 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
                     ctx.close();
                     return;
                 }
-                ByteBuf byteBuf = ByteBufUtil.pooledByteBuf(300).writeBytes("ok".getBytes(StandardCharsets.UTF_8));
-                DefaultFullHttpResponse response = new DefaultFullHttpResponse(fullHttpRequest.protocolVersion(), HttpResponseStatus.OK, byteBuf);
-                response.headers().set(HttpHeaderNames.CONTENT_TYPE, HttpHeadValueType.Text);
-                response.headers().set(HttpHeaderNames.CONTENT_LENGTH, byteBuf.readableBytes());
-                boolean keepAlive = HttpUtil.isKeepAlive(fullHttpRequest);
-                if (keepAlive) {
-                    response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-                } else {
-                    /* TODO 非复用的连接池 */
-                    response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
-                }
-                ctx
-                        .writeAndFlush(response)
-                        .addListener((ChannelFutureListener) future1 -> {
-                            if (!keepAlive) {
-                                /* TODO 非复用的连接池 */
-                                ctx.disconnect();
-                            }
-                        });
+                httpListenerFactory.dispatch(ctx, fullHttpRequest);
                 break;
             }
             case ByteBuf byteBuf -> {

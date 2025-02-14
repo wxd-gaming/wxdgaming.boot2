@@ -12,10 +12,10 @@ import io.netty.channel.ChannelHandlerContext;
 @ChannelHandler.Sharable
 public class SocketServerDeviceHandler extends SocketDeviceHandler {
 
-    final SocketConfig socketConfig;
+    final SocketServerConfig socketServerConfig;
 
-    public SocketServerDeviceHandler(SocketConfig socketConfig) {
-        this.socketConfig = socketConfig;
+    public SocketServerDeviceHandler(SocketServerConfig socketServerConfig) {
+        this.socketServerConfig = socketServerConfig;
     }
 
     @Override public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
@@ -26,8 +26,8 @@ public class SocketServerDeviceHandler extends SocketDeviceHandler {
                 ctx.channel(),
                 ChannelUtil.attr(ctx.channel(), ChannelUtil.WEB_SOCKET_SESSION_KEY)
         );
-        socketSession.setMaxFrameBytes(socketConfig.getMaxFrameBytes());
-        socketSession.setMaxFrameLength(socketConfig.getMaxFrameLength());
+        socketSession.setMaxFrameBytes(socketServerConfig.getMaxFrameBytes());
+        socketSession.setMaxFrameLength(socketServerConfig.getMaxFrameLength());
     }
 
 }

@@ -1,4 +1,4 @@
-package wxdgaming.boot2.core;
+package wxdgaming.boot2.core.util;
 
 
 import ch.qos.logback.core.LogbackUtil;

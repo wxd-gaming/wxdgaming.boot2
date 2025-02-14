@@ -3,8 +3,8 @@ package wxdgaming.boot2.core.threading;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.AnnUtil;
-import wxdgaming.boot2.core.GlobalUtil;
+import wxdgaming.boot2.core.util.AnnUtil;
+import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.core.chatset.StringUtils;
 
 import java.lang.reflect.Method;

@@ -1,11 +1,12 @@
 package wxdgaming.boot2.core.threading;
 
+import ch.qos.logback.core.LogbackUtil;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wxdgaming.boot2.core.GlobalUtil;
 import wxdgaming.boot2.core.lang.Tick;
 import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.boot2.core.util.GlobalUtil;
 
 import java.io.Serializable;
 import java.util.*;
@@ -39,6 +40,10 @@ public final class ExecutorUtil implements Serializable {
     @Getter private static IExecutorServices virtualExecutor = null;
 
     public static void init(ExecutorConfig config) {
+        Logger logger = LogbackUtil.logger();
+        if (logger.isDebugEnabled()) {
+            logger.debug("ExecutorUtil init config: {}", config.toJsonString());
+        }
         defaultExecutor = newExecutorServices("default-executor", config.getDefaultCoreSize(), config.getDefaultMaxSize());
         logicExecutor = newExecutorServices("logic-executor", config.getLogicCoreSize(), config.getLogicMaxSize());
         virtualExecutor = newExecutorVirtualServices("virtual-executor", config.getVirtualCoreSize(), config.getVirtualMaxSize());
@@ -164,7 +169,7 @@ public final class ExecutorUtil implements Serializable {
 
         protected GuardThread() {
             super("guard-thread");
-            setDaemon(true);
+            setPriority(Thread.MIN_PRIORITY);
             start();
         }
 
@@ -197,7 +202,7 @@ public final class ExecutorUtil implements Serializable {
 
         public TimerThread() {
             super("timer-executor");
-            this.setDaemon(true);
+            setPriority(6);
             start();
         }
 

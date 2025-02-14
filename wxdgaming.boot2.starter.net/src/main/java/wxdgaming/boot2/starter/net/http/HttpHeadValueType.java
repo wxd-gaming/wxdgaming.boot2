@@ -1,4 +1,4 @@
-package wxdgaming.boot2.starter.net;
+package wxdgaming.boot2.starter.net.http;
 
 import lombok.Getter;
 import wxdgaming.boot2.core.io.FileUtil;

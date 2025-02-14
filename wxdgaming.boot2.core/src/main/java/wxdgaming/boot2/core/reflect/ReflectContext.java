@@ -6,9 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.slf4j.LoggerFactory;
-import wxdgaming.boot2.core.AnnUtil;
 import wxdgaming.boot2.core.Throw;
+import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.io.FileReadUtil;
+import wxdgaming.boot2.core.util.AnnUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -41,6 +42,7 @@ public class ReflectContext {
                 parameterTypes[i] = args[i].getClass();
             }
             Constructor<R> constructor = cls.getConstructor(parameterTypes);
+            constructor.setAccessible(true);
             return constructor.newInstance(args);
         } catch (Exception e) {
             throw Throw.of(e);
@@ -96,6 +98,31 @@ public class ReflectContext {
         Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
         return (Class) params[index];
     }
+
+    /** 根据 {@link Sort} 注解排序，如果值相同使用类名值排序 */
+    public static Comparator<Class<?>> ComparatorClassBySort = new Comparator<Class<?>>() {
+        @Override public int compare(Class<?> o1, Class<?> o2) {
+            int o1Sort = AnnUtil.annOpt(o1, Sort.class).map(Sort::value).orElse(999999);
+            int o2Sort = AnnUtil.annOpt(o2, Sort.class).map(Sort::value).orElse(999999);
+            if (o1Sort == o2Sort) {
+                /*如果排序值相同，采用名字排序*/
+                return o1.getName().compareTo(o2.getName());
+            }
+            return Integer.compare(o1Sort, o2Sort);
+        }
+    };
+
+    public static Comparator<Class<?>> comparatorMethod = new Comparator<Class<?>>() {
+        @Override public int compare(Class<?> o1, Class<?> o2) {
+            int o1Sort = AnnUtil.annOpt(o1, Sort.class).map(Sort::value).orElse(999999);
+            int o2Sort = AnnUtil.annOpt(o2, Sort.class).map(Sort::value).orElse(999999);
+            if (o1Sort == o2Sort) {
+                /*如果排序值相同，采用名字排序*/
+                return o1.getName().compareTo(o2.getName());
+            }
+            return Integer.compare(o1Sort, o2Sort);
+        }
+    };
 
     /** 所有的类 */
     private final List<Class<?>> classList;

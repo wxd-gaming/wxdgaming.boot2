@@ -13,6 +13,7 @@
         <module>wxdgaming.boot2.core</module>
         <module>wxdgaming.boot2.starter.net</module>
         <module>wxdgaming.boot2.starter.net.server</module>
+        <module>wxdgaming.game.test</module>
     </modules>
 
     <properties>
@@ -244,12 +245,12 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
-                <version>4.4</version>
+                <version>4.5.0-M3</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.13.0</version>
+                <version>3.17.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
@@ -421,16 +422,17 @@
             <artifactId>jjwt-jackson</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.carrotsearch</groupId>
-            <artifactId>hppc</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
     </dependencies>
 
