@@ -8,9 +8,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.io.Objects;
-import wxdgaming.boot2.starter.batis.DataHelper;
-import wxdgaming.boot2.starter.batis.EntityName;
-import wxdgaming.boot2.starter.batis.TableMapping;
+import wxdgaming.boot2.starter.batis.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -30,15 +28,14 @@ import java.util.function.Predicate;
 @Slf4j
 @Getter
 @Setter
-public abstract class SqlDataHelper extends DataHelper {
+public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelper<DDL> {
 
     protected final SqlConfig sqlConfig;
-    protected final SqlDDLBuilder sqlDDLBuilder;
     protected final HikariDataSource hikariDataSource;
 
-    public SqlDataHelper(SqlConfig sqlConfig, SqlDDLBuilder sqlDDLBuilder) {
+    public SqlDataHelper(SqlConfig sqlConfig, DDL ddl) {
+        super(ddl);
         this.sqlConfig = sqlConfig;
-        this.sqlDDLBuilder = sqlDDLBuilder;
         this.sqlConfig.createDatabase();
         HikariConfig config = new HikariConfig();
         config.setDriverClassName(sqlConfig.getDriverClassName());
@@ -67,7 +64,7 @@ public abstract class SqlDataHelper extends DataHelper {
         return sqlConfig.getDbName();
     }
 
-    public void checkTable(Class<?> cls) {
+    public void checkTable(Class<? extends Entity> cls) {
         TableMapping tableMapping = tableMapping(cls);
         if (tableMapping == null) {
             throw new RuntimeException("表映射关系不存在");
@@ -76,7 +73,7 @@ public abstract class SqlDataHelper extends DataHelper {
         checkTable(tableMapping, tableName, tableMapping.getTableComment());
     }
 
-    public void checkTable(Class<?> cls, String tableName, String tableComment) {
+    public void checkTable(Class<? extends Entity> cls, String tableName, String tableComment) {
         TableMapping tableMapping = tableMapping(cls);
         if (tableMapping == null) {
             throw new RuntimeException("表映射关系不存在");
@@ -106,7 +103,7 @@ public abstract class SqlDataHelper extends DataHelper {
     }
 
     protected void createTable(TableMapping tableMapping, String tableName, String comment) {
-        StringBuilder stringBuilder = sqlDDLBuilder.buildTableSqlString(tableMapping, tableName);
+        StringBuilder stringBuilder = ddlBuilder.buildTableSqlString(tableMapping, tableName);
         this.executeUpdate(stringBuilder.toString());
         log.warn("创建表：{}", tableName);
     }
@@ -115,14 +112,14 @@ public abstract class SqlDataHelper extends DataHelper {
         String sql = "ALTER TABLE %s ADD COLUMN %s %s COMMENT '%s'".formatted(
                 tableName,
                 fieldMapping.getColumnName(),
-                sqlDDLBuilder.buildColumnDefinition(fieldMapping),
+                ddlBuilder.buildColumnDefinition(fieldMapping),
                 fieldMapping.getComment()
         );
         executeUpdate(sql);
     }
 
     protected void updateColumn(String tableName, JSONObject dbColumnMapping, TableMapping.FieldMapping fieldMapping) {
-        String columnDefinition = sqlDDLBuilder.buildColumnDefinition(fieldMapping);
+        String columnDefinition = ddlBuilder.buildColumnDefinition(fieldMapping);
         String[] split = columnDefinition.split(" ");
         String columnType = split[0].toLowerCase();
         if (dbColumnMapping.getString("COLUMN_TYPE").equalsIgnoreCase(columnType)) {
@@ -285,61 +282,94 @@ public abstract class SqlDataHelper extends DataHelper {
         }
     }
 
-    @Override public <R> List<R> findAll(Class<R> cls) {
+    @Override public <R extends Entity> List<R> findAll(Class<R> cls) {
         TableMapping tableMapping = tableMapping(cls);
         return findAll(tableMapping.getTableName(), cls);
     }
 
-    @Override public <R> List<R> findAll(String tableName, Class<R> cls) {
+    @Override public <R extends Entity> List<R> findAll(String tableName, Class<R> cls) {
         TableMapping tableMapping = tableMapping(cls);
-        String sql = sqlDDLBuilder.buildSelect(tableMapping, tableMapping.getTableName());
+        String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
         List<R> ret = new ArrayList<>();
         query(sql, Objects.ZERO_ARRAY, row -> {
-            R object = sqlDDLBuilder.data2Object(tableMapping, row);
-            ret.add(object);
+            R entity = ddlBuilder.data2Object(tableMapping, row);
+            entity.setNewEntity(false);
+            ret.add(entity);
             return true;
         });
         return ret;
     }
 
-    @Override public <R> R findById(Class<R> cls, Object... args) {
+    @Override public <R extends Entity> List<R> findListBySql(Class<R> cls, String sql, Object... args) {
+        TableMapping tableMapping = tableMapping(cls);
+        List<R> ret = new ArrayList<>();
+        query(sql, args, row -> {
+            R entity = ddlBuilder.data2Object(tableMapping, row);
+            entity.setNewEntity(false);
+            ret.add(entity);
+            return true;
+        });
+        return ret;
+    }
+
+    @Override public <R extends Entity> List<R> findListByWhere(Class<R> cls, String sqlWhere, Object... args) {
+        TableMapping tableMapping = tableMapping(cls);
+        String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
+        sql += " where " + sqlWhere;
+        List<R> ret = new ArrayList<>();
+        query(sql, args, row -> {
+            R entity = ddlBuilder.data2Object(tableMapping, row);
+            entity.setNewEntity(false);
+            ret.add(entity);
+            return true;
+        });
+        return ret;
+    }
+
+    @Override public <R extends Entity> R findById(Class<R> cls, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
         return findById(tableMapping.getTableName(), cls, args);
     }
 
-    @Override public <R> R findById(String tableName, Class<R> cls, Object... args) {
+    @Override public <R extends Entity> R findById(String tableName, Class<R> cls, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
-        String sql = sqlDDLBuilder.buildSelect(tableMapping, tableMapping.getTableName());
-        String where = sqlDDLBuilder.buildKeyWhere(tableMapping);
+        String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
+        String where = ddlBuilder.buildKeyWhere(tableMapping);
         sql += " where " + where;
         AtomicReference<R> ret = new AtomicReference<>();
         this.query(sql, args, row -> {
-            R object = sqlDDLBuilder.data2Object(tableMapping, row);
-            ret.set(object);
+            R entity = ddlBuilder.data2Object(tableMapping, row);
+            entity.setNewEntity(false);
+            ret.set(entity);
             return false;
         });
         return ret.get();
     }
 
-    @Override public void insert(Object object) {
-        TableMapping tableMapping = tableMapping(object.getClass());
-        String tableName = tableMapping.getTableName();
-        if (object instanceof EntityName entity) {
-            tableName = entity.tableName();
+    @Override public boolean existBean(Entity entity) {
+        TableMapping tableMapping = tableMapping(entity.getClass());
+        String exitSql = ddlBuilder.buildExitSql(entity);
+        Integer scalar = executeScalar(exitSql, Integer.class, ddlBuilder.buildKeyParams(tableMapping, entity));
+        if (scalar != null && scalar == 1) {
+            entity.setNewEntity(false);
+            return true;
         }
-        String insert = sqlDDLBuilder.buildInsert(tableMapping, tableName);
-        Object[] insertParams = sqlDDLBuilder.buildInsertParams(tableMapping, object);
+        return false;
+    }
+
+    @Override public void insert(Entity entity) {
+        TableMapping tableMapping = tableMapping(entity.getClass());
+        String tableName = TableMapping.beanTableName(entity);
+        String insert = ddlBuilder.buildInsert(tableMapping, tableName);
+        Object[] insertParams = ddlBuilder.buildInsertParams(tableMapping, entity);
         this.executeUpdate(insert, insertParams);
     }
 
-    @Override public void update(Object object) {
-        TableMapping tableMapping = tableMapping(object.getClass());
-        String tableName = tableMapping.getTableName();
-        if (object instanceof EntityName entity) {
-            tableName = entity.tableName();
-        }
-        String sql = sqlDDLBuilder.buildUpdate(tableMapping, tableName);
-        Object[] objects = sqlDDLBuilder.builderUpdateParams(tableMapping, object);
+    @Override public void update(Entity entity) {
+        TableMapping tableMapping = tableMapping(entity.getClass());
+        String tableName = TableMapping.beanTableName(entity);
+        String sql = ddlBuilder.buildUpdate(tableMapping, tableName);
+        Object[] objects = ddlBuilder.builderUpdateParams(tableMapping, entity);
         this.executeUpdate(sql, objects);
     }
 

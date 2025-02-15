@@ -2,6 +2,8 @@ package wxdgaming.boot2.starter.batis.sql.pgsql;
 
 import wxdgaming.boot2.core.util.AnnUtil;
 import wxdgaming.boot2.starter.batis.ColumnType;
+import wxdgaming.boot2.starter.batis.Entity;
+import wxdgaming.boot2.starter.batis.EntityName;
 import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlDDLBuilder;
 import wxdgaming.boot2.starter.batis.sql.ann.Partition;
@@ -85,5 +87,19 @@ public class PgSqlDDLBuilder extends SqlDDLBuilder {
             return "?::json";
         }
         return super.build$$(fieldMapping);
+    }
+
+    @Override public String buildExitSql(Entity entity) {
+        TableMapping tableMapping = tableMapping(entity.getClass());
+        String tableName = TableMapping.beanTableName(entity);
+        return tableMapping.getExitSql().computeIfAbsent(
+                tableName,
+                k -> {
+                    String sql = "select 1 as \"exits\" from " + tableName;
+                    String where = buildKeyWhere(tableMapping);
+                    sql += " where " + where;
+                    return sql;
+                }
+        );
     }
 }

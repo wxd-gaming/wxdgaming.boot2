@@ -52,6 +52,7 @@ public class PgsqlTest {
         dataHelper.insert(entityTest);
         entityTest.getList().add("测试1");
         dataHelper.update(entityTest);
+        dataHelper.save(entityTest);
     }
 
     @Test

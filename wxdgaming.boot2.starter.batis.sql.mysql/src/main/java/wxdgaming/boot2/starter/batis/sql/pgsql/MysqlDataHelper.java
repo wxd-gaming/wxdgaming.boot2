@@ -23,7 +23,7 @@ import java.util.Map;
 @Slf4j
 @Getter
 @Setter
-public class MysqlDataHelper extends SqlDataHelper {
+public class MysqlDataHelper extends SqlDataHelper<MySqlDDLBuilder> {
 
     public MysqlDataHelper(SqlConfig sqlConfig) {
         super(sqlConfig, new MySqlDDLBuilder());
@@ -48,7 +48,7 @@ public class MysqlDataHelper extends SqlDataHelper {
                         """.formatted(getDbName(), tableName, keyName);
                 Integer scalar = executeScalar(checkIndexSql, Integer.class);
                 if (scalar == null || scalar != 1) {
-                    String alterColumn = sqlDDLBuilder.buildAlterColumnIndex(tableName, fieldMapping);
+                    String alterColumn = ddlBuilder.buildAlterColumnIndex(tableName, fieldMapping);
                     executeUpdate(alterColumn);
                     log.warn("mysql 数据库 {}，新增索引：{}", getSqlConfig().getDbName(), keyName);
                 }

@@ -12,7 +12,7 @@ import wxdgaming.boot2.starter.batis.ann.DbColumn;
  **/
 @Getter
 @Setter
-public class EntityIntegerUID implements EntityUID<Integer> {
+public class EntityIntegerUID extends Entity implements EntityUID<Integer> {
 
     @DbColumn(key = true)
     private Integer uid;

@@ -8,9 +8,6 @@ import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +21,7 @@ import java.util.Map;
 @Slf4j
 @Getter
 @Setter
-public class PgsqlDataHelper extends SqlDataHelper {
+public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
 
     public PgsqlDataHelper(SqlConfig sqlConfig) {
         super(sqlConfig, new PgSqlDDLBuilder());
@@ -100,7 +97,7 @@ public class PgsqlDataHelper extends SqlDataHelper {
                 String checkIndexSql = "SELECT 1 as exists FROM pg_indexes WHERE tablename = '%s' AND indexname = '%s';".formatted(tableName, keyName);
                 Integer scalar = executeScalar(checkIndexSql, Integer.class);
                 if (scalar == null || scalar != 1) {
-                    String alterColumn = sqlDDLBuilder.buildAlterColumnIndex(tableName, fieldMapping);
+                    String alterColumn = ddlBuilder.buildAlterColumnIndex(tableName, fieldMapping);
                     executeUpdate(alterColumn);
                     log.warn("pgsql 数据库 {}，新增索引：{}", getSqlConfig().getDbName(), keyName);
                 }
@@ -113,7 +110,7 @@ public class PgsqlDataHelper extends SqlDataHelper {
     }
 
     @Override protected void createTable(TableMapping tableMapping, String tableName, String comment) {
-        StringBuilder stringBuilder = sqlDDLBuilder.buildTableSqlString(tableMapping, tableName);
+        StringBuilder stringBuilder = ddlBuilder.buildTableSqlString(tableMapping, tableName);
         this.executeUpdate(stringBuilder.toString());
         this.executeUpdate("COMMENT ON TABLE \"%s\" IS '%s';".formatted(tableName, comment));
         log.warn("创建表：{}", tableName);
@@ -135,14 +132,14 @@ public class PgsqlDataHelper extends SqlDataHelper {
         String sql = "ALTER TABLE %s ADD COLUMN %s %s;".formatted(
                 tableName,
                 fieldMapping.getColumnName(),
-                sqlDDLBuilder.buildColumnDefinition(fieldMapping)
+                ddlBuilder.buildColumnDefinition(fieldMapping)
         );
         executeUpdate(sql);
         updateColumnComment(tableName, fieldMapping);
     }
 
     @Override protected void updateColumn(String tableName, JSONObject dbColumnMapping, TableMapping.FieldMapping fieldMapping) {
-        String columnDefinition = sqlDDLBuilder.buildColumnDefinition(fieldMapping);
+        String columnDefinition = ddlBuilder.buildColumnDefinition(fieldMapping);
         String[] split = columnDefinition.split(" ");
         String columnType = split[0].toLowerCase();
         if (columnType.equalsIgnoreCase(dbColumnMapping.getString("column_type"))) {

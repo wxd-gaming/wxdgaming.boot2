@@ -53,6 +53,7 @@ public class MysqlTest {
         entityTest.getList().add("测试1");
         entityTest.setDatas(new byte[100]);
         dataHelper.update(entityTest);
+        dataHelper.save(entityTest);
     }
 
     @Test

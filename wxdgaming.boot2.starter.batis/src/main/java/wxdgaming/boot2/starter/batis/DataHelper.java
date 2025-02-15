@@ -5,8 +5,6 @@ import lombok.Setter;
 
 import java.sql.Connection;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 数据集
@@ -16,26 +14,99 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 @Getter
 @Setter
-public abstract class DataHelper {
+public abstract class DataHelper<DDL extends DDLBuilder> {
 
-    protected final Map<Class<?>, TableMapping> tableMappings = new ConcurrentHashMap<>();
+    protected DDL ddlBuilder;
+
+    public DataHelper(DDL ddlBuilder) {
+        this.ddlBuilder = ddlBuilder;
+    }
+
+    public TableMapping tableMapping(Class<? extends Entity> cls) {
+        return ddlBuilder.tableMapping(cls);
+    }
 
     public abstract Connection connection();
 
-    public TableMapping tableMapping(Class<?> cls) {
-        return tableMappings.computeIfAbsent(cls, l -> new TableMapping(cls));
+    /** 查询表的所有数据 */
+    public abstract <R extends Entity> List<R> findAll(Class<R> cls);
+
+    /** 查询表的所有数据 */
+    public abstract <R extends Entity> List<R> findAll(String tableName, Class<R> cls);
+
+    /**
+     * 查询表数据
+     *
+     * @param cls  返回的数据实体类
+     * @param sql  查询的sql
+     * @param args 参数
+     * @param <R>  实体模型
+     * @return
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-02-16 01:13
+     */
+    public abstract <R extends Entity> List<R> findListBySql(Class<R> cls, String sql, Object... args);
+
+    /**
+     * 查询表数据
+     *
+     * @param cls      返回的数据实体类
+     * @param sqlWhere where 条件
+     * @param args     参数
+     * @param <R>      实体模型
+     * @return
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-02-16 01:14
+     */
+    public abstract <R extends Entity> List<R> findListByWhere(Class<R> cls, String sqlWhere, Object... args);
+
+    /**
+     * 根据主键值查询
+     *
+     * @param cls  返回的数据实体类
+     * @param args 参数
+     * @param <R>  实体模型
+     * @return
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-02-16 01:15
+     */
+    public abstract <R extends Entity> R findById(Class<R> cls, Object... args);
+
+    /**
+     * 根据主键值查询
+     *
+     * @param tableName 表明
+     * @param cls       返回的数据实体类
+     * @param args      参数
+     * @param <R>       实体模型
+     * @return
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-02-16 01:15
+     */
+    public abstract <R extends Entity> R findById(String tableName, Class<R> cls, Object... args);
+
+    /**
+     * 根据主键查询数据是否已经在数据库
+     *
+     * @param entity 实体对象
+     * @return
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-02-16 01:16
+     */
+    public abstract boolean existBean(Entity entity);
+
+    /** 保存数据  如果数据主键不在数据库 insert 存在数据库 update */
+    public void save(Entity entity) {
+        if (existBean(entity)) {
+            entity.setNewEntity(false);
+            update(entity);
+        } else {
+            insert(entity);
+        }
     }
 
-    public abstract <R> List<R> findAll(Class<R> cls);
+    public abstract void insert(Entity entity);
 
-    public abstract <R> List<R> findAll(String tableName, Class<R> cls);
-
-    public abstract <R> R findById(Class<R> cls, Object... args);
-
-    public abstract <R> R findById(String tableName, Class<R> cls, Object... args);
-
-    public abstract void insert(Object object);
-
-    public abstract void update(Object object);
+    public abstract void update(Entity entity);
 
 }

@@ -8,7 +8,6 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.chatset.json.ParameterizedTypeImpl;
 import wxdgaming.boot2.core.reflect.FieldUtils;
 import wxdgaming.boot2.core.reflect.MethodUtil;
-import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.core.util.AnnUtil;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
@@ -38,6 +37,11 @@ public class TableMapping {
         return tmpTableName.toLowerCase();
     }
 
+    public static String beanTableName(Object bean) {
+        if (bean instanceof EntityName entityName) return entityName.tableName().toLowerCase();
+        return tableName(bean.getClass());
+    }
+
     public static String tableComment(Class<?> cls) {
         String tmpTableComment = cls.getSimpleName();
         DbTable table = AnnUtil.ann(cls, DbTable.class);
@@ -54,13 +58,17 @@ public class TableMapping {
     private final Class<?> cls;
     private final String tableName;
     private final String tableComment;
+    /** 主键字段 */
     private final List<FieldMapping> keyFields = new ArrayList<>();
+    /** 所有的列 */
     private final LinkedHashMap<String, FieldMapping> columns = new LinkedHashMap<>();
 
     /** 完全查询 */
     private Map<String, String> selectSql = new LinkedHashMap<>();
     /** 根据主键查询 key: tableName, value: sql语句 */
     private Map<String, String> selectByKeySql = new LinkedHashMap<>();
+    /** 根据主键查询 key: tableName, value: sql语句 */
+    private Map<String, String> exitSql = new LinkedHashMap<>();
     /** 插入 key: tableName, value: sql语句 */
     private Map<String, String> insertSql = new LinkedHashMap<>();
     /** 主键列更新  key: tableName, value: sql语句 */
@@ -107,7 +115,11 @@ public class TableMapping {
             fieldMapping.columnName = fieldMapping.columnName.toLowerCase();
             columns.put(fieldMapping.columnName, fieldMapping);
         }
+        if (keyFields.isEmpty()) {
+            throw new RuntimeException(cls + " 类不存在主键 ");
+        }
     }
+
 
     public void buildColumnType(FieldMapping fieldMapping) {
         Class<?> type = fieldMapping.getField().getType();

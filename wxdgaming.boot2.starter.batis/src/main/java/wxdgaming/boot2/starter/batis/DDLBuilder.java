@@ -2,9 +2,8 @@ package wxdgaming.boot2.starter.batis;
 
 import lombok.Getter;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 构建器
@@ -14,5 +13,11 @@ import java.sql.Statement;
  **/
 @Getter
 public abstract class DDLBuilder {
+
+    protected final Map<Class<? extends Entity>, TableMapping> tableMappings = new ConcurrentHashMap<>();
+
+    public TableMapping tableMapping(Class<? extends Entity> cls) {
+        return tableMappings.computeIfAbsent(cls, l -> new TableMapping(cls));
+    }
 
 }

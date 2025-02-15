@@ -3,9 +3,7 @@ package wxdgaming.boot2.starter.batis.sql;
 import com.alibaba.fastjson.JSONObject;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
-import wxdgaming.boot2.starter.batis.ColumnType;
-import wxdgaming.boot2.starter.batis.DDLBuilder;
-import wxdgaming.boot2.starter.batis.TableMapping;
+import wxdgaming.boot2.starter.batis.*;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -133,6 +131,21 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
     }
 
     /** insert into */
+    public String buildExitSql(Entity bean) {
+        TableMapping tableMapping = tableMapping(bean.getClass());
+        final String tableName = TableMapping.beanTableName(bean);
+        return tableMapping.getExitSql().computeIfAbsent(
+                tableName,
+                k -> {
+                    String sql = "select 1 as 'exits' from " + tableName;
+                    String where = buildKeyWhere(tableMapping);
+                    sql += " where " + where;
+                    return sql;
+                }
+        );
+    }
+
+    /** insert into */
     public String buildInsert(TableMapping tableMapping, String tableName) {
         return tableMapping.getInsertSql().computeIfAbsent(
                 tableName,
@@ -152,6 +165,14 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
                     return sql;
                 }
         );
+    }
+
+    public Object[] buildKeyParams(TableMapping tableMapping, Object bean) {
+        List<Object> params = new ArrayList<>();
+        for (TableMapping.FieldMapping fieldMapping : tableMapping.getKeyFields()) {
+            params.add(fieldMapping.toDbValue(bean));
+        }
+        return params.toArray();
     }
 
     public Object[] buildInsertParams(TableMapping tableMapping, Object bean) {

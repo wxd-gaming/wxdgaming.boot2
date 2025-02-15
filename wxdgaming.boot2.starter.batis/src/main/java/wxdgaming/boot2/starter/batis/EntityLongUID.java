@@ -14,7 +14,7 @@ import wxdgaming.boot2.starter.batis.ann.DbColumn;
  **/
 @Getter
 @Setter
-public class EntityLongUID extends ObjectBase implements EntityUID<Long> {
+public class EntityLongUID extends Entity implements EntityUID<Long> {
 
     @JSONField(ordinal = 1)
     @DbColumn(key = true)
