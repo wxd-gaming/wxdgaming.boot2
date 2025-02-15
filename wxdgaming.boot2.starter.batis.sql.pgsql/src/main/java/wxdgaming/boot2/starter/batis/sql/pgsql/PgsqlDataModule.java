@@ -21,8 +21,8 @@ public class PgsqlDataModule extends ServiceModule {
     @Override protected void bind() throws Throwable {
         SqlConfig sqlConfig = BootConfig.getIns().getObject("db.pgsql", SqlConfig.class);
         if (sqlConfig != null) {
-            PgsqlDataHelper pgsqlDataHelper = new PgsqlDataHelper(sqlConfig);
-            bindSingleton(PgsqlDataHelper.class, pgsqlDataHelper);
+            PgsqlDataHelper dataHelper = new PgsqlDataHelper(sqlConfig);
+            bindSingleton(PgsqlDataHelper.class, dataHelper);
         }
     }
 

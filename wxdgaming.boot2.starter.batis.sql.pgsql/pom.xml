@@ -13,6 +13,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+        <dependency>
             <groupId>wxdgaming.boot2</groupId>
             <artifactId>wxdgaming.boot2.core</artifactId>
             <version>${project.version}</version>
