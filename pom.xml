@@ -14,6 +14,9 @@
         <module>wxdgaming.boot2.starter.net</module>
         <module>wxdgaming.boot2.starter.net.server</module>
         <module>wxdgaming.game.test</module>
+        <module>wxdgaming.boot2.starter.batis</module>
+        <module>wxdgaming.boot2.starter.batis.sql</module>
+        <module>wxdgaming.boot2.starter.batis.sql.pgsql</module>
     </modules>
 
     <properties>
