@@ -17,6 +17,7 @@
         <module>wxdgaming.boot2.starter.batis</module>
         <module>wxdgaming.boot2.starter.batis.sql</module>
         <module>wxdgaming.boot2.starter.batis.sql.pgsql</module>
+        <module>wxdgaming.boot2.starter.batis.sql.mysql</module>
     </modules>
 
     <properties>

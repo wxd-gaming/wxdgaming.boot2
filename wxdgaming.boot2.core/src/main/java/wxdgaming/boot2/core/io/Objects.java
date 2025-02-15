@@ -20,6 +20,8 @@ import java.util.Map;
  */
 public class Objects {
 
+    public static final Object[] ZERO_ARRAY = new Objects[0];
+
     public static boolean compare(Object o1, Object o2) {
         long hashCode1 = getHashCode(o1);
         long hashCode2 = getHashCode(o2);

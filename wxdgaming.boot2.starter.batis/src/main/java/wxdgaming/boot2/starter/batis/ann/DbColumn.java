@@ -1,5 +1,7 @@
 package wxdgaming.boot2.starter.batis.ann;
 
+import wxdgaming.boot2.starter.batis.ColumnType;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 
@@ -17,14 +19,21 @@ import java.lang.annotation.ElementType;
 })
 public @interface DbColumn {
 
+    /** 忽略字段 */
+    boolean ignore() default false;
+
     boolean key() default false;
 
     boolean index() default false;
 
-    String name() default "";
+    /** 字段名字 */
+    String columnName() default "";
 
-    /** 配置 */
-    String columnDefinition() default "";
+    ColumnType columnType() default ColumnType.None;
+
+    int length() default 0;
+
+    boolean nullable() default true;
 
     /** 备注 */
     String comment() default "";

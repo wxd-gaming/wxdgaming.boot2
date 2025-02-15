@@ -22,6 +22,10 @@
             <artifactId>wxdgaming.boot2.starter.batis</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

@@ -234,7 +234,7 @@ public class ReflectContext {
 
         /** 所有的字段 */
         public Collection<Field> getFields() {
-            return FieldUtil.getFields(false, cls).values();
+            return FieldUtils.getFields(cls, false).values();
         }
 
         /** 所有的字段 */

@@ -187,7 +187,7 @@ public class GuiceReflectContext {
 
         /** 所有的字段 */
         public Collection<Field> getFields() {
-            return FieldUtil.getFields(false, t.getClass()).values();
+            return FieldUtils.getFields(t.getClass(), false).values();
         }
 
         /** 所有的字段 */

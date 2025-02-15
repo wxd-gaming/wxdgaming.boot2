@@ -1,7 +1,9 @@
 package wxdgaming.boot2.starter.batis;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
+import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 
 /**
@@ -12,8 +14,9 @@ import wxdgaming.boot2.starter.batis.ann.DbColumn;
  **/
 @Getter
 @Setter
-public class EntityLongUID implements EntityUID<Long> {
+public class EntityLongUID extends ObjectBase implements EntityUID<Long> {
 
+    @JSONField(ordinal = 1)
     @DbColumn(key = true)
     private Long uid;
 

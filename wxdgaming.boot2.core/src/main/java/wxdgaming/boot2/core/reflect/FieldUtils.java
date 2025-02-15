@@ -14,30 +14,34 @@ import java.util.Map;
  * @version: 2023-10-20 15:35
  **/
 @Slf4j
-public class FieldUtil {
+public class FieldUtils {
 
     /**
-     * 获取所有字段，排除静态属性
+     * 获取所有字段
      *
-     * @param clazz
+     * @param clazz      类
+     * @param readStatic true 读取静态字段
      * @return
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-02-15 16:26
      */
-    public static Map<String, Field> getFields(boolean readStatic, Class<?> clazz) {
+    public static Map<String, Field> getFields(Class<?> clazz, boolean readStatic) {
         Map<String, Field> mapf = new LinkedHashMap<>();
-        getFields(readStatic, clazz, mapf);
+        getFields(clazz, readStatic, mapf);
         return mapf;
     }
 
     /**
      * 获取所有字段，排除静态属性
      *
-     * @param clazz
+     * @param clazz      读取类
+     * @param readStatic true 读取静态字段
      * @param mapf
      */
-    public static void getFields(boolean readStatic, Class<?> clazz, Map<String, Field> mapf) {
+    public static void getFields(Class<?> clazz, boolean readStatic, Map<String, Field> mapf) {
         Class<?> scls = clazz.getSuperclass();
         if (scls != null && !Object.class.equals(scls)) {
-            getFields(readStatic, scls, mapf);
+            getFields(scls, readStatic, mapf);
         }
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {

@@ -15,6 +15,8 @@ import java.lang.annotation.Documented;
 })
 public @interface DbTable {
 
-    String name() default "";
+    String tableName() default "";
+
+    String tableComment() default "";
 
 }

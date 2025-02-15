@@ -20,9 +20,7 @@ public enum ColumnType {
     Float("浮点数"),
     Double("双精度浮点数"),
     String("字符串"),
-    Date("日期"),
-    Bytes("字节数组"),
-    Object("对象"),
+    Blob("二进制"),
     Json("JSON"),
     ;
 
