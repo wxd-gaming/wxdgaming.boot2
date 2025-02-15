@@ -9,6 +9,7 @@ import wxdgaming.boot2.core.reflect.GuiceReflectContext;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * 运行类
@@ -48,6 +49,14 @@ public abstract class RunApplication {
             allBindings(context.getParent(), allBindings);
         }
         allBindings.putAll(context.getAllBindings());
+    }
+
+    public <T> T getInstance(Class<T> clazz) {
+        return reflectContext.classWithSuper(clazz).findFirst().orElse(null);
+    }
+
+    public <T> Stream<T> classWithSuper(Class<T> clazz) {
+        return reflectContext.classWithSuper(clazz);
     }
 
 }

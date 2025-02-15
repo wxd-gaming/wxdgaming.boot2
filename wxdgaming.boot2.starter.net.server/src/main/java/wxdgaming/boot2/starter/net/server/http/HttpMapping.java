@@ -1,9 +1,11 @@
 package wxdgaming.boot2.starter.net.server.http;
 
 import com.google.inject.Injector;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
+import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Body;
 import wxdgaming.boot2.core.ann.Param;
 import wxdgaming.boot2.core.ann.Qualifier;
@@ -19,12 +21,31 @@ import java.lang.reflect.Type;
 @Slf4j
 public record HttpMapping(HttpRequest httpRequest, String path, Object ins, Method method) {
 
-    public void invoke(RunApplication runApplication, HttpContext context) throws Exception {
-        Object invoke = method.invoke(ins, injectorParameters(runApplication, context));
-        if (invoke != null) {
-            context.getResponse().response(invoke);
-        } else {
-            context.getResponse().response("");
+    public void invoke(RunApplication runApplication, HttpContext httpContext) {
+        try {
+            Object invoke = method.invoke(ins, injectorParameters(runApplication, httpContext));
+            if (invoke != null) {
+                httpContext.getResponse().response(invoke);
+            } else {
+                httpContext.getResponse().response("");
+            }
+        } catch (Throwable e) {
+            StringBuilder stringBuilder = httpContext.showLog();
+            stringBuilder
+                    .append("=============================================异常================================================")
+                    .append("\n")
+                    .append(Throw.ofString(e))
+                    .append("\n=============================================结束================================================")
+                    .append("\n");
+            log.error(
+                    "{}",
+                    stringBuilder
+            );
+            stringBuilder.setLength(0);
+            httpContext.getResponse().setStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+            httpContext.getResponse().response("server error");
+        } finally {
+            httpContext.close();
         }
     }
 

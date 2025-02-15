@@ -10,6 +10,7 @@ import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
+import wxdgaming.boot2.starter.net.server.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.rpc.RpcListenerFactory;
 import wxdgaming.boot2.starter.net.server.ssl.WxdOptionalSslHandler;
 
@@ -40,7 +41,7 @@ public class SocketServer implements Closeable, AutoCloseable {
     }
 
     @Start
-    public void start(HttpListenerFactory httpListenerFactory, RpcListenerFactory rpcListenerFactory) {
+    public void start(ProtoListenerFactory protoListenerFactory, RpcListenerFactory rpcListenerFactory, HttpListenerFactory httpListenerFactory) {
         bootstrap = new ServerBootstrap().group(NioFactory.bossThreadGroup(), NioFactory.workThreadGroup())
                 /*channel方法用来创建通道实例(NioServerSocketChannel类来实例化一个进来的链接)*/
                 .channel(NioFactory.serverSocketChannelClass())
@@ -77,7 +78,7 @@ public class SocketServer implements Closeable, AutoCloseable {
                         /*处理链接*/
                         pipeline.addLast("device-handler", new SocketServerDeviceHandler(socketServerConfig));
                         /*解码消息*/
-                        pipeline.addLast("decode", new MessageDecode(socketServerConfig, httpListenerFactory) {});
+                        pipeline.addLast("decode", new MessageDecode(socketServerConfig, protoListenerFactory, httpListenerFactory) {});
                         /*解码消息*/
                         pipeline.addLast("encode", new MessageEncode() {});
                         addChanelHandler(socketChannel, pipeline);

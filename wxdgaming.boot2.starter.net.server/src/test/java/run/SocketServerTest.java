@@ -5,6 +5,7 @@ import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.starter.net.server.SocketServer;
 import wxdgaming.boot2.starter.net.server.SocketServerConfig;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
+import wxdgaming.boot2.starter.net.server.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.rpc.RpcListenerFactory;
 
 import java.util.Scanner;
@@ -22,7 +23,7 @@ public class SocketServerTest {
         SocketServerConfig socketServerConfig = new SocketServerConfig();
         socketServerConfig.setEnabledHttp(false);
         SocketServer socketServer = new SocketServer(socketServerConfig);
-        socketServer.start(new HttpListenerFactory(), new RpcListenerFactory());
+        socketServer.start(new ProtoListenerFactory(), new RpcListenerFactory(), new HttpListenerFactory());
         Scanner scanner = new Scanner(System.in);
         String s = scanner.nextLine();
     }

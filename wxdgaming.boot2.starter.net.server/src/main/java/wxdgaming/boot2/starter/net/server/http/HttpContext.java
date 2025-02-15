@@ -73,8 +73,9 @@ public class HttpContext implements AutoCloseable {
                         .append("\n").append(request.httpMethod()).append(" ").append(request.getCompleteUri())
                         .append("\nSession：").append(NioFactory.getCtxName(this.ctx)).append(" ").append("; Remote-Host：").append(this.getRemoteAddress()).append("; Local-Host：").append(this.getLocalAddress())
                         .append(";\nContent-type：").append(request.getReqContentType())
+                        .append(";\nkeepAlive：").append(HttpContext.this.getRequest().keepAlive())
                         .append(";\n").append(HttpHeaderNames.COOKIE).append("：").append(request.header(HttpHeaderNames.COOKIE))
-                        .append(";\n参数：").append(request.getReqContent());
+                        .append(";\n参数：").append(request.getReqContent()).append("\n");
             }
         }
         return showLogStringBuilder;
@@ -129,7 +130,7 @@ public class HttpContext implements AutoCloseable {
             this.init();
         }
 
-        @Override public void close() throws Exception {
+        @Override public void close() {
             try {
                 if (httpDecoder != null) {
                     httpDecoder.cleanFiles();
@@ -281,6 +282,10 @@ public class HttpContext implements AutoCloseable {
                    && reqContentType.toLowerCase().contains("multipart");
         }
 
+        public boolean keepAlive() {
+            return HttpUtil.isKeepAlive(fullHttpRequest);
+        }
+
         public JSONObject getReqParams() {
             if (reqParams == null) {
                 reqParams = MapOf.newJSONObject();
@@ -298,21 +303,34 @@ public class HttpContext implements AutoCloseable {
 
     @Getter
     @Setter
-    @Accessors(chain = true)
     public class Response implements AutoCloseable {
 
         private final CookiePack responseCookie = new CookiePack();
         private final Map<String, String> headers = new LinkedHashMap<>();
         private HttpResponseStatus status = HttpResponseStatus.OK;
-        private HttpHeadValueType httpHeadValueType = HttpHeadValueType.Text;
+        private HttpHeadValueType responseContentType;
 
 
         public Response() {
         }
 
-        public Response header(String name, String value) {
+        public void header(String name, String value) {
             this.headers.put(name, value);
-            return this;
+        }
+
+        public void responseHtml(Object string) {
+            responseContentType = HttpHeadValueType.Html;
+            response(string);
+        }
+
+        public void responseJson(Object string) {
+            responseContentType = HttpHeadValueType.Json;
+            response(string);
+        }
+
+        public void responseText(Object string) {
+            responseContentType = HttpHeadValueType.Text;
+            response(string);
         }
 
         public void response(Object data) {
@@ -324,19 +342,25 @@ public class HttpContext implements AutoCloseable {
             byte[] dataBytes;
             if (data instanceof byte[] bytes) {
                 dataBytes = bytes;
-                httpHeadValueType = HttpHeadValueType.OctetStream;
+                if (responseContentType == null)
+                    responseContentType = HttpHeadValueType.OctetStream;
             } else if (data instanceof String str) {
                 dataBytes = str.getBytes(StandardCharsets.UTF_8);
             } else if (data instanceof File file) {
                 dataBytes = FileReadUtil.readBytes(file.toPath());
                 header(HttpHeaderNames.CONTENT_DISPOSITION.toString(), "attachment;filename=" + HttpDataAction.urlEncoder(file));
                 header(HttpHeaderNames.EXPIRES.toString(), "0");
-                httpHeadValueType = HttpHeadValueType.findContentType(file);
+                if (responseContentType == null)
+                    responseContentType = HttpHeadValueType.findContentType(file);
             } else {
                 dataBytes = FastJsonUtil.toBytes(data);
-
-                httpHeadValueType = HttpHeadValueType.Json;
+                if (responseContentType == null)
+                    responseContentType = HttpHeadValueType.Json;
             }
+
+
+            if (responseContentType == null)
+                responseContentType = HttpHeadValueType.Text;
 
             boolean accept_gzip = false;
 
@@ -359,7 +383,7 @@ public class HttpContext implements AutoCloseable {
 
             DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpContext.this.getRequest().fullHttpRequest.protocolVersion(), status, byteBuf);
 
-            response.headers().set(HttpHeaderNames.CONTENT_TYPE, httpHeadValueType);
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE, responseContentType);
 
             responseCookie.serverCookie(response.headers());
 
@@ -369,9 +393,11 @@ public class HttpContext implements AutoCloseable {
             if (accept_gzip) {
                 response.headers().set(HttpHeaderNames.CONTENT_ENCODING, HttpHeaderValues.GZIP);
             }
-            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, byteBuf.readableBytes());
 
-            boolean keepAlive = HttpUtil.isKeepAlive(HttpContext.this.getRequest().fullHttpRequest);
+            int readableBytes = byteBuf.readableBytes();
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, readableBytes);
+
+            boolean keepAlive = HttpContext.this.getRequest().keepAlive();
             if (keepAlive) {
                 /* TODO 复用连接池 */
                 response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
@@ -389,16 +415,33 @@ public class HttpContext implements AutoCloseable {
                         }
                     });
 
+            if (log.isDebugEnabled()) {
+                StringBuilder showLog = showLog();
+                if (!showLog.isEmpty()) {
+                    showLog.append("=============================================输出================================================")
+                            .append("\n")
+                            .append(HttpHeaderNames.CONTENT_TYPE).append("=").append(responseContentType)
+                            .append("\n")
+                            .append(HttpHeaderNames.CONTENT_LENGTH).append("=").append(readableBytes)
+                            .append("\nbody: ")
+                            .append(data)
+                            .append("\n=============================================结束================================================")
+                            .append("\n");
+                    log.debug("{}", showLog);
+                }
+            }
+
         }
 
-        @Override public void close() throws Exception {
+        @Override public void close() {
 
         }
 
     }
 
-    @Override public void close() throws Exception {
+    @Override public void close() {
         this.request.close();
         this.response.close();
     }
+
 }

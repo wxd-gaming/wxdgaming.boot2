@@ -1,6 +1,7 @@
 package wxdgaming.boot2.starter.net.server;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -19,6 +20,7 @@ import wxdgaming.boot2.starter.net.server.pojo.PojoBase;
  **/
 @Slf4j
 @Getter
+@ChannelHandler.Sharable
 public abstract class MessageEncode extends ChannelOutboundHandlerAdapter {
 
     @Override public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {

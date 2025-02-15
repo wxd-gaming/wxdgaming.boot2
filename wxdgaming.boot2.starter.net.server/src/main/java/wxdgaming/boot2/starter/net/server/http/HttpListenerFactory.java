@@ -3,30 +3,20 @@ package wxdgaming.boot2.starter.net.server.http;
 import com.google.inject.Singleton;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
-import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.io.Objects;
-import wxdgaming.boot2.core.lang.Tuple2;
-import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.util.AnnUtil;
-import wxdgaming.boot2.starter.net.http.HttpHeadValueType;
 import wxdgaming.boot2.starter.net.server.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.server.ann.RequestMapping;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.nio.file.Path;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -39,8 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 @Singleton
 public class HttpListenerFactory {
-    /** 过期时间格式化 */
-    public static SimpleDateFormat ExpiresFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss", Locale.ENGLISH);
+
 
     private final ConcurrentHashMap<String, HttpMapping> httpMappingMap = new ConcurrentHashMap<>();
 
@@ -106,61 +95,31 @@ public class HttpListenerFactory {
     public void dispatch(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) {
         try {
             HttpContext httpContext = new HttpContext(ctx, fullHttpRequest);
+
             String uriPath = httpContext.getRequest().getUriPath();
             String lowerCase = uriPath.toLowerCase();
             HttpMapping httpMapping = httpMappingMap.get(lowerCase);
+            Method method = httpMapping == null ? null : httpMapping.method();
+            boolean allMatch = lastRunApplication
+                    .classWithSuper(HttpFilter.class)
+                    .allMatch(filter -> filter.doFilter(uriPath, method, httpContext));
+            if (!allMatch) {
+                if (httpContext.getDisconnected().get()) {
+                    httpContext.getResponse().responseJson(RunResult.error("filter"));
+                }
+                return;
+            }
             if (httpMapping == null) {
-                if (actionFile(httpContext)) {
-                    return;
-                }
-                httpContext.getResponse().setStatus(HttpResponseStatus.NOT_FOUND);
-                httpContext.getResponse().response("not found url " + httpContext.getRequest().getUriPath());
+                HttpFileEvent httpFileEvent = new HttpFileEvent(httpContext);
+                ExecutorUtil.getVirtualExecutor().execute(httpFileEvent);
             } else {
-                if (StringUtils.isNotBlank(httpMapping.httpRequest().method())) {
-                    if (!httpMapping.httpRequest().method().equalsIgnoreCase(httpContext.getRequest().httpMethod().name())) {
-                        httpContext.getResponse().setStatus(HttpResponseStatus.METHOD_NOT_ALLOWED);
-                        httpContext.getResponse().response("method not allowed");
-                        return;
-                    }
-                }
-                httpMapping.invoke(lastRunApplication, httpContext);
+                HttpListenerEvent httpListenerEvent = new HttpListenerEvent(httpMapping, lastRunApplication, httpContext);
+                httpListenerEvent.submit();
             }
         } catch (Exception e) {
             log.error("dispatch error", e);
         }
     }
 
-    public boolean actionFile(HttpContext httpContext) throws IOException {
-        String htmlPath = "html" + httpContext.getRequest().getUriPath();
-        try {
-            Tuple2<Path, byte[]> inputStream = FileUtil.findInputStream(this.getClass().getClassLoader(), htmlPath);
-            if (inputStream != null) {
-                HttpHeadValueType hct = HttpHeadValueType.findContentType(htmlPath);
-                /*如果是固有资源增加缓存效果*/
-                httpContext.getResponse().header(HttpHeaderNames.PRAGMA.toString(), "private");
-                /*过期时间10个小时*/
-                httpContext.getResponse().header(HttpHeaderNames.EXPIRES.toString(), ExpiresFormat.format(new Date(MyClock.addHourOfTime(10))) + " GMT");
-                /*过期时间10个小时*/
-                httpContext.getResponse().header(HttpHeaderNames.CACHE_CONTROL.toString(), "max-age=" + (60 * 60 * 10));
-                httpContext.getResponse().response(inputStream.getRight());
-                return true;
-            }
-            return false;
-        } catch (Exception e) {
-            final String ofString = Throw.ofString(e);
-            StringBuilder stringBuilder = httpContext.showLog();
-            stringBuilder
-                    .append(";\n=============================================输出================================================")
-                    .append("\nfile path = ").append(new File(htmlPath).getCanonicalPath())
-                    .append("\n")
-                    .append(ofString)
-                    .append("\n=============================================结束================================================")
-                    .append("\n");
-            log.warn(stringBuilder.toString());
-            stringBuilder.setLength(0);
-            httpContext.getResponse().setStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
-            httpContext.getResponse().response("server error");
-            return true;
-        }
-    }
+
 }

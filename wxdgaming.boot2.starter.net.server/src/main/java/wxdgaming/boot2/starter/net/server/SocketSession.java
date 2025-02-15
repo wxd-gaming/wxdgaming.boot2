@@ -64,6 +64,14 @@ public class SocketSession {
         return ChannelUtil.getIP(this.channel);
     }
 
+    public String getLocalAddress() {
+        return ChannelUtil.getLocalAddress(this.channel);
+    }
+
+    public String getRemoteAddress() {
+        return ChannelUtil.getRemoteAddress(this.channel);
+    }
+
     public ChannelFuture writeAndFlush(Object message) {
         return channel.writeAndFlush(message);
     }

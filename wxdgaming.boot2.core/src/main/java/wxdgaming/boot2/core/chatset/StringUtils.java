@@ -119,4 +119,58 @@ public class StringUtils {
         return new String(newChars);
     }
 
+    /**
+     * 统计字符串的hash计算方法
+     */
+    public static int hashcode(Object source) {
+        return hashcode(source, false);
+    }
+
+    /**
+     * 计算字符串的hash值
+     *
+     * @param source 需要计算hash值的字符串
+     * @param abs    是否返回绝对值
+     * @return
+     */
+    public static int hashcode(Object source, boolean abs) {
+        double h = 0.0f;
+        final String valueOf = String.valueOf(source);
+        char[] chars = valueOf.toCharArray();
+        for (char aChar : chars) {
+            double tmp;
+            if (h < 1000) {
+                tmp = (h * 0.238f);
+            } else {
+                tmp = (h * 0.00238f);
+            }
+            h = h + tmp + (int) aChar;
+        }
+        h *= 10000;
+        int code;
+        if (h < Integer.MAX_VALUE) {
+            code = (int) h;
+        } else {
+            code = Double.hashCode(h);
+        }
+        if (abs) {
+            return Math.abs(code);
+        }
+        return code;
+    }
+
+    /**
+     * @param source
+     * @param abs
+     * @param hashFactor hash 算法因子
+     * @return
+     */
+    public static int hashIndex(Object source, boolean abs, int hashFactor) {
+        final int hashcode = hashcode(source, abs);
+        return hashIndex(hashcode, hashFactor);
+    }
+
+    public static int hashIndex(long hashcode, int hashFactor) {
+        return (int) (hashcode % (int) (hashFactor * 3.8f) % hashFactor);
+    }
 }

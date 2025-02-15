@@ -2,6 +2,7 @@ package wxdgaming.boot2.starter.net.server;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -12,6 +13,8 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.net.ByteBufUtil;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
+import wxdgaming.boot2.starter.net.server.pojo.IWebSocketStringListener;
+import wxdgaming.boot2.starter.net.server.pojo.ProtoListenerFactory;
 
 /**
  * 消息解码，收到消息处理
@@ -21,15 +24,18 @@ import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
  **/
 @Slf4j
 @Getter
+@ChannelHandler.Sharable
 public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
 
     public static final AttributeKey<ByteBuf> byteBufAttributeKey = AttributeKey.<ByteBuf>valueOf("__ctx_byteBuf__");
 
     final SocketServerConfig socketServerConfig;
+    final ProtoListenerFactory protoListenerFactory;
     final HttpListenerFactory httpListenerFactory;
 
-    public MessageDecode(SocketServerConfig socketServerConfig, HttpListenerFactory httpListenerFactory) {
+    public MessageDecode(SocketServerConfig socketServerConfig, ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
         this.socketServerConfig = socketServerConfig;
+        this.protoListenerFactory = protoListenerFactory;
         this.httpListenerFactory = httpListenerFactory;
     }
 
@@ -110,7 +116,12 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
                     if (!session.checkReceiveMessage(request.length())) {
                         return;
                     }
-                    // dispatcher.getDispatcherHandler().stringDispatcher(session, request);
+                    IWebSocketStringListener instance = protoListenerFactory.getLastRunApplication().getInstance(IWebSocketStringListener.class);
+                    if (instance != null) {
+                        instance.onMessage(session, request);
+                    } else {
+                        log.warn("websocket {} 为实现 text 文本监听", session);
+                    }
                 }
                 default -> log.warn("无法处理：{}", frame.getClass().getName());
             }
@@ -153,11 +164,11 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
                 byte[] messageBytes = new byte[len - 4];
                 /*读取报文类容*/
                 byteBuf.readBytes(messageBytes);
-                SocketSession session = ChannelUtil.session(ctx.channel());
-                if (!session.checkReceiveMessage(messageBytes.length)) {
+                SocketSession socketSession = ChannelUtil.session(ctx.channel());
+                if (!socketSession.checkReceiveMessage(messageBytes.length)) {
                     return;
                 }
-                // dispatcher.dispatch(session, messageId, messageBytes);
+                protoListenerFactory.dispatch(socketSession, messageId, messageBytes);
             } else {
                 /*重新设置读取进度*/
                 byteBuf.resetReaderIndex();

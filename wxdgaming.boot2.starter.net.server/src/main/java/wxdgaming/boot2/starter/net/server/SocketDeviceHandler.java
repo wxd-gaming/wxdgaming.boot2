@@ -22,11 +22,19 @@ public abstract class SocketDeviceHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         super.channelRegistered(ctx);
+        log.debug(
+                "channel open {}",
+                ChannelUtil.getLocalAddress(ctx.channel()) + " : " + ChannelUtil.getRemoteAddress(ctx.channel())
+        );
     }
 
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
         super.channelUnregistered(ctx);
+        log.debug(
+                "channel close {}",
+                ChannelUtil.getLocalAddress(ctx.channel()) + " : " + ChannelUtil.getRemoteAddress(ctx.channel())
+        );
     }
 
     @Override

@@ -2,6 +2,7 @@ package wxdgaming.boot2.starter.net.server;
 
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * socket server 驱动
@@ -9,6 +10,7 @@ import io.netty.channel.ChannelHandlerContext;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2024-08-16 09:05
  **/
+@Slf4j
 @ChannelHandler.Sharable
 public class SocketServerDeviceHandler extends SocketDeviceHandler {
 
