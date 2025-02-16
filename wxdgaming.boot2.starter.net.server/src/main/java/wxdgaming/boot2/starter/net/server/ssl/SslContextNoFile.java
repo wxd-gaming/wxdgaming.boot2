@@ -1,4 +1,4 @@
-package wxdgaming.boot2.starter.net.ssl;
+package wxdgaming.boot2.starter.net.server.ssl;
 
 
 import wxdgaming.boot2.core.Throw;

@@ -1,4 +1,4 @@
-package wxdgaming.boot2.starter.net.http;
+package wxdgaming.boot2.starter.net.server.http;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;

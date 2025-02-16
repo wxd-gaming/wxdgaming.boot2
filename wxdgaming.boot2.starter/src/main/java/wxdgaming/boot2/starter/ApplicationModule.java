@@ -21,7 +21,6 @@ class ApplicationModule extends BaseModule {
     }
 
     @Override protected void bind() throws Throwable {
-        bindSingleton(RunApplicationMain.class);
         ExecutorConfig executorConfig = BootConfig.getIns().getExecutorConfig();
         ExecutorUtil.init(executorConfig);
     }

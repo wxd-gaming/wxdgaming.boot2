@@ -8,7 +8,6 @@ import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.lang.Tuple2;
 import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.boot2.starter.net.http.HttpHeadValueType;
 
 import java.io.File;
 import java.nio.file.Path;

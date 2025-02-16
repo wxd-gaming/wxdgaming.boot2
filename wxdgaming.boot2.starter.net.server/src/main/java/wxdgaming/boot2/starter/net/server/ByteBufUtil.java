@@ -1,4 +1,4 @@
-package wxdgaming.boot2.starter.net;
+package wxdgaming.boot2.starter.net.server;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;

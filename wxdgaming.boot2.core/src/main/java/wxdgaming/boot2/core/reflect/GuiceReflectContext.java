@@ -127,15 +127,8 @@ public class GuiceReflectContext {
                 /*实现注入*/
                 Value value = parameter.getAnnotation(Value.class);
                 if (value != null) {
-                    String name = value.name();
-                    Object o = BootConfig.getIns().getObject(name, clazz);
-                    if (o == null && !value.defaultValue().isBlank()) {
-                        o = value.defaultValue();
-                    }
-                    if (value.required() && o == null) {
-                        throw new RuntimeException("value:" + name + " is null");
-                    }
-                    params[i] = o;
+                    Object valued = BootConfig.getIns().value(value, clazz);
+                    params[i] = clazz.cast(valued);
                     continue;
                 }
 

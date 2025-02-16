@@ -40,7 +40,7 @@ public class WxdApplication {
 
             ReflectContext reflectContext = ReflectContext.Builder.of(finalPackages).build();
 
-            Stream<Class<? extends BaseModule>> moduleStream = reflectContext.classWithSuper(ApplicationModule.class).map(v -> v);
+            Stream<Class<? extends BaseModule>> moduleStream = Stream.empty();
 
             moduleStream = Stream.concat(moduleStream, reflectContext.classWithSuper(ServiceModule.class));
             moduleStream = Stream.concat(moduleStream, reflectContext.classWithSuper(UserModule.class));
@@ -48,10 +48,14 @@ public class WxdApplication {
             List<BaseModule> collect = moduleStream
                     .map(cls -> ReflectContext.newInstance(cls, reflectContext))
                     .collect(Collectors.toList());
+            collect.addFirst(new ApplicationModule(reflectContext));
+            collect.add(new SingletonModule(reflectContext));
 
             Injector injector = Guice.createInjector(Stage.PRODUCTION, collect);
             RunApplicationMain runApplication = injector.getInstance(RunApplicationMain.class);
+
             runApplication.init();
+
             runApplication.getReflectContext()
                     .withMethodAnnotated(Init.class)
                     .forEach(GuiceReflectContext.ContentMethod::invoke);

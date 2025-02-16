@@ -57,8 +57,6 @@ public abstract class BaseModule extends AbstractModule {
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
-
-        bindClassWithAnnotated(Singleton.class);
     }
 
     protected abstract void bind() throws Throwable;

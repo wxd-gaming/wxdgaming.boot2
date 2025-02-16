@@ -4,6 +4,7 @@ import com.google.inject.Binding;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import lombok.Getter;
+import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
 
 import java.util.HashMap;
@@ -41,7 +42,20 @@ public abstract class RunApplication {
         } catch (Exception e) {
             throw Throw.of(e);
         }
+
         reflectContext = new GuiceReflectContext(this, hashMap.values());
+        reflectContext.stream().forEach(content -> {
+            content.fieldWithAnnotated(Value.class).forEach(field -> {
+                Object valued = BootConfig.getIns().value(field.getAnnotation(Value.class), field.getType());
+                try {
+                    if (valued != null) {
+                        field.set(content.getT(), valued);
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        });
     }
 
     static void allBindings(Injector context, Map<Key<?>, Binding<?>> allBindings) {

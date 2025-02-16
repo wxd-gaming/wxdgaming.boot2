@@ -2,6 +2,8 @@ package wxdgaming.boot2.core;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
+import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.lang.Tuple2;
 import wxdgaming.boot2.core.threading.ExecutorConfig;
@@ -31,6 +33,24 @@ public class BootConfig {
     }
 
     private JSONObject config = new JSONObject(true);
+
+    public <R> R value(Value value, Class<R> type) {
+        /*实现注入*/
+        String name = value.name();
+        R r;
+        try {
+            r = BootConfig.getIns().getObject(name, type);
+            if (r == null && !value.defaultValue().isBlank()) {
+                r = FastJsonUtil.parse(value.defaultValue(), type);
+            }
+        } catch (Exception e) {
+            throw Throw.of("参数：" + name, e);
+        }
+        if (value.required() && r == null) {
+            throw new RuntimeException("value:" + name + " is null");
+        }
+        return r;
+    }
 
     public boolean isDebug() {
         return config.getBooleanValue("debug");

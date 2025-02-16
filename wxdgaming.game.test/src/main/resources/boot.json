@@ -22,5 +22,23 @@
     "sslProtocolType": null,
     "webSocketPrefix": "",
     "writeTimeout": 0
+  },
+  "db.mysql": {
+    "debug": true,
+    "driverClassName": "com.mysql.cj.jdbc.Driver",
+    "maxPoolSize": 20,
+    "minPoolSize": 5,
+    "password": "test",
+    "url": "jdbc:mysql://192.168.137.10:3306/test2",
+    "username": "root"
+  },
+  "db.pgsql": {
+    "debug": true,
+    "driverClassName": "org.postgresql.Driver",
+    "maxPoolSize": 20,
+    "minPoolSize": 5,
+    "password": "test",
+    "url": "jdbc:postgresql://192.168.137.10:5432/test2",
+    "username": "postgres"
   }
 }

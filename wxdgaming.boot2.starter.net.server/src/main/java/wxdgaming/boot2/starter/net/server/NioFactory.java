@@ -1,4 +1,4 @@
-package wxdgaming.boot2.starter.net;
+package wxdgaming.boot2.starter.net.server;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;

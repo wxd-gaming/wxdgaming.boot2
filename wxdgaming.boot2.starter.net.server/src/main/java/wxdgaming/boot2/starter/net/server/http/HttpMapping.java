@@ -11,6 +11,7 @@ import wxdgaming.boot2.core.ann.Param;
 import wxdgaming.boot2.core.ann.Qualifier;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
 import wxdgaming.boot2.starter.net.server.ann.HttpRequest;
 
@@ -79,15 +80,8 @@ public record HttpMapping(HttpRequest httpRequest, String path, Object ins, Meth
                 {
                     Value value = parameter.getAnnotation(Value.class);
                     if (value != null) {
-                        String name = value.name();
-                        Object o = BootConfig.getIns().getObject(name, clazz);
-                        if (o == null && !value.defaultValue().isBlank()) {
-                            o = value.defaultValue();
-                        }
-                        if (value.required() && o == null) {
-                            throw new RuntimeException("value:" + name + " is null");
-                        }
-                        params[i] = o;
+                        Object valued = BootConfig.getIns().value(value, clazz);
+                        params[i] = clazz.cast(valued);
                         continue;
                     }
                 }
@@ -96,9 +90,14 @@ public record HttpMapping(HttpRequest httpRequest, String path, Object ins, Meth
                     Param param = parameter.getAnnotation(Param.class);
                     if (param != null) {
                         String name = param.name();
-                        Object o = context.getRequest().getReqParams().getObject(name, clazz);
-                        if (o == null && !param.defaultValue().isBlank()) {
-                            o = param.defaultValue();
+                        Object o;
+                        try {
+                            o = context.getRequest().getReqParams().getObject(name, clazz);
+                            if (o == null && !param.defaultValue().isBlank()) {
+                                o = FastJsonUtil.parse(param.defaultValue(), type);
+                            }
+                        } catch (Exception e) {
+                            throw Throw.of("参数：" + name, e);
                         }
                         if (param.required() && o == null) {
                             throw new RuntimeException("param:" + name + " is null");

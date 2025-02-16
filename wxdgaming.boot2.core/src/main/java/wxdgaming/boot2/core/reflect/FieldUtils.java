@@ -48,6 +48,9 @@ public class FieldUtils {
             if (!readStatic && Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
+            try {
+                field.setAccessible(true);
+            } catch (Exception ignore) {}
             mapf.put(field.getName(), field);
         }
     }

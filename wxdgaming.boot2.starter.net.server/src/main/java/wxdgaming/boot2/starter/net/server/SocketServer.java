@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.util.BytesUnit;
-import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 import wxdgaming.boot2.starter.net.server.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.rpc.RpcListenerFactory;

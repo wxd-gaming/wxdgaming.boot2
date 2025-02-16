@@ -26,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>wxdgaming.boot2</groupId>
-            <artifactId>wxdgaming.boot2.starter.net</artifactId>
+            <artifactId>wxdgaming.boot2.core</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

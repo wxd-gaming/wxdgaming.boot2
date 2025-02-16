@@ -9,7 +9,6 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.starter.net.ByteBufUtil;
 import wxdgaming.boot2.starter.net.server.pojo.PojoBase;
 
 /**

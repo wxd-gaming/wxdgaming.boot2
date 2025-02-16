@@ -11,7 +11,6 @@ import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.AttributeKey;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.starter.net.ByteBufUtil;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 import wxdgaming.boot2.starter.net.server.pojo.IWebSocketStringListener;
 import wxdgaming.boot2.starter.net.server.pojo.ProtoListenerFactory;

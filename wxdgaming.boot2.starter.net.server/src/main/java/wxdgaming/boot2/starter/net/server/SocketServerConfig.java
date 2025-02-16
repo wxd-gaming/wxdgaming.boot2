@@ -4,8 +4,8 @@ import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.lang.ObjectBase;
-import wxdgaming.boot2.starter.net.ssl.SslContextByJks;
-import wxdgaming.boot2.starter.net.ssl.SslProtocolType;
+import wxdgaming.boot2.starter.net.server.ssl.SslContextByJks;
+import wxdgaming.boot2.starter.net.server.ssl.SslProtocolType;
 
 import javax.net.ssl.SSLContext;
 import java.util.concurrent.TimeUnit;

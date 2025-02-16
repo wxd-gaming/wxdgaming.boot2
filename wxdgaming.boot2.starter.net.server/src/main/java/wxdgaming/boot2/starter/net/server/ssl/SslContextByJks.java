@@ -1,4 +1,4 @@
-package wxdgaming.boot2.starter.net.ssl;
+package wxdgaming.boot2.starter.net.server.ssl;
 
 
 import lombok.extern.slf4j.Slf4j;
