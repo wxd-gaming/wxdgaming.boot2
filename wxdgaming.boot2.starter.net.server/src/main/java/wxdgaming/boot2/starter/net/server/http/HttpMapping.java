@@ -31,11 +31,12 @@ public record HttpMapping(HttpRequest httpRequest, String path, Object ins, Meth
                 httpContext.getResponse().response("");
             }
         } catch (Throwable e) {
+            Throwable throwable = e.getCause();
             StringBuilder stringBuilder = httpContext.showLog();
             stringBuilder
                     .append("=============================================异常================================================")
                     .append("\n")
-                    .append(Throw.ofString(e))
+                    .append(Throw.ofString(throwable))
                     .append("\n=============================================结束================================================")
                     .append("\n");
             log.error(
@@ -89,7 +90,7 @@ public record HttpMapping(HttpRequest httpRequest, String path, Object ins, Meth
                 {
                     Param param = parameter.getAnnotation(Param.class);
                     if (param != null) {
-                        String name = param.name();
+                        String name = param.value();
                         Object o;
                         try {
                             o = context.getRequest().getReqParams().getObject(name, clazz);

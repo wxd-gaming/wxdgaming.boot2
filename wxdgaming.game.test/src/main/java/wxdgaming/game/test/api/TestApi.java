@@ -24,7 +24,7 @@ public class TestApi {
                         @Value(name = "executor") ExecutorConfig executorConfig,
                         @Value(name = "executor1", required = false) ExecutorConfig executorConfig1,
                         @Body(defaultValue = "1") String body,
-                        @Param(name = "b1", defaultValue = "2") int b1) {
+                        @Param(value = "b1", defaultValue = "2") int b1) {
         return "index";
     }
 
@@ -33,7 +33,7 @@ public class TestApi {
                           @Value(name = "executor") ExecutorConfig executorConfig,
                           @Value(name = "executor1", required = false) ExecutorConfig executorConfig1,
                           @Body(defaultValue = "1") String body,
-                          @Param(name = "b1", defaultValue = "2") String b1) {
+                          @Param(value = "b1", defaultValue = "2") String b1) {
         return RunResult.ok();
     }
 
@@ -42,7 +42,7 @@ public class TestApi {
                         @Value(name = "executor") ExecutorConfig executorConfig,
                         @Value(name = "executor1", required = false) ExecutorConfig executorConfig1,
                         @Body(defaultValue = "1") String body,
-                        @Param(name = "b1", defaultValue = "2") String b1) {
+                        @Param(value = "b1", defaultValue = "2") String b1) {
         throw new RuntimeException("d");
     }
 

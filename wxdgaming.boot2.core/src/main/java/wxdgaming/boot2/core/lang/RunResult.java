@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.lang;
 
 import com.alibaba.fastjson.JSONObject;
+import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 
 import java.util.Map;
 
@@ -11,6 +12,9 @@ import java.util.Map;
  * @version: 2025-02-15 10:49
  **/
 public class RunResult extends JSONObject {
+    public static RunResult parse(String json) {
+        return FastJsonUtil.parse(json, RunResult.class);
+    }
 
     public static RunResult ok() {
         return new RunResult().fluentPut("code", 1).fluentPut("msg", "ok");
@@ -32,8 +36,18 @@ public class RunResult extends JSONObject {
         return getIntValue("code");
     }
 
+    public RunResult code(int code) {
+        put("code", code);
+        return this;
+    }
+
     public String msg() {
         return getString("msg");
+    }
+
+    public RunResult msg(String message) {
+        put("msg", message);
+        return this;
     }
 
     public JSONObject data() {
@@ -42,6 +56,11 @@ public class RunResult extends JSONObject {
 
     public <R> R data(Class<R> clazz) {
         return getObject("data", clazz);
+    }
+
+    public RunResult data(Object data) {
+        put("data", data);
+        return this;
     }
 
     @Override public RunResult fluentPut(String key, Object value) {

@@ -9,14 +9,16 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>wxdgaming.boot2.starter</module>
         <module>wxdgaming.boot2.core</module>
-        <module>wxdgaming.boot2.starter.net.server</module>
-        <module>wxdgaming.game.test</module>
+        <module>wxdgaming.boot2.starter</module>
         <module>wxdgaming.boot2.starter.batis</module>
         <module>wxdgaming.boot2.starter.batis.sql</module>
         <module>wxdgaming.boot2.starter.batis.sql.pgsql</module>
         <module>wxdgaming.boot2.starter.batis.sql.mysql</module>
+        <module>wxdgaming.boot2.starter.net</module>
+        <module>wxdgaming.boot2.starter.net.httpclient</module>
+        <module>wxdgaming.boot2.starter.net.server</module>
+        <module>wxdgaming.game.test</module>
     </modules>
 
     <properties>

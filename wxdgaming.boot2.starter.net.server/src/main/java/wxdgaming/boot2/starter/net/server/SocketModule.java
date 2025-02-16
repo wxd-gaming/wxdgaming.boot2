@@ -21,7 +21,7 @@ public class SocketModule extends ServiceModule {
         SocketServerConfig serverConfig = BootConfig.getIns().getObject("socket.server", SocketServerConfig.class);
         if (serverConfig != null) {
             SocketServer server = new SocketServer(serverConfig);
-            bindSingleton(SocketServer.class, server);
+            bindInstance(SocketServer.class, server);
 
 
         }

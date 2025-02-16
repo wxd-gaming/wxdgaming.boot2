@@ -1,5 +1,8 @@
 package wxdgaming.boot2.starter.batis.sql;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +13,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -23,15 +27,29 @@ import java.util.function.Consumer;
 @Setter
 public class SqlConfig extends ObjectBase {
 
+    @JSONField(ordinal = 1)
     private boolean debug;
+    @JSONField(ordinal = 2)
     private String driverClassName;
+    @JSONField(ordinal = 3)
     private String url;
+    @JSONField(ordinal = 4)
     private String username;
+    @JSONField(ordinal = 5)
     private String password;
+    @JSONField(ordinal = 6)
     private int minPoolSize = 5;
+    @JSONField(ordinal = 7)
     private int maxPoolSize = 20;
+    /** 单位分钟 */
+    @JSONField(ordinal = 8)
+    private int idleTimeoutM = 10;
+    @JSONField(ordinal = 9)
+    private int connectionTimeoutMs = 2000;
+    @JSONField(ordinal = 11)
+    private String scanPackage;
 
-    public String getDbName() {
+    public String dbName() {
         String dbName = url;
         int indexOf = dbName.indexOf("?");
         if (indexOf > 0) {
@@ -42,11 +60,35 @@ public class SqlConfig extends ObjectBase {
         return dbName;
     }
 
+    public HikariDataSource hikariDataSource() {
+        HikariConfig config = new HikariConfig();
+        config.setDriverClassName(getDriverClassName());
+        config.setJdbcUrl(getUrl());
+        config.setUsername(getUsername());
+        config.setPassword(getPassword());
+        config.setAutoCommit(true);
+        config.setPoolName("wxd-gaming.db");
+        config.setConnectionTimeout(connectionTimeoutMs);
+        config.setIdleTimeout(TimeUnit.MINUTES.toMillis(idleTimeoutM));
+        config.setValidationTimeout(TimeUnit.SECONDS.toMillis(10));
+        config.setKeepaliveTime(TimeUnit.MINUTES.toMillis(3));/*连接存活时间，这个值必须小于 maxLifetime 值。*/
+        config.setMaxLifetime(TimeUnit.MINUTES.toMillis(6));/*池中连接最长生命周期。*/
+        config.setMinimumIdle(getMinPoolSize());/*池中最小空闲连接数，包括闲置和使用中的连接。*/
+        config.setMaximumPoolSize(getMaxPoolSize());/*池中最大连接数，包括闲置和使用中的连接。*/
+        config.setConnectionTestQuery("SELECT 1");
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        config.addDataSourceProperty("autoReconnect", "true");
+        config.addDataSourceProperty("characterEncoding", "utf-8");
+        return new HikariDataSource(config);
+    }
+
     /** 创建数据库 , 吃方法创建数据库后会自动使用 use 语句 */
     public void createDatabase() {
         if (url.contains("jdbc:mysql")) {
-            String dbName = getDbName();
-            try (Connection connection = getConnection("INFORMATION_SCHEMA")) {
+            String dbName = dbName();
+            try (Connection connection = connection("INFORMATION_SCHEMA")) {
                 Consumer<String> stringConsumer = (character) -> {
                     String databaseString = "CREATE DATABASE IF NOT EXISTS `%s` DEFAULT CHARACTER SET %s COLLATE %s_unicode_ci"
                             .formatted(dbName.toLowerCase(), character, character);
@@ -71,8 +113,8 @@ public class SqlConfig extends ObjectBase {
                 log.error("mysql 创建数据库 {}", dbName, e);
             }
         } else if (url.contains("jdbc:postgresql:")) {
-            String dbName = getDbName();
-            try (Connection connection = getConnection("postgres"); Statement statement = connection.createStatement()) {
+            String dbName = dbName();
+            try (Connection connection = connection("postgres"); Statement statement = connection.createStatement()) {
                 String formatted = "SELECT 1 as t FROM pg_database WHERE datname = '%s'".formatted(dbName);
                 ResultSet resultSet = statement.executeQuery(formatted);
                 if (resultSet.next()) {
@@ -87,11 +129,11 @@ public class SqlConfig extends ObjectBase {
         }
     }
 
-    public Connection getConnection(String databaseName) {
+    public Connection connection(String databaseName) {
         try {
             Class.forName(getDriverClassName());
             return DriverManager.getConnection(
-                    url.replace(getDbName(), databaseName),
+                    url.replace(dbName(), databaseName),
                     username,
                     password
             );
@@ -100,5 +142,10 @@ public class SqlConfig extends ObjectBase {
         }
     }
 
-
+    public SqlConfig clone(String dbName) {
+        SqlConfig clone = (SqlConfig) super.clone();
+        String replace = clone.url.replace(dbName(), dbName);
+        clone.setUrl(replace);
+        return clone;
+    }
 }

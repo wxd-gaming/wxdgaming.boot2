@@ -112,13 +112,15 @@ public class ReflectContext {
         }
     };
 
-    public static Comparator<Class<?>> comparatorMethod = new Comparator<Class<?>>() {
-        @Override public int compare(Class<?> o1, Class<?> o2) {
-            int o1Sort = AnnUtil.annOpt(o1, Sort.class).map(Sort::value).orElse(999999);
-            int o2Sort = AnnUtil.annOpt(o2, Sort.class).map(Sort::value).orElse(999999);
+
+    /** 根据 {@link Sort} 注解排序，如果值相同使用类名值排序 */
+    public static Comparator<Object> ComparatorBeanBySort = new Comparator<Object>() {
+        @Override public int compare(Object o1, Object o2) {
+            int o1Sort = AnnUtil.annOpt(o1.getClass(), Sort.class).map(Sort::value).orElse(999999);
+            int o2Sort = AnnUtil.annOpt(o2.getClass(), Sort.class).map(Sort::value).orElse(999999);
             if (o1Sort == o2Sort) {
                 /*如果排序值相同，采用名字排序*/
-                return o1.getName().compareTo(o2.getName());
+                return o1.getClass().getName().compareTo(o2.getClass().getName());
             }
             return Integer.compare(o1Sort, o2Sort);
         }
@@ -128,7 +130,9 @@ public class ReflectContext {
     private final List<Class<?>> classList;
 
     public ReflectContext(Collection<Class<?>> classList) {
-        this.classList = new ArrayList<>(classList);
+        ArrayList<Class<?>> classes = new ArrayList<>(classList);
+        classes.sort(ComparatorClassBySort);
+        this.classList = List.copyOf(classes);
     }
 
     /** 所有的类 */

@@ -10,10 +10,12 @@ import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.collection.SetOf;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
 import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.util.JvmUtil;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,8 +28,15 @@ import java.util.stream.Stream;
 @Slf4j
 public class WxdApplication {
 
+    static final AtomicBoolean isRunning = new AtomicBoolean();
+
     public static RunApplication run(Class<?>... classes) {
+        if (isRunning.get()) {
+            throw new RuntimeException("boot2-starter is running");
+        }
         try {
+            log.info("boot2-starter is starting");
+            isRunning.set(true);
             BootConfig.getIns().loadConfig();
 
             String[] packages = Arrays.stream(classes).map(Class::getPackageName).toArray(String[]::new);
@@ -63,6 +72,12 @@ public class WxdApplication {
             runApplication.getReflectContext()
                     .withMethodAnnotated(Start.class)
                     .forEach(GuiceReflectContext.ContentMethod::invoke);
+
+            JvmUtil.addShutdownHook(() -> {
+                runApplication.getReflectContext()
+                        .withMethodAnnotated(Close.class)
+                        .forEach(GuiceReflectContext.ContentMethod::invoke);
+            });
 
             log.info("boot2-starter is running");
             return runApplication;

@@ -25,7 +25,8 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
     /** 默认暗号长度为23 */
     private static final int MAX_LENGTH = 23;
     /** WebSocket握手的协议前缀 */
-    private static final String WEBSOCKET_PREFIX = "GET /";
+    private static final String WEBSOCKET_PREFIX_GET = "GET /";
+    private static final String WEBSOCKET_PREFIX_POST = "POST /";
 
     final SocketServerConfig socketServerConfig;
 
@@ -36,7 +37,7 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         String protocol = getBufStart(in);
-        if (protocol.startsWith(WEBSOCKET_PREFIX)) {
+        if (protocol.startsWith(WEBSOCKET_PREFIX_GET) || protocol.startsWith(WEBSOCKET_PREFIX_POST)) {
             websocketAdd(ctx);
         }
         in.resetReaderIndex();
@@ -56,6 +57,7 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
     }
 
     public void websocketAdd(ChannelHandlerContext ctx) {
+        ChannelUtil.attr(ctx.channel(), "http", true);
         int maxContentLength = (int) BytesUnit.Mb.toBytes(socketServerConfig.getMaxAggregatorLength());
         // HttpServerCodec：将请求和应答消息解码为HTTP消息
         ctx.pipeline().addBefore("device-handler", "http-codec", new HttpServerCodec());

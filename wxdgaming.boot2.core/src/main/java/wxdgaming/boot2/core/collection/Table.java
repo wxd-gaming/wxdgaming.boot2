@@ -141,4 +141,8 @@ public class Table<K1, K2, V> implements Serializable, Data2Json {
         return remove;
     }
 
+    public boolean isEmpty() {
+        return nodes.isEmpty();
+    }
+
 }

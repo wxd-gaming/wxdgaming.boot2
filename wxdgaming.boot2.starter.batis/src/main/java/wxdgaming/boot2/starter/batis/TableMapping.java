@@ -210,7 +210,7 @@ public class TableMapping {
                 }
                 if (object != null) {
                     switch (columnType) {
-                        case Json -> {
+                        case String, Json -> {
                             if (!(object instanceof String)) {
                                 object = FastJsonUtil.toJson(object, FastJsonUtil.Writer_Features_Type_Name_NOT_ROOT);
                             }

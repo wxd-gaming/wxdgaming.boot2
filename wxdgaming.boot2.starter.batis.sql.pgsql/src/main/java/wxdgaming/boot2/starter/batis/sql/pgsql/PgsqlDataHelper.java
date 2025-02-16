@@ -27,6 +27,10 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
         super(sqlConfig, new PgSqlDDLBuilder());
     }
 
+    @Override public void initBatch() {
+        this.sqlDataBatch = new PgsqlDataBatch(this);
+    }
+
     @Override public Map<String, String> getDbTableMap() {
         Map<String, String> dbTableMap = new LinkedHashMap<>();
         String sql = """
@@ -99,7 +103,7 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
                 if (scalar == null || scalar != 1) {
                     String alterColumn = ddlBuilder.buildAlterColumnIndex(tableName, fieldMapping);
                     executeUpdate(alterColumn);
-                    log.warn("pgsql 数据库 {}，新增索引：{}", getSqlConfig().getDbName(), keyName);
+                    log.warn("pgsql 数据库 {}，新增索引：{}", getSqlConfig().dbName(), keyName);
                 }
             }
         }
@@ -111,7 +115,9 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
 
     @Override protected void createTable(TableMapping tableMapping, String tableName, String comment) {
         StringBuilder stringBuilder = ddlBuilder.buildTableSqlString(tableMapping, tableName);
-        this.executeUpdate(stringBuilder.toString());
+        String string = stringBuilder.toString();
+        string = ddlBuilder.buildSql$$(string);
+        this.executeUpdate(string);
         this.executeUpdate("COMMENT ON TABLE \"%s\" IS '%s';".formatted(tableName, comment));
         log.warn("创建表：{}", tableName);
     }
@@ -120,20 +126,19 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
         String partition_table_name = tableName + "_" + from;
         if (getDbTableMap().containsKey(partition_table_name))
             return;
-        String string = """
-                CREATE TABLE %s PARTITION OF %s
-                    FOR VALUES FROM (%s) TO (%s);
-                """.formatted(partition_table_name, tableName, from, to);
+        String string = "CREATE TABLE \"%s\" PARTITION OF \"%s\" FOR VALUES FROM (%s) TO (%s);"
+                .formatted(partition_table_name, tableName, from, to);
         executeUpdate(string);
-        log.info("数据库 {} 表 {} 创建分区 {}", sqlConfig.getDbName(), tableName, partition_table_name);
+        log.info("数据库 {} 表 {} 创建分区 {}", sqlConfig.dbName(), tableName, partition_table_name);
     }
 
     @Override protected void addColumn(String tableName, TableMapping.FieldMapping fieldMapping) {
-        String sql = "ALTER TABLE %s ADD COLUMN %s %s;".formatted(
-                tableName,
-                fieldMapping.getColumnName(),
-                ddlBuilder.buildColumnDefinition(fieldMapping)
-        );
+        String sql = "ALTER TABLE \"%s\" ADD COLUMN \"%s\" %s;"
+                .formatted(
+                        tableName,
+                        fieldMapping.getColumnName(),
+                        ddlBuilder.buildColumnDefinition(fieldMapping)
+                );
         executeUpdate(sql);
         updateColumnComment(tableName, fieldMapping);
     }
@@ -145,21 +150,23 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
         if (columnType.equalsIgnoreCase(dbColumnMapping.getString("column_type"))) {
             return;
         }
-        String sql = "ALTER TABLE %s ALTER COLUMN %s TYPE %s;".formatted(
-                tableName,
-                fieldMapping.getColumnName(),
-                columnDefinition
-        );
+        String sql = "ALTER TABLE \"%s\" ALTER COLUMN \"%s\" TYPE %s;"
+                .formatted(
+                        tableName,
+                        fieldMapping.getColumnName(),
+                        columnDefinition
+                );
         executeUpdate(sql);
         updateColumnComment(tableName, fieldMapping);
     }
 
     protected void updateColumnComment(String tableName, TableMapping.FieldMapping fieldMapping) {
-        String sql = "COMMENT ON COLUMN %s.%s IS '%s';".formatted(
-                tableName,
-                fieldMapping.getColumnName(),
-                fieldMapping.getComment()
-        );
+        String sql = "COMMENT ON COLUMN \"%s\".\"%s\" IS '%s';"
+                .formatted(
+                        tableName,
+                        fieldMapping.getColumnName(),
+                        fieldMapping.getComment()
+                );
         executeUpdate(sql);
     }
 

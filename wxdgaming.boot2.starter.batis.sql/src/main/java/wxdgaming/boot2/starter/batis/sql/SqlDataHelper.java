@@ -6,9 +6,12 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.io.Objects;
+import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.starter.batis.*;
+import wxdgaming.boot2.starter.batis.ann.DbTable;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -32,36 +35,35 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
 
     protected final SqlConfig sqlConfig;
     protected final HikariDataSource hikariDataSource;
+    protected SqlDataBatch sqlDataBatch;
 
     public SqlDataHelper(SqlConfig sqlConfig, DDL ddl) {
         super(ddl);
         this.sqlConfig = sqlConfig;
         this.sqlConfig.createDatabase();
-        HikariConfig config = new HikariConfig();
-        config.setDriverClassName(sqlConfig.getDriverClassName());
-        config.setJdbcUrl(sqlConfig.getUrl());
-        config.setUsername(sqlConfig.getUsername());
-        config.setPassword(sqlConfig.getPassword());
-        config.setAutoCommit(true);
-        config.setPoolName("wxd.db");
-        config.setConnectionTimeout(2000);
-        config.setIdleTimeout(TimeUnit.MINUTES.toMillis(10));
-        config.setValidationTimeout(TimeUnit.SECONDS.toMillis(10));
-        config.setKeepaliveTime(TimeUnit.MINUTES.toMillis(3));/*连接存活时间，这个值必须小于 maxLifetime 值。*/
-        config.setMaxLifetime(TimeUnit.MINUTES.toMillis(6));/*池中连接最长生命周期。*/
-        config.setMinimumIdle(sqlConfig.getMinPoolSize());/*池中最小空闲连接数，包括闲置和使用中的连接。*/
-        config.setMaximumPoolSize(sqlConfig.getMaxPoolSize());/*池中最大连接数，包括闲置和使用中的连接。*/
-        config.setConnectionTestQuery("SELECT 1");
-        config.addDataSourceProperty("cachePrepStmts", "true");
-        config.addDataSourceProperty("prepStmtCacheSize", "250");
-        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        config.addDataSourceProperty("autoReconnect", "true");
-        config.addDataSourceProperty("characterEncoding", "utf-8");
-        this.hikariDataSource = new HikariDataSource(config);
+        this.hikariDataSource = sqlConfig.hikariDataSource();
+        if (StringUtils.isNotBlank(sqlConfig.getScanPackage())) {
+            ReflectContext.Builder.of(sqlConfig.getScanPackage()).build()
+                    .classWithAnnotated(DbTable.class)
+                    .forEach(cls -> {
+                        if (!Entity.class.isAssignableFrom(cls)) {
+                            throw new RuntimeException(cls + " not super " + Entity.class);
+                        }
+
+                        checkTable((Class<? extends Entity>) cls);
+                    });
+        }
+        initBatch();
+    }
+
+    public abstract void initBatch();
+
+    public <SDB extends SqlDataBatch> SDB dataBatch() {
+        return (SDB) sqlDataBatch;
     }
 
     public String getDbName() {
-        return sqlConfig.getDbName();
+        return sqlConfig.dbName();
     }
 
     public void checkTable(Class<? extends Entity> cls) {
@@ -189,6 +191,35 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         }
     }
 
+    @Override public <R extends Entity> int tableCount(Class<R> cls) {
+        String tableName = TableMapping.tableName(cls);
+        return tableCount(tableName);
+    }
+
+    @Override public <R extends Entity> int tableCount(Class<R> cls, String where, Object... args) {
+        String tableName = TableMapping.tableName(cls);
+        return tableCount(tableName, where, args);
+    }
+
+    @Override public int tableCount(String tableName) {
+        String sql = "SELECT COUNT(*) FROM %s".formatted(tableName);
+        Integer scalar = executeScalar(sql, Integer.class);
+        if (scalar == null)
+            return 0;
+        return scalar;
+    }
+
+    @Override public int tableCount(String tableName, String where, Object... args) {
+        String sql = "SELECT COUNT(*) FROM %s".formatted(tableName);
+        if (StringUtils.isNotBlank(where)) {
+            sql += " WHERE " + where;
+        }
+        Integer scalar = executeScalar(sql, Integer.class, args);
+        if (scalar == null)
+            return 0;
+        return 0;
+    }
+
     public int executeUpdate(String sql, Object... params) {
         try (Connection connection = connection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             if (params != null) {
@@ -242,8 +273,11 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         this.queryResultSet(sql, params, resultSet -> {
             try {
                 JSONObject jsonObject = new JSONObject();
-                for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-                    jsonObject.put(resultSet.getMetaData().getColumnName(i), resultSet.getObject(i));
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                    String columnName = metaData.getColumnName(i);
+                    Object columnValue = resultSet.getObject(i);
+                    jsonObject.put(columnName, columnValue);
                 }
                 if (!consumer.test(jsonObject))
                     return false;
@@ -336,6 +370,20 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
         String where = ddlBuilder.buildKeyWhere(tableMapping);
         sql += " where " + where;
+        AtomicReference<R> ret = new AtomicReference<>();
+        this.query(sql, args, row -> {
+            R entity = ddlBuilder.data2Object(tableMapping, row);
+            entity.setNewEntity(false);
+            ret.set(entity);
+            return false;
+        });
+        return ret.get();
+    }
+
+    @Override public <R extends Entity> R findByWhere(Class<R> cls, String sqlWhere, Object... args) {
+        TableMapping tableMapping = tableMapping(cls);
+        String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
+        sql += " where " + sqlWhere;
         AtomicReference<R> ret = new AtomicReference<>();
         this.query(sql, args, row -> {
             R entity = ddlBuilder.data2Object(tableMapping, row);

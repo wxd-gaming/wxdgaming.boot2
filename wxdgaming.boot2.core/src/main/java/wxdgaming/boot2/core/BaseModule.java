@@ -41,7 +41,12 @@ public abstract class BaseModule extends AbstractModule {
         bind(father).to(son).in(Singleton.class);
     }
 
-    public <B> void bindSingleton(Class<B> clazz, B instance) {
+    public void bindInstance(Object instance) {
+        Class aClass = instance.getClass();
+        bindInstance(aClass, instance);
+    }
+
+    public void bindInstance(Class clazz, Object instance) {
         log.debug("bind instance {} {} clazz={} instance={}", this.getClass().getName(), this.hashCode(), clazz, instance.getClass());
         bind(clazz).toInstance(instance);
     }

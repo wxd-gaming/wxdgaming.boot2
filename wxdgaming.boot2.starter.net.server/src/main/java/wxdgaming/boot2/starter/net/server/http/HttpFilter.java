@@ -1,5 +1,7 @@
 package wxdgaming.boot2.starter.net.server.http;
 
+import wxdgaming.boot2.starter.net.server.ann.HttpRequest;
+
 import java.lang.reflect.Method;
 
 /**
@@ -10,6 +12,6 @@ import java.lang.reflect.Method;
  **/
 public abstract class HttpFilter {
 
-    public abstract boolean doFilter(String url, Method method, HttpContext httpContext);
+    public abstract boolean doFilter(HttpRequest httpRequest, Method method, String url, HttpContext httpContext);
 
 }

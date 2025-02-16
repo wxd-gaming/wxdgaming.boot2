@@ -13,8 +13,8 @@ import java.lang.annotation.ElementType;
 })
 public @interface Param {
 
-    /** 属性名字 */
-    String name();
+    /** 属性名字 path */
+    String value();
 
     /** 必须 */
     boolean required() default true;

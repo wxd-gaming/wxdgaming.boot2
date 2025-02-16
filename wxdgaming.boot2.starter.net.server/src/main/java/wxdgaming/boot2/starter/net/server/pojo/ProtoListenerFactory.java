@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
@@ -65,6 +66,7 @@ public class ProtoListenerFactory {
     }
 
     @Init
+    @Sort(6)
     public void init(RunApplication runApplication) {
         lastRunApplication = runApplication;
         runApplication.getReflectContext()

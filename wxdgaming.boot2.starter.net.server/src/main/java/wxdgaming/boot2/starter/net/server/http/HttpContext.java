@@ -18,6 +18,9 @@ import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.core.zip.GzipUtil;
+import wxdgaming.boot2.starter.net.http.CookiePack;
+import wxdgaming.boot2.starter.net.http.HttpDataAction;
+import wxdgaming.boot2.starter.net.http.HttpHeadValueType;
 import wxdgaming.boot2.starter.net.server.NioFactory;
 import wxdgaming.boot2.starter.net.server.ssl.WxdOptionalSslHandler;
 

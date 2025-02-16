@@ -8,9 +8,6 @@ import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -27,6 +24,10 @@ public class MysqlDataHelper extends SqlDataHelper<MySqlDDLBuilder> {
 
     public MysqlDataHelper(SqlConfig sqlConfig) {
         super(sqlConfig, new MySqlDDLBuilder());
+    }
+
+    @Override public void initBatch() {
+        this.sqlDataBatch = new MysqlDataBatch(this);
     }
 
     @Override public void checkTable(Map<String, LinkedHashMap<String, JSONObject>> databseTableMap, TableMapping tableMapping, String tableName, String tableComment) {
@@ -50,7 +51,7 @@ public class MysqlDataHelper extends SqlDataHelper<MySqlDDLBuilder> {
                 if (scalar == null || scalar != 1) {
                     String alterColumn = ddlBuilder.buildAlterColumnIndex(tableName, fieldMapping);
                     executeUpdate(alterColumn);
-                    log.warn("mysql 数据库 {}，新增索引：{}", getSqlConfig().getDbName(), keyName);
+                    log.warn("mysql 数据库 {}，新增索引：{}", getSqlConfig().dbName(), keyName);
                 }
             }
         }
@@ -77,7 +78,7 @@ public class MysqlDataHelper extends SqlDataHelper<MySqlDDLBuilder> {
                     ALTER TABLE %s ADD PARTITION (PARTITION %s_%s VALUES LESS THAN (%s))
                     """.formatted(tableName, tableName, partitionExpr, partitionExpr);
             executeUpdate(string);
-            log.info("数据库 {} 表 {} 创建分区 {}", sqlConfig.getDbName(), tableName, partitionExpr);
+            log.info("数据库 {} 表 {} 创建分区 {}", sqlConfig.dbName(), tableName, partitionExpr);
         }
     }
 }

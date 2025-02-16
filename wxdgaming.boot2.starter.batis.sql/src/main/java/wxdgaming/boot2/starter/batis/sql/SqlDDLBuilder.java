@@ -1,7 +1,6 @@
 package wxdgaming.boot2.starter.batis.sql;
 
 import com.alibaba.fastjson.JSONObject;
-import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.starter.batis.*;
 
@@ -20,15 +19,15 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
 
     public StringBuilder buildTableSqlString(TableMapping tableMapping, String tableName) {
         StringBuilder sb = new StringBuilder();
-        sb.append("CREATE TABLE ").append(tableName).append(" (").append("\n");
+        sb.append("CREATE TABLE `").append(tableName).append("` (").append("\n");
         for (TableMapping.FieldMapping fieldMapping : tableMapping.getColumns().values()) {
-            sb.append(fieldMapping.getColumnName()).append(" ").append(buildColumnDefinition(fieldMapping)).append(",").append("\n");
+            sb.append("`").append(fieldMapping.getColumnName()).append("`").append(" ").append(buildColumnDefinition(fieldMapping)).append(",").append("\n");
         }
         List<TableMapping.FieldMapping> keyFields = tableMapping.getKeyFields();
         sb.append("PRIMARY KEY (");
         for (int i = 0; i < keyFields.size(); i++) {
             TableMapping.FieldMapping keyField = keyFields.get(i);
-            sb.append(keyField.getColumnName());
+            sb.append("`").append(keyField.getColumnName()).append("`");
             if (i < keyFields.size() - 1) {
                 sb.append(",");
             }
@@ -107,15 +106,22 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
         return "?";
     }
 
+    public String buildSql$$(String sql) {
+        return sql;
+    }
+
     public String buildSelectKeyWhere(TableMapping tableMapping, String tableName) {
         return tableMapping.getSelectByKeySql().computeIfAbsent(
                 tableName,
-                k -> buildSelect(tableMapping, tableName) + " where " + buildKeyWhere(tableMapping)
+                k -> buildSql$$(buildSelect(tableMapping, tableName) + " where " + buildKeyWhere(tableMapping))
         );
     }
 
     public String buildSelect(TableMapping tableMapping, String tableName) {
-        return tableMapping.getSelectSql().computeIfAbsent(tableName, k -> "select * from " + tableName);
+        return tableMapping.getSelectSql().computeIfAbsent(
+                tableName,
+                k -> buildSql$$("select * from `" + tableName + "`")
+        );
     }
 
     /** 根据主键列构建where */
@@ -125,8 +131,9 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
             if (!sql.isEmpty()) {
                 sql += " and ";
             }
-            sql += fieldMapping.getColumnName() + "=" + build$$(fieldMapping);
+            sql += "`" + fieldMapping.getColumnName() + "`" + "=" + build$$(fieldMapping);
         }
+        sql = buildSql$$(sql);
         return sql;
     }
 
@@ -137,9 +144,10 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
         return tableMapping.getExitSql().computeIfAbsent(
                 tableName,
                 k -> {
-                    String sql = "select 1 as 'exits' from " + tableName;
+                    String sql = "select 1 as 'exits' from `" + tableName + "`";
                     String where = buildKeyWhere(tableMapping);
                     sql += " where " + where;
+                    sql = buildSql$$(sql);
                     return sql;
                 }
         );
@@ -151,9 +159,9 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
                 tableName,
                 k -> {
                     String sql = "insert into ";
-                    sql += tableName + "(";
+                    sql += "`" + tableName + "`" + "(";
                     for (TableMapping.FieldMapping fieldMapping : tableMapping.getColumns().values()) {
-                        sql += fieldMapping.getColumnName() + ",";
+                        sql += "`" + fieldMapping.getColumnName() + "`" + ",";
                     }
                     sql = sql.substring(0, sql.length() - 1);
                     sql += ") values (";
@@ -162,6 +170,28 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
                     }
                     sql = sql.substring(0, sql.length() - 1);
                     sql += ")";
+                    sql = buildSql$$(sql);
+                    return sql;
+                }
+        );
+    }
+
+    public String buildUpdate(TableMapping tableMapping, String tableName) {
+        return tableMapping.getUpdateSql().computeIfAbsent(
+                tableName,
+                k -> {
+                    String sql = "update `" + tableName + "` set ";
+                    for (TableMapping.FieldMapping fieldMapping : tableMapping.getColumns().values()) {
+                        if (fieldMapping.isKey()) continue;
+                        sql += "`" + fieldMapping.getColumnName() + "`" + "=" + build$$(fieldMapping) + ",";
+                    }
+                    sql = sql.substring(0, sql.length() - 1);
+                    sql += " where ";
+                    for (TableMapping.FieldMapping fieldMapping : tableMapping.getKeyFields()) {
+                        sql += "`" + fieldMapping.getColumnName() + "`" + "=" + build$$(fieldMapping) + " and ";
+                    }
+                    sql = sql.substring(0, sql.length() - 5);
+                    sql = buildSql$$(sql);
                     return sql;
                 }
         );
@@ -181,26 +211,6 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
             params.add(fieldMapping.toDbValue(bean));
         }
         return params.toArray();
-    }
-
-    public String buildUpdate(TableMapping tableMapping, String tableName) {
-        return tableMapping.getUpdateSql().computeIfAbsent(
-                tableName,
-                k -> {
-                    String sql = "update " + tableName + " set ";
-                    for (TableMapping.FieldMapping fieldMapping : tableMapping.getColumns().values()) {
-                        if (fieldMapping.isKey()) continue;
-                        sql += fieldMapping.getColumnName() + "=" + build$$(fieldMapping) + ",";
-                    }
-                    sql = sql.substring(0, sql.length() - 1);
-                    sql += " where ";
-                    for (TableMapping.FieldMapping fieldMapping : tableMapping.getKeyFields()) {
-                        sql += fieldMapping.getColumnName() + "=" + build$$(fieldMapping) + " and ";
-                    }
-                    sql = sql.substring(0, sql.length() - 5);
-                    return sql;
-                }
-        );
     }
 
     public Object[] builderUpdateParams(TableMapping tableMapping, Object bean) {
@@ -256,9 +266,6 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
             }
             case Float -> {
                 return Float.parseFloat(object.toString());
-            }
-            case String -> {
-                return object.toString();
             }
             case Blob -> {
                 return FastJsonUtil.parse((byte[]) object, fieldMapping.getJsonType());

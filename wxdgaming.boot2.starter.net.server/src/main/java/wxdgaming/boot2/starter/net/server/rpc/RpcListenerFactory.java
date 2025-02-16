@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
@@ -30,6 +31,7 @@ public class RpcListenerFactory {
     private final ConcurrentHashMap<String, RpcMapping> rpcMappingMap = new ConcurrentHashMap<>();
 
     @Init
+    @Sort(9)
     public void init(RunApplication runApplication,
                      @Value(name = "executor") ExecutorConfig executorConfig,
                      @Value(name = "executor1", required = false) ExecutorConfig executorConfig1) {

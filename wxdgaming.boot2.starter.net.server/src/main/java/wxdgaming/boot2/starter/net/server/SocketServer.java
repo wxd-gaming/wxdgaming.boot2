@@ -6,6 +6,8 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.Close;
+import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
@@ -39,8 +41,8 @@ public class SocketServer implements Closeable, AutoCloseable {
         this.socketServerConfig = socketServerConfig;
     }
 
-    @Start
-    public void start(ProtoListenerFactory protoListenerFactory, RpcListenerFactory rpcListenerFactory, HttpListenerFactory httpListenerFactory) {
+    @Init
+    public void init(ProtoListenerFactory protoListenerFactory, RpcListenerFactory rpcListenerFactory, HttpListenerFactory httpListenerFactory) {
         bootstrap = new ServerBootstrap().group(NioFactory.bossThreadGroup(), NioFactory.workThreadGroup())
                 /*channel方法用来创建通道实例(NioServerSocketChannel类来实例化一个进来的链接)*/
                 .channel(NioFactory.serverSocketChannelClass())
@@ -85,12 +87,17 @@ public class SocketServer implements Closeable, AutoCloseable {
 
                 });
 
+    }
+
+    @Start
+    public void start() {
         future = bootstrap.bind(socketServerConfig.getPort());
         future.syncUninterruptibly();
         serverChannel = future.channel();
         log.info("SocketServer started at port {}", socketServerConfig.getPort());
     }
 
+    @Close
     @Override public void close() throws IOException {
         if (future != null) {
             try {

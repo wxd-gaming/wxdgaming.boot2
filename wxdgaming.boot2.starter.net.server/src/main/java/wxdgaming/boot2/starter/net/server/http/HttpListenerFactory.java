@@ -3,11 +3,11 @@ package wxdgaming.boot2.starter.net.server.http;
 import com.google.inject.Singleton;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.RunResult;
@@ -36,6 +36,7 @@ public class HttpListenerFactory {
     RunApplication lastRunApplication;
 
     @Init
+    @Sort(7)
     public void init(RunApplication runApplication) {
         lastRunApplication = runApplication;
         runApplication.getReflectContext()
@@ -65,10 +66,10 @@ public class HttpListenerFactory {
                         } else if (simpleName.endsWith("Api")) {
                             simpleName = simpleName.substring(0, simpleName.length() - 3);
                         }
-
-                        path += simpleName + "/";
+                        path += "/" + simpleName;
                     }
-
+                    if (!path.startsWith("/")) path = "/" + path;
+                    if (!path.endsWith("/")) path += "/";
                     if (StringUtils.isBlank(methodRequestMapping.path())) {
                         path += method.getName();
                     } else {
@@ -99,10 +100,11 @@ public class HttpListenerFactory {
             String uriPath = httpContext.getRequest().getUriPath();
             String lowerCase = uriPath.toLowerCase();
             HttpMapping httpMapping = httpMappingMap.get(lowerCase);
+            HttpRequest httpRequest = httpMapping == null ? null : httpMapping.httpRequest();
             Method method = httpMapping == null ? null : httpMapping.method();
             boolean allMatch = lastRunApplication
                     .classWithSuper(HttpFilter.class)
-                    .allMatch(filter -> filter.doFilter(uriPath, method, httpContext));
+                    .allMatch(filter -> filter.doFilter(httpRequest, method, uriPath, httpContext));
             if (!allMatch) {
                 if (httpContext.getDisconnected().get()) {
                     httpContext.getResponse().responseJson(RunResult.error("filter"));

@@ -24,6 +24,7 @@ public class SocketServerConfig extends ObjectBase {
     private int port = 8080;
     private int maxFrameBytes = -1;
     private int maxFrameLength = -1;
+    private boolean enabledTcp = false;
     private boolean enabledHttp = true;
     private boolean enabledWebSocket = false;
     /** 如果开启 websocket 可以指定后缀 */

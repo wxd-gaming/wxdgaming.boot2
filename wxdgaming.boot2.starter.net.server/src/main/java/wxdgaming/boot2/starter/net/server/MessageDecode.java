@@ -82,7 +82,17 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
                 break;
             }
             case ByteBuf byteBuf -> {
-                readBytes(ctx, byteBuf);
+                if (!Boolean.TRUE.equals(ChannelUtil.attr(ctx.channel(), "http"))) {
+                    if (!socketServerConfig.isEnabledTcp()) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("{} 不支持 tcp socket 服务 {}", ChannelUtil.ctxTostring(ctx), object.getClass().getName());
+                        }
+                        ctx.disconnect();
+                        ctx.close();
+                        return;
+                    }
+                    readBytes(ctx, byteBuf);
+                }
                 break;
             }
 

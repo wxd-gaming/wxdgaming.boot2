@@ -23,7 +23,8 @@ public class SocketServerTest {
         SocketServerConfig socketServerConfig = new SocketServerConfig();
         socketServerConfig.setEnabledHttp(false);
         SocketServer socketServer = new SocketServer(socketServerConfig);
-        socketServer.start(new ProtoListenerFactory(), new RpcListenerFactory(), new HttpListenerFactory());
+        socketServer.init(new ProtoListenerFactory(), new RpcListenerFactory(), new HttpListenerFactory());
+        socketServer.start();
         Scanner scanner = new Scanner(System.in);
         String s = scanner.nextLine();
     }

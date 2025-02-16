@@ -34,6 +34,7 @@ public class SplitCollection<E> extends ObjectBase implements Serializable, Data
         this(1000);
     }
 
+    /** 块大小 */
     public SplitCollection(int splitOrg) {
         this(splitOrg, true);
     }

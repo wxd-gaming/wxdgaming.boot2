@@ -28,6 +28,14 @@ public abstract class DataHelper<DDL extends DDLBuilder> {
 
     public abstract Connection connection();
 
+    public abstract <R extends Entity> int tableCount(Class<R> cls);
+
+    public abstract <R extends Entity> int tableCount(Class<R> cls, String where, Object... args);
+
+    public abstract int tableCount(String tableName);
+
+    public abstract int tableCount(String tableName, String where, Object... args);
+
     /** 查询表的所有数据 */
     public abstract <R extends Entity> List<R> findAll(Class<R> cls);
 
@@ -84,6 +92,18 @@ public abstract class DataHelper<DDL extends DDLBuilder> {
      * @version: 2025-02-16 01:15
      */
     public abstract <R extends Entity> R findById(String tableName, Class<R> cls, Object... args);
+
+    /**
+     * 根据主键值查询
+     *
+     * @param cls  返回的数据实体类
+     * @param args 参数
+     * @param <R>  实体模型
+     * @return
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-02-16 01:15
+     */
+    public abstract <R extends Entity> R findByWhere(Class<R> cls, String sqlWhere, Object... args);
 
     /**
      * 根据主键查询数据是否已经在数据库

@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.reflect;
 
 import com.google.inject.Injector;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Qualifier;
@@ -14,6 +15,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
@@ -25,6 +27,7 @@ import java.util.stream.Stream;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2023-10-16 10:11
  **/
+@Slf4j
 @Getter
 public class GuiceReflectContext {
 
@@ -34,7 +37,9 @@ public class GuiceReflectContext {
 
     public GuiceReflectContext(RunApplication runApplication, Collection<?> classList) {
         this.runApplication = runApplication;
-        this.classList = List.copyOf(classList);
+        ArrayList<?> arrayList = new ArrayList<>(classList);
+        arrayList.sort(ReflectContext.ComparatorBeanBySort);
+        this.classList = List.copyOf(arrayList);
     }
 
     /** 所有的类 */
@@ -100,7 +105,9 @@ public class GuiceReflectContext {
         Stream<ContentMethod> methodStream = stream()
                 .flatMap(content -> content.methodsWithAnnotated(annotation)
                         .map(m -> new ContentMethod(content.t, m))
-                );
+                )
+                .sorted(ContentMethod::compareTo);
+
         if (predicate != null) {
             methodStream = methodStream.filter(predicate);
         }
@@ -208,6 +215,7 @@ public class GuiceReflectContext {
 
         public Object invoke() {
             try {
+                log.debug("{}.{}", ins.getClass().getSimpleName(), this.method.getName());
                 Object[] objects = GuiceReflectContext.this.injectorParameters(ins, method);
                 return method.invoke(ins, objects);
             } catch (Exception e) {
@@ -222,7 +230,7 @@ public class GuiceReflectContext {
                     .map(Sort::value)
                     .orElse(999999);
 
-            int o2Sort = AnnUtil.annOpt(o.method.getClass(), Sort.class)
+            int o2Sort = AnnUtil.annOpt(o.method, Sort.class)
                     .or(() -> AnnUtil.annOpt(o.ins.getClass(), Sort.class))
                     .map(Sort::value)
                     .orElse(999999);

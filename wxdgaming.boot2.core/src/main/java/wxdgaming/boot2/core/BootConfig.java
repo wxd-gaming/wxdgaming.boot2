@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPath;
 import lombok.Getter;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
@@ -78,6 +79,35 @@ public class BootConfig {
 
     public <T> T getObject(String key, Class<T> clazz) {
         return config.getObject(key, clazz);
+    }
+
+
+    /** 新增方法：通过路由获取嵌套的 JSON 数据 */
+    public Object getNestedValue(String path) {
+        String[] keys = path.split("\\.");
+        Object current = config;
+        for (String key : keys) {
+            if (!(current instanceof JSONObject jsonObject)) {
+                return null; // 如果当前对象不是 JSON 对象，则返回 null
+            }
+            current = jsonObject.get(key);
+            if (current == null) {
+                return null; // 如果路径中的某个部分不是 JSON 对象，则返回 null
+            }
+        }
+        return current; // 返回最终的 JSON 对象或值
+    }
+
+    /** 泛型方法：通过路由获取嵌套的 JSON 数据并转换为指定类型 */
+    public <T> T getNestedValue(String path, Class<T> clazz) {
+        Object value = getNestedValue(path);
+        if (value == null) {
+            return null;
+        }
+        if (clazz.isInstance(value)) {
+            return clazz.cast(value);
+        }
+        return FastJsonUtil.parse(String.valueOf(value), clazz);
     }
 
 }

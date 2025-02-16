@@ -2,6 +2,9 @@ package wxdgaming.boot2.core.chatset;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -173,4 +176,72 @@ public class StringUtils {
     public static int hashIndex(long hashcode, int hashFactor) {
         return (int) (hashcode % (int) (hashFactor * 3.8f) % hashFactor);
     }
+
+    /**
+     * @param string
+     * @return
+     * @Title: unicodeEncode
+     * @Description: unicode编码 将中文字符转换成Unicode字符
+     */
+    public static String unicodeEncode(String string) {
+        char[] utfBytes = string.toCharArray();
+        String unicodeBytes = "";
+        for (int i = 0; i < utfBytes.length; i++) {
+            String hexB = Integer.toHexString(utfBytes[i]);
+            if (hexB.length() <= 2) {
+                hexB = "00" + hexB;
+            }
+            unicodeBytes = unicodeBytes + "\\u" + hexB;
+        }
+        return unicodeBytes;
+    }
+
+    /**
+     * @param string
+     * @return 转换之后的内容
+     * @Title: unicodeDecode
+     * @Description: unicode解码 将Unicode的编码转换为中文
+     */
+    public static String unicodeDecode(String string) {
+        Pattern pattern = Pattern.compile("(\\\\u(\\p{XDigit}{4}))");
+        Matcher matcher = pattern.matcher(string);
+        char ch;
+        while (matcher.find()) {
+            ch = (char) Integer.parseInt(matcher.group(2), 16);
+            string = string.replace(matcher.group(1), ch + "");
+        }
+        return string;
+    }
+
+
+    public static String randomString(int length) {
+        // 产生随机数
+        StringBuilder sb = new StringBuilder();
+        // 循环length次
+        for (int i = 0; i < length; i++) {
+            // 产生0-2个随机数，既与a-z，A-Z，0-9三种可能
+            int number = ThreadLocalRandom.current().nextInt(3);
+            long result = 0;
+            switch (number) {
+                // 如果number产生的是数字0；
+                case 0:
+                    // 产生A-Z的ASCII码
+                    result = Math.round(Math.random() * 25 + 65);
+                    // 将ASCII码转换成字符
+                    sb.append((char) result);
+                    break;
+                case 1:
+                    // 产生a-z的ASCII码
+                    result = Math.round(Math.random() * 25 + 97);
+                    sb.append((char) result);
+                    break;
+                case 2:
+                    // 产生0-9的数字
+                    sb.append(new Random().nextInt(10));
+                    break;
+            }
+        }
+        return sb.toString();
+    }
+
 }
