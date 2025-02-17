@@ -7,6 +7,7 @@ import io.netty.handler.logging.LoggingHandler;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Close;
+import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.util.BytesUnit;
@@ -91,10 +92,14 @@ public class SocketServer implements Closeable, AutoCloseable {
 
     @Start
     public void start() {
-        future = bootstrap.bind(socketServerConfig.getPort());
-        future.syncUninterruptibly();
-        serverChannel = future.channel();
-        log.info("SocketServer started at port {}", socketServerConfig.getPort());
+        try {
+            future = bootstrap.bind(socketServerConfig.getPort());
+            future.syncUninterruptibly();
+            serverChannel = future.channel();
+            log.info("SocketServer started at port {}", socketServerConfig.getPort());
+        } catch (Exception e) {
+            throw Throw.of("SocketServer start fail port: " + socketServerConfig.getPort(), e);
+        }
     }
 
     @Close

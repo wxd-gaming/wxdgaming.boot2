@@ -7,6 +7,7 @@ import lombok.Getter;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
 
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -71,6 +72,14 @@ public abstract class RunApplication {
 
     public <T> Stream<T> classWithSuper(Class<T> clazz) {
         return reflectContext.classWithSuper(clazz);
+    }
+
+    public Stream<Object> classWithAnnotated(Class<? extends Annotation> annotation) {
+        return reflectContext.classWithAnnotated(annotation);
+    }
+
+    public void executeMethodWithAnnotated(Class<? extends Annotation> annotation) {
+        reflectContext.executeMethodWithAnnotated(annotation);
     }
 
 }

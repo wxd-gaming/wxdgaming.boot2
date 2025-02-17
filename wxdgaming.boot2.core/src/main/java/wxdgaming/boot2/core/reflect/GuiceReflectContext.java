@@ -96,22 +96,26 @@ public class GuiceReflectContext {
     }
 
     /** 所有bean里面的方法，添加了注解的 */
-    public Stream<ContentMethod> withMethodAnnotated(Class<? extends Annotation> annotation) {
+    public Stream<MethodContent> withMethodAnnotated(Class<? extends Annotation> annotation) {
         return withMethodAnnotated(annotation, null);
     }
 
     /** 所有添加了这个注解的类 */
-    public Stream<ContentMethod> withMethodAnnotated(Class<? extends Annotation> annotation, Predicate<ContentMethod> predicate) {
-        Stream<ContentMethod> methodStream = stream()
+    public Stream<MethodContent> withMethodAnnotated(Class<? extends Annotation> annotation, Predicate<MethodContent> predicate) {
+        Stream<MethodContent> methodStream = stream()
                 .flatMap(content -> content.methodsWithAnnotated(annotation)
-                        .map(m -> new ContentMethod(content.t, m))
+                        .map(m -> new MethodContent(content.t, m))
                 )
-                .sorted(ContentMethod::compareTo);
+                .sorted(MethodContent::compareTo);
 
         if (predicate != null) {
             methodStream = methodStream.filter(predicate);
         }
         return methodStream;
+    }
+
+    public void executeMethodWithAnnotated(Class<? extends Annotation> annotation) {
+        withMethodAnnotated(annotation).forEach(MethodContent::invoke);
     }
 
     public Object[] injectorParameters(Object bean, Method method) {
@@ -203,12 +207,12 @@ public class GuiceReflectContext {
     }
 
     @Getter
-    public class ContentMethod implements Comparable<ContentMethod> {
+    public class MethodContent implements Comparable<MethodContent> {
 
         private final Object ins;
         private final Method method;
 
-        public ContentMethod(Object ins, Method method) {
+        public MethodContent(Object ins, Method method) {
             this.ins = ins;
             this.method = method;
         }
@@ -223,7 +227,7 @@ public class GuiceReflectContext {
             }
         }
 
-        @Override public int compareTo(ContentMethod o) {
+        @Override public int compareTo(MethodContent o) {
 
             int o1Sort = AnnUtil.annOpt(method, Sort.class)
                     .or(() -> AnnUtil.annOpt(ins.getClass(), Sort.class))

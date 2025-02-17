@@ -71,7 +71,6 @@ public class ProtoListenerFactory {
         lastRunApplication = runApplication;
         runApplication.getReflectContext()
                 .withMethodAnnotated(ProtoRequest.class)
-                .sorted()
                 .forEach(contentMethod -> {
                     Object ins = contentMethod.getIns();
                     Method method = contentMethod.getMethod();

@@ -1,12 +1,14 @@
 package wxdgaming.game.test.api;
 
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Body;
 import wxdgaming.boot2.core.ann.Param;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.threading.ExecutorConfig;
+import wxdgaming.boot2.core.timer.ann.Scheduled;
 import wxdgaming.boot2.starter.net.server.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.server.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.server.ann.RpcRequest;
@@ -15,6 +17,7 @@ import wxdgaming.boot2.starter.net.server.ann.RpcRequest;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-14 19:22
  **/
+@Slf4j
 @Singleton
 @RequestMapping(path = "/")
 public class TestApi {
@@ -50,6 +53,11 @@ public class TestApi {
     public String rpcIndex() {
 
         return "index";
+    }
+
+    @Scheduled()
+    public void timer() {
+        log.info("{}", "timer()");
     }
 
 }

@@ -36,7 +36,7 @@ public final class ExecutorVirtualServices implements Executor, IExecutorService
      * @param coreSize 线程最大数量
      * @return
      */
-    protected ExecutorVirtualServices(String name, int coreSize, int maxSize) {
+    ExecutorVirtualServices(String name, int coreSize, int maxSize) {
         if (!name.startsWith("vt-"))
             name = "vt-" + name;
         if (ExecutorUtil.All_THREAD_LOCAL.containsKey(name)) {

@@ -1,6 +1,5 @@
 package wxdgaming.boot2.core.timer;
 
-import com.alibaba.fastjson.annotation.JSONCreator;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -64,11 +63,7 @@ public class CronExpress extends ObjectBase {
      * <p> 星期 1-7 Mon Tues Wed Thur Fri Sat Sun
      * <p> 年 1970 - 2199
      */
-    @JSONCreator
-    public CronExpress(
-            @JSONField(name = "cron") String cron,
-            @JSONField(name = "timeUnit") TimeUnit timeUnit,
-            @JSONField(name = "duration") long duration) {
+    public CronExpress(String cron, TimeUnit timeUnit, long duration) {
         this.cron = cron;
         this.timeUnit = timeUnit;
         this.duration = duration;
@@ -80,7 +75,7 @@ public class CronExpress extends ObjectBase {
         String[] values = new String[7];
         Arrays.fill(values, "*");
 
-        if (StringUtils.isBlank(cron)) {
+        if (StringUtils.isNotBlank(cron)) {
             String[] split = cron.split(" ");
             for (int i = 0; i < split.length; i++) {
                 if (StringUtils.isBlank(split[i])) {
@@ -129,6 +124,7 @@ public class CronExpress extends ObjectBase {
             if (!"*".equals(split[0]) && !"?".equals(split[0])) {
                 min = Integer.parseInt(split[0]);
             }
+
             int intv = Integer.parseInt(split[1]);
 
             for (int i = min; i <= max; i++) {
@@ -140,7 +136,7 @@ public class CronExpress extends ObjectBase {
         } else if (actionStr.contains(",") || actionStr.contains("，")) {
             String[] split = actionStr.split("[,，]");
             for (String s : split) {
-                final Integer of = Integer.valueOf(s);
+                final int of = Integer.parseInt(s);
                 if (min > of) {
                     throw new RuntimeException(actionStr + " 起始值 " + of + " 小于最小值：" + min);
                 }
@@ -153,6 +149,18 @@ public class CronExpress extends ObjectBase {
             set.add(Integer.valueOf(actionStr));
         }
 
+    }
+
+    /** 取下一次执行时间戳 */
+    public long validateTimeAfterMillis() {
+        return validateTimeAfterMillis(MyClock.millis());
+    }
+
+    /** 取下一次执行时间戳 */
+    public long validateTimeAfterMillis(long time) {
+        long[] longs = validateTimeAfter(time);
+        if (longs == null) return -1;
+        return longs[0];
     }
 
     /** 取下一次可用的时间 */
@@ -172,7 +180,9 @@ public class CronExpress extends ObjectBase {
 
     /** 获取下一次可用的格式化时间字符串 */
     public String validateDateAfter(long time) {
-        return MyClock.formatDate(validateTimeAfter(time)[0]);
+        long[] longs = validateTimeAfter(time);
+        if (longs == null) return null;
+        return MyClock.formatDate(longs[0]);
     }
 
     /** 取下一次可用的时间 */
@@ -192,7 +202,16 @@ public class CronExpress extends ObjectBase {
 
     /** 获取下一次可用的时间 持续结束时间 格式化字符串 */
     public String validateOverDateAfter(long time) {
-        return MyClock.formatDate(validateOverTimeAfter(time)[1]);
+        long[] longs = validateOverTimeAfter(time);
+        if (longs == null) return null;
+        return MyClock.formatDate(longs[1]);
+    }
+
+    /** 取上一次执行时间戳 */
+    public long validateTimeBeforeMillis() {
+        long[] longs = validateTimeBefore(MyClock.millis());
+        if (longs == null) return -1;
+        return longs[0];
     }
 
     /** 获取上一次可用的时间 */
@@ -212,7 +231,9 @@ public class CronExpress extends ObjectBase {
 
     /** 获取上一次可用时间的格式化字符串 */
     public String validateDateBefore(long time) {
-        return MyClock.formatDate(validateTimeBefore(time)[0]);
+        long[] longs = validateTimeBefore(time);
+        if (longs == null) return null;
+        return MyClock.formatDate(longs[0]);
     }
 
     /** 获取上一次可用时间 持续结束时间 */
@@ -222,7 +243,11 @@ public class CronExpress extends ObjectBase {
 
     /** 获取上一次可用时间 持续结束时间 */
     public long validateOverTimeBefore(long time) {
-        return findValidateTime(time, -1000)[1];
+        long[] validateTime = findValidateTime(time, -1000);
+        if (validateTime == null) {
+            return -1;
+        }
+        return validateTime[1];
     }
 
     /** 获取上一次可用时间 持续结束时间 的格式化字符串 */
@@ -232,7 +257,11 @@ public class CronExpress extends ObjectBase {
 
     /** 获取上一次可用时间 持续结束时间 的格式化字符串 */
     public String validateOverDateBefore(long time) {
-        return MyClock.formatDate(validateOverTimeBefore(time));
+        long date = validateOverTimeBefore(time);
+        if (date == -1) {
+            return null;
+        }
+        return MyClock.formatDate(date);
     }
 
     /** 获取开启时间 */

@@ -37,7 +37,6 @@ public class RpcListenerFactory {
                      @Value(name = "executor1", required = false) ExecutorConfig executorConfig1) {
         runApplication.getReflectContext()
                 .withMethodAnnotated(RpcRequest.class)
-                .sorted()
                 .forEach(contentMethod -> {
                     Object ins = contentMethod.getIns();
                     Method method = contentMethod.getMethod();

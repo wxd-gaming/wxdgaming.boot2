@@ -8,7 +8,6 @@ import wxdgaming.boot2.core.*;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.collection.SetOf;
-import wxdgaming.boot2.core.reflect.GuiceReflectContext;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.core.util.JvmUtil;
 
@@ -42,7 +41,7 @@ public class WxdApplication {
             String[] packages = Arrays.stream(classes).map(Class::getPackageName).toArray(String[]::new);
 
             /*组合把必要的启动器加入*/
-            Set<String> packageSet = SetOf.asSet(WxdApplication.class.getPackageName());
+            Set<String> packageSet = SetOf.asSet(WxdApplication.class.getPackageName(), CoreScan.class.getPackageName());
             packageSet.addAll(Arrays.asList(packages));
 
             final String[] finalPackages = packageSet.toArray(new String[0]);
@@ -65,19 +64,10 @@ public class WxdApplication {
 
             runApplication.init();
 
-            runApplication.getReflectContext()
-                    .withMethodAnnotated(Init.class)
-                    .forEach(GuiceReflectContext.ContentMethod::invoke);
+            runApplication.executeMethodWithAnnotated(Init.class);
+            runApplication.executeMethodWithAnnotated(Start.class);
 
-            runApplication.getReflectContext()
-                    .withMethodAnnotated(Start.class)
-                    .forEach(GuiceReflectContext.ContentMethod::invoke);
-
-            JvmUtil.addShutdownHook(() -> {
-                runApplication.getReflectContext()
-                        .withMethodAnnotated(Close.class)
-                        .forEach(GuiceReflectContext.ContentMethod::invoke);
-            });
+            JvmUtil.addShutdownHook(() -> runApplication.executeMethodWithAnnotated(Close.class));
 
             log.info("boot2-starter is running");
             return runApplication;

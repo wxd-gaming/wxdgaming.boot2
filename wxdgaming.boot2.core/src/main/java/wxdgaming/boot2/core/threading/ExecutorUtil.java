@@ -240,8 +240,8 @@ public final class ExecutorUtil implements Serializable {
                                 }
                                 if (next.checkRunTime(millis)) {
                                     if (next.runJob()) {
-                                        /*优先移除当前对象*/
                                         if (next.isOver()) {
+                                            /*移除当前对象*/
                                             iterator.remove();
                                             if (logger.isDebugEnabled()) {
                                                 logger.debug("线程{}执行时间到期，移除{}", next.IExecutorServices.getName(), next.executorServiceJob.toString());

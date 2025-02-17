@@ -41,7 +41,6 @@ public class HttpListenerFactory {
         lastRunApplication = runApplication;
         runApplication.getReflectContext()
                 .withMethodAnnotated(HttpRequest.class)
-                .sorted()
                 .forEach(contentMethod -> {
                     Object ins = contentMethod.getIns();
                     Method method = contentMethod.getMethod();

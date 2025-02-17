@@ -6,6 +6,7 @@ import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.function.*;
 import wxdgaming.boot2.core.reflect.MethodUtil;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.*;
@@ -24,7 +25,7 @@ import java.util.function.Consumer;
 @Slf4j
 public class LambdaUtil implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     /**
      * 获取实体类的字段名称

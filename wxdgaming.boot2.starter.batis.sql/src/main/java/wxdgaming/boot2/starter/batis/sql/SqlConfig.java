@@ -88,13 +88,19 @@ public class SqlConfig extends ObjectBase {
     public void createDatabase() {
         if (url.contains("jdbc:mysql")) {
             String dbName = dbName();
-            try (Connection connection = connection("INFORMATION_SCHEMA")) {
+            try (Connection connection = connection("INFORMATION_SCHEMA"); Statement statement = connection.createStatement()) {
+                String formatted = "SHOW DATABASES LIKE '%s';".formatted(dbName);
+                ResultSet resultSet = statement.executeQuery(formatted);
+                if (resultSet.next()) {
+                    log.debug("mysql 数据库 {} 已经存在", dbName);
+                    return;
+                }
                 Consumer<String> stringConsumer = (character) -> {
                     String databaseString = "CREATE DATABASE IF NOT EXISTS `%s` DEFAULT CHARACTER SET %s COLLATE %s_unicode_ci"
                             .formatted(dbName.toLowerCase(), character, character);
-                    try (Statement statement = connection.createStatement()) {
-                        int update = statement.executeUpdate(databaseString);
-                        log.info("mysql 数据库 {} 创建 {}", dbName, update);
+                    try {
+                        statement.executeUpdate(databaseString);
+                        log.info("mysql 数据库 {} 创建完成", dbName);
                     } catch (Exception e) {
                         throw Throw.of(e);
                     }
@@ -121,8 +127,8 @@ public class SqlConfig extends ObjectBase {
                     log.debug("pgsql 数据库 {} 已经存在", dbName);
                     return;
                 }
-                boolean execute = statement.execute("CREATE DATABASE %s".formatted(dbName));
-                log.info("pgsql 数据库 {} 创建 {}", dbName, execute);
+                statement.execute("CREATE DATABASE %s".formatted(dbName));
+                log.info("pgsql 数据库 {} 创建完成", dbName);
             } catch (Exception e) {
                 log.error("pgsql 创建数据库 {}", dbName, e);
             }
