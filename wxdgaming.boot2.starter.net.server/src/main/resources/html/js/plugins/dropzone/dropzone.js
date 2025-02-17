@@ -1832,10 +1832,10 @@
     });
 
     if (typeof exports == "object") {
-        module.exports = require("dropzone");
+        module.exports = require("html/js/plugins/dropzone/dropzone");
     } else if (typeof define == "function" && define.amd) {
-        define([], function(){ return require("dropzone"); });
+        define([], function(){ return require("html/js/plugins/dropzone/dropzone"); });
     } else {
-        this["Dropzone"] = require("dropzone");
+        this["Dropzone"] = require("html/js/plugins/dropzone/dropzone");
     }
 })()
