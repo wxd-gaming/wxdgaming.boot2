@@ -261,7 +261,7 @@ public class Cache<K, V> implements Closeable {
             return this;
         }
 
-        /** 心跳间隔时间 */
+        /** 读取过期时间 */
         public CacheBuilder<K, V> expireAfterAccess(long duration, TimeUnit timeUnit) {
             return this.expireAfterAccess(timeUnit.toMillis(duration));
         }
@@ -275,7 +275,7 @@ public class Cache<K, V> implements Closeable {
             return this;
         }
 
-        /** 心跳间隔时间 */
+        /** 写入过期时间 */
         public CacheBuilder<K, V> expireAfterWrite(long duration, TimeUnit timeUnit) {
             return this.expireAfterWrite(timeUnit.toMillis(duration));
         }

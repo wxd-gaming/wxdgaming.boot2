@@ -98,7 +98,7 @@ public class PgSqlDDLBuilder extends SqlDDLBuilder {
         return tableMapping.getExitSql().computeIfAbsent(
                 tableName,
                 k -> {
-                    String sql = "select 1 as \"exits\" from " + tableName;
+                    String sql = "select 1 as \"exits\" from \"" + tableName + "\"";
                     String where = buildKeyWhere(tableMapping);
                     sql += " where " + where;
                     return sql;
