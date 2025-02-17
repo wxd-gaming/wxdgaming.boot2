@@ -17,6 +17,7 @@ public abstract class DDLBuilder {
     protected final Map<Class<? extends Entity>, TableMapping> tableMappings = new ConcurrentHashMap<>();
 
     public TableMapping tableMapping(Class<? extends Entity> cls) {
+        if (!Entity.class.isAssignableFrom(cls)) throw new IllegalArgumentException("cls must be Entity");
         return tableMappings.computeIfAbsent(cls, l -> new TableMapping(cls));
     }
 

@@ -1,7 +1,6 @@
 package wxdgaming.boot2.starter.batis.sql;
 
 import com.alibaba.fastjson.JSONObject;
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,15 +9,19 @@ import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.ReflectContext;
-import wxdgaming.boot2.starter.batis.*;
+import wxdgaming.boot2.starter.batis.DataHelper;
+import wxdgaming.boot2.starter.batis.Entity;
+import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
@@ -43,6 +46,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         this.sqlConfig.createDatabase();
         this.hikariDataSource = sqlConfig.hikariDataSource();
         if (StringUtils.isNotBlank(sqlConfig.getScanPackage())) {
+            Map<String, LinkedHashMap<String, JSONObject>> tableStructMap = findTableStructMap();
             ReflectContext.Builder.of(sqlConfig.getScanPackage()).build()
                     .classWithAnnotated(DbTable.class)
                     .forEach(cls -> {
@@ -50,7 +54,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
                             throw new RuntimeException(cls + " not super " + Entity.class);
                         }
 
-                        checkTable((Class<? extends Entity>) cls);
+                        checkTable(tableStructMap, (Class<? extends Entity>) cls);
                     });
         }
         initBatch();
@@ -83,8 +87,17 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         checkTable(tableMapping, tableName, tableComment);
     }
 
+    public void checkTable(Map<String, LinkedHashMap<String, JSONObject>> tableStructMap, Class<? extends Entity> cls) {
+        TableMapping tableMapping = tableMapping(cls);
+        if (tableMapping == null) {
+            throw new RuntimeException("表映射关系不存在");
+        }
+        String tableName = tableMapping.getTableName();
+        checkTable(tableStructMap, tableMapping, tableName, tableMapping.getTableComment());
+    }
+
     public void checkTable(TableMapping tableMapping, String tableName, String tableComment) {
-        Map<String, LinkedHashMap<String, JSONObject>> tableStructMap = getDbTableStructMap();
+        Map<String, LinkedHashMap<String, JSONObject>> tableStructMap = findTableStructMap();
         checkTable(tableStructMap, tableMapping, tableName, tableComment);
     }
 
@@ -137,8 +150,8 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
     }
 
 
-    /** 表映射关系 */
-    public Map<String, String> getDbTableMap() {
+    /** 查询当前数据库所有的表 key: 表名字, value: 表备注 */
+    public Map<String, String> findTableMap() {
         Map<String, String> dbTableMap = new LinkedHashMap<>();
         String sql = "SELECT TABLE_NAME,TABLE_COMMENT FROM information_schema.`TABLES` WHERE table_schema= ? ORDER BY TABLE_NAME";
         this.query(sql, new Object[]{this.getDbName()}, row -> {
@@ -150,8 +163,8 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         return dbTableMap;
     }
 
-    /** 表映射关系 */
-    public Map<String, LinkedHashMap<String, JSONObject>> getDbTableStructMap() {
+    /** 查询所有表的结构，key: 表名字, value: { key: 字段名字, value: 字段结构 } */
+    public Map<String, LinkedHashMap<String, JSONObject>> findTableStructMap() {
         LinkedHashMap<String, LinkedHashMap<String, JSONObject>> dbTableStructMap = new LinkedHashMap<>();
         String sql =
                 "SELECT" +

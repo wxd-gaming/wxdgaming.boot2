@@ -31,7 +31,8 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
         this.sqlDataBatch = new PgsqlDataBatch(this);
     }
 
-    @Override public Map<String, String> getDbTableMap() {
+    /** 查询当前数据库所有的表 key: 表名字, value: 表备注 */
+    @Override public Map<String, String> findTableMap() {
         Map<String, String> dbTableMap = new LinkedHashMap<>();
         String sql = """
                 SELECT c.relname AS table_name, obj_description(c.oid, 'pg_class') AS table_comment
@@ -48,7 +49,8 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
         return dbTableMap;
     }
 
-    @Override public Map<String, LinkedHashMap<String, JSONObject>> getDbTableStructMap() {
+    /** 查询所有表的结构，key: 表名字, value: { key: 字段名字, value: 字段结构 } */
+    @Override public Map<String, LinkedHashMap<String, JSONObject>> findTableStructMap() {
         String pgsql = """
                 SELECT
                 c.relname as table_name,
@@ -124,7 +126,7 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
 
     public void addPartition(String tableName, String from, String to) {
         String partition_table_name = tableName + "_" + from;
-        if (getDbTableMap().containsKey(partition_table_name))
+        if (findTableMap().containsKey(partition_table_name))
             return;
         String string = "CREATE TABLE \"%s\" PARTITION OF \"%s\" FOR VALUES FROM (%s) TO (%s);"
                 .formatted(partition_table_name, tableName, from, to);
