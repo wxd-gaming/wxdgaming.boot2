@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.util.BytesUnit;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 判定是 socket 还是 web socket
@@ -25,8 +26,17 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
     /** 默认暗号长度为23 */
     private static final int MAX_LENGTH = 23;
     /** WebSocket握手的协议前缀 */
-    private static final String WEBSOCKET_PREFIX_GET = "GET /";
-    private static final String WEBSOCKET_PREFIX_POST = "POST /";
+    private static final Set<String> WEB_PREFIX = Set.of(
+            "GET /",
+            "POST /",
+            "OPTIONS /",
+            "HEAD /",
+            "PUT /",
+            "PATCH",
+            "DELETE",
+            "TRACE",
+            "CONNECT"
+    );
 
     final SocketServerConfig socketServerConfig;
 
@@ -37,7 +47,7 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         String protocol = getBufStart(in);
-        if (protocol.startsWith(WEBSOCKET_PREFIX_GET) || protocol.startsWith(WEBSOCKET_PREFIX_POST)) {
+        if (WEB_PREFIX.stream().anyMatch(protocol::startsWith)) {
             websocketAdd(ctx);
         }
         in.resetReaderIndex();
