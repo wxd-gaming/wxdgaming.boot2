@@ -26,14 +26,14 @@ public class OutConfigTest {
         JSONObject config = BootConfig.getIns().getConfig();
         config.put("debug", true);
         config.put("sid", 1);
-        config.put("executor", new ExecutorConfig());
-        config.put("scheduled", new ScheduledConfig());
-        config.put("http", new JSONObject().fluentPut("client", new HttpClientConfig()));
+        config.put("executor", FastJsonUtil.parse(new ExecutorConfig().toJsonString()));
+        config.put("scheduled", FastJsonUtil.parse(new ScheduledConfig().toJsonString()));
+        config.put("http", FastJsonUtil.parse(new JSONObject().fluentPut("client", new HttpClientConfig()).toString()));
         config.put(
                 "socket",
                 new JSONObject()
-                        .fluentPut("server", new SocketServerConfig().setWebSocketPrefix("/ws"))
-                        .fluentPut("client", new SocketClientConfig().setWebSocketPrefix("/ws"))
+                        .fluentPut("server", FastJsonUtil.parse(new SocketServerConfig().toJsonString()))
+                        .fluentPut("client", FastJsonUtil.parse(new SocketClientConfig().toJsonString()))
         );
         JSONObject db = new JSONObject();
         config.put("db", db);
@@ -44,7 +44,7 @@ public class OutConfigTest {
             sqlConfig.setUrl("jdbc:postgresql://192.168.137.10:5432/test2");
             sqlConfig.setUsername("postgres");
             sqlConfig.setPassword("test");
-            db.put("pgsql", sqlConfig);
+            db.put("pgsql", FastJsonUtil.parse(sqlConfig.toString()));
             db.put("pgsql-second", FastJsonUtil.parse(sqlConfig.toString()));
         }
         {
@@ -54,7 +54,7 @@ public class OutConfigTest {
             sqlConfig.setUsername("root");
             sqlConfig.setPassword("test");
             sqlConfig.setDriverClassName(Driver.class.getName());
-            db.put("mysql", sqlConfig);
+            db.put("mysql", FastJsonUtil.parse(sqlConfig.toString()));
             db.put("mysql-second", FastJsonUtil.parse(sqlConfig.toString()));
 
         }
@@ -64,7 +64,7 @@ public class OutConfigTest {
                 SerializerFeature.WriteMapNullValue,
                 SerializerFeature.WriteNullStringAsEmpty
         );
-        System.out.println(jsonFmt);
+        // System.out.println(jsonFmt);
         System.out.println(YamlUtil.dumpYaml(config));
     }
 

@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
  **/
 @Getter
 @Setter
-@Accessors(chain = true)
 public class SocketServerConfig extends ObjectBase {
 
     @JSONField(ordinal = 1)
@@ -36,7 +35,7 @@ public class SocketServerConfig extends ObjectBase {
     private boolean enabledWebSocket = false;
     /** 如果开启 websocket 可以指定后缀 */
     @JSONField(ordinal = 6)
-    private String webSocketPrefix = "";
+    private String webSocketPrefix = "/ws";
     @JSONField(ordinal = 10)
     private SslProtocolType sslProtocolType;
     /** 路径 */

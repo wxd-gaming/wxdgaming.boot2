@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
  **/
 @Getter
 @Setter
-@Accessors(chain = true)
 public class SocketClientConfig extends ObjectBase {
 
     @JSONField(ordinal = 1)
@@ -35,7 +34,7 @@ public class SocketClientConfig extends ObjectBase {
     private boolean enabledWebSocket = false;
     /** 如果开启 websocket 可以指定后缀 */
     @JSONField(ordinal = 6)
-    private String webSocketPrefix = "";
+    private String webSocketPrefix = "/ws";
     /** 断线重连，默认开启 */
     @JSONField(ordinal = 7)
     private boolean enableReconnection = true;
