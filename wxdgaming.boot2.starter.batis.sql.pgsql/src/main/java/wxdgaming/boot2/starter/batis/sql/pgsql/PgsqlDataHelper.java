@@ -124,9 +124,15 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
         log.warn("创建表：{}", tableName);
     }
 
+    /** 添加分区 */
     public void addPartition(String tableName, String from, String to) {
+        addPartition(findTableMap(), tableName, from, to);
+    }
+
+    /** 添加分区 */
+    public void addPartition(Map<String, String> dbTableMap, String tableName, String from, String to) {
         String partition_table_name = tableName + "_" + from;
-        if (findTableMap().containsKey(partition_table_name))
+        if (dbTableMap.containsKey(partition_table_name))
             return;
         String string = "CREATE TABLE \"%s\" PARTITION OF \"%s\" FOR VALUES FROM (%s) TO (%s);"
                 .formatted(partition_table_name, tableName, from, to);
