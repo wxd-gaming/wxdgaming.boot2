@@ -8,13 +8,14 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Close;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.util.BytesUnit;
+import wxdgaming.boot2.starter.net.NioFactory;
+import wxdgaming.boot2.starter.net.SessionGroup;
+import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
-import wxdgaming.boot2.starter.net.server.pojo.ProtoListenerFactory;
-import wxdgaming.boot2.starter.net.server.rpc.RpcListenerFactory;
-import wxdgaming.boot2.starter.net.server.ssl.WxdOptionalSslHandler;
+import wxdgaming.boot2.starter.net.ssl.WxdOptionalSslHandler;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -31,9 +32,11 @@ import java.io.IOException;
 public class SocketServer implements Closeable, AutoCloseable {
 
     protected SocketServerConfig socketServerConfig;
+    protected final SessionGroup sessionGroup = new SessionGroup();
     protected ServerBootstrap bootstrap;
     protected ChannelFuture future;
     protected Channel serverChannel;
+
 
     public SocketServer(SocketServerConfig socketServerConfig) {
         if (log.isDebugEnabled()) {
@@ -42,8 +45,14 @@ public class SocketServer implements Closeable, AutoCloseable {
         this.socketServerConfig = socketServerConfig;
     }
 
-    @Init
-    public void init(ProtoListenerFactory protoListenerFactory, RpcListenerFactory rpcListenerFactory, HttpListenerFactory httpListenerFactory) {
+    @Start
+    @Sort(1000)
+    public void start(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
+
+        SocketServerDeviceHandler socketServerDeviceHandler = new SocketServerDeviceHandler(socketServerConfig);
+        ServerMessageDecode serverMessageDecode = new ServerMessageDecode(socketServerConfig, protoListenerFactory, httpListenerFactory);
+        ServerMessageEncode serverMessageEncode = new ServerMessageEncode(protoListenerFactory);
+
         bootstrap = new ServerBootstrap().group(NioFactory.bossThreadGroup(), NioFactory.workThreadGroup())
                 /*channel方法用来创建通道实例(NioServerSocketChannel类来实例化一个进来的链接)*/
                 .channel(NioFactory.serverSocketChannelClass())
@@ -66,32 +75,34 @@ public class SocketServer implements Closeable, AutoCloseable {
 
                     @Override
                     public void initChannel(SocketChannel socketChannel) throws Exception {
-                        ChannelPipeline pipeline = socketChannel.pipeline();
-                        if (socketServerConfig.isDebug()) {
-                            pipeline.addLast("logging", new LoggingHandler("DEBUG"));// 设置log监听器，并且日志级别为debug，方便观察运行流程
+                        try {
+                            ChannelPipeline pipeline = socketChannel.pipeline();
+                            if (socketServerConfig.isDebug()) {
+                                pipeline.addLast("logging", new LoggingHandler("DEBUG"));// 设置log监听器，并且日志级别为debug，方便观察运行流程
+                            }
+
+                            pipeline.addFirst(new WxdOptionalSslHandler(socketServerConfig.sslContext()));
+
+                            /*设置读取空闲*/
+                            pipeline.addLast("idleHandler", socketServerConfig.idleStateHandler());
+                            /* socket 选择器 区分是tcp websocket http*/
+                            pipeline.addLast("socket-choose-handler", new SocketServerChooseHandler(socketServerConfig));
+                            /*处理链接*/
+                            pipeline.addLast("device-handler", socketServerDeviceHandler);
+                            /*解码消息*/
+                            pipeline.addLast("decode", serverMessageDecode);
+                            /*解码消息*/
+                            pipeline.addLast("encode", serverMessageEncode);
+                            addChanelHandler(socketChannel, pipeline);
+                        } catch (Exception e) {
+                            log.error("SocketServer init fail port: {}", socketServerConfig.getPort(), e);
+                            throw e;
                         }
-
-                        pipeline.addFirst(new WxdOptionalSslHandler(socketServerConfig.sslContext()));
-
-                        /*设置读取空闲*/
-                        pipeline.addLast("idleHandler", socketServerConfig.idleStateHandler());
-                        /* socket 选择器 区分是tcp websocket http*/
-                        pipeline.addLast("socket-choose-handler", new SocketServerChooseHandler(socketServerConfig));
-                        /*处理链接*/
-                        pipeline.addLast("device-handler", new SocketServerDeviceHandler(socketServerConfig));
-                        /*解码消息*/
-                        pipeline.addLast("decode", new MessageDecode(socketServerConfig, protoListenerFactory, httpListenerFactory) {});
-                        /*解码消息*/
-                        pipeline.addLast("encode", new MessageEncode() {});
-                        addChanelHandler(socketChannel, pipeline);
                     }
 
                 });
 
-    }
 
-    @Start
-    public void start() {
         try {
             future = bootstrap.bind(socketServerConfig.getPort());
             future.syncUninterruptibly();

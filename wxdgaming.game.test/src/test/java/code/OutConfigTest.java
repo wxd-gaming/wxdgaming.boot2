@@ -1,12 +1,15 @@
 package code;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.mysql.cj.jdbc.Driver;
 import org.junit.Test;
 import wxdgaming.boot2.core.BootConfig;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.threading.ExecutorConfig;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
+import wxdgaming.boot2.starter.net.client.SocketClientConfig;
+import wxdgaming.boot2.starter.net.server.SocketServerConfig;
 
 /**
  * @author: wxd-gaming(無心道, 15388152619)
@@ -18,6 +21,8 @@ public class OutConfigTest {
     public void out() {
         JSONObject config = BootConfig.getIns().getConfig();
         config.put("executor", new ExecutorConfig());
+        config.put("socket.server", new SocketServerConfig());
+        config.put("socket.client", new SocketClientConfig());
         {
             SqlConfig sqlConfig = new SqlConfig();
             sqlConfig.setDebug(true);
@@ -36,7 +41,12 @@ public class OutConfigTest {
             sqlConfig.setDriverClassName(Driver.class.getName());
             config.put("db.mysql", sqlConfig);
         }
-        String jsonFmt = FastJsonUtil.toJsonFmt(config);
+        String jsonFmt = JSON.toJSONString(
+                config,
+                SerializerFeature.PrettyFormat,
+                SerializerFeature.WriteMapNullValue,
+                SerializerFeature.WriteNullStringAsEmpty
+        );
         System.out.println(jsonFmt);
     }
 

@@ -10,6 +10,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.util.BytesUnit;
+import wxdgaming.boot2.starter.net.ChannelUtil;
 
 import java.util.List;
 import java.util.Set;
@@ -67,7 +68,6 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
     }
 
     public void websocketAdd(ChannelHandlerContext ctx) {
-        ChannelUtil.attr(ctx.channel(), "http", true);
         int maxContentLength = (int) BytesUnit.Mb.toBytes(socketServerConfig.getMaxAggregatorLength());
         // HttpServerCodec：将请求和应答消息解码为HTTP消息
         ctx.pipeline().addBefore("device-handler", "http-codec", new HttpServerCodec());
@@ -78,11 +78,8 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
         /*接受完整的websocket消息 64mb*/
         ctx.pipeline().addBefore("device-handler", "WebSocketAggregator", new WebSocketFrameAggregator(maxContentLength));
         // 用于处理websocket, /ws为访问websocket时的uri
-        ctx.pipeline().addBefore(
-                "device-handler",
-                "ProtocolHandler",
-                new WebSocketServerProtocolHandler(socketServerConfig.getWebSocketPrefix(), null, false, maxContentLength)
-        );
+        WebSocketServerProtocolHandler webSocketServerProtocolHandler = new WebSocketServerProtocolHandler(socketServerConfig.getWebSocketPrefix(), null, false, maxContentLength);
+        ctx.pipeline().addBefore("device-handler", "ProtocolHandler", webSocketServerProtocolHandler);
         ChannelUtil.session(ctx.channel()).setWebSocket(true);
     }
 

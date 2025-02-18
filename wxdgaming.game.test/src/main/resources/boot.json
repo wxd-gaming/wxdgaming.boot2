@@ -1,4 +1,6 @@
 {
+  "debug": true,
+  "sid": 1,
   "executor": {
     "defaultCoreSize": 2,
     "defaultMaxSize": 4,
@@ -10,35 +12,63 @@
   "socket.server": {
     "debug": false,
     "port": 8080,
+    "enabledTcp": true,
     "enabledHttp": true,
-    "enabledWebSocket": false,
-    "idleTimeout": 0,
-    "maxAggregatorLength": 64,
-    "maxFrameBytes": -1,
-    "maxFrameLength": -1,
-    "readTimeout": 0,
+    "enabledWebSocket": true,
+    "webSocketPrefix": "/ws",
+    "sslProtocolType": null,
     "sslKeyStorePath": "",
     "sslPasswordPath": "",
-    "sslProtocolType": null,
-    "webSocketPrefix": "",
-    "writeTimeout": 0
+    "maxFrameBytes": -1,
+    "maxFrameLength": -1,
+    "maxAggregatorLength": 64,
+    "readTimeout": 0,
+    "writeTimeout": 0,
+    "idleTimeout": 0
   },
-  "db.mysql": {
-    "debug": true,
-    "driverClassName": "com.mysql.cj.jdbc.Driver",
-    "url": "jdbc:mysql://192.168.137.10:3306/test6",
-    "username": "root",
-    "password": "test",
-    "maxPoolSize": 20,
-    "minPoolSize": 5
+  "socket.client": {
+    "debug": false,
+    "host": "127.0.0.1",
+    "port": 8080,
+    "enabledTcp": false,
+    "enabledWebSocket": true,
+    "webSocketPrefix": "/ws",
+    "enableReconnection": false,
+    "enabledSSL": false,
+    "sslProtocolType": "TLS",
+    "sslKeyStorePath": "",
+    "sslPasswordPath": "",
+    "maxFrameBytes": -1,
+    "maxFrameLength": -1,
+    "maxAggregatorLength": 64,
+    "maxConnectionCount": 1,
+    "readTimeout": 0,
+    "writeTimeout": 0,
+    "idleTimeout": 0,
+    "connectTimeout": 500
   },
   "db.pgsql": {
     "debug": true,
     "driverClassName": "org.postgresql.Driver",
-    "url": "jdbc:postgresql://192.168.137.10:5432/test6",
+    "url": "jdbc:postgresql://192.168.137.10:5432/test2",
     "username": "postgres",
     "password": "test",
+    "connectionTimeoutMs": 2000,
+    "minPoolSize": 5,
     "maxPoolSize": 20,
-    "minPoolSize": 5
+    "idleTimeoutM": 10,
+    "scanPackage": ""
+  },
+  "db.mysql": {
+    "debug": true,
+    "driverClassName": "com.mysql.cj.jdbc.Driver",
+    "url": "jdbc:mysql://192.168.137.10:3306/test2",
+    "username": "root",
+    "password": "test",
+    "connectionTimeoutMs": 2000,
+    "minPoolSize": 5,
+    "maxPoolSize": 20,
+    "idleTimeoutM": 10,
+    "scanPackage": ""
   }
 }

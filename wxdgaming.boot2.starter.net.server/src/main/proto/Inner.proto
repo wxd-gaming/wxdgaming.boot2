@@ -1,0 +1,22 @@
+syntax = "proto3";
+//把文件拆分
+option java_multiple_files = true;
+//导出包名
+option java_package = "wxdgaming.boot2.starter.net.module";
+
+//执行同步等待消息
+message ReqRemote {
+    int64 uid                       = 1;
+    string token                    = 2;//用于验证的消息
+    string cmd                      = 3;//执行的命令
+    int32 gzip                      = 4;//1表示压缩过
+    string params                   = 5;//用JsonObject来解析
+}
+
+//执行同步等待消息
+message ResRemote {
+    int64 uid                       = 1;
+    string token                    = 2;//用于验证的消息
+    int32 gzip                      = 4;//1表示压缩过
+    string params                   = 5;//用JsonObject来解析
+}

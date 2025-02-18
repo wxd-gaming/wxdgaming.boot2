@@ -13,8 +13,8 @@ import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.util.AnnUtil;
-import wxdgaming.boot2.starter.net.server.ann.HttpRequest;
-import wxdgaming.boot2.starter.net.server.ann.RequestMapping;
+import wxdgaming.boot2.starter.net.ann.HttpRequest;
+import wxdgaming.boot2.starter.net.ann.RequestMapping;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class HttpListenerFactory {
 
 
-    private final ConcurrentHashMap<String, HttpMapping> httpMappingMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, HttpMapping> httpMappingMap = new ConcurrentHashMap<>();
 
     RunApplication lastRunApplication;
 
@@ -39,6 +39,9 @@ public class HttpListenerFactory {
     @Sort(7)
     public void init(RunApplication runApplication) {
         lastRunApplication = runApplication;
+
+        ConcurrentHashMap<String, HttpMapping> tmpHttpMappingMap = new ConcurrentHashMap<>();
+
         runApplication.getReflectContext()
                 .withMethodAnnotated(HttpRequest.class)
                 .forEach(contentMethod -> {
@@ -78,7 +81,7 @@ public class HttpListenerFactory {
                     String lowerCase = path.toLowerCase();
                     HttpMapping httpMapping = new HttpMapping(methodRequestMapping, lowerCase, ins, method);
 
-                    HttpMapping old = httpMappingMap.put(lowerCase, httpMapping);
+                    HttpMapping old = tmpHttpMappingMap.put(lowerCase, httpMapping);
                     if (old != null && !Objects.equals(old.ins().getClass().getName(), ins.getClass().getName())) {
                         String formatted = "重复路由监听 %s old = %s - new = %s"
                                 .formatted(
@@ -90,6 +93,7 @@ public class HttpListenerFactory {
                     }
                     log.debug("http listener url: {}", lowerCase);
                 });
+        httpMappingMap = tmpHttpMappingMap;
     }
 
     public void dispatch(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) {
@@ -114,8 +118,8 @@ public class HttpListenerFactory {
                 HttpFileEvent httpFileEvent = new HttpFileEvent(httpContext);
                 ExecutorUtil.getVirtualExecutor().execute(httpFileEvent);
             } else {
-                HttpListenerEvent httpListenerEvent = new HttpListenerEvent(httpMapping, lastRunApplication, httpContext);
-                httpListenerEvent.submit();
+                HttpListenerTrigger httpListenerTrigger = new HttpListenerTrigger(httpMapping, lastRunApplication, httpContext);
+                httpListenerTrigger.submit();
             }
         } catch (Exception e) {
             log.error("dispatch error", e);

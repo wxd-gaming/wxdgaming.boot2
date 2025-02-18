@@ -30,7 +30,7 @@ public class SqlConfig extends ObjectBase {
     @JSONField(ordinal = 1)
     private boolean debug;
     @JSONField(ordinal = 2)
-    private String driverClassName;
+    private String driverClassName = "";
     @JSONField(ordinal = 3)
     private String url;
     @JSONField(ordinal = 4)
@@ -38,16 +38,16 @@ public class SqlConfig extends ObjectBase {
     @JSONField(ordinal = 5)
     private String password;
     @JSONField(ordinal = 6)
-    private int minPoolSize = 5;
+    private int connectionTimeoutMs = 2000;
     @JSONField(ordinal = 7)
+    private int minPoolSize = 5;
+    @JSONField(ordinal = 8)
     private int maxPoolSize = 20;
     /** 单位分钟 */
-    @JSONField(ordinal = 8)
-    private int idleTimeoutM = 10;
     @JSONField(ordinal = 9)
-    private int connectionTimeoutMs = 2000;
+    private int idleTimeoutM = 10;
     @JSONField(ordinal = 11)
-    private String scanPackage;
+    private String scanPackage = "";
 
     public String dbName() {
         String dbName = url;

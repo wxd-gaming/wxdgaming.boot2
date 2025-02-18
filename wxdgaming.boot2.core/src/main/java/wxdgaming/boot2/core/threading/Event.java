@@ -3,13 +3,11 @@ package wxdgaming.boot2.core.threading;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.util.AnnUtil;
 import wxdgaming.boot2.core.util.GlobalUtil;
-import wxdgaming.boot2.core.chatset.StringUtils;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 获取任务定义的注释名称
@@ -44,15 +42,12 @@ public abstract class Event implements Runnable, RunMonitor {
         if (method == null) {
             return;
         }
-        /* 虚拟线程 */
-        AtomicBoolean vt = new AtomicBoolean();
-        AtomicReference<String> threadName = new AtomicReference<>();
-        AtomicReference<String> queueName = new AtomicReference<>();
 
-        ThreadInfoImpl.action(vt, threadName, queueName, method);
-        this.vt = vt.get();
-        this.threadName = threadName.get();
-        this.queueName = queueName.get();
+        AnnUtil.annOpt(method, ExecutorWith.class).ifPresent(executorWith -> {
+            this.vt = executorWith.useVirtualThread();
+            this.threadName = executorWith.threadName();
+            this.queueName = executorWith.queueName();
+        });
 
         AnnUtil.annOpt(method, ExecutorLog.class).ifPresent(executorLog -> {
             logTime = executorLog.logTime();

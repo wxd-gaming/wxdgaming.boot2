@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.net.server.http;
 
-import wxdgaming.boot2.starter.net.server.ann.HttpRequest;
+import wxdgaming.boot2.starter.net.ann.HttpRequest;
 
 import java.lang.reflect.Method;
 

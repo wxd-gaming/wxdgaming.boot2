@@ -1,7 +1,6 @@
 package wxdgaming.boot2.core;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPath;
 import lombok.Getter;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
@@ -55,6 +54,10 @@ public class BootConfig {
 
     public boolean isDebug() {
         return config.getBooleanValue("debug");
+    }
+
+    public int sid() {
+        return config.getInteger("sid");
     }
 
     public ExecutorConfig getExecutorConfig() {

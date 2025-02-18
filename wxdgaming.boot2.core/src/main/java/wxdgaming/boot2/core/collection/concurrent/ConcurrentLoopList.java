@@ -48,7 +48,7 @@ public class ConcurrentLoopList<T> extends ObjectBase {
     }
 
     /** 循环获取 如果 null 则会引发异常 */
-    public T loopOrException() {
+    public T loopNullException() {
         T loop = loop();
         AssertUtil.assertNullEmpty(loop, "当前链接 empty ");
         return loop;
