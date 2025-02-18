@@ -20,6 +20,8 @@ public class OutConfigTest {
     @Test
     public void out() {
         JSONObject config = BootConfig.getIns().getConfig();
+        config.put("debug", true);
+        config.put("sid", 1);
         config.put("executor", new ExecutorConfig());
         config.put("socket.server", new SocketServerConfig());
         config.put("socket.client", new SocketClientConfig());

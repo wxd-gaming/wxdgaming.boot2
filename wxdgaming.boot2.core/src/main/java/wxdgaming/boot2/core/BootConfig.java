@@ -57,7 +57,11 @@ public class BootConfig {
     }
 
     public int sid() {
-        return config.getInteger("sid");
+        Integer sid = config.getInteger("sid");
+        if (sid == null) {
+            throw new RuntimeException("sid is null");
+        }
+        return sid;
     }
 
     public ExecutorConfig getExecutorConfig() {
