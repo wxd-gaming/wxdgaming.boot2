@@ -137,6 +137,7 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
         String string = "CREATE TABLE \"%s\" PARTITION OF \"%s\" FOR VALUES FROM (%s) TO (%s);"
                 .formatted(partition_table_name, tableName, from, to);
         executeUpdate(string);
+        dbTableMap.put(partition_table_name, partition_table_name);
         log.info("数据库 {} 表 {} 创建分区 {}", sqlConfig.dbName(), tableName, partition_table_name);
     }
 
