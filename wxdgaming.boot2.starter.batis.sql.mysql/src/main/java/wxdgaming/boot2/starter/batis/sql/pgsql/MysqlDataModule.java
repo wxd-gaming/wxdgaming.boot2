@@ -20,21 +20,21 @@ public class MysqlDataModule extends ServiceModule {
 
     @Override protected void bind() throws Throwable {
         {
-            SqlConfig sqlConfig = BootConfig.getIns().getObject("db.mysql", SqlConfig.class);
+            SqlConfig sqlConfig = BootConfig.getIns().getNestedValue("db.mysql", SqlConfig.class);
             if (sqlConfig != null) {
                 MysqlService dataHelper = new MysqlService(sqlConfig);
                 bindInstance(dataHelper);
             }
         }
         {
-            SqlConfig sqlConfig = BootConfig.getIns().getObject("db.mysql.second", SqlConfig.class);
+            SqlConfig sqlConfig = BootConfig.getIns().getNestedValue("db.mysql-second", SqlConfig.class);
             if (sqlConfig != null) {
                 MysqlService2 dataHelper = new MysqlService2(sqlConfig);
                 bindInstance(dataHelper);
             }
         }
         {
-            SqlConfig sqlConfig = BootConfig.getIns().getObject("db.mysql.third", SqlConfig.class);
+            SqlConfig sqlConfig = BootConfig.getIns().getNestedValue("db.mysql-third", SqlConfig.class);
             if (sqlConfig != null) {
                 MysqlService3 dataHelper = new MysqlService3(sqlConfig);
                 bindInstance(dataHelper);

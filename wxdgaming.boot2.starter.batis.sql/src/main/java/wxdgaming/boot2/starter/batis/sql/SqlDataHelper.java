@@ -5,6 +5,8 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.io.Objects;
@@ -45,6 +47,12 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         this.sqlConfig = sqlConfig;
         this.sqlConfig.createDatabase();
         this.hikariDataSource = sqlConfig.hikariDataSource();
+        initBatch();
+    }
+
+    @Start()
+    @Sort(100)
+    public void start() {
         if (StringUtils.isNotBlank(sqlConfig.getScanPackage())) {
             Map<String, LinkedHashMap<String, JSONObject>> tableStructMap = findTableStructMap();
             ReflectContext.Builder.of(sqlConfig.getScanPackage()).build()
@@ -57,7 +65,6 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
                         checkTable(tableStructMap, (Class<? extends Entity>) cls);
                     });
         }
-        initBatch();
     }
 
     public abstract void initBatch();

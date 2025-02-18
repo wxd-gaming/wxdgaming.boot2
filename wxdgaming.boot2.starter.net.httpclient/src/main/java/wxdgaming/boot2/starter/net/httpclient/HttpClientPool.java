@@ -38,7 +38,7 @@ public class HttpClientPool implements AutoCloseable {
 
     static {
         HttpClientConfig defaultConfig = new HttpClientConfig();
-        HttpClientConfig clientConfig = BootConfig.getIns().getObject("http.client", HttpClientConfig.class, defaultConfig);
+        HttpClientConfig clientConfig = BootConfig.getIns().getNestedValue("http.client", HttpClientConfig.class, defaultConfig);
         HTTP_CLIENT_CACHE = Cache.<String, HttpClientPool>builder().cacheName("http-client")
                 .expireAfterWrite(clientConfig.getResetTimeM(), TimeUnit.MINUTES)
                 .delay(TimeUnit.MINUTES.toMillis(1))
@@ -105,6 +105,7 @@ public class HttpClientPool implements AutoCloseable {
                 };
 
                 sslContext.init(null, new TrustManager[]{tm}, null);
+
                 SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sslContext, (s, sslSession) -> true);
 
 

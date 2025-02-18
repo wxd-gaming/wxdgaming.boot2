@@ -17,6 +17,7 @@ import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 import wxdgaming.boot2.starter.net.ssl.WxdOptionalSslHandler;
 
+import javax.net.ssl.SSLContext;
 import java.io.Closeable;
 import java.io.IOException;
 
@@ -31,28 +32,31 @@ import java.io.IOException;
 @Getter
 public class SocketServer implements Closeable, AutoCloseable {
 
-    protected SocketServerConfig socketServerConfig;
+    protected SocketServerConfig config;
     protected final SessionGroup sessionGroup = new SessionGroup();
     protected ServerBootstrap bootstrap;
     protected ChannelFuture future;
     protected Channel serverChannel;
 
 
-    public SocketServer(SocketServerConfig socketServerConfig) {
+    public SocketServer(SocketServerConfig config) {
         if (log.isDebugEnabled()) {
-            log.debug("socket server config: {}", socketServerConfig.toJsonString());
+            log.debug("socket server config: {}", config.toJsonString());
         }
-        this.socketServerConfig = socketServerConfig;
+        this.config = config;
     }
 
     @Start
     @Sort(1000)
     public void start(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
 
-        SocketServerDeviceHandler socketServerDeviceHandler = new SocketServerDeviceHandler(socketServerConfig);
-        ServerMessageDecode serverMessageDecode = new ServerMessageDecode(socketServerConfig, protoListenerFactory, httpListenerFactory);
+        SocketServerDeviceHandler socketServerDeviceHandler = new SocketServerDeviceHandler(config);
+        ServerMessageDecode serverMessageDecode = new ServerMessageDecode(config, protoListenerFactory, httpListenerFactory);
         ServerMessageEncode serverMessageEncode = new ServerMessageEncode(protoListenerFactory);
+        SSLContext sslContext = config.sslContext();
 
+        int writeBytes = (int) BytesUnit.Mb.toBytes(config.getWriteByteBufM());
+        int recvBytes = (int) BytesUnit.Mb.toBytes(config.getRecvByteBufM());
         bootstrap = new ServerBootstrap().group(NioFactory.bossThreadGroup(), NioFactory.workThreadGroup())
                 /*channel方法用来创建通道实例(NioServerSocketChannel类来实例化一个进来的链接)*/
                 .channel(NioFactory.serverSocketChannelClass())
@@ -67,9 +71,9 @@ public class SocketServer implements Closeable, AutoCloseable {
                 /*地址重用，socket链接断开后，立即可以被其他请求使用*/
                 .childOption(ChannelOption.SO_REUSEADDR, true)
                 /*发送缓冲区 影响 channel.isWritable()*/
-                .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(1, (int) BytesUnit.Mb.toBytes(12)))
+                .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(1, writeBytes))
                 /*接收缓冲区，使用内存池*/
-                .childOption(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(512, 2048, (int) BytesUnit.Mb.toBytes(12)))
+                .childOption(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(512, 2048, recvBytes))
                 /*为新链接到服务器的handler分配一个新的channel。ChannelInitializer用来配置新生成的channel。(如需其他的处理，继续ch.pipeline().addLast(新匿名handler对象)即可)*/
                 .childHandler(new ChannelInitializer<SocketChannel>() {
 
@@ -77,16 +81,16 @@ public class SocketServer implements Closeable, AutoCloseable {
                     public void initChannel(SocketChannel socketChannel) throws Exception {
                         try {
                             ChannelPipeline pipeline = socketChannel.pipeline();
-                            if (socketServerConfig.isDebug()) {
+                            if (config.isDebug()) {
                                 pipeline.addLast("logging", new LoggingHandler("DEBUG"));// 设置log监听器，并且日志级别为debug，方便观察运行流程
                             }
 
-                            pipeline.addFirst(new WxdOptionalSslHandler(socketServerConfig.sslContext()));
+                            pipeline.addFirst(new WxdOptionalSslHandler(sslContext));
 
                             /*设置读取空闲*/
-                            pipeline.addLast("idleHandler", socketServerConfig.idleStateHandler());
+                            pipeline.addLast("idleHandler", config.idleStateHandler());
                             /* socket 选择器 区分是tcp websocket http*/
-                            pipeline.addLast("socket-choose-handler", new SocketServerChooseHandler(socketServerConfig));
+                            pipeline.addLast("socket-choose-handler", new SocketServerChooseHandler(config));
                             /*处理链接*/
                             pipeline.addLast("device-handler", socketServerDeviceHandler);
                             /*解码消息*/
@@ -95,7 +99,7 @@ public class SocketServer implements Closeable, AutoCloseable {
                             pipeline.addLast("encode", serverMessageEncode);
                             addChanelHandler(socketChannel, pipeline);
                         } catch (Exception e) {
-                            log.error("SocketServer init fail port: {}", socketServerConfig.getPort(), e);
+                            log.error("SocketServer init fail port: {}", config.getPort(), e);
                             throw e;
                         }
                     }
@@ -104,12 +108,12 @@ public class SocketServer implements Closeable, AutoCloseable {
 
 
         try {
-            future = bootstrap.bind(socketServerConfig.getPort());
+            future = bootstrap.bind(config.getPort());
             future.syncUninterruptibly();
             serverChannel = future.channel();
-            log.info("SocketServer started at port {}", socketServerConfig.getPort());
+            log.info("SocketServer started at port {}", config.getPort());
         } catch (Exception e) {
-            throw Throw.of("SocketServer start fail port: " + socketServerConfig.getPort(), e);
+            throw Throw.of("SocketServer start fail port: " + config.getPort(), e);
         }
     }
 

@@ -19,13 +19,25 @@ public class SocketServerModule extends ServiceModule {
     }
 
     @Override protected void bind() throws Throwable {
-        SocketServerConfig serverConfig = BootConfig.getIns().getObject("socket.server", SocketServerConfig.class);
-        if (serverConfig != null && serverConfig.getPort() > 0) {
-            if (serverConfig.isEnabledWebSocket() && StringUtils.isBlank(serverConfig.getWebSocketPrefix())) {
-                throw new RuntimeException("WebSocket 模块配置错误，WebSocket 模块需要配置 WebSocket 前缀");
+        {
+            SocketServerConfig serverConfig = BootConfig.getIns().getNestedValue("socket.server", SocketServerConfig.class);
+            if (serverConfig != null && serverConfig.getPort() > 0) {
+                if (serverConfig.isEnabledWebSocket() && StringUtils.isBlank(serverConfig.getWebSocketPrefix())) {
+                    throw new RuntimeException("WebSocket 模块配置错误，WebSocket 模块需要配置 WebSocket 前缀");
+                }
+                SocketServerImpl server = new SocketServerImpl(serverConfig);
+                bindInstance(server);
             }
-            SocketService server = new SocketService(serverConfig);
-            bindInstance(server);
+        }
+        {
+            SocketServerConfig serverConfig = BootConfig.getIns().getNestedValue("socket.server-second", SocketServerConfig.class);
+            if (serverConfig != null && serverConfig.getPort() > 0) {
+                if (serverConfig.isEnabledWebSocket() && StringUtils.isBlank(serverConfig.getWebSocketPrefix())) {
+                    throw new RuntimeException("WebSocket 模块配置错误，WebSocket 模块需要配置 WebSocket 前缀");
+                }
+                SocketServerImpl2 server = new SocketServerImpl2(serverConfig);
+                bindInstance(server);
+            }
         }
     }
 

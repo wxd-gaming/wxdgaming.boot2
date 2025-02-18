@@ -20,20 +20,16 @@ public class SocketClientModule extends ServiceModule {
 
     @Override protected void bind() throws Throwable {
         {
-            SocketClientConfig clientConfig = BootConfig.getIns().getObject("socket.client", SocketClientConfig.class);
+            SocketClientConfig clientConfig = BootConfig.getIns().getNestedValue("socket.client", SocketClientConfig.class);
             if (clientConfig != null && clientConfig.getPort() > 0) {
                 if (clientConfig.isEnabledWebSocket()) {
                     if (StringUtils.isBlank(clientConfig.getWebSocketPrefix())) {
                         throw new RuntimeException("WebSocket 模块配置错误，WebSocket 模块需要配置 WebSocket 前缀");
                     }
-                    WebSocketClient webSocketClient = new WebSocketClient(clientConfig);
-                    bindInstance(SocketClient.class, webSocketClient);
-                    bindInstance(WebSocketClient.class, webSocketClient);
-                } else {
-                    TcpSocketClient tcpSocketClient = new TcpSocketClient(clientConfig);
-                    bindInstance(SocketClient.class, tcpSocketClient);
-                    bindInstance(TcpSocketClient.class, tcpSocketClient);
                 }
+                SocketClientImpl socketClient = new SocketClientImpl(clientConfig);
+                bindInstance(SocketClient.class, socketClient);
+                bindInstance(SocketClientImpl.class, socketClient);
             }
         }
     }

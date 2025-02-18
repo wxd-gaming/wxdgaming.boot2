@@ -1,0 +1,106 @@
+debug: true
+sid: 1
+executor:
+  defaultCoreSize: 2                   #默认线程池的核心线程数
+  defaultMaxSize: 4                    #默认线程池的最大线程数
+  logicCoreSize: 10                    #逻辑线程池
+  logicMaxSize: 32                     #逻辑线程池
+  virtualCoreSize: 100                 #虚拟线程池
+  virtualMaxSize: 200                  #虚拟线程池
+scheduled:
+  coreSize: 1
+http:
+  client:
+    core: 20                            #连接池的核心连接数
+    max: 300                            #连接池的最大连接数
+    resetTimeM: 30                      #连接池重置时间，时间太长连接池会异常 单位分钟
+    sslProtocol: TLS                    #ssl 类型
+    connectTimeOut: 3000                #创建连接超时时间
+    connectionRequestTimeout: 1000      #从连接池获取连接超时
+    keepAliveTimeout: 30000             #连接有效时间
+    readTimeout: 3000                   #读取超时时间
+socket:
+  server:
+    debug: false
+    port: 8080
+    enabledHttp: true              #是否启用http
+    enabledTcp: false              #是否启用tcp
+    enabledWebSocket: false        #是否启用websocket
+    webSocketPrefix: ""            #websocket前缀
+    maxAggregatorLength: 64        #聚合器最大长度
+    maxFrameBytes: -1              #单个消息最大长度
+    maxFrameLength: -1             #一秒钟接收消息最大数量
+    sslProtocolType: TLS           #ssll类型
+    sslKeyStorePath: ""            #jks证书路径
+    sslPasswordPath: ""            #jks证书密码路径
+    idleTimeout: 0
+    writeTimeout: 0
+    readTimeout: 0
+  client:
+    debug: false
+    host: 127.0.0.1
+    port: 8080
+    connectTimeout: 500             #创建链接的超时时间
+    enabledTcp: true                #是否启用tcp
+    enabledWebSocket: false         #是否启用websocket
+    webSocketPrefix: ""             #websocket前缀
+    enableReconnection: true        #是否启用重连
+    enabledSSL: true
+    maxAggregatorLength: 64        #聚合器最大长度
+    maxConnectionCount: 1
+    maxFrameBytes: -1              #单个消息最大长度
+    maxFrameLength: -1             #一秒钟接收消息最大数量
+    sslProtocolType: TLS           #ssll类型
+    sslKeyStorePath: ""            #jks证书路径
+    sslPasswordPath: ""            #jks证书密码路径
+    idleTimeout: 0
+    writeTimeout: 0
+    readTimeout: 0
+db:
+  pgsql:
+    debug: true                 #调试模式将会显示sql语句
+    driverClassName: "org.postgresql.Driver"
+    url: "jdbc:postgresql://192.168.137.10:5432/test1"
+    username: "postgres"
+    password: "test"
+    scanPackage: ""             #扫描路径
+    connectionTimeoutMs: 2000   #链接超时单位毫秒
+    idleTimeoutM: 10            #空闲超时单位分钟
+    minPoolSize: 5              #最小连接数
+    maxPoolSize: 20             #最大连接数
+
+  pgsql-second: #第二个数据库
+    debug: true                 #调试模式将会显示sql语句
+    driverClassName: "org.postgresql.Driver"
+    url: "jdbc:postgresql://192.168.137.10:5432/test2"
+    username: "postgres"
+    password: "test"
+    scanPackage: ""             #扫描路径
+    connectionTimeoutMs: 2000   #链接超时单位毫秒
+    idleTimeoutM: 10            #空闲超时单位分钟
+    minPoolSize: 5              #最小连接数
+    maxPoolSize: 20             #最大连接数
+
+  mysql:
+    debug: true                 #调试模式将会显示sql语句
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    url: "jdbc:mysql://192.168.137.10:3306/test1"
+    username: "root"
+    password: "test"
+    scanPackage: ""             #扫描路径
+    connectionTimeoutMs: 2000   #链接超时单位毫秒
+    idleTimeoutM: 10            #空闲超时单位分钟
+    minPoolSize: 5              #最小连接数
+    maxPoolSize: 20             #最大连接数
+
+  mysql-second: #第二个数据库
+    debug: true                 #调试模式将会显示sql语句
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    url: "jdbc:mysql://192.168.137.10:3306/test2"
+    username: "root"
+    password: "test"
+    scanPackage: ""             #扫描路径
+    connectionTimeoutMs: 2000   #链接超时单位毫秒
+    idleTimeoutM: 10            #空闲超时单位分钟
+    minPoolSize: 5              #最小连接数
+    maxPoolSize: 20             #最大连接数

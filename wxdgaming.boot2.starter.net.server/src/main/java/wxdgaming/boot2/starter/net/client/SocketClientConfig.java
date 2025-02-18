@@ -4,6 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.net.ssl.SslContextByJks;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
  **/
 @Getter
 @Setter
+@Accessors(chain = true)
 public class SocketClientConfig extends ObjectBase {
 
     @JSONField(ordinal = 1)
@@ -29,8 +31,6 @@ public class SocketClientConfig extends ObjectBase {
     private String host = "127.0.0.1";
     @JSONField(ordinal = 2)
     private int port = 8080;
-    @JSONField(ordinal = 3)
-    private boolean enabledTcp = true;
     @JSONField(ordinal = 5)
     private boolean enabledWebSocket = false;
     /** 如果开启 websocket 可以指定后缀 */
@@ -66,6 +66,13 @@ public class SocketClientConfig extends ObjectBase {
     private int idleTimeout = 0;
     @JSONField(ordinal = 33)
     private int connectTimeout = 500;
+
+    /** 接收缓冲区大小，单位 mb */
+    @JSONField(ordinal = 40)
+    private int recvByteBufM = 12;
+    /** 发送缓冲区大小，单位 mb */
+    @JSONField(ordinal = 41)
+    private int writeByteBufM = 12;
 
     public IdleStateHandler idleStateHandler() {
         return new IdleStateHandler(getReadTimeout(), getWriteTimeout(), getIdleTimeout(), TimeUnit.SECONDS);

@@ -42,7 +42,7 @@ public class ClientMessageDecode extends MessageDecode {
     }
 
     @Override protected void actionBytes(ChannelHandlerContext ctx, ByteBuf byteBuf) throws Exception {
-        if (!socketClientConfig.isEnabledTcp()) {
+        if (socketClientConfig.isEnabledWebSocket()) {
             if (log.isDebugEnabled()) {
                 log.debug("{} 不支持 tcp socket 服务 {}", ChannelUtil.ctxTostring(ctx), byteBuf.getClass().getName());
             }

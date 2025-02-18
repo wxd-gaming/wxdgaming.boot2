@@ -4,10 +4,10 @@ import com.alibaba.fastjson.annotation.JSONField;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.net.ssl.SslContextByJks;
-import wxdgaming.boot2.starter.net.ssl.SslContextNoFile;
 import wxdgaming.boot2.starter.net.ssl.SslProtocolType;
 
 import javax.net.ssl.SSLContext;
@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
  **/
 @Getter
 @Setter
+@Accessors(chain = true)
 public class SocketServerConfig extends ObjectBase {
 
     @JSONField(ordinal = 1)
@@ -57,6 +58,12 @@ public class SocketServerConfig extends ObjectBase {
     private int writeTimeout = 0;
     @JSONField(ordinal = 32)
     private int idleTimeout = 0;
+    /** 接收缓冲区大小，单位 mb */
+    @JSONField(ordinal = 40)
+    private int recvByteBufM = 12;
+    /** 发送缓冲区大小，单位 mb */
+    @JSONField(ordinal = 41)
+    private int writeByteBufM = 12;
 
     public IdleStateHandler idleStateHandler() {
         return new IdleStateHandler(getReadTimeout(), getWriteTimeout(), getIdleTimeout(), TimeUnit.SECONDS);
@@ -67,7 +74,10 @@ public class SocketServerConfig extends ObjectBase {
             return null;
         }
         if (StringUtils.isBlank(sslKeyStorePath)) {
-            return SslContextNoFile.sslContext(sslProtocolType);
+            throw new RuntimeException("jks path error");
+        }
+        if (StringUtils.isBlank(sslPasswordPath)) {
+            throw new RuntimeException("jks pwd path error");
         }
         return SslContextByJks.sslContext(sslProtocolType, sslKeyStorePath, sslPasswordPath);
     }

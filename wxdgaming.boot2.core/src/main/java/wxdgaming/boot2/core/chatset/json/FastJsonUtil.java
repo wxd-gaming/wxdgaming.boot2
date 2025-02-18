@@ -250,4 +250,54 @@ public class FastJsonUtil {
                         ParameterizedTypeImpl.genericTypes(HashMap.class, HashMap.class, keyType, valueType)
                 );
     }
+
+    public static <T> T getObject(JSONObject source, String key, Class<T> clazz, Object defaultValue) {
+        T object = source.getObject(key, clazz);
+        if (object == null) {
+            if (defaultValue == null) return null;
+            if (clazz.isInstance(defaultValue)) {
+                return clazz.cast(defaultValue);
+            }
+            object = FastJsonUtil.parse(String.valueOf(defaultValue), clazz);
+        }
+        return object;
+    }
+
+    public static <T> T getNestedValue(JSONObject source, String path, Class<T> clazz) {
+        return getNestedValue(source, path, clazz, null);
+    }
+
+    /** 泛型方法：通过路由获取嵌套的 JSON 数据并转换为指定类型 */
+    public static <T> T getNestedValue(JSONObject source, String path, Class<T> clazz, Object defaultValue) {
+        Object value = getNestedValue(source, path);
+        if (value == null) {
+            if (defaultValue == null) return null;
+            if (clazz.isInstance(defaultValue)) {
+                return clazz.cast(defaultValue);
+            }
+            return FastJsonUtil.parse(String.valueOf(defaultValue), clazz);
+        }
+        if (clazz.isInstance(value)) {
+            return clazz.cast(value);
+        }
+        return FastJsonUtil.parse(String.valueOf(value), clazz);
+    }
+
+    /** 新增方法：通过路由获取嵌套的 JSON 数据 */
+    private static Object getNestedValue(JSONObject source, String path) {
+        String[] keys = path.split("\\.");
+        Object current = source;
+        for (int i = 0; i < keys.length; i++) {
+            String key = keys[i];
+            if (!(current instanceof JSONObject jsonObject)) {
+                return null; // 如果当前对象不是 JSON 对象，则返回 null
+            }
+            current = jsonObject.get(key);
+            if (current == null) {
+                return null; // 如果路径中的某个部分不是 JSON 对象，则返回 null
+            }
+        }
+        return current; // 返回最终的 JSON 对象或值
+    }
+
 }

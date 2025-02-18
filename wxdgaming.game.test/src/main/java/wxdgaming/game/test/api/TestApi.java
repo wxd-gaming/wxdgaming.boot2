@@ -57,6 +57,12 @@ public class TestApi {
         throw new RuntimeException("test");
     }
 
+    @RpcRequest
+    public String rpcIndex2(JSONObject paramData) {
+        log.info("{}", paramData);
+        return "ok";
+    }
+
     @Scheduled("*/10")
     public void timer() {
         log.info("{}", "timer()");

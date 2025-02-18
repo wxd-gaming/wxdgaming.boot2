@@ -6,7 +6,9 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.mysql.cj.jdbc.Driver;
 import org.junit.Test;
 import wxdgaming.boot2.core.BootConfig;
+import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.threading.ExecutorConfig;
+import wxdgaming.boot2.core.util.YamlUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 import wxdgaming.boot2.starter.net.client.SocketClientConfig;
 import wxdgaming.boot2.starter.net.httpclient.HttpClientConfig;
@@ -26,9 +28,15 @@ public class OutConfigTest {
         config.put("sid", 1);
         config.put("executor", new ExecutorConfig());
         config.put("scheduled", new ScheduledConfig());
-        config.put("http.client", new HttpClientConfig());
-        config.put("socket.server", new SocketServerConfig());
-        config.put("socket.client", new SocketClientConfig());
+        config.put("http", new JSONObject().fluentPut("client", new HttpClientConfig()));
+        config.put(
+                "socket",
+                new JSONObject()
+                        .fluentPut("server", new SocketServerConfig().setWebSocketPrefix("/ws"))
+                        .fluentPut("client", new SocketClientConfig().setWebSocketPrefix("/ws"))
+        );
+        JSONObject db = new JSONObject();
+        config.put("db", db);
         {
             SqlConfig sqlConfig = new SqlConfig();
             sqlConfig.setDebug(true);
@@ -36,7 +44,8 @@ public class OutConfigTest {
             sqlConfig.setUrl("jdbc:postgresql://192.168.137.10:5432/test2");
             sqlConfig.setUsername("postgres");
             sqlConfig.setPassword("test");
-            config.put("db.pgsql", sqlConfig);
+            db.put("pgsql", sqlConfig);
+            db.put("pgsql-second", FastJsonUtil.parse(sqlConfig.toString()));
         }
         {
             SqlConfig sqlConfig = new SqlConfig();
@@ -45,7 +54,9 @@ public class OutConfigTest {
             sqlConfig.setUsername("root");
             sqlConfig.setPassword("test");
             sqlConfig.setDriverClassName(Driver.class.getName());
-            config.put("db.mysql", sqlConfig);
+            db.put("mysql", sqlConfig);
+            db.put("mysql-second", FastJsonUtil.parse(sqlConfig.toString()));
+
         }
         String jsonFmt = JSON.toJSONString(
                 config,
@@ -54,6 +65,7 @@ public class OutConfigTest {
                 SerializerFeature.WriteNullStringAsEmpty
         );
         System.out.println(jsonFmt);
+        System.out.println(YamlUtil.dumpYaml(config));
     }
 
 }

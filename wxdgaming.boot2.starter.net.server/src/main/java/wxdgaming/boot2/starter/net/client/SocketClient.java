@@ -3,7 +3,13 @@ package wxdgaming.boot2.starter.net.client;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.http.DefaultHttpHeaders;
+import io.netty.handler.codec.http.HttpClientCodec;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.websocketx.*;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Sort;
@@ -18,8 +24,10 @@ import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 import wxdgaming.boot2.starter.net.ssl.WxdSslHandler;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import java.io.Closeable;
+import java.net.URI;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -41,9 +49,28 @@ public abstract class SocketClient implements Closeable {
     protected volatile SessionGroup sessionGroup = new SessionGroup();
     protected volatile boolean started = false;
     protected volatile boolean closed = false;
+    protected WebSocketClientHandshaker handshaker;
+    /** 包含的http head参数 */
+    protected final HttpHeaders httpHeaders = new DefaultHttpHeaders();
 
     public SocketClient(SocketClientConfig config) {
         this.config = config;
+        if (config.isEnabledWebSocket()) {
+            String protocol = "ws";
+            if (config.isEnabledSSL()) {
+                protocol = "wss";
+            }
+            String url = protocol + "://" + getConfig().getHost() + ":" + getConfig().getPort() + this.getConfig().getWebSocketPrefix();
+            log.debug("{}", url);
+            handshaker = WebSocketClientHandshakerFactory.newHandshaker(
+                    URI.create(url),
+                    WebSocketVersion.V13,
+                    null,
+                    false,
+                    httpHeaders,
+                    (int) BytesUnit.Mb.toBytes(config.getMaxAggregatorLength())/*64 mb*/
+            );
+        }
     }
 
     @Start
@@ -53,6 +80,11 @@ public abstract class SocketClient implements Closeable {
         SocketClientDeviceHandler socketClientDeviceHandler = new SocketClientDeviceHandler();
         ClientMessageDecode clientMessageDecode = new ClientMessageDecode(config, protoListenerFactory, httpListenerFactory);
         ClientMessageEncode clientMessageEncode = new ClientMessageEncode(protoListenerFactory);
+        SSLContext sslContext = config.sslContext();
+
+        int writeBytes = (int) BytesUnit.Mb.toBytes(config.getWriteByteBufM());
+        int recvBytes = (int) BytesUnit.Mb.toBytes(config.getRecvByteBufM());
+        int maxContentLength = (int) BytesUnit.Mb.toBytes(config.getMaxAggregatorLength());
 
         bootstrap = new Bootstrap();
         bootstrap.group(NioFactory.clientThreadGroup())
@@ -62,9 +94,9 @@ public abstract class SocketClient implements Closeable {
                 /*是否启用心跳保活机机制*/
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 /*发送缓冲区 影响 channel.isWritable()*/
-                .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(1, (int) BytesUnit.Mb.toBytes(this.config.getMaxAggregatorLength())))
+                .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(1, writeBytes))
                 /*使用内存池*/
-                .option(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(64, 1024, (int) BytesUnit.Mb.toBytes(this.config.getMaxAggregatorLength())))
+                .option(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(64, 1024, recvBytes))
                 .handler(new ChannelInitializer<SocketChannel>() {
 
                     @Override
@@ -74,7 +106,7 @@ public abstract class SocketClient implements Closeable {
                             pipeline.addLast(new LoggingHandler("DEBUG"));/*设置log监听器，并且日志级别为debug，方便观察运行流程*/
                         }
                         if (SocketClient.this.config.isEnabledSSL()) {
-                            SSLEngine sslEngine = SocketClient.this.config.sslContext().createSSLEngine();
+                            SSLEngine sslEngine = sslContext.createSSLEngine();
                             sslEngine.setUseClientMode(true);
                             sslEngine.setNeedClientAuth(false);
                             pipeline.addFirst("sslhandler", new WxdSslHandler(sslEngine));
@@ -87,6 +119,17 @@ public abstract class SocketClient implements Closeable {
                         pipeline.addLast("decode", clientMessageDecode);
                         /*解码消息*/
                         pipeline.addLast("encode", clientMessageEncode);
+
+                        if (config.isEnabledWebSocket()) {
+
+                            // HttpServerCodec：将请求和应答消息解码为HTTP消息
+                            pipeline.addBefore("device-handler", "http-codec", new HttpClientCodec());
+                            pipeline.addBefore("device-handler", "http-object-aggregator", new HttpObjectAggregator(maxContentLength));/*接受完整的http消息 64mb*/
+                            // ChunkedWriteHandler：向客户端发送HTML5文件,文件过大会将内存撑爆
+                            pipeline.addBefore("device-handler", "http-chunked", new ChunkedWriteHandler());
+                            pipeline.addBefore("device-handler", "websocket-aggregator", new WebSocketFrameAggregator(maxContentLength));
+                            pipeline.addBefore("device-handler", "ProtocolHandler", new WebSocketClientProtocolHandler(handshaker));
+                        }
 
                         addChanelHandler(socketChannel, pipeline);
                     }
@@ -127,8 +170,14 @@ public abstract class SocketClient implements Closeable {
                     if (config.getMaxFrameBytes() > 0) {
                         socketSession.setMaxFrameBytes(BytesUnit.Mb.toBytes(getConfig().getMaxFrameBytes()));
                     }
+
                     socketSession.setMaxFrameLength(getConfig().getMaxFrameLength());
                     socketSession.setSsl(config.isEnabledSSL());
+
+                    if (config.isEnabledWebSocket()) {
+                        socketSession.setWebSocket(true);
+                    }
+
                     log.debug("{} connect success {}", this.getClass().getSimpleName(), channel);
 
                     sessionGroup.add(socketSession);

@@ -8,7 +8,9 @@ import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.lang.Tuple2;
 import wxdgaming.boot2.core.threading.ExecutorConfig;
 import wxdgaming.boot2.core.util.JvmUtil;
+import wxdgaming.boot2.core.util.YamlUtil;
 
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
@@ -26,10 +28,15 @@ public class BootConfig {
     private BootConfig() {}
 
     public void loadConfig() throws Exception {
-        String property = JvmUtil.getProperty("boot.config", "boot.json", s -> s);
+        String property = JvmUtil.getProperty("boot.config", "boot.yml", s -> s);
         Tuple2<Path, byte[]> inputStream = FileUtil.findInputStream(BootConfig.class.getClassLoader(), property);
-        String json = new String(inputStream.getRight(), StandardCharsets.UTF_8);
-        config = JSONObject.parseObject(json);
+        if (property.endsWith(".json")) {
+            String json = new String(inputStream.getRight(), StandardCharsets.UTF_8);
+            config = JSONObject.parseObject(json);
+        } else {
+            config = YamlUtil.loadYaml(new ByteArrayInputStream(inputStream.getRight()));
+        }
+
     }
 
     private JSONObject config = new JSONObject(true);
@@ -76,8 +83,16 @@ public class BootConfig {
         return config.getIntValue(key);
     }
 
-    public int getInteger(String key) {
+    public Integer getInteger(String key) {
         return config.getInteger(key);
+    }
+
+    public Long getLong(String key) {
+        return config.getLong(key);
+    }
+
+    public long getLongValue(String key) {
+        return config.getLongValue(key);
     }
 
     public String getString(String key) {
@@ -89,44 +104,17 @@ public class BootConfig {
     }
 
     public <T> T getObject(String key, Class<T> clazz, Object defaultValue) {
-        T object = config.getObject(key, clazz);
-        if (object == null) {
-            if (defaultValue == null) return null;
-            if (clazz.isInstance(defaultValue)) {
-                return clazz.cast(defaultValue);
-            }
-            object = FastJsonUtil.parse(String.valueOf(defaultValue), clazz);
-        }
-        return object;
+        return FastJsonUtil.getObject(config, key, clazz, defaultValue);
     }
 
-
-    /** 新增方法：通过路由获取嵌套的 JSON 数据 */
-    public Object getNestedValue(String path) {
-        String[] keys = path.split("\\.");
-        Object current = config;
-        for (String key : keys) {
-            if (!(current instanceof JSONObject jsonObject)) {
-                return null; // 如果当前对象不是 JSON 对象，则返回 null
-            }
-            current = jsonObject.get(key);
-            if (current == null) {
-                return null; // 如果路径中的某个部分不是 JSON 对象，则返回 null
-            }
-        }
-        return current; // 返回最终的 JSON 对象或值
+    public <T> T getNestedValue(String path, Class<T> clazz) {
+        return FastJsonUtil.getNestedValue(config, path, clazz, null);
     }
 
     /** 泛型方法：通过路由获取嵌套的 JSON 数据并转换为指定类型 */
-    public <T> T getNestedValue(String path, Class<T> clazz) {
-        Object value = getNestedValue(path);
-        if (value == null) {
-            return null;
-        }
-        if (clazz.isInstance(value)) {
-            return clazz.cast(value);
-        }
-        return FastJsonUtil.parse(String.valueOf(value), clazz);
+    public <T> T getNestedValue(String path, Class<T> clazz, Object defaultValue) {
+        return FastJsonUtil.getNestedValue(config, path, clazz, defaultValue);
     }
+
 
 }

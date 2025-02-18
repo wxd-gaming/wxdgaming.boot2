@@ -63,6 +63,19 @@ public class RunResult extends JSONObject {
         return this;
     }
 
+    public <T> T getObject(String key, Class<T> clazz, Object defaultValue) {
+        return FastJsonUtil.getObject(this, key, clazz, defaultValue);
+    }
+    /** 泛型方法：通过路由获取嵌套的 JSON 数据并转换为指定类型 */
+    public <T> T getNestedValue(String path, Class<T> clazz) {
+        return FastJsonUtil.getNestedValue(this, path, clazz, null);
+    }
+
+    /** 泛型方法：通过路由获取嵌套的 JSON 数据并转换为指定类型 */
+    public <T> T getNestedValue(String path, Class<T> clazz, Object defaultValue) {
+        return FastJsonUtil.getNestedValue(this, path, clazz, defaultValue);
+    }
+
     @Override public RunResult fluentPut(String key, Object value) {
         super.fluentPut(key, value);
         return this;

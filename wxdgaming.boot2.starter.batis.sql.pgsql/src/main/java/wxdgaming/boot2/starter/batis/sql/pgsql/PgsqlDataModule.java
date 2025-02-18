@@ -20,21 +20,21 @@ public class PgsqlDataModule extends ServiceModule {
 
     @Override protected void bind() throws Throwable {
         {
-            SqlConfig sqlConfig = BootConfig.getIns().getObject("db.pgsql", SqlConfig.class);
+            SqlConfig sqlConfig = BootConfig.getIns().getNestedValue("db.pgsql", SqlConfig.class);
             if (sqlConfig != null) {
                 PgsqlService dataHelper = new PgsqlService(sqlConfig);
                 bindInstance(PgsqlService.class, dataHelper);
             }
         }
         {
-            SqlConfig sqlConfig = BootConfig.getIns().getObject("db.pgsql.second", SqlConfig.class);
+            SqlConfig sqlConfig = BootConfig.getIns().getNestedValue("db.pgsql-second", SqlConfig.class);
             if (sqlConfig != null) {
                 PgsqlService2 dataHelper = new PgsqlService2(sqlConfig);
                 bindInstance(PgsqlService2.class, dataHelper);
             }
         }
         {
-            SqlConfig sqlConfig = BootConfig.getIns().getObject("db.pgsql.third", SqlConfig.class);
+            SqlConfig sqlConfig = BootConfig.getIns().getNestedValue("db.pgsql-third", SqlConfig.class);
             if (sqlConfig != null) {
                 PgsqlService3 dataHelper = new PgsqlService3(sqlConfig);
                 bindInstance(PgsqlService3.class, dataHelper);

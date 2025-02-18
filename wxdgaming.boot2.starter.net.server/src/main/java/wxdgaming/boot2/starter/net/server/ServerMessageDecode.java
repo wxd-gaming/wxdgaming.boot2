@@ -50,8 +50,8 @@ public class ServerMessageDecode extends MessageDecode {
 
     @Override protected void actionWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) {
         if (!config.isEnabledWebSocket()) {
-            if (log.isDebugEnabled()) {
-                log.debug("{} 不支持 WebSocket 服务 {}", ChannelUtil.ctxTostring(ctx), frame.getClass().getName());
+            if (log.isWarnEnabled()) {
+                log.warn("{} 不支持 WebSocket 服务 {}", ChannelUtil.ctxTostring(ctx), frame.getClass().getName());
             }
             ctx.disconnect();
             ctx.close();
@@ -62,8 +62,8 @@ public class ServerMessageDecode extends MessageDecode {
 
     @Override protected void actionBytes(ChannelHandlerContext ctx, ByteBuf byteBuf) throws Exception {
         if (!config.isEnabledTcp()) {
-            if (log.isDebugEnabled()) {
-                log.debug("{} 不支持 tcp socket 服务 {}", ChannelUtil.ctxTostring(ctx), byteBuf.getClass().getName());
+            if (log.isWarnEnabled()) {
+                log.warn("{} 不支持 tcp socket 服务 {}", ChannelUtil.ctxTostring(ctx), byteBuf.getClass().getName());
             }
             ctx.disconnect();
             ctx.close();
@@ -74,8 +74,8 @@ public class ServerMessageDecode extends MessageDecode {
 
     @Override protected void actionHttpRequest(ChannelHandlerContext ctx, FullHttpRequest httpRequest) throws Exception {
         if (!config.isEnabledHttp()) {
-            if (log.isDebugEnabled()) {
-                log.debug("{} 不支持 Http 服务 {}", ChannelUtil.ctxTostring(ctx), httpRequest.uri());
+            if (log.isWarnEnabled()) {
+                log.warn("{} 不支持 Http 服务 {}", ChannelUtil.ctxTostring(ctx), httpRequest.uri());
             }
             ctx.disconnect();
             ctx.close();

@@ -30,12 +30,6 @@ public class SslContextByJks implements Serializable {
     private static final ConcurrentHashMap<SslProtocolType, ConcurrentHashMap<String, SSLContext>> sslContextMap = new ConcurrentHashMap<>();
 
     public static SSLContext sslContext(SslProtocolType sslProtocolType, String jks_path, String jks_pwd_path) {
-
-        if (sslProtocolType == null
-            || jks_path == null || jks_path.isBlank()
-            || jks_pwd_path == null || jks_pwd_path.isBlank())
-            return null;
-
         Map<String, SSLContext> row = sslContextMap.computeIfAbsent(sslProtocolType, l -> new ConcurrentHashMap<>());
         return row.computeIfAbsent(jks_path, l -> {
             try {
