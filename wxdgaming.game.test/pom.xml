@@ -34,6 +34,11 @@
         </dependency>
         <dependency>
             <groupId>wxdgaming.boot2</groupId>
+            <artifactId>wxdgaming.boot2.starter.net.httpclient</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>wxdgaming.boot2</groupId>
             <artifactId>wxdgaming.boot2.starter.net.server</artifactId>
             <version>${project.version}</version>
         </dependency>

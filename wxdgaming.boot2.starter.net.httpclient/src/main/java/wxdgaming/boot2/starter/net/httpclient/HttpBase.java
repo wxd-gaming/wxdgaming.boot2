@@ -53,10 +53,10 @@ public class HttpBase<H extends HttpBase> implements Closeable {
     public HttpBase(HttpClientPool httpClientPool, String uriPath) {
         this.httpClientPool = httpClientPool;
         this.uriPath = uriPath;
-        connectionRequestTimeout = httpClientPool.getConnectionRequestTimeout();
-        connTimeout = httpClientPool.getConnectTimeOut();
-        readTimeout = httpClientPool.getReadTimeout();
-        header("user-agent", "wxd-gaming j21");
+        connectionRequestTimeout = httpClientPool.getClientConfig().getConnectionRequestTimeout();
+        connTimeout = httpClientPool.getClientConfig().getConnectTimeOut();
+        readTimeout = httpClientPool.getClientConfig().getReadTimeout();
+        header("user-agent", "wxd-gaming jdk 21");
         response = new Response(this, uriPath);
     }
 

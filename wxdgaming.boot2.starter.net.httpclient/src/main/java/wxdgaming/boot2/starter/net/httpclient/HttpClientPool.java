@@ -13,9 +13,9 @@ import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.cache.Cache;
 import wxdgaming.boot2.core.function.Function1;
-import wxdgaming.boot2.core.util.JvmUtil;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -37,22 +37,13 @@ public class HttpClientPool implements AutoCloseable {
     protected static final Cache<String, HttpClientPool> HTTP_CLIENT_CACHE;
 
     static {
+        HttpClientConfig defaultConfig = new HttpClientConfig();
+        HttpClientConfig clientConfig = BootConfig.getIns().getObject("http.client", HttpClientConfig.class, defaultConfig);
         HTTP_CLIENT_CACHE = Cache.<String, HttpClientPool>builder().cacheName("http-client")
-                .expireAfterWrite(5, TimeUnit.MINUTES)
+                .expireAfterWrite(clientConfig.getResetTimeM(), TimeUnit.MINUTES)
                 .delay(TimeUnit.MINUTES.toMillis(1))
                 .loader((Function1<String, HttpClientPool>) s -> {
-                    Integer core = JvmUtil.getProperty("http.client.core", 50, Integer::parseInt);
-                    Integer max = JvmUtil.getProperty("http.client.max", 200, Integer::parseInt);
-                    int connectionRequestTimeout = JvmUtil.getProperty("apache.http.client.connectionRequestTimeout", 2000, Integer::parseInt);
-                    int connectTimeOut = JvmUtil.getProperty("http.client.connectTimeOut", 2000, Integer::parseInt);
-                    int readTimeout = JvmUtil.getProperty("http.client.readTimeout", 2000, Integer::parseInt);
-                    int keepAliveTimeout = JvmUtil.getProperty("http.client.keepAliveTimeout", 2000, Integer::parseInt);
-                    String sslProtocol = JvmUtil.getProperty("http.client.ssl", "TLS", str -> str);
-                    return build(core, max,
-                            connectionRequestTimeout, connectTimeOut, readTimeout,
-                            keepAliveTimeout,
-                            sslProtocol
-                    );
+                    return build(clientConfig);
                 })
                 .build();
     }
@@ -65,44 +56,16 @@ public class HttpClientPool implements AutoCloseable {
         return HTTP_CLIENT_CACHE.get(key);
     }
 
-    /***
-     *
-     * @param core 初始大小
-     * @param max 最大大小
-     * @param connectionRequestTimeout 从连接池获取链接的超时时间
-     * @param connectTimeOut 连接超时时间
-     * @param readTimeout 读取超时时间
-     * @param sslProtocol ssl 名字
-     * @return
-     */
-    public static HttpClientPool build(int core, int max,
-                                       int connectionRequestTimeout, int connectTimeOut, int readTimeout,
-                                       int keepAliveTimeout, String sslProtocol) {
-        return new HttpClientPool(core, max, connectionRequestTimeout, connectTimeOut, readTimeout, keepAliveTimeout, sslProtocol);
+    public static HttpClientPool build(HttpClientConfig clientConfig) {
+        return new HttpClientPool(clientConfig);
     }
 
+    private final HttpClientConfig clientConfig;
     private PoolingHttpClientConnectionManager connPoolMng;
     private CloseableHttpClient closeableHttpClient;
 
-    private final int core;
-    private final int max;
-    private final int connectionRequestTimeout;
-    private final int connectTimeOut;
-    private final int readTimeout;
-    private final int keepAliveTimeout;
-    private final String sslProtocol;
-
-    public HttpClientPool(int core, int max,
-                          int connectionRequestTimeout, int connectTimeOut, int readTimeout,
-                          int keepAliveTimeout,
-                          String sslProtocol) {
-        this.core = core;
-        this.max = max;
-        this.connectionRequestTimeout = connectionRequestTimeout;
-        this.connectTimeOut = connectTimeOut;
-        this.readTimeout = readTimeout;
-        this.keepAliveTimeout = keepAliveTimeout;
-        this.sslProtocol = sslProtocol;
+    public HttpClientPool(HttpClientConfig clientConfig) {
+        this.clientConfig = clientConfig;
         this.build();
     }
 
@@ -132,7 +95,7 @@ public class HttpClientPool implements AutoCloseable {
         lock.lock();
         try {
             try {
-                SSLContext sslContext = SSLContext.getInstance(sslProtocol);
+                SSLContext sslContext = SSLContext.getInstance(clientConfig.getSslProtocol());
                 X509TrustManager tm = new X509TrustManager() {
                     public X509Certificate[] getAcceptedIssuers() {return null;}
 
@@ -154,19 +117,19 @@ public class HttpClientPool implements AutoCloseable {
 
                 connPoolMng = new PoolingHttpClientConnectionManager(registry);
                 // 设置总的连接数为200，每个路由的最大连接数为20
-                connPoolMng.setMaxTotal(max);
-                connPoolMng.setDefaultMaxPerRoute(core);
+                connPoolMng.setMaxTotal(clientConfig.getMax());
+                connPoolMng.setDefaultMaxPerRoute(clientConfig.getCore());
 
                 // 初始化请求超时控制参数
                 RequestConfig requestConfig = RequestConfig.custom()
-                        .setConnectionRequestTimeout(connectionRequestTimeout) // 从线程池中获取线程超时时间
-                        .setConnectTimeout(connectTimeOut) // 连接超时时间
-                        .setSocketTimeout(readTimeout) // 设置数据超时时间
+                        .setConnectionRequestTimeout(clientConfig.getConnectionRequestTimeout()) // 从线程池中获取线程超时时间
+                        .setConnectTimeout(clientConfig.getConnectTimeOut()) // 连接超时时间
+                        .setSocketTimeout(clientConfig.getReadTimeout()) // 设置数据超时时间
                         .build();
 
 
                 ConnectionKeepAliveStrategy connectionKeepAliveStrategy = (httpResponse, httpContext) -> {
-                    return keepAliveTimeout; /*tomcat默认keepAliveTimeout为20s*/
+                    return clientConfig.getKeepAliveTimeout(); /*tomcat默认keepAliveTimeout为20s*/
                 };
 
                 HttpClientBuilder httpClientBuilder = HttpClients.custom()

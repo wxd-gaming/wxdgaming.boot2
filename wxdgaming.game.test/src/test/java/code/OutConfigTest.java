@@ -9,7 +9,9 @@ import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.threading.ExecutorConfig;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 import wxdgaming.boot2.starter.net.client.SocketClientConfig;
+import wxdgaming.boot2.starter.net.httpclient.HttpClientConfig;
 import wxdgaming.boot2.starter.net.server.SocketServerConfig;
+import wxdgaming.boot2.starter.scheduled.ScheduledConfig;
 
 /**
  * @author: wxd-gaming(無心道, 15388152619)
@@ -23,6 +25,8 @@ public class OutConfigTest {
         config.put("debug", true);
         config.put("sid", 1);
         config.put("executor", new ExecutorConfig());
+        config.put("scheduled", new ScheduledConfig());
+        config.put("http.client", new HttpClientConfig());
         config.put("socket.server", new SocketServerConfig());
         config.put("socket.client", new SocketClientConfig());
         {

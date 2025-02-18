@@ -88,6 +88,18 @@ public class BootConfig {
         return config.getObject(key, clazz);
     }
 
+    public <T> T getObject(String key, Class<T> clazz, Object defaultValue) {
+        T object = config.getObject(key, clazz);
+        if (object == null) {
+            if (defaultValue == null) return null;
+            if (clazz.isInstance(defaultValue)) {
+                return clazz.cast(defaultValue);
+            }
+            object = FastJsonUtil.parse(String.valueOf(defaultValue), clazz);
+        }
+        return object;
+    }
+
 
     /** 新增方法：通过路由获取嵌套的 JSON 数据 */
     public Object getNestedValue(String path) {
