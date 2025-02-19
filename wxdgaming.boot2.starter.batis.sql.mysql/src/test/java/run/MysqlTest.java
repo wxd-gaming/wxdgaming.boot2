@@ -58,7 +58,7 @@ public class MysqlTest {
 
     @Test
     public void selectAll() {
-        List<EntityTest> all = dataHelper.findAll(EntityTest.class);
+        List<EntityTest> all = dataHelper.findList(EntityTest.class);
         for (EntityTest entityTest : all) {
             System.out.println(entityTest);
         }

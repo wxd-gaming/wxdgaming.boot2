@@ -4,9 +4,11 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.cookie.*;
 import io.netty.util.AsciiString;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -18,16 +20,13 @@ import java.util.Set;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2022-03-14 11:34
  **/
+@Getter
 @Slf4j
 public class CookiePack implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private Set<Cookie> cookies = new LinkedHashSet<>();
-
-    public Set<Cookie> getCookies() {
-        return cookies;
-    }
 
     public String findCookieValue(AsciiString cookieKey) {
         return findCookieValue(cookieKey.toString(), "/");
@@ -197,4 +196,9 @@ public class CookiePack implements Serializable {
         }
         return null;
     }
+
+    public String toString() {
+        return clientCookieString();
+    }
+
 }

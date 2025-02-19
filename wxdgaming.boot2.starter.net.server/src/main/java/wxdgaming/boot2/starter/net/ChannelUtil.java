@@ -30,6 +30,10 @@ public class ChannelUtil implements Serializable {
         return str;
     }
 
+    static public String getCtxName(ChannelHandlerContext ctx) {
+        return getCtxName(ctx.channel());
+    }
+
     static public String getCtxName(Channel ctx) {
         String str;
         if (ctx == null) {

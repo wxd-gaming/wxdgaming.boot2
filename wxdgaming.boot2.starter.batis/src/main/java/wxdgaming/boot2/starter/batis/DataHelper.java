@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter.batis;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,24 +37,18 @@ public abstract class DataHelper<DDL extends DDLBuilder> {
 
     public abstract int tableCount(String tableName, String where, Object... args);
 
-    /** 查询表的所有数据 */
-    public abstract <R extends Entity> List<R> findAll(Class<R> cls);
+    public abstract List<JSONObject> queryListByEntity(Class<? extends Entity> cls);
+
+    public abstract List<JSONObject> queryListByEntityWhere(Class<? extends Entity> cls, String sqlWhere, Object... args);
+
+    public abstract List<JSONObject> queryListByTableName(String tableName);
 
     /** 查询表的所有数据 */
-    public abstract <R extends Entity> List<R> findAll(String tableName, Class<R> cls);
+    public abstract <R extends Entity> List<R> findList(Class<R> cls);
 
-    /**
-     * 查询表数据
-     *
-     * @param cls  返回的数据实体类
-     * @param sql  查询的sql
-     * @param args 参数
-     * @param <R>  实体模型
-     * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-02-16 01:13
-     */
-    public abstract <R extends Entity> List<R> findListBySql(Class<R> cls, String sql, Object... args);
+    /** 查询表的所有数据 */
+    public abstract <R extends Entity> List<R> findList(String tableName, Class<R> cls);
+
 
     /**
      * 查询表数据
@@ -67,6 +62,19 @@ public abstract class DataHelper<DDL extends DDLBuilder> {
      * @version: 2025-02-16 01:14
      */
     public abstract <R extends Entity> List<R> findListByWhere(Class<R> cls, String sqlWhere, Object... args);
+
+    /**
+     * 查询表数据
+     *
+     * @param cls  返回的数据实体类
+     * @param sql  查询的sql
+     * @param args 参数
+     * @param <R>  实体模型
+     * @return
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-02-16 01:13
+     */
+    public abstract <R extends Entity> List<R> findListBySql(Class<R> cls, String sql, Object... args);
 
     /**
      * 根据主键值查询
@@ -104,6 +112,8 @@ public abstract class DataHelper<DDL extends DDLBuilder> {
      * @version: 2025-02-16 01:15
      */
     public abstract <R extends Entity> R findByWhere(Class<R> cls, String sqlWhere, Object... args);
+
+    public abstract <R extends Entity> R findBySql(Class<R> cls, String sql, Object... args);
 
     /**
      * 根据主键查询数据是否已经在数据库

@@ -6,15 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.Body;
-import wxdgaming.boot2.core.ann.Param;
-import wxdgaming.boot2.core.ann.Qualifier;
-import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.ann.*;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
 import wxdgaming.boot2.core.threading.Event;
+import wxdgaming.boot2.core.threading.ThreadContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 
 import java.lang.reflect.InvocationTargetException;
@@ -102,16 +100,22 @@ public class RpcListenerTrigger extends Event {
                 {
                     Value value = parameter.getAnnotation(Value.class);
                     if (value != null) {
-                        Object valued = BootConfig.getIns().value(value, clazz);
-                        params[i] = clazz.cast(valued);
+                        params[i] = BootConfig.getIns().value(value, clazz);
                         continue;
                     }
                 }
 
                 {
+                    ThreadParam threadParam = parameter.getAnnotation(ThreadParam.class);
+                    if (threadParam != null) {
+                        params[i] = ThreadContext.context(threadParam, clazz);
+                        continue;
+                    }
+                }
+                {
                     Param param = parameter.getAnnotation(Param.class);
                     if (param != null) {
-                        String name = param.value();
+                        String name = param.path();
                         Object o;
                         try {
                             o = paramObject.getObject(name, clazz);
@@ -119,7 +123,7 @@ public class RpcListenerTrigger extends Event {
                                 o = FastJsonUtil.parse(param.defaultValue(), type);
                             }
                         } catch (Exception e) {
-                            throw Throw.of("参数：" + name, e);
+                            throw Throw.of("param 参数：" + name, e);
                         }
                         if (param.required() && o == null) {
                             throw new RuntimeException("param:" + name + " is null");
@@ -137,7 +141,7 @@ public class RpcListenerTrigger extends Event {
                             o = paramObject.toJavaObject(clazz);
                         }
                         if (o == null && StringUtils.isNotBlank(body.defaultValue())) {
-                            o = body.defaultValue();
+                            o = FastJsonUtil.parse(body.defaultValue(), clazz);
                         }
                         if (body.required() && o == null) {
                             throw new RuntimeException("body is null");
@@ -148,7 +152,7 @@ public class RpcListenerTrigger extends Event {
                 }
 
                 try {
-                    params[i] = runApplication.getInjector().getInstance(clazz);
+                    params[i] = runApplication.getInstance(clazz);
                 } catch (Exception e) {
                     Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
                     if (qualifier != null && qualifier.required()) {

@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.lang;
 
+import com.alibaba.fastjson.JSONObject;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 
 import java.io.Serial;
@@ -22,6 +23,10 @@ public abstract class ObjectBase implements Serializable, Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public JSONObject toJSONObject() {
+        return FastJsonUtil.toJSONObject(this);
     }
 
     public String toJsonString() {

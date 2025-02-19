@@ -3,6 +3,10 @@ package wxdgaming.boot2.core.threading;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.Throw;
+import wxdgaming.boot2.core.ann.ThreadParam;
+import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 
 import java.util.Map;
 
@@ -17,6 +21,26 @@ import java.util.Map;
 public class ThreadContext extends JSONObject {
 
     private static final ThreadLocal<ThreadContext> local = new InheritableThreadLocal<>();
+
+    public static <T> T context(ThreadParam threadParam, Class<T> clazz) {
+        String name = threadParam.path();
+        T o;
+        try {
+            o = ThreadContext.context(name);
+            if (clazz.isInstance(o)) {
+                return clazz.cast(o);
+            }
+            if (o == null && StringUtils.isNotBlank(threadParam.defaultValue())) {
+                o = FastJsonUtil.parse(threadParam.defaultValue(), clazz);
+            }
+        } catch (Exception e) {
+            throw Throw.of("threadParam 参数：" + name, e);
+        }
+        if (threadParam.required() && o == null) {
+            throw new RuntimeException("threadParam:" + name + " is null");
+        }
+        return o;
+    }
 
     /** 获取参数 */
     public static <T> T context(final Class<T> clazz) {

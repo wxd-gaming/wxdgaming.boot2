@@ -1,9 +1,10 @@
 package wxdgaming.boot2.starter.net.httpclient;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 import java.io.IOException;
 
@@ -25,7 +26,9 @@ public class Get extends HttpBase<Get> {
         if (log.isDebugEnabled()) {
             log.info("send url={}", url());
         }
-        response.httpResponse = httpClientPool.getCloseableHttpClient().execute(get);
+        CloseableHttpClient closeableHttpClient = httpClientPool.getCloseableHttpClient();
+        response.httpResponse = closeableHttpClient.execute(get);
+        response.cookieStore = httpClientPool.getCookieStore().getCookies();
         HttpEntity entity = response.httpResponse.getEntity();
         response.bodys = EntityUtils.toByteArray(entity);
         EntityUtils.consume(entity);

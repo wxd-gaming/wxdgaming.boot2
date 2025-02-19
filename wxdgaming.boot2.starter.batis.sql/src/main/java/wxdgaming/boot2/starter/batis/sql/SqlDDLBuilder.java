@@ -2,7 +2,10 @@ package wxdgaming.boot2.starter.batis.sql;
 
 import com.alibaba.fastjson.JSONObject;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
-import wxdgaming.boot2.starter.batis.*;
+import wxdgaming.boot2.starter.batis.ColumnType;
+import wxdgaming.boot2.starter.batis.DDLBuilder;
+import wxdgaming.boot2.starter.batis.Entity;
+import wxdgaming.boot2.starter.batis.TableMapping;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -227,8 +230,9 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
 
     /** 把数据库的数据转化成对象 */
     public <R> R data2Object(TableMapping tableMapping, JSONObject data) {
-        Object object = tableMapping.newInstance();
+        Entity object = tableMapping.newInstance();
         data2Object(tableMapping, object, data);
+        object.setNewEntity(false);
         return (R) object;
     }
 

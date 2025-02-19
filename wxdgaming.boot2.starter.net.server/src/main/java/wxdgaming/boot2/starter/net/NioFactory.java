@@ -134,21 +134,6 @@ public class NioFactory implements Serializable {
      */
     static public final String AuthUser = "__AuthUser__";
 
-    static public String getCtxName(ChannelHandlerContext ctx) {
-        String str;
-        if (ctx == null) {
-            str = "null";
-        } else {
-            Channel channel = ctx.channel();
-            if (channel != null && channel.id() != null) {
-                str = channel.id().asShortText();
-            } else {
-                str = "null";
-            }
-        }
-        return str;
-    }
-
     /**
      * 获取链接的ip地址
      *

@@ -43,18 +43,21 @@ public class BootConfig {
 
     public <R> R value(Value value, Class<R> type) {
         /*实现注入*/
-        String name = value.name();
+        String path = value.path();
         R r;
         try {
-            r = BootConfig.getIns().getObject(name, type);
+            r = BootConfig.getIns().getNestedValue(path, type);
+            if (type.isInstance(r)) {
+                return type.cast(r);
+            }
             if (r == null && !value.defaultValue().isBlank()) {
                 r = FastJsonUtil.parse(value.defaultValue(), type);
             }
         } catch (Exception e) {
-            throw Throw.of("参数：" + name, e);
+            throw Throw.of("参数：" + path, e);
         }
         if (value.required() && r == null) {
-            throw new RuntimeException("value:" + name + " is null");
+            throw new RuntimeException("value:" + path + " is null");
         }
         return r;
     }
@@ -72,11 +75,7 @@ public class BootConfig {
     }
 
     public ExecutorConfig getExecutorConfig() {
-        ExecutorConfig executor = config.getObject("executor", ExecutorConfig.class);
-        if (executor == null) {
-            executor = new ExecutorConfig();
-        }
-        return executor;
+        return getObject("executor", ExecutorConfig.class, ExecutorConfig.INSTANCE);
     }
 
     public int getIntValue(String key) {

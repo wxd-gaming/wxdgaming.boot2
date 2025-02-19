@@ -15,7 +15,7 @@ public class OutConfigTest {
 
     @Test
     public void out() {
-        BootConfig.getIns().getConfig().put("executor", new ExecutorConfig());
+        BootConfig.getIns().getConfig().put("executor", ExecutorConfig.INSTANCE);
         BootConfig.getIns().getConfig().put("socket.server", new SocketServerConfig());
         String jsonFmt = FastJsonUtil.toJsonFmt(BootConfig.getIns().getConfig());
         System.out.println(jsonFmt);

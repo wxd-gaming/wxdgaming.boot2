@@ -4,7 +4,6 @@ import com.alibaba.fastjson.annotation.JSONField;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.net.ssl.SslContextByJks;

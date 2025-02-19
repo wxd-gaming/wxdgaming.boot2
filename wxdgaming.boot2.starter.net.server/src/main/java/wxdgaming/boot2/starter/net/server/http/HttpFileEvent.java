@@ -49,18 +49,20 @@ public class HttpFileEvent extends Event {
                 /*过期时间10个小时*/
                 httpContext.getResponse().header(HttpHeaderNames.CACHE_CONTROL.toString(), "max-age=" + (60 * 60 * 10));
                 httpContext.getResponse().setResponseContentType(contentType);
-                StringBuilder stringBuilder = httpContext.showLog();
-                stringBuilder
-                        .append("\n=============================================输出================================================")
-                        .append("\n").append(HttpHeaderNames.CONTENT_TYPE).append("=").append(contentType)
-                        .append("\n")
-                        .append(HttpHeaderNames.CONTENT_LENGTH).append("=").append(inputStream.getRight().length)
-                        .append("\n")
-                        .append("file path = ").append(new File(htmlPath).getCanonicalPath())
-                        .append("\n=============================================结束================================================")
-                        .append("\n");
-                log.debug(stringBuilder.toString());
-                stringBuilder.setLength(0);
+                if (httpContext.getHttpServerConfig().isShowResponse()) {
+                    StringBuilder stringBuilder = httpContext.showLog();
+                    stringBuilder
+                            .append("\n=============================================输出================================================")
+                            .append("\n").append(HttpHeaderNames.CONTENT_TYPE).append("=").append(contentType)
+                            .append("\n")
+                            .append(HttpHeaderNames.CONTENT_LENGTH).append("=").append(inputStream.getRight().length)
+                            .append("\n")
+                            .append("file path = ").append(new File(htmlPath).getCanonicalPath())
+                            .append("\n=============================================结束================================================")
+                            .append("\n");
+                    log.debug(stringBuilder.toString());
+                    stringBuilder.setLength(0);
+                }
                 httpContext.getResponse().response(inputStream.getRight());
                 return;
             }

@@ -2,14 +2,13 @@ package wxdgaming.boot2.starter.net.httpclient;
 
 import io.netty.util.AsciiString;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpEntity;
-import org.apache.http.NoHttpResponseException;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.conn.HttpHostConnectException;
+import org.apache.hc.client5.http.HttpHostConnectException;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.NoHttpResponseException;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.threading.Event;
@@ -19,13 +18,13 @@ import wxdgaming.boot2.starter.net.http.HttpHeadNameType;
 import wxdgaming.boot2.starter.net.http.HttpHeadValueType;
 
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.SocketTimeoutException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -35,13 +34,12 @@ import java.util.function.Consumer;
  * @version: 2023-04-28 12:44
  **/
 @Slf4j
-public class HttpBase<H extends HttpBase> implements Closeable {
+public abstract class HttpBase<H extends HttpBase> {
 
     protected HttpClientPool httpClientPool;
     protected long logTime = 200;
     protected long waringTime = 1200;
     protected int connectionRequestTimeout;
-    protected int connTimeout;
     protected int readTimeout;
     protected int retry = 1;
     protected String uriPath;
@@ -54,13 +52,12 @@ public class HttpBase<H extends HttpBase> implements Closeable {
         this.httpClientPool = httpClientPool;
         this.uriPath = uriPath;
         connectionRequestTimeout = httpClientPool.getClientConfig().getConnectionRequestTimeout();
-        connTimeout = httpClientPool.getClientConfig().getConnectTimeOut();
         readTimeout = httpClientPool.getClientConfig().getReadTimeout();
         header("user-agent", "wxd-gaming jdk 21");
         response = new Response(this, uriPath);
     }
 
-    @Override public void close() {
+    public void close() {
         try {
             if (this.response.httpResponse != null) this.response.httpResponse.close();
         } catch (IOException e) {
@@ -150,7 +147,6 @@ public class HttpBase<H extends HttpBase> implements Closeable {
                     return this.response;
                 } catch (NoHttpResponseException
                          | SocketTimeoutException
-                         | ConnectTimeoutException
                          | HttpHostConnectException e) {
                     exception = e;
                     if (k > 0) {
@@ -176,8 +172,7 @@ public class HttpBase<H extends HttpBase> implements Closeable {
         throw new RuntimeException(exception);
     }
 
-    protected void request0() throws IOException {
-    }
+    protected abstract void request0() throws IOException;
 
     protected HttpGet createGet() {
         HttpGet post = new HttpGet(uriPath);
@@ -191,13 +186,12 @@ public class HttpBase<H extends HttpBase> implements Closeable {
         return post;
     }
 
-    protected void writeHeader(HttpRequestBase httpRequestBase) {
+    protected void writeHeader(HttpUriRequestBase httpRequestBase) {
 
         // 初始化请求超时控制参数
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectionRequestTimeout(connectionRequestTimeout) // 从线程池中获取线程超时时间
-                .setConnectTimeout(connTimeout) // 连接超时时间
-                .setSocketTimeout(readTimeout) // 设置数据超时时间
+                .setConnectionRequestTimeout(connectionRequestTimeout, TimeUnit.MILLISECONDS) // 从线程池中获取线程超时时间
+                .setResponseTimeout(readTimeout, TimeUnit.MILLISECONDS) // 设置数据超时时间
                 .build();
 
         /*超时设置*/
@@ -249,23 +243,13 @@ public class HttpBase<H extends HttpBase> implements Closeable {
         return (H) this;
     }
 
+    /** 从连接池获取连接超时时间 ms */
     public H connectionRequestTimeout(int timeout) {
         this.connectionRequestTimeout = timeout;
         return (H) this;
     }
 
-    /** 同时设置连接超时和读取超时时间 */
-    public H timeout(int timeout) {
-        this.connTimeout = timeout;
-        this.readTimeout = timeout;
-        return (H) this;
-    }
-
-    public H connTimeout(int timeout) {
-        this.connTimeout = timeout;
-        return (H) this;
-    }
-
+    /** 连接成功读取数据超时 ms */
     public H readTimeout(int timeout) {
         this.readTimeout = timeout;
         return (H) this;

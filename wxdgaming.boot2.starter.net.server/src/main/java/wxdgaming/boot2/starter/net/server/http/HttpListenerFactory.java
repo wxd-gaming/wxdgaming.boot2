@@ -8,9 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
-import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.util.AnnUtil;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
@@ -33,12 +33,17 @@ public class HttpListenerFactory {
 
     private ConcurrentHashMap<String, HttpMapping> httpMappingMap = new ConcurrentHashMap<>();
 
+    HttpServerConfig httpServerConfig;
     RunApplication lastRunApplication;
 
     @Init
     @Sort(7)
-    public void init(RunApplication runApplication) {
-        lastRunApplication = runApplication;
+    public void init(@Value(path = "http.server", required = false) HttpServerConfig httpServerConfig,
+                     RunApplication runApplication) {
+
+        this.httpServerConfig = Objects.returnNonNull(httpServerConfig, HttpServerConfig.INSTANCE);
+
+        this.lastRunApplication = runApplication;
 
         ConcurrentHashMap<String, HttpMapping> tmpHttpMappingMap = new ConcurrentHashMap<>();
 
@@ -98,26 +103,33 @@ public class HttpListenerFactory {
 
     public void dispatch(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) {
         try {
-            HttpContext httpContext = new HttpContext(ctx, fullHttpRequest);
+            HttpContext httpContext = new HttpContext(this.httpServerConfig, ctx, fullHttpRequest);
 
             String uriPath = httpContext.getRequest().getUriPath();
             String lowerCase = uriPath.toLowerCase();
             HttpMapping httpMapping = httpMappingMap.get(lowerCase);
             HttpRequest httpRequest = httpMapping == null ? null : httpMapping.httpRequest();
             Method method = httpMapping == null ? null : httpMapping.method();
-            boolean allMatch = lastRunApplication
-                    .classWithSuper(HttpFilter.class)
-                    .allMatch(filter -> filter.doFilter(httpRequest, method, uriPath, httpContext));
-            if (!allMatch) {
-                if (httpContext.getDisconnected().get()) {
-                    httpContext.getResponse().responseJson(RunResult.error("filter"));
-                }
+
+
+            Object filterMatch = lastRunApplication.classWithSuper(HttpFilter.class)
+                    .map(httpFilter -> httpFilter.doFilter(httpRequest, method, uriPath, httpContext))
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse(null);
+
+            if (filterMatch != null) {
+                httpContext.getResponse().response(filterMatch);
                 return;
             }
             if (httpMapping == null) {
                 HttpFileEvent httpFileEvent = new HttpFileEvent(httpContext);
                 ExecutorUtil.getVirtualExecutor().execute(httpFileEvent);
             } else {
+                if (this.httpServerConfig.isShowRequest()) {
+                    StringBuilder showLog = httpContext.showLog();
+                    log.info("{}", showLog);
+                }
                 HttpListenerTrigger httpListenerTrigger = new HttpListenerTrigger(httpMapping, lastRunApplication, httpContext);
                 httpListenerTrigger.submit();
             }

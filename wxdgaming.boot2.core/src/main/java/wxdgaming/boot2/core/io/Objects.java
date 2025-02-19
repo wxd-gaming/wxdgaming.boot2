@@ -178,4 +178,40 @@ public class Objects {
         }
         return ts1;
     }
+
+    /** 检查数组是否包含某个值 */
+    public static boolean checkHave(int[] ints, int value) {
+        for (int i : ints) {
+            if (i == value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 检查数组是否包含某个值 */
+    public static boolean checkHave(long[] longs, long value) {
+        for (long i : longs) {
+            if (i == value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean nonNull(Object obj) {
+        return obj != null;
+    }
+
+    /** 返回非null的那个参数，优先第一个 */
+    public static <R> R returnNonNull(R... args) {
+        for (int i = 0; i < args.length; i++) {
+            R arg = args[i];
+            if (arg != null) {
+                return arg;
+            }
+        }
+        throw new NullPointerException();
+    }
+
 }

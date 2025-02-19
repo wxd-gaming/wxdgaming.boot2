@@ -4,11 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import wxdgaming.boot2.starter.net.http.HttpDataAction;
 
 import java.io.File;
@@ -45,7 +45,7 @@ public class PostMulti extends HttpBase<PostMulti> {
                     builder.addTextBody(key, String.valueOf(objectObjectEntry.getValue()));
                 }
             }
-            HttpEntity build = builder.build();
+            org.apache.hc.core5.http.HttpEntity build = builder.build();
             httpRequestBase.setEntity(build);
             if (log.isDebugEnabled()) {
                 String s = new String(readBytes(build));
@@ -53,6 +53,7 @@ public class PostMulti extends HttpBase<PostMulti> {
             }
         }
         response.httpResponse = httpClientPool.getCloseableHttpClient().execute(httpRequestBase);
+        response.cookieStore = httpClientPool.getCookieStore().getCookies();
         HttpEntity entity = response.httpResponse.getEntity();
         response.bodys = EntityUtils.toByteArray(entity);
         EntityUtils.consume(entity);

@@ -5,11 +5,11 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
-import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.starter.batis.DataHelper;
 import wxdgaming.boot2.starter.batis.Entity;
@@ -237,7 +237,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         Integer scalar = executeScalar(sql, Integer.class, args);
         if (scalar == null)
             return 0;
-        return 0;
+        return scalar;
     }
 
     public int executeUpdate(String sql, Object... params) {
@@ -259,7 +259,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
                 connection.commit();
             return i;
         } catch (Exception e) {
-            throw new RuntimeException(sql, e);
+            throw Throw.of(getDbName() + " " + sql, e);
         }
     }
 
@@ -276,20 +276,19 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
                 }
                 return false;
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw Throw.of(getDbName() + " " + sql, e);
             }
         });
         return ret.get();
     }
 
-    public List<JSONObject> query(String sql, Object... params) {
+    public List<JSONObject> queryList(String sql, Object... params) {
         List<JSONObject> rows = new ArrayList<>();
         this.query(sql, params, rows::add);
         return rows;
     }
 
     public void query(String sql, Object[] params, Predicate<JSONObject> consumer) {
-
         this.queryResultSet(sql, params, resultSet -> {
             try {
                 JSONObject jsonObject = new JSONObject();
@@ -303,7 +302,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
                     return false;
                 return true;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw Throw.of(getDbName() + " " + sql, e);
             }
         });
 
@@ -332,26 +331,42 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException(sql, e);
+            throw Throw.of(getDbName() + " " + sql, e);
         }
     }
 
-    @Override public <R extends Entity> List<R> findAll(Class<R> cls) {
+    @Override public List<JSONObject> queryListByEntity(Class<? extends Entity> cls) {
         TableMapping tableMapping = tableMapping(cls);
-        return findAll(tableMapping.getTableName(), cls);
+        return queryListByTableName(tableMapping.getTableName());
     }
 
-    @Override public <R extends Entity> List<R> findAll(String tableName, Class<R> cls) {
+    @Override public List<JSONObject> queryListByEntityWhere(Class<? extends Entity> cls, String sqlWhere, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
         String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
-        List<R> ret = new ArrayList<>();
-        query(sql, Objects.ZERO_ARRAY, row -> {
-            R entity = ddlBuilder.data2Object(tableMapping, row);
-            entity.setNewEntity(false);
-            ret.add(entity);
-            return true;
-        });
-        return ret;
+        sql += " where " + sqlWhere;
+        return queryList(sql, args);
+    }
+
+    @Override public List<JSONObject> queryListByTableName(String tableName) {
+        return queryList("select * from " + tableName);
+    }
+
+    @Override public <R extends Entity> List<R> findList(Class<R> cls) {
+        TableMapping tableMapping = tableMapping(cls);
+        return findList(tableMapping.getTableName(), cls);
+    }
+
+    @Override public <R extends Entity> List<R> findList(String tableName, Class<R> cls) {
+        TableMapping tableMapping = tableMapping(cls);
+        String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
+        return findListBySql(cls, sql);
+    }
+
+    @Override public <R extends Entity> List<R> findListByWhere(Class<R> cls, String sqlWhere, Object... args) {
+        TableMapping tableMapping = tableMapping(cls);
+        String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
+        sql += " where " + sqlWhere;
+        return findListBySql(cls, sql, args);
     }
 
     @Override public <R extends Entity> List<R> findListBySql(Class<R> cls, String sql, Object... args) {
@@ -359,21 +374,6 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         List<R> ret = new ArrayList<>();
         query(sql, args, row -> {
             R entity = ddlBuilder.data2Object(tableMapping, row);
-            entity.setNewEntity(false);
-            ret.add(entity);
-            return true;
-        });
-        return ret;
-    }
-
-    @Override public <R extends Entity> List<R> findListByWhere(Class<R> cls, String sqlWhere, Object... args) {
-        TableMapping tableMapping = tableMapping(cls);
-        String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
-        sql += " where " + sqlWhere;
-        List<R> ret = new ArrayList<>();
-        query(sql, args, row -> {
-            R entity = ddlBuilder.data2Object(tableMapping, row);
-            entity.setNewEntity(false);
             ret.add(entity);
             return true;
         });
@@ -390,24 +390,21 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
         String where = ddlBuilder.buildKeyWhere(tableMapping);
         sql += " where " + where;
-        AtomicReference<R> ret = new AtomicReference<>();
-        this.query(sql, args, row -> {
-            R entity = ddlBuilder.data2Object(tableMapping, row);
-            entity.setNewEntity(false);
-            ret.set(entity);
-            return false;
-        });
-        return ret.get();
+        return findBySql(cls, sql, args);
     }
 
     @Override public <R extends Entity> R findByWhere(Class<R> cls, String sqlWhere, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
         String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
         sql += " where " + sqlWhere;
+        return findBySql(cls, sql, args);
+    }
+
+    @Override public <R extends Entity> R findBySql(Class<R> cls, String sql, Object... args) {
+        TableMapping tableMapping = tableMapping(cls);
         AtomicReference<R> ret = new AtomicReference<>();
         this.query(sql, args, row -> {
             R entity = ddlBuilder.data2Object(tableMapping, row);
-            entity.setNewEntity(false);
             ret.set(entity);
             return false;
         });

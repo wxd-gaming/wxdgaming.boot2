@@ -3,7 +3,6 @@ package wxdgaming.boot2.starter.batis;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 
 /**

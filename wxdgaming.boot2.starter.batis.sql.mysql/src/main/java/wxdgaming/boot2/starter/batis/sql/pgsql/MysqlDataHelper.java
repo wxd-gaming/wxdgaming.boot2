@@ -51,7 +51,6 @@ public class MysqlDataHelper extends SqlDataHelper<MySqlDDLBuilder> {
                 if (scalar == null || scalar != 1) {
                     String alterColumn = ddlBuilder.buildAlterColumnIndex(tableName, fieldMapping);
                     executeUpdate(alterColumn);
-                    log.warn("mysql 数据库 {}，新增索引：{}", getSqlConfig().dbName(), keyName);
                 }
             }
         }
@@ -78,7 +77,6 @@ public class MysqlDataHelper extends SqlDataHelper<MySqlDDLBuilder> {
                     ALTER TABLE %s ADD PARTITION (PARTITION %s_%s VALUES LESS THAN (%s))
                     """.formatted(tableName, tableName, partitionExpr, partitionExpr);
             executeUpdate(string);
-            log.info("数据库 {} 表 {} 创建分区 {}", sqlConfig.dbName(), tableName, partitionExpr);
         }
     }
 }

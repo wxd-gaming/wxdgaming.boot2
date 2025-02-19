@@ -42,6 +42,14 @@ public abstract class SqlDataBatch extends DataBatch {
         return (SDH) sqlDataHelper;
     }
 
+    @Override public void save(Entity entity) {
+        if (entity.isNewEntity())
+            sqlDataHelper.insert(entity);
+        else
+            sqlDataHelper.update(entity);
+        entity.setNewEntity(false);
+    }
+
     @Override public void insert(Entity entity) {
         int hashCode = entity.hashCode();
         BatchThread batchThread = batchThreads.get(hashCode % batchThreads.size());
@@ -58,13 +66,15 @@ public abstract class SqlDataBatch extends DataBatch {
 
         protected final ReentrantLock lock = new ReentrantLock();
         protected final int threadId;
+        /** key: tableName, value: {key: sql, value: params} */
         protected Table<String, String, SplitCollection<Object[]>> batchInsertMap = new Table<>();
+        /** key: tableName, value: {key: sql, value: params} */
         protected Table<String, String, SplitCollection<Object[]>> batchUpdateMap = new Table<>();
 
         protected DiffTime diffTime = new DiffTime();
         protected long executeDiffTime = 0;
         protected long executeCount = 0;
-        protected Tick ticket = new Tick(5, TimeUnit.MINUTES);
+        protected Tick ticket = new Tick(1, TimeUnit.MINUTES);
 
         public BatchThread(int threadId, String name) {
             super(name);

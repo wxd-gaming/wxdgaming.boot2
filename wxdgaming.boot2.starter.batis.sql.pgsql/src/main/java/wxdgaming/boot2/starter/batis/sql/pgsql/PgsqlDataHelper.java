@@ -40,7 +40,7 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
                 JOIN pg_namespace n ON n.oid = c.relnamespace
                 WHERE c.relkind = 'r' AND n.nspname = 'public'
                 """;
-        final List<JSONObject> jsonObjects = this.query(sql);
+        final List<JSONObject> jsonObjects = this.queryList(sql);
         for (JSONObject jsonObject : jsonObjects) {
             final String table_name = jsonObject.getString("table_name");
             final String TABLE_COMMENT = jsonObject.getString("table_comment");
@@ -70,7 +70,7 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
                 ORDER BY c.relname,a.attnum
                 """;
         LinkedHashMap<String, LinkedHashMap<String, JSONObject>> dbTableStructMap = new LinkedHashMap<>();
-        final List<JSONObject> jsonObjects = this.query(pgsql);
+        final List<JSONObject> jsonObjects = this.queryList(pgsql);
         for (JSONObject jsonObject : jsonObjects) {
             final String table_name = jsonObject.getString("table_name");
             final String column_name = jsonObject.getString("column_name");
@@ -105,7 +105,6 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
                 if (scalar == null || scalar != 1) {
                     String alterColumn = ddlBuilder.buildAlterColumnIndex(tableName, fieldMapping);
                     executeUpdate(alterColumn);
-                    log.warn("pgsql 数据库 {}，新增索引：{}", getSqlConfig().dbName(), keyName);
                 }
             }
         }
@@ -121,7 +120,6 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
         string = ddlBuilder.buildSql$$(string);
         this.executeUpdate(string);
         this.executeUpdate("COMMENT ON TABLE \"%s\" IS '%s';".formatted(tableName, comment));
-        log.warn("创建表：{}", tableName);
     }
 
     /** 添加分区 */
@@ -138,7 +136,6 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
                 .formatted(partition_table_name, tableName, from, to);
         executeUpdate(string);
         dbTableMap.put(partition_table_name, partition_table_name);
-        log.info("数据库 {} 表 {} 创建分区 {}", sqlConfig.dbName(), tableName, partition_table_name);
     }
 
     @Override protected void addColumn(String tableName, TableMapping.FieldMapping fieldMapping) {

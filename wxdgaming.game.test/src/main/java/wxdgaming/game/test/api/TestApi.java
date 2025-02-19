@@ -26,28 +26,28 @@ public class TestApi {
 
     @HttpRequest()
     public String index(RunApplication runApplication,
-                        @Value(name = "executor") ExecutorConfig executorConfig,
-                        @Value(name = "executor1", required = false) ExecutorConfig executorConfig1,
+                        @Value(path = "executor") ExecutorConfig executorConfig,
+                        @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
                         @Body(defaultValue = "1") String body,
-                        @Param(value = "b1", defaultValue = "2") int b1) {
+                        @Param(path = "b1", defaultValue = "2") int b1) {
         return "index";
     }
 
     @HttpRequest()
     public RunResult json(RunApplication runApplication,
-                          @Value(name = "executor") ExecutorConfig executorConfig,
-                          @Value(name = "executor1", required = false) ExecutorConfig executorConfig1,
+                          @Value(path = "executor") ExecutorConfig executorConfig,
+                          @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
                           @Body(defaultValue = "1") String body,
-                          @Param(value = "b1", defaultValue = "2") String b1) {
+                          @Param(path = "b1", defaultValue = "2") String b1) {
         return RunResult.ok();
     }
 
     @HttpRequest()
     public String error(RunApplication runApplication,
-                        @Value(name = "executor") ExecutorConfig executorConfig,
-                        @Value(name = "executor1", required = false) ExecutorConfig executorConfig1,
+                        @Value(path = "executor") ExecutorConfig executorConfig,
+                        @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
                         @Body(defaultValue = "1") String body,
-                        @Param(value = "b1", defaultValue = "2") String b1) {
+                        @Param(path = "b1", defaultValue = "2") String b1) {
         throw new RuntimeException("d");
     }
 

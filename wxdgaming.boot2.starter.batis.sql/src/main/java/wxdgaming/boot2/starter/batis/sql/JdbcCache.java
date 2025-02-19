@@ -35,13 +35,18 @@ public class JdbcCache<E extends Entity, UID> {
 
     protected E loader(UID uid) {
         E byId = (E) sqlDataHelper.findById(cls, uid);
-        if (byId != null)
+        if (byId != null) {
             byId.setNewEntity(false);
+            byId.checkHashCode();
+        }
         return byId;
     }
 
     protected void heart(UID uid, E e) {
-        sqlDataHelper.getSqlDataBatch().update(e);
+        boolean checkHashCode = e.checkHashCode();
+        if (checkHashCode) {
+            sqlDataHelper.getSqlDataBatch().save(e);
+        }
     }
 
     protected boolean removed(UID uid, E e) {

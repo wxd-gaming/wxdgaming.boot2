@@ -6,15 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.Body;
-import wxdgaming.boot2.core.ann.Param;
-import wxdgaming.boot2.core.ann.Qualifier;
-import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.ann.*;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
 import wxdgaming.boot2.core.threading.Event;
+import wxdgaming.boot2.core.threading.ThreadContext;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 
@@ -55,12 +54,14 @@ public class HttpListenerTrigger extends Event {
                 httpContext.getResponse().response("");
             }
         } catch (Throwable e) {
-            Throwable throwable = e.getCause();
+            if (e instanceof InvocationTargetException) {
+                e = e.getCause();
+            }
             StringBuilder stringBuilder = httpContext.showLog();
             stringBuilder
                     .append("=============================================异常================================================")
                     .append("\n")
-                    .append(Throw.ofString(throwable))
+                    .append(Throw.ofString(e))
                     .append("\n=============================================结束================================================")
                     .append("\n");
             log.error(
@@ -110,11 +111,17 @@ public class HttpListenerTrigger extends Event {
                         continue;
                     }
                 }
-
+                {
+                    ThreadParam threadParam = parameter.getAnnotation(ThreadParam.class);
+                    if (threadParam != null) {
+                        params[i] = ThreadContext.context(threadParam, clazz);
+                        continue;
+                    }
+                }
                 {
                     Param param = parameter.getAnnotation(Param.class);
                     if (param != null) {
-                        String name = param.value();
+                        String name = param.path();
                         Object o;
                         try {
                             o = context.getRequest().getReqParams().getObject(name, clazz);
@@ -151,7 +158,7 @@ public class HttpListenerTrigger extends Event {
                 }
 
                 try {
-                    params[i] = runApplication.getInjector().getInstance(clazz);
+                    params[i] = runApplication.getInstance(clazz);
                 } catch (Exception e) {
                     Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
                     if (qualifier != null && qualifier.required()) {

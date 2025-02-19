@@ -14,5 +14,5 @@ public @interface HttpRequest {
     String method() default "";
 
     /** 权限 */
-    int authority() default -1;
+    int[] authority() default -1;
 }

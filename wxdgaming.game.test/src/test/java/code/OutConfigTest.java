@@ -13,6 +13,7 @@ import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 import wxdgaming.boot2.starter.net.client.SocketClientConfig;
 import wxdgaming.boot2.starter.net.httpclient.HttpClientConfig;
 import wxdgaming.boot2.starter.net.server.SocketServerConfig;
+import wxdgaming.boot2.starter.net.server.http.HttpServerConfig;
 import wxdgaming.boot2.starter.scheduled.ScheduledConfig;
 
 /**
@@ -26,9 +27,15 @@ public class OutConfigTest {
         JSONObject config = BootConfig.getIns().getConfig();
         config.put("debug", true);
         config.put("sid", 1);
-        config.put("executor", FastJsonUtil.parse(new ExecutorConfig().toJsonString()));
-        config.put("scheduled", FastJsonUtil.parse(new ScheduledConfig().toJsonString()));
-        config.put("http", FastJsonUtil.parse(new JSONObject().fluentPut("client", new HttpClientConfig()).toString()));
+        config.put("executor", FastJsonUtil.parse(ExecutorConfig.INSTANCE.toJsonString()));
+        config.put("scheduled", FastJsonUtil.parse(ScheduledConfig.INSTANCE.toJsonString()));
+        config.put("http", FastJsonUtil.parse(
+                        new JSONObject()
+                                .fluentPut("client", HttpClientConfig.DEFAULT)
+                                .fluentPut("server", HttpServerConfig.INSTANCE)
+                                .toString()
+                )
+        );
         config.put(
                 "socket",
                 new JSONObject()

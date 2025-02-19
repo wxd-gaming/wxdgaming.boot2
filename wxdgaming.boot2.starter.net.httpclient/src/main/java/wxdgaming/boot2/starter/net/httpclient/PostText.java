@@ -5,11 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import wxdgaming.boot2.starter.net.http.HttpDataAction;
 
 import java.io.IOException;
@@ -41,6 +41,7 @@ public class PostText extends HttpBase<PostText> {
             }
         }
         response.httpResponse = httpClientPool.getCloseableHttpClient().execute(httpRequestBase);
+        response.cookieStore = httpClientPool.getCookieStore().getCookies();
         HttpEntity entity = response.httpResponse.getEntity();
         response.bodys = EntityUtils.toByteArray(entity);
         EntityUtils.consume(entity);

@@ -7,7 +7,9 @@ import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Qualifier;
 import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.threading.ThreadContext;
 import wxdgaming.boot2.core.util.AnnUtil;
 
 import java.lang.annotation.Annotation;
@@ -138,13 +140,19 @@ public class GuiceReflectContext {
                 /*实现注入*/
                 Value value = parameter.getAnnotation(Value.class);
                 if (value != null) {
-                    Object valued = BootConfig.getIns().value(value, clazz);
-                    params[i] = clazz.cast(valued);
+                    params[i] = BootConfig.getIns().value(value, clazz);
                     continue;
                 }
 
+                {
+                    ThreadParam threadParam = parameter.getAnnotation(ThreadParam.class);
+                    if (threadParam != null) {
+                        params[i] = ThreadContext.context(threadParam, clazz);
+                        continue;
+                    }
+                }
                 try {
-                    params[i] = runApplication.getInjector().getInstance(clazz);
+                    params[i] = runApplication.getInstance(clazz);
                 } catch (Exception e) {
                     Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
                     if (qualifier != null && qualifier.required()) {

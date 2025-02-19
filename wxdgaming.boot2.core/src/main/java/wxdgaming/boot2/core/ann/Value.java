@@ -14,7 +14,7 @@ import java.lang.annotation.ElementType;
 public @interface Value {
 
     /** 属性名字 */
-    String name();
+    String path();
 
     /** 必须 */
     boolean required() default true;

@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.entity.ContentType;
+import org.apache.hc.core5.http.ContentType;
 import wxdgaming.boot2.starter.net.http.HttpHeadNameType;
 import wxdgaming.boot2.starter.net.http.HttpHeadValueType;
 
@@ -70,16 +70,6 @@ public class PostMultiFile extends PostMulti {
 
     @Override public PostMultiFile connectionRequestTimeout(int timeout) {
         super.connectionRequestTimeout(timeout);
-        return this;
-    }
-
-    @Override public PostMultiFile timeout(int timeout) {
-        super.timeout(timeout);
-        return this;
-    }
-
-    @Override public PostMultiFile connTimeout(int timeout) {
-        super.connTimeout(timeout);
         return this;
     }
 

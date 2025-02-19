@@ -11,7 +11,7 @@ import java.lang.annotation.ElementType;
         ElementType.PARAMETER,
         ElementType.LOCAL_VARIABLE
 })
-public @interface Param {
+public @interface ThreadParam {
 
     /** 属性名字 path */
     String path();

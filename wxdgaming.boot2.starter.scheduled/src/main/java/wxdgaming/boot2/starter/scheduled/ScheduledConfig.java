@@ -1,7 +1,8 @@
 package wxdgaming.boot2.starter.scheduled;
 
+import com.alibaba.fastjson.annotation.JSONCreator;
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
-import lombok.Setter;
 import wxdgaming.boot2.core.lang.ObjectBase;
 
 /**
@@ -11,9 +12,15 @@ import wxdgaming.boot2.core.lang.ObjectBase;
  * @version: 2025-02-18 09:31
  **/
 @Getter
-@Setter
 public class ScheduledConfig extends ObjectBase {
 
-    protected int coreSize = 1;
+    public static final ScheduledConfig INSTANCE = new ScheduledConfig(1);
 
+    @JSONField(ordinal = 1)
+    protected final int coreSize;
+
+    @JSONCreator
+    public ScheduledConfig(@JSONField(name = "coreSize") int coreSize) {
+        this.coreSize = coreSize;
+    }
 }

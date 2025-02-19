@@ -17,9 +17,7 @@ public class ScheduledModule extends ServiceModule {
     }
 
     @Override protected void bind() throws Throwable {
-        ScheduledConfig scheduledConfig = BootConfig.getIns().getNestedValue("scheduled", ScheduledConfig.class);
-        if (scheduledConfig == null)
-            scheduledConfig = new ScheduledConfig();
+        ScheduledConfig scheduledConfig = BootConfig.getIns().getNestedValue("scheduled", ScheduledConfig.class, ScheduledConfig.INSTANCE);
         ScheduledService scheduledService = new ScheduledService(scheduledConfig);
         bindInstance(scheduledService);
     }

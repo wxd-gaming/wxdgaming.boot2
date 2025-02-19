@@ -2,8 +2,9 @@ package wxdgaming.boot2.starter.net.httpclient;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.hc.client5.http.cookie.Cookie;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.NameValuePair;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.zip.GzipUtil;
@@ -11,6 +12,7 @@ import wxdgaming.boot2.starter.net.http.HttpHeadNameType;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -28,6 +30,7 @@ public final class Response<H extends HttpBase> {
     String postText = null;
     protected CloseableHttpResponse httpResponse;
     protected byte[] bodys = null;
+    protected List<Cookie> cookieStore = null;
 
     Response(H httpBase, String uriPath) {
         this.httpBase = httpBase;
@@ -40,8 +43,17 @@ public final class Response<H extends HttpBase> {
                 .orElse(null);
     }
 
+    public String cookie(String name) {
+        if (cookieStore == null) return null;
+        return cookieStore.stream()
+                .filter(v -> v.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElse(null);
+    }
+
     public int responseCode() {
-        return httpResponse.getStatusLine().getStatusCode();
+        return httpResponse.getCode();
     }
 
     public byte[] body() {
@@ -49,6 +61,11 @@ public final class Response<H extends HttpBase> {
             return GzipUtil.unGZip(bodys);
         }
         return bodys;
+    }
+
+    public RunResult bodyRunResult() {
+        String string = bodyString(StandardCharsets.UTF_8);
+        return RunResult.parse(string);
     }
 
     public String bodyString() {

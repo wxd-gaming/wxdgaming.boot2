@@ -1,18 +1,22 @@
 package wxdgaming.boot2.starter.net.httpclient;
 
 import lombok.Getter;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.ConnectionKeepAliveStrategy;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.cookie.CookieStore;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.http.config.Registry;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.util.TimeValue;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.cache.Cache;
 import wxdgaming.boot2.core.function.Function1;
@@ -37,14 +41,11 @@ public class HttpClientPool implements AutoCloseable {
     protected static final Cache<String, HttpClientPool> HTTP_CLIENT_CACHE;
 
     static {
-        HttpClientConfig defaultConfig = new HttpClientConfig();
-        HttpClientConfig clientConfig = BootConfig.getIns().getNestedValue("http.client", HttpClientConfig.class, defaultConfig);
+        HttpClientConfig clientConfig = BootConfig.getIns().getNestedValue("http.client", HttpClientConfig.class, HttpClientConfig.DEFAULT);
         HTTP_CLIENT_CACHE = Cache.<String, HttpClientPool>builder().cacheName("http-client")
                 .expireAfterWrite(clientConfig.getResetTimeM(), TimeUnit.MINUTES)
                 .delay(TimeUnit.MINUTES.toMillis(1))
-                .loader((Function1<String, HttpClientPool>) s -> {
-                    return build(clientConfig);
-                })
+                .loader((Function1<String, HttpClientPool>) s -> build(clientConfig))
                 .build();
     }
 
@@ -61,8 +62,10 @@ public class HttpClientPool implements AutoCloseable {
     }
 
     private final HttpClientConfig clientConfig;
-    private PoolingHttpClientConnectionManager connPoolMng;
-    private CloseableHttpClient closeableHttpClient;
+    protected PoolingHttpClientConnectionManager connPoolMng;
+    protected CloseableHttpClient closeableHttpClient;
+    // 创建一个 Cookie 存储对象
+    protected final CookieStore cookieStore = new BasicCookieStore();
 
     public HttpClientPool(HttpClientConfig clientConfig) {
         this.clientConfig = clientConfig;
@@ -81,7 +84,7 @@ public class HttpClientPool implements AutoCloseable {
     @Override public void close() throws Exception {
         try {
             if (this.connPoolMng != null) {
-                this.connPoolMng.shutdown();
+                this.connPoolMng.close();
             }
         } catch (Exception ignore) {}
         try {
@@ -120,29 +123,32 @@ public class HttpClientPool implements AutoCloseable {
                 // 设置总的连接数为200，每个路由的最大连接数为20
                 connPoolMng.setMaxTotal(clientConfig.getMax());
                 connPoolMng.setDefaultMaxPerRoute(clientConfig.getCore());
+                ConnectionConfig connectionConfig = ConnectionConfig.custom()
+                        .setConnectTimeout(clientConfig.getConnectTimeOut(), TimeUnit.MILLISECONDS)
+                        .setSocketTimeout(clientConfig.getConnectTimeOut(), TimeUnit.MILLISECONDS)
+                        .build();
+                connPoolMng.setDefaultConnectionConfig(connectionConfig);
 
                 // 初始化请求超时控制参数
                 RequestConfig requestConfig = RequestConfig.custom()
-                        .setConnectionRequestTimeout(clientConfig.getConnectionRequestTimeout()) // 从线程池中获取线程超时时间
-                        .setConnectTimeout(clientConfig.getConnectTimeOut()) // 连接超时时间
-                        .setSocketTimeout(clientConfig.getReadTimeout()) // 设置数据超时时间
+                        .setConnectionRequestTimeout(clientConfig.getConnectionRequestTimeout(), TimeUnit.MILLISECONDS) // 从线程池中获取线程超时时间
+                        .setResponseTimeout(clientConfig.getReadTimeout(), TimeUnit.MILLISECONDS) // 设置数据超时时间
                         .build();
 
-
                 ConnectionKeepAliveStrategy connectionKeepAliveStrategy = (httpResponse, httpContext) -> {
-                    return clientConfig.getKeepAliveTimeout(); /*tomcat默认keepAliveTimeout为20s*/
+                    return TimeValue.of(clientConfig.getKeepAliveTimeout(), TimeUnit.MILLISECONDS); /*tomcat默认keepAliveTimeout为20s*/
                 };
+
 
                 HttpClientBuilder httpClientBuilder = HttpClients.custom()
                         .setConnectionManager(connPoolMng)
+                        .setDefaultCookieStore(cookieStore)
                         //                        .evictExpiredConnections()/*关闭异常链接*/
                         //                        .evictIdleConnections(10, TimeUnit.SECONDS)/*关闭空闲链接*/
                         .setDefaultRequestConfig(requestConfig)
-                        .setRetryHandler(new DefaultHttpRequestRetryHandler())
+                        .setRetryStrategy(DefaultHttpRequestRetryStrategy.INSTANCE) /*创建一个不进行重试的策略*/
                         .setKeepAliveStrategy(connectionKeepAliveStrategy);
 
-                httpClientBuilder.setSSLContext(sslContext);
-                httpClientBuilder.setSSLSocketFactory(sslSocketFactory);
                 closeableHttpClient = httpClientBuilder.build();
 
             } catch (Exception e) {

@@ -18,10 +18,11 @@ import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.core.zip.GzipUtil;
+import wxdgaming.boot2.starter.net.ChannelUtil;
+import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.http.CookiePack;
 import wxdgaming.boot2.starter.net.http.HttpDataAction;
 import wxdgaming.boot2.starter.net.http.HttpHeadValueType;
-import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.ssl.WxdOptionalSslHandler;
 
 import java.io.File;
@@ -46,6 +47,7 @@ public class HttpContext implements AutoCloseable {
     /** 大于 5mb 的请求会使用硬盘帮忙存储，如果小5mb会使用内存 */
     public static HttpDataFactory factory = new DefaultHttpDataFactory(BytesUnit.Mb.toBytes(10), StandardCharsets.UTF_8);
 
+    private final HttpServerConfig httpServerConfig;
     private final ChannelHandlerContext ctx;
     private final Request request;
     private final Response response;
@@ -56,7 +58,9 @@ public class HttpContext implements AutoCloseable {
     private final AtomicBoolean disconnected = new AtomicBoolean();
     private StringBuilder showLogStringBuilder = null;
 
-    public HttpContext(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) throws Exception {
+
+    public HttpContext(HttpServerConfig httpServerConfig, ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) throws Exception {
+        this.httpServerConfig = httpServerConfig;
         this.ctx = ctx;
         this.request = new Request(fullHttpRequest);
         this.response = new Response();
@@ -68,9 +72,8 @@ public class HttpContext implements AutoCloseable {
             if (request != null) {
                 showLogStringBuilder
                         .append("\n")
-                        .append("\n=============================================请求================================================")
                         .append("\n").append(request.httpMethod()).append(" ").append(request.getCompleteUri())
-                        .append("\nSession：").append(NioFactory.getCtxName(this.ctx)).append(" ").append("; Remote-Host：").append(this.getRemoteAddress()).append("; Local-Host：").append(this.getLocalAddress())
+                        .append("\nSession：").append(ChannelUtil.getCtxName(this.ctx)).append(" ").append("; Remote-Host：").append(this.getRemoteAddress()).append("; Local-Host：").append(this.getLocalAddress())
                         .append(";\nContent-type：").append(request.getReqContentType())
                         .append(";\nkeepAlive：").append(HttpContext.this.getRequest().keepAlive())
                         .append(";\n").append(HttpHeaderNames.COOKIE).append("：").append(request.header(HttpHeaderNames.COOKIE))
@@ -414,19 +417,23 @@ public class HttpContext implements AutoCloseable {
                         }
                     });
 
-            if (log.isDebugEnabled()) {
+            if (HttpContext.this.httpServerConfig.isShowResponse()) {
                 StringBuilder showLog = showLog();
                 if (!showLog.isEmpty()) {
-                    showLog.append("=============================================输出================================================")
+                    showLog.setLength(0);
+                    showLog
+                            .append("\n")
+                            .append("Session: ").append(ChannelUtil.getCtxName(getCtx()))
                             .append("\n")
                             .append(HttpHeaderNames.CONTENT_TYPE).append("=").append(responseContentType)
+                            .append("\n")
+                            .append(HttpHeaderNames.COOKIE).append("=").append(responseCookie)
                             .append("\n")
                             .append(HttpHeaderNames.CONTENT_LENGTH).append("=").append(readableBytes)
                             .append("\nbody: ")
                             .append(data)
-                            .append("\n=============================================结束================================================")
                             .append("\n");
-                    log.debug("{}", showLog);
+                    log.info("{}", showLog);
                 }
             }
 
