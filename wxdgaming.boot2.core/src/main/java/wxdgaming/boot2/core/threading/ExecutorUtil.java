@@ -174,7 +174,7 @@ public final class ExecutorUtil implements Serializable {
         }
 
         @Override public void run() {
-            Tick tick = new Tick(50, 1, TimeUnit.SECONDS);
+            Tick tick = new Tick(50, 10, TimeUnit.SECONDS);
             while (!GlobalUtil.SHUTTING.get()) {
                 try {
                     try {

@@ -15,7 +15,6 @@ import wxdgaming.boot2.starter.batis.ann.DbTable;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * 数据表映射
@@ -212,9 +211,14 @@ public class TableMapping {
                 }
                 if (object != null) {
                     switch (columnType) {
-                        case String, Json -> {
+                        case String -> {
                             if (!(object instanceof String)) {
                                 object = FastJsonUtil.toJson(object, FastJsonUtil.Writer_Features_Type_Name_NOT_ROOT);
+                            }
+                        }
+                        case Json -> {
+                            if (!(object instanceof String)) {
+                                object = FastJsonUtil.toJson(object, FastJsonUtil.Writer_Features);
                             }
                         }
                         case Blob -> {

@@ -19,5 +19,8 @@ public class EntityLongUID extends Entity implements EntityUID<Long> {
     @DbColumn(key = true)
     private Long uid;
 
+    public int intUid() {
+        return uid.intValue();
+    }
 
 }

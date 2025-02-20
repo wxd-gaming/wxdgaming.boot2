@@ -1,5 +1,7 @@
 package wxdgaming.boot2.core.chatset;
 
+import wxdgaming.boot2.core.util.RandomUtils;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
@@ -240,6 +242,15 @@ public class StringUtils {
                     sb.append(new Random().nextInt(10));
                     break;
             }
+        }
+        return sb.toString();
+    }
+
+    /** 根据固定字符 生成一个随机字符串 */
+    public static String randomString(char[] chars, int len) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < len; i++) {
+            sb.append(chars[RandomUtils.random(chars.length)]);
         }
         return sb.toString();
     }
