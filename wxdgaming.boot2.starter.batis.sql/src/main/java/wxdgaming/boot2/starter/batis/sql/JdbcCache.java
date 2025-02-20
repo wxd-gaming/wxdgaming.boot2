@@ -34,7 +34,7 @@ public class JdbcCache<E extends Entity, UID> {
     }
 
     protected E loader(UID uid) {
-        E byId = (E) sqlDataHelper.findById(cls, uid);
+        E byId = (E) sqlDataHelper.findByKey(cls, uid);
         if (byId != null) {
             byId.setNewEntity(false);
             byId.checkHashCode();

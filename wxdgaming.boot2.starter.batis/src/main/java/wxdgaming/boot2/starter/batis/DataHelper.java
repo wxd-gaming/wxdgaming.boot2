@@ -86,7 +86,7 @@ public abstract class DataHelper<DDL extends DDLBuilder> {
      * @author: wxd-gaming(無心道, 15388152619)
      * @version: 2025-02-16 01:15
      */
-    public abstract <R extends Entity> R findById(Class<R> cls, Object... args);
+    public abstract <R extends Entity> R findByKey(Class<R> cls, Object... args);
 
     /**
      * 根据主键值查询
@@ -99,7 +99,7 @@ public abstract class DataHelper<DDL extends DDLBuilder> {
      * @author: wxd-gaming(無心道, 15388152619)
      * @version: 2025-02-16 01:15
      */
-    public abstract <R extends Entity> R findById(String tableName, Class<R> cls, Object... args);
+    public abstract <R extends Entity> R findByKey(String tableName, Class<R> cls, Object... args);
 
     /**
      * 根据主键值查询

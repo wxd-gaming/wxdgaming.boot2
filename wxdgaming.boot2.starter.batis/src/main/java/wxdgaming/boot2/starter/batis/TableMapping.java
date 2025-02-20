@@ -14,6 +14,8 @@ import wxdgaming.boot2.starter.batis.ann.DbTable;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * 数据表映射
@@ -64,15 +66,15 @@ public class TableMapping {
     private final LinkedHashMap<String, FieldMapping> columns = new LinkedHashMap<>();
 
     /** 完全查询 */
-    private Map<String, String> selectSql = new LinkedHashMap<>();
+    private final Map<String, String> selectSql = new ConcurrentHashMap<>();
     /** 根据主键查询 key: tableName, value: sql语句 */
-    private Map<String, String> selectByKeySql = new LinkedHashMap<>();
+    private final Map<String, String> selectByKeySql = new ConcurrentHashMap<>();
     /** 根据主键查询 key: tableName, value: sql语句 */
-    private Map<String, String> exitSql = new LinkedHashMap<>();
+    private final Map<String, String> exitSql = new ConcurrentHashMap<>();
     /** 插入 key: tableName, value: sql语句 */
-    private Map<String, String> insertSql = new LinkedHashMap<>();
+    private final Map<String, String> insertSql = new ConcurrentHashMap<>();
     /** 主键列更新  key: tableName, value: sql语句 */
-    private Map<String, String> updateSql = new LinkedHashMap<>();
+    private final Map<String, String> updateSql = new ConcurrentHashMap<>();
 
     public TableMapping(Class<?> cls) {
         this.cls = cls;

@@ -106,10 +106,6 @@ public class CookiePack implements Serializable {
             return this;
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("cookiePath {}, domain = {}", cookiePath, domain);
-        }
-
         final DefaultCookie defaultCookie = new DefaultCookie(cookieKey, String.valueOf(cookieValue));
         if (cookiePath != null) {
             defaultCookie.setPath(cookiePath);
