@@ -48,6 +48,14 @@ public abstract class SqlQueryBuilder {
         this.limit = limit;
     }
 
+    public void limit(int limit, int minLimit, int maxLimit) {
+        if (limit < minLimit)
+            limit = minLimit;
+        if (limit > maxLimit)
+            limit = maxLimit;
+        setLimit(limit);
+    }
+
     public SqlQueryBuilder sqlByEntity(Class<? extends Entity> clazz) {
         String tableName = TableMapping.tableName(clazz);
         this.setTableName(tableName);
@@ -62,7 +70,7 @@ public abstract class SqlQueryBuilder {
     }
 
     public SqlQueryBuilder pushWhere(String where, Object param) {
-        if (Objects.nonNullEmpty(param)) throw new IllegalArgumentException("param null or empty");
+        if (Objects.nullEmpty(param)) throw new IllegalArgumentException("param null or empty");
         if (StringUtils.isNotBlank(where)) {
             if (StringUtils.isNotBlank(this.where)) {
                 this.where += " and ";
@@ -117,8 +125,8 @@ public abstract class SqlQueryBuilder {
     }
 
     /** 查询满足条件的数据库数据行数 */
-    public int findCount() {
-        return sqlDataHelper.tableCountBySql(buildCountSql(), Integer.class, getParameters());
+    public long findCount() {
+        return sqlDataHelper.tableCountBySql(buildCountSql(), getParameters());
     }
 
     /** 查询满足条件的所有数据 */

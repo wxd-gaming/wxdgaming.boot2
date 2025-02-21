@@ -1,6 +1,5 @@
 package wxdgaming.boot2.starter.net;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.ServerChannel;
@@ -15,6 +14,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.shutdown;
 
 import java.io.Serializable;
 import java.net.InetSocketAddress;
@@ -114,7 +114,7 @@ public class NioFactory implements Serializable {
         return eventExecutors;
     }
 
-    public static void close() {
+    public static void shutdown() {
         if (Boss_Thread_Group != null) {
             Boss_Thread_Group.shutdownGracefully();
             Boss_Thread_Group = null;

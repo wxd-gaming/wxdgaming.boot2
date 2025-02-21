@@ -11,6 +11,7 @@ import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.shutdown;
 import wxdgaming.boot2.starter.batis.DataHelper;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
@@ -40,14 +41,16 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
 
     protected final SqlConfig sqlConfig;
     protected final HikariDataSource hikariDataSource;
-    protected SqlDataBatch sqlDataBatch;
+    protected SqlDataBatch dataBatch;
 
     public SqlDataHelper(SqlConfig sqlConfig, DDL ddl) {
         super(ddl);
         this.sqlConfig = sqlConfig;
         this.sqlConfig.createDatabase();
         this.hikariDataSource = sqlConfig.hikariDataSource();
-        initBatch();
+        if (sqlConfig.getBatchThreadSize() > 0) {
+            initDataBatch();
+        }
     }
 
     @Start()
@@ -67,12 +70,20 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         }
     }
 
-    public abstract void initBatch();
+    @shutdown
+    @Sort(Integer.MAX_VALUE/*最后关闭*/)
+    public void shutdown() {
+        if (this.dataBatch != null)
+            this.dataBatch.shutdown();
+        this.hikariDataSource.close();
+    }
+
+    public abstract void initDataBatch();
 
     public abstract SqlQueryBuilder queryBuilder();
 
     public <SDB extends SqlDataBatch> SDB dataBatch() {
-        return (SDB) sqlDataBatch;
+        return (SDB) dataBatch;
     }
 
     public String getDbName() {
@@ -213,21 +224,21 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         }
     }
 
-    @Override public <R extends Entity> int tableCount(Class<R> cls) {
+    @Override public <R extends Entity> long tableCount(Class<R> cls) {
         String tableName = TableMapping.tableName(cls);
         return tableCount(tableName);
     }
 
-    public <R extends Entity> int tableCount(Class<R> cls, String where, Object... args) {
+    public <R extends Entity> long tableCount(Class<R> cls, String where, Object... args) {
         String tableName = TableMapping.tableName(cls);
         return tableCount(tableName, where, args);
     }
 
-    @Override public int tableCount(String tableName) {
+    @Override public long tableCount(String tableName) {
         return tableCount(tableName, "");
     }
 
-    public int tableCount(String tableName, String where, Object... args) {
+    public long tableCount(String tableName, String where, Object... args) {
         String sql = "SELECT COUNT(*) FROM %s".formatted(tableName);
         if (StringUtils.isNotBlank(where)) {
             sql += " WHERE " + where;
@@ -235,8 +246,8 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         return tableCountBySql(sql, args);
     }
 
-    public int tableCountBySql(String sql, Object... args) {
-        Integer scalar = executeScalar(sql, Integer.class, args);
+    public long tableCountBySql(String sql, Object... args) {
+        Long scalar = executeScalar(sql, Long.class, args);
         if (scalar == null)
             return 0;
         return scalar;

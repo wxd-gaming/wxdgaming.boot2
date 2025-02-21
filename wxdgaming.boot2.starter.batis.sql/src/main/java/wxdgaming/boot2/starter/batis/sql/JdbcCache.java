@@ -45,7 +45,7 @@ public class JdbcCache<E extends Entity, UID> {
     protected void heart(UID uid, E e) {
         boolean checkHashCode = e.checkHashCode();
         if (checkHashCode) {
-            sqlDataHelper.getSqlDataBatch().save(e);
+            sqlDataHelper.getDataBatch().save(e);
         }
     }
 

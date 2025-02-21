@@ -4,12 +4,13 @@ import ch.qos.logback.core.LogbackUtil;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.function.ConsumerE0;
 import wxdgaming.boot2.core.lang.Tick;
+import wxdgaming.boot2.core.shutdown;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.GlobalUtil;
 
-import java.io.Closeable;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,12 +23,23 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2021-09-28 14:22
  **/
-public final class ExecutorUtil implements Serializable, Closeable {
+@Getter
+public final class ExecutorUtil implements Serializable {
 
     @Getter private static ExecutorUtil instance = new ExecutorUtil();
 
-    public static void reset() {
-        instance.close();
+    public static void resetInstance() {
+        executorIgnoredException(instance.TIMER_THREAD::clear);
+        executorIgnoredException(instance.TIMER_THREAD::interrupt);
+        executorIgnoredException(instance.TIMER_THREAD::join);
+        executorIgnoredException(instance.GUARD_THREAD::interrupt);
+        executorIgnoredException(instance.GUARD_THREAD::join);
+        instance.All_THREAD_LOCAL.values().forEach(executorServices -> {
+            System.out.println("shutdown executorServices start: " + executorServices.getName());
+            executorIgnoredException(executorServices::terminate);
+            System.out.println("shutdown executorServices end: " + executorServices.getName());
+        });
+        instance.All_THREAD_LOCAL.clear();
         instance = new ExecutorUtil();
     }
 
@@ -49,11 +61,11 @@ public final class ExecutorUtil implements Serializable, Closeable {
     /** 全部初始化的 */
     public final ConcurrentHashMap<String, IExecutorServices> All_THREAD_LOCAL = new ConcurrentHashMap<>();
     /** 属于后台线程池, 默认线程池， 一旦收到停服新号，线程立马关闭了 */
-    @Getter private IExecutorServices defaultExecutor = null;
+    private IExecutorServices defaultExecutor = null;
     /** 属于后台线程池, 逻辑线程池，一旦收到停服新号，线程立马关闭了 */
-    @Getter private IExecutorServices logicExecutor = null;
+    private IExecutorServices logicExecutor = null;
     /** 属于后台线程池, 虚拟线程池，一旦收到停服新号，线程立马关闭了 */
-    @Getter private IExecutorServices virtualExecutor = null;
+    private IExecutorServices virtualExecutor = null;
 
     public void init(ExecutorConfig config) {
         Logger logger = LogbackUtil.logger();
@@ -63,15 +75,16 @@ public final class ExecutorUtil implements Serializable, Closeable {
         defaultExecutor = newExecutorServices("default-executor", config.getDefaultCoreSize(), config.getDefaultMaxSize());
         logicExecutor = newExecutorServices("logic-executor", config.getLogicCoreSize(), config.getLogicMaxSize());
         virtualExecutor = newExecutorVirtualServices("virtual-executor", config.getVirtualCoreSize(), config.getVirtualMaxSize());
+
+        TIMER_THREAD.start();
+        GUARD_THREAD.start();
+
     }
 
-    @Override public void close() {
-        executorIgnoredException(TIMER_THREAD::clear);
-        executorIgnoredException(TIMER_THREAD::interrupt);
-        executorIgnoredException(GUARD_THREAD::interrupt);
-        All_THREAD_LOCAL.values().forEach(executorServices -> {
-            executorIgnoredException(executorServices::shutdown);
-        });
+    @shutdown
+    @Sort(1001)
+    public void shutdown() {
+        resetInstance();
     }
 
     /**
@@ -195,12 +208,12 @@ public final class ExecutorUtil implements Serializable, Closeable {
         protected GuardThread() {
             super("guard-thread");
             setPriority(Thread.MIN_PRIORITY);
-            start();
         }
 
         @Override public void run() {
             Tick tick = new Tick(50, 10, TimeUnit.SECONDS);
-            while (!GlobalUtil.SHUTTING.get() || Thread.currentThread().isInterrupted()) {
+            Logger logger = LoggerFactory.getLogger(this.getClass());
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     try {
                         tick.waitNext();
@@ -212,11 +225,12 @@ public final class ExecutorUtil implements Serializable, Closeable {
                             LoggerFactory.getLogger(this.getClass()).info(stringBuilder.toString());
                         }
                     } catch (Throwable throwable) {
-                        GlobalUtil.exception("guard-thread", throwable);
+                        if (!(throwable instanceof InterruptedException))
+                            GlobalUtil.exception("guard-thread", throwable);
                     }
                 } catch (Throwable throwable) {/*不能加东西，log也有可能异常*/}
             }
-            LoggerFactory.getLogger(this.getClass()).info("guard-thread 线程退出");
+            logger.info("线程 {} 退出", Thread.currentThread());
         }
     }
 
@@ -228,7 +242,6 @@ public final class ExecutorUtil implements Serializable, Closeable {
         public TimerThread() {
             super("timer-executor");
             setPriority(6);
-            start();
         }
 
         public void add(TimerJob timerJob) {
@@ -253,7 +266,7 @@ public final class ExecutorUtil implements Serializable, Closeable {
         @Override public void run() {
             Tick tick = new Tick(1, 2, TimeUnit.MILLISECONDS);
             Logger logger = LoggerFactory.getLogger(this.getClass());
-            while (!GlobalUtil.SHUTTING.get() || Thread.currentThread().isInterrupted()) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     tick.waitNext();
                     relock.lock();
@@ -299,7 +312,7 @@ public final class ExecutorUtil implements Serializable, Closeable {
                     }
                 } catch (Throwable throwable) {/*不能加东西，log也有可能异常*/}
             }
-            logger.info("定时任务公共处理器 线程退出");
+            logger.info("线程 {} 退出", Thread.currentThread());
         }
     }
 

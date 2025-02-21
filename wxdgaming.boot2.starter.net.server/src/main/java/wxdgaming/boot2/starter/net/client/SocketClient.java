@@ -14,9 +14,9 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.shutdown;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.util.BytesUnit;
-import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.SessionGroup;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -26,7 +26,6 @@ import wxdgaming.boot2.starter.net.ssl.WxdSslHandler;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
-import java.io.Closeable;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -40,7 +39,7 @@ import java.util.function.Consumer;
  **/
 @Slf4j
 @Getter
-public abstract class SocketClient implements Closeable {
+public abstract class SocketClient {
 
     protected Bootstrap bootstrap;
     protected final SocketClientConfig config;
@@ -139,8 +138,9 @@ public abstract class SocketClient implements Closeable {
 
     protected void addChanelHandler(SocketChannel socketChannel, ChannelPipeline pipeline) {}
 
-
-    @Override public void close() {
+    @Sort(100)
+    @shutdown
+    public void shutdown() {
         closed = true;
         log.info("shutdown tcp client：{}:{}", config.getHost(), config.getPort());
     }
@@ -197,9 +197,7 @@ public abstract class SocketClient implements Closeable {
 
     protected boolean reconnection() {
 
-        if (closed
-            || !config.isEnableReconnection()
-            || GlobalUtil.SHUTTING.get())
+        if (closed || !config.isEnableReconnection())
             return false;
 
         long l = atomicLong.get();

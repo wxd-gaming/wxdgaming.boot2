@@ -8,6 +8,7 @@ import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.lang.DiffTime;
 import wxdgaming.boot2.core.lang.Tick;
+import wxdgaming.boot2.core.shutdown;
 import wxdgaming.boot2.starter.batis.DataBatch;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
@@ -17,6 +18,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -35,6 +37,16 @@ public abstract class SqlDataBatch extends DataBatch {
         this.sqlDataHelper = sqlDataHelper;
         for (int i = 1; i <= sqlDataHelper.getSqlConfig().getBatchThreadSize(); i++) {
             batchThreads.add(new BatchThread(i, sqlDataHelper.getDbName() + "-" + i, sqlDataHelper.getSqlConfig().getBatchSubmitSize()));
+        }
+    }
+
+    @shutdown
+    public void shutdown() {
+        for (BatchThread batchThread : batchThreads) {
+            batchThread.closed.set(true);
+            try {
+                batchThread.join();
+            } catch (InterruptedException ignored) {}
         }
     }
 
@@ -65,6 +77,7 @@ public abstract class SqlDataBatch extends DataBatch {
     public class BatchThread extends Thread {
 
         protected final ReentrantLock lock = new ReentrantLock();
+        protected AtomicBoolean closed = new AtomicBoolean();
         protected final int threadId;
         protected final int batchSubmitSize;
         /** key: tableName, value: {key: sql, value: params} */
@@ -82,7 +95,6 @@ public abstract class SqlDataBatch extends DataBatch {
             this.threadId = threadId;
             this.batchSubmitSize = batchSubmitSize;
             this.setPriority(MAX_PRIORITY);
-            this.setDaemon(true);
             this.start();
         }
 
@@ -116,16 +128,22 @@ public abstract class SqlDataBatch extends DataBatch {
 
         @Override public void run() {
 
-            while (!Thread.currentThread().isInterrupted()) {
+            while (true) {
                 try {
                     Thread.sleep(200);
                     insertBach();
                     updateBach();
+                    if (closed.get()) {
+                        if (batchInsertMap.isEmpty() && batchUpdateMap.isEmpty())
+                            break;
+                    }
                 } catch (Throwable throwable) {
-                    log.error("sqlDataBatch error", throwable);
+                    if (!(throwable instanceof InterruptedException)) {
+                        log.error("sqlDataBatch error", throwable);
+                    }
                 }
             }
-
+            log.info("线程 sql batch {} 退出", Thread.currentThread());
         }
 
         protected void insertBach() {

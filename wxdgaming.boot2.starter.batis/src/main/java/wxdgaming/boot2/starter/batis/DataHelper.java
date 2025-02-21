@@ -3,6 +3,7 @@ package wxdgaming.boot2.starter.batis;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
+import wxdgaming.boot2.core.shutdown;
 
 import java.sql.Connection;
 import java.util.List;
@@ -23,15 +24,18 @@ public abstract class DataHelper<DDL extends DDLBuilder> {
         this.ddlBuilder = ddlBuilder;
     }
 
+    @shutdown
+    public abstract void shutdown();
+
     public TableMapping tableMapping(Class<? extends Entity> cls) {
         return ddlBuilder.tableMapping(cls);
     }
 
     public abstract Connection connection();
 
-    public abstract <R extends Entity> int tableCount(Class<R> cls);
+    public abstract <R extends Entity> long tableCount(Class<R> cls);
 
-    public abstract int tableCount(String tableName);
+    public abstract long tableCount(String tableName);
 
     public abstract List<JSONObject> queryListByEntity(Class<? extends Entity> cls);
 

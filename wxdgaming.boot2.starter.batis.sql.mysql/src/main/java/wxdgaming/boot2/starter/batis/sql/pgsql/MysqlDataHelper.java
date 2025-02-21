@@ -27,8 +27,8 @@ public class MysqlDataHelper extends SqlDataHelper<MySqlDDLBuilder> {
         super(sqlConfig, new MySqlDDLBuilder());
     }
 
-    @Override public void initBatch() {
-        this.sqlDataBatch = new MysqlDataBatch(this);
+    @Override public void initDataBatch() {
+        this.dataBatch = new MysqlDataBatch(this);
     }
 
     @Override public SqlQueryBuilder queryBuilder() {

@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wxdgaming.boot2.core.util.JvmUtil;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.lang.Tuple2;
 import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.util.JvmUtil;
 import wxdgaming.boot2.core.zip.ZipReadFile;
 
 import java.io.File;
@@ -122,8 +122,25 @@ public class FileUtil implements Serializable {
         String x = JvmUtil.javaClassPath();
         String[] split = x.split(File.pathSeparator);
         for (String string : split) {
-            if (!string.endsWith(".jar") && !string.endsWith(".war") && !string.endsWith(".zip")) continue;
-            try (InputStream inputStream = Files.newInputStream(Paths.get(string));
+            Path startPath = Paths.get(string);
+            if (!string.endsWith(".jar") && !string.endsWith(".war") && !string.endsWith(".zip")) {
+                try (Stream<Path> stream = Files.walk(startPath)) {
+                    String target = startPath.toString();
+                    stream
+                            .map(Path::toString)
+                            .filter(s -> s.startsWith(target) && s.length() > target.length())
+                            .map(s -> {
+                                String replace = s.replace(target + File.separator, "");
+                                if (replace.endsWith(".class")) {
+                                    replace = replace.replace(".class", "").replace(File.separator, ".");
+                                }
+                                return replace;
+                            })
+                            .forEach(resourcesPath::add);
+                }
+                continue;
+            }
+            try (InputStream inputStream = Files.newInputStream(startPath);
                  ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
                 ZipEntry nextEntry = null;
                 while ((nextEntry = zipInputStream.getNextEntry()) != null) {

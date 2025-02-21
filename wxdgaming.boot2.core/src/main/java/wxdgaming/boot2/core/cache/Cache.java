@@ -15,11 +15,11 @@ import wxdgaming.boot2.core.function.Consumer2;
 import wxdgaming.boot2.core.function.Function1;
 import wxdgaming.boot2.core.function.Function2;
 import wxdgaming.boot2.core.lang.Tuple3;
+import wxdgaming.boot2.core.shutdown;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.threading.TimerJob;
 import wxdgaming.boot2.core.timer.MyClock;
 
-import java.io.Closeable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 @Getter
 @Setter(value = AccessLevel.PROTECTED)
 @Accessors(chain = true)
-public class Cache<K, V> implements Closeable {
+public class Cache<K, V> {
 
     protected final ConcurrentTable<Integer, K, Tuple3<V, Long, Long>> kv = new ConcurrentTable<>();
     private String cacheName;
@@ -158,7 +158,8 @@ public class Cache<K, V> implements Closeable {
 
     protected final TimerJob timerJob;
 
-    @Override public void close() {
+    @shutdown
+    public void shutdown() {
         timerJob.cancel();
         kv.clear();
     }

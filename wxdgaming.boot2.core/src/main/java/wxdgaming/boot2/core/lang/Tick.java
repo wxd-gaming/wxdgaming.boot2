@@ -68,7 +68,7 @@ public class Tick extends ObjectBase {
                 Thread.sleep(heart);
             }
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+           Thread.currentThread().interrupt();
         }
     }
 

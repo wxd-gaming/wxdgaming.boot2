@@ -6,10 +6,10 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.Close;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.shutdown;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.SessionGroup;
@@ -18,8 +18,6 @@ import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 import wxdgaming.boot2.starter.net.ssl.WxdOptionalSslHandler;
 
 import javax.net.ssl.SSLContext;
-import java.io.Closeable;
-import java.io.IOException;
 
 
 /**
@@ -30,7 +28,7 @@ import java.io.IOException;
  **/
 @Slf4j
 @Getter
-public class SocketServer implements Closeable, AutoCloseable {
+public class SocketServer {
 
     protected SocketServerConfig config;
     protected final SessionGroup sessionGroup = new SessionGroup();
@@ -117,11 +115,13 @@ public class SocketServer implements Closeable, AutoCloseable {
         }
     }
 
-    @Close
-    @Override public void close() throws IOException {
+    @shutdown
+    @Sort(100)
+    public void shutdown() {
         if (future != null) {
             try {
                 serverChannel.close();
+                log.info("socket server: {}, port: {} close ", this.getClass().getSimpleName(), config.getPort());
             } catch (Exception ignored) {}
         }
     }

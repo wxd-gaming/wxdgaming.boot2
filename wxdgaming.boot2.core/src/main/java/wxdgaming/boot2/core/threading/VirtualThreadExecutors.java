@@ -99,7 +99,7 @@ final class VirtualThreadExecutors implements Executor {
     public List<Runnable> terminate() {
         this.shutdowning.set(true);
         this.terminating.set(true);
-        while (!isTerminated()) {}
+        while (!isTerminated() && threadActivationCount.get() > 0) {}
         List<Runnable> tasks = new ArrayList<>(queue);
         queue.clear();
         return tasks;

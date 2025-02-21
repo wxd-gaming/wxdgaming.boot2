@@ -32,8 +32,8 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
         super(sqlConfig, new PgSqlDDLBuilder());
     }
 
-    @Override public void initBatch() {
-        this.sqlDataBatch = new PgsqlDataBatch(this);
+    @Override public void initDataBatch() {
+        this.dataBatch = new PgsqlDataBatch(this);
     }
 
     @Override public SqlQueryBuilder queryBuilder() {

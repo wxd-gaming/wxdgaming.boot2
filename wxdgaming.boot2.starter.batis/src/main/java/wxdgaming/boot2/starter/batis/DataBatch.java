@@ -20,4 +20,5 @@ public abstract class DataBatch {
 
     public abstract void update(Entity entity);
 
+    public abstract void shutdown();
 }

@@ -96,7 +96,7 @@ final class ThreadPoolExecutors implements Executor, Runnable {
         WxThread currentThread = (WxThread) Thread.currentThread();
         while (!terminating.get()) {
             try {
-                if (shutdowning.get() || GlobalUtil.SHUTTING.get()) {
+                if (shutdowning.get()) {
                     if (queue.isEmpty()) {
                         break;
                     }
@@ -109,7 +109,7 @@ final class ThreadPoolExecutors implements Executor, Runnable {
                     } else {
                         /*非核心线程*/
                         if (!currentThread.waiting.get()
-                                && (shutdowning.get()/*如果是即将关闭状态，那么全力以赴处理*/ || queue.size() > threadActivationCount.get() * 20/*为了避免线程的频繁切换*/)) {
+                            && (shutdowning.get()/*如果是即将关闭状态，那么全力以赴处理*/ || queue.size() > threadActivationCount.get() * 20/*为了避免线程的频繁切换*/)) {
                             runnable = queue.poll(20, TimeUnit.MILLISECONDS);
                         } else {
                             /*避免cpu的频繁切换，暂停非核心线程*/
@@ -137,7 +137,7 @@ final class ThreadPoolExecutors implements Executor, Runnable {
 
     @Override public void execute(Runnable command) {
         if (shutdowning.get() || terminating.get())
-            throw new RuntimeException("线程正在关闭 "+String.valueOf(command));
+            throw new RuntimeException("线程正在关闭 " + String.valueOf(command));
         queue.add(command);
         checkThread();
     }
@@ -154,7 +154,9 @@ final class ThreadPoolExecutors implements Executor, Runnable {
 
     /** 已经关闭完成 */
     public boolean isTerminated() {
-        if (coreThreads.isEmpty()) return false;
+        if (!terminate.get() && !shutdowning.get()) {
+            return false;
+        }
         for (Thread thread : coreThreads) {
             if (thread.getState() != Thread.State.TERMINATED) return false;
         }

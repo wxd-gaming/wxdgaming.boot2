@@ -35,7 +35,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @version: 2023-04-28 12:30
  **/
 @Getter
-public class HttpClientPool implements AutoCloseable {
+public class HttpClientPool {
 
     public static final ReentrantLock lock = new ReentrantLock();
     protected static final Cache<String, HttpClientPool> HTTP_CLIENT_CACHE;
@@ -46,6 +46,10 @@ public class HttpClientPool implements AutoCloseable {
                 .expireAfterWrite(clientConfig.getResetTimeM(), TimeUnit.MINUTES)
                 .delay(TimeUnit.MINUTES.toMillis(1))
                 .loader((Function1<String, HttpClientPool>) s -> build(clientConfig))
+                .removalListener((k, pool) -> {
+                    pool.shutdown();
+                    return true;
+                })
                 .build();
     }
 
@@ -81,7 +85,7 @@ public class HttpClientPool implements AutoCloseable {
         }
     }
 
-    @Override public void close() throws Exception {
+    public void shutdown() {
         try {
             if (this.connPoolMng != null) {
                 this.connPoolMng.close();

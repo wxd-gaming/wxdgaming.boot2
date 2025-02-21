@@ -4,13 +4,14 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.shutdown;
 import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.threading.IExecutorServices;
 import wxdgaming.boot2.core.threading.Job;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.boot2.core.util.JvmUtil;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 
 import java.util.ArrayList;
@@ -68,11 +69,12 @@ public class ScheduledService {
                 10,
                 TimeUnit.MILLISECONDS
         );
-        JvmUtil.addShutdownHook(this::close);
     }
 
-    void close() {
-        log.info("------------------------------关闭定时任务调度器------------------------------");
+    @shutdown
+    @Sort(1000)
+    public void shutdown() {
+        log.info("线程 Scheduled 调度器 退出");
         if (job != null) {
             job.cancel();
             job = null;

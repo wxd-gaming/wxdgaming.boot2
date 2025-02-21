@@ -16,8 +16,6 @@ public class GlobalUtil {
 
     /** 当前服务器的debug状态 */
     public static final AtomicBoolean DEBUG = new AtomicBoolean();
-    /** 停服关闭状态 */
-    public static final AtomicBoolean SHUTTING = new AtomicBoolean();
 
     public static Consumer2<Object, Throwable> exceptionCall = null;
 
@@ -28,7 +26,4 @@ public class GlobalUtil {
         }
     }
 
-    static {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> SHUTTING.set(true)));
-    }
 }
