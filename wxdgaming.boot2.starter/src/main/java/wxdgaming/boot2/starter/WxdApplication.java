@@ -7,9 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.*;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.collection.SetOf;
+import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.reflect.ReflectContext;
-import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.core.util.JvmUtil;
 
 import java.util.Arrays;
@@ -35,7 +36,7 @@ public class WxdApplication {
             throw new RuntimeException("boot2-starter is running");
         }
         try {
-            log.info("boot2-starter is starting");
+            log.info("boot2-starter starting");
             isRunning.set(true);
             BootConfig.getIns().loadConfig();
 
@@ -73,7 +74,20 @@ public class WxdApplication {
                 runApplication.executeMethodWithAnnotated(shutdown.class);
             });
 
-            log.info("boot2-starter is running");
+            StringBuilder stringAppend = new StringBuilder(1024);
+
+            String printString = FileReadUtil.readString("print.txt");
+
+            int len = 60;
+
+            stringAppend.append("\n\n")
+                    .append(printString)
+                    .append("\n")
+                    .append("    -[ " + StringUtils.padRight("debug = " + BootConfig.getIns().isDebug() + " | " + JvmUtil.processIDString(), len, ' ') + " ]-\n")
+                    .append("    -[ " + StringUtils.padRight(BootConfig.getIns().sid() + " | " + BootConfig.getIns().sname(), len, ' ') + " ]-\n")
+                    .append("    -[ " + StringUtils.padRight(JvmUtil.timeZone(), len, ' ') + " ]-\n");
+            stringAppend.append("\n");
+            log.warn(stringAppend.toString());
             return runApplication;
         } catch (Throwable throwable) {
             log.error("", throwable);

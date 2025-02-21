@@ -74,6 +74,14 @@ public class BootConfig {
         return sid;
     }
 
+    public String sname() {
+        String sname = config.getString("sname");
+        if (sname == null) {
+            return "boot server";
+        }
+        return sname;
+    }
+
     public ExecutorConfig getExecutorConfig() {
         return getObject("executor", ExecutorConfig.class, ExecutorConfig.INSTANCE);
     }

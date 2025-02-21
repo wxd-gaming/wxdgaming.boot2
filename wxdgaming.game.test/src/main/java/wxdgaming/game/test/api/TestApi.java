@@ -63,12 +63,12 @@ public class TestApi {
         return "ok";
     }
 
-    @Scheduled("*/10")
+    @Scheduled("*/30")
     public void timer() {
         log.info("{}", "timer()");
     }
 
-    @Scheduled("*")
+    @Scheduled("*/30")
     @ExecutorWith(useVirtualThread = true)
     public void timerAsync() {
         log.info("{}", "timerAsync()");
