@@ -33,8 +33,8 @@ public abstract class SqlDataBatch extends DataBatch {
 
     public SqlDataBatch(SqlDataHelper<?> sqlDataHelper) {
         this.sqlDataHelper = sqlDataHelper;
-        for (int i = 1; i <= 1; i++) {
-            batchThreads.add(new BatchThread(i, sqlDataHelper.getDbName() + "-" + i));
+        for (int i = 1; i <= sqlDataHelper.getSqlConfig().getBatchThreadSize(); i++) {
+            batchThreads.add(new BatchThread(i, sqlDataHelper.getDbName() + "-" + i, sqlDataHelper.getSqlConfig().getBatchSubmitSize()));
         }
     }
 
@@ -66,6 +66,7 @@ public abstract class SqlDataBatch extends DataBatch {
 
         protected final ReentrantLock lock = new ReentrantLock();
         protected final int threadId;
+        protected final int batchSubmitSize;
         /** key: tableName, value: {key: sql, value: params} */
         protected Table<String, String, SplitCollection<Object[]>> batchInsertMap = new Table<>();
         /** key: tableName, value: {key: sql, value: params} */
@@ -76,9 +77,10 @@ public abstract class SqlDataBatch extends DataBatch {
         protected long executeCount = 0;
         protected Tick ticket = new Tick(1, TimeUnit.MINUTES);
 
-        public BatchThread(int threadId, String name) {
+        public BatchThread(int threadId, String name, int batchSubmitSize) {
             super(name);
             this.threadId = threadId;
+            this.batchSubmitSize = batchSubmitSize;
             this.setPriority(MAX_PRIORITY);
             this.setDaemon(true);
             this.start();
@@ -91,7 +93,7 @@ public abstract class SqlDataBatch extends DataBatch {
                 TableMapping tableMapping = sqlDataHelper.tableMapping(entity.getClass());
                 String insertSql = sqlDataHelper.getDdlBuilder().buildInsert(tableMapping, tableName);
                 Object[] insertParams = sqlDataHelper.getDdlBuilder().buildInsertParams(tableMapping, entity);
-                SplitCollection<Object[]> entitySplitCollection = batchInsertMap.computeIfAbsent(tableName, insertSql, k -> new SplitCollection<>(500));
+                SplitCollection<Object[]> entitySplitCollection = batchInsertMap.computeIfAbsent(tableName, insertSql, k -> new SplitCollection<>(batchSubmitSize));
                 entitySplitCollection.add(insertParams);
             } finally {
                 lock.unlock();

@@ -69,6 +69,8 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
 
     public abstract void initBatch();
 
+    public abstract SqlQueryBuilder queryBuilder();
+
     public <SDB extends SqlDataBatch> SDB dataBatch() {
         return (SDB) sqlDataBatch;
     }
@@ -216,30 +218,39 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         return tableCount(tableName);
     }
 
-    @Override public <R extends Entity> int tableCount(Class<R> cls, String where, Object... args) {
+    public <R extends Entity> int tableCount(Class<R> cls, String where, Object... args) {
         String tableName = TableMapping.tableName(cls);
         return tableCount(tableName, where, args);
     }
 
     @Override public int tableCount(String tableName) {
-        String sql = "SELECT COUNT(*) FROM %s".formatted(tableName);
-        Integer scalar = executeScalar(sql, Integer.class);
-        if (scalar == null)
-            return 0;
-        return scalar;
+        return tableCount(tableName, "");
     }
 
-    @Override public int tableCount(String tableName, String where, Object... args) {
+    public int tableCount(String tableName, String where, Object... args) {
         String sql = "SELECT COUNT(*) FROM %s".formatted(tableName);
         if (StringUtils.isNotBlank(where)) {
             sql += " WHERE " + where;
         }
+        return tableCountBySql(sql, args);
+    }
+
+    public int tableCountBySql(String sql, Object... args) {
         Integer scalar = executeScalar(sql, Integer.class, args);
         if (scalar == null)
             return 0;
         return scalar;
     }
 
+    /**
+     * 执行sql语句
+     *
+     * @param sql    需要执行的 sql 语句
+     * @param params 参数列表
+     * @return 执行影响的行数
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-02-21 13:35
+     */
     public int executeUpdate(String sql, Object... params) {
         try (Connection connection = connection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             if (params != null) {
@@ -282,6 +293,25 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         return ret.get();
     }
 
+    /** 返回第一列 */
+    public <R> List<R> executeList(String sql, Class<R> cls, Object... params) {
+        List<R> results = new ArrayList<>();
+        this.queryResultSet(sql, params, resultSet -> {
+            try {
+                Object object = resultSet.getObject(1);
+                if (cls.isAssignableFrom(object.getClass())) {
+                    results.add(cls.cast(object));
+                } else {
+                    results.add(FastJsonUtil.parse(String.valueOf(object), cls));
+                }
+                return false;
+            } catch (SQLException e) {
+                throw Throw.of(getDbName() + " " + sql, e);
+            }
+        });
+        return results;
+    }
+
     @Override public List<JSONObject> queryListByEntity(Class<? extends Entity> cls) {
         TableMapping tableMapping = tableMapping(cls);
         return queryListByTableName(tableMapping.getTableName());
@@ -291,7 +321,17 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         return queryList("select * from " + tableName);
     }
 
-    @Override public List<JSONObject> queryListByEntityWhere(Class<? extends Entity> cls, String sqlWhere, Object... args) {
+    /**
+     * 根据实体查询列表
+     *
+     * @param cls      实体类
+     * @param sqlWhere sql 语句的 where 条件
+     * @param args
+     * @return
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-02-21 09:18
+     */
+    public List<JSONObject> queryListByEntityWhere(Class<? extends Entity> cls, String sqlWhere, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
         String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
         sql += " where " + sqlWhere;
@@ -362,14 +402,36 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         return findListBySql(cls, sql);
     }
 
-    @Override public <R extends Entity> List<R> findListByWhere(Class<R> cls, String sqlWhere, Object... args) {
+    /**
+     * 查询表数据
+     *
+     * @param cls      返回的数据实体类
+     * @param sqlWhere where 条件
+     * @param args     参数
+     * @param <R>      实体模型
+     * @return
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-02-16 01:14
+     */
+    public <R extends Entity> List<R> findListByWhere(Class<R> cls, String sqlWhere, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
         String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
         sql += " where " + sqlWhere;
         return findListBySql(cls, sql, args);
     }
 
-    @Override public <R extends Entity> List<R> findListBySql(Class<R> cls, String sql, Object... args) {
+    /**
+     * 查询表数据
+     *
+     * @param cls  返回的数据实体类
+     * @param sql  查询的sql
+     * @param args 参数
+     * @param <R>  实体模型
+     * @return
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-02-16 01:13
+     */
+    public <R extends Entity> List<R> findListBySql(Class<R> cls, String sql, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
         List<R> ret = new ArrayList<>();
         query(sql, args, row -> {
@@ -393,14 +455,24 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         return findBySql(cls, sql, args);
     }
 
-    @Override public <R extends Entity> R findByWhere(Class<R> cls, String sqlWhere, Object... args) {
+    /**
+     * 根据主键值查询
+     *
+     * @param cls  返回的数据实体类
+     * @param args 参数
+     * @param <R>  实体模型
+     * @return
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-02-16 01:15
+     */
+    public <R extends Entity> R findByWhere(Class<R> cls, String sqlWhere, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
         String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
         sql += " where " + sqlWhere;
         return findBySql(cls, sql, args);
     }
 
-    @Override public <R extends Entity> R findBySql(Class<R> cls, String sql, Object... args) {
+    public <R extends Entity> R findBySql(Class<R> cls, String sql, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
         AtomicReference<R> ret = new AtomicReference<>();
         this.query(sql, args, row -> {

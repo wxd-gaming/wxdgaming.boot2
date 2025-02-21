@@ -81,6 +81,7 @@ public class PgSqlDDLBuilder extends SqlDDLBuilder {
         return "CREATE INDEX \"%s_%s\" ON \"%s\" (\"%s\");".formatted(tableName, columnName, tableName, columnName);
     }
 
+    /** pgsql 如果字段是json的 ? => ?::json */
     @Override public String build$$(TableMapping.FieldMapping fieldMapping) {
         if (fieldMapping.getColumnType() == ColumnType.Json) {
             return "?::json";
@@ -88,6 +89,7 @@ public class PgSqlDDLBuilder extends SqlDDLBuilder {
         return super.build$$(fieldMapping);
     }
 
+    /** sql语句中替换`为" */
     @Override public String buildSql$$(String sql) {
         return super.buildSql$$(sql).replace("`", "\"");
     }

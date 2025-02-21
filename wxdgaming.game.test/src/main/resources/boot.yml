@@ -74,6 +74,8 @@ db:
     idleTimeoutM: 10                                       #空闲超时单位分钟
     minPoolSize: 5                                         #最小连接数
     maxPoolSize: 20                                        #最大连接数
+    batchSubmitSize: 500                                      #批量提交数量
+    batchThreadSize: 1                                        #批量提交线程数
 
   pgsql-second: #第二个数据库
     debug: true                                             #调试模式将会显示sql语句
@@ -86,6 +88,8 @@ db:
     idleTimeoutM: 10                                        #空闲超时单位分钟
     minPoolSize: 5                                          #最小连接数
     maxPoolSize: 20                                         #最大连接数
+    batchSubmitSize: 500                                      #批量提交数量
+    batchThreadSize: 1                                        #批量提交线程数
 
   mysql:
     debug: true                                              #调试模式将会显示sql语句
@@ -98,6 +102,8 @@ db:
     idleTimeoutM: 10                                         #空闲超时单位分钟
     minPoolSize: 5                                           #最小连接数
     maxPoolSize: 20                                          #最大连接数
+    batchSubmitSize: 500                                      #批量提交数量
+    batchThreadSize: 1                                        #批量提交线程数
 
   mysql-second: #第二个数据库
     debug: true                                              #调试模式将会显示sql语句
@@ -110,3 +116,5 @@ db:
     idleTimeoutM: 10                                          #空闲超时单位分钟
     minPoolSize: 5                                            #最小连接数
     maxPoolSize: 20                                           #最大连接数
+    batchSubmitSize: 500                                      #批量提交数量
+    batchThreadSize: 1                                        #批量提交线程数

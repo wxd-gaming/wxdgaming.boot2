@@ -13,4 +13,10 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 public @interface Partition {
 
+    /** 由于 mysql 初始化表 添加分区信息必须要有 最小分区 */
+    String mysqlInitMinRangeValue() default "0";
+
+    /** 初始化表的时候添加分区信息 */
+    String[] initRangeArrays() default "";
+
 }

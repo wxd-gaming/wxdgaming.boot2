@@ -13,14 +13,14 @@ import wxdgaming.boot2.starter.batis.ann.DbColumn;
  **/
 @Getter
 @Setter
-public class EntityLongUID extends Entity implements EntityUID<Long> {
+public class EntityLongUID extends Entity {
 
-    @JSONField(ordinal = 1)
     @DbColumn(key = true)
-    private Long uid = 0L;
+    @JSONField(ordinal = 1)
+    private long uid = 0;
 
     public int intUid() {
-        return uid.intValue();
+        return (int) uid;
     }
 
 }

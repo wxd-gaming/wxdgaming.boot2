@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -20,7 +21,7 @@ import java.util.Map;
  */
 public class Objects {
 
-    public static final Object[] ZERO_ARRAY = new Objects[0];
+    public static final Object[] ZERO_ARRAY = new Object[0];
 
     public static boolean compare(Object o1, Object o2) {
         long hashCode1 = getHashCode(o1);
@@ -201,6 +202,20 @@ public class Objects {
 
     public static boolean nonNull(Object obj) {
         return obj != null;
+    }
+
+    public static boolean nullEmpty(Object obj) {
+        return switch (obj) {
+            case null -> true;
+            case String string -> string.isBlank();
+            case Collection<?> collection -> collection.isEmpty();
+            case Map<?, ?> map -> map.isEmpty();
+            default -> false;
+        };
+    }
+
+    public static boolean nonNullEmpty(Object obj) {
+        return !nullEmpty(obj);
     }
 
     /** 返回非null的那个参数，优先第一个 */

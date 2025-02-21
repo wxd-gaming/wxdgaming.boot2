@@ -1,8 +1,7 @@
 package wxdgaming.boot2.starter.batis.sql.pgsql;
 
-import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.util.AnnUtil;
-import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlDDLBuilder;
 import wxdgaming.boot2.starter.batis.sql.ann.Partition;
@@ -16,19 +15,32 @@ import wxdgaming.boot2.starter.batis.sql.ann.Partition;
 public class MySqlDDLBuilder extends SqlDDLBuilder {
 
     @Override public StringBuilder buildTableSqlString(TableMapping tableMapping, String tableName) {
-        StringBuilder table = super.buildTableSqlString(tableMapping, tableName);
+        StringBuilder tableSql = super.buildTableSqlString(tableMapping, tableName);
         tableMapping.getColumns().values()
                 .stream()
                 .filter(v -> AnnUtil.ann(v.getField(), Partition.class) != null)
                 .findFirst()
                 .ifPresent(fieldMapping -> {
-                    String yyyyMMdd = MyClock.formatDate("yyyyMMdd");
-                    table.append(" PARTITION BY RANGE").append("(")
-                            .append(fieldMapping.getColumnName())
-                            .append(")")
-                            .append("(PARTITION %s_%s VALUES LESS THAN (%s))".formatted(tableName, yyyyMMdd, yyyyMMdd));
+                    Partition partition = AnnUtil.ann(fieldMapping.getField(), Partition.class);
+                    String minRangeValue = partition.mysqlInitMinRangeValue();
+                    String[] strings = partition.initRangeArrays();
+                    tableSql.append(" PARTITION BY RANGE")
+                            .append("(").append(fieldMapping.getColumnName()).append(")");
+                    if (strings != null && strings.length > 0 && StringUtils.isNotBlank(strings[0])) {
+                        tableSql.append("(");
+                        for (int i = 0; i < strings.length; i++) {
+                            String s = strings[i];
+                            if (StringUtils.isBlank(s)) {
+                                continue;
+                            }
+                            tableSql.append("PARTITION p_%s VALUES LESS THAN (%s)".formatted(i, s));
+                        }
+                        tableSql.append(")");
+                    } else {
+                        tableSql.append("(PARTITION p_min_value VALUES LESS THAN (%s))".formatted(minRangeValue));
+                    }
                 });
-        return table;
+        return tableSql;
     }
 
 }

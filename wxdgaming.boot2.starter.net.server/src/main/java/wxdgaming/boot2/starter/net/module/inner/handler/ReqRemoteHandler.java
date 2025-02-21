@@ -49,7 +49,7 @@ public class ReqRemoteHandler {
 
         try {
             String lowerCase = cmd.toLowerCase();
-            RpcMapping rpcMapping = rpcListenerFactory.getRpcMappingMap().get(lowerCase);
+            RpcMapping rpcMapping = rpcListenerFactory.getRpcListenerContent().getRpcMappingMap().get(lowerCase);
             if (rpcMapping == null) {
                 if (rpcId > 0) {
                     rpcService.response(socketSession, rpcId, RunResult.error(9, "not cmd path"));
@@ -58,7 +58,7 @@ public class ReqRemoteHandler {
             }
             RpcRequest rpcRequest = rpcMapping.rpcRequest();
             Method method = rpcMapping.method();
-            boolean allMatch = rpcListenerFactory.getLastRunApplication()
+            boolean allMatch = rpcListenerFactory.getRpcListenerContent().getRunApplication()
                     .classWithSuper(RpcFilter.class)
                     .allMatch(filter -> filter.doFilter(rpcRequest, method, lowerCase, socketSession, paramObject));
             if (!allMatch) {
@@ -67,7 +67,7 @@ public class ReqRemoteHandler {
             RpcListenerTrigger rpcListenerTrigger = new RpcListenerTrigger(
                     rpcMapping,
                     rpcService,
-                    rpcListenerFactory.getLastRunApplication(),
+                    rpcListenerFactory.getRpcListenerContent().getRunApplication(),
                     socketSession,
                     rpcId,
                     paramObject

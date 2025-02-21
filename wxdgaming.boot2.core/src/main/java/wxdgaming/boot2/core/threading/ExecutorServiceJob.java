@@ -88,8 +88,8 @@ class ExecutorServiceJob implements Runnable, Job {
 
         currentThread = Thread.currentThread();
         startExecTime = System.nanoTime();
-        ExecutorUtil.Run_THREAD_LOCAL.put(currentThread, this);
-        ExecutorUtil.CurrentThread.set(this);
+        ExecutorUtil.getInstance().Run_THREAD_LOCAL.put(currentThread, this);
+        ExecutorUtil.getInstance().CurrentThread.set(this);
 
         try {
             ThreadContext.set(threadContext);
@@ -132,8 +132,8 @@ class ExecutorServiceJob implements Runnable, Job {
         } catch (Throwable throwable) {
             GlobalUtil.exception("执行：" + runName, throwable);
         } finally {
-            ExecutorUtil.CurrentThread.remove();
-            ExecutorUtil.Run_THREAD_LOCAL.remove(currentThread);
+            ExecutorUtil.getInstance().CurrentThread.remove();
+            ExecutorUtil.getInstance().Run_THREAD_LOCAL.remove(currentThread);
             this.append.set(false);
         }
     }

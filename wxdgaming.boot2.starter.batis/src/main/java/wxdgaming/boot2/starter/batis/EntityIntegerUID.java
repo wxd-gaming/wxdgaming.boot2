@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter.batis;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
@@ -12,10 +13,10 @@ import wxdgaming.boot2.starter.batis.ann.DbColumn;
  **/
 @Getter
 @Setter
-public class EntityIntegerUID extends Entity implements EntityUID<Integer> {
+public class EntityIntegerUID extends Entity {
 
     @DbColumn(key = true)
-    private Integer uid;
-
+    @JSONField(ordinal = 1)
+    private int uid = 0;
 
 }

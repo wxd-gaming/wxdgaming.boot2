@@ -118,7 +118,7 @@ public abstract class HttpBase<H extends HttpBase> {
         stackTraceElements = new StackTraceElement[stackTrace.length - stackTraceIndex];
         System.arraycopy(stackTrace, stackTraceIndex, stackTraceElements, 0, stackTraceElements.length);
         final CompletableFuture<Response<H>> future = new CompletableFuture<>();
-        ExecutorUtil.getVirtualExecutor().submit(new Event(Throw.ofString(stackTraceElements[0]) + " " + HttpBase.this.response.toString(), logTime, waringTime) {
+        ExecutorUtil.getInstance().getVirtualExecutor().submit(new Event(Throw.ofString(stackTraceElements[0]) + " " + HttpBase.this.response.toString(), logTime, waringTime) {
 
             @Override public void onEvent() throws Exception {
                 try {

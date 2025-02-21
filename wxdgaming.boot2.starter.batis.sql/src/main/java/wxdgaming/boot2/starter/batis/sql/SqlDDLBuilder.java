@@ -2,10 +2,12 @@ package wxdgaming.boot2.starter.batis.sql;
 
 import com.alibaba.fastjson.JSONObject;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.util.AnnUtil;
 import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.DDLBuilder;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
+import wxdgaming.boot2.starter.batis.sql.ann.Partition;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -19,6 +21,15 @@ import java.util.Map;
  * @version: 2025-02-15 17:38
  **/
 public abstract class SqlDDLBuilder extends DDLBuilder {
+
+    @Override public TableMapping tableMapping(Class<? extends Entity> cls) {
+        TableMapping tableMapping = super.tableMapping(cls);
+        long count = tableMapping.getColumns().values().stream().filter(v -> AnnUtil.ann(v.getField(), Partition.class) != null).count();
+        if (count > 1) {
+            throw new RuntimeException("一个实体类只能有一个分区字段");
+        }
+        return tableMapping;
+    }
 
     public StringBuilder buildTableSqlString(TableMapping tableMapping, String tableName) {
         StringBuilder sb = new StringBuilder();
@@ -105,10 +116,12 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
         return "ALTER TABLE `%s` ADD INDEX %s_%s (`%s`);".formatted(tableName, tableName, columnName, columnName);
     }
 
+    /** ? 占位符 */
     public String build$$(TableMapping.FieldMapping fieldMapping) {
         return "?";
     }
 
+    /** 构建sql占位符 */
     public String buildSql$$(String sql) {
         return sql;
     }

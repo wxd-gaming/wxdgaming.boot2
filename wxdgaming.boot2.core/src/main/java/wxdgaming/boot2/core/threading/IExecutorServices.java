@@ -247,7 +247,7 @@ public interface IExecutorServices extends Executor {
         }
         ExecutorServiceJob executorServiceJob = new ExecutorServiceJob(this, command, stackTrace);
         TimerJob timerJob = new TimerJob(this, queueName, executorServiceJob, delay, delay, unit, 1);
-        ExecutorUtil.TIMER_THREAD.add(timerJob);
+        ExecutorUtil.getInstance().TIMER_THREAD.add(timerJob);
         return timerJob;
     }
 
@@ -255,7 +255,7 @@ public interface IExecutorServices extends Executor {
     default TimerJob schedule(String queueName, Runnable command, long delay, TimeUnit unit) {
         ExecutorServiceJob executorServiceJob = new ExecutorServiceJob(this, command, 2);
         TimerJob timerJob = new TimerJob(this, queueName, executorServiceJob, delay, delay, unit, 1);
-        ExecutorUtil.TIMER_THREAD.add(timerJob);
+        ExecutorUtil.getInstance().TIMER_THREAD.add(timerJob);
         return timerJob;
     }
 
@@ -267,7 +267,7 @@ public interface IExecutorServices extends Executor {
         }
         ExecutorServiceJob executorServiceJob = new ExecutorServiceJob(this, command, 2);
         TimerJob timerJob = new TimerJob(this, queueName, executorServiceJob, initialDelay, delay, unit, -1);
-        ExecutorUtil.TIMER_THREAD.add(timerJob);
+        ExecutorUtil.getInstance().TIMER_THREAD.add(timerJob);
         return timerJob;
     }
 
@@ -284,7 +284,7 @@ public interface IExecutorServices extends Executor {
         }
         ExecutorServiceJob executorServiceJob = new ExecutorServiceJob(this, command, stackTrace);
         TimerJob timerJob = new TimerJob(this, queueName, executorServiceJob, initialDelay, delay, unit, execCount);
-        ExecutorUtil.TIMER_THREAD.add(timerJob);
+        ExecutorUtil.getInstance().TIMER_THREAD.add(timerJob);
         return timerJob;
     }
 
@@ -292,7 +292,7 @@ public interface IExecutorServices extends Executor {
     default TimerJob scheduleAtFixedDelay(String queueName, Runnable command, long initialDelay, long delay, TimeUnit unit) {
         ExecutorServiceJob executorServiceJob = new ExecutorServiceJob(this, command, 2);
         TimerJob timerJob = new TimerJob(this, queueName, executorServiceJob, initialDelay, delay, unit, -1);
-        ExecutorUtil.TIMER_THREAD.add(timerJob);
+        ExecutorUtil.getInstance().TIMER_THREAD.add(timerJob);
         return timerJob;
     }
 
@@ -305,7 +305,7 @@ public interface IExecutorServices extends Executor {
     default TimerJob scheduleAtFixedDelay(String queueName, Runnable command, long initialDelay, long delay, TimeUnit unit, int execCount, int stackTrace) {
         ExecutorServiceJob executorServiceJob = new ExecutorServiceJob(this, command, stackTrace);
         TimerJob timerJob = new TimerJob(this, queueName, executorServiceJob, initialDelay, delay, unit, execCount);
-        ExecutorUtil.TIMER_THREAD.add(timerJob);
+        ExecutorUtil.getInstance().TIMER_THREAD.add(timerJob);
         return timerJob;
     }
 

@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
+import wxdgaming.boot2.starter.batis.sql.SqlQueryBuilder;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,6 +29,10 @@ public class MysqlDataHelper extends SqlDataHelper<MySqlDDLBuilder> {
 
     @Override public void initBatch() {
         this.sqlDataBatch = new MysqlDataBatch(this);
+    }
+
+    @Override public SqlQueryBuilder queryBuilder() {
+        return new MysqlQueryBuilder(this);
     }
 
     @Override public void checkTable(Map<String, LinkedHashMap<String, JSONObject>> databseTableMap, TableMapping tableMapping, String tableName, String tableComment) {

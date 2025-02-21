@@ -95,11 +95,11 @@ public abstract class Event implements Runnable, RunMonitor {
     public final void submit() {
         IExecutorServices executor;
         if (StringUtils.isNotBlank(getThreadName())) {
-            executor = ExecutorUtil.All_THREAD_LOCAL.get(getThreadName());
+            executor = ExecutorUtil.getInstance().All_THREAD_LOCAL.get(getThreadName());
         } else if (isVt()) {
-            executor = ExecutorUtil.getVirtualExecutor();
+            executor = ExecutorUtil.getInstance().getVirtualExecutor();
         } else {
-            executor = ExecutorUtil.getLogicExecutor();
+            executor = ExecutorUtil.getInstance().getLogicExecutor();
         }
         executor.submit(getQueueName(), this, 4);
     }

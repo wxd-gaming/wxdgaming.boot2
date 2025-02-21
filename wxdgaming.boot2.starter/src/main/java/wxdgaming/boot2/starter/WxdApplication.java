@@ -11,6 +11,7 @@ import wxdgaming.boot2.core.collection.SetOf;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.core.util.JvmUtil;
 
+import java.io.Closeable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -67,7 +68,25 @@ public class WxdApplication {
             runApplication.executeMethodWithAnnotated(Init.class);
             runApplication.executeMethodWithAnnotated(Start.class);
 
-            JvmUtil.addShutdownHook(() -> runApplication.executeMethodWithAnnotated(Close.class));
+            JvmUtil.addShutdownHook(() -> {
+                runApplication.classWithSuper(AutoCloseable.class)
+                        .forEach(autoCloseable -> {
+                            try {
+                                autoCloseable.close();
+                            } catch (Exception e) {
+                                e.printStackTrace(System.err);
+                            }
+                        });
+                runApplication.classWithSuper(Closeable.class)
+                        .forEach(autoCloseable -> {
+                            try {
+                                autoCloseable.close();
+                            } catch (Exception e) {
+                                e.printStackTrace(System.err);
+                            }
+                        });
+                runApplication.executeMethodWithAnnotated(Close.class);
+            });
 
             log.info("boot2-starter is running");
             return runApplication;

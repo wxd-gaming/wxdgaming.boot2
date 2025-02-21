@@ -30,7 +30,7 @@ public class Main {
                 Main.class
         );
 
-        ExecutorUtil.getDefaultExecutor().schedule(
+        ExecutorUtil.getInstance().getDefaultExecutor().schedule(
                 () -> {
                     run.executeMethodWithAnnotated(Init.class);
                     log.info("热更新重载");
@@ -39,7 +39,7 @@ public class Main {
                 TimeUnit.SECONDS
         );
 
-        ExecutorUtil.getDefaultExecutor().schedule(
+        ExecutorUtil.getInstance().getDefaultExecutor().schedule(
                 () -> {
                     RpcService rpcService = run.getInstance(RpcService.class);
                     SocketClient client = run.getInstance(SocketClient.class);

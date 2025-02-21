@@ -116,9 +116,11 @@ public class TableMapping {
             fieldMapping.columnName = fieldMapping.columnName.toLowerCase();
             columns.put(fieldMapping.columnName, fieldMapping);
         }
+
         if (keyFields.isEmpty()) {
             throw new RuntimeException(cls + " 类不存在主键 ");
         }
+
     }
 
 

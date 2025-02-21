@@ -209,7 +209,7 @@ public abstract class SocketClient implements Closeable {
 
         log.info("{} 链接异常 {} 秒 重连", this.hashCode(), l);
 
-        ExecutorUtil.getLogicExecutor().schedule(this::connect, l, TimeUnit.SECONDS);
+        ExecutorUtil.getInstance().getLogicExecutor().schedule(this::connect, l, TimeUnit.SECONDS);
         return true;
     }
 

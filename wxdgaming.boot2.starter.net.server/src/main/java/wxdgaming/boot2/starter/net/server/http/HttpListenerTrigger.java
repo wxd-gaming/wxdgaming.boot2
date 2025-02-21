@@ -9,6 +9,7 @@ import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.*;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
 import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.core.threading.ThreadContext;
@@ -70,7 +71,7 @@ public class HttpListenerTrigger extends Event {
             );
             stringBuilder.setLength(0);
             httpContext.getResponse().setStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
-            httpContext.getResponse().response("server error");
+            httpContext.getResponse().response(RunResult.error("server error " + e.getMessage()));
         } finally {
             httpContext.close();
         }

@@ -9,15 +9,6 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.ann.Value;
-import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.io.Objects;
-import wxdgaming.boot2.core.threading.ExecutorUtil;
-import wxdgaming.boot2.core.util.AnnUtil;
-import wxdgaming.boot2.starter.net.ann.HttpRequest;
-import wxdgaming.boot2.starter.net.ann.RequestMapping;
-
-import java.lang.reflect.Method;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * http 监听 绑定工厂
@@ -30,113 +21,18 @@ import java.util.concurrent.ConcurrentHashMap;
 @Singleton
 public class HttpListenerFactory {
 
-
-    private ConcurrentHashMap<String, HttpMapping> httpMappingMap = new ConcurrentHashMap<>();
-
-    HttpServerConfig httpServerConfig;
-    RunApplication lastRunApplication;
+    /** 相当于用 read and copy write方式作为线程安全性 */
+    HttpListenerContent httpListenerContent;
 
     @Init
     @Sort(7)
     public void init(@Value(path = "http.server", required = false) HttpServerConfig httpServerConfig,
                      RunApplication runApplication) {
-
-        this.httpServerConfig = Objects.returnNonNull(httpServerConfig, HttpServerConfig.INSTANCE);
-
-        this.lastRunApplication = runApplication;
-
-        ConcurrentHashMap<String, HttpMapping> tmpHttpMappingMap = new ConcurrentHashMap<>();
-
-        runApplication.getReflectContext()
-                .withMethodAnnotated(HttpRequest.class)
-                .forEach(contentMethod -> {
-                    Object ins = contentMethod.getIns();
-                    Method method = contentMethod.getMethod();
-
-                    RequestMapping insRequestMapping = AnnUtil.ann(ins.getClass(), RequestMapping.class);
-                    HttpRequest methodRequestMapping = AnnUtil.ann(method, HttpRequest.class);
-
-                    String path = "";
-
-                    if (insRequestMapping != null) {
-                        path += insRequestMapping.path();
-                    } else {
-                        String simpleName = ins.getClass().getSimpleName();
-                        if (simpleName.endsWith("Spi")) {
-                            simpleName = simpleName.substring(0, simpleName.length() - 3);
-                        } else if (simpleName.endsWith("Impl")) {
-                            simpleName = simpleName.substring(0, simpleName.length() - 4);
-                        } else if (simpleName.endsWith("Service")) {
-                            simpleName = simpleName.substring(0, simpleName.length() - 7);
-                        } else if (simpleName.endsWith("Controller")) {
-                            simpleName = simpleName.substring(0, simpleName.length() - 10);
-                        } else if (simpleName.endsWith("Api")) {
-                            simpleName = simpleName.substring(0, simpleName.length() - 3);
-                        }
-                        path += "/" + simpleName;
-                    }
-                    if (!path.startsWith("/")) path = "/" + path;
-                    if (!path.endsWith("/")) path += "/";
-                    if (StringUtils.isBlank(methodRequestMapping.path())) {
-                        path += method.getName();
-                    } else {
-                        path += methodRequestMapping.path();
-                    }
-
-                    String lowerCase = path.toLowerCase();
-                    HttpMapping httpMapping = new HttpMapping(methodRequestMapping, lowerCase, ins, method);
-
-                    HttpMapping old = tmpHttpMappingMap.put(lowerCase, httpMapping);
-                    if (old != null && !Objects.equals(old.ins().getClass().getName(), ins.getClass().getName())) {
-                        String formatted = "重复路由监听 %s old = %s - new = %s"
-                                .formatted(
-                                        lowerCase,
-                                        old.ins().getClass().getName(),
-                                        ins.getClass().getName()
-                                );
-                        throw new RuntimeException(formatted);
-                    }
-                    log.debug("http listener url: {}", lowerCase);
-                });
-        httpMappingMap = tmpHttpMappingMap;
+        httpListenerContent = new HttpListenerContent(httpServerConfig, runApplication);
     }
 
     public void dispatch(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) {
-        try {
-            HttpContext httpContext = new HttpContext(this.httpServerConfig, ctx, fullHttpRequest);
-
-            String uriPath = httpContext.getRequest().getUriPath();
-            String lowerCase = uriPath.toLowerCase();
-            HttpMapping httpMapping = httpMappingMap.get(lowerCase);
-            HttpRequest httpRequest = httpMapping == null ? null : httpMapping.httpRequest();
-            Method method = httpMapping == null ? null : httpMapping.method();
-
-
-            Object filterMatch = lastRunApplication.classWithSuper(HttpFilter.class)
-                    .map(httpFilter -> httpFilter.doFilter(httpRequest, method, uriPath, httpContext))
-                    .filter(Objects::nonNull)
-                    .findFirst()
-                    .orElse(null);
-
-            if (filterMatch != null) {
-                httpContext.getResponse().response(filterMatch);
-                return;
-            }
-            if (httpMapping == null) {
-                HttpFileEvent httpFileEvent = new HttpFileEvent(httpContext);
-                ExecutorUtil.getVirtualExecutor().execute(httpFileEvent);
-            } else {
-                if (this.httpServerConfig.isShowRequest()) {
-                    StringBuilder showLog = httpContext.showLog();
-                    log.info("{}", showLog);
-                }
-                HttpListenerTrigger httpListenerTrigger = new HttpListenerTrigger(httpMapping, lastRunApplication, httpContext);
-                httpListenerTrigger.submit();
-            }
-        } catch (Exception e) {
-            log.error("dispatch error", e);
-        }
+        httpListenerContent.dispatch(ctx, fullHttpRequest);
     }
-
 
 }

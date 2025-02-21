@@ -4,10 +4,12 @@ import ch.qos.logback.core.LogbackUtil;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wxdgaming.boot2.core.function.ConsumerE0;
 import wxdgaming.boot2.core.lang.Tick;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.GlobalUtil;
 
+import java.io.Closeable;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,26 +22,40 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2021-09-28 14:22
  **/
-public final class ExecutorUtil implements Serializable {
+public final class ExecutorUtil implements Serializable, Closeable {
+
+    @Getter private static ExecutorUtil instance = new ExecutorUtil();
+
+    public static void reset() {
+        instance.close();
+        instance = new ExecutorUtil();
+    }
+
+    /** 忽略异常 */
+    public static void executorIgnoredException(ConsumerE0 ce) {
+        try {
+            ce.accept();
+        } catch (Throwable ignored) {}
+    }
 
     /** 定时任务线程 */
-    static final TimerThread TIMER_THREAD = new TimerThread();
+    final TimerThread TIMER_THREAD = new TimerThread();
     /** 守护线程 */
-    static final GuardThread GUARD_THREAD = new GuardThread();
+    final GuardThread GUARD_THREAD = new GuardThread();
     /** 当前线程 */
-    static final ThreadLocal<ExecutorServiceJob> CurrentThread = new ThreadLocal<>();
+    final ThreadLocal<ExecutorServiceJob> CurrentThread = new ThreadLocal<>();
     /** 当前正在执行的任务 */
-    static final ConcurrentHashMap<Thread, ExecutorServiceJob> Run_THREAD_LOCAL = new ConcurrentHashMap<>();
+    final ConcurrentHashMap<Thread, ExecutorServiceJob> Run_THREAD_LOCAL = new ConcurrentHashMap<>();
     /** 全部初始化的 */
-    public static final ConcurrentHashMap<String, IExecutorServices> All_THREAD_LOCAL = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<String, IExecutorServices> All_THREAD_LOCAL = new ConcurrentHashMap<>();
     /** 属于后台线程池, 默认线程池， 一旦收到停服新号，线程立马关闭了 */
-    @Getter private static IExecutorServices defaultExecutor = null;
+    @Getter private IExecutorServices defaultExecutor = null;
     /** 属于后台线程池, 逻辑线程池，一旦收到停服新号，线程立马关闭了 */
-    @Getter private static IExecutorServices logicExecutor = null;
+    @Getter private IExecutorServices logicExecutor = null;
     /** 属于后台线程池, 虚拟线程池，一旦收到停服新号，线程立马关闭了 */
-    @Getter private static IExecutorServices virtualExecutor = null;
+    @Getter private IExecutorServices virtualExecutor = null;
 
-    public static void init(ExecutorConfig config) {
+    public void init(ExecutorConfig config) {
         Logger logger = LogbackUtil.logger();
         if (logger.isDebugEnabled()) {
             logger.debug("ExecutorUtil init config: {}", config.toJsonString());
@@ -49,17 +65,26 @@ public final class ExecutorUtil implements Serializable {
         virtualExecutor = newExecutorVirtualServices("virtual-executor", config.getVirtualCoreSize(), config.getVirtualMaxSize());
     }
 
+    @Override public void close() {
+        executorIgnoredException(TIMER_THREAD::clear);
+        executorIgnoredException(TIMER_THREAD::interrupt);
+        executorIgnoredException(GUARD_THREAD::interrupt);
+        All_THREAD_LOCAL.values().forEach(executorServices -> {
+            executorIgnoredException(executorServices::shutdown);
+        });
+    }
+
     /**
      * 默认队列最大长度2000,单线程
      *
      * @param name 线程池名称
      * @return
      */
-    public static ExecutorServices newExecutorServices(String name) {
+    public ExecutorServices newExecutorServices(String name) {
         return newExecutorServices(name, false);
     }
 
-    public static ExecutorServices newExecutorServices(String name, boolean daemon) {
+    public ExecutorServices newExecutorServices(String name, boolean daemon) {
         return newExecutorServices(name, daemon, 1, 1);
     }
 
@@ -70,7 +95,7 @@ public final class ExecutorUtil implements Serializable {
      * @param coreSize 线程最大数量
      * @return
      */
-    public static ExecutorServices newExecutorServices(String name, int coreSize) {
+    public ExecutorServices newExecutorServices(String name, int coreSize) {
         return newExecutorServices(name, false, coreSize);
     }
 
@@ -79,7 +104,7 @@ public final class ExecutorUtil implements Serializable {
      * @param coreSize 线程最大数量
      * @return
      */
-    public static ExecutorServices newExecutorServices(String name, boolean daemon, int coreSize) {
+    public ExecutorServices newExecutorServices(String name, boolean daemon, int coreSize) {
         return newExecutorServices(name, daemon, coreSize, coreSize);
     }
 
@@ -91,7 +116,7 @@ public final class ExecutorUtil implements Serializable {
      * @param maxSize  线程最大数量
      * @return
      */
-    public static ExecutorServices newExecutorServices(String name, int coreSize, int maxSize) {
+    public ExecutorServices newExecutorServices(String name, int coreSize, int maxSize) {
         return newExecutorServices(name, false, coreSize, maxSize);
     }
 
@@ -102,7 +127,7 @@ public final class ExecutorUtil implements Serializable {
      * @param maxSize  线程最大数量
      * @return
      */
-    public static ExecutorServices newExecutorServices(String name, boolean daemon, int coreSize, int maxSize) {
+    public ExecutorServices newExecutorServices(String name, boolean daemon, int coreSize, int maxSize) {
         return new ExecutorServices(name, daemon, coreSize, maxSize);
     }
 
@@ -117,7 +142,7 @@ public final class ExecutorUtil implements Serializable {
      * @param name 线程池名称
      * @return
      */
-    public static ExecutorVirtualServices newExecutorVirtualServices(String name) {
+    public ExecutorVirtualServices newExecutorVirtualServices(String name) {
         return newExecutorVirtualServices(name, 1);
     }
 
@@ -132,7 +157,7 @@ public final class ExecutorUtil implements Serializable {
      * @param coreSize 线程核心数量
      * @return
      */
-    public static ExecutorVirtualServices newExecutorVirtualServices(String name, int coreSize) {
+    public ExecutorVirtualServices newExecutorVirtualServices(String name, int coreSize) {
         return newExecutorVirtualServices(name, coreSize, coreSize);
     }
 
@@ -148,24 +173,24 @@ public final class ExecutorUtil implements Serializable {
      * @param coreSize 线程最大数量
      * @return
      */
-    public static ExecutorVirtualServices newExecutorVirtualServices(String name, int coreSize, int maxSize) {
+    public ExecutorVirtualServices newExecutorVirtualServices(String name, int coreSize, int maxSize) {
         return new ExecutorVirtualServices(name, coreSize, maxSize);
     }
 
     /** 检测当前线程是否是同一线程 */
-    public static boolean checkCurrentThread(String queueKey) {
+    public boolean checkCurrentThread(String queueKey) {
         return Objects.equals(currentThreadQueueKey(), queueKey);
     }
 
     /** 当前线程队列名称 */
-    public static String currentThreadQueueKey() {
+    public String currentThreadQueueKey() {
         return Optional.ofNullable(CurrentThread.get()).map(s -> s.queueName).orElse("");
     }
 
     ExecutorUtil() {}
 
     /** 守护线程 */
-    protected static class GuardThread extends Thread implements Serializable {
+    protected class GuardThread extends Thread implements Serializable {
 
         protected GuardThread() {
             super("guard-thread");
@@ -175,7 +200,7 @@ public final class ExecutorUtil implements Serializable {
 
         @Override public void run() {
             Tick tick = new Tick(50, 10, TimeUnit.SECONDS);
-            while (!GlobalUtil.SHUTTING.get()) {
+            while (!GlobalUtil.SHUTTING.get() || Thread.currentThread().isInterrupted()) {
                 try {
                     try {
                         tick.waitNext();
@@ -195,7 +220,7 @@ public final class ExecutorUtil implements Serializable {
         }
     }
 
-    protected static class TimerThread extends Thread {
+    protected class TimerThread extends Thread {
 
         final ReentrantLock relock = new ReentrantLock();
         private LinkedList<TimerJob> timerJobs = new LinkedList<>();
@@ -216,10 +241,19 @@ public final class ExecutorUtil implements Serializable {
             }
         }
 
+        public void clear() {
+            relock.lock();
+            try {
+                timerJobs = new LinkedList<>();
+            } finally {
+                relock.unlock();
+            }
+        }
+
         @Override public void run() {
             Tick tick = new Tick(1, 2, TimeUnit.MILLISECONDS);
             Logger logger = LoggerFactory.getLogger(this.getClass());
-            while (!GlobalUtil.SHUTTING.get()) {
+            while (!GlobalUtil.SHUTTING.get() || Thread.currentThread().isInterrupted()) {
                 try {
                     tick.waitNext();
                     relock.lock();

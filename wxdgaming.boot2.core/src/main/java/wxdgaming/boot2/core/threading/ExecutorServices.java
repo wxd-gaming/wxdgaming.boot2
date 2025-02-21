@@ -25,13 +25,13 @@ public final class ExecutorServices implements IExecutorServices {
     /** 当队列执行数量剩余过多的预警 */
     long queueCheckSize = 5000;
 
-    protected ExecutorServices(String name, boolean daemon, int coreSize, int maxSize) {
+    ExecutorServices(String name, boolean daemon, int coreSize, int maxSize) {
 
-        if (ExecutorUtil.All_THREAD_LOCAL.containsKey(name)) {
+        if (ExecutorUtil.getInstance().All_THREAD_LOCAL.containsKey(name)) {
             throw new RuntimeException("已经存在线程池：" + name);
         }
 
-        ExecutorUtil.All_THREAD_LOCAL.put(name, this);
+        ExecutorUtil.getInstance().All_THREAD_LOCAL.put(name, this);
 
         threadPoolExecutor = new ThreadPoolExecutors(
                 name,

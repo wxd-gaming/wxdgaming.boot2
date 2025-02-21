@@ -19,6 +19,7 @@ import wxdgaming.boot2.starter.net.SocketSession;
 @Singleton
 public class ProtoListenerFactory {
 
+    /** 相当于用 read and copy write方式作为线程安全性 */
     ProtoListenerContent protoListenerContent = null;
 
     @Init

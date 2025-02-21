@@ -4,10 +4,15 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.util.AnnUtil;
 import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
+import wxdgaming.boot2.starter.batis.sql.SqlQueryBuilder;
+import wxdgaming.boot2.starter.batis.sql.ann.Partition;
 
+import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +34,10 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
 
     @Override public void initBatch() {
         this.sqlDataBatch = new PgsqlDataBatch(this);
+    }
+
+    @Override public SqlQueryBuilder queryBuilder() {
+        return new PgsqlQueryBuilder(this);
     }
 
     /** 查询当前数据库所有的表 key: 表名字, value: 表备注 */
@@ -116,10 +125,28 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
 
     @Override protected void createTable(TableMapping tableMapping, String tableName, String comment) {
         StringBuilder stringBuilder = ddlBuilder.buildTableSqlString(tableMapping, tableName);
-        String string = stringBuilder.toString();
-        string = ddlBuilder.buildSql$$(string);
-        this.executeUpdate(string);
+        String creteTableSql = stringBuilder.toString();
+        creteTableSql = ddlBuilder.buildSql$$(creteTableSql);
+        this.executeUpdate(creteTableSql);
+        /*创建表备注*/
         this.executeUpdate("COMMENT ON TABLE \"%s\" IS '%s';".formatted(tableName, comment));
+        TableMapping.FieldMapping fieldMapping = tableMapping.getColumns()
+                .values()
+                .stream()
+                .filter(v -> AnnUtil.ann(v.getField(), Partition.class) != null)
+                .findFirst()
+                .orElse(null);
+        if (fieldMapping != null) {
+            Field field = fieldMapping.getField();
+            Partition partition = AnnUtil.ann(field, Partition.class);
+            String[] strings = partition.initRangeArrays();
+            if (strings != null && strings.length > 0 && StringUtils.isNotBlank(strings[0])) {
+                for (String s : strings) {
+                    String[] split = s.split("=");
+                    addPartition(tableName, split[0], split[1]);
+                }
+            }
+        }
     }
 
     /** 添加分区 */

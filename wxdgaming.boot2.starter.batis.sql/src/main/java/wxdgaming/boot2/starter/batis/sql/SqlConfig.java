@@ -48,6 +48,12 @@ public class SqlConfig extends ObjectBase {
     private int idleTimeoutM = 10;
     @JSONField(ordinal = 11)
     private String scanPackage = "";
+    /** 默认异步批处理线程数量 */
+    @JSONField(ordinal = 12)
+    private int batchThreadSize = 1;
+    /** 线程池单次批处理提交的数量 */
+    @JSONField(ordinal = 12)
+    private int batchSubmitSize = 500;
 
     public String dbName() {
         String dbName = url;
