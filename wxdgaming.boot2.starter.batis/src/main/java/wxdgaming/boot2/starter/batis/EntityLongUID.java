@@ -17,7 +17,7 @@ public class EntityLongUID extends Entity implements EntityUID<Long> {
 
     @JSONField(ordinal = 1)
     @DbColumn(key = true)
-    private Long uid;
+    private Long uid = 0L;
 
     public int intUid() {
         return uid.intValue();
