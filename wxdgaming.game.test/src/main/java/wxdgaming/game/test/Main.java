@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        RunApplication run = WxdApplication.run(
+        RunApplication runApplication = WxdApplication.run(
                 CoreScan.class,
                 ScheduledScan.class,
                 NetScan.class,
@@ -32,7 +32,7 @@ public class Main {
 
         ExecutorUtil.getInstance().getDefaultExecutor().schedule(
                 () -> {
-                    run.executeMethodWithAnnotated(Init.class);
+                    runApplication.executeMethodWithAnnotated(Init.class);
                     log.info("热更新重载");
                 },
                 10,
@@ -41,8 +41,8 @@ public class Main {
 
         ExecutorUtil.getInstance().getDefaultExecutor().schedule(
                 () -> {
-                    RpcService rpcService = run.getInstance(RpcService.class);
-                    SocketClient client = run.getInstance(SocketClient.class);
+                    RpcService rpcService = runApplication.getInstance(RpcService.class);
+                    SocketClient client = runApplication.getInstance(SocketClient.class);
                     SocketSession socketSession = client.idleNullException();
                     rpcService.request(socketSession, "rpcIndex", RunResult.ok().fluentPut("a", "b"))
                             .whenComplete((jsonObject, throwable) -> {

@@ -202,6 +202,16 @@ public class EntityTest extends EntityLongUID {
 </code>
 </pre>
 
+##### 定时任务
+
+<pre><code class="language-lava">
+    @Scheduled("*/30")
+    @ExecutorWith(useVirtualThread = true)
+    public void timerAsync() {
+        log.info("{}", "timerAsync()");
+    }
+</code></pre>
+
 #### 预览
 
 ![image](/png/start.png)
