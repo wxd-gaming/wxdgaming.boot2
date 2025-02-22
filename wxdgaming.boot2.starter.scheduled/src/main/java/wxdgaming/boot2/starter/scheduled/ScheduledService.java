@@ -60,6 +60,7 @@ public class ScheduledService {
     }
 
     @Start
+    @Sort(99999998)
     public void start() {
         ScheduleTrigger scheduleTrigger = new ScheduleTrigger();
         job = ExecutorUtil.getInstance().getDefaultExecutor().scheduleAtFixedDelay(

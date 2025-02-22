@@ -49,6 +49,10 @@ public class RpcListenerTrigger extends Event {
         this.paramObject = paramObject;
     }
 
+    @Override public String getTaskInfoString() {
+        return "RpcListenerTrigger: " + rpcMapping.path() + "; " + rpcMapping.ins().getClass().getName() + "." + rpcMapping.method().getName() + "()";
+    }
+
     @Override public void onEvent() {
         try {
             Object invoke = rpcMapping.method().invoke(rpcMapping.ins(), injectorParameters(runApplication, socketSession, paramObject));

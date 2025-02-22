@@ -155,6 +155,11 @@ public interface IExecutorServices extends Executor {
     }
 
     /** 提交带回调的执行 */
+    default CompletableFuture<Void> completableFuture(Runnable runnable) {
+        return completableFuture("", runnable, 4);
+    }
+
+    /** 提交带回调的执行 */
     default CompletableFuture<Void> completableFuture(String queueName, Runnable runnable) {
         return completableFuture(queueName, runnable, 4);
     }

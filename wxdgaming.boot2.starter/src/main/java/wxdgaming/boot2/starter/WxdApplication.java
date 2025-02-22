@@ -88,6 +88,7 @@ public class WxdApplication {
                     .append("    -[ " + StringUtils.padRight(JvmUtil.timeZone(), len, ' ') + " ]-\n");
             stringAppend.append("\n");
             log.warn(stringAppend.toString());
+
             return runApplication;
         } catch (Throwable throwable) {
             log.error("", throwable);

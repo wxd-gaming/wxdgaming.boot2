@@ -291,10 +291,12 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         this.queryResultSet(sql, params, resultSet -> {
             try {
                 Object object = resultSet.getObject(1);
-                if (cls.isAssignableFrom(object.getClass())) {
-                    ret.set(cls.cast(object));
-                } else {
-                    ret.set(FastJsonUtil.parse(String.valueOf(object), cls));
+                if (object != null) {
+                    if (cls.isAssignableFrom(object.getClass())) {
+                        ret.set(cls.cast(object));
+                    } else {
+                        ret.set(FastJsonUtil.parse(String.valueOf(object), cls));
+                    }
                 }
                 return false;
             } catch (SQLException e) {

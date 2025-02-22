@@ -38,6 +38,10 @@ public class HttpListenerTrigger extends Event {
         this.httpContext = httpContext;
     }
 
+    @Override public String getTaskInfoString() {
+        return "HttpListenerTrigger: " + httpMapping.path() + "; " + httpMapping.ins().getClass().getName() + "." + httpMapping.method().getName() + "()";
+    }
+
     @Override public void onEvent() throws Exception {
         if (StringUtils.isNotBlank(httpMapping.httpRequest().method())) {
             /*请求格式处理，比如必须是get请求，或者必须是post请求*/

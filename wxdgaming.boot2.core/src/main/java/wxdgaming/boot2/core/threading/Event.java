@@ -101,7 +101,7 @@ public abstract class Event implements Runnable, RunMonitor {
         } else {
             executor = ExecutorUtil.getInstance().getLogicExecutor();
         }
-        executor.submit(getQueueName(), this, 4);
+        executor.submit(getQueueName(), this, 3);
     }
 
 }
