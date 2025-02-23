@@ -13,6 +13,7 @@ import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
 import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.core.threading.ThreadContext;
+import wxdgaming.boot2.core.util.GlobalUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
@@ -52,6 +53,7 @@ public class HttpListenerTrigger extends Event {
             }
         }
         try {
+            ThreadContext.putContent("http-path", httpMapping.path());
             Object invoke = httpMapping.method().invoke(httpMapping.ins(), injectorParameters(runApplication, httpContext));
             if (invoke != null) {
                 httpContext.getResponse().response(invoke);
@@ -63,16 +65,7 @@ public class HttpListenerTrigger extends Event {
                 e = e.getCause();
             }
             StringBuilder stringBuilder = httpContext.showLog();
-            stringBuilder
-                    .append("=============================================异常================================================")
-                    .append("\n")
-                    .append(Throw.ofString(e))
-                    .append("\n=============================================结束================================================")
-                    .append("\n");
-            log.error(
-                    "{}",
-                    stringBuilder
-            );
+            GlobalUtil.exception(stringBuilder.toString(), e);
             stringBuilder.setLength(0);
             httpContext.getResponse().setStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
             httpContext.getResponse().response(RunResult.error("server error " + e.getMessage()));

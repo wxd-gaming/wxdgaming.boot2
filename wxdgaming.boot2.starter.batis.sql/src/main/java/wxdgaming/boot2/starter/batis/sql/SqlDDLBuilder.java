@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * sql ddl
@@ -273,9 +275,15 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
                 return Boolean.parseBoolean(object.toString());
             }
             case Int -> {
+                if (AtomicInteger.class.isAssignableFrom(fieldMapping.getFileType())) {
+                    return new AtomicInteger(Integer.parseInt(object.toString()));
+                }
                 return Integer.parseInt(object.toString());
             }
             case Long -> {
+                if (AtomicLong.class.isAssignableFrom(fieldMapping.getFileType())) {
+                    return new AtomicLong(Long.parseLong(object.toString()));
+                }
                 return Long.parseLong(object.toString());
             }
             case Double -> {

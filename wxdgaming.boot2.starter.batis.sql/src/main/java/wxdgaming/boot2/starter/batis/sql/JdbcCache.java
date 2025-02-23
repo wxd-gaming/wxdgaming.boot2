@@ -34,6 +34,7 @@ public class JdbcCache<E extends Entity, Key> {
         this.tableMapping = this.sqlDataHelper.tableMapping(cls);
         cache = Cache.<Key, E>builder()
                 .cacheName("cache-" + tableMapping.getTableName())
+                .hashArea(100)
                 .expireAfterAccess(expireAfterAccessM, TimeUnit.MINUTES)
                 .heartTime(1, TimeUnit.MINUTES)
                 .loader(this::loader)

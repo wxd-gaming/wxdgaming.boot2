@@ -15,6 +15,8 @@ import wxdgaming.boot2.starter.batis.ann.DbTable;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 数据表映射
@@ -132,9 +134,9 @@ public class TableMapping {
             fieldMapping.columnType = ColumnType.Byte;
         } else if (short.class.isAssignableFrom(type) || Short.class.isAssignableFrom(type)) {
             fieldMapping.columnType = ColumnType.Short;
-        } else if (int.class.isAssignableFrom(type) || Integer.class.isAssignableFrom(type)) {
+        } else if (int.class.isAssignableFrom(type) || Integer.class.isAssignableFrom(type) || AtomicInteger.class.isAssignableFrom(type)) {
             fieldMapping.columnType = ColumnType.Int;
-        } else if (long.class.isAssignableFrom(type) || Long.class.isAssignableFrom(type)) {
+        } else if (long.class.isAssignableFrom(type) || Long.class.isAssignableFrom(type) || AtomicLong.class.isAssignableFrom(type)) {
             fieldMapping.columnType = ColumnType.Long;
         } else if (float.class.isAssignableFrom(type) || Float.class.isAssignableFrom(type)) {
             fieldMapping.columnType = ColumnType.Float;
@@ -213,6 +215,16 @@ public class TableMapping {
                 }
                 if (object != null) {
                     switch (columnType) {
+                        case Int -> {
+                            if (object instanceof AtomicInteger atomicInteger) {
+                                object = atomicInteger.get();
+                            }
+                        }
+                        case Long -> {
+                            if (object instanceof AtomicLong atomicLong) {
+                                object = atomicLong.get();
+                            }
+                        }
                         case String -> {
                             if (!(object instanceof String)) {
                                 object = FastJsonUtil.toJson(object, FastJsonUtil.Writer_Features_Type_Name_NOT_ROOT);
