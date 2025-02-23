@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.threading;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.core.chatset.StringUtils;
@@ -14,13 +15,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @version: 2023-11-10 22:45
  **/
 @Slf4j
-class ExecutorServiceJob implements Runnable, Job {
+@Getter
+public class ExecutorServiceJob implements Runnable, Job {
 
-    protected IExecutorServices iExecutorServices;
+    protected final IExecutorServices iExecutorServices;
     protected String runName = "";
     protected volatile String queueName = "";
     protected final Runnable task;
-    private final ThreadContext threadContext;
+    protected final ThreadContext threadContext;
     protected volatile long initTaskTime;
     protected volatile long startExecTime;
     protected volatile Thread currentThread;

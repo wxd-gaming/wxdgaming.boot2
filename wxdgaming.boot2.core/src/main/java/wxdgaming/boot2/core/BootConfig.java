@@ -11,6 +11,7 @@ import wxdgaming.boot2.core.util.JvmUtil;
 import wxdgaming.boot2.core.util.YamlUtil;
 
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
@@ -41,14 +42,14 @@ public class BootConfig {
 
     private JSONObject config = new JSONObject(true);
 
-    public <R> R value(Value value, Class<R> type) {
+    public <R> R value(Value value, Type type) {
         /*实现注入*/
         String path = value.path();
         R r;
         try {
             r = BootConfig.getIns().getNestedValue(path, type);
-            if (type.isInstance(r)) {
-                return type.cast(r);
+            if (type instanceof Class<?> clazz && clazz.isInstance(r)) {
+                return (R) clazz.cast(r);
             }
             if (r == null && !value.defaultValue().isBlank()) {
                 r = FastJsonUtil.parse(value.defaultValue(), type);
@@ -106,20 +107,20 @@ public class BootConfig {
         return config.getString(key);
     }
 
-    public <T> T getObject(String key, Class<T> clazz) {
+    public <T> T getObject(String key, Type clazz) {
         return config.getObject(key, clazz);
     }
 
-    public <T> T getObject(String key, Class<T> clazz, Object defaultValue) {
+    public <T> T getObject(String key, Type clazz, Object defaultValue) {
         return FastJsonUtil.getObject(config, key, clazz, defaultValue);
     }
 
-    public <T> T getNestedValue(String path, Class<T> clazz) {
+    public <T> T getNestedValue(String path, Type clazz) {
         return FastJsonUtil.getNestedValue(config, path, clazz, null);
     }
 
     /** 泛型方法：通过路由获取嵌套的 JSON 数据并转换为指定类型 */
-    public <T> T getNestedValue(String path, Class<T> clazz, Object defaultValue) {
+    public <T> T getNestedValue(String path, Type clazz, Object defaultValue) {
         return FastJsonUtil.getNestedValue(config, path, clazz, defaultValue);
     }
 

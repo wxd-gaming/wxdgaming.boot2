@@ -182,10 +182,6 @@ public class FastJsonUtil {
         return JSON.parseObject(bytes, clazz, Reader_Features);
     }
 
-    public static <T> T parse(String str, Class<T> clazz) {
-        return JSON.parseObject(str, clazz, Reader_Features);
-    }
-
     public static <T, F> T parse(String str, SLFunction1<F, ?> function) {
         Type type = ParameterizedTypeImpl.genericFieldTypes(function);
         return JSON.parseObject(str, type, Reader_Features);
@@ -197,6 +193,10 @@ public class FastJsonUtil {
 
     public static <T> T parse(String str, Type type) {
         return JSON.parseObject(str, type, Reader_Features);
+    }
+
+    public static <T> T parse(String str, Class<T> clazz) {
+        return JSON.parseObject(str, clazz, Reader_Features);
     }
 
     public static <T> T parse(String str, TypeReference<T> tTypeReference) {
@@ -215,7 +215,7 @@ public class FastJsonUtil {
      * 多重泛型  数据结构
      * List<R>
      */
-    public static <R> List<R> parseArray(String jsonString, Class<R> innerClass) {
+    public static <R> List<R> parseArray(String jsonString, Type innerClass) {
         return parse(jsonString, ParameterizedTypeImpl.genericTypes(ArrayList.class, ArrayList.class, innerClass));
     }
 
@@ -223,7 +223,7 @@ public class FastJsonUtil {
      * 多重泛型  数据结构
      * List<R>
      */
-    public static <R> List<R> parseArray(byte[] bytes, Class<R> innerClass) {
+    public static <R> List<R> parseArray(byte[] bytes, Type innerClass) {
         return parse(bytes, ParameterizedTypeImpl.genericTypes(ArrayList.class, ArrayList.class, innerClass));
     }
 
@@ -231,7 +231,7 @@ public class FastJsonUtil {
         return parseMap(jsonString, String.class, String.class);
     }
 
-    public static <K, V> Map<K, V> parseMap(String jsonString, Class<K> keyType, Class<V> valueType) {
+    public static <K, V> Map<K, V> parseMap(String jsonString, Type keyType, Type valueType) {
         return
                 parse(
                         jsonString,
@@ -243,7 +243,7 @@ public class FastJsonUtil {
         return parseMap(bytes, String.class, String.class);
     }
 
-    public static <K, V> Map<K, V> parseMap(byte[] bytes, Class<K> keyType, Class<V> valueType) {
+    public static <K, V> Map<K, V> parseMap(byte[] bytes, Type keyType, Type valueType) {
         return
                 parse(
                         bytes,
@@ -251,36 +251,33 @@ public class FastJsonUtil {
                 );
     }
 
-    public static <T> T getObject(JSONObject source, String key, Class<T> clazz, Object defaultValue) {
-        T object = source.getObject(key, clazz);
+    public static <T> T parseObject(Object object, Type type, Object defaultValue) {
         if (object == null) {
             if (defaultValue == null) return null;
-            if (clazz.isInstance(defaultValue)) {
-                return clazz.cast(defaultValue);
+            if (type instanceof Class<?> clazz && clazz.isInstance(defaultValue)) {
+                return (T) clazz.cast(defaultValue);
             }
-            object = FastJsonUtil.parse(String.valueOf(defaultValue), clazz);
+            object = FastJsonUtil.parse(String.valueOf(defaultValue), type);
         }
-        return object;
+        if (type instanceof Class<?> clazz && clazz.isInstance(object)) {
+            return (T) clazz.cast(object);
+        }
+        return (T) FastJsonUtil.parse(String.valueOf(object), type);
     }
 
-    public static <T> T getNestedValue(JSONObject source, String path, Class<T> clazz) {
+    public static <T> T getObject(JSONObject source, String key, Type type, Object defaultValue) {
+        T object = source.getObject(key, type);
+        return parseObject(object, type, defaultValue);
+    }
+
+    public static <T> T getNestedValue(JSONObject source, String path, Type clazz) {
         return getNestedValue(source, path, clazz, null);
     }
 
     /** 泛型方法：通过路由获取嵌套的 JSON 数据并转换为指定类型 */
-    public static <T> T getNestedValue(JSONObject source, String path, Class<T> clazz, Object defaultValue) {
+    public static <T> T getNestedValue(JSONObject source, String path, Type type, Object defaultValue) {
         Object value = getNestedValue(source, path);
-        if (value == null) {
-            if (defaultValue == null) return null;
-            if (clazz.isInstance(defaultValue)) {
-                return clazz.cast(defaultValue);
-            }
-            return FastJsonUtil.parse(String.valueOf(defaultValue), clazz);
-        }
-        if (clazz.isInstance(value)) {
-            return clazz.cast(value);
-        }
-        return FastJsonUtil.parse(String.valueOf(value), clazz);
+        return parseObject(value, type, defaultValue);
     }
 
     /** 新增方法：通过路由获取嵌套的 JSON 数据 */

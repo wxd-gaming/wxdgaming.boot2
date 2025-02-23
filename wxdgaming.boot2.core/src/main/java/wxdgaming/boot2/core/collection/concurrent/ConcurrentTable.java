@@ -42,16 +42,30 @@ public class ConcurrentTable<K1, K2, V> implements Serializable, Data2Json {
         }
     }
 
+    /** 是否包含kay */
+    public boolean containsKey(K1 k1) {
+        return nodes.containsKey(k1);
+    }
+
+    /** 是否包含kay */
+    public boolean containsKey(K1 k1, K2 k2) {
+        ConcurrentHashMap<K2, V> hashMap = nodes.get(k1);
+        if (hashMap != null) {
+            return hashMap.containsKey(k2);
+        }
+        return false;
+    }
+
     public V put(K1 k1, K2 k2, V v) {
         return row(k1).put(k2, v);
     }
 
-    public V putIfAbsent(K1 k1, K2 k2, V v) {
-        return row(k1).putIfAbsent(k2, v);
-    }
-
     public void put(K1 k1, Map<K2, V> m) {
         nodes.put(k1, new ConcurrentHashMap<>(m));
+    }
+
+    public V putIfAbsent(K1 k1, K2 k2, V v) {
+        return row(k1).putIfAbsent(k2, v);
     }
 
     public ConcurrentTable<K1, K2, V> append(K1 k1, K2 k2, V v) {

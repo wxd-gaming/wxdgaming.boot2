@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.lang.ObjectBase;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 public class ConvertCollection<E> extends ObjectBase {
 
     private final ReentrantLock lock = new ReentrantLock();
-    private List<E> nodes = new ArrayList<>();
+    private LinkedList<E> nodes = new LinkedList<>();
 
     public boolean add(E e) {
         lock.lock();
@@ -43,7 +43,7 @@ public class ConvertCollection<E> extends ObjectBase {
     public void clear() {
         lock.lock();
         try {
-            nodes = new ArrayList<>();
+            nodes = new LinkedList<>();
         } finally {
             lock.unlock();
         }
@@ -53,7 +53,7 @@ public class ConvertCollection<E> extends ObjectBase {
         lock.lock();
         try {
             List<E> tmp = nodes;
-            nodes = new ArrayList<>();
+            nodes = new LinkedList<>();
             return tmp;
         } finally {
             lock.unlock();
@@ -64,7 +64,7 @@ public class ConvertCollection<E> extends ObjectBase {
         lock.lock();
         try {
             List<E> tmp = nodes;
-            nodes = new ArrayList<>();
+            nodes = new LinkedList<>();
             return ListOf.split(tmp, limit, null);
         } finally {
             lock.unlock();

@@ -38,6 +38,7 @@ public class HexId implements Serializable {
     }
 
 
+    /** 因为无符号 所以每一秒的id最大值是52万 */
     public synchronized long newId() {
         long nanoTime = System.currentTimeMillis();
         final long days = MyClock.days(nanoTime) - OffSetDays;

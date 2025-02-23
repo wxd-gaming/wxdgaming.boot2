@@ -48,7 +48,8 @@ public abstract class SqlQueryBuilder {
         this.limit = limit;
     }
 
-    public void limit(int limit, int minLimit, int maxLimit) {
+    public void limit(int skip, int limit, int minLimit, int maxLimit) {
+        setSkip(skip);
         if (limit < minLimit)
             limit = minLimit;
         if (limit > maxLimit)

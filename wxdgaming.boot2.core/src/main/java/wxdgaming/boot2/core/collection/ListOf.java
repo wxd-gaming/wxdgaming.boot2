@@ -78,13 +78,13 @@ public class ListOf implements Serializable {
     /** 把数据切割成指定大小的list */
     public static <U> List<List<U>> split(Collection<U> us, int limit, Predicate<U> predicate) {
         List<List<U>> list = new ArrayList<>();
-        ArrayList<U> items = new ArrayList<>();
+        ArrayList<U> items = new ArrayList<>(limit);
         for (U value : us) {
             if (predicate != null && !predicate.test(value)) continue;
             items.add(value);
             if (items.size() >= limit) {
                 list.add(items);
-                items = new ArrayList<>();
+                items = new ArrayList<>(limit);
             }
         }
         if (!items.isEmpty()) {

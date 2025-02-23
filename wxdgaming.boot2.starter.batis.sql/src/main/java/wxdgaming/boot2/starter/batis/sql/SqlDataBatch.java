@@ -1,8 +1,10 @@
 package wxdgaming.boot2.starter.batis.sql;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.collection.ConvertCollection;
 import wxdgaming.boot2.core.collection.SplitCollection;
 import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.core.io.FileWriteUtil;
@@ -56,9 +58,9 @@ public abstract class SqlDataBatch extends DataBatch {
 
     @Override public void save(Entity entity) {
         if (entity.isNewEntity())
-            sqlDataHelper.insert(entity);
+            insert(entity);
         else
-            sqlDataHelper.update(entity);
+            update(entity);
         entity.setNewEntity(false);
     }
 
@@ -81,9 +83,9 @@ public abstract class SqlDataBatch extends DataBatch {
         protected final int threadId;
         protected final int batchSubmitSize;
         /** key: tableName, value: {key: sql, value: params} */
-        protected Table<String, String, SplitCollection<Object[]>> batchInsertMap = new Table<>();
+        protected Table<String, String, ConvertCollection<BatchParam>> batchInsertMap = new Table<>();
         /** key: tableName, value: {key: sql, value: params} */
-        protected Table<String, String, SplitCollection<Object[]>> batchUpdateMap = new Table<>();
+        protected Table<String, String, ConvertCollection<BatchParam>> batchUpdateMap = new Table<>();
 
         protected DiffTime diffTime = new DiffTime();
         protected long executeDiffTime = 0;
@@ -105,8 +107,9 @@ public abstract class SqlDataBatch extends DataBatch {
                 TableMapping tableMapping = sqlDataHelper.tableMapping(entity.getClass());
                 String insertSql = sqlDataHelper.getDdlBuilder().buildInsert(tableMapping, tableName);
                 Object[] insertParams = sqlDataHelper.getDdlBuilder().buildInsertParams(tableMapping, entity);
-                SplitCollection<Object[]> entitySplitCollection = batchInsertMap.computeIfAbsent(tableName, insertSql, k -> new SplitCollection<>(batchSubmitSize));
-                entitySplitCollection.add(insertParams);
+                ConvertCollection<BatchParam> entitySplitCollection = batchInsertMap.computeIfAbsent(tableName, insertSql, k -> new ConvertCollection<>());
+                entitySplitCollection.add(new BatchParam(entity, insertParams));
+                entity.setNewEntity(false);
             } finally {
                 lock.unlock();
             }
@@ -119,8 +122,8 @@ public abstract class SqlDataBatch extends DataBatch {
                 TableMapping tableMapping = sqlDataHelper.tableMapping(entity.getClass());
                 String updateSql = sqlDataHelper.getDdlBuilder().buildUpdate(tableMapping, tableName);
                 Object[] updateParams = sqlDataHelper.getDdlBuilder().builderUpdateParams(tableMapping, entity);
-                SplitCollection<Object[]> entitySplitCollection = batchUpdateMap.computeIfAbsent(tableName, updateSql, k -> new SplitCollection<>(500));
-                entitySplitCollection.add(updateParams);
+                ConvertCollection<BatchParam> entitySplitCollection = batchUpdateMap.computeIfAbsent(tableName, updateSql, k -> new ConvertCollection<>());
+                entitySplitCollection.add(new BatchParam(entity, updateParams));
             } finally {
                 lock.unlock();
             }
@@ -147,7 +150,7 @@ public abstract class SqlDataBatch extends DataBatch {
         }
 
         protected void insertBach() {
-            Table<String, String, SplitCollection<Object[]>> tmp;
+            Table<String, String, ConvertCollection<BatchParam>> tmp;
             lock.lock();
             try {
                 if (batchInsertMap.isEmpty()) {
@@ -162,7 +165,7 @@ public abstract class SqlDataBatch extends DataBatch {
         }
 
         protected void updateBach() {
-            Table<String, String, SplitCollection<Object[]>> tmp;
+            Table<String, String, ConvertCollection<BatchParam>> tmp;
             lock.lock();
             try {
                 if (batchUpdateMap.isEmpty()) {
@@ -176,15 +179,15 @@ public abstract class SqlDataBatch extends DataBatch {
             executeBach(tmp);
         }
 
-        protected void executeBach(Table<String, String, SplitCollection<Object[]>> tmp) {
+        protected void executeBach(Table<String, String, ConvertCollection<BatchParam>> tmp) {
             int insertCount = 0;
             diffTime.reset();
-            Collection<HashMap<String, SplitCollection<Object[]>>> values = tmp.values();
-            for (HashMap<String, SplitCollection<Object[]>> map : values) {
-                for (Map.Entry<String, SplitCollection<Object[]>> entry : map.entrySet()) {
+            Collection<HashMap<String, ConvertCollection<BatchParam>>> values = tmp.values();
+            for (HashMap<String, ConvertCollection<BatchParam>> map : values) {
+                for (Map.Entry<String, ConvertCollection<BatchParam>> entry : map.entrySet()) {
                     String insertSql = entry.getKey();
-                    LinkedList<List<Object[]>> es = entry.getValue().getEs();
-                    for (List<Object[]> list : es) {
+                    List<List<BatchParam>> lists = entry.getValue().splitAndClear(batchSubmitSize);
+                    for (List<BatchParam> list : lists) {
                         insertCount += executeUpdate(insertSql, list);
                     }
                 }
@@ -214,14 +217,14 @@ public abstract class SqlDataBatch extends DataBatch {
             }
         }
 
-        protected int executeUpdate(String sql, List<Object[]> paramList) {
+        protected int executeUpdate(String sql, List<BatchParam> paramList) {
             int insertCount = 0;
             try (Connection connection = sqlDataHelper.connection()) {
                 connection.setAutoCommit(false);
                 try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-                    for (Object[] objects : paramList) {
-                        for (int i = 0; i < objects.length; i++) {
-                            Object object = objects[i];
+                    for (BatchParam objects : paramList) {
+                        for (int i = 0; i < objects.params.length; i++) {
+                            Object object = objects.params[i];
                             preparedStatement.setObject(i + 1, object);
                         }
                         preparedStatement.addBatch();
@@ -232,11 +235,11 @@ public abstract class SqlDataBatch extends DataBatch {
                 }
             } catch (Exception e) {
                 insertCount = 0;
-                for (Object[] objects : paramList) {
+                for (BatchParam objects : paramList) {
                     try (Connection connection = sqlDataHelper.connection();
                          PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-                        for (int i = 0; i < objects.length; i++) {
-                            Object object = objects[i];
+                        for (int i = 0; i < objects.params.length; i++) {
+                            Object object = objects.params[i];
                             preparedStatement.setObject(i + 1, object);
                         }
                         preparedStatement.executeUpdate();
@@ -252,4 +255,29 @@ public abstract class SqlDataBatch extends DataBatch {
             return insertCount;
         }
     }
+
+    @Getter
+    protected class BatchParam {
+
+        protected final Entity entity;
+        protected final Object[] params;
+
+        public BatchParam(Entity entity, Object[] params) {
+            this.entity = entity;
+            this.params = params;
+        }
+
+        @Override public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+
+            BatchParam that = (BatchParam) o;
+            return getEntity().equals(that.getEntity());
+        }
+
+        @Override public int hashCode() {
+            return getEntity().hashCode();
+        }
+
+    }
+
 }

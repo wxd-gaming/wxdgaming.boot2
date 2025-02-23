@@ -125,39 +125,38 @@ public class GuiceReflectContext {
         Object[] params = new Object[parameters.length];
         for (int i = 0; i < params.length; i++) {
             Parameter parameter = parameters[i];
-            Type type = parameter.getParameterizedType();
-            if (type instanceof Class<?> clazz) {
-                if (GuiceReflectContext.class.isAssignableFrom(clazz)) {
-                    params[i] = clazz.cast(this);
-                    continue;
-                } else if (Injector.class.isAssignableFrom(clazz)) {
-                    params[i] = clazz.cast(runApplication.getInjector());
-                    continue;
-                } else if (RunApplication.class.isAssignableFrom(clazz)) {
-                    params[i] = clazz.cast(runApplication);
-                    continue;
-                }
-                /*实现注入*/
-                Value value = parameter.getAnnotation(Value.class);
-                if (value != null) {
-                    params[i] = BootConfig.getIns().value(value, clazz);
-                    continue;
-                }
+            Class<?> parameterType = parameter.getType();
+            Type parameterizedType = parameter.getParameterizedType();
+            if (GuiceReflectContext.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(this);
+                continue;
+            } else if (Injector.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(runApplication.getInjector());
+                continue;
+            } else if (RunApplication.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(runApplication);
+                continue;
+            }
+            /*实现注入*/
+            Value value = parameter.getAnnotation(Value.class);
+            if (value != null) {
+                params[i] = BootConfig.getIns().value(value, parameterizedType);
+                continue;
+            }
 
-                {
-                    ThreadParam threadParam = parameter.getAnnotation(ThreadParam.class);
-                    if (threadParam != null) {
-                        params[i] = ThreadContext.context(threadParam, clazz);
-                        continue;
-                    }
+            {
+                ThreadParam threadParam = parameter.getAnnotation(ThreadParam.class);
+                if (threadParam != null) {
+                    params[i] = ThreadContext.context(threadParam, parameterizedType);
+                    continue;
                 }
-                try {
-                    params[i] = runApplication.getInstance(clazz);
-                } catch (Exception e) {
-                    Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
-                    if (qualifier != null && qualifier.required()) {
-                        throw new RuntimeException("bean:" + clazz.getName() + " is not bind");
-                    }
+            }
+            try {
+                params[i] = runApplication.getInstance(parameterType);
+            } catch (Exception e) {
+                Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
+                if (qualifier != null && qualifier.required()) {
+                    throw new RuntimeException("bean:" + parameterType.getName() + " is not bind");
                 }
             }
         }

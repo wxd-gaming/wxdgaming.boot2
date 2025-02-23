@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter.batis.sql;
 
+import lombok.Getter;
 import wxdgaming.boot2.core.cache.Cache;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.starter.batis.Entity;
@@ -13,19 +14,27 @@ import java.util.concurrent.TimeUnit;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-17 11:28
  **/
+@Getter
 public class JdbcCache<E extends Entity, UID> {
 
-    private final Class<E> cls;
-    private final TableMapping tableMapping;
-    private final SqlDataHelper sqlDataHelper;
-    private final Cache<UID, E> cache;
+    protected final Class<E> cls;
+    protected final TableMapping tableMapping;
+    protected final SqlDataHelper<?> sqlDataHelper;
+    protected final Cache<UID, E> cache;
 
-    public JdbcCache(SqlDataHelper sqlDataHelper, long duration) {
+    /**
+     * 构建
+     *
+     * @param sqlDataHelper      数据库
+     * @param expireAfterAccessM 滑动缓存过期时间
+     */
+    public JdbcCache(SqlDataHelper<?> sqlDataHelper, int expireAfterAccessM) {
         this.cls = ReflectContext.getTClass(this.getClass());
         this.sqlDataHelper = sqlDataHelper;
         this.tableMapping = this.sqlDataHelper.tableMapping(cls);
         cache = Cache.<UID, E>builder()
-                .expireAfterAccess(duration, TimeUnit.MINUTES)
+                .cacheName("cache-" + tableMapping.getTableName())
+                .expireAfterAccess(expireAfterAccessM, TimeUnit.MINUTES)
                 .heartTime(1, TimeUnit.MINUTES)
                 .loader(this::loader)
                 .heartListener(this::heart)

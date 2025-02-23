@@ -8,6 +8,7 @@ import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
@@ -22,24 +23,27 @@ public class ThreadContext extends JSONObject {
 
     private static final ThreadLocal<ThreadContext> local = new InheritableThreadLocal<>();
 
-    public static <T> T context(ThreadParam threadParam, Class<T> clazz) {
+    public static <R> R context(ThreadParam threadParam, Type type) {
         String name = threadParam.path();
-        T o;
+        if (StringUtils.isBlank(name)) {
+            name = type.getTypeName();
+        }
+        R r;
         try {
-            o = ThreadContext.context(name);
-            if (clazz.isInstance(o)) {
-                return clazz.cast(o);
+            r = ThreadContext.context(name);
+            if (type instanceof Class<?> clazz && clazz.isInstance(r)) {
+                return (R) clazz.cast(r);
             }
-            if (o == null && StringUtils.isNotBlank(threadParam.defaultValue())) {
-                o = FastJsonUtil.parse(threadParam.defaultValue(), clazz);
+            if (r == null && StringUtils.isNotBlank(threadParam.defaultValue())) {
+                r = FastJsonUtil.parse(threadParam.defaultValue(), type);
             }
         } catch (Exception e) {
             throw Throw.of("threadParam 参数：" + name, e);
         }
-        if (threadParam.required() && o == null) {
+        if (threadParam.required() && r == null) {
             throw new RuntimeException("threadParam:" + name + " is null");
         }
-        return o;
+        return r;
     }
 
     /** 获取参数 */

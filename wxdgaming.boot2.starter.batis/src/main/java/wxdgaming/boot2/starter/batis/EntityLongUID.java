@@ -23,4 +23,14 @@ public class EntityLongUID extends Entity {
         return (int) uid;
     }
 
+    @Override public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EntityLongUID that = (EntityLongUID) o;
+        return getUid() == that.getUid();
+    }
+
+    @Override public int hashCode() {
+        return Long.hashCode(getUid());
+    }
 }

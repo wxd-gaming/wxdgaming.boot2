@@ -16,6 +16,7 @@ import wxdgaming.boot2.core.function.Function1;
 import wxdgaming.boot2.core.function.Function2;
 import wxdgaming.boot2.core.lang.Tuple3;
 import wxdgaming.boot2.core.shutdown;
+import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.threading.TimerJob;
 import wxdgaming.boot2.core.timer.MyClock;
@@ -83,6 +84,11 @@ public class Cache<K, V> {
             h = i % hashArea;
         }
         return h;
+    }
+
+    /** 是否包含kay */
+    public boolean containsKey(K k) {
+        return kv.containsKey(hashKey(k), k);
     }
 
     /** 如果获取缓存没有，可以根据加载,失败回抛出异常 */
@@ -170,41 +176,45 @@ public class Cache<K, V> {
      * @param delay 缓存容器check间隔时间
      */
     protected Cache(long delay) {
-        timerJob = ExecutorUtil.getInstance().getDefaultExecutor().scheduleAtFixedDelay(
-                () -> {
-                    long now = MyClock.millis();
-                    for (Map.Entry<Integer, ConcurrentHashMap<K, Tuple3<V, Long, Long>>> next : kv.entrySet()) {
-                        Integer hashKey = next.getKey();
-                        ConcurrentHashMap<K, Tuple3<V, Long, Long>> nextValue = next.getValue();
-                        Iterator<Map.Entry<K, Tuple3<V, Long, Long>>> entryIterator = nextValue.entrySet().iterator();
-                        while (entryIterator.hasNext()) {
-                            Map.Entry<K, Tuple3<V, Long, Long>> entryNext = entryIterator.next();
-                            K key = entryNext.getKey();
-                            Tuple3<V, Long, Long> value = entryNext.getValue();
+        Event event = new Event(cacheName, 10_000, 100_000) {
+            @Override public void onEvent() throws Exception {
+                long now = MyClock.millis();
+                for (Map.Entry<Integer, ConcurrentHashMap<K, Tuple3<V, Long, Long>>> next : kv.entrySet()) {
+                    Integer hashKey = next.getKey();
+                    ConcurrentHashMap<K, Tuple3<V, Long, Long>> nextValue = next.getValue();
+                    Iterator<Map.Entry<K, Tuple3<V, Long, Long>>> entryIterator = nextValue.entrySet().iterator();
+                    while (entryIterator.hasNext()) {
+                        Map.Entry<K, Tuple3<V, Long, Long>> entryNext = entryIterator.next();
+                        K key = entryNext.getKey();
+                        Tuple3<V, Long, Long> value = entryNext.getValue();
 
-                            if (heartTime > 0 && heartListener != null && value.getRight() < now) {
-                                heartListener.accept(key, value.getLeft());
-                                value.setRight(now + heartTime);
-                            }
+                        if (heartTime > 0 && heartListener != null && value.getRight() < now) {
+                            heartListener.accept(key, value.getLeft());
+                            value.setRight(now + heartTime);
+                        }
 
-                            if (value.getCenter() > 0 && value.getCenter() < now) {
-                                if (removalListener != null) {
-                                    Boolean apply = removalListener.apply(key, value.getLeft());
-                                    if (Boolean.TRUE.equals(apply)) {
-                                        entryIterator.remove();
-                                    } else {
-                                        refresh(value);
-                                        log.info("缓存过期：{} 移除失败", key);
-                                    }
-                                } else {
+                        if (value.getCenter() > 0 && value.getCenter() < now) {
+                            if (removalListener != null) {
+                                Boolean apply = removalListener.apply(key, value.getLeft());
+                                if (Boolean.TRUE.equals(apply)) {
                                     entryIterator.remove();
-                                    log.info("缓存过期：{}", key);
+                                } else {
+                                    refresh(value);
+                                    log.info("缓存过期：{} 移除失败", key);
                                 }
-                                continue;
+                            } else {
+                                entryIterator.remove();
+                                log.info("缓存过期：{}", key);
                             }
+                            continue;
                         }
                     }
-                },
+                }
+            }
+        };
+
+        timerJob = ExecutorUtil.getInstance().getDefaultExecutor().scheduleAtFixedDelay(
+                event,
                 10_000,
                 delay,
                 TimeUnit.MILLISECONDS

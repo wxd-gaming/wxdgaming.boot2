@@ -156,23 +156,28 @@ public interface IExecutorServices extends Executor {
 
     /** 提交带回调的执行 */
     default CompletableFuture<Void> completableFuture(Runnable runnable) {
-        return completableFuture("", runnable, 4);
+        return completableFuture("", runnable, "", 66, 150, 4);
+    }
+
+    /** 提交带回调的执行 */
+    default CompletableFuture<Void> completableFuture(Runnable runnable, String taskInfoString, long logTime, long warningTime) {
+        return completableFuture("", runnable, taskInfoString, logTime, warningTime, 4);
     }
 
     /** 提交带回调的执行 */
     default CompletableFuture<Void> completableFuture(String queueName, Runnable runnable) {
-        return completableFuture(queueName, runnable, 4);
+        return completableFuture(queueName, runnable, "", 66, 150, 4);
     }
 
     /** 提交带回调的执行 */
     default CompletableFuture<Void> completableFuture(Runnable runnable, int stackTrace) {
-        return completableFuture("", runnable, stackTrace);
+        return completableFuture("", runnable, "", 66, 150, stackTrace);
     }
 
     /** 提交带回调的执行 */
-    default CompletableFuture<Void> completableFuture(String queueName, Runnable runnable, int stackTrace) {
+    default CompletableFuture<Void> completableFuture(String queueName, Runnable runnable, String taskInfoString, long logTime, long warningTime, int stackTrace) {
         CompletableFuture<Void> completableFuture = new CompletableFuture<>();
-        this.submit(queueName, new Event(66, 150) {
+        this.submit(queueName, new Event(taskInfoString, logTime, warningTime) {
             @Override public void onEvent() throws Exception {
                 try {
                     runnable.run();
@@ -322,7 +327,7 @@ public interface IExecutorServices extends Executor {
             throw new RuntimeException("线程已经关闭 " + job);
         }
         job.queueName = queueName;
-        /**定时器任务，需要重置一次*/
+        /*TODO 定时器任务，需要重置一次*/
         job.initTaskTime = System.nanoTime();
         job.append.set(true);
         if (StringUtils.isNotBlank(queueName)) {

@@ -86,89 +86,88 @@ public class HttpListenerTrigger extends Event {
         Object[] params = new Object[parameters.length];
         for (int i = 0; i < params.length; i++) {
             Parameter parameter = parameters[i];
-            Type type = parameter.getParameterizedType();
-            if (type instanceof Class<?> clazz) {
-                if (GuiceReflectContext.class.isAssignableFrom(clazz)) {
-                    params[i] = clazz.cast(runApplication.getReflectContext());
-                    continue;
-                } else if (RunApplication.class.isAssignableFrom(clazz)) {
-                    params[i] = clazz.cast(runApplication);
-                    continue;
-                } else if (Injector.class.isAssignableFrom(clazz)) {
-                    params[i] = clazz.cast(runApplication.getInjector());
-                    continue;
-                } else if (HttpContext.class.isAssignableFrom(clazz)) {
-                    params[i] = clazz.cast(context);
-                    continue;
-                } else if (HttpContext.Request.class.isAssignableFrom(clazz)) {
-                    params[i] = clazz.cast(context.getRequest());
-                    continue;
-                } else if (HttpContext.Response.class.isAssignableFrom(clazz)) {
-                    params[i] = clazz.cast(context.getResponse());
+            Class<?> parameterType = parameter.getType();
+            Type parameterizedType = parameter.getParameterizedType();
+            if (GuiceReflectContext.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(runApplication.getReflectContext());
+                continue;
+            } else if (RunApplication.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(runApplication);
+                continue;
+            } else if (Injector.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(runApplication.getInjector());
+                continue;
+            } else if (HttpContext.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(context);
+                continue;
+            } else if (HttpContext.Request.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(context.getRequest());
+                continue;
+            } else if (HttpContext.Response.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(context.getResponse());
+                continue;
+            }
+            /*实现注入*/
+            {
+                Value value = parameter.getAnnotation(Value.class);
+                if (value != null) {
+                    Object valued = BootConfig.getIns().value(value, parameterizedType);
+                    params[i] = parameterType.cast(valued);
                     continue;
                 }
-                /*实现注入*/
-                {
-                    Value value = parameter.getAnnotation(Value.class);
-                    if (value != null) {
-                        Object valued = BootConfig.getIns().value(value, clazz);
-                        params[i] = clazz.cast(valued);
-                        continue;
-                    }
+            }
+            {
+                ThreadParam threadParam = parameter.getAnnotation(ThreadParam.class);
+                if (threadParam != null) {
+                    params[i] = ThreadContext.context(threadParam, parameterizedType);
+                    continue;
                 }
-                {
-                    ThreadParam threadParam = parameter.getAnnotation(ThreadParam.class);
-                    if (threadParam != null) {
-                        params[i] = ThreadContext.context(threadParam, clazz);
-                        continue;
-                    }
-                }
-                {
-                    Param param = parameter.getAnnotation(Param.class);
-                    if (param != null) {
-                        String name = param.path();
-                        Object o;
-                        try {
-                            o = context.getRequest().getReqParams().getObject(name, clazz);
-                            if (o == null && StringUtils.isNotBlank(param.defaultValue())) {
-                                o = FastJsonUtil.parse(param.defaultValue(), type);
-                            }
-                        } catch (Exception e) {
-                            throw Throw.of("参数：" + name, e);
+            }
+            {
+                Param param = parameter.getAnnotation(Param.class);
+                if (param != null) {
+                    String name = param.path();
+                    Object o;
+                    try {
+                        o = context.getRequest().getReqParams().getObject(name, parameterizedType);
+                        if (o == null && StringUtils.isNotBlank(param.defaultValue())) {
+                            o = FastJsonUtil.parse(param.defaultValue(), parameterizedType);
                         }
-                        if (param.required() && o == null) {
-                            throw new RuntimeException("param:" + name + " is null");
-                        }
-                        params[i] = o;
-                        continue;
+                    } catch (Exception e) {
+                        throw Throw.of("参数：" + name, e);
                     }
+                    if (param.required() && o == null) {
+                        throw new RuntimeException("param:" + name + " is null");
+                    }
+                    params[i] = o;
+                    continue;
                 }
+            }
 
-                {
-                    Body body = parameter.getAnnotation(Body.class);
-                    if (body != null) {
-                        Object o = null;
-                        if (StringUtils.isNotBlank(context.getRequest().getReqContent())) {
-                            o = context.getRequest().getReqParams().toJavaObject(clazz);
-                        }
-                        if (o == null && StringUtils.isNotBlank(body.defaultValue())) {
-                            o = body.defaultValue();
-                        }
-                        if (body.required() && o == null) {
-                            throw new RuntimeException("body is null");
-                        }
-                        params[i] = o;
-                        continue;
+            {
+                Body body = parameter.getAnnotation(Body.class);
+                if (body != null) {
+                    Object o = null;
+                    if (StringUtils.isNotBlank(context.getRequest().getReqContent())) {
+                        o = context.getRequest().getReqParams().toJavaObject(parameterType);
                     }
+                    if (o == null && StringUtils.isNotBlank(body.defaultValue())) {
+                        o = body.defaultValue();
+                    }
+                    if (body.required() && o == null) {
+                        throw new RuntimeException("body is null");
+                    }
+                    params[i] = o;
+                    continue;
                 }
+            }
 
-                try {
-                    params[i] = runApplication.getInstance(clazz);
-                } catch (Exception e) {
-                    Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
-                    if (qualifier != null && qualifier.required()) {
-                        throw new RuntimeException("bean:" + clazz.getName() + " is not bind");
-                    }
+            try {
+                params[i] = runApplication.getInstance(parameterType);
+            } catch (Exception e) {
+                Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
+                if (qualifier != null && qualifier.required()) {
+                    throw new RuntimeException("bean:" + parameterType.getName() + " is not bind");
                 }
             }
         }

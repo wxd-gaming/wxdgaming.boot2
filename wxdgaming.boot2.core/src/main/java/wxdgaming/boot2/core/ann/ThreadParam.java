@@ -14,7 +14,7 @@ import java.lang.annotation.ElementType;
 public @interface ThreadParam {
 
     /** 属性名字 path */
-    String path();
+    String path() default "";
 
     /** 必须 */
     boolean required() default true;

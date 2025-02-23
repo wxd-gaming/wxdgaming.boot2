@@ -19,4 +19,14 @@ public class EntityIntegerUID extends Entity {
     @JSONField(ordinal = 1)
     private int uid = 0;
 
+    @Override public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EntityIntegerUID that = (EntityIntegerUID) o;
+        return getUid() == that.getUid();
+    }
+
+    @Override public int hashCode() {
+        return getUid();
+    }
 }

@@ -55,41 +55,40 @@ public class ProtoListenerTrigger extends Event {
         Object[] params = new Object[parameters.length];
         for (int i = 0; i < params.length; i++) {
             Parameter parameter = parameters[i];
-            Type type = parameter.getParameterizedType();
-            if (type instanceof Class<?> clazz) {
-                if (GuiceReflectContext.class.isAssignableFrom(clazz)) {
-                    params[i] = clazz.cast(runApplication.getReflectContext());
-                    continue;
-                } else if (RunApplication.class.isAssignableFrom(clazz)) {
-                    params[i] = clazz.cast(runApplication);
-                    continue;
-                } else if (Injector.class.isAssignableFrom(clazz)) {
-                    params[i] = clazz.cast(runApplication.getInjector());
-                    continue;
-                } else if (SocketSession.class.isAssignableFrom(clazz)) {
-                    params[i] = clazz.cast(socketSession);
-                    continue;
-                } else if (pojoBase.getClass().isAssignableFrom(clazz)) {
-                    params[i] = clazz.cast(pojoBase);
+            Class<?> parameterType = parameter.getType();
+            Type parameterizedType = parameter.getParameterizedType();
+            if (GuiceReflectContext.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(runApplication.getReflectContext());
+                continue;
+            } else if (RunApplication.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(runApplication);
+                continue;
+            } else if (Injector.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(runApplication.getInjector());
+                continue;
+            } else if (SocketSession.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(socketSession);
+                continue;
+            } else if (pojoBase.getClass().isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(pojoBase);
+                continue;
+            }
+            /*实现注入*/
+            {
+                Value value = parameter.getAnnotation(Value.class);
+                if (value != null) {
+                    Object valued = BootConfig.getIns().value(value, parameterizedType);
+                    params[i] = parameterType.cast(valued);
                     continue;
                 }
-                /*实现注入*/
-                {
-                    Value value = parameter.getAnnotation(Value.class);
-                    if (value != null) {
-                        Object valued = BootConfig.getIns().value(value, clazz);
-                        params[i] = clazz.cast(valued);
-                        continue;
-                    }
-                }
+            }
 
-                try {
-                    params[i] = runApplication.getInstance(clazz);
-                } catch (Exception e) {
-                    Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
-                    if (qualifier != null && qualifier.required()) {
-                        throw new RuntimeException("bean:" + clazz.getName() + " is not bind");
-                    }
+            try {
+                params[i] = runApplication.getInstance(parameterType);
+            } catch (Exception e) {
+                Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
+                if (qualifier != null && qualifier.required()) {
+                    throw new RuntimeException("bean:" + parameterType.getName() + " is not bind");
                 }
             }
         }
