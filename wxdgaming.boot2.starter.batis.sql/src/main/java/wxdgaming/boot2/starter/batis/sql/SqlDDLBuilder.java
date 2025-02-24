@@ -1,7 +1,6 @@
 package wxdgaming.boot2.starter.batis.sql;
 
 import com.alibaba.fastjson.JSONObject;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.util.AnnUtil;
 import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.DDLBuilder;
@@ -13,8 +12,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * sql ddl
@@ -255,50 +252,9 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
         LinkedHashMap<String, TableMapping.FieldMapping> columns = tableMapping.getColumns();
         for (Map.Entry<String, TableMapping.FieldMapping> entry : columns.entrySet()) {
             TableMapping.FieldMapping fieldMapping = entry.getValue();
-            Object columnValue = fromDbValue(fieldMapping, data);
-            if (columnValue != null) {
-                fieldMapping.setValue(bean, columnValue);
-            }
+            fieldMapping.setValue(bean, data);
         }
     }
 
-    public Object fromDbValue(TableMapping.FieldMapping fieldMapping, JSONObject data) {
-        Object object = data.get(fieldMapping.getColumnName());
-        if (object == null) {
-            return null;
-        }
-        if (fieldMapping.getFileType().isAssignableFrom(object.getClass())) {
-            return object;
-        }
-        switch (fieldMapping.getColumnType()) {
-            case Bool -> {
-                return Boolean.parseBoolean(object.toString());
-            }
-            case Int -> {
-                if (AtomicInteger.class.isAssignableFrom(fieldMapping.getFileType())) {
-                    return new AtomicInteger(Integer.parseInt(object.toString()));
-                }
-                return Integer.parseInt(object.toString());
-            }
-            case Long -> {
-                if (AtomicLong.class.isAssignableFrom(fieldMapping.getFileType())) {
-                    return new AtomicLong(Long.parseLong(object.toString()));
-                }
-                return Long.parseLong(object.toString());
-            }
-            case Double -> {
-                return Double.parseDouble(object.toString());
-            }
-            case Float -> {
-                return Float.parseFloat(object.toString());
-            }
-            case Blob -> {
-                return FastJsonUtil.parse((byte[]) object, fieldMapping.getJsonType());
-            }
-            case null, default -> {
-                return FastJsonUtil.parse(object.toString(), fieldMapping.getJsonType());
-            }
-        }
-    }
 
 }

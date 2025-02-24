@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter.batis;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.Throw;
@@ -15,6 +16,7 @@ import wxdgaming.boot2.starter.batis.ann.DbTable;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -191,7 +193,8 @@ public class TableMapping {
             this.getMethod = MethodUtil.findGetMethod(cls, field);
         }
 
-        public Object getValue(Object bean) {
+        /** 获取字段的值 */
+        public Object getFieldValue(Object bean) {
             try {
                 Object object;
                 if (getMethod == null) {
@@ -205,16 +208,17 @@ public class TableMapping {
             }
         }
 
+        /** 获取字段的值，转换成数据库可用 */
         public Object toDbValue(Object bean) {
             try {
-                Object object;
-                if (getMethod == null) {
-                    object = field.get(bean);
-                } else {
-                    object = getMethod.invoke(bean);
-                }
+                Object object = getFieldValue(bean);
                 if (object != null) {
                     switch (columnType) {
+                        case Bool -> {
+                            if (object instanceof AtomicBoolean atomicBoolean) {
+                                object = atomicBoolean.get();
+                            }
+                        }
                         case Int -> {
                             if (object instanceof AtomicInteger atomicInteger) {
                                 object = atomicInteger.get();
@@ -231,7 +235,10 @@ public class TableMapping {
                             }
                         }
                         case Json -> {
-                            if (!(object instanceof String)) {
+                            if (object instanceof BitSet bitSet) {
+                                long[] longArray = bitSet.toLongArray();
+                                object = FastJsonUtil.toJson(longArray);
+                            } else if (!(object instanceof String)) {
                                 object = FastJsonUtil.toJson(object, FastJsonUtil.Writer_Features);
                             }
                         }
@@ -251,18 +258,27 @@ public class TableMapping {
             }
         }
 
-        public void setValue(Object bean, Object colValue) {
+        /**
+         * @param bean 需要赋值的实例
+         * @param data 数据库读取的行数据
+         * @author: wxd-gaming(無心道, 15388152619)
+         * @version: 2025-02-24 09:39
+         */
+        public void setValue(Object bean, JSONObject data) {
             try {
+                Object colValue = data.get(getColumnName());
+                colValue = fromDbValue(colValue);
+                if (colValue == null) return;
                 if (setMethod == null) {
                     if (Modifier.isFinal(field.getModifiers())) {
                         if (Map.class.isAssignableFrom(field.getType())) {
-                            final Map fieldValue = (Map) getValue(bean);
+                            final Map<?, ?> fieldValue = (Map<?, ?>) getFieldValue(bean);
                             fieldValue.putAll((Map) colValue);
                         } else if (List.class.isAssignableFrom(field.getType())) {
-                            final List fieldValue = (List) getValue(bean);
+                            final List<?> fieldValue = (List<?>) getFieldValue(bean);
                             fieldValue.addAll((List) colValue);
                         } else if (Set.class.isAssignableFrom(field.getType())) {
-                            final Set fieldValue = (Set) getValue(bean);
+                            final Set<?> fieldValue = (Set<?>) getFieldValue(bean);
                             fieldValue.addAll((Set) colValue);
                         } else {
                             throw new RuntimeException(
@@ -279,10 +295,59 @@ public class TableMapping {
                         field.set(bean, colValue);
                     }
                 } else {
+
                     setMethod.invoke(bean, colValue);
                 }
             } catch (Exception e) {
                 throw Throw.of(e);
+            }
+        }
+
+        /** 从数据库加载转化成实体bean数据 */
+        protected Object fromDbValue(Object object) {
+            if (object == null) {
+                return null;
+            }
+            if (getFileType().isAssignableFrom(object.getClass())) {
+                return object;
+            }
+            switch (getColumnType()) {
+                case Bool -> {
+                    if (AtomicBoolean.class.isAssignableFrom(getFileType())) {
+                        return new AtomicBoolean(Boolean.parseBoolean(object.toString()));
+                    }
+                    return Boolean.parseBoolean(object.toString());
+                }
+                case Int -> {
+                    if (AtomicInteger.class.isAssignableFrom(getFileType())) {
+                        return new AtomicInteger(Integer.parseInt(object.toString()));
+                    }
+                    return Integer.parseInt(object.toString());
+                }
+                case Long -> {
+                    if (AtomicLong.class.isAssignableFrom(getFileType())) {
+                        return new AtomicLong(Long.parseLong(object.toString()));
+                    }
+                    return Long.parseLong(object.toString());
+                }
+                case Double -> {
+                    return Double.parseDouble(object.toString());
+                }
+                case Float -> {
+                    return Float.parseFloat(object.toString());
+                }
+                case Blob -> {
+                    return FastJsonUtil.parse((byte[]) object, getJsonType());
+                }
+                case null, default -> {
+                    if (BitSet.class.isAssignableFrom(field.getType())) {
+                        if (object instanceof String json) {
+                            long[] parse = FastJsonUtil.parse(json, long[].class);
+                            return BitSet.valueOf(parse);
+                        }
+                    }
+                    return FastJsonUtil.parse(object.toString(), getJsonType());
+                }
             }
         }
 
