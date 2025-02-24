@@ -128,11 +128,11 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
     public String buildSelectKeyWhere(TableMapping tableMapping, String tableName) {
         return tableMapping.getSelectByKeySql().computeIfAbsent(
                 tableName,
-                k -> buildSql$$(buildSelect(tableMapping, tableName) + " where " + buildKeyWhere(tableMapping))
+                k -> buildSql$$(buildSelectSql(tableMapping, tableName) + " where " + buildKeyWhere(tableMapping))
         );
     }
 
-    public String buildSelect(TableMapping tableMapping, String tableName) {
+    public String buildSelectSql(TableMapping tableMapping, String tableName) {
         return tableMapping.getSelectSql().computeIfAbsent(
                 tableName,
                 k -> buildSql$$("select * from `" + tableName + "`")
@@ -169,7 +169,7 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
     }
 
     /** insert into */
-    public String buildInsert(TableMapping tableMapping, String tableName) {
+    public String buildInsertSql(TableMapping tableMapping, String tableName) {
         return tableMapping.getInsertSql().computeIfAbsent(
                 tableName,
                 k -> {
@@ -191,7 +191,7 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
         );
     }
 
-    public String buildUpdate(TableMapping tableMapping, String tableName) {
+    public String buildUpdateSql(TableMapping tableMapping, String tableName) {
         return tableMapping.getUpdateSql().computeIfAbsent(
                 tableName,
                 k -> {
@@ -212,7 +212,7 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
         );
     }
 
-    public Object[] buildKeyParams(TableMapping tableMapping, Object bean) {
+    @Override public Object[] buildKeyParams(TableMapping tableMapping, Object bean) {
         List<Object> params = new ArrayList<>();
         for (TableMapping.FieldMapping fieldMapping : tableMapping.getKeyFields()) {
             params.add(fieldMapping.toDbValue(bean));
@@ -220,7 +220,7 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
         return params.toArray();
     }
 
-    public Object[] buildInsertParams(TableMapping tableMapping, Object bean) {
+    @Override public Object[] buildInsertParams(TableMapping tableMapping, Object bean) {
         List<Object> params = new ArrayList<>();
         for (TableMapping.FieldMapping fieldMapping : tableMapping.getColumns().values()) {
             params.add(fieldMapping.toDbValue(bean));
@@ -228,7 +228,7 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
         return params.toArray();
     }
 
-    public Object[] builderUpdateParams(TableMapping tableMapping, Object bean) {
+    @Override public Object[] builderUpdateParams(TableMapping tableMapping, Object bean) {
         List<Object> params = new ArrayList<>();
         for (TableMapping.FieldMapping fieldMapping : tableMapping.getColumns().values()) {
             if (fieldMapping.isKey()) continue;

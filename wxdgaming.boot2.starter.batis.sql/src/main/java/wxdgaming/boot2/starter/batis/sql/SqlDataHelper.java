@@ -346,7 +346,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
      */
     public List<JSONObject> queryListByEntityWhere(Class<? extends Entity> cls, String sqlWhere, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
-        String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
+        String sql = ddlBuilder.buildSelectSql(tableMapping, tableMapping.getTableName());
         sql += " where " + sqlWhere;
         return queryList(sql, args);
     }
@@ -411,7 +411,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
 
     @Override public <R extends Entity> List<R> findList(String tableName, Class<R> cls) {
         TableMapping tableMapping = tableMapping(cls);
-        String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
+        String sql = ddlBuilder.buildSelectSql(tableMapping, tableMapping.getTableName());
         return findListBySql(cls, sql);
     }
 
@@ -428,7 +428,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
      */
     public <R extends Entity> List<R> findListByWhere(Class<R> cls, String sqlWhere, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
-        String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
+        String sql = ddlBuilder.buildSelectSql(tableMapping, tableMapping.getTableName());
         sql += " where " + sqlWhere;
         return findListBySql(cls, sql, args);
     }
@@ -462,7 +462,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
 
     @Override public <R extends Entity> R findByKey(String tableName, Class<R> cls, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
-        String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
+        String sql = ddlBuilder.buildSelectSql(tableMapping, tableMapping.getTableName());
         String where = ddlBuilder.buildKeyWhere(tableMapping);
         sql += " where " + where;
         return findBySql(cls, sql, args);
@@ -480,7 +480,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
      */
     public <R extends Entity> R findByWhere(Class<R> cls, String sqlWhere, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
-        String sql = ddlBuilder.buildSelect(tableMapping, tableMapping.getTableName());
+        String sql = ddlBuilder.buildSelectSql(tableMapping, tableMapping.getTableName());
         sql += " where " + sqlWhere;
         return findBySql(cls, sql, args);
     }
@@ -510,7 +510,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
     @Override public void insert(Entity entity) {
         TableMapping tableMapping = tableMapping(entity.getClass());
         String tableName = TableMapping.beanTableName(entity);
-        String insert = ddlBuilder.buildInsert(tableMapping, tableName);
+        String insert = ddlBuilder.buildInsertSql(tableMapping, tableName);
         Object[] insertParams = ddlBuilder.buildInsertParams(tableMapping, entity);
         this.executeUpdate(insert, insertParams);
     }
@@ -518,7 +518,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
     @Override public void update(Entity entity) {
         TableMapping tableMapping = tableMapping(entity.getClass());
         String tableName = TableMapping.beanTableName(entity);
-        String sql = ddlBuilder.buildUpdate(tableMapping, tableName);
+        String sql = ddlBuilder.buildUpdateSql(tableMapping, tableName);
         Object[] objects = ddlBuilder.builderUpdateParams(tableMapping, entity);
         this.executeUpdate(sql, objects);
     }

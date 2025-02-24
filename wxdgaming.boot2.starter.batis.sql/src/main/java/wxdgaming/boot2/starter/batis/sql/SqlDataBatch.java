@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.collection.ConvertCollection;
-import wxdgaming.boot2.core.collection.SplitCollection;
 import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.lang.DiffTime;
@@ -105,10 +104,11 @@ public abstract class SqlDataBatch extends DataBatch {
             try {
                 String tableName = TableMapping.beanTableName(entity);
                 TableMapping tableMapping = sqlDataHelper.tableMapping(entity.getClass());
-                String insertSql = sqlDataHelper.getDdlBuilder().buildInsert(tableMapping, tableName);
+                String insertSql = sqlDataHelper.getDdlBuilder().buildInsertSql(tableMapping, tableName);
+                Object[] keyParams = sqlDataHelper.getDdlBuilder().buildKeyParams(tableMapping, entity);
                 Object[] insertParams = sqlDataHelper.getDdlBuilder().buildInsertParams(tableMapping, entity);
                 ConvertCollection<BatchParam> entitySplitCollection = batchInsertMap.computeIfAbsent(tableName, insertSql, k -> new ConvertCollection<>());
-                entitySplitCollection.add(new BatchParam(entity, insertParams));
+                entitySplitCollection.add(new BatchParam(entity, keyParams, insertParams));
                 entity.setNewEntity(false);
             } finally {
                 lock.unlock();
@@ -120,10 +120,11 @@ public abstract class SqlDataBatch extends DataBatch {
             try {
                 String tableName = TableMapping.beanTableName(entity);
                 TableMapping tableMapping = sqlDataHelper.tableMapping(entity.getClass());
-                String updateSql = sqlDataHelper.getDdlBuilder().buildUpdate(tableMapping, tableName);
+                String updateSql = sqlDataHelper.getDdlBuilder().buildUpdateSql(tableMapping, tableName);
+                Object[] keyParams = sqlDataHelper.getDdlBuilder().buildKeyParams(tableMapping, entity);
                 Object[] updateParams = sqlDataHelper.getDdlBuilder().builderUpdateParams(tableMapping, entity);
                 ConvertCollection<BatchParam> entitySplitCollection = batchUpdateMap.computeIfAbsent(tableName, updateSql, k -> new ConvertCollection<>());
-                entitySplitCollection.add(new BatchParam(entity, updateParams));
+                entitySplitCollection.add(new BatchParam(entity, keyParams, updateParams));
             } finally {
                 lock.unlock();
             }
@@ -260,10 +261,13 @@ public abstract class SqlDataBatch extends DataBatch {
     protected class BatchParam {
 
         protected final Entity entity;
+        /** 主键的值 */
+        protected final Object[] keyParams;
         protected final Object[] params;
 
-        public BatchParam(Entity entity, Object[] params) {
+        public BatchParam(Entity entity, Object[] keyParams, Object[] params) {
             this.entity = entity;
+            this.keyParams = keyParams;
             this.params = params;
         }
 

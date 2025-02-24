@@ -21,4 +21,10 @@ public abstract class DDLBuilder {
         return tableMappings.computeIfAbsent(cls, l -> new TableMapping(cls));
     }
 
+    public abstract Object[] buildKeyParams(TableMapping tableMapping, Object bean);
+
+    public abstract Object[] buildInsertParams(TableMapping tableMapping, Object bean);
+
+    public abstract Object[] builderUpdateParams(TableMapping tableMapping, Object bean);
+
 }
