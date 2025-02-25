@@ -167,7 +167,19 @@ public class Cache<K, V> {
     @shutdown
     public void shutdown() {
         timerJob.cancel();
-        kv.clear();
+        for (Map.Entry<Integer, ConcurrentHashMap<K, Tuple3<V, Long, Long>>> next : kv.entrySet()) {
+            ConcurrentHashMap<K, Tuple3<V, Long, Long>> nextValue = next.getValue();
+            Iterator<Map.Entry<K, Tuple3<V, Long, Long>>> entryIterator = nextValue.entrySet().iterator();
+            while (entryIterator.hasNext()) {
+                Map.Entry<K, Tuple3<V, Long, Long>> entryNext = entryIterator.next();
+                K key = entryNext.getKey();
+                Tuple3<V, Long, Long> value = entryNext.getValue();
+                if (removalListener != null) {
+                    Boolean apply = removalListener.apply(key, value.getLeft());
+                    log.info("缓存 shutdown：{} 移除 {}", key, apply);
+                }
+            }
+        }
     }
 
     /**

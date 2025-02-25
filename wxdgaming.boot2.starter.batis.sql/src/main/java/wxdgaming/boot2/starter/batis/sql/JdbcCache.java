@@ -43,6 +43,10 @@ public class JdbcCache<E extends Entity, Key> {
                 .build();
     }
 
+    public void shutdown() {
+        getCache().shutdown();
+    }
+
     protected E loader(Key key) {
         E byId = (E) sqlDataHelper.findByKey(cls, key);
         if (byId != null) {
