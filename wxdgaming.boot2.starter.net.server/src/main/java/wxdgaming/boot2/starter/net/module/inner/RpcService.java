@@ -35,6 +35,7 @@ public class RpcService {
         this.rpcListenerFactory = rpcListenerFactory;
         this.hexId = new HexId(BootConfig.getIns().sid());
         this.rpcCache = Cache.<Long, CompletableFuture<JSONObject>>builder()
+                .cacheName("rpc-server")
                 .expireAfterWrite(60, TimeUnit.SECONDS)
                 .removalListener((key, value) -> {
                     log.debug("rpcCache remove key:{}", key);

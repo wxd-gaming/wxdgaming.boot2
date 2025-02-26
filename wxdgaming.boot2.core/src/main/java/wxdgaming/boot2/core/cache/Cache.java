@@ -39,32 +39,33 @@ import java.util.concurrent.TimeUnit;
 @Getter
 @Setter(value = AccessLevel.PROTECTED)
 @Accessors(chain = true)
-public class Cache<K, V> {
+public final class Cache<K, V> {
 
-    protected final ConcurrentTable<Integer, K, Tuple3<V, Long, Long>> kv = new ConcurrentTable<>();
+    private final ConcurrentTable<Integer, K, Tuple3<V, Long, Long>> kv = new ConcurrentTable<>();
     private String cacheName;
     /** hash桶,通过hash分区 */
     private int hashArea = 0;
     /** 加载 */
-    protected Function1<K, V> loader;
+    private Function1<K, V> loader;
     /** 移除监听, 如果返回 false 者不会删除 */
-    protected Function2<K, V, Boolean> removalListener;
+    private Function2<K, V, Boolean> removalListener;
     /** 读取过期时间 */
-    protected long expireAfterAccess;
+    private long expireAfterAccess;
     /** 写入过期时间 */
-    protected long expireAfterWrite;
+    private long expireAfterWrite;
     /** 心跳间隔时间 */
-    protected long heartTime;
+    private long heartTime;
     /** 心跳监听 */
-    protected Consumer2<K, V> heartListener;
+    private Consumer2<K, V> heartListener;
+    private TimerJob timerJob;
 
-    protected Tuple3<V, Long, Long> buildValue(V v) {
+    private Tuple3<V, Long, Long> buildValue(V v) {
         Tuple3<V, Long, Long> tuple = new Tuple3<>(v, -1L, -1L);
         refresh(tuple);
         return tuple;
     }
 
-    protected void refresh(Tuple3<V, Long, Long> tuple) {
+    private void refresh(Tuple3<V, Long, Long> tuple) {
         long now = MyClock.millis();
         if (this.expireAfterWrite > 0L && tuple.getCenter() < now) {
             tuple.setCenter(now + this.expireAfterWrite);
@@ -77,7 +78,7 @@ public class Cache<K, V> {
         }
     }
 
-    protected int hashKey(K k) {
+    private int hashKey(K k) {
         int i = k.hashCode();
         int h = 0;
         if (hashArea > 0) {
@@ -158,20 +159,16 @@ public class Cache<K, V> {
         return kv.size();
     }
 
-    protected Cache() {
-        this(100);
+    private Cache() {
     }
 
-    protected final TimerJob timerJob;
 
     @shutdown
     public void shutdown() {
         timerJob.cancel();
         for (Map.Entry<Integer, ConcurrentHashMap<K, Tuple3<V, Long, Long>>> next : kv.entrySet()) {
             ConcurrentHashMap<K, Tuple3<V, Long, Long>> nextValue = next.getValue();
-            Iterator<Map.Entry<K, Tuple3<V, Long, Long>>> entryIterator = nextValue.entrySet().iterator();
-            while (entryIterator.hasNext()) {
-                Map.Entry<K, Tuple3<V, Long, Long>> entryNext = entryIterator.next();
+            for (Map.Entry<K, Tuple3<V, Long, Long>> entryNext : nextValue.entrySet()) {
                 K key = entryNext.getKey();
                 Tuple3<V, Long, Long> value = entryNext.getValue();
                 if (removalListener != null) {
@@ -183,11 +180,11 @@ public class Cache<K, V> {
     }
 
     /**
-     * 构建缓存容器
+     * 初始化
      *
      * @param delay 缓存容器check间隔时间
      */
-    protected Cache(long delay) {
+    private void init(long delay) {
         Event event = new Event(cacheName, 10_000, 100_000) {
             @Override public void onEvent() throws Exception {
                 long now = MyClock.millis();
@@ -231,7 +228,6 @@ public class Cache<K, V> {
                 delay,
                 TimeUnit.MILLISECONDS
         );
-
     }
 
     public static <K, V> CacheBuilder<K, V> builder() {
@@ -331,7 +327,7 @@ public class Cache<K, V> {
         }
 
         public Cache<K, V> build() {
-            return new Cache<K, V>(delay)
+            Cache<K, V> kvCache = new Cache<K, V>()
                     .setCacheName(cacheName)
                     .setHashArea(hashArea)
                     .setLoader(loader)
@@ -340,14 +336,14 @@ public class Cache<K, V> {
                     .setExpireAfterWrite(expireAfterWrite)
                     .setHeartTime(heartTime)
                     .setHeartListener(heartListener);
+            kvCache.init(delay);
+            return kvCache;
         }
 
     }
 
     @Override public String toString() {
-        return "Cache{" +
-               "cacheName='" + cacheName + '\'' +
-               '}';
+        return "Cache{cacheName='%s'}".formatted(cacheName);
     }
 
 }

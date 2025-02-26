@@ -140,6 +140,7 @@ public abstract class SqlDataBatch extends DataBatch {
                     if (closed.get()) {
                         if (batchInsertMap.isEmpty() && batchUpdateMap.isEmpty())
                             break;
+                        log.info("停服等待数据落地 sql batch {}", Thread.currentThread());
                     }
                 } catch (Throwable throwable) {
                     if (!(throwable instanceof InterruptedException)) {
@@ -196,7 +197,7 @@ public abstract class SqlDataBatch extends DataBatch {
             long diff = diffTime.diff100();
             executeDiffTime += diff;
             executeCount += insertCount;
-            if (sqlDataHelper.getSqlConfig().isDebug() || ticket.need()) {
+            if (sqlDataHelper.getSqlConfig().isDebug() || ticket.need() || closed.get()) {
                 log.info(
                         """
                                 
