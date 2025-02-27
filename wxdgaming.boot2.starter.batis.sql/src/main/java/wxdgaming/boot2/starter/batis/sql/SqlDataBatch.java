@@ -17,7 +17,10 @@ import wxdgaming.boot2.starter.batis.TableMapping;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
@@ -108,8 +111,8 @@ public abstract class SqlDataBatch extends DataBatch {
             BatchParam batchParam = new BatchParam(entity, keyParams, insertParams);
             lock.lock();
             try {
-                ConvertCollection<BatchParam> entitySplitCollection = batchInsertMap.computeIfAbsent(tableName, insertSql, k -> new ConvertCollection<>());
-                entitySplitCollection.add(batchParam);
+                ConvertCollection<BatchParam> collection = batchInsertMap.computeIfAbsent(tableName, insertSql, k -> new ConvertCollection<>());
+                collection.add(batchParam);
                 entity.setNewEntity(false);
             } finally {
                 lock.unlock();
@@ -125,8 +128,8 @@ public abstract class SqlDataBatch extends DataBatch {
             BatchParam batchParam = new BatchParam(entity, keyParams, updateParams);
             lock.lock();
             try {
-                ConvertCollection<BatchParam> entitySplitCollection = batchUpdateMap.computeIfAbsent(tableName, updateSql, k -> new ConvertCollection<>());
-                entitySplitCollection.add(batchParam);
+                ConvertCollection<BatchParam> collection = batchUpdateMap.computeIfAbsent(tableName, updateSql, k -> new ConvertCollection<>());
+                collection.add(batchParam);
             } finally {
                 lock.unlock();
             }
@@ -186,11 +189,11 @@ public abstract class SqlDataBatch extends DataBatch {
         protected void executeBach(Table<String, String, ConvertCollection<BatchParam>> tmp) {
             int insertCount = 0;
             diffTime.reset();
-            Collection<HashMap<String, ConvertCollection<BatchParam>>> values = tmp.values();
-            for (HashMap<String, ConvertCollection<BatchParam>> map : values) {
+            for (HashMap<String, ConvertCollection<BatchParam>> map : tmp.values()) {
                 for (Map.Entry<String, ConvertCollection<BatchParam>> entry : map.entrySet()) {
                     String insertSql = entry.getKey();
-                    List<List<BatchParam>> lists = entry.getValue().splitAndClear(batchSubmitSize);
+                    ConvertCollection<BatchParam> values = entry.getValue();
+                    List<List<BatchParam>> lists = values.clearAll(batchSubmitSize);
                     for (List<BatchParam> list : lists) {
                         insertCount += executeUpdate(insertSql, list);
                     }
