@@ -100,15 +100,16 @@ public abstract class SqlDataBatch extends DataBatch {
         }
 
         public void insert(Entity entity) {
+            String tableName = TableMapping.beanTableName(entity);
+            TableMapping tableMapping = sqlDataHelper.tableMapping(entity.getClass());
+            String insertSql = sqlDataHelper.getDdlBuilder().buildInsertSql(tableMapping, tableName);
+            Object[] keyParams = sqlDataHelper.getDdlBuilder().buildKeyParams(tableMapping, entity);
+            Object[] insertParams = sqlDataHelper.getDdlBuilder().buildInsertParams(tableMapping, entity);
+            BatchParam batchParam = new BatchParam(entity, keyParams, insertParams);
             lock.lock();
             try {
-                String tableName = TableMapping.beanTableName(entity);
-                TableMapping tableMapping = sqlDataHelper.tableMapping(entity.getClass());
-                String insertSql = sqlDataHelper.getDdlBuilder().buildInsertSql(tableMapping, tableName);
-                Object[] keyParams = sqlDataHelper.getDdlBuilder().buildKeyParams(tableMapping, entity);
-                Object[] insertParams = sqlDataHelper.getDdlBuilder().buildInsertParams(tableMapping, entity);
                 ConvertCollection<BatchParam> entitySplitCollection = batchInsertMap.computeIfAbsent(tableName, insertSql, k -> new ConvertCollection<>());
-                entitySplitCollection.add(new BatchParam(entity, keyParams, insertParams));
+                entitySplitCollection.add(batchParam);
                 entity.setNewEntity(false);
             } finally {
                 lock.unlock();
@@ -116,15 +117,16 @@ public abstract class SqlDataBatch extends DataBatch {
         }
 
         public void update(Entity entity) {
+            String tableName = TableMapping.beanTableName(entity);
+            TableMapping tableMapping = sqlDataHelper.tableMapping(entity.getClass());
+            String updateSql = sqlDataHelper.getDdlBuilder().buildUpdateSql(tableMapping, tableName);
+            Object[] keyParams = sqlDataHelper.getDdlBuilder().buildKeyParams(tableMapping, entity);
+            Object[] updateParams = sqlDataHelper.getDdlBuilder().builderUpdateParams(tableMapping, entity);
+            BatchParam batchParam = new BatchParam(entity, keyParams, updateParams);
             lock.lock();
             try {
-                String tableName = TableMapping.beanTableName(entity);
-                TableMapping tableMapping = sqlDataHelper.tableMapping(entity.getClass());
-                String updateSql = sqlDataHelper.getDdlBuilder().buildUpdateSql(tableMapping, tableName);
-                Object[] keyParams = sqlDataHelper.getDdlBuilder().buildKeyParams(tableMapping, entity);
-                Object[] updateParams = sqlDataHelper.getDdlBuilder().builderUpdateParams(tableMapping, entity);
                 ConvertCollection<BatchParam> entitySplitCollection = batchUpdateMap.computeIfAbsent(tableName, updateSql, k -> new ConvertCollection<>());
-                entitySplitCollection.add(new BatchParam(entity, keyParams, updateParams));
+                entitySplitCollection.add(batchParam);
             } finally {
                 lock.unlock();
             }

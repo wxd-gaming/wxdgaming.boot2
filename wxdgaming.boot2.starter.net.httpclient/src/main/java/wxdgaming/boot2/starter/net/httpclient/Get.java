@@ -22,16 +22,18 @@ public class Get extends HttpBase<Get> {
     }
 
     @Override public void request0() throws IOException {
-        HttpGet get = createGet();
+        HttpGet httpRequest = createGet();
         if (log.isDebugEnabled()) {
             log.info("send url={}", url());
         }
+
         CloseableHttpClient closeableHttpClient = httpClientPool.getCloseableHttpClient();
-        response.httpResponse = closeableHttpClient.execute(get);
-        response.cookieStore = httpClientPool.getCookieStore().getCookies();
-        HttpEntity entity = response.httpResponse.getEntity();
-        response.bodys = EntityUtils.toByteArray(entity);
-        EntityUtils.consume(entity);
+        closeableHttpClient.execute(httpRequest, classicHttpResponse -> {
+            response.httpResponse = classicHttpResponse;
+            response.cookieStore = httpClientPool.getCookieStore().getCookies();
+            response.bodys = EntityUtils.toByteArray(classicHttpResponse.getEntity());
+            return null;
+        });
     }
 
 }

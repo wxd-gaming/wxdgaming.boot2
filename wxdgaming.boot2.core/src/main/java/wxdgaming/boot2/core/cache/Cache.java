@@ -173,7 +173,9 @@ public final class Cache<K, V> {
                 Tuple3<V, Long, Long> value = entryNext.getValue();
                 if (removalListener != null) {
                     Boolean apply = removalListener.apply(key, value.getLeft());
-                    log.info("缓存 shutdown：{} 移除 {}", key, apply);
+                    if (!Boolean.TRUE.equals(apply)) {
+                        log.debug("缓存 shutdown：{} 移除 {}", key, apply);
+                    }
                 }
             }
         }

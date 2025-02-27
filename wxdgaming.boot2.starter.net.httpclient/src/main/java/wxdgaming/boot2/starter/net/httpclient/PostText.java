@@ -6,10 +6,11 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.apache.hc.core5.http.io.entity.StringEntity;
+import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.starter.net.http.HttpDataAction;
 
 import java.io.IOException;
@@ -31,20 +32,27 @@ public class PostText extends HttpBase<PostText> {
     }
 
     @Override public void request0() throws IOException {
-        HttpPost httpRequestBase = createPost();
+        HttpPost httpRequest = createPost();
         if (null != params) {
-            StringEntity stringEntity = new StringEntity(params, contentType);
-            httpRequestBase.setEntity(stringEntity);
+            byte[] bytes = params.getBytes(StandardCharsets.UTF_8);
+            if (bytes.length > 512) {
+                // 设置请求头，告知服务器请求内容使用 Gzip 压缩
+                httpRequest.setHeader("Content-Encoding", "gzip");
+                bytes = GzipUtil.gzip(bytes);
+            }
+            ByteArrayEntity requestEntity = new ByteArrayEntity(bytes, contentType);
+            httpRequest.setEntity(requestEntity);
             if (log.isDebugEnabled()) {
-                String s = new String(readBytes(stringEntity));
-                log.info("send url={}\n{}", url(), s);
+                log.debug("send url={}\n{}", url(), params);
             }
         }
-        response.httpResponse = httpClientPool.getCloseableHttpClient().execute(httpRequestBase);
-        response.cookieStore = httpClientPool.getCookieStore().getCookies();
-        HttpEntity entity = response.httpResponse.getEntity();
-        response.bodys = EntityUtils.toByteArray(entity);
-        EntityUtils.consume(entity);
+        CloseableHttpClient closeableHttpClient = httpClientPool.getCloseableHttpClient();
+        closeableHttpClient.execute(httpRequest, classicHttpResponse -> {
+            response.httpResponse = classicHttpResponse;
+            response.cookieStore = httpClientPool.getCookieStore().getCookies();
+            response.bodys = EntityUtils.toByteArray(classicHttpResponse.getEntity());
+            return null;
+        });
     }
 
     @Override public PostText addHeader(String headerKey, String HeaderValue) {

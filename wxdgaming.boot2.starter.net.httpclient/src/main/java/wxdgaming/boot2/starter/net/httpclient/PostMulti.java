@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
@@ -30,7 +31,7 @@ public class PostMulti extends HttpBase<PostMulti> {
     }
 
     @Override public void request0() throws IOException {
-        HttpPost httpRequestBase = createPost();
+        HttpPost httpRequest = createPost();
         if (!objMap.isEmpty()) {
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
             builder.setContentType(contentType);
@@ -46,17 +47,20 @@ public class PostMulti extends HttpBase<PostMulti> {
                 }
             }
             org.apache.hc.core5.http.HttpEntity build = builder.build();
-            httpRequestBase.setEntity(build);
+            httpRequest.setEntity(build);
             if (log.isDebugEnabled()) {
                 String s = new String(readBytes(build));
                 log.info("send url={}\n{}", url(), s);
             }
         }
-        response.httpResponse = httpClientPool.getCloseableHttpClient().execute(httpRequestBase);
-        response.cookieStore = httpClientPool.getCookieStore().getCookies();
-        HttpEntity entity = response.httpResponse.getEntity();
-        response.bodys = EntityUtils.toByteArray(entity);
-        EntityUtils.consume(entity);
+
+        CloseableHttpClient closeableHttpClient = httpClientPool.getCloseableHttpClient();
+        closeableHttpClient.execute(httpRequest, classicHttpResponse -> {
+            response.httpResponse = classicHttpResponse;
+            response.cookieStore = httpClientPool.getCookieStore().getCookies();
+            response.bodys = EntityUtils.toByteArray(classicHttpResponse.getEntity());
+            return null;
+        });
     }
 
     @Override public PostMulti addHeader(String headerKey, String HeaderValue) {

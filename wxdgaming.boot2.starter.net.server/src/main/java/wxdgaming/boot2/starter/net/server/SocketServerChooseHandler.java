@@ -3,6 +3,7 @@ package wxdgaming.boot2.starter.net.server;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketFrameAggregator;
@@ -71,6 +72,8 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
         int maxContentLength = (int) BytesUnit.Mb.toBytes(socketServerConfig.getMaxAggregatorLength());
         // HttpServerCodec：将请求和应答消息解码为HTTP消息
         ctx.pipeline().addBefore("device-handler", "http-codec", new HttpServerCodec());
+        // 添加HTTP内容解压缩器，用于处理Gzip压缩的请求
+        ctx.pipeline().addBefore("device-handler", "Http-Content-Decompressor", new HttpContentDecompressor());
         /*接受完整的http消息 64mb*/
         ctx.pipeline().addBefore("device-handler", "http-object-aggregator", new HttpObjectAggregator(maxContentLength));
         // ChunkedWriteHandler：向客户端发送HTML5文件,文件过大会将内存撑爆

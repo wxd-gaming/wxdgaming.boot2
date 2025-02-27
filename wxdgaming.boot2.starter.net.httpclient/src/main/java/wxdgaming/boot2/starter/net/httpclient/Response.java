@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.cookie.Cookie;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.NameValuePair;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.lang.RunResult;
@@ -28,9 +29,9 @@ public final class Response<H extends HttpBase> {
     final H httpBase;
     final String uriPath;
     String postText = null;
-    protected CloseableHttpResponse httpResponse;
-    protected byte[] bodys = null;
-    protected List<Cookie> cookieStore = null;
+    ClassicHttpResponse httpResponse;
+    byte[] bodys = null;
+    List<Cookie> cookieStore = null;
 
     Response(H httpBase, String uriPath) {
         this.httpBase = httpBase;

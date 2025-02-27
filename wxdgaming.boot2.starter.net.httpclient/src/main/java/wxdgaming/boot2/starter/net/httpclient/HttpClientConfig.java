@@ -15,10 +15,11 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 public class HttpClientConfig extends ObjectBase {
 
     public static final HttpClientConfig DEFAULT = new HttpClientConfig(
-            20,300,
+            20, 300,
             30,
-            3000,3000,3000,30000,
-            "TLS"
+            3000, 3000, 3000, 30000,
+            "TLS",
+            true
     );
 
     @JSONField(ordinal = 1)
@@ -37,6 +38,8 @@ public class HttpClientConfig extends ObjectBase {
     private final int keepAliveTimeout;
     @JSONField(ordinal = 8)
     private final String sslProtocol;
+    @JSONField(ordinal = 9)
+    private final boolean autoUseGzip;
 
     @JSONCreator
     public HttpClientConfig(@JSONField(name = "core") int core,
@@ -46,7 +49,8 @@ public class HttpClientConfig extends ObjectBase {
                             @JSONField(name = "connectTimeOut") int connectTimeOut,
                             @JSONField(name = "readTimeout") int readTimeout,
                             @JSONField(name = "keepAliveTimeout") int keepAliveTimeout,
-                            @JSONField(name = "sslProtocol") String sslProtocol) {
+                            @JSONField(name = "sslProtocol", defaultValue = "TLS") String sslProtocol,
+                            @JSONField(name = "autoUseGzip", defaultValue = "false") boolean autoUseGzip) {
         this.core = core;
         this.max = max;
         this.resetTimeM = resetTimeM;
@@ -55,5 +59,6 @@ public class HttpClientConfig extends ObjectBase {
         this.readTimeout = readTimeout;
         this.keepAliveTimeout = keepAliveTimeout;
         this.sslProtocol = sslProtocol;
+        this.autoUseGzip = autoUseGzip;
     }
 }

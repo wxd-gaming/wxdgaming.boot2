@@ -1,5 +1,7 @@
 package wxdgaming.boot2.starter.net.httpclient;
 
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.util.AsciiString;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.HttpHostConnectException;
@@ -201,12 +203,13 @@ public abstract class HttpBase<H extends HttpBase> {
             httpRequestBase.setHeader(entry.getKey().toString(), entry.getValue());
         }
 
-        httpRequestBase.setHeader("accept_encoding", "gzip");
+        /*告诉服务器我支持gzip*/
+        httpRequestBase.setHeader(HttpHeaderNames.ACCEPT_ENCODING.toString(), HttpHeaderValues.GZIP.toString());
 
         // 防止被当成攻击添加的
-        httpRequestBase.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.2; Win64; x64) wxd");
+        httpRequestBase.setHeader(HttpHeaderNames.USER_AGENT.toString(), "Mozilla/5.0 (Windows NT 6.2; Win64; x64) wxd");
         // 设置不使用长连接
-        //        httpRequestBase.setHeader("Connection", "close");
+        // httpRequestBase.setHeader("Connection", "close");
 
     }
 
