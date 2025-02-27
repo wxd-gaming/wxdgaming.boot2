@@ -52,8 +52,12 @@ public class SqlConfig extends ObjectBase {
     @JSONField(ordinal = 12)
     private int batchThreadSize = 1;
     /** 线程池单次批处理提交的数量 */
-    @JSONField(ordinal = 12)
+    @JSONField(ordinal = 13)
     private int batchSubmitSize = 500;
+    @JSONField(ordinal = 14)
+    private int prepStmtCacheSize = 500;
+    @JSONField(ordinal = 15)
+    private int prepStmtCacheSqlLimit = 100;
 
     public String dbName() {
         String dbName = url;
@@ -73,7 +77,7 @@ public class SqlConfig extends ObjectBase {
         config.setUsername(getUsername());
         config.setPassword(getPassword());
         config.setAutoCommit(true);
-        config.setPoolName("wxd-gaming.db");
+        config.setPoolName(dbName());
         config.setConnectionTimeout(connectionTimeoutMs);
         config.setIdleTimeout(TimeUnit.MINUTES.toMillis(idleTimeoutM));
         config.setValidationTimeout(TimeUnit.SECONDS.toMillis(10));
@@ -83,8 +87,8 @@ public class SqlConfig extends ObjectBase {
         config.setMaximumPoolSize(getMaxPoolSize());/*池中最大连接数，包括闲置和使用中的连接。*/
         config.setConnectionTestQuery("SELECT 1");
         config.addDataSourceProperty("cachePrepStmts", "true");
-        config.addDataSourceProperty("prepStmtCacheSize", "250");
-        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        config.addDataSourceProperty("prepStmtCacheSize", prepStmtCacheSize);
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", prepStmtCacheSqlLimit);
         config.addDataSourceProperty("autoReconnect", "true");
         config.addDataSourceProperty("characterEncoding", "utf-8");
         return new HikariDataSource(config);

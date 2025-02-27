@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.collection;
 
+import lombok.Getter;
 import wxdgaming.boot2.core.lang.ObjectBase;
 
 import java.util.*;
@@ -14,6 +15,7 @@ import java.util.stream.Stream;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2022-02-16 10:46
  **/
+@Getter
 public class ConvertCollection<E> extends ObjectBase {
 
     private final ReentrantLock lock = new ReentrantLock();

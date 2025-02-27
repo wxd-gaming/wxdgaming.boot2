@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.collection.ConvertCollection;
+import wxdgaming.boot2.core.collection.SplitCollection;
 import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.lang.DiffTime;
@@ -39,7 +40,9 @@ public abstract class SqlDataBatch extends DataBatch {
 
     public SqlDataBatch(SqlDataHelper<?> sqlDataHelper) {
         this.sqlDataHelper = sqlDataHelper;
-        for (int i = 1; i <= sqlDataHelper.getSqlConfig().getBatchThreadSize(); i++) {
+        int batchThreadSize = sqlDataHelper.getSqlConfig().getBatchThreadSize();
+        log.info("{} 数据库: {} 创建 {} 个 sql 批量线程", sqlDataHelper.getClass().getSimpleName(), sqlDataHelper.getDbName(), batchThreadSize);
+        for (int i = 1; i <= batchThreadSize; i++) {
             batchThreads.add(new BatchThread(i, sqlDataHelper.getDbName() + "-" + i, sqlDataHelper.getSqlConfig().getBatchSubmitSize()));
         }
     }
@@ -47,7 +50,10 @@ public abstract class SqlDataBatch extends DataBatch {
     @shutdown
     public void shutdown() {
         for (BatchThread batchThread : batchThreads) {
+            log.info("准备关闭线程 {}", batchThread);
             batchThread.closed.set(true);
+        }
+        for (BatchThread batchThread : batchThreads) {
             try {
                 batchThread.join();
             } catch (InterruptedException ignored) {}
@@ -66,16 +72,18 @@ public abstract class SqlDataBatch extends DataBatch {
         entity.setNewEntity(false);
     }
 
-    @Override public void insert(Entity entity) {
+    BatchThread batchThread(Entity entity) {
         int hashCode = entity.hashCode();
-        BatchThread batchThread = batchThreads.get(hashCode % batchThreads.size());
-        batchThread.insert(entity);
+        int index = Math.abs(hashCode) % batchThreads.size();
+        return batchThreads.get(index);
+    }
+
+    @Override public void insert(Entity entity) {
+        batchThread(entity).insert(entity);
     }
 
     @Override public void update(Entity entity) {
-        int hashCode = entity.hashCode();
-        BatchThread batchThread = batchThreads.get(hashCode % batchThreads.size());
-        batchThread.update(entity);
+        batchThread(entity).update(entity);
     }
 
     public class BatchThread extends Thread {
@@ -187,40 +195,42 @@ public abstract class SqlDataBatch extends DataBatch {
         }
 
         protected void executeBach(Table<String, String, ConvertCollection<BatchParam>> tmp) {
-            int insertCount = 0;
-            diffTime.reset();
+            int executeCount = 0;
             for (HashMap<String, ConvertCollection<BatchParam>> map : tmp.values()) {
                 for (Map.Entry<String, ConvertCollection<BatchParam>> entry : map.entrySet()) {
                     String insertSql = entry.getKey();
                     ConvertCollection<BatchParam> values = entry.getValue();
-                    List<List<BatchParam>> lists = values.clearAll(batchSubmitSize);
-                    for (List<BatchParam> list : lists) {
-                        insertCount += executeUpdate(insertSql, list);
+                    SplitCollection<BatchParam> splitCollection = new SplitCollection<>(batchSubmitSize, values.getNodes());
+                    while (!splitCollection.isEmpty()) {
+                        List<BatchParam> batchParams = splitCollection.removeFirst();
+                        diffTime.reset();
+                        executeCount += executeUpdate(insertSql, batchParams);
+                        long diff = diffTime.diff100();
+                        executeDiffTime += diff;
+                        this.executeCount += executeCount;
+                        if (sqlDataHelper.getSqlConfig().isDebug() || ticket.need() || closed.get()) {
+                            log.info(
+                                    """
+                                            
+                                            %s 数据库: %s, 单次批量提交数量限制: %s, 当前待提交剩余: %s 条
+                                            本次 count: %s 条 耗时: %s ms 性能：%s 条/s
+                                            累计 count: %s 条 耗时: %s ms 性能：%s 条/s
+                                            """
+                                            .formatted(
+                                                    sqlDataHelper.getClass().getSimpleName(),
+                                                    sqlDataHelper.getDbName(),
+                                                    batchSubmitSize, splitCollection.size(),
+                                                    StringUtils.padLeft(executeCount, 19, ' '),
+                                                    StringUtils.padLeft(diff / 100f, 19, ' '),
+                                                    StringUtils.padLeft(executeCount / (diff / 100f) * 1000, 19, ' '),
+                                                    StringUtils.padLeft(this.executeCount, 19, ' '),
+                                                    StringUtils.padLeft(executeDiffTime / 100f, 19, ' '),
+                                                    StringUtils.padLeft(this.executeCount / (executeDiffTime / 100f) * 1000, 19, ' ')
+                                            )
+                            );
+                        }
                     }
                 }
-            }
-            long diff = diffTime.diff100();
-            executeDiffTime += diff;
-            executeCount += insertCount;
-            if (sqlDataHelper.getSqlConfig().isDebug() || ticket.need() || closed.get()) {
-                log.info(
-                        """
-                                
-                                db: %s %s execute bach
-                                本次 count: %s 条 耗时: %s ms 性能：%s 条/s
-                                累计 count: %s 条 耗时: %s ms 性能：%s 条/s
-                                """
-                                .formatted(
-                                        sqlDataHelper.getClass().getSimpleName(),
-                                        sqlDataHelper.getDbName(),
-                                        StringUtils.padLeft(insertCount, 19, ' '),
-                                        StringUtils.padLeft(diff / 100f, 19, ' '),
-                                        StringUtils.padLeft(insertCount / (diff / 100f) * 1000, 19, ' '),
-                                        StringUtils.padLeft(executeCount, 19, ' '),
-                                        StringUtils.padLeft(executeDiffTime / 100f, 19, ' '),
-                                        StringUtils.padLeft(executeCount / (executeDiffTime / 100f) * 1000, 19, ' ')
-                                )
-                );
             }
         }
 
