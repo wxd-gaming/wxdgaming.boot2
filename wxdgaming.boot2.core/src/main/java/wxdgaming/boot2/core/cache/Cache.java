@@ -84,7 +84,8 @@ public final class Cache<K, V> {
         if (hashArea > 0) {
             h = i % hashArea;
         }
-        return h;
+        /*不需要负数*/
+        return Math.abs(h);
     }
 
     /** 是否包含kay */
