@@ -90,7 +90,7 @@ public enum HttpHeadValueType {
     public static HttpHeadValueType findContentType(String fileName) {
         String extendName = FileUtil.extendName(fileName);
         return switch (extendName) {
-            case "htm", "html", "jsp", "asp", "aspx", "xhtml" -> HttpHeadValueType.Html;
+            case "htm", "html", "jsp", "asp", "aspx", "xhtml", "md" -> HttpHeadValueType.Html;
             case "css" -> HttpHeadValueType.CSS;
             case "js" -> HttpHeadValueType.Javascript;
             case "xml" -> HttpHeadValueType.Xml;

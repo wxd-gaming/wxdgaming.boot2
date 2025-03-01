@@ -923,7 +923,7 @@ ${text}
         },
     },
 
-    load: function (url, width, height, parent) {
+    loadHtml: function (url, width, height, parent) {
         if (wxd.isNull(width)) {
             width = "650px;"
         }
