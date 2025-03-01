@@ -659,7 +659,9 @@ const wxd = {
                         try {
                             onLoad(data);
                         } catch (e) {
-                            console.error("error: " + e + "\n" + JSON.stringify(data));
+                            wxd.loading_close();
+                            console.error(e);
+                            console.error(JSON.stringify(data));
                             wxd.message.notice("error: " + e, true);
                         }
                     } else {
