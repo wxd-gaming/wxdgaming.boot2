@@ -557,8 +557,6 @@
                             <manifest>
                                 <addClasspath>true</addClasspath>
                                 <classpathPrefix>lib/</classpathPrefix>
-                                <addClasspath>true</addClasspath>
-                                <classpathPrefix>lib/</classpathPrefix>
                                 <useUniqueVersions>false</useUniqueVersions>
                                 <!-- 加载主要运行类 -->
                                 <mainClass>wxdgaming.chargame.server.CharGameAppMain</mainClass>
