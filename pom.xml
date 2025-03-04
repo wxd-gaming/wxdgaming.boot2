@@ -20,6 +20,7 @@
         <module>wxdgaming.boot2.starter.net.server</module>
         <module>wxdgaming.game.test</module>
         <module>wxdgaming.boot2.starter.scheduled</module>
+        <module>wxdgaming.boot2.starter.js</module>
     </modules>
 
     <properties>
@@ -100,16 +101,6 @@
             </dependency>
             <!--日志框架-->
             <dependency>
-                <groupId>org.graalvm.js</groupId>
-                <artifactId>js-scriptengine</artifactId>
-                <version>22.3.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.graalvm.js</groupId>
-                <artifactId>js</artifactId>
-                <version>22.3.1</version>
-            </dependency>
-            <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-common</artifactId>
                 <version>4.1.111.Final</version>
@@ -130,14 +121,31 @@
                 <version>1.8.0</version>
             </dependency>
             <dependency>
+                <groupId>org.checkerframework</groupId>
+                <artifactId>checker-qual</artifactId>
+                <version>3.49.0</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>32.1.2-jre</version>
+                <version>33.4.0-jre</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.checkerframework</groupId>
+                        <artifactId>checker-qual</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.google.inject</groupId>
                 <artifactId>guice</artifactId>
                 <version>7.0.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.guava</groupId>
+                        <artifactId>guava</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.javassist</groupId>
@@ -345,6 +353,12 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>42.7.5</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.checkerframework</groupId>
+                        <artifactId>checker-qual</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
@@ -413,6 +427,10 @@
             <artifactId>fastjson</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker-qual</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
@@ -456,9 +474,9 @@
                     <version>3.3.0</version>
                     <configuration>
                         <appendAssemblyId>false</appendAssemblyId>
-<!--                        <descriptors>-->
-<!--                            <descriptor>src/main/resources/assembly.xml</descriptor>-->
-<!--                        </descriptors>-->
+                        <!--                        <descriptors>-->
+                        <!--                            <descriptor>src/main/resources/assembly.xml</descriptor>-->
+                        <!--                        </descriptors>-->
                         <descriptorRefs>
                             <descriptorRef>jar-with-dependencies</descriptorRef>
                         </descriptorRefs>
