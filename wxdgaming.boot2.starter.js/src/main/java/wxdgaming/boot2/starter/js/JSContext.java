@@ -43,19 +43,19 @@ public class JSContext {
         return this.context.getBindings("js").getMember(key);
     }
 
-    public void evalFile(String fileName) {
+    public Value evalFile(String fileName) {
         String script = FileReadUtil.readString(fileName, StandardCharsets.UTF_8);
-        this.context.eval("js", script);
+        return this.context.eval("js", script);
     }
 
-    public void evalFile(File file) {
+    public Value evalFile(File file) {
         String script = FileReadUtil.readString(file, StandardCharsets.UTF_8);
-        this.context.eval("js", script);
+        return this.context.eval("js", script);
     }
 
 
-    public void eval(String script) {
-        this.context.eval("js", script);
+    public Value eval(String script) {
+        return this.context.eval("js", script);
     }
 
     /**

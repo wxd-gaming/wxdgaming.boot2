@@ -3,6 +3,9 @@ package wxdgaming.boot2.starter.js.plugin;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.js.IJSPlugin;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 /**
  * java log
  *
@@ -16,16 +19,24 @@ public class JLog implements IJSPlugin {
         return "jlog";
     }
 
-    public void debug(String msg) {
-        log.debug(msg);
+    public void print(Object... args) {
+        System.out.println(Arrays.stream(args).map(String::valueOf).collect(Collectors.joining(" ")));
     }
 
-    public void info(String msg) {
-        log.info(msg);
+    public void printf(String format, Object... args) {
+        System.out.printf(format, args);
     }
 
-    public void warn(String msg) {
-        log.warn(msg);
+    public void debug(String format, Object... args) {
+        log.debug(format, args);
+    }
+
+    public void info(String format, Object... args) {
+        log.info(format, args);
+    }
+
+    public void warn(String format, Object... args) {
+        log.warn(format, args);
     }
 
 

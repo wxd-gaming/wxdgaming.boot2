@@ -2,7 +2,11 @@ package run;
 
 import lombok.Getter;
 import lombok.Setter;
+import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.js.JSContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 测试
@@ -17,17 +21,21 @@ public class JSTest {
         build.evalFile("ClassTest.js");
         build.eval("var ct=new ClassTest();");
         build.eval("ct.print();");
-        build.invokeMember("ct", "print2", new Actor(999997203685477580L, "hello"));
+        Actor hello = new Actor(999997203685477580L, "hello");
+        hello.getStrings().add("world");
+        build.invokeMember("ct", "print2", hello);
         build.eval("jlog.debug('hello world;')");
+        build.eval("jlog.debug('{}',1)");
         build.eval("jlog.info('hello world;')");
     }
 
     @Getter
     @Setter
-    public static class Actor {
+    public static class Actor extends ObjectBase {
 
         public long uid;
         public String name;
+        public List<String> strings = new ArrayList<>();
 
         public Actor(long uid, String name) {
             this.uid = uid;
@@ -39,12 +47,7 @@ public class JSTest {
             return name;
         }
 
-        @Override public String toString() {
-            return "Actor{" +
-                   "uid=" + uid +
-                   ", name='" + name + '\'' +
-                   '}';
-        }
+
     }
 
 }
