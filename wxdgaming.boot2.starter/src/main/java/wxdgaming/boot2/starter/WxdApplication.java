@@ -3,6 +3,7 @@ package wxdgaming.boot2.starter;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Stage;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.*;
 import wxdgaming.boot2.core.ann.Init;
@@ -30,6 +31,8 @@ import java.util.stream.Stream;
 public class WxdApplication {
 
     static final AtomicBoolean isRunning = new AtomicBoolean();
+
+    @Getter static RunApplicationMain runApplicationMain;
 
     public static RunApplication run(Class<?>... classes) {
         if (isRunning.get()) {
@@ -62,16 +65,16 @@ public class WxdApplication {
             collect.add(new SingletonModule(reflectContext));
 
             Injector injector = Guice.createInjector(Stage.PRODUCTION, collect);
-            RunApplicationMain runApplication = injector.getInstance(RunApplicationMain.class);
+            runApplicationMain = injector.getInstance(RunApplicationMain.class);
 
-            runApplication.init();
+            runApplicationMain.init();
 
-            runApplication.executeMethodWithAnnotated(Init.class);
-            runApplication.executeMethodWithAnnotated(Start.class);
+            runApplicationMain.executeMethodWithAnnotated(Init.class);
+            runApplicationMain.executeMethodWithAnnotated(Start.class);
 
             JvmUtil.addShutdownHook(() -> {
                 System.out.println("--------------------------shutdown---------------------------");
-                runApplication.executeMethodWithAnnotated(shutdown.class);
+                runApplicationMain.executeMethodWithAnnotated(shutdown.class);
             });
 
             StringBuilder stringAppend = new StringBuilder(1024);
@@ -89,7 +92,7 @@ public class WxdApplication {
             stringAppend.append("\n");
             log.warn(stringAppend.toString());
 
-            return runApplication;
+            return runApplicationMain;
         } catch (Throwable throwable) {
             log.error("", throwable);
             try {
@@ -98,6 +101,19 @@ public class WxdApplication {
             Runtime.getRuntime().halt(99);
         }
         return null;
+    }
+
+    public static RunApplicationSub createRunApplicationSub(ReflectContext reflectContext) {
+        List<BaseModule> collect = reflectContext.classWithSuper(UserModule.class)
+                .map(cls -> ReflectContext.newInstance(cls, reflectContext))
+                .collect(Collectors.toList());
+        /* TODO 这里把子容器注入进去 */
+        collect.add(new SingletonModule(reflectContext, RunApplicationSub.class));
+
+        Injector injector = runApplicationMain.getInjector().createChildInjector(collect);
+        RunApplicationSub runApplicationSub = injector.getInstance(RunApplicationSub.class);
+        runApplicationSub.init();
+        return runApplicationSub;
     }
 
 }

@@ -21,6 +21,7 @@
         <module>wxdgaming.game.test</module>
         <module>wxdgaming.boot2.starter.scheduled</module>
         <module>wxdgaming.boot2.starter.js</module>
+        <module>wxdgaming.game.test-script</module>
     </modules>
 
     <properties>

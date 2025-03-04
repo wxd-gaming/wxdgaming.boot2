@@ -34,7 +34,7 @@ public class HttpListenerContent {
         this.httpServerConfig = Objects.returnNonNull(httpServerConfig, HttpServerConfig.INSTANCE);
         this.runApplication = runApplication;
 
-        runApplication.getReflectContext()
+        runApplication.getGuiceReflectContext()
                 .withMethodAnnotated(HttpRequest.class)
                 .forEach(contentMethod -> {
                     Object ins = contentMethod.getIns();

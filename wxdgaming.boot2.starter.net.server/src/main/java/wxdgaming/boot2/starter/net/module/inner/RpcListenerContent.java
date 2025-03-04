@@ -11,7 +11,6 @@ import wxdgaming.boot2.starter.net.ann.RpcRequest;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * rpc 监听 绑定工厂
@@ -28,7 +27,7 @@ public class RpcListenerContent {
 
     public RpcListenerContent(RunApplication runApplication) {
         this.runApplication = runApplication;
-        this.runApplication.getReflectContext()
+        this.runApplication.getGuiceReflectContext()
                 .withMethodAnnotated(RpcRequest.class)
                 .forEach(contentMethod -> {
                     Object ins = contentMethod.getIns();

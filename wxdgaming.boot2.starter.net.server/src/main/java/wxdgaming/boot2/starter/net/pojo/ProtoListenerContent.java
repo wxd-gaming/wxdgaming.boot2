@@ -31,7 +31,7 @@ public class ProtoListenerContent {
 
     public ProtoListenerContent(RunApplication runApplication) {
         this.runApplication = runApplication;
-        runApplication.getReflectContext()
+        runApplication.getGuiceReflectContext()
                 .withMethodAnnotated(ProtoRequest.class)
                 .forEach(contentMethod -> {
                     Object ins = contentMethod.getIns();

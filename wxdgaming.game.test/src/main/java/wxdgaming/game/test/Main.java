@@ -5,7 +5,10 @@ import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.core.loader.ClassDirLoader;
+import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
+import wxdgaming.boot2.starter.RunApplicationSub;
 import wxdgaming.boot2.starter.WxdApplication;
 import wxdgaming.boot2.starter.batis.sql.pgsql.MysqlScan;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
@@ -30,9 +33,13 @@ public class Main {
                 Main.class
         );
 
+        ClassDirLoader classDirLoader = new ClassDirLoader("wxdgaming.game.test-script/target/classes");
+        ReflectContext reflectContext = ReflectContext.Builder.of(classDirLoader, "wxdgaming.game.test.script").build();
+        RunApplicationSub runApplicationSub = WxdApplication.createRunApplicationSub(reflectContext);
+
         ExecutorUtil.getInstance().getDefaultExecutor().schedule(
                 () -> {
-                    runApplication.executeMethodWithAnnotated(Init.class);
+                    runApplicationSub.executeMethodWithAnnotated(Init.class);
                     log.info("热更新重载");
                 },
                 10,

@@ -12,13 +12,19 @@ import wxdgaming.boot2.core.reflect.ReflectContext;
  **/
 public class SingletonModule extends BaseModule {
 
-    public SingletonModule(ReflectContext reflectContext) {
+    private final Class<?>[] classes;
+
+    public SingletonModule(ReflectContext reflectContext, Class<?>... classes) {
         super(reflectContext);
+        this.classes = classes;
     }
 
 
     @Override protected void bind() throws Throwable {
         bindClassWithAnnotated(Singleton.class);
+        for (Class<?> clazz : classes) {
+            bindSingleton(clazz);
+        }
     }
 
 }

@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 public abstract class RunApplication {
 
     private final Injector injector;
-    private GuiceReflectContext reflectContext;
+    private GuiceReflectContext guiceReflectContext;
 
     public RunApplication(Injector injector) {
         this.injector = injector;
@@ -44,8 +44,8 @@ public abstract class RunApplication {
             throw Throw.of(e);
         }
 
-        reflectContext = new GuiceReflectContext(this, hashMap.values());
-        reflectContext.stream().forEach(content -> {
+        guiceReflectContext = new GuiceReflectContext(this, hashMap.values());
+        guiceReflectContext.stream().forEach(content -> {
             content.fieldWithAnnotated(Value.class).forEach(field -> {
                 Object valued = BootConfig.getIns().value(field.getAnnotation(Value.class), field.getType());
                 try {
@@ -59,7 +59,8 @@ public abstract class RunApplication {
         });
     }
 
-    static void allBindings(Injector context, Map<Key<?>, Binding<?>> allBindings) {
+
+    void allBindings(Injector context, Map<Key<?>, Binding<?>> allBindings) {
         if (context.getParent() != null) {
             allBindings(context.getParent(), allBindings);
         }
@@ -91,7 +92,7 @@ public abstract class RunApplication {
      * @version: 2025-02-19 11:02
      */
     public <T> Stream<T> classWithSuper(Class<T> clazz) {
-        return reflectContext.classWithSuper(clazz);
+        return guiceReflectContext.classWithSuper(clazz);
     }
 
     /**
@@ -103,12 +104,12 @@ public abstract class RunApplication {
      * @version: 2025-02-19 11:04
      */
     public Stream<Object> classWithAnnotated(Class<? extends Annotation> annotation) {
-        return reflectContext.classWithAnnotated(annotation);
+        return guiceReflectContext.classWithAnnotated(annotation);
     }
 
     /** 执行包含某个注解的方法 */
     public void executeMethodWithAnnotated(Class<? extends Annotation> annotation) {
-        reflectContext.executeMethodWithAnnotated(annotation);
+        guiceReflectContext.executeMethodWithAnnotated(annotation);
     }
 
 }

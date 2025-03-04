@@ -45,7 +45,7 @@ public class ScheduledService {
     public void init(RunApplication runApplication) {
         log.debug("------------------------------初始化定时任务调度器------------------------------");
         List<ScheduledInfo> tmpJobList = new ArrayList<>();
-        runApplication.getReflectContext().withMethodAnnotated(Scheduled.class)
+        runApplication.getGuiceReflectContext().withMethodAnnotated(Scheduled.class)
                 .forEach(methodContent -> {
                     ScheduledInfo scheduledInfo = new ScheduledInfo(
                             methodContent.getIns(),

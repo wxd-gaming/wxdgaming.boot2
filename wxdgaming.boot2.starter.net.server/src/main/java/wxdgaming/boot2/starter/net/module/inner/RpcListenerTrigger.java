@@ -85,7 +85,7 @@ public class RpcListenerTrigger extends Event {
             Class<?> parameterType = parameter.getType();
             Type parameterizedType = parameter.getParameterizedType();
             if (GuiceReflectContext.class.isAssignableFrom(parameterType)) {
-                params[i] = parameterType.cast(runApplication.getReflectContext());
+                params[i] = parameterType.cast(runApplication.getGuiceReflectContext());
                 continue;
             } else if (RunApplication.class.isAssignableFrom(parameterType)) {
                 params[i] = parameterType.cast(runApplication);
