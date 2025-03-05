@@ -32,7 +32,9 @@ public class JsService {
         return threadJsContext.computeIfAbsent(Thread.currentThread(), k -> {
             JSContext jsContext = JSContext.build();
             /*构建插件*/
-            runApplication.classWithSuper(IJSPlugin.class).forEach(jsContext::put);
+            if (runApplication != null) {
+                runApplication.classWithSuper(IJSPlugin.class).forEach(jsContext::put);
+            }
             return jsContext;
         });
     }
