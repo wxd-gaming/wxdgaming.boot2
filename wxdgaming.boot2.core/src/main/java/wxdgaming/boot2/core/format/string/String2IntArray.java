@@ -14,7 +14,7 @@ public class String2IntArray {
             if (trim.startsWith("[") && trim.endsWith("]")) {
                 arrays = FastJsonUtil.parse(trim, int[].class);
             } else {
-                String[] split = trim.split("[，,|]");
+                String[] split = trim.split("[，,|:]");
                 arrays = new int[split.length];
                 for (int i = 0; i < split.length; i++) {
                     arrays[i] = Double.valueOf(split[i]).intValue();

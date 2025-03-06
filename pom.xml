@@ -13,14 +13,15 @@
         <module>wxdgaming.boot2.starter</module>
         <module>wxdgaming.boot2.starter.batis</module>
         <module>wxdgaming.boot2.starter.batis.sql</module>
-        <module>wxdgaming.boot2.starter.batis.sql.pgsql</module>
         <module>wxdgaming.boot2.starter.batis.sql.mysql</module>
+        <module>wxdgaming.boot2.starter.batis.sql.pgsql</module>
+        <module>wxdgaming.boot2.starter.excel</module>
+        <module>wxdgaming.boot2.starter.js</module>
         <module>wxdgaming.boot2.starter.net</module>
         <module>wxdgaming.boot2.starter.net.httpclient</module>
         <module>wxdgaming.boot2.starter.net.server</module>
-        <module>wxdgaming.game.test</module>
         <module>wxdgaming.boot2.starter.scheduled</module>
-        <module>wxdgaming.boot2.starter.js</module>
+        <module>wxdgaming.game.test</module>
         <module>wxdgaming.game.test-script</module>
     </modules>
 
