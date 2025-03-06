@@ -265,6 +265,11 @@ public final class Cache<K, V> {
             return this;
         }
 
+        /** 缓存容器check间隔时间 */
+        public CacheBuilder<K, V> delay(long duration, TimeUnit timeUnit) {
+            return delay(timeUnit.toMillis(duration));
+        }
+
         /** hash桶,通过hash分区 */
         public CacheBuilder<K, V> hashArea(int hashArea) {
             this.hashArea = hashArea;
