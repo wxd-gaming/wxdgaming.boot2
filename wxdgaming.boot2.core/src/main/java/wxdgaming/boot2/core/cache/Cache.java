@@ -15,7 +15,6 @@ import wxdgaming.boot2.core.function.Function1;
 import wxdgaming.boot2.core.function.Function2;
 import wxdgaming.boot2.core.shutdown;
 
-import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,14 +32,14 @@ import java.util.concurrent.TimeUnit;
 public final class Cache<K, V> {
 
     /** key: hash分区, value: {key: 缓存键, value: 缓存对象} */
-    private final HashMap<Integer, ICacheArea<K, V>> cacheAreaMap = new HashMap<>();
+    private ICacheArea<K, V>[] cacheAreaMap;
     final String cacheName;
 
     private int hashKey(K k) {
         int i = k.hashCode();
         int h = 0;
-        if (cacheAreaMap.size() > 1) {
-            h = i % cacheAreaMap.size();
+        if (cacheAreaMap.length > 1) {
+            h = i % cacheAreaMap.length;
         }
         /*不需要负数*/
         return Math.abs(h);
@@ -48,17 +47,17 @@ public final class Cache<K, V> {
 
     /** 是否包含kay */
     public boolean containsKey(K k) {
-        return cacheAreaMap.get(hashKey(k)).containsKey(k);
+        return cacheAreaMap[hashKey(k)].containsKey(k);
     }
 
     /** 如果获取缓存没有，可以根据加载,失败回抛出异常 */
     public V get(K k) {
-        return cacheAreaMap.get(hashKey(k)).get(k);
+        return cacheAreaMap[hashKey(k)].get(k);
     }
 
     /** 如果获取缓存没有，可以根据加载,失败回抛出异常 */
     public V get(K k, Function1<K, V> load) {
-        V ifPresent = cacheAreaMap.get(hashKey(k)).getIfPresent(k, load);
+        V ifPresent = cacheAreaMap[hashKey(k)].getIfPresent(k, load);
         if (ifPresent == null) {
             throw new NullPointerException(String.valueOf(k) + " cache null");
         }
@@ -67,53 +66,78 @@ public final class Cache<K, V> {
 
     /** 获取数据，如果没有数据返回null */
     public V getIfPresent(K k) {
-        return cacheAreaMap.get(hashKey(k)).getIfPresent(k);
+        return cacheAreaMap[hashKey(k)].getIfPresent(k);
     }
 
     /** 获取数据，如果没有数据返回null */
     public V getIfPresent(K k, Function1<K, V> load) {
-        return cacheAreaMap.get(hashKey(k)).getIfPresent(k, load);
+        return cacheAreaMap[hashKey(k)].getIfPresent(k, load);
     }
 
     /** 添加缓存 */
     public void put(K k, V v) {
-        cacheAreaMap.get(hashKey(k)).put(k, v);
+        cacheAreaMap[hashKey(k)].put(k, v);
     }
 
     /** 添加缓存 */
     public void putIfAbsent(K k, V v) {
-        cacheAreaMap.get(hashKey(k)).putIfAbsent(k, v);
+        cacheAreaMap[hashKey(k)].putIfAbsent(k, v);
     }
 
     /** 过期 */
     public V invalidate(K k) {
-        return cacheAreaMap.get(hashKey(k)).invalidate(k);
+        return cacheAreaMap[hashKey(k)].invalidate(k);
     }
 
     /** 过期 */
     public void invalidateAll() {
-        cacheAreaMap.values().forEach(ICacheArea::invalidateAll);
+        for (int i = 0; i < cacheAreaMap.length; i++) {
+            ICacheArea<K, V> kviCacheArea = cacheAreaMap[i];
+            kviCacheArea.invalidateAll();
+        }
     }
 
     public long cacheSize() {
-        return cacheAreaMap.values().stream().mapToLong(ICacheArea::getSize).sum();
+        long size = 0;
+        for (int i = 0; i < cacheAreaMap.length; i++) {
+            ICacheArea<K, V> kviCacheArea = cacheAreaMap[i];
+            size += kviCacheArea.getSize();
+        }
+        return size;
+    }
+
+    @shutdown
+    public void shutdown() {
+        for (int i = 0; i < cacheAreaMap.length; i++) {
+            ICacheArea<K, V> kviCacheArea = cacheAreaMap[i];
+            kviCacheArea.shutdown();
+        }
     }
 
     private Cache(String cacheName) {
         this.cacheName = cacheName;
     }
 
-    @shutdown
-    public void shutdown() {
-        cacheAreaMap.values().forEach(ICacheArea::shutdown);
-    }
-
     public static <K, V> CacheBuilder<K, V> builder() {
         return new CacheBuilder<>();
     }
 
+    public enum CacheType {
+        /**
+         * 基于线程安全的hashmap内部cas
+         * <p>确实存在缓存过期零界点同时被访问；卸载和加载同时进行；如果不考虑零界点性能高于LRU、
+         */
+        CAS,
+        /**
+         * 基于读写锁
+         * <p>线程更安全，但是性能比CAS低,
+         */
+        LRU;
+    }
+
     public static class CacheBuilder<K, V> {
         private String cacheName;
+        private CacheType cacheType = CacheType.LRU;
         /** 缓存容器check间隔时间 */
         private long delay = 100;
         /** hash桶,通过hash分区 */
@@ -126,6 +150,11 @@ public final class Cache<K, V> {
         private Consumer2<K, V> heartListener;
 
         CacheBuilder() {
+        }
+
+        public CacheBuilder<K, V> cacheType(CacheType cacheType) {
+            this.cacheType = cacheType;
+            return this;
         }
 
         /** 缓存容器名字 */
@@ -212,14 +241,25 @@ public final class Cache<K, V> {
         public Cache<K, V> build() {
             Cache<K, V> kvCache = new Cache<K, V>(cacheName);
             if (hashArea < 1) hashArea = 1;
+            kvCache.cacheAreaMap = new ICacheArea[hashArea];
             for (int i = 0; i < hashArea; i++) {
-                ICacheArea<K, V> cacheArea = new CASCacheArea<>(
-                        cacheName + "-" + i,
-                        delay, expireAfterAccess, expireAfterWrite,
-                        loader, removalListener,
-                        heartTime, heartListener
-                );
-                kvCache.cacheAreaMap.put(i, cacheArea);
+                ICacheArea<K, V> cacheArea;
+                if (cacheType == CacheType.CAS) {
+                    cacheArea = new CASCacheArea<>(
+                            cacheName + "-" + i,
+                            delay, expireAfterAccess, expireAfterWrite,
+                            loader, removalListener,
+                            heartTime, heartListener
+                    );
+                } else {
+                    cacheArea = new LRUCacheArea<>(
+                            cacheName + "-" + i,
+                            delay, expireAfterAccess, expireAfterWrite,
+                            loader, removalListener,
+                            heartTime, heartListener
+                    );
+                }
+                kvCache.cacheAreaMap[i] = cacheArea;
             }
             return kvCache;
         }
