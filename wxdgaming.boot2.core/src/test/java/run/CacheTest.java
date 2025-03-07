@@ -21,6 +21,7 @@ public class CacheTest {
     public static void main(String[] args) throws InterruptedException {
 
         ExecutorUtil.getInstance().init(ExecutorConfig.INSTANCE);
+        ExecutorUtil.getInstance().getLogicExecutor().setQueueCheckSize(1000_0000);
         LogbackUtil.refreshLoggerLevel(Level.INFO);
         t0();
         t0();
@@ -32,12 +33,13 @@ public class CacheTest {
 
     public static void t0() throws InterruptedException {
         Cache<Long, Long> cache = Cache.<Long, Long>builder()
-                .cacheName("test")
-                .expireAfterWrite(1000)
+                .cacheName("test1")
+                .delay(1000)
+                .expireAfterWrite(10000)
                 .loader((k) -> k)
                 .removalListener((k, v) -> true)
-                .heartTime(10)
-                .hashArea(1000)
+                .heartTime(10000)
+                .hashArea(1)
                 .build();
 
         DiffTime diffTime = new DiffTime();
@@ -55,12 +57,13 @@ public class CacheTest {
 
     public static void t1() throws InterruptedException {
         Cache<Long, Long> cache = Cache.<Long, Long>builder()
-                .cacheName("test")
-                .expireAfterWrite(1000)
+                .cacheName("test2")
+                .delay(1000)
+                .expireAfterWrite(10000)
                 .loader((k) -> k)
                 .removalListener((k, v) -> true)
-                .heartTime(10)
-                .hashArea(1000)
+                .heartTime(10000)
+                .hashArea(1)
                 .build();
 
         DiffTime diffTime = new DiffTime();

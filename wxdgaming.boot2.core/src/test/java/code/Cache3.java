@@ -3,7 +3,7 @@
 // (powered by FernFlower decompiler)
 //
 
-package wxdgaming.boot2.core.cache;
+package code;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,14 +13,15 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.function.Consumer2;
 import wxdgaming.boot2.core.function.Function1;
 import wxdgaming.boot2.core.function.Function2;
+import wxdgaming.boot2.core.lang.DiffTime;
 import wxdgaming.boot2.core.shutdown;
 import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.threading.TimerJob;
 import wxdgaming.boot2.core.timer.MyClock;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +39,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Getter
 @Setter(value = AccessLevel.PROTECTED)
 @Accessors(chain = true)
-public final class Cache2<K, V> {
+public final class Cache3<K, V> {
 
     /** key: hash分区, value: {key: 缓存键, value: 缓存对象} */
     private final HashMap<Integer, CacheHolderManager> hkv = new HashMap<>();
@@ -129,7 +130,7 @@ public final class Cache2<K, V> {
         return hkv.values().stream().mapToLong(v -> v.nodes.size()).sum();
     }
 
-    public Cache2(String cacheName, int hashArea, long delay, long expireAfterAccess, long expireAfterWrite, long heartTime) {
+    public Cache3(String cacheName, int hashArea, long delay, long expireAfterAccess, long expireAfterWrite, long heartTime) {
         this.cacheName = cacheName;
         this.hashArea = hashArea;
         this.delay = delay;
@@ -148,7 +149,7 @@ public final class Cache2<K, V> {
                 CacheHolderManager holderManager = next.getValue();
                 holderManager.writeLock.lock();
                 try {
-                    for (CacheHolder holder : holderManager.expireTimeLinkedSet) {
+                    for (CacheHolder holder : holderManager.nodes.values()) {
                         Boolean apply = removalListener.apply(holder.key, holder.value);
                         if (!Boolean.TRUE.equals(apply)) {
                             log.debug("缓存 shutdown：{} 移除 {}", holder.key, apply);
@@ -167,30 +168,28 @@ public final class Cache2<K, V> {
             final int hkey = i;
             CacheHolderManager holderManager = new CacheHolderManager();
             hkv.put(hkey, holderManager);
+
+            final DiffTime diffTime = new DiffTime();
+
             Event event = new Event(cacheName, 10_000, 100_000) {
                 @Override public void onEvent() throws Exception {
                     long now = MyClock.millis();
                     // if (!holderManager.writeLock.tryLock()) return;
+                    diffTime.reset();
                     holderManager.writeLock.lock();
                     try {
-                        LinkedHashSet<CacheHolder> changes = new LinkedHashSet<>();
                         if (heartListener != null) {
-                            for (CacheHolder holder : holderManager.heartTimeLinkedSet) {
+                            for (CacheHolder holder : holderManager.nodes.values()) {
                                 if (holder.lastHeartTime < now) {
                                     heartListener.accept(holder.key, holder.value);
                                     holder.lastHeartTime = now + heartTime;
-                                    changes.add(holder);
                                 } else {
                                     break;
                                 }
                             }
-                            for (CacheHolder change : changes) {
-                                holderManager.heartTimeLinkedSet.remove(change);
-                                holderManager.heartTimeLinkedSet.add(change);
-                            }
                         }
-                        changes.clear();
-                        for (CacheHolder holder : holderManager.expireTimeLinkedSet) {
+                        ArrayList<CacheHolder> changes = new ArrayList<>();
+                        for (CacheHolder holder : holderManager.nodes.values()) {
                             if (holder.expireEndTime < now) {
                                 changes.add(holder);
                             } else {
@@ -203,12 +202,17 @@ public final class Cache2<K, V> {
                     } finally {
                         holderManager.writeLock.unlock();
                     }
+
+                    float diff = diffTime.diff();
+                    if (diff > 0) {
+                        log.info("缓存 {}-{} 刷新 {}", cacheName, hkey, diff);
+                    }
                 }
             };
 
             TimerJob timerJob = ExecutorUtil.getInstance().getDefaultExecutor().scheduleAtFixedDelay(
                     event,
-                    10_000,
+                    delay,
                     delay,
                     TimeUnit.MILLISECONDS
             );
@@ -223,8 +227,6 @@ public final class Cache2<K, V> {
         private final ReentrantReadWriteLock.WriteLock writeLock;
         private final ReentrantReadWriteLock.ReadLock readLock;
         private HashMap<K, CacheHolder> nodes = new HashMap<>();
-        private LinkedHashSet<CacheHolder> expireTimeLinkedSet = new LinkedHashSet<>();
-        private LinkedHashSet<CacheHolder> heartTimeLinkedSet = new LinkedHashSet<>();
 
         public CacheHolderManager() {
             lock = new ReentrantReadWriteLock();
@@ -236,8 +238,6 @@ public final class Cache2<K, V> {
             writeLock.lock();
             try {
                 nodes = new HashMap<>();
-                expireTimeLinkedSet = new LinkedHashSet<>();
-                heartTimeLinkedSet = new LinkedHashSet<>();
             } finally {
                 writeLock.unlock();
             }
@@ -298,7 +298,7 @@ public final class Cache2<K, V> {
                     writeLock.unlock();
                 }
             }
-            if (Cache2.this.expireAfterAccess > 0L) {
+            if (Cache3.this.expireAfterAccess > 0L) {
                 refresh(holder);
             }
             return holder.value;
@@ -319,13 +319,10 @@ public final class Cache2<K, V> {
             writeLock.lock();
             try {
                 if (holder != null) {
-                    if (Cache2.this.removalListener != null) {
-                        Cache2.this.removalListener.apply(holder.key, holder.value);
+                    if (Cache3.this.removalListener != null) {
+                        Cache3.this.removalListener.apply(holder.key, holder.value);
                     }
                     this.nodes.remove(holder.key);
-                    this.expireTimeLinkedSet.remove(holder);
-                    this.heartTimeLinkedSet.remove(holder);
-                    // log.info("缓存 {} 过期：{}", cacheName, holder.key);
                     return holder.value;
                 }
                 return null;
@@ -336,10 +333,6 @@ public final class Cache2<K, V> {
 
         private CacheHolder buildValue(K k, V v) {
             CacheHolder holder = new CacheHolder(k, v);
-            if (Cache2.this.heartListener != null) {
-                heartTimeLinkedSet.remove(holder);
-                heartTimeLinkedSet.add(holder);
-            }
             refresh(holder);
             return holder;
         }
@@ -348,18 +341,14 @@ public final class Cache2<K, V> {
             writeLock.lock();
             try {
                 long now = MyClock.millis();
-                if (Cache2.this.expireAfterWrite > 0L) {
+                if (Cache3.this.expireAfterWrite > 0L) {
                     /*表示当前是写入过期*/
                     if (holder.expireEndTime == 0) {
-                        holder.expireEndTime = (now + Cache2.this.expireAfterWrite);
-                        expireTimeLinkedSet.remove(holder);
-                        expireTimeLinkedSet.add(holder);
+                        holder.expireEndTime = (now + Cache3.this.expireAfterWrite);
                     }
-                } else if (Cache2.this.expireAfterAccess > 0L) {
+                } else if (Cache3.this.expireAfterAccess > 0L) {
                     /*表示读取过期*/
-                    holder.expireEndTime = (now + Cache2.this.expireAfterAccess);
-                    expireTimeLinkedSet.remove(holder);
-                    expireTimeLinkedSet.add(holder);
+                    holder.expireEndTime = (now + Cache3.this.expireAfterAccess);
                 }
             } finally {
                 writeLock.unlock();
@@ -379,7 +368,7 @@ public final class Cache2<K, V> {
         public CacheHolder(K key, V value) {
             this.key = key;
             this.value = value;
-            this.lastHeartTime = MyClock.millis() + Cache2.this.heartTime;
+            this.lastHeartTime = MyClock.millis() + Cache3.this.heartTime;
         }
 
         public int compareTo(CacheHolder o) {
@@ -505,8 +494,8 @@ public final class Cache2<K, V> {
             return this;
         }
 
-        public Cache2<K, V> build() {
-            Cache2<K, V> kvCache = new Cache2<K, V>(cacheName, hashArea, delay, expireAfterAccess, expireAfterWrite, heartTime)
+        public Cache3<K, V> build() {
+            Cache3<K, V> kvCache = new Cache3<K, V>(cacheName, hashArea, delay, expireAfterAccess, expireAfterWrite, heartTime)
                     .setLoader(loader)
                     .setHeartListener(heartListener)
                     .setRemovalListener(removalListener);

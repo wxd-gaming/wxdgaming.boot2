@@ -28,13 +28,13 @@ public class JdbcCache<E extends Entity, Key> {
      * @param sqlDataHelper      数据库
      * @param expireAfterAccessM 滑动缓存过期时间
      */
-    public JdbcCache(SqlDataHelper<?> sqlDataHelper, int expireAfterAccessM) {
+    public JdbcCache(SqlDataHelper<?> sqlDataHelper, int hashArea, int expireAfterAccessM) {
         this.cls = ReflectContext.getTClass(this.getClass());
         this.sqlDataHelper = sqlDataHelper;
         this.tableMapping = this.sqlDataHelper.tableMapping(cls);
         cache = Cache.<Key, E>builder()
                 .cacheName("cache-" + tableMapping.getTableName())
-                .hashArea(100)
+                .hashArea(hashArea)
                 .expireAfterAccess(expireAfterAccessM, TimeUnit.MINUTES)
                 .heartTime(1, TimeUnit.MINUTES)
                 .loader(this::loader)

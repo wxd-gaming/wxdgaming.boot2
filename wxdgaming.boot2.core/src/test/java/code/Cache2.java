@@ -3,26 +3,29 @@
 // (powered by FernFlower decompiler)
 //
 
-package wxdgaming.boot2.core.cache;
+package code;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
 import wxdgaming.boot2.core.function.Consumer2;
 import wxdgaming.boot2.core.function.Function1;
 import wxdgaming.boot2.core.function.Function2;
+import wxdgaming.boot2.core.lang.DiffTime;
 import wxdgaming.boot2.core.shutdown;
 import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.threading.TimerJob;
 import wxdgaming.boot2.core.timer.MyClock;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * 缓存
@@ -36,10 +39,10 @@ import java.util.concurrent.TimeUnit;
 @Getter
 @Setter(value = AccessLevel.PROTECTED)
 @Accessors(chain = true)
-public final class Cache<K, V> {
+public final class Cache2<K, V> {
 
     /** key: hash分区, value: {key: 缓存键, value: 缓存对象} */
-    private final ConcurrentTable<Integer, K, CacheHolder> hkv = new ConcurrentTable<>();
+    private final HashMap<Integer, CacheHolderManager> hkv = new HashMap<>();
     private final String cacheName;
     /** hash桶,通过hash分区 */
     private final int hashArea;
@@ -59,25 +62,6 @@ public final class Cache<K, V> {
     private Consumer2<K, V> heartListener;
     private Map<Integer, TimerJob> timerJobs = Map.of();
 
-    private CacheHolder buildValue(K k, V v) {
-        CacheHolder tuple = new CacheHolder(k, v);
-        refresh(tuple);
-        return tuple;
-    }
-
-    private void refresh(CacheHolder holder) {
-        long now = MyClock.millis();
-        if (this.expireAfterWrite > 0L) {
-            /*表示当前是写入过期*/
-            if (holder.expireEndTime == 0) {
-                holder.expireEndTime = (now + this.expireAfterWrite);
-            }
-        } else {
-            /*表示读取过期*/
-            holder.expireEndTime = (now + this.expireAfterAccess);
-        }
-    }
-
     private int hashKey(K k) {
         int i = k.hashCode();
         int h = 0;
@@ -90,7 +74,8 @@ public final class Cache<K, V> {
 
     /** 是否包含kay */
     public boolean containsKey(K k) {
-        return hkv.containsKey(hashKey(k), k);
+        int hashKey = hashKey(k);
+        return hkv.get(hashKey).containsKey(k);
     }
 
     /** 如果获取缓存没有，可以根据加载,失败回抛出异常 */
@@ -115,40 +100,25 @@ public final class Cache<K, V> {
     /** 获取数据，如果没有数据返回null */
     public V getIfPresent(K k, Function1<K, V> load) {
         int hk = hashKey(k);
-        CacheHolder holder = this.hkv.get(hk).computeIfAbsent(k, l -> {
-            V apply = null;
-            if (load != null) {
-                apply = load.apply(l);
-            }
-            if (apply == null) return null;
-            return buildValue(k, apply);
-        });
-        if (holder != null) {
-            if (this.expireAfterAccess > 0L) {
-                refresh(holder);
-            }
-            return holder.value;
-        } else {
-            return null;
-        }
+        return this.hkv.get(hk).getIfPresent(k, load);
     }
 
     /** 添加缓存 */
     public void put(K k, V v) {
         int hk = hashKey(k);
-        this.hkv.put(hk, k, buildValue(k, v));
+        this.hkv.get(hk).put(k, v);
     }
 
     /** 添加缓存 */
     public void putIfAbsent(K k, V v) {
         int hk = hashKey(k);
-        this.hkv.putIfAbsent(hk, k, buildValue(k, v));
+        this.hkv.get(hk).putIfAbsent(k, v);
     }
 
     /** 过期 */
     public V invalidate(K k) {
         int hk = hashKey(k);
-        return Optional.ofNullable(this.hkv.remove(hk, k)).map(holder -> holder.value).orElse(null);
+        return this.hkv.get(hk).remove(k);
     }
 
     /** 过期 */
@@ -157,10 +127,10 @@ public final class Cache<K, V> {
     }
 
     public long cacheSize() {
-        return hkv.size();
+        return hkv.values().stream().mapToLong(v -> v.nodes.size()).sum();
     }
 
-    public Cache(String cacheName, int hashArea, long delay, long expireAfterAccess, long expireAfterWrite, long heartTime) {
+    public Cache2(String cacheName, int hashArea, long delay, long expireAfterAccess, long expireAfterWrite, long heartTime) {
         this.cacheName = cacheName;
         this.hashArea = hashArea;
         this.delay = delay;
@@ -174,16 +144,19 @@ public final class Cache<K, V> {
 
         timerJobs.values().forEach(TimerJob::cancel);
 
-        for (Map.Entry<Integer, ConcurrentHashMap<K, CacheHolder>> next : hkv.entrySet()) {
-            ConcurrentHashMap<K, CacheHolder> nextValue = next.getValue();
-            for (Map.Entry<K, CacheHolder> entryNext : nextValue.entrySet()) {
-                K key = entryNext.getKey();
-                CacheHolder holder = entryNext.getValue();
-                if (removalListener != null) {
-                    Boolean apply = removalListener.apply(key, holder.value);
-                    if (!Boolean.TRUE.equals(apply)) {
-                        log.debug("缓存 shutdown：{} 移除 {}", key, apply);
+        if (removalListener != null) {
+            for (Map.Entry<Integer, CacheHolderManager> next : hkv.entrySet()) {
+                CacheHolderManager holderManager = next.getValue();
+                holderManager.writeLock.lock();
+                try {
+                    for (CacheHolder holder : holderManager.expireTimeLinkedSet) {
+                        Boolean apply = removalListener.apply(holder.key, holder.value);
+                        if (!Boolean.TRUE.equals(apply)) {
+                            log.debug("缓存 shutdown：{} 移除 {}", holder.key, apply);
+                        }
                     }
+                } finally {
+                    holderManager.writeLock.unlock();
                 }
             }
         }
@@ -193,36 +166,51 @@ public final class Cache<K, V> {
         HashMap<Integer, TimerJob> tmpJobMap = new HashMap<>();
         for (int i = 0; i < hashArea; i++) {
             final int hkey = i;
-            final Map<K, CacheHolder> hash = hkv.row(hkey);
+            final CacheHolderManager holderManager = new CacheHolderManager();
+            hkv.put(hkey, holderManager);
 
-            Event event = new Event(cacheName + "-" + hkey, 10_000, 100_000) {
+            final DiffTime diffTime = new DiffTime();
+
+            Event event = new Event(cacheName, 10_000, 100_000) {
                 @Override public void onEvent() throws Exception {
                     long now = MyClock.millis();
-                    Iterator<Map.Entry<K, CacheHolder>> entryIterator = hash.entrySet().iterator();
-                    while (entryIterator.hasNext()) {
-                        Map.Entry<K, CacheHolder> entryNext = entryIterator.next();
-                        K key = entryNext.getKey();
-                        CacheHolder holder = entryNext.getValue();
-
-                        if (heartTime > 0 && heartListener != null && holder.lastHeartTime < now) {
-                            heartListener.accept(key, holder.value);
-                            holder.lastHeartTime = now + heartTime;
-                        }
-
-                        if (holder.expireEndTime > 0 && holder.expireEndTime < now) {
-                            if (removalListener != null) {
-                                Boolean apply = removalListener.apply(key, holder.value);
-                                if (Boolean.TRUE.equals(apply)) {
-                                    entryIterator.remove();
+                    // if (!holderManager.writeLock.tryLock()) return;
+                    diffTime.reset();
+                    holderManager.writeLock.lock();
+                    try {
+                        LinkedHashSet<CacheHolder> changes = new LinkedHashSet<>();
+                        if (heartListener != null) {
+                            for (CacheHolder holder : holderManager.heartTimeLinkedSet) {
+                                if (holder.lastHeartTime < now) {
+                                    heartListener.accept(holder.key, holder.value);
+                                    holder.lastHeartTime = now + heartTime;
+                                    changes.add(holder);
                                 } else {
-                                    refresh(holder);
-                                    log.info("缓存过期：{} 移除失败", key);
+                                    break;
                                 }
-                            } else {
-                                entryIterator.remove();
-                                log.info("缓存过期：{}", key);
+                            }
+                            for (CacheHolder change : changes) {
+                                holderManager.heartTimeLinkedSet.remove(change);
+                                holderManager.heartTimeLinkedSet.add(change);
                             }
                         }
+                        changes.clear();
+                        for (CacheHolder holder : holderManager.expireTimeLinkedSet) {
+                            if (holder.expireEndTime < now) {
+                                changes.add(holder);
+                            } else {
+                                break;
+                            }
+                        }
+                        for (CacheHolder change : changes) {
+                            holderManager.remove(change);
+                        }
+                    } finally {
+                        holderManager.writeLock.unlock();
+                    }
+                    float diff = diffTime.diff();
+                    if (diff > 0) {
+                        log.info("缓存 {}-{} 刷新 {}", cacheName, hkey, diff);
                     }
                 }
             };
@@ -238,6 +226,156 @@ public final class Cache<K, V> {
         timerJobs = Map.copyOf(tmpJobMap);
     }
 
+    private class CacheHolderManager {
+
+        private final ReentrantReadWriteLock lock;
+        private final ReentrantReadWriteLock.WriteLock writeLock;
+        private final ReentrantReadWriteLock.ReadLock readLock;
+        private HashMap<K, CacheHolder> nodes = new HashMap<>();
+        private LinkedHashSet<CacheHolder> expireTimeLinkedSet = new LinkedHashSet<>();
+        private LinkedHashSet<CacheHolder> heartTimeLinkedSet = new LinkedHashSet<>();
+
+        public CacheHolderManager() {
+            lock = new ReentrantReadWriteLock();
+            writeLock = lock.writeLock();
+            readLock = lock.readLock();
+        }
+
+        public void clear() {
+            writeLock.lock();
+            try {
+                nodes = new HashMap<>();
+                expireTimeLinkedSet = new LinkedHashSet<>();
+                heartTimeLinkedSet = new LinkedHashSet<>();
+            } finally {
+                writeLock.unlock();
+            }
+        }
+
+        public boolean containsKey(K k) {
+            readLock.lock();
+            try {
+                return nodes.containsKey(k);
+            } finally {
+                readLock.unlock();
+            }
+        }
+
+        /** 添加缓存 */
+        public void put(K k, V v) {
+            writeLock.lock();
+            try {
+                this.nodes.put(k, buildValue(k, v));
+            } finally {
+                writeLock.unlock();
+            }
+        }
+
+        /** 添加缓存 */
+        public void putIfAbsent(K k, V v) {
+            writeLock.lock();
+            try {
+                this.nodes.putIfAbsent(k, buildValue(k, v));
+            } finally {
+                writeLock.unlock();
+            }
+        }
+
+        /** 获取数据，如果没有数据返回null */
+        public V getIfPresent(K k, Function1<K, V> load) {
+            CacheHolder holder;
+            readLock.lock();
+            try {
+                holder = this.nodes.get(k);
+            } finally {
+                readLock.unlock();
+            }
+            if (holder == null) {
+                writeLock.lock();
+                try {
+                    holder = this.nodes.get(k);
+                    if (holder == null) {
+                        V apply = null;
+                        if (load != null) {
+                            apply = load.apply(k);
+                        }
+                        if (apply == null) return null;
+                        holder = buildValue(k, apply);
+                        this.nodes.putIfAbsent(k, holder);
+                    }
+                } finally {
+                    writeLock.unlock();
+                }
+            }
+            if (Cache2.this.expireAfterAccess > 0L) {
+                refresh(holder);
+            }
+            return holder.value;
+        }
+
+        public V remove(K key) {
+            CacheHolder holder;
+            readLock.lock();
+            try {
+                holder = this.nodes.get(key);
+            } finally {
+                readLock.unlock();
+            }
+            return remove(holder);
+        }
+
+        public V remove(CacheHolder holder) {
+            writeLock.lock();
+            try {
+                if (holder != null) {
+                    if (Cache2.this.removalListener != null) {
+                        Cache2.this.removalListener.apply(holder.key, holder.value);
+                    }
+                    this.nodes.remove(holder.key);
+                    this.expireTimeLinkedSet.remove(holder);
+                    this.heartTimeLinkedSet.remove(holder);
+                    // log.info("缓存 {} 过期：{}", cacheName, holder.key);
+                    return holder.value;
+                }
+                return null;
+            } finally {
+                writeLock.unlock();
+            }
+        }
+
+        private CacheHolder buildValue(K k, V v) {
+            CacheHolder holder = new CacheHolder(k, v);
+            if (Cache2.this.heartListener != null) {
+                heartTimeLinkedSet.remove(holder);
+                heartTimeLinkedSet.add(holder);
+            }
+            refresh(holder);
+            return holder;
+        }
+
+        private void refresh(CacheHolder holder) {
+            writeLock.lock();
+            try {
+                long now = MyClock.millis();
+                if (Cache2.this.expireAfterWrite > 0L) {
+                    /*表示当前是写入过期*/
+                    if (holder.expireEndTime == 0) {
+                        holder.expireEndTime = (now + Cache2.this.expireAfterWrite);
+                        expireTimeLinkedSet.remove(holder);
+                        expireTimeLinkedSet.add(holder);
+                    }
+                } else if (Cache2.this.expireAfterAccess > 0L) {
+                    /*表示读取过期*/
+                    holder.expireEndTime = (now + Cache2.this.expireAfterAccess);
+                    expireTimeLinkedSet.remove(holder);
+                    expireTimeLinkedSet.add(holder);
+                }
+            } finally {
+                writeLock.unlock();
+            }
+        }
+    }
+
     private class CacheHolder implements Comparable<CacheHolder> {
 
         private final K key;
@@ -250,7 +388,7 @@ public final class Cache<K, V> {
         public CacheHolder(K key, V value) {
             this.key = key;
             this.value = value;
-            this.lastHeartTime = MyClock.millis() + Cache.this.heartTime;
+            this.lastHeartTime = MyClock.millis() + Cache2.this.heartTime;
         }
 
         public int compareTo(CacheHolder o) {
@@ -376,8 +514,8 @@ public final class Cache<K, V> {
             return this;
         }
 
-        public Cache<K, V> build() {
-            Cache<K, V> kvCache = new Cache<K, V>(cacheName, hashArea, delay, expireAfterAccess, expireAfterWrite, heartTime)
+        public Cache2<K, V> build() {
+            Cache2<K, V> kvCache = new Cache2<K, V>(cacheName, hashArea, delay, expireAfterAccess, expireAfterWrite, heartTime)
                     .setLoader(loader)
                     .setHeartListener(heartListener)
                     .setRemovalListener(removalListener);
