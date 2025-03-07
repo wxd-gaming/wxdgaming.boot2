@@ -5,7 +5,9 @@ import lombok.Getter;
 import org.graalvm.polyglot.Value;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.io.FileReadUtil;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -47,6 +49,12 @@ public class JsService {
 
     public void release() {
         threadJsContext.remove(Thread.currentThread());
+    }
+
+    public Value evalFile(String file) {
+        JSContext context = threadContext();
+        String string = FileReadUtil.readString(file, StandardCharsets.UTF_8);
+        return context.eval(string);
     }
 
     public Value eval(String script) {
