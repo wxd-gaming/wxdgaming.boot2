@@ -357,6 +357,16 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         return rows;
     }
 
+    /** 返回第一条 */
+    public JSONObject queryTop(String sql, Object... params) {
+        AtomicReference<JSONObject> result = new AtomicReference<>();
+        this.query(sql, params, row -> {
+            result.set(row);
+            return false;
+        });
+        return result.get();
+    }
+
     public void query(String sql, Object[] params, Predicate<JSONObject> consumer) {
         this.queryResultSet(sql, params, resultSet -> {
             try {

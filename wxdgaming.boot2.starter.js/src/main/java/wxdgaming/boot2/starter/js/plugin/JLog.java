@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter.js.plugin;
 
+import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.js.IJSPlugin;
 
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
  * @version: 2025-03-04 09:18
  **/
 @Slf4j
+@Singleton
 public class JLog implements IJSPlugin {
 
     @Override public String getName() {
