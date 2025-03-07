@@ -42,7 +42,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public final class Cache3<K, V> {
 
     /** key: hash分区, value: {key: 缓存键, value: 缓存对象} */
-    private final HashMap<Integer, CacheHolderManager> hkv = new HashMap<>();
+    private final HashMap<Integer, CacheArea> hkv = new HashMap<>();
     private final String cacheName;
     /** hash桶,通过hash分区 */
     private final int hashArea;
@@ -145,8 +145,8 @@ public final class Cache3<K, V> {
         timerJobs.values().forEach(TimerJob::cancel);
 
         if (removalListener != null) {
-            for (Map.Entry<Integer, CacheHolderManager> next : hkv.entrySet()) {
-                CacheHolderManager holderManager = next.getValue();
+            for (Map.Entry<Integer, CacheArea> next : hkv.entrySet()) {
+                CacheArea holderManager = next.getValue();
                 holderManager.writeLock.lock();
                 try {
                     for (CacheHolder holder : holderManager.nodes.values()) {
@@ -166,7 +166,7 @@ public final class Cache3<K, V> {
         HashMap<Integer, TimerJob> tmpJobMap = new HashMap<>();
         for (int i = 0; i < hashArea; i++) {
             final int hkey = i;
-            CacheHolderManager holderManager = new CacheHolderManager();
+            CacheArea holderManager = new CacheArea();
             hkv.put(hkey, holderManager);
 
             final DiffTime diffTime = new DiffTime();
@@ -221,14 +221,15 @@ public final class Cache3<K, V> {
         timerJobs = Map.copyOf(tmpJobMap);
     }
 
-    private class CacheHolderManager {
+    /** cache 区块，用于缓存加速 */
+    private class CacheArea {
 
         private final ReentrantReadWriteLock lock;
         private final ReentrantReadWriteLock.WriteLock writeLock;
         private final ReentrantReadWriteLock.ReadLock readLock;
         private HashMap<K, CacheHolder> nodes = new HashMap<>();
 
-        public CacheHolderManager() {
+        public CacheArea() {
             lock = new ReentrantReadWriteLock();
             writeLock = lock.writeLock();
             readLock = lock.readLock();
