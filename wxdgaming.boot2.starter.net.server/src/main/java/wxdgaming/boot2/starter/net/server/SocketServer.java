@@ -4,20 +4,24 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.concurrent.ScheduledFuture;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.shutdown;
+import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.SessionGroup;
+import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 import wxdgaming.boot2.starter.net.ssl.WxdOptionalSslHandler;
 
 import javax.net.ssl.SSLContext;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -35,6 +39,7 @@ public class SocketServer {
     protected ServerBootstrap bootstrap;
     protected ChannelFuture future;
     protected Channel serverChannel;
+    protected ScheduledFuture<?> scheduledFuture;
 
 
     public SocketServer(SocketServerConfig config) {
@@ -104,6 +109,17 @@ public class SocketServer {
 
                 });
 
+        /*这里是定时flush操作，减少网络io并发*/
+        scheduledFuture = NioFactory.workThreadGroup().scheduleAtFixedRate(
+                new Event("session flush event", 150, 500) {
+                    @Override public void onEvent() throws Exception {
+                        sessionGroup.forEach(SocketSession::flush);
+                    }
+                },
+                5,
+                5,
+                TimeUnit.MILLISECONDS
+        );
 
         try {
             future = bootstrap.bind(config.getPort());
@@ -118,6 +134,9 @@ public class SocketServer {
     @shutdown
     @Sort(100)
     public void shutdown() {
+        if (scheduledFuture != null) {
+            scheduledFuture.cancel(false);
+        }
         if (future != null) {
             try {
                 serverChannel.close();

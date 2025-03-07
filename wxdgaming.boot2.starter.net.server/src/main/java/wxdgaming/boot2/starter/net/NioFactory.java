@@ -153,7 +153,7 @@ public class NioFactory implements Serializable {
         try {
             InetSocketAddress insocket = (InetSocketAddress) session.channel().remoteAddress();
             return insocket.getAddress().getHostAddress() + ":" + insocket.getPort();
-        } catch (Throwable e) {
+        } catch (Throwable ignored) {
         }
         return null;
     }
@@ -162,7 +162,7 @@ public class NioFactory implements Serializable {
         try {
             InetSocketAddress insocket = (InetSocketAddress) session.channel().localAddress();
             return insocket.getAddress().getHostAddress() + ":" + insocket.getPort();
-        } catch (Throwable e) {
+        } catch (Throwable ignored) {
         }
         return null;
     }
