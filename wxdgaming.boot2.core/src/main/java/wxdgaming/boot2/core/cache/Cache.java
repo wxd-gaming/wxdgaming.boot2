@@ -137,7 +137,7 @@ public final class Cache<K, V> {
 
     public static class CacheBuilder<K, V> {
         private String cacheName;
-        private CacheType cacheType = CacheType.LRU;
+        private CacheType cacheType = CacheType.CAS;
         /** 缓存容器check间隔时间 */
         private long delay = 100;
         /** hash桶,通过hash分区 */

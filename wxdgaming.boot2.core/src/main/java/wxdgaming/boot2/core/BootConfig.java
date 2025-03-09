@@ -47,7 +47,11 @@ public class BootConfig {
         String path = value.path();
         R r;
         try {
-            r = BootConfig.getIns().getNestedValue(path, type);
+            if (value.nestedPath()) {
+                r = BootConfig.getIns().getNestedValue(path, type);
+            } else {
+                r = BootConfig.getIns().getObject(path, type);
+            }
             if (type instanceof Class<?> clazz && clazz.isInstance(r)) {
                 return (R) clazz.cast(r);
             }

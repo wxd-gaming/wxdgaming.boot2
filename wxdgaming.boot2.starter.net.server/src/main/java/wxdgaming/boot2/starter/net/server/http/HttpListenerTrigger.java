@@ -122,7 +122,12 @@ public class HttpListenerTrigger extends Event {
                     String name = param.path();
                     Object o;
                     try {
-                        o = context.getRequest().getReqParams().getObject(name, parameterizedType);
+
+                        if (param.nestedPath()) {
+                            o = FastJsonUtil.getNestedValue(context.getRequest().getReqParams(), name, parameterizedType);
+                        } else {
+                            o = context.getRequest().getReqParams().getObject(name, parameterizedType);
+                        }
                         if (o == null && StringUtils.isNotBlank(param.defaultValue())) {
                             o = FastJsonUtil.parse(param.defaultValue(), parameterizedType);
                         }

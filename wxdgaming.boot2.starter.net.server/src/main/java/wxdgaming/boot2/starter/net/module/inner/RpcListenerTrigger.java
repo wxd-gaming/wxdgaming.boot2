@@ -122,7 +122,11 @@ public class RpcListenerTrigger extends Event {
                     String name = param.path();
                     Object o;
                     try {
-                        o = paramObject.getObject(name, parameterizedType);
+                        if (param.nestedPath()) {
+                            o = FastJsonUtil.getNestedValue(paramObject, name, parameterizedType);
+                        } else {
+                            o = paramObject.getObject(name, parameterizedType);
+                        }
                         if (o == null && StringUtils.isNotBlank(param.defaultValue())) {
                             o = FastJsonUtil.parse(param.defaultValue(), parameterizedType);
                         }

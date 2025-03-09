@@ -30,9 +30,11 @@ public class ThreadContext extends JSONObject {
         }
         R r;
         try {
-            r = ThreadContext.context(name);
-            if (type instanceof Class<?> clazz && clazz.isInstance(r)) {
-                return (R) clazz.cast(r);
+            ThreadContext context = ThreadContext.context();
+            if (threadParam.nestedPath()) {
+                r = FastJsonUtil.getNestedValue(context, name, type);
+            } else {
+                r = context.getObject(name, type);
             }
             if (r == null && StringUtils.isNotBlank(threadParam.defaultValue())) {
                 r = FastJsonUtil.parse(threadParam.defaultValue(), type);

@@ -16,6 +16,12 @@ public @interface Param {
     /** 属性名字 path */
     String path();
 
+    /**
+     * 嵌套的参数路由，比如数据是在json内，可以使用a.b.c嵌套获取参数
+     * <p>参数: {a:{b:{c:"a"}}}
+     */
+    boolean nestedPath() default false;
+
     /** 必须 */
     boolean required() default true;
 
