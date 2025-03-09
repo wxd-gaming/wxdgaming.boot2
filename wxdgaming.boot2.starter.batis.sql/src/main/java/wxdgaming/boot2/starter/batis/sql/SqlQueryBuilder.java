@@ -104,12 +104,6 @@ public abstract class SqlQueryBuilder {
             if (StringUtils.isNotBlank(this.where)) {
                 this.where += " and ";
             }
-            if (!where.startsWith("`")) {
-                where = "`" + where;
-            }
-            if (!where.endsWith("`")) {
-                where += "`";
-            }
             this.where += where;
             pushParameter(param);
         }
