@@ -14,4 +14,11 @@ public class PgsqlQueryBuilder extends SqlQueryBuilder {
         super(sqlDataHelper);
     }
 
+    @Override public String getTableName() {
+        return super.getTableName().replace('`', '"');
+    }
+
+    @Override public String buildSelectSql() {
+        return super.buildSelectSql().replace('`', '"');
+    }
 }

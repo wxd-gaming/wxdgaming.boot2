@@ -38,6 +38,17 @@ public abstract class SqlQueryBuilder {
         this.sqlDataHelper = sqlDataHelper;
     }
 
+    public String getTableName() {
+        String tmp = tableName;
+        if (!tmp.startsWith("`")) {
+            tmp = "`" + tmp;
+        }
+        if (!tmp.endsWith("`")) {
+            tmp += "`";
+        }
+        return tmp;
+    }
+
     public void setSkip(int skip) {
         if (skip < 0) skip = 0;
         this.skip = skip;
@@ -63,18 +74,41 @@ public abstract class SqlQueryBuilder {
         return this;
     }
 
-    /** 当value != null 才会push */
+    /**
+     * 当value != null 才会push
+     *
+     * @param where 例如： a=?
+     * @param param 1
+     * @return
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-03-08 20:49
+     */
     public SqlQueryBuilder pushWhereByValueNotNull(String where, Object param) {
         if (Objects.nonNullEmpty(param))
             pushWhere(where, param);
         return this;
     }
 
+    /**
+     * 添加 where 条件
+     *
+     * @param where 例如： a=?
+     * @param param 1
+     * @return
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-03-08 20:48
+     */
     public SqlQueryBuilder pushWhere(String where, Object param) {
         if (Objects.nullEmpty(param)) throw new IllegalArgumentException("param null or empty");
         if (StringUtils.isNotBlank(where)) {
             if (StringUtils.isNotBlank(this.where)) {
                 this.where += " and ";
+            }
+            if (!where.startsWith("`")) {
+                where = "`" + where;
+            }
+            if (!where.endsWith("`")) {
+                where += "`";
             }
             this.where += where;
             pushParameter(param);
