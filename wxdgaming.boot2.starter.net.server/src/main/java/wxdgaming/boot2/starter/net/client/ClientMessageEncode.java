@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.net.client;
 
-import io.netty.channel.ChannelHandler;
+import io.netty.channel.Channel;
 import wxdgaming.boot2.starter.net.MessageEncode;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 
@@ -10,11 +10,10 @@ import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-17 15:08
  **/
-@ChannelHandler.Sharable
 public class ClientMessageEncode extends MessageEncode {
 
-    public ClientMessageEncode(ProtoListenerFactory protoListenerFactory) {
-        super(protoListenerFactory);
+    public ClientMessageEncode(boolean scheduledFlush, long scheduledDelayMs, Channel channel, ProtoListenerFactory protoListenerFactory) {
+        super(scheduledFlush, scheduledDelayMs, channel, protoListenerFactory);
     }
 
 }

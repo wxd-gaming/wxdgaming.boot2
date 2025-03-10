@@ -1,17 +1,21 @@
 package wxdgaming.boot2.starter.net;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.util.concurrent.ScheduledFuture;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.pojo.SerializerUtil;
+
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 消息编码
@@ -21,13 +25,29 @@ import wxdgaming.boot2.starter.net.pojo.SerializerUtil;
  **/
 @Slf4j
 @Getter
-@ChannelHandler.Sharable
 public abstract class MessageEncode extends ChannelOutboundHandlerAdapter {
 
     protected final ProtoListenerFactory protoListenerFactory;
+    protected final AtomicInteger writeUpdate = new AtomicInteger(0);
+    protected long lastUpdateTime = 0;
 
-    public MessageEncode(ProtoListenerFactory protoListenerFactory) {
+    public MessageEncode(boolean scheduledFlush, long scheduledDelayMs, Channel channel, ProtoListenerFactory protoListenerFactory) {
         this.protoListenerFactory = protoListenerFactory;
+        if (scheduledFlush) {
+            /*采用定时器flush，调用 write 而非 writAndFlush 减少网络io开销*/
+            ScheduledFuture<?> scheduledFuture = channel.eventLoop().scheduleAtFixedRate(() -> {
+                if (lastUpdateTime != writeUpdate.get()) {
+                    lastUpdateTime = writeUpdate.get();
+                    channel.flush();
+                }
+            }, scheduledDelayMs, scheduledDelayMs, TimeUnit.MILLISECONDS);
+            /*注册事件。 如果连接断开，关闭定时器*/
+            channel.closeFuture().addListener(future -> scheduledFuture.cancel(false));
+        }
+    }
+
+    @Override public void deregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        super.deregister(ctx, promise);
     }
 
     @Override public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
@@ -72,6 +92,7 @@ public abstract class MessageEncode extends ChannelOutboundHandlerAdapter {
             }
             case null, default -> super.write(ctx, msg, promise);
         }
+        writeUpdate.incrementAndGet();
     }
 
     public static ByteBuf build(int messageId, byte[] bytes) {

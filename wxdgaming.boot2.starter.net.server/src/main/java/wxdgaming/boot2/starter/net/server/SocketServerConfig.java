@@ -35,6 +35,12 @@ public class SocketServerConfig extends ObjectBase {
     /** 如果开启 websocket 可以指定后缀 */
     @JSONField(ordinal = 6)
     private String webSocketPrefix = "/ws";
+    /** 是否需要特别调用flush */
+    @JSONField(ordinal = 7)
+    private boolean enabledScheduledFlush = false;
+    /** 是否需要特别调用flush, 调用频率单位 ms */
+    @JSONField(ordinal = 8)
+    private long scheduledDelayMs = 5;
     @JSONField(ordinal = 10)
     private SslProtocolType sslProtocolType;
     /** 路径 */

@@ -50,25 +50,15 @@ public class RpcService {
     }
 
     public CompletableFuture<JSONObject> request(SocketSession socketSession, String cmd, Object params) {
-        CompletableFuture<JSONObject> completableFuture = new CompletableFuture<>();
-        ReqRemote reqRemote = new ReqRemote();
-        reqRemote
-                .setUid(hexId.newId())
-                .setToken("")
-                .setCmd(cmd)
-                .setParams(String.valueOf(params));
-
-        if (reqRemote.getParams().length() > 1024) {
-            reqRemote.setGzip(1);
-            reqRemote.setParams(GzipUtil.gzip2String(reqRemote.getParams()));
-        }
-        rpcCache.put(reqRemote.getUid(), completableFuture);
-        socketSession.writeAndFlush(reqRemote);
-        return completableFuture;
+        return request(socketSession, cmd, params, false);
     }
 
-    public void request2(SocketSession socketSession, String cmd, String params) {
+    public CompletableFuture<JSONObject> request(SocketSession socketSession, String cmd, Object params, boolean immediate) {
+        return request(socketSession, cmd, JSONObject.toJSONString(params), immediate);
+    }
 
+    public CompletableFuture<JSONObject> request(SocketSession socketSession, String cmd, String params, boolean immediate) {
+        CompletableFuture<JSONObject> completableFuture = new CompletableFuture<>();
         ReqRemote reqRemote = new ReqRemote();
         reqRemote
                 .setCmd(cmd)
@@ -78,8 +68,12 @@ public class RpcService {
             reqRemote.setGzip(1);
             reqRemote.setParams(GzipUtil.gzip2String(reqRemote.getParams()));
         }
-
-        socketSession.writeAndFlush(reqRemote);
+        rpcCache.put(reqRemote.getUid(), completableFuture);
+        if (immediate)
+            socketSession.writeAndFlush(reqRemote);
+        else
+            socketSession.write(reqRemote);
+        return completableFuture;
     }
 
     public void response(SocketSession socketSession, long rpcId, Object data) {

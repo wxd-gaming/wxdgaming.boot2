@@ -26,7 +26,7 @@ public class HttpListenerFactory {
 
     @Init
     @Sort(7)
-    public void init(@Value(path = "http.server", required = false) HttpServerConfig httpServerConfig,
+    public void init(@Value(path = "http.server", nestedPath = true, required = false) HttpServerConfig httpServerConfig,
                      RunApplication runApplication) {
         httpListenerContent = new HttpListenerContent(httpServerConfig, runApplication);
     }

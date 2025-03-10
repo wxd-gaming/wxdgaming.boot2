@@ -1,6 +1,7 @@
 package wxdgaming.boot2.starter.net.server.http;
 
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 
 import java.lang.reflect.Method;
@@ -17,5 +18,12 @@ import java.lang.reflect.Method;
  */
 @Slf4j
 public record HttpMapping(HttpRequest httpRequest, String path, Object ins, Method method) {
+
+    public String comment() {
+        if (StringUtils.isBlank(httpRequest.comment())) {
+            return path;
+        }
+        return httpRequest.comment();
+    }
 
 }

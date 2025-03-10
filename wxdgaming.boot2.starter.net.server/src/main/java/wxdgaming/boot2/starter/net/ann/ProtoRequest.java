@@ -15,4 +15,6 @@ import java.lang.annotation.Documented;
 })
 public @interface ProtoRequest {
 
+    /** 备注 */
+    String comment() default "";
 }

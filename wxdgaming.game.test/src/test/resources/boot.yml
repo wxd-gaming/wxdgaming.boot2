@@ -44,7 +44,7 @@ socket:
     enabledTcp: true                #是否启用tcp
     enabledWebSocket: false         #是否启用websocket
     webSocketPrefix: ""             #websocket前缀
-    enableReconnection: true        #是否启用重连
+    enabledReconnection: true        #是否启用重连
     enabledSSL: true
     maxAggregatorLength: 64        #聚合器最大长度
     maxConnectionCount: 1

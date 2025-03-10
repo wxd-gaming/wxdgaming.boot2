@@ -49,7 +49,7 @@
       "enabledTcp": true,
       "enabledWebSocket": false,
       "webSocketPrefix": "",
-      "enableReconnection": true,
+      "enabledReconnection": true,
       "enabledSSL": true,
       "sslProtocolType": "TLS",
       "sslKeyStorePath": "",

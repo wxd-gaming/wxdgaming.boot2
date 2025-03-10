@@ -37,14 +37,14 @@ public class Main {
         ReflectContext reflectContext = ReflectContext.Builder.of(classDirLoader, "wxdgaming.game.test.script").build();
         RunApplicationSub runApplicationSub = WxdApplication.createRunApplicationSub(reflectContext);
 
-        ExecutorUtil.getInstance().getDefaultExecutor().schedule(
-                () -> {
-                    runApplicationSub.executeMethodWithAnnotated(Init.class);
-                    log.info("热更新重载");
-                },
-                10,
-                TimeUnit.SECONDS
-        );
+        // ExecutorUtil.getInstance().getDefaultExecutor().schedule(
+        //         () -> {
+        //             runApplicationSub.executeMethodWithAnnotated(Init.class);
+        //             log.info("热更新重载");
+        //         },
+        //         10,
+        //         TimeUnit.SECONDS
+        // );
 
         ExecutorUtil.getInstance().getDefaultExecutor().schedule(
                 () -> {
@@ -67,7 +67,7 @@ public class Main {
                                     log.info("rpcIndex2 response {}", jsonObject);
                                 }
                             });
-                    socketSession.writeAndFlush("我是文本消息");
+                    socketSession.write("我是文本消息");
                 },
                 3,
                 TimeUnit.SECONDS

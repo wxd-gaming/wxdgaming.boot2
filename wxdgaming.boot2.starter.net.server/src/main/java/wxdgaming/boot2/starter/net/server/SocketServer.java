@@ -11,17 +11,14 @@ import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.shutdown;
-import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.SessionGroup;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 import wxdgaming.boot2.starter.net.ssl.WxdOptionalSslHandler;
 
 import javax.net.ssl.SSLContext;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -55,7 +52,6 @@ public class SocketServer {
 
         SocketServerDeviceHandler socketServerDeviceHandler = new SocketServerDeviceHandler(config);
         ServerMessageDecode serverMessageDecode = new ServerMessageDecode(config, protoListenerFactory, httpListenerFactory);
-        ServerMessageEncode serverMessageEncode = new ServerMessageEncode(protoListenerFactory);
         SSLContext sslContext = config.sslContext();
 
         int writeBytes = (int) BytesUnit.Mb.toBytes(config.getWriteByteBufM());
@@ -99,7 +95,15 @@ public class SocketServer {
                             /*解码消息*/
                             pipeline.addLast("decode", serverMessageDecode);
                             /*解码消息*/
-                            pipeline.addLast("encode", serverMessageEncode);
+                            pipeline.addLast(
+                                    "encode",
+                                    new ServerMessageEncode(
+                                            config.isEnabledScheduledFlush(),
+                                            config.getScheduledDelayMs(),
+                                            socketChannel,
+                                            protoListenerFactory
+                                    )
+                            );
                             addChanelHandler(socketChannel, pipeline);
                         } catch (Exception e) {
                             log.error("SocketServer init fail port: {}", config.getPort(), e);
@@ -108,18 +112,6 @@ public class SocketServer {
                     }
 
                 });
-
-        /*这里是定时flush操作，减少网络io并发*/
-        scheduledFuture = NioFactory.workThreadGroup().scheduleAtFixedRate(
-                new Event("session flush event", 150, 500) {
-                    @Override public void onEvent() throws Exception {
-                        sessionGroup.forEach(SocketSession::flush);
-                    }
-                },
-                5,
-                5,
-                TimeUnit.MILLISECONDS
-        );
 
         try {
             future = bootstrap.bind(config.getPort());

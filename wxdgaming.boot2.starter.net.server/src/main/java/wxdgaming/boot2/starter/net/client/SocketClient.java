@@ -78,7 +78,6 @@ public abstract class SocketClient {
 
         SocketClientDeviceHandler socketClientDeviceHandler = new SocketClientDeviceHandler();
         ClientMessageDecode clientMessageDecode = new ClientMessageDecode(config, protoListenerFactory, httpListenerFactory);
-        ClientMessageEncode clientMessageEncode = new ClientMessageEncode(protoListenerFactory);
         SSLContext sslContext = config.sslContext();
 
         int writeBytes = (int) BytesUnit.Mb.toBytes(config.getWriteByteBufM());
@@ -117,7 +116,13 @@ public abstract class SocketClient {
                         /*解码消息*/
                         pipeline.addLast("decode", clientMessageDecode);
                         /*解码消息*/
-                        pipeline.addLast("encode", clientMessageEncode);
+                        pipeline.addLast(
+                                "encode",
+                                new ClientMessageEncode(
+                                        config.isEnabledScheduledFlush(), config.getScheduledDelayMs(),
+                                        socketChannel, protoListenerFactory
+                                )
+                        );
 
                         if (config.isEnabledWebSocket()) {
 
@@ -129,7 +134,6 @@ public abstract class SocketClient {
                             pipeline.addBefore("device-handler", "websocket-aggregator", new WebSocketFrameAggregator(maxContentLength));
                             pipeline.addBefore("device-handler", "ProtocolHandler", new WebSocketClientProtocolHandler(handshaker));
                         }
-
                         addChanelHandler(socketChannel, pipeline);
                     }
                 });
@@ -197,7 +201,7 @@ public abstract class SocketClient {
 
     protected boolean reconnection() {
 
-        if (closed || !config.isEnableReconnection())
+        if (closed || !config.isEnabledReconnection())
             return false;
 
         long l = atomicLong.get();

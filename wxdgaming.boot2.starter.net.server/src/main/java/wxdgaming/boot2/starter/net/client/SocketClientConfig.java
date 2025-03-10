@@ -4,7 +4,6 @@ import com.alibaba.fastjson.annotation.JSONField;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.net.ssl.SslContextByJks;
@@ -37,7 +36,13 @@ public class SocketClientConfig extends ObjectBase {
     private String webSocketPrefix = "/ws";
     /** 断线重连，默认开启 */
     @JSONField(ordinal = 7)
-    private boolean enableReconnection = true;
+    private boolean enabledReconnection = true;
+    /** 是否需要特别调用flush */
+    @JSONField(ordinal = 8)
+    private boolean enabledScheduledFlush = false;
+    /** 是否需要特别调用flush, 调用频率单位 ms */
+    @JSONField(ordinal = 9)
+    private long scheduledDelayMs = 5;
     @JSONField(ordinal = 10)
     private boolean enabledSSL = true;
     @JSONField(ordinal = 11)
