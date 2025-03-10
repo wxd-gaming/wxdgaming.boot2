@@ -48,28 +48,28 @@ public abstract class SocketClient {
     protected volatile SessionGroup sessionGroup = new SessionGroup();
     protected volatile boolean started = false;
     protected volatile boolean closed = false;
-    protected WebSocketClientHandshaker handshaker;
     /** 包含的http head参数 */
     protected final HttpHeaders httpHeaders = new DefaultHttpHeaders();
 
     public SocketClient(SocketClientConfig config) {
         this.config = config;
-        if (config.isEnabledWebSocket()) {
-            String protocol = "ws";
-            if (config.isEnabledSSL()) {
-                protocol = "wss";
-            }
-            String url = protocol + "://" + getConfig().getHost() + ":" + getConfig().getPort() + this.getConfig().getWebSocketPrefix();
-            log.debug("{}", url);
-            handshaker = WebSocketClientHandshakerFactory.newHandshaker(
-                    URI.create(url),
-                    WebSocketVersion.V13,
-                    null,
-                    false,
-                    httpHeaders,
-                    (int) BytesUnit.Mb.toBytes(config.getMaxAggregatorLength())/*64 mb*/
-            );
+    }
+
+    public WebSocketClientHandshaker newHandshaker() {
+        String protocol = "ws";
+        if (config.isEnabledSSL()) {
+            protocol = "wss";
         }
+        String url = protocol + "://" + getConfig().getHost() + ":" + getConfig().getPort() + this.getConfig().getWebSocketPrefix();
+        log.debug("{}", url);
+        return WebSocketClientHandshakerFactory.newHandshaker(
+                URI.create(url),
+                WebSocketVersion.V13,
+                null,
+                false,
+                httpHeaders,
+                (int) BytesUnit.Mb.toBytes(config.getMaxAggregatorLength())/*64 mb*/
+        );
     }
 
     @Start
@@ -132,12 +132,14 @@ public abstract class SocketClient {
                             // ChunkedWriteHandler：向客户端发送HTML5文件,文件过大会将内存撑爆
                             pipeline.addBefore("device-handler", "http-chunked", new ChunkedWriteHandler());
                             pipeline.addBefore("device-handler", "websocket-aggregator", new WebSocketFrameAggregator(maxContentLength));
-                            pipeline.addBefore("device-handler", "ProtocolHandler", new WebSocketClientProtocolHandler(handshaker));
+                            pipeline.addBefore("device-handler", "ProtocolHandler", new WebSocketClientProtocolHandler(newHandshaker()));
                         }
                         addChanelHandler(socketChannel, pipeline);
                     }
                 });
-        connect();
+        for (int i = 0; i < config.getMaxConnectionCount(); i++) {
+            connect();
+        }
     }
 
     protected void addChanelHandler(SocketChannel socketChannel, ChannelPipeline pipeline) {}
@@ -155,7 +157,10 @@ public abstract class SocketClient {
             return;
         }
         ChannelFuture connect = connect(null);
-        connect.syncUninterruptibly();
+        try {
+            connect.sync();
+        } catch (InterruptedException e) {
+        }
     }
 
     public ChannelFuture connect(Consumer<SocketSession> consumer) {

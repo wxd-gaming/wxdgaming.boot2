@@ -3,7 +3,6 @@ package wxdgaming.game.test;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.RunApplication;
-import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.reflect.ReflectContext;
@@ -46,7 +45,7 @@ public class Main {
         //         TimeUnit.SECONDS
         // );
 
-        ExecutorUtil.getInstance().getDefaultExecutor().schedule(
+        ExecutorUtil.getInstance().getDefaultExecutor().scheduleAtFixedDelay(
                 () -> {
                     RpcService rpcService = runApplication.getInstance(RpcService.class);
                     SocketClient client = runApplication.getInstance(SocketClient.class);
@@ -69,8 +68,9 @@ public class Main {
                             });
                     socketSession.write("我是文本消息");
                 },
-                3,
-                TimeUnit.SECONDS
+                10000,
+                300,
+                TimeUnit.MILLISECONDS
         );
 
     }
