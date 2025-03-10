@@ -37,17 +37,19 @@ public class SocketSession {
     private final Channel channel;
     private boolean webSocket;
     private boolean ssl;
+    private final boolean enabledScheduledFlush;
     /** 每秒钟帧的最大数量 */
     private int maxFrameLength = -1;
     /** 帧最大字节数 */
     private long maxFrameBytes = -1;
     private final TickCount receiveMessageTick = new TickCount(1000);
 
-    public SocketSession(Type type, Channel channel, Boolean webSocket) {
+    public SocketSession(Type type, Channel channel, Boolean webSocket, boolean enabledScheduledFlush) {
         this.uid = ATOMIC_LONG.get();
         this.type = type;
         this.channel = channel;
         this.webSocket = Boolean.TRUE.equals(webSocket);
+        this.enabledScheduledFlush = enabledScheduledFlush;
         ChannelUtil.attr(this.channel, ChannelUtil.SOCKET_SESSION_KEY, this);
     }
 

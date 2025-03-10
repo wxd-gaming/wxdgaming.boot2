@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.cache.Cache;
+import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.format.HexId;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -50,11 +51,15 @@ public class RpcService {
     }
 
     public CompletableFuture<JSONObject> request(SocketSession socketSession, String cmd, Object params) {
-        return request(socketSession, cmd, params, false);
+        return request(socketSession, cmd, params, !socketSession.isEnabledScheduledFlush());
     }
 
     public CompletableFuture<JSONObject> request(SocketSession socketSession, String cmd, Object params, boolean immediate) {
         return request(socketSession, cmd, JSONObject.toJSONString(params), immediate);
+    }
+
+    public CompletableFuture<JSONObject> request(SocketSession socketSession, String cmd, String params) {
+        return request(socketSession, cmd, params, !socketSession.isEnabledScheduledFlush());
     }
 
     public CompletableFuture<JSONObject> request(SocketSession socketSession, String cmd, String params, boolean immediate) {
@@ -77,6 +82,14 @@ public class RpcService {
     }
 
     public void response(SocketSession socketSession, long rpcId, Object data) {
+        response(socketSession, rpcId, FastJsonUtil.toJson(data), !socketSession.isEnabledScheduledFlush());
+    }
+
+    public void response(SocketSession socketSession, long rpcId, Object data, boolean immediate) {
+        response(socketSession, rpcId, FastJsonUtil.toJson(data), immediate);
+    }
+
+    public void response(SocketSession socketSession, long rpcId, String data, boolean immediate) {
         ResRemote resRemote = new ResRemote();
         resRemote
                 .setUid(rpcId)
@@ -87,8 +100,10 @@ public class RpcService {
             resRemote.setGzip(1);
             resRemote.setParams(GzipUtil.gzip2String(resRemote.getParams()));
         }
-
-        socketSession.writeAndFlush(resRemote);
+        if (immediate)
+            socketSession.writeAndFlush(resRemote);
+        else
+            socketSession.write(resRemote);
     }
 
 }

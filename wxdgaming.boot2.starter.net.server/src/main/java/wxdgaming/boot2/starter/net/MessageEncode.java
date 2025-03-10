@@ -29,7 +29,7 @@ public abstract class MessageEncode extends ChannelOutboundHandlerAdapter {
 
     protected final ProtoListenerFactory protoListenerFactory;
     protected final AtomicInteger writeUpdate = new AtomicInteger(0);
-    protected long lastUpdateTime = 0;
+    protected int lastUpdateTime = 0;
 
     public MessageEncode(boolean scheduledFlush, long scheduledDelayMs, Channel channel, ProtoListenerFactory protoListenerFactory) {
         this.protoListenerFactory = protoListenerFactory;

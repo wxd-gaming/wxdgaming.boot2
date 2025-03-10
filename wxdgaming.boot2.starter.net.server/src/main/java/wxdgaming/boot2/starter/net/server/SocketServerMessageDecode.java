@@ -21,11 +21,11 @@ import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
  **/
 @Slf4j
 @ChannelHandler.Sharable
-public class ServerMessageDecode extends MessageDecode {
+public class SocketServerMessageDecode extends MessageDecode {
 
     final SocketServerConfig config;
 
-    public ServerMessageDecode(SocketServerConfig config, ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
+    public SocketServerMessageDecode(SocketServerConfig config, ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
         super(protoListenerFactory, httpListenerFactory);
         this.config = config;
     }
@@ -36,16 +36,6 @@ public class ServerMessageDecode extends MessageDecode {
 
     @Override public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
-        /*TODO 构造函数自动注册*/
-        SocketSession socketSession = new SocketSession(
-                SocketSession.Type.server,
-                ctx.channel(),
-                ChannelUtil.attr(ctx.channel(), ChannelUtil.WEB_SOCKET_SESSION_KEY)
-        );
-        if (config.getMaxFrameBytes() > 0) {
-            socketSession.setMaxFrameBytes(BytesUnit.Mb.toBytes(config.getMaxFrameBytes()));
-        }
-        socketSession.setMaxFrameLength(config.getMaxFrameLength());
     }
 
     @Override protected void actionWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) {

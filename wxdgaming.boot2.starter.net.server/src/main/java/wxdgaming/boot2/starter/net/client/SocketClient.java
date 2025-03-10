@@ -170,9 +170,9 @@ public abstract class SocketClient {
                         return;
                     }
                     Channel channel = future.channel();
-                    SocketSession socketSession = new SocketSession(SocketSession.Type.client, channel, false);
+                    SocketSession socketSession = new SocketSession(SocketSession.Type.client, channel, false, config.isEnabledScheduledFlush());
                     if (config.getMaxFrameBytes() > 0) {
-                        socketSession.setMaxFrameBytes(BytesUnit.Mb.toBytes(getConfig().getMaxFrameBytes()));
+                        socketSession.setMaxFrameBytes(BytesUnit.Kb.toBytes(getConfig().getMaxFrameBytes()));
                     }
 
                     socketSession.setMaxFrameLength(getConfig().getMaxFrameLength());

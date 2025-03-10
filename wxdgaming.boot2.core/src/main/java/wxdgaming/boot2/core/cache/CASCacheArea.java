@@ -67,7 +67,7 @@ class CASCacheArea<K, V> implements ICacheArea<K, V> {
                     K key = entryNext.getKey();
                     CacheHolder<K, V> holder = entryNext.getValue();
 
-                    if (heartTime > 0 && heartListener != null && holder.getLastHeartTime() < now) {
+                    if (heartListener != null && heartTime > 0 && holder.getLastHeartTime() < now) {
                         heartListener.accept(key, holder.getValue());
                         holder.setLastHeartTime(now + heartTime);
                     }

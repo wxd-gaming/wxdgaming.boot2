@@ -48,7 +48,7 @@ socket:
     host: 127.0.0.1
     port: 8080
     connectTimeout: 500                                       #创建链接的超时时间
-    enabledScheduledFlush: true                             # 开启定时器flush
+    enabledScheduledFlush: false                             # 开启定时器flush
     scheduledFlushMs: 10                                    #定时调用flush的频率单位是ms
     enabledWebSocket: true                                    #是否启用websocket
     webSocketPrefix: "/ws"                                    #websocket前缀

@@ -51,7 +51,7 @@ public class SocketServer {
     public void start(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
 
         SocketServerDeviceHandler socketServerDeviceHandler = new SocketServerDeviceHandler(config);
-        ServerMessageDecode serverMessageDecode = new ServerMessageDecode(config, protoListenerFactory, httpListenerFactory);
+        SocketServerMessageDecode socketServerMessageDecode = new SocketServerMessageDecode(config, protoListenerFactory, httpListenerFactory);
         SSLContext sslContext = config.sslContext();
 
         int writeBytes = (int) BytesUnit.Mb.toBytes(config.getWriteByteBufM());
@@ -93,7 +93,7 @@ public class SocketServer {
                             /*处理链接*/
                             pipeline.addLast("device-handler", socketServerDeviceHandler);
                             /*解码消息*/
-                            pipeline.addLast("decode", serverMessageDecode);
+                            pipeline.addLast("decode", socketServerMessageDecode);
                             /*解码消息*/
                             pipeline.addLast(
                                     "encode",

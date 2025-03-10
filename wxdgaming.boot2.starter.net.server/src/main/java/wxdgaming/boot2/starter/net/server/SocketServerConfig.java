@@ -49,8 +49,10 @@ public class SocketServerConfig extends ObjectBase {
     /** 路径 */
     @JSONField(ordinal = 12)
     private String sslPasswordPath = "";
+    /** 每一个消息最大字节数，单位是kb */
     @JSONField(ordinal = 20)
     private int maxFrameBytes = -1;
+    /** 每一秒钟接受消息的最大量 */
     @JSONField(ordinal = 21)
     private int maxFrameLength = -1;
     /** 完整消息一次最大传输，单位mb */

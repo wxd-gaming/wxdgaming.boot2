@@ -3,6 +3,7 @@ package wxdgaming.boot2.starter.net.server;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.ChannelUtil;
 import wxdgaming.boot2.starter.net.SocketDeviceHandler;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -33,9 +34,12 @@ public class SocketServerDeviceHandler extends SocketDeviceHandler {
         SocketSession socketSession = new SocketSession(
                 SocketSession.Type.server,
                 ctx.channel(),
-                ChannelUtil.attr(ctx.channel(), ChannelUtil.WEB_SOCKET_SESSION_KEY)
+                ChannelUtil.attr(ctx.channel(), ChannelUtil.WEB_SOCKET_SESSION_KEY),
+                socketServerConfig.isEnabledScheduledFlush()
         );
-        socketSession.setMaxFrameBytes(socketServerConfig.getMaxFrameBytes());
+        if (socketServerConfig.getMaxFrameBytes() >= 0) {
+            socketSession.setMaxFrameBytes(BytesUnit.Kb.toBytes(socketServerConfig.getMaxFrameBytes()));
+        }
         socketSession.setMaxFrameLength(socketServerConfig.getMaxFrameLength());
     }
 
