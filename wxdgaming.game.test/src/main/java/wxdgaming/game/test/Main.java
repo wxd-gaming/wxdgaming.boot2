@@ -17,6 +17,7 @@ import wxdgaming.boot2.starter.net.client.SocketClient;
 import wxdgaming.boot2.starter.net.module.inner.RpcService;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -32,18 +33,21 @@ public class Main {
                 Main.class
         );
 
-        ClassDirLoader classDirLoader = new ClassDirLoader("wxdgaming.game.test-script/target/classes");
-        ReflectContext reflectContext = ReflectContext.Builder.of(classDirLoader, "wxdgaming.game.test.script").build();
-        RunApplicationSub runApplicationSub = WxdApplication.createRunApplicationSub(reflectContext);
+        String classDir = "wxdgaming.game.test-script/target/classes";
+        if (new File(classDir).exists()) {
+            ClassDirLoader classDirLoader = new ClassDirLoader(classDir);
+            ReflectContext reflectContext = ReflectContext.Builder.of(classDirLoader, "wxdgaming.game.test.script").build();
+            RunApplicationSub runApplicationSub = WxdApplication.createRunApplicationSub(reflectContext);
 
-        // ExecutorUtil.getInstance().getDefaultExecutor().schedule(
-        //         () -> {
-        //             runApplicationSub.executeMethodWithAnnotated(Init.class);
-        //             log.info("热更新重载");
-        //         },
-        //         10,
-        //         TimeUnit.SECONDS
-        // );
+            // ExecutorUtil.getInstance().getDefaultExecutor().schedule(
+            //         () -> {
+            //             runApplicationSub.executeMethodWithAnnotated(Init.class);
+            //             log.info("热更新重载");
+            //         },
+            //         10,
+            //         TimeUnit.SECONDS
+            // );
+        }
 
         ExecutorUtil.getInstance().getDefaultExecutor().scheduleAtFixedDelay(
                 () -> {

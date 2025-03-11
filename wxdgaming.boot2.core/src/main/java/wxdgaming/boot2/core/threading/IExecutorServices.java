@@ -2,8 +2,8 @@ package wxdgaming.boot2.core.threading;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.util.GlobalUtil;
 
 import java.util.List;
 import java.util.concurrent.*;
@@ -21,10 +21,7 @@ public interface IExecutorServices extends Executor {
     int getMaxSize();
 
     /** 当前线程池触发警告队列长度 */
-    long getQueueCheckSize();
-
-    /** 当前线程池触发警告队列长度 */
-    IExecutorServices setQueueCheckSize(long queueCheckSize);
+    int getQueueCheckSize();
 
     /** 当前线程池队列是否为空 */
     boolean isQueueEmpty();
@@ -321,10 +318,10 @@ public interface IExecutorServices extends Executor {
 
     default void executeJob(String queueName, ExecutorServiceJob job) {
         if (isShutdown() && !isTerminated()) {
-            throw new RuntimeException("线程正在关闭 " + job);
+            throw new RuntimeException(getName() + " 线程正在关闭 " + job);
         }
         if (isTerminated()) {
-            throw new RuntimeException("线程已经关闭 " + job);
+            throw new RuntimeException(getName() + " 线程已经关闭 " + job);
         }
         job.queueName = queueName;
         /*TODO 定时器任务，需要重置一次*/
@@ -338,7 +335,7 @@ public interface IExecutorServices extends Executor {
             int queueSize = queueSize();
             if (queueSize > getQueueCheckSize()) {
                 RuntimeException throwable = new RuntimeException();
-                GlobalUtil.exception("任务剩余过多 主队列 size：" + queueSize, throwable);
+                GlobalUtil.exception(getName() + " 任务剩余过多 主队列 size：" + queueSize, throwable);
             }
         }
     }

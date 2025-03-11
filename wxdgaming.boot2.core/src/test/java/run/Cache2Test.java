@@ -20,8 +20,7 @@ public class Cache2Test {
 
     public static void main(String[] args) throws InterruptedException {
 
-        ExecutorUtil.getInstance().init(ExecutorConfig.INSTANCE);
-        ExecutorUtil.getInstance().getLogicExecutor().setQueueCheckSize(1000_0000);
+        ExecutorUtil.getInstance().init();
         LogbackUtil.refreshLoggerLevel(Level.INFO);
         t0();
         t0();

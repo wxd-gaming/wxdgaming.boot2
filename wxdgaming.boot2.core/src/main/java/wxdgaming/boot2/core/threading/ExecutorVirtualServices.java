@@ -28,7 +28,7 @@ public final class ExecutorVirtualServices implements Executor, IExecutorService
     /** 队列任务 */
     final ConcurrentHashMap<String, ExecutorQueue> executorQueueMap = new ConcurrentHashMap<>();
     /** 当队列执行数量剩余过多的预警 */
-    public long queueCheckSize = 5000;
+    final int queueCheckSize;
 
     /**
      * @param name     线程池名称
@@ -36,7 +36,7 @@ public final class ExecutorVirtualServices implements Executor, IExecutorService
      * @param coreSize 线程最大数量
      * @return
      */
-    ExecutorVirtualServices(String name, int coreSize, int maxSize) {
+    ExecutorVirtualServices(String name, int coreSize, int maxSize, int queueCheckSize) {
         if (!name.startsWith("vt-"))
             name = "vt-" + name;
         if (ExecutorUtil.getInstance().All_THREAD_LOCAL.containsKey(name)) {
@@ -49,6 +49,7 @@ public final class ExecutorVirtualServices implements Executor, IExecutorService
                 maxSize,
                 new LinkedBlockingQueue<>()
         );
+        this.queueCheckSize = queueCheckSize;
     }
 
     /** 线程池名字 */
@@ -94,13 +95,8 @@ public final class ExecutorVirtualServices implements Executor, IExecutorService
         return executors.isTerminated();
     }
 
-    @Override public long getQueueCheckSize() {
+    @Override public int getQueueCheckSize() {
         return this.queueCheckSize;
-    }
-
-    @Override public ExecutorVirtualServices setQueueCheckSize(long queueCheckSize) {
-        this.queueCheckSize = queueCheckSize;
-        return this;
     }
 
     @Override public ConcurrentHashMap<String, ExecutorQueue> getExecutorQueueMap() {

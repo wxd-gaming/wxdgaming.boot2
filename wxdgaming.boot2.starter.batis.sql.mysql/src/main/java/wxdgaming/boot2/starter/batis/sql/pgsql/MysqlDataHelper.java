@@ -10,6 +10,7 @@ import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryBuilder;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,49 +40,65 @@ public class MysqlDataHelper extends SqlDataHelper<MySqlDDLBuilder> {
         super.checkTable(databseTableMap, tableMapping, tableName, tableComment);
 
         /*TODO 处理索引*/
+
+        List<String> indexList = executeList(
+                "SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA =? AND TABLE_NAME = ?",
+                String.class,
+                getDbName(),
+                tableName
+        );
+
+        StringBuilder sb = new StringBuilder();
         LinkedHashMap<String, TableMapping.FieldMapping> columnMap = tableMapping.getColumns();
         for (TableMapping.FieldMapping fieldMapping : columnMap.values()) {
             if (fieldMapping.isIndex()) {
                 String keyName = tableName + "_" + fieldMapping.getColumnName();
                 /*pgsql 默认全小写*/
                 keyName = keyName.toLowerCase();
-                String checkIndexSql = """
-                        SELECT 1 AS 'EXISTS'
-                        FROM INFORMATION_SCHEMA.STATISTICS
-                        WHERE TABLE_SCHEMA = '%s'
-                        AND TABLE_NAME = '%s'
-                        AND INDEX_NAME = '%s'
-                        """.formatted(getDbName(), tableName, keyName);
-                Integer scalar = executeScalar(checkIndexSql, Integer.class);
-                if (scalar == null || scalar != 1) {
+                if (!indexList.contains(keyName)) {
                     String alterColumn = ddlBuilder.buildAlterColumnIndex(tableName, fieldMapping);
-                    executeUpdate(alterColumn);
+                    sb.append(alterColumn).append("\n");
                 }
             }
         }
+        executeUpdate(sb.toString());
     }
 
     @Override protected void createTable(TableMapping tableMapping, String tableName, String comment) {
         super.createTable(tableMapping, tableName, comment);
     }
 
-    public void addPartition(String tableName, String partitionExpr) {
-        String sql = """
+    /** 获取指定表的所有分区 */
+    public List<String> queryPartition(String tableName) {
+        return executeList("""
                 SELECT
-                1 AS 'EXISTS'
+                PARTITION_NAME
                 FROM
                 INFORMATION_SCHEMA.PARTITIONS
                 WHERE
                 TABLE_SCHEMA = '%s'
                 AND TABLE_NAME = '%s'
-                AND PARTITION_NAME = '%s'
-                """.formatted(getDbName(), tableName, tableName + "_" + partitionExpr);
-        Integer scalar = executeScalar(sql, Integer.class);
-        if (scalar == null || scalar != 1) {
-            String string = """
-                    ALTER TABLE %s ADD PARTITION (PARTITION %s_%s VALUES LESS THAN (%s))
-                    """.formatted(tableName, tableName, partitionExpr, partitionExpr);
+                """.formatted(getDbName(), tableName), String.class);
+    }
+
+    /** 对指定表添加分区信息 */
+    public void addPartition(String tableName, String partitionExpr) {
+        List<String> queryPartition = queryPartition(tableName);
+        addPartition(queryPartition, tableName, partitionExpr);
+    }
+
+    /** 对指定表添加分区信息 */
+    public void addPartition(List<String> partitionNames, String tableName, String partitionExpr) {
+        String partition_name = tableName + "_" + partitionExpr;
+        if (!partitionNames.contains(partition_name)) {
+            String string = buildPartition(tableName, partitionExpr);
             executeUpdate(string);
         }
     }
+
+    public String buildPartition(String tableName, String partitionExpr) {
+        return "ALTER TABLE %s ADD PARTITION (PARTITION %s_%s VALUES LESS THAN (%s));"
+                .formatted(tableName, tableName, partitionExpr, partitionExpr);
+    }
+
 }

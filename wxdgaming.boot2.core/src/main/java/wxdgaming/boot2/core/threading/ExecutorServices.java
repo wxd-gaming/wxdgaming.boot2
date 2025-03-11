@@ -23,9 +23,9 @@ public final class ExecutorServices implements IExecutorServices {
     /** 队列任务 */
     final ConcurrentHashMap<String, ExecutorQueue> executorQueueMap = new ConcurrentHashMap<>();
     /** 当队列执行数量剩余过多的预警 */
-    long queueCheckSize = 5000;
+    final int queueCheckSize;
 
-    ExecutorServices(String name, boolean daemon, int coreSize, int maxSize) {
+    ExecutorServices(String name, boolean daemon, int coreSize, int maxSize, int queueCheckSize) {
 
         if (ExecutorUtil.getInstance().All_THREAD_LOCAL.containsKey(name)) {
             throw new RuntimeException("已经存在线程池：" + name);
@@ -41,15 +41,11 @@ public final class ExecutorServices implements IExecutorServices {
                 new LinkedBlockingQueue<>()
         );
 
+        this.queueCheckSize = queueCheckSize;
     }
 
     @Override public BlockingQueue<Runnable> threadPoolQueue() {
         return this.threadPoolExecutor.getQueue();
-    }
-
-    public ExecutorServices setQueueCheckSize(long queueCheckSize) {
-        this.queueCheckSize = queueCheckSize;
-        return this;
     }
 
     /** 线程池名字 */

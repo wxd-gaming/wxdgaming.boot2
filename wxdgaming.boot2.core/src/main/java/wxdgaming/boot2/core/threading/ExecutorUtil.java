@@ -4,6 +4,7 @@ import ch.qos.logback.core.LogbackUtil;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.function.ConsumerE0;
 import wxdgaming.boot2.core.lang.Tick;
@@ -67,14 +68,27 @@ public final class ExecutorUtil implements Serializable {
     /** 属于后台线程池, 虚拟线程池，一旦收到停服新号，线程立马关闭了 */
     private IExecutorServices virtualExecutor = null;
 
-    public void init(ExecutorConfig config) {
+    public void init() {
         Logger logger = LogbackUtil.logger();
+        ExecutorConfig defaultConfig = BootConfig.getIns().defaultConfig();
         if (logger.isDebugEnabled()) {
-            logger.debug("ExecutorUtil init config: {}", config.toJsonString());
+            logger.debug("ExecutorUtil init default config: {}", defaultConfig.toJsonString());
         }
-        defaultExecutor = newExecutorServices("default-executor", config.getDefaultCoreSize(), config.getDefaultMaxSize());
-        logicExecutor = newExecutorServices("logic-executor", config.getLogicCoreSize(), config.getLogicMaxSize());
-        virtualExecutor = newExecutorVirtualServices("virtual-executor", config.getVirtualCoreSize(), config.getVirtualMaxSize());
+        defaultExecutor = newExecutorServices("default-executor", defaultConfig.getCoreSize(), defaultConfig.getMaxSize(), defaultConfig.getMaxQueueSize());
+        ExecutorConfig logicConfig = BootConfig.getIns().logicConfig();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("ExecutorUtil init logic config: {}", defaultConfig.toJsonString());
+        }
+
+        logicExecutor = newExecutorServices("logic-executor", logicConfig.getCoreSize(), logicConfig.getMaxSize(), logicConfig.getMaxQueueSize());
+        ExecutorConfig virtualConfig = BootConfig.getIns().virtualConfig();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("ExecutorUtil init virtual config: {}", defaultConfig.toJsonString());
+        }
+
+        virtualExecutor = newExecutorVirtualServices("virtual-executor", virtualConfig.getCoreSize(), virtualConfig.getMaxSize(), virtualConfig.getMaxQueueSize());
 
         TIMER_THREAD.start();
         GUARD_THREAD.start();
@@ -98,27 +112,7 @@ public final class ExecutorUtil implements Serializable {
     }
 
     public ExecutorServices newExecutorServices(String name, boolean daemon) {
-        return newExecutorServices(name, daemon, 1, 1);
-    }
-
-    /**
-     * 默认队列最大长度 Integer.MAX_VALUE
-     *
-     * @param name     线程池名称
-     * @param coreSize 线程最大数量
-     * @return
-     */
-    public ExecutorServices newExecutorServices(String name, int coreSize) {
-        return newExecutorServices(name, false, coreSize);
-    }
-
-    /**
-     * @param name     线程池名称
-     * @param coreSize 线程最大数量
-     * @return
-     */
-    public ExecutorServices newExecutorServices(String name, boolean daemon, int coreSize) {
-        return newExecutorServices(name, daemon, coreSize, coreSize);
+        return newExecutorServices(name, daemon, 1, 1, 5000);
     }
 
     /**
@@ -129,8 +123,8 @@ public final class ExecutorUtil implements Serializable {
      * @param maxSize  线程最大数量
      * @return
      */
-    public ExecutorServices newExecutorServices(String name, int coreSize, int maxSize) {
-        return newExecutorServices(name, false, coreSize, maxSize);
+    public ExecutorServices newExecutorServices(String name, int coreSize, int maxSize, int queueCheckSize) {
+        return newExecutorServices(name, false, coreSize, maxSize, queueCheckSize);
     }
 
     /**
@@ -140,8 +134,8 @@ public final class ExecutorUtil implements Serializable {
      * @param maxSize  线程最大数量
      * @return
      */
-    public ExecutorServices newExecutorServices(String name, boolean daemon, int coreSize, int maxSize) {
-        return new ExecutorServices(name, daemon, coreSize, maxSize);
+    public ExecutorServices newExecutorServices(String name, boolean daemon, int coreSize, int maxSize, int queueCheckSize) {
+        return new ExecutorServices(name, daemon, coreSize, maxSize, queueCheckSize);
     }
 
 
@@ -155,23 +149,8 @@ public final class ExecutorUtil implements Serializable {
      * @param name 线程池名称
      * @return
      */
-    public ExecutorVirtualServices newExecutorVirtualServices(String name) {
-        return newExecutorVirtualServices(name, 1);
-    }
-
-    /**
-     * 虚拟线程池核心数量和最大数量相等，
-     * <p>
-     * 禁止使用 synchronized 同步锁
-     * <p>
-     * 直接线程池，每一个任务都会new Virtual Thread
-     *
-     * @param name     线程池名称
-     * @param coreSize 线程核心数量
-     * @return
-     */
-    public ExecutorVirtualServices newExecutorVirtualServices(String name, int coreSize) {
-        return newExecutorVirtualServices(name, coreSize, coreSize);
+    public ExecutorVirtualServices newExecutorVirtualServices(String name, int queueCheckSize) {
+        return newExecutorVirtualServices(name, 1, 1, queueCheckSize);
     }
 
     /**
@@ -186,8 +165,8 @@ public final class ExecutorUtil implements Serializable {
      * @param coreSize 线程最大数量
      * @return
      */
-    public ExecutorVirtualServices newExecutorVirtualServices(String name, int coreSize, int maxSize) {
-        return new ExecutorVirtualServices(name, coreSize, maxSize);
+    public ExecutorVirtualServices newExecutorVirtualServices(String name, int coreSize, int maxSize, int queueCheckSize) {
+        return new ExecutorVirtualServices(name, coreSize, maxSize, queueCheckSize);
     }
 
     /** 检测当前线程是否是同一线程 */

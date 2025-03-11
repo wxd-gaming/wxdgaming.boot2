@@ -317,7 +317,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
                 } else {
                     results.add(FastJsonUtil.parse(String.valueOf(object), cls));
                 }
-                return false;
+                return true;
             } catch (SQLException e) {
                 throw Throw.of(getDbName() + " " + sql, e);
             }

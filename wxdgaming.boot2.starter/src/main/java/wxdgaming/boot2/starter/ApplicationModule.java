@@ -1,10 +1,8 @@
 package wxdgaming.boot2.starter;
 
 import wxdgaming.boot2.core.BaseModule;
-import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.reflect.ReflectContext;
-import wxdgaming.boot2.core.threading.ExecutorConfig;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
 
 /**
@@ -21,8 +19,7 @@ class ApplicationModule extends BaseModule {
     }
 
     @Override protected void bind() throws Throwable {
-        ExecutorConfig executorConfig = BootConfig.getIns().getExecutorConfig();
-        ExecutorUtil.getInstance().init(executorConfig);
+        ExecutorUtil.getInstance().init();
         bindInstance(ExecutorUtil.getInstance());
     }
 

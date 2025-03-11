@@ -1,14 +1,22 @@
 debug: true
 sid: 1
 executor:
-  defaultCoreSize: 2                   #默认线程池的核心线程数
-  defaultMaxSize: 4                    #默认线程池的最大线程数
-  logicCoreSize: 10                    #逻辑线程池
-  logicMaxSize: 32                     #逻辑线程池
-  virtualCoreSize: 100                 #虚拟线程池
-  virtualMaxSize: 200                  #虚拟线程池
-scheduled:
-  coreSize: 1
+  default:
+    coreSize: 2                        #默认线程池的核心线程数
+    maxSize: 4                         #默认线程池的最大线程数
+    maxQueueSize: 10000                #队列超过就会打印异常
+  logic:
+    coreSize: 10                       #逻辑线程池
+    maxSize: 32                        #逻辑线程池
+    maxQueueSize: 50000                #队列超过就会打印异常
+  virtual:
+    coreSize: 100                      #虚拟线程池
+    maxSize: 200                       #虚拟线程池
+    maxQueueSize: 1500000              #队列超过就会打印异常
+  scheduled:
+    coreSize: 1
+    maxSize: 2
+    maxQueueSize: 50000
 http:
   client:
     core: 20                            #连接池的核心连接数

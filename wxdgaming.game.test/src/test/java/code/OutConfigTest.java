@@ -7,6 +7,7 @@ import com.mysql.cj.jdbc.Driver;
 import org.junit.Test;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.threading.ExecutorConfig;
 import wxdgaming.boot2.core.util.YamlUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
@@ -14,7 +15,6 @@ import wxdgaming.boot2.starter.net.client.SocketClientConfig;
 import wxdgaming.boot2.starter.net.httpclient.HttpClientConfig;
 import wxdgaming.boot2.starter.net.server.SocketServerConfig;
 import wxdgaming.boot2.starter.net.server.http.HttpServerConfig;
-import wxdgaming.boot2.starter.scheduled.ScheduledConfig;
 
 /**
  * @author: wxd-gaming(無心道, 15388152619)
@@ -27,8 +27,13 @@ public class OutConfigTest {
         JSONObject config = BootConfig.getIns().getConfig();
         config.put("debug", true);
         config.put("sid", 1);
-        config.put("executor", FastJsonUtil.parse(ExecutorConfig.INSTANCE.toJsonString()));
-        config.put("scheduled", FastJsonUtil.parse(ScheduledConfig.INSTANCE.toJsonString()));
+        config.put("executor",
+                MapOf.newJSONObject()
+                        .fluentPut("default", FastJsonUtil.parse(ExecutorConfig.DEFAULT_INSTANCE.toJsonString()))
+                        .fluentPut("logic", FastJsonUtil.parse(ExecutorConfig.LOGIC_INSTANCE.toJsonString()))
+                        .fluentPut("virtual", FastJsonUtil.parse(ExecutorConfig.VIRTUAL_INSTANCE.toJsonString()))
+                        .fluentPut("scheduled", FastJsonUtil.parse(ExecutorConfig.VIRTUAL_INSTANCE.toJsonString()))
+        );
         config.put("http", FastJsonUtil.parse(
                         new JSONObject()
                                 .fluentPut("client", HttpClientConfig.DEFAULT)

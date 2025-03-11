@@ -14,39 +14,24 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 @Getter
 public class ExecutorConfig extends ObjectBase {
 
-    public static final ExecutorConfig INSTANCE = new ExecutorConfig(
-            2, 4,
-            10, 32,
-            100, 200
-    );
+    public static final ExecutorConfig DEFAULT_INSTANCE = new ExecutorConfig(2, 4, 5000);
+    public static final ExecutorConfig LOGIC_INSTANCE = new ExecutorConfig(2, 4, 5000);
+    public static final ExecutorConfig VIRTUAL_INSTANCE = new ExecutorConfig(100, 200, 5000);
+
     @JSONField(ordinal = 1)
-    private final int defaultCoreSize;
+    private final int coreSize;
     @JSONField(ordinal = 2)
-    private final int defaultMaxSize;
-
-    @JSONField(ordinal = 10)
-    private final int logicCoreSize;
-    @JSONField(ordinal = 12)
-    private final int logicMaxSize;
-
-    @JSONField(ordinal = 20)
-    private final int virtualCoreSize;
-    @JSONField(ordinal = 21)
-    private final int virtualMaxSize;
+    private final int maxSize;
+    @JSONField(ordinal = 3)
+    private final int maxQueueSize;
 
     @JSONCreator
     public ExecutorConfig(
-            @JSONField(name = "defaultCoreSize") int defaultCoreSize,
-            @JSONField(name = "defaultMaxSize") int defaultMaxSize,
-            @JSONField(name = "logicCoreSize") int logicCoreSize,
-            @JSONField(name = "logicMaxSize") int logicMaxSize,
-            @JSONField(name = "virtualCoreSize") int virtualCoreSize,
-            @JSONField(name = "virtualMaxSize") int virtualMaxSize) {
-        this.defaultCoreSize = defaultCoreSize;
-        this.defaultMaxSize = defaultMaxSize;
-        this.logicCoreSize = logicCoreSize;
-        this.logicMaxSize = logicMaxSize;
-        this.virtualCoreSize = virtualCoreSize;
-        this.virtualMaxSize = virtualMaxSize;
+            @JSONField(name = "coreSize", defaultValue = "2") int coreSize,
+            @JSONField(name = "maxSize", defaultValue = "4") int maxSize,
+            @JSONField(name = "maxQueueSize", defaultValue = "5000") int maxQueueSize) {
+        this.coreSize = coreSize;
+        this.maxSize = maxSize;
+        this.maxQueueSize = maxQueueSize;
     }
 }

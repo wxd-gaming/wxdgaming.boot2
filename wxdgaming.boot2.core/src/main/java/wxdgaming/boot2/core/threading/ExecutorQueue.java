@@ -14,7 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @version: 2023-11-10 22:48
  **/
 @Slf4j
-class ExecutorQueue implements Runnable {
+public class ExecutorQueue implements Runnable {
 
     private final ReentrantLock lock = new ReentrantLock();
     private final IExecutorServices iExecutorServices;

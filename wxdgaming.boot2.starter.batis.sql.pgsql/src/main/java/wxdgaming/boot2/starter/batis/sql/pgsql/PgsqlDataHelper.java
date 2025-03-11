@@ -102,25 +102,33 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
     @Override public void checkTable(Map<String, LinkedHashMap<String, JSONObject>> databseTableMap, TableMapping tableMapping, String tableName, String tableComment) {
         super.checkTable(databseTableMap, tableMapping, tableName, tableComment);
 
+        List<String> indexList = executeList("SELECT indexname FROM pg_indexes WHERE tablename=?", String.class, tableName);
+
         /*TODO 处理索引*/
         LinkedHashMap<String, TableMapping.FieldMapping> columnMap = tableMapping.getColumns();
+        StringBuilder sb = new StringBuilder();
         for (TableMapping.FieldMapping fieldMapping : columnMap.values()) {
             if (fieldMapping.isIndex()) {
                 String keyName = tableName + "_" + fieldMapping.getColumnName();
                 /*pgsql 默认全小写*/
                 keyName = keyName.toLowerCase();
-                String checkIndexSql = "SELECT 1 as exists FROM pg_indexes WHERE tablename = '%s' AND indexname = '%s';".formatted(tableName, keyName);
-                Integer scalar = executeScalar(checkIndexSql, Integer.class);
-                if (scalar == null || scalar != 1) {
+                if (!indexList.contains(keyName)) {
                     String alterColumn = ddlBuilder.buildAlterColumnIndex(tableName, fieldMapping);
-                    executeUpdate(alterColumn);
+                    sb.append(alterColumn).append("\n");
                 }
             }
         }
-
+        if (!sb.isEmpty()) {
+            executeUpdate(sb.toString());
+        }
+        sb.setLength(0);
+        /*TODO 处理字段的备注信息*/
         tableMapping.getColumns().values().forEach(fieldMapping -> {
-            updateColumnComment(tableName, fieldMapping);
+            sb.append(buildColumnComment(tableName, fieldMapping)).append("\n");
         });
+        if (!sb.isEmpty()) {
+            executeUpdate(sb.toString());
+        }
     }
 
     @Override protected void createTable(TableMapping tableMapping, String tableName, String comment) {
@@ -165,6 +173,12 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
         dbTableMap.put(partition_table_name, partition_table_name);
     }
 
+    public String buildPartition(String tableName, String from, String to) {
+        String partition_table_name = tableName + "_" + from;
+        return "CREATE TABLE \"%s\" PARTITION OF \"%s\" FOR VALUES FROM (%s) TO (%s);"
+                .formatted(partition_table_name, tableName, from, to);
+    }
+
     @Override protected void addColumn(String tableName, TableMapping.FieldMapping fieldMapping) {
         String sql = "ALTER TABLE \"%s\" ADD COLUMN \"%s\" %s;"
                 .formatted(
@@ -194,13 +208,17 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
     }
 
     protected void updateColumnComment(String tableName, TableMapping.FieldMapping fieldMapping) {
-        String sql = "COMMENT ON COLUMN \"%s\".\"%s\" IS '%s';"
+        String columnComment = buildColumnComment(tableName, fieldMapping);
+        executeUpdate(columnComment);
+    }
+
+    protected String buildColumnComment(String tableName, TableMapping.FieldMapping fieldMapping) {
+        return "COMMENT ON COLUMN \"%s\".\"%s\" IS '%s';"
                 .formatted(
                         tableName,
                         fieldMapping.getColumnName(),
                         fieldMapping.getComment()
                 );
-        executeUpdate(sql);
     }
 
 }

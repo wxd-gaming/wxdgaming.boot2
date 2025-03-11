@@ -37,7 +37,6 @@ public class BootConfig {
         } else {
             config = YamlUtil.loadYaml(new ByteArrayInputStream(inputStream.getRight()));
         }
-
     }
 
     private JSONObject config = new JSONObject(true);
@@ -87,8 +86,16 @@ public class BootConfig {
         return sname;
     }
 
-    public ExecutorConfig getExecutorConfig() {
-        return getObject("executor", ExecutorConfig.class, ExecutorConfig.INSTANCE);
+    public ExecutorConfig defaultConfig() {
+        return getNestedValue("executor.default", ExecutorConfig.class, ExecutorConfig.DEFAULT_INSTANCE);
+    }
+
+    public ExecutorConfig logicConfig() {
+        return getNestedValue("executor.logic", ExecutorConfig.class, ExecutorConfig.LOGIC_INSTANCE);
+    }
+
+    public ExecutorConfig virtualConfig() {
+        return getNestedValue("executor.virtual", ExecutorConfig.class, ExecutorConfig.VIRTUAL_INSTANCE);
     }
 
     public int getIntValue(String key) {

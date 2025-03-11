@@ -16,8 +16,8 @@ public class ThreadPoolExecutorsTest {
 
     @Test
     public void testClose() {
-        ExecutorServices executorServices = ExecutorUtil.getInstance().newExecutorServices("scheduled-executor", 1, 1);
-        executorServices.scheduleAtFixedDelay(()->{}, 1,1, TimeUnit.SECONDS);
+        ExecutorServices executorServices = ExecutorUtil.getInstance().newExecutorServices("scheduled-executor", 1, 1, 1000);
+        executorServices.scheduleAtFixedDelay(() -> {}, 1, 1, TimeUnit.SECONDS);
         executorServices.shutdown();
     }
 

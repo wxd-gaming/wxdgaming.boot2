@@ -7,10 +7,7 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.shutdown;
-import wxdgaming.boot2.core.threading.Event;
-import wxdgaming.boot2.core.threading.ExecutorUtil;
-import wxdgaming.boot2.core.threading.IExecutorServices;
-import wxdgaming.boot2.core.threading.Job;
+import wxdgaming.boot2.core.threading.*;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 
@@ -33,11 +30,11 @@ public class ScheduledService {
     /*                          类名字                  方法名    实例 */
     protected List<ScheduledInfo> jobList = new ArrayList<>();
 
-    protected final ScheduledConfig config;
+    protected final ExecutorConfig config;
     protected IExecutorServices defaultExecutor;
 
-    public ScheduledService(ScheduledConfig config) {
-        defaultExecutor = ExecutorUtil.getInstance().newExecutorServices("scheduled-executor", config.getCoreSize(), config.getCoreSize());
+    public ScheduledService(ExecutorConfig config) {
+        defaultExecutor = ExecutorUtil.getInstance().newExecutorServices("scheduled-executor", config.getCoreSize(), config.getCoreSize(), config.getMaxQueueSize());
         this.config = config;
     }
 
