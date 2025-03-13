@@ -22,12 +22,19 @@ import java.util.Optional;
 @Accessors(chain = true)
 public class TableData {
 
+    /** 对应的excel文件 */
     private final String filePath;
+    /** 文件名 */
     private final String fileName;
+    /** 标签 */
     private final String sheetName;
+    /** 表名字 */
     private final String tableName;
+    /** 表注释 */
     private final String tableComment;
+    /** 表头 */
     Map<Integer, CellInfo> cellInfo4IndexMap;
+    /** 行数据 */
     Map<Object, RowData> rows;
 
     public TableData(String filePath, String fileName,

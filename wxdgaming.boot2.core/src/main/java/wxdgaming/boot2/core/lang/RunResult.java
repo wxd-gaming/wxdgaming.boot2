@@ -12,6 +12,10 @@ import java.util.Map;
  * @version: 2025-02-15 10:49
  **/
 public class RunResult extends JSONObject {
+
+    /** 不可变更的 */
+    public static final RunResult OK = new RunResult(Map.copyOf(ok()));
+
     public static RunResult parse(String json) {
         return FastJsonUtil.parse(json, RunResult.class);
     }
@@ -30,6 +34,10 @@ public class RunResult extends JSONObject {
 
     public RunResult() {
         super(true);
+    }
+
+    public RunResult(Map<String, Object> map) {
+        super(map);
     }
 
     public int code() {
@@ -66,6 +74,7 @@ public class RunResult extends JSONObject {
     public <T> T getObject(String key, Class<T> clazz, Object defaultValue) {
         return FastJsonUtil.getObject(this, key, clazz, defaultValue);
     }
+
     /** 泛型方法：通过路由获取嵌套的 JSON 数据并转换为指定类型 */
     public <T> T getNestedValue(String path, Class<T> clazz) {
         return FastJsonUtil.getNestedValue(this, path, clazz, null);

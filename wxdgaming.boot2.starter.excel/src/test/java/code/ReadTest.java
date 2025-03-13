@@ -26,7 +26,6 @@ public class ReadTest {
         excelReader.outJsonFile("target/out/json");
         excelReader.getTableInfoMap().values().forEach(tableInfo -> {
             System.out.println(tableInfo.showData());
-            Object shopItem = tableInfo.getObject(2, "shop_item");
             System.out.println(tableInfo.getString(2, "shop_item"));
             System.out.println(Arrays.toString(tableInfo.getIntArray(2, "price")));
 
