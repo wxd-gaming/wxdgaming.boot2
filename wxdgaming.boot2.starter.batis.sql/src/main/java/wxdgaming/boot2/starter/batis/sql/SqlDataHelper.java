@@ -272,8 +272,8 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
             }
             if (sqlConfig.isDebug()) {
                 log.info(
-                        "\nexecuteUpdate sql: \n{}",
-                        statement.toString()
+                        "\n{} executeUpdate sql: \n{}",
+                        getDbName(), statement.toString()
                 );
             }
             int i = statement.executeUpdate();
@@ -398,8 +398,8 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
 
             if (sqlConfig.isDebug()) {
                 log.info(
-                        "\nquery sql: \n{}",
-                        statement.toString()
+                        "\n {} query sql: \n{}",
+                        getDbName(), statement.toString()
                 );
             }
 
