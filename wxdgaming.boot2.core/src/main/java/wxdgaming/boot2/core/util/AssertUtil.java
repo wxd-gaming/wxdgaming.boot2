@@ -102,7 +102,7 @@ public class AssertUtil {
     /** null empty */
     public static void assertNullEmpty(Object source, String message) {
         if (source == null
-            || (source instanceof String str && (str.isEmpty() || str.isBlank()))
+            || (source instanceof String str && str.isBlank())
             || (source instanceof Collection && ((Collection<?>) source).isEmpty())) {
             throw assertException(message);
         }

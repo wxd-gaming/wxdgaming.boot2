@@ -3,6 +3,7 @@ package wxdgaming.boot2.core.threading;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.core.util.GlobalUtil;
 
 import java.util.List;
@@ -317,12 +318,9 @@ public interface IExecutorServices extends Executor {
     }
 
     default void executeJob(String queueName, ExecutorServiceJob job) {
-        if (isShutdown() && !isTerminated()) {
-            throw new RuntimeException(getName() + " 线程正在关闭 " + job);
-        }
-        if (isTerminated()) {
-            throw new RuntimeException(getName() + " 线程已经关闭 " + job);
-        }
+        AssertUtil.assertTrue(!isTerminated(), getName() + " 线程已经关闭 " + job);
+        AssertUtil.assertTrue(!isShutdown(), getName() + " 线程正在关闭 " + job);
+
         job.queueName = queueName;
         /*TODO 定时器任务，需要重置一次*/
         job.initTaskTime = System.nanoTime();
