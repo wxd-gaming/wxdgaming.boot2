@@ -121,6 +121,17 @@ public class MyClock {
         return time.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
+    /** yyyyMMdd */
+    public static int dayInt() {
+        LocalDateTime localDateTime = LocalDateTime.now();
+        return dayInt(localDateTime);
+    }
+
+    /** yyyyMMdd */
+    public static int dayInt(LocalDateTime localDateTime) {
+        return (localDateTime.getYear() * 10000 + localDateTime.getMonthValue() * 100 + localDateTime.getDayOfMonth());
+    }
+
     public static LocalDate localDate() {
         return localDate(millis());
     }

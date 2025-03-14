@@ -27,9 +27,6 @@ http:
     connectionRequestTimeout: 1000      #从连接池获取连接超时
     keepAliveTimeout: 30000             #连接有效时间
     readTimeout: 3000                   #读取超时时间
-  server:
-    showRequest: false
-    showResponse: false
 socket:
   server:
     debug: false
@@ -51,6 +48,9 @@ socket:
     readTimeout: 0
     recvByteBufM: 12                                          #接收缓冲区大小 单位MB
     writeByteBufM: 12                                         #发送缓冲区大小 单位MB
+    http:
+      showRequest: true
+      showResponse: true
   client:
     debug: false
     host: 127.0.0.1

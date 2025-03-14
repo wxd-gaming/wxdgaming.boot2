@@ -6,7 +6,6 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.mysql.cj.jdbc.Driver;
 import org.junit.Test;
 import wxdgaming.boot2.core.BootConfig;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.threading.ExecutorConfig;
 import wxdgaming.boot2.core.util.YamlUtil;
@@ -29,23 +28,25 @@ public class OutConfigTest {
         config.put("sid", 1);
         config.put("executor",
                 MapOf.newJSONObject()
-                        .fluentPut("default", FastJsonUtil.parse(ExecutorConfig.DEFAULT_INSTANCE.toJsonString()))
-                        .fluentPut("logic", FastJsonUtil.parse(ExecutorConfig.LOGIC_INSTANCE.toJsonString()))
-                        .fluentPut("virtual", FastJsonUtil.parse(ExecutorConfig.VIRTUAL_INSTANCE.toJsonString()))
-                        .fluentPut("scheduled", FastJsonUtil.parse(ExecutorConfig.VIRTUAL_INSTANCE.toJsonString()))
+                        .fluentPut("default", ExecutorConfig.DEFAULT_INSTANCE.toJSONObject())
+                        .fluentPut("logic", ExecutorConfig.LOGIC_INSTANCE.toJSONObject())
+                        .fluentPut("virtual", ExecutorConfig.VIRTUAL_INSTANCE.toJSONObject())
+                        .fluentPut("scheduled", ExecutorConfig.VIRTUAL_INSTANCE.toJSONObject())
         );
-        config.put("http", FastJsonUtil.parse(
-                        new JSONObject()
-                                .fluentPut("client", HttpClientConfig.DEFAULT)
-                                .fluentPut("server", HttpServerConfig.INSTANCE)
-                                .toString()
-                )
+        config.put("http",
+                MapOf.newJSONObject()
+                        .fluentPut("client", HttpClientConfig.DEFAULT.toJSONObject())
+
         );
         config.put(
                 "socket",
                 new JSONObject()
-                        .fluentPut("server", FastJsonUtil.parse(new SocketServerConfig().toJsonString()))
-                        .fluentPut("client", FastJsonUtil.parse(new SocketClientConfig().toJsonString()))
+                        .fluentPut(
+                                "server",
+                                new SocketServerConfig().toJSONObject()
+                                        .fluentPut("http", HttpServerConfig.INSTANCE.toJSONObject())
+                        )
+                        .fluentPut("client", new SocketClientConfig().toJSONObject())
         );
         JSONObject db = new JSONObject();
         config.put("db", db);
@@ -56,8 +57,8 @@ public class OutConfigTest {
             sqlConfig.setUrl("jdbc:postgresql://192.168.137.10:5432/test2");
             sqlConfig.setUsername("postgres");
             sqlConfig.setPassword("test");
-            db.put("pgsql", FastJsonUtil.parse(sqlConfig.toString()));
-            db.put("pgsql-second", FastJsonUtil.parse(sqlConfig.toString()));
+            db.put("pgsql", sqlConfig.toJSONObject());
+            db.put("pgsql-second", sqlConfig.toJSONObject());
         }
         {
             SqlConfig sqlConfig = new SqlConfig();
@@ -66,8 +67,8 @@ public class OutConfigTest {
             sqlConfig.setUsername("root");
             sqlConfig.setPassword("test");
             sqlConfig.setDriverClassName(Driver.class.getName());
-            db.put("mysql", FastJsonUtil.parse(sqlConfig.toString()));
-            db.put("mysql-second", FastJsonUtil.parse(sqlConfig.toString()));
+            db.put("mysql", sqlConfig.toJSONObject());
+            db.put("mysql-second", sqlConfig.toJSONObject());
 
         }
         String jsonFmt = JSON.toJSONString(

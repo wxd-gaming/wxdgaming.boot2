@@ -71,7 +71,8 @@ public class DataRepository {
     }
 
     public void reload(Class<?> dataTableClass) {
-        dataTableMap.get(dataTableClass).loadJson(jsonPath);
+        DataTable<?> dataTable = buildDataTable(dataTableClass);
+        dataTableMap.put(dataTableClass, dataTable);
     }
 
     DataTable<?> buildDataTable(Class<?> dataTableClass) {

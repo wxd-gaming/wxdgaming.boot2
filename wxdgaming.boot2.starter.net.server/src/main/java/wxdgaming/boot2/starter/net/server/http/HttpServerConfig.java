@@ -3,6 +3,7 @@ package wxdgaming.boot2.starter.net.server.http;
 import com.alibaba.fastjson.annotation.JSONCreator;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
+import wxdgaming.boot2.core.lang.ObjectBase;
 
 /**
  * 配置
@@ -11,7 +12,7 @@ import lombok.Getter;
  * @version: 2025-02-19 17:05
  **/
 @Getter
-public class HttpServerConfig {
+public class HttpServerConfig extends ObjectBase {
 
     public static final HttpServerConfig INSTANCE = new HttpServerConfig(false, false);
 
