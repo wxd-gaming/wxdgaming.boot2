@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script charset="utf-8" type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script charset="utf-8" type="text/javascript" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/Chart.js/3.7.1/chart.js"></script>
+    <title>图表测试</title>
+    <style>
+        div {display: block;width: 80%;}
+
+        canvas {
+            display: inline-block;
+            padding: 0;margin: 0;box-sizing: border-box;
+        }
+    </style>
+    <script>
+
+        const bgs = ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)',
+            'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)'];
+
+        function newChartLine(ctx, config) {
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'],
+                    datasets: [{
+                        label: '# 票数',
+                        data: config,
+                        backgroundColor: bgs,
+                        borderColor: bgs,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true, // 启用响应式布局
+                    maintainAspectRatio: false, // 禁用保持宽高比
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function newChartBar(ctx, config) {
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['18'],
+                    datasets: [{
+                        label: '# 票数',
+                        data: config,
+                        backgroundColor: bgs,
+                        borderColor: bgs,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true, // 启用响应式布局
+                    maintainAspectRatio: false, // 禁用保持宽高比
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        $(() => {
+            var config = [800];
+            newChartLine($('#myChart'), config);
+            newChartBar($('#myChart2'), config);
+        });
+    </script>
+</head>
+<body>
+<div>
+    <canvas id="myChart" height="140"></canvas>
+</div>
+<div>
+    <canvas id="myChart2" height="140"></canvas>
+</div>
+</body>
+</html>
