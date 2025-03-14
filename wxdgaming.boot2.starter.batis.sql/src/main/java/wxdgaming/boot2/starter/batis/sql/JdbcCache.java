@@ -6,6 +6,7 @@ import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
 
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -97,6 +98,10 @@ public class JdbcCache<E extends Entity, Key> {
     /** 强制缓存过期 */
     public void invalidate(Key key) {
         cache.invalidate(key);
+    }
+
+    public Collection<E> values() {
+        return cache.values();
     }
 
 }

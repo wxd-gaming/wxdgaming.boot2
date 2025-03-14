@@ -15,6 +15,8 @@ import wxdgaming.boot2.core.function.Function1;
 import wxdgaming.boot2.core.function.Function2;
 import wxdgaming.boot2.core.shutdown;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -104,6 +106,15 @@ public final class Cache<K, V> {
             size += kviCacheArea.getSize();
         }
         return size;
+    }
+
+    public Collection<V> values() {
+        ArrayList<V> vs = new ArrayList<>();
+        for (int i = 0; i < cacheAreaMap.length; i++) {
+            ICacheArea<K, V> kviCacheArea = cacheAreaMap[i];
+            vs.addAll(kviCacheArea.values());
+        }
+        return vs;
     }
 
     @shutdown

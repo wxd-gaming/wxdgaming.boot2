@@ -10,6 +10,7 @@ import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.threading.TimerJob;
 import wxdgaming.boot2.core.timer.MyClock;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -185,6 +186,10 @@ class CASCacheArea<K, V> implements ICacheArea<K, V> {
         if (removalListener != null) {
             tmp.values().forEach((cacheHolder) -> removalListener.apply(cacheHolder.getKey(), cacheHolder.getValue()));
         }
+    }
+
+    @Override public Collection<V> values() {
+        return nodes.values().stream().map(CacheHolder::getValue).toList();
     }
 
     @Override public void shutdown() {

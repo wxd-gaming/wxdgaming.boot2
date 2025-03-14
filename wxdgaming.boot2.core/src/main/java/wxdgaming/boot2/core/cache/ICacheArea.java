@@ -2,6 +2,8 @@ package wxdgaming.boot2.core.cache;
 
 import wxdgaming.boot2.core.function.Function1;
 
+import java.util.Collection;
+
 interface ICacheArea<K, V> {
     default CacheHolder<K, V> buildValue(K k, V v, long heartTime) {
         CacheHolder<K, V> tuple = new CacheHolder<>(k, v, heartTime);
@@ -30,6 +32,8 @@ interface ICacheArea<K, V> {
     V invalidate(K k);
 
     void invalidateAll();
+
+    Collection<V> values();
 
     void shutdown();
 

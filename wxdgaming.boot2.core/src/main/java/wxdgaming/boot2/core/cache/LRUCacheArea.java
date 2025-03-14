@@ -10,6 +10,7 @@ import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.threading.TimerJob;
 import wxdgaming.boot2.core.timer.MyClock;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -250,6 +251,15 @@ class LRUCacheArea<K, V> implements ICacheArea<K, V> {
             }
         } finally {
             writeLock.unlock();
+        }
+    }
+
+    @Override public Collection<V> values() {
+        readLock.lock();
+        try {
+            return nodes.values().stream().map(CacheHolder::getValue).toList();
+        } finally {
+            readLock.unlock();
         }
     }
 
