@@ -95,7 +95,12 @@ public class ReflectContext {
     /** 获取泛型的类型 */
     public static <T> Class<T> getTClass(Class<?> source, int index) {
         Type genType = source.getGenericSuperclass();
-        Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
+        return getTType(genType, index);
+    }
+
+    /** 获取泛型的类型 */
+    public static <T> Class<T> getTType(Type source, int index) {
+        Type[] params = ((ParameterizedType) source).getActualTypeArguments();
         return (Class) params[index];
     }
 

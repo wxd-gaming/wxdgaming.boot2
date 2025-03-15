@@ -45,14 +45,19 @@ public class PgsqlTest {
 
     @Test
     public void t1() {
+        long uid = System.currentTimeMillis();
+        int yyyyMMdd = Integer.parseInt(MyClock.formatDate("yyyyMMdd"));
         EntityTest entityTest = new EntityTest();
-        entityTest.setUid(System.currentTimeMillis());
-        entityTest.setDay(Integer.parseInt(MyClock.formatDate("yyyyMMdd")));
+        entityTest.setUid(uid);
+        entityTest.setDay(yyyyMMdd);
         entityTest.setName("测试");
+        entityTest.getRemark4().set(400);
         dataHelper.insert(entityTest);
         entityTest.getList().add("测试1");
         dataHelper.update(entityTest);
         dataHelper.save(entityTest);
+        EntityTest byKey = dataHelper.findByKey(EntityTest.class, uid, yyyyMMdd);
+        System.out.println(byKey);
     }
 
     @Test

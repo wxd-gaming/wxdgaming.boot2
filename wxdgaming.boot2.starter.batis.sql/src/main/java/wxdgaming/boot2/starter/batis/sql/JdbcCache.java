@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
- * jdbc cahce
+ * jdbc cache
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-17 11:28

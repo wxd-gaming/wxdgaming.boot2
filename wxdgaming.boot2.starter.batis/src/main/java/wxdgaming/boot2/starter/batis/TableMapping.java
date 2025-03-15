@@ -9,6 +9,7 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.chatset.json.ParameterizedTypeImpl;
 import wxdgaming.boot2.core.reflect.FieldUtils;
 import wxdgaming.boot2.core.reflect.MethodUtil;
+import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.core.util.AnnUtil;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
@@ -19,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 数据表映射
@@ -130,6 +132,9 @@ public class TableMapping {
 
     public void buildColumnType(FieldMapping fieldMapping) {
         Class<?> type = fieldMapping.getField().getType();
+        if (AtomicReference.class.isAssignableFrom(type)) {
+            type = ReflectContext.getTType(fieldMapping.getField().getGenericType(), 0);
+        }
         if (boolean.class.isAssignableFrom(type) || Boolean.class.isAssignableFrom(type)) {
             fieldMapping.columnType = ColumnType.Bool;
         } else if (byte.class.isAssignableFrom(type) || Byte.class.isAssignableFrom(type)) {
@@ -148,7 +153,7 @@ public class TableMapping {
             if (fieldMapping.length == 0)
                 fieldMapping.length = 65535;
             fieldMapping.columnType = ColumnType.Blob;
-        } else if (String.class.isAssignableFrom(type)) {
+        } else if (String.class.isAssignableFrom(type) || Enum.class.isAssignableFrom(type)) {
             if (fieldMapping.length == 0)
                 fieldMapping.length = 256;
             fieldMapping.columnType = ColumnType.String;
@@ -213,6 +218,11 @@ public class TableMapping {
             try {
                 Object object = getFieldValue(bean);
                 if (object != null) {
+                    if (object instanceof AtomicReference<?> atomicReference) {
+                        object = atomicReference.get();
+                    }
+                }
+                if (object != null) {
                     switch (columnType) {
                         case Bool -> {
                             if (object instanceof AtomicBoolean atomicBoolean) {
@@ -230,7 +240,9 @@ public class TableMapping {
                             }
                         }
                         case String -> {
-                            if (!(object instanceof String)) {
+                            if (object instanceof Enum) {
+                                object = ((Enum<?>) object).name();
+                            } else if (!(object instanceof String)) {
                                 object = FastJsonUtil.toJson(object, FastJsonUtil.Writer_Features_Type_Name_NOT_ROOT);
                             }
                         }
@@ -265,21 +277,26 @@ public class TableMapping {
          * @version: 2025-02-24 09:39
          */
         public void setValue(Object bean, JSONObject data) {
+            Object colValue = data.get(getColumnName());
+            colValue = fromDbValue(colValue);
+            if (colValue == null) return;
             try {
-                Object colValue = data.get(getColumnName());
-                colValue = fromDbValue(colValue);
-                if (colValue == null) return;
                 if (setMethod == null) {
                     if (Modifier.isFinal(field.getModifiers())) {
-                        if (Map.class.isAssignableFrom(field.getType())) {
+                        if (Map.class.isAssignableFrom(getFileType())) {
                             final Map<?, ?> fieldValue = (Map<?, ?>) getFieldValue(bean);
                             fieldValue.putAll((Map) colValue);
-                        } else if (List.class.isAssignableFrom(field.getType())) {
+                        } else if (List.class.isAssignableFrom(getFileType())) {
                             final List<?> fieldValue = (List<?>) getFieldValue(bean);
                             fieldValue.addAll((List) colValue);
-                        } else if (Set.class.isAssignableFrom(field.getType())) {
+                        } else if (Set.class.isAssignableFrom(getFileType())) {
                             final Set<?> fieldValue = (Set<?>) getFieldValue(bean);
                             fieldValue.addAll((Set) colValue);
+                        } else if (AtomicReference.class.isAssignableFrom(getFileType())) {
+                            if (!(colValue instanceof AtomicReference)) {
+                                final AtomicReference fieldValue = (AtomicReference) getFieldValue(bean);
+                                fieldValue.set(colValue);
+                            }
                         } else {
                             throw new RuntimeException(
                                     "映射表：%s \n字段：%s \n类型：%s \n数据库配置值：%s; 最终类型异常"
@@ -291,15 +308,19 @@ public class TableMapping {
                                             )
                             );
                         }
+                    } else if (AtomicReference.class.isAssignableFrom(getFileType())) {
+                        if (!(colValue instanceof AtomicReference)) {
+                            final AtomicReference fieldValue = (AtomicReference) getFieldValue(bean);
+                            fieldValue.set(colValue);
+                        }
                     } else {
                         field.set(bean, colValue);
                     }
                 } else {
-
                     setMethod.invoke(bean, colValue);
                 }
             } catch (Exception e) {
-                throw Throw.of(e);
+                throw Throw.of(this.getField().toString(), e);
             }
         }
 
@@ -311,6 +332,15 @@ public class TableMapping {
             if (getFileType().isAssignableFrom(object.getClass())) {
                 return object;
             }
+
+            if (AtomicReference.class.isAssignableFrom(getFileType())) {
+                Class tType = ReflectContext.getTType(getField().getGenericType(), 0);
+                if (!String.class.isAssignableFrom(tType)) {
+                    object = FastJsonUtil.parse(object.toString(), tType);
+                }
+                return new AtomicReference<>(object);
+            }
+
             switch (getColumnType()) {
                 case Bool -> {
                     if (AtomicBoolean.class.isAssignableFrom(getFileType())) {
@@ -340,11 +370,13 @@ public class TableMapping {
                     return FastJsonUtil.parse((byte[]) object, getJsonType());
                 }
                 case null, default -> {
-                    if (BitSet.class.isAssignableFrom(field.getType())) {
+                    if (BitSet.class.isAssignableFrom(getFileType())) {
                         if (object instanceof String json) {
                             long[] parse = FastJsonUtil.parse(json, long[].class);
                             return BitSet.valueOf(parse);
                         }
+                    } else if (Enum.class.isAssignableFrom(getFileType())) {
+                        return Enum.valueOf((Class<Enum>) getFileType(), object.toString());
                     }
                     return FastJsonUtil.parse(object.toString(), getJsonType());
                 }

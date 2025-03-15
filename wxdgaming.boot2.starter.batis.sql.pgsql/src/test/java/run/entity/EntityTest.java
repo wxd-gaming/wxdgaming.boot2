@@ -9,6 +9,7 @@ import wxdgaming.boot2.starter.batis.sql.ann.Partition;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Getter
 @Setter
@@ -33,4 +34,13 @@ public class EntityTest extends EntityLongUID {
     private byte[] datas;
     @DbColumn(index = true)
     private int overhead = 2;
+    private AtomicReference<String> remark3 = new AtomicReference<>("test");
+    private final AtomicReference<Integer> remark4 = new AtomicReference<>(4);
+    private Sex sex2 = Sex.MALE;
+
+    public enum Sex {
+        MALE,
+        FEMALE
+    }
+
 }

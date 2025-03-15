@@ -30,6 +30,13 @@ public class StringUtils {
     public static final byte[] LineBytes = "\n".getBytes();
     /** 包含汉字 */
     public static final Pattern PATTERN_Have_UUU = Pattern.compile(".*[\\u4e00-\\u9fa5]+.*");
+    /** 只保留数字 */
+    public static final Pattern PATTERN_REPLACE_UUU_2 = Pattern.compile("[^0-9]");
+
+    /** 保留数值字 */
+    public static String retainNumbers(String source) {
+        return PATTERN_REPLACE_UUU_2.matcher(source).replaceAll("");
+    }
 
     public static boolean isBlank(String s) {
         return s == null || s.isBlank();

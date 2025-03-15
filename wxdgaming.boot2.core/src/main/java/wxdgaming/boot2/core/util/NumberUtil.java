@@ -42,6 +42,11 @@ public class NumberUtil {
         }
     }
 
+    /** 去掉其它符号保留数字 */
+    public static int retainNumber(String source) {
+        return parseInt(StringUtils.retainNumbers(source), 0);
+    }
+
     public static int parseInt(Object source, int defaultValue) {
         if (source == null) {
             return defaultValue;
