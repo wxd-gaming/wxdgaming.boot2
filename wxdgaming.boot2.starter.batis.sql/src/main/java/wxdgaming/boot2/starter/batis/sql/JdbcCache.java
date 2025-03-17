@@ -37,6 +37,7 @@ public class JdbcCache<E extends Entity, Key> {
                 .cacheName("cache-" + tableMapping.getTableName())
                 .hashArea(hashArea)
                 .expireAfterAccess(expireAfterAccessM, TimeUnit.MINUTES)
+                .delay(1, TimeUnit.MINUTES)
                 .heartTime(1, TimeUnit.MINUTES)
                 .loader(this::loader)
                 .heartListener(this::heart)

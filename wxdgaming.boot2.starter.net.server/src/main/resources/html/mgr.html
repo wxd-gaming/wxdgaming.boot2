@@ -44,11 +44,6 @@
                         let ls = `<a class="J_menuItem" href="${row.value}">${row.key}</a>`;
                         $("#side-menu-sub").append(ls);
                     }
-                    wxd.loading_close();
-                },
-                function (error) {
-                    console.log("11->" + error);
-                    wxd.loading_close();
                 }
             );
 

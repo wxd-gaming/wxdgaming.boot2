@@ -659,7 +659,6 @@ const wxd = {
                         try {
                             onLoad(data);
                         } catch (e) {
-                            wxd.loading_close();
                             console.error(e);
                             console.error(JSON.stringify(data));
                             wxd.message.notice("error: " + e, true);
@@ -667,10 +666,11 @@ const wxd = {
                     } else {
                         console.log(data);
                     }
+                    wxd.loading_close();
                 }, error: function (jqXHR, textStatus, errorMsg) {
                     // jqXHR 是经过jQuery封装的XMLHttpRequest对象
                     // textStatus 可能为null、 'timeout'、 'error'、 'abort'和'parsererror'等
-                    // errorMsg 是错误信息字符串(响应状态的文本描述部分，例如'Not Found'或'Internal Server Error')
+                    wxd.loading_close();
                     if (!wxd.isNull(onError)) {
                         onError(errorMsg);
                     } else {

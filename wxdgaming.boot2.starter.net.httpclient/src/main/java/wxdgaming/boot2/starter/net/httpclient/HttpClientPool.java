@@ -45,8 +45,8 @@ public class HttpClientPool {
         HttpClientConfig clientConfig = BootConfig.getIns().getNestedValue("http.client", HttpClientConfig.class, HttpClientConfig.DEFAULT);
         HTTP_CLIENT_CACHE = Cache.<String, HttpClientPool>builder()
                 .cacheName("http-client")
+                .delay(clientConfig.getResetTimeM(), TimeUnit.MINUTES)
                 .expireAfterWrite(clientConfig.getResetTimeM(), TimeUnit.MINUTES)
-                .delay(TimeUnit.MINUTES.toMillis(1))
                 .loader((Function1<String, HttpClientPool>) s -> build(clientConfig))
                 .removalListener((k, pool) -> {
                     ExecutorUtil.getInstance().getLogicExecutor().schedule(
