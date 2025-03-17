@@ -50,7 +50,7 @@ public class PostText extends HttpBase<PostText> {
         closeableHttpClient.execute(httpRequest, classicHttpResponse -> {
             response.httpResponse = classicHttpResponse;
             response.cookieStore = httpClientPool.getCookieStore().getCookies();
-            response.bodys = EntityUtils.toByteArray(classicHttpResponse.getEntity());
+            response.setBodys(EntityUtils.toByteArray(classicHttpResponse.getEntity()));
             return null;
         });
     }

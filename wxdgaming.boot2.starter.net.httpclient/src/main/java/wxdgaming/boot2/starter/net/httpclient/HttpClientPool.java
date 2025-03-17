@@ -20,6 +20,7 @@ import org.apache.hc.core5.util.TimeValue;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.cache.Cache;
 import wxdgaming.boot2.core.function.Function1;
+import wxdgaming.boot2.core.threading.ExecutorUtil;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -48,7 +49,11 @@ public class HttpClientPool {
                 .delay(TimeUnit.MINUTES.toMillis(1))
                 .loader((Function1<String, HttpClientPool>) s -> build(clientConfig))
                 .removalListener((k, pool) -> {
-                    pool.shutdown();
+                    ExecutorUtil.getInstance().getLogicExecutor().schedule(
+                            pool::shutdown,
+                            30,
+                            TimeUnit.SECONDS
+                    );
                     return true;
                 })
                 .build();

@@ -3,7 +3,6 @@ package wxdgaming.boot2.starter.net.httpclient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 import java.io.IOException;
@@ -31,7 +30,7 @@ public class Get extends HttpBase<Get> {
         closeableHttpClient.execute(httpRequest, classicHttpResponse -> {
             response.httpResponse = classicHttpResponse;
             response.cookieStore = httpClientPool.getCookieStore().getCookies();
-            response.bodys = EntityUtils.toByteArray(classicHttpResponse.getEntity());
+            response.setBodys(EntityUtils.toByteArray(classicHttpResponse.getEntity()));
             return null;
         });
     }

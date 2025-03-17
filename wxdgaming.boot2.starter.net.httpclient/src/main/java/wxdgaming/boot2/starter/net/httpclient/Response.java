@@ -3,7 +3,6 @@ package wxdgaming.boot2.starter.net.httpclient;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.cookie.Cookie;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.NameValuePair;
 import wxdgaming.boot2.core.chatset.StringUtils;
@@ -30,7 +29,7 @@ public final class Response<H extends HttpBase> {
     final String uriPath;
     String postText = null;
     ClassicHttpResponse httpResponse;
-    byte[] bodys = null;
+    private byte[] bodys = null;
     List<Cookie> cookieStore = null;
 
     Response(H httpBase, String uriPath) {
@@ -57,10 +56,15 @@ public final class Response<H extends HttpBase> {
         return httpResponse.getCode();
     }
 
-    public byte[] body() {
-        if ("gzip".equalsIgnoreCase(getHeader(HttpHeadNameType.Content_Encoding.getValue()))) {
-            return GzipUtil.unGZip(bodys);
+    public void setBodys(byte[] data) {
+        String header = getHeader(HttpHeadNameType.Content_Encoding.getValue());
+        if (header != null && !header.isBlank() && header.toLowerCase().contains("gzip")) {
+            data = GzipUtil.unGZip(data);
         }
+        bodys = data;
+    }
+
+    public byte[] body() {
         return bodys;
     }
 
