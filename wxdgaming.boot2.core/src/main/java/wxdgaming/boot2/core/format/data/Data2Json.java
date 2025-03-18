@@ -12,27 +12,27 @@ public interface Data2Json {
 
     /** json */
     default String toJson() {
-        return FastJsonUtil.toJson(this);
+        return FastJsonUtil.toJSONString(this);
     }
 
     /** 一般是js用的，所有 key 值都是字符串 格式化 */
     default String toJsonKeyAsString() {
-        return FastJsonUtil.toJsonKeyAsString(this);
+        return FastJsonUtil.toJSONStringKeyAsString(this);
     }
 
     /** 一般是js用的，所有 key - value 值都是字符串 格式化 */
     default String toJsonAllAsString() {
-        return FastJsonUtil.toJsonAllAsString(this);
+        return FastJsonUtil.toJSONStringAllAsString(this);
     }
 
     /** json, 输出类型名称 */
     default String toJsonWriteType() {
-        return FastJsonUtil.toJsonWriteType(this);
+        return FastJsonUtil.toJSONStringAsWriteType(this);
     }
 
     /** 格式化json */
     default String toJsonFmt() {
-        return FastJsonUtil.toJsonFmt(this);
+        return FastJsonUtil.toJSONStringAsFmt(this);
     }
 
     /** 格式化json,输出类型名称 */

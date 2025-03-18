@@ -84,7 +84,7 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
                     }
                 }
             } catch (Throwable e) {
-                throw Throw.of("数据：" + FastJsonUtil.toJson(dbModel), e);
+                throw Throw.of("数据：" + FastJsonUtil.toJSONString(dbModel), e);
             }
         });
         /*不可变的列表*/
@@ -163,7 +163,7 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
                 } else if (ConvertUtil.isBaseType(value.getClass())) {
                     streamWriter.write("|").writeRight(String.valueOf(value), len, ' ');
                 } else {
-                    streamWriter.write("|").writeRight(FastJsonUtil.toJson(value), len, ' ');
+                    streamWriter.write("|").writeRight(FastJsonUtil.toJSONString(value), len, ' ');
                 }
             }
         }

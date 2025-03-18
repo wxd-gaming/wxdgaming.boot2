@@ -82,11 +82,11 @@ public class RpcService {
     }
 
     public void response(SocketSession socketSession, long rpcId, Object data) {
-        response(socketSession, rpcId, FastJsonUtil.toJson(data), !socketSession.isEnabledScheduledFlush());
+        response(socketSession, rpcId, FastJsonUtil.toJSONString(data), !socketSession.isEnabledScheduledFlush());
     }
 
     public void response(SocketSession socketSession, long rpcId, Object data, boolean immediate) {
-        response(socketSession, rpcId, FastJsonUtil.toJson(data), immediate);
+        response(socketSession, rpcId, FastJsonUtil.toJSONString(data), immediate);
     }
 
     public void response(SocketSession socketSession, long rpcId, String data, boolean immediate) {

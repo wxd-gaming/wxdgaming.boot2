@@ -8,7 +8,10 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.io.FileReadUtil;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /**
  * js脚本服务
@@ -20,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Singleton
 public class JsService {
 
+    private final List<Consumer<JSContext>> onInitListener = new ArrayList<>();
     private ConcurrentHashMap<Thread, JSContext> threadJsContext = new ConcurrentHashMap<>();
     RunApplication runApplication;
 
@@ -37,6 +41,7 @@ public class JsService {
             if (runApplication != null) {
                 runApplication.classWithSuper(IJSPlugin.class).forEach(jsContext::put);
             }
+            onInitListener.forEach(jsPlugin -> jsPlugin.accept(jsContext));
             return jsContext;
         });
     }

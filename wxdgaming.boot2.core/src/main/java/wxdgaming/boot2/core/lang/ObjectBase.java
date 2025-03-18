@@ -26,18 +26,18 @@ public abstract class ObjectBase implements Serializable, Cloneable {
     }
 
     public JSONObject toJSONObject() {
-        return FastJsonUtil.toJSONObject(this);
+        return FastJsonUtil.parseJSONObject(this);
     }
 
     public String toJsonString() {
-        return FastJsonUtil.toJson(this);
+        return FastJsonUtil.toJSONString(this);
     }
 
     public String toTypeJsonString() {
-        return FastJsonUtil.toJsonWriteType(this);
+        return FastJsonUtil.toJSONStringAsWriteType(this);
     }
 
     @Override public String toString() {
-        return FastJsonUtil.toJson(this);
+        return FastJsonUtil.toJSONString(this);
     }
 }

@@ -54,7 +54,7 @@ public class AssertUtil {
                         if (v instanceof String || v instanceof Boolean || v instanceof Number) {
                             return String.valueOf(v);
                         } else {
-                            return FastJsonUtil.toJson(v);
+                            return FastJsonUtil.toJSONString(v);
                         }
                     })
                     .collect(Collectors.joining(" "));

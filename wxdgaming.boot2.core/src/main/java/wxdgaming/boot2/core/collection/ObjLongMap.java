@@ -98,7 +98,7 @@ public class ObjLongMap<K> extends HashMap<K, Long> implements Map<K, Long> {
     }
 
     @Override public String toString() {
-        return FastJsonUtil.toJson(this);
+        return FastJsonUtil.toJSONString(this);
     }
 
 }

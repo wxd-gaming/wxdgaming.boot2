@@ -201,7 +201,7 @@ public class TableData {
      */
     public String data2Json() {
         Object array = rows.values().stream().toList();
-        return FastJsonUtil.toJsonFmt(array);
+        return FastJsonUtil.toJSONStringAsFmt(array);
     }
 
     public String showData() {
@@ -245,7 +245,7 @@ public class TableData {
                     } else if (ConvertUtil.isBaseType(value.getClass())) {
                         return String.valueOf(value);
                     } else {
-                        return FastJsonUtil.toJson(value);
+                        return FastJsonUtil.toJSONString(value);
                     }
                 }).toArray();
                 String formatted = String.format(format, array);

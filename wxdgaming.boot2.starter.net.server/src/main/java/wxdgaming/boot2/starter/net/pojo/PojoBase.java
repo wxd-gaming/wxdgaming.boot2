@@ -22,7 +22,7 @@ public class PojoBase {
     }
 
     @Override public String toString() {
-        return this.getClass().getSimpleName() + FastJsonUtil.toJson(this);
+        return this.getClass().getSimpleName() + FastJsonUtil.toJSONString(this);
     }
 
 }

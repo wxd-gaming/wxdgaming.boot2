@@ -243,20 +243,20 @@ public class TableMapping {
                             if (object instanceof Enum) {
                                 object = ((Enum<?>) object).name();
                             } else if (!(object instanceof String)) {
-                                object = FastJsonUtil.toJson(object, FastJsonUtil.Writer_Features_Type_Name_NOT_ROOT);
+                                object = FastJsonUtil.toJSONString(object, FastJsonUtil.Writer_Features_Type_Name_NOT_ROOT);
                             }
                         }
                         case Json -> {
                             if (object instanceof BitSet bitSet) {
                                 long[] longArray = bitSet.toLongArray();
-                                object = FastJsonUtil.toJson(longArray);
+                                object = FastJsonUtil.toJSONString(longArray);
                             } else if (!(object instanceof String)) {
-                                object = FastJsonUtil.toJson(object, FastJsonUtil.Writer_Features);
+                                object = FastJsonUtil.toJSONString(object, FastJsonUtil.Writer_Features);
                             }
                         }
                         case Blob -> {
                             if (!(object instanceof byte[])) {
-                                object = FastJsonUtil.toBytes(object);
+                                object = FastJsonUtil.toJSONBytes(object);
                             }
                         }
                         case null, default -> {

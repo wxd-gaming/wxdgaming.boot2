@@ -27,7 +27,7 @@ public class RowData extends JSONObject {
         } else if (ConvertUtil.isBaseType(object.getClass())) {
             return String.valueOf(object);
         } else {
-            return FastJsonUtil.toJson(object);
+            return FastJsonUtil.toJSONString(object);
         }
     }
 

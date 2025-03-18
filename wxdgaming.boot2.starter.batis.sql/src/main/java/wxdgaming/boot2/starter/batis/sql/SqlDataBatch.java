@@ -267,7 +267,7 @@ public abstract class SqlDataBatch extends DataBatch {
                         insertCount++;
                     } catch (Exception e1) {
                         File file = new File("target/db_error/" + sqlDataHelper.getDbName() + "/" + this.threadId + "_" + System.nanoTime() + ".txt");
-                        String formatted = "db batch error\nsql: %s\ndata: %s\n\nerror: \n%s".formatted(sql, FastJsonUtil.toJson(objects), e1.toString());
+                        String formatted = "db batch error\nsql: %s\ndata: %s\n\nerror: \n%s".formatted(sql, FastJsonUtil.toJSONString(objects), e1.toString());
                         FileWriteUtil.writeString(file, formatted, true);
                         log.error("{}", formatted, e1);
                     }

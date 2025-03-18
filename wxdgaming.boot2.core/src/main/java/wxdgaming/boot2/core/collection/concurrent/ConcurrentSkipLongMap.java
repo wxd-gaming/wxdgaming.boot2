@@ -98,7 +98,7 @@ public class ConcurrentSkipLongMap<K extends Comparable<K>> extends ConcurrentSk
     }
 
     @Override public String toString() {
-        return FastJsonUtil.toJson(this);
+        return FastJsonUtil.toJSONString(this);
     }
 
 }

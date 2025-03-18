@@ -98,7 +98,7 @@ public class ConcurrentObjLongMap<K> extends ConcurrentHashMap<K, Long> implemen
     }
 
     @Override public String toString() {
-        return FastJsonUtil.toJson(this);
+        return FastJsonUtil.toJSONString(this);
     }
 
 }

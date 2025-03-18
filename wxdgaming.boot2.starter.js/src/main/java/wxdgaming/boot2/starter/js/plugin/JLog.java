@@ -2,6 +2,7 @@ package wxdgaming.boot2.starter.js.plugin;
 
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.starter.js.IJSPlugin;
 
 import java.util.Arrays;
@@ -19,6 +20,10 @@ public class JLog implements IJSPlugin {
 
     @Override public String getName() {
         return "jlog";
+    }
+
+    public String toJSONString(Object obj) {
+        return FastJsonUtil.toJSONString(obj);
     }
 
     public void print(Object... args) {

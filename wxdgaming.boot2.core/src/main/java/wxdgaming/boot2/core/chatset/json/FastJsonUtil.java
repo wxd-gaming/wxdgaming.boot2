@@ -57,19 +57,20 @@ public class FastJsonUtil {
 
     static {
         /*fast json 启动类型自动推断*/
-        Writer_Features = new SerializerFeature[]{SerializerFeature.QuoteFieldNames,    /*给字段加引号*/
-                SerializerFeature.WriteMapNullValue,   /*map字段如果为null,输出为null*/
-                SerializerFeature.WriteNullListAsEmpty,   /*List字段如果为null,输出为[],而非null*/
-                SerializerFeature.WriteNullNumberAsZero,   /*数值字段如果为null,输出为0,而非null*/
-                SerializerFeature.WriteNullBooleanAsFalse,   /*Boolean字段如果为null,输出为false,而非null*/
-                SerializerFeature.WriteNullStringAsEmpty,   /*String字段如果为null,输出为"",而非null*/
-                SerializerFeature.SkipTransientField,   /*忽律 transient*/
-                SerializerFeature.WriteEnumUsingName,   /*枚举用 toString() */
-                SerializerFeature.IgnoreNonFieldGetter,   /*忽略 没有 get 属性 继续写入*/
+        Writer_Features = new SerializerFeature[]{
+                SerializerFeature.QuoteFieldNames,                  /*给字段加引号*/
+                SerializerFeature.WriteMapNullValue,                /*map字段如果为null,输出为null*/
+                SerializerFeature.WriteNullListAsEmpty,             /*List字段如果为null,输出为[],而非null*/
+                SerializerFeature.WriteNullNumberAsZero,            /*数值字段如果为null,输出为0,而非null*/
+                SerializerFeature.WriteNullBooleanAsFalse,          /*Boolean字段如果为null,输出为false,而非null*/
+                SerializerFeature.WriteNullStringAsEmpty,           /*String字段如果为null,输出为"",而非null*/
+                SerializerFeature.SkipTransientField,               /*忽律 transient*/
+                SerializerFeature.WriteEnumUsingName,               /*枚举用 toString() */
+                SerializerFeature.IgnoreNonFieldGetter,             /*忽略 没有 get 属性 继续写入*/
                 SerializerFeature.DisableCircularReferenceDetect,   /*屏蔽循环引用*/
-                SerializerFeature.SortField,   /*排序*/
-                SerializerFeature.MapSortField}   /*排序*/
-        ;
+                SerializerFeature.SortField,                        /*排序*/
+                SerializerFeature.MapSortField                      /*排序*/
+        };
 
         Reader_Features = new Feature[]{
                 Feature.OrderedField,
@@ -101,42 +102,42 @@ public class FastJsonUtil {
     }
 
     /** 一般是js用的，所有 key 值都是字符串 格式化 */
-    public static String toJsonKeyAsString(Object object) {
-        return JSON.toJSONString(object, Writer_Features_Key_String);
+    public static String toJSONStringKeyAsString(Object object) {
+        return toJSONString(object, Writer_Features_Key_String);
     }
 
     /** 一般是js用的，所有 key - value 值都是字符串 格式化 */
-    public static String toJsonAllAsString(Object object) {
-        return JSON.toJSONString(object, Writer_Features_K_V_String);
+    public static String toJSONStringAllAsString(Object object) {
+        return toJSONString(object, Writer_Features_K_V_String);
     }
 
     /** 一般是js用的，所有 key 值都是字符串 格式化 */
-    public static String toJsonFmtKeyAsString(Object object) {
-        return JSON.toJSONString(object, Writer_Features_Fmt_Key_String);
+    public static String toJSONStringFmtKeyAsString(Object object) {
+        return toJSONString(object, Writer_Features_Fmt_Key_String);
     }
 
     /** 一般是js用的，所有 key - value 值都是字符串 格式化 */
-    public static String toJsonFmtAllAsString(Object object) {
-        return JSON.toJSONString(object, Writer_Features_Fmt_K_V_String);
+    public static String toJSONStringFmtAllAsString(Object object) {
+        return toJSONString(object, Writer_Features_Fmt_K_V_String);
     }
 
     /** 格式化 */
-    public static String toJson(Object object) {
-        return JSON.toJSONString(object, Writer_Features);
+    public static String toJSONString(Object object) {
+        return toJSONString(object, Writer_Features);
     }
 
     /** 格式化 */
-    public static String toJson(Object object, SerializerFeature... features) {
+    public static String toJSONString(Object object, SerializerFeature... features) {
         return JSON.toJSONString(object, features);
     }
 
     /** 格式化 ,包含数据类型 {@code @class} */
-    public static String toJsonWriteType(Object object) {
+    public static String toJSONStringAsWriteType(Object object) {
         return JSON.toJSONString(object, Writer_Features_Type_Name);
     }
 
     /** 格式化 */
-    public static String toJsonFmt(Object object) {
+    public static String toJSONStringAsFmt(Object object) {
         return JSON.toJSONString(object, Writer_Features_Fmt);
     }
 
@@ -145,23 +146,23 @@ public class FastJsonUtil {
         return JSON.toJSONString(object, Writer_Features_Type_Name_Fmt);
     }
 
-    public static JSONObject toJSONObject(Object object) {
-        return parse(toJson(object));
+    /** 格式化,包含数据类型 {@code @class} */
+    public static byte[] toJSONBytesAsWriteType(Object object) {
+        return JSON.toJSONBytes(object, Writer_Features_Type_Name);
     }
 
     /** 转化成字节流 */
-    public static byte[] toBytes(Object object) {
+    public static byte[] toJSONBytes(Object object) {
         return JSON.toJSONBytes(object, Writer_Features);
     }
 
     /** 转化成字节流 */
-    public static byte[] toBytes(Object object, SerializerFeature... features) {
+    public static byte[] toJSONBytes(Object object, SerializerFeature... features) {
         return JSON.toJSONBytes(object, features);
     }
 
-    /** 格式化,包含数据类型 {@code @class} */
-    public static byte[] toBytesWriteType(Object object) {
-        return JSON.toJSONBytes(object, Writer_Features_Type_Name);
+    public static JSONObject parseJSONObject(Object object) {
+        return parse(toJSONString(object));
     }
 
     /** 通过反射解析某个类的某个字段，然后转化 */

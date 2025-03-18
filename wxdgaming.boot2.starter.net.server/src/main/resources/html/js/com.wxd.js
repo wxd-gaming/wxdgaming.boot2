@@ -71,7 +71,7 @@ const wxd = {
                             return;
                         }
                     } catch (ex) {
-                        console.info("delayed exception " + ex);
+                        console.info("delayed exception ", ex);
                         resolve('');
                         clearInterval(intervalTmp);
                         return;

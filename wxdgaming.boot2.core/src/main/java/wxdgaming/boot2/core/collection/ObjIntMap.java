@@ -103,7 +103,7 @@ public class ObjIntMap<K> extends HashMap<K, Integer> implements Map<K, Integer>
     }
 
     @Override public String toString() {
-        return FastJsonUtil.toJson(this);
+        return FastJsonUtil.toJSONString(this);
     }
 
 }

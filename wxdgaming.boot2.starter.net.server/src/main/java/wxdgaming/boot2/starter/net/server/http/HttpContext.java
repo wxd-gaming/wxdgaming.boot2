@@ -355,7 +355,7 @@ public class HttpContext implements AutoCloseable {
                 if (responseContentType == null)
                     responseContentType = HttpHeadValueType.findContentType(file);
             } else {
-                dataBytes = FastJsonUtil.toBytes(data);
+                dataBytes = FastJsonUtil.toJSONBytes(data);
                 if (responseContentType == null)
                     responseContentType = HttpHeadValueType.Json;
             }

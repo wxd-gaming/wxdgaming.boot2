@@ -28,7 +28,7 @@ public abstract class Entity extends ObjectBase {
     private transient int oldHashCode = -1;
 
     public boolean checkHashCode() {
-        String jsonString = FastJsonUtil.toJson(
+        String jsonString = FastJsonUtil.toJSONString(
                 this,
                 SerializerFeature.SortField,   /*排序*/
                 SerializerFeature.MapSortField
