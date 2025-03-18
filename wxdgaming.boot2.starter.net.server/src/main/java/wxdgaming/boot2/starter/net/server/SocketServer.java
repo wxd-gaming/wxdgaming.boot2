@@ -41,7 +41,7 @@ public class SocketServer {
 
     public SocketServer(SocketServerConfig config) {
         if (log.isDebugEnabled()) {
-            log.debug("socket server config: {}", config.toJsonString());
+            log.debug("socket server config: {}", config.toJSONString());
         }
         this.config = config;
     }

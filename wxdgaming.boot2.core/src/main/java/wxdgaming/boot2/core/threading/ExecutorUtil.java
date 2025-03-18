@@ -72,20 +72,20 @@ public final class ExecutorUtil implements Serializable {
         Logger logger = LogbackUtil.logger();
         ExecutorConfig defaultConfig = BootConfig.getIns().defaultConfig();
         if (logger.isDebugEnabled()) {
-            logger.debug("ExecutorUtil init default config: {}", defaultConfig.toJsonString());
+            logger.debug("ExecutorUtil init default config: {}", defaultConfig.toJSONString());
         }
         defaultExecutor = newExecutorServices("default-executor", defaultConfig.getCoreSize(), defaultConfig.getMaxSize(), defaultConfig.getMaxQueueSize());
         ExecutorConfig logicConfig = BootConfig.getIns().logicConfig();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("ExecutorUtil init logic config: {}", defaultConfig.toJsonString());
+            logger.debug("ExecutorUtil init logic config: {}", defaultConfig.toJSONString());
         }
 
         logicExecutor = newExecutorServices("logic-executor", logicConfig.getCoreSize(), logicConfig.getMaxSize(), logicConfig.getMaxQueueSize());
         ExecutorConfig virtualConfig = BootConfig.getIns().virtualConfig();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("ExecutorUtil init virtual config: {}", defaultConfig.toJsonString());
+            logger.debug("ExecutorUtil init virtual config: {}", defaultConfig.toJSONString());
         }
 
         virtualExecutor = newExecutorVirtualServices("virtual-executor", virtualConfig.getCoreSize(), virtualConfig.getMaxSize(), virtualConfig.getMaxQueueSize());

@@ -29,11 +29,11 @@ public abstract class ObjectBase implements Serializable, Cloneable {
         return FastJsonUtil.parseJSONObject(this);
     }
 
-    public String toJsonString() {
+    public String toJSONString() {
         return FastJsonUtil.toJSONString(this);
     }
 
-    public String toTypeJsonString() {
+    public String toJSONStringAsWriteType() {
         return FastJsonUtil.toJSONStringAsWriteType(this);
     }
 
