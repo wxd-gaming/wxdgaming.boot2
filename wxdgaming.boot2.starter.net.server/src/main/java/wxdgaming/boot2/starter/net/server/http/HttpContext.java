@@ -414,6 +414,7 @@ public class HttpContext implements AutoCloseable {
                         if (!keepAlive) {
                             /* TODO 非复用的连接池 */
                             HttpContext.this.ctx.disconnect();
+                            HttpContext.this.ctx.close();
                         }
                     });
 

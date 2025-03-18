@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter.net;
 
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
@@ -104,6 +105,21 @@ public class ChannelUtil implements Serializable {
 
     static public SocketSession session(Channel channel) {
         return attr(channel, SOCKET_SESSION_KEY);
+    }
+
+    static public void closeSession(Channel channel, String msg) {
+        if (channel.isActive()) {
+            channel.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener((future) -> closeSession0(channel, msg));
+        } else {
+            closeSession0(channel, msg);
+        }
+    }
+
+    static private void closeSession0(Channel channel, String msg) {
+        try {channel.disconnect();} catch (Exception ignore) {}
+        try {channel.close();} catch (Exception ignore) {}
+        try {channel.deregister();} catch (Exception ignore) {}
+        log.info("close {}", msg);
     }
 
     /**

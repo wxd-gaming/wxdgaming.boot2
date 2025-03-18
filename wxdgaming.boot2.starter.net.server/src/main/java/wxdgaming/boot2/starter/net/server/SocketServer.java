@@ -95,7 +95,7 @@ public class SocketServer {
                             /*解码消息*/
                             pipeline.addLast(
                                     "encode",
-                                    new ServerMessageEncode(
+                                    new SocketServerMessageEncode(
                                             config.isEnabledScheduledFlush(),
                                             config.getScheduledDelayMs(),
                                             socketChannel,

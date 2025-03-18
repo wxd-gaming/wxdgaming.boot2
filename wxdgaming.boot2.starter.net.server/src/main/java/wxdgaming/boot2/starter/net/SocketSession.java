@@ -117,10 +117,7 @@ public class SocketSession {
     }
 
     public void close(String string) {
-        try {channel.disconnect();} catch (Exception ignore) {}
-        try {channel.close();} catch (Exception ignore) {}
-        try {channel.deregister();} catch (Exception ignore) {}
-        log.info("close {} {}", toString(), string);
+        ChannelUtil.closeSession(channel, toString() + " " + string);
     }
 
     /** 增加接受消息的次数 */

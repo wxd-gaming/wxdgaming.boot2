@@ -44,18 +44,15 @@ public abstract class SocketDeviceHandler extends ChannelInboundHandlerAdapter {
         if (evt instanceof IdleStateEvent event) {
             switch (event.state()) {
                 case IdleState.READER_IDLE: {
-                    log.debug("读空闲");
-                    ctx.disconnect();
+                    ChannelUtil.closeSession(ctx.channel(), "读空闲");
                 }
                 break;
                 case IdleState.WRITER_IDLE: {
-                    log.debug("写空闲");
-                    ctx.disconnect();
+                    ChannelUtil.closeSession(ctx.channel(), "写空闲");
                 }
                 break;
                 case IdleState.ALL_IDLE: {
-                    log.debug("读写空闲");
-                    ctx.disconnect();
+                    ChannelUtil.closeSession(ctx.channel(), "读写空闲");
                 }
                 break;
             }

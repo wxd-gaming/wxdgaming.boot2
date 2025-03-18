@@ -74,11 +74,7 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
                 break;
             }
             default -> {
-                if (log.isDebugEnabled()) {
-                    log.debug("{} 未知处理类型：{}", ChannelUtil.ctxTostring(ctx), object.getClass().getName());
-                }
-                ctx.disconnect();
-                ctx.close();
+                ChannelUtil.closeSession(ctx.channel(), "未知处理类型: " + object.getClass().getName());
             }
         }
     }

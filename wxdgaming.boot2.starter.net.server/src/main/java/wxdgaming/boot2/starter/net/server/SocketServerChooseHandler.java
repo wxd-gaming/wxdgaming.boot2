@@ -34,10 +34,10 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
             "OPTIONS /",
             "HEAD /",
             "PUT /",
-            "PATCH",
-            "DELETE",
-            "TRACE",
-            "CONNECT"
+            "PATCH /",
+            "DELETE /",
+            "TRACE /",
+            "CONNECT /"
     );
 
     final SocketServerConfig socketServerConfig;

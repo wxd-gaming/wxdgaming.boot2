@@ -6,10 +6,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.ChannelUtil;
 import wxdgaming.boot2.starter.net.MessageDecode;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 
@@ -30,21 +28,17 @@ public class SocketServerMessageDecode extends MessageDecode {
         this.config = config;
     }
 
-    @Override public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        super.channelRead(ctx, msg);
-    }
-
     @Override public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
     }
 
+    @Override public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        super.channelRead(ctx, msg);
+    }
+
     @Override protected void actionWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) {
         if (!config.isEnabledWebSocket()) {
-            if (log.isWarnEnabled()) {
-                log.warn("{} 不支持 WebSocket 服务 {}", ChannelUtil.ctxTostring(ctx), frame.getClass().getName());
-            }
-            ctx.disconnect();
-            ctx.close();
+            ChannelUtil.closeSession(ctx.channel(), "不支持 WebSocket 服务");
             return;
         }
         super.actionWebSocketFrame(ctx, frame);
@@ -52,11 +46,7 @@ public class SocketServerMessageDecode extends MessageDecode {
 
     @Override protected void actionBytes(ChannelHandlerContext ctx, ByteBuf byteBuf) throws Exception {
         if (!config.isEnabledTcp()) {
-            if (log.isWarnEnabled()) {
-                log.warn("{} 不支持 tcp socket 服务 {}", ChannelUtil.ctxTostring(ctx), byteBuf.getClass().getName());
-            }
-            ctx.disconnect();
-            ctx.close();
+            ChannelUtil.closeSession(ctx.channel(), "不支持 tcp socket 服务");
             return;
         }
         super.actionBytes(ctx, byteBuf);
@@ -64,11 +54,7 @@ public class SocketServerMessageDecode extends MessageDecode {
 
     @Override protected void actionHttpRequest(ChannelHandlerContext ctx, FullHttpRequest httpRequest) throws Exception {
         if (!config.isEnabledHttp()) {
-            if (log.isWarnEnabled()) {
-                log.warn("{} 不支持 Http 服务 {}", ChannelUtil.ctxTostring(ctx), httpRequest.uri());
-            }
-            ctx.disconnect();
-            ctx.close();
+            ChannelUtil.closeSession(ctx.channel(), "不支持 Http 服务");
             return;
         }
         super.actionHttpRequest(ctx, httpRequest);
