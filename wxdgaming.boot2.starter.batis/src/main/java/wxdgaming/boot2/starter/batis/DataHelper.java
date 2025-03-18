@@ -84,7 +84,7 @@ public abstract class DataHelper<DDL extends DDLBuilder> {
 
     /** 保存数据  如果数据主键不在数据库 insert 存在数据库 update */
     public void save(Entity entity) {
-        if (existBean(entity)) {
+        if (Boolean.FALSE.equals(entity.getNewEntity()) || existBean(entity)) {
             entity.setNewEntity(false);
             update(entity);
         } else {

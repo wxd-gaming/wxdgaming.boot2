@@ -65,7 +65,11 @@ public abstract class SqlDataBatch extends DataBatch {
     }
 
     @Override public void save(Entity entity) {
-        if (entity.isNewEntity())
+        Boolean newEntity = entity.getNewEntity();
+        if (newEntity == null) {
+            newEntity = this.sqlDataHelper.existBean(entity);
+        }
+        if (Boolean.TRUE.equals(newEntity))
             insert(entity);
         else
             update(entity);

@@ -22,7 +22,7 @@ public abstract class Entity extends ObjectBase {
     /** null 未知， true 表示不存在数据库 false 表示在数据库 */
     @DbColumn(ignore = true)
     @JSONField(serialize = false, deserialize = false)
-    private transient boolean newEntity = true;
+    private transient Boolean newEntity = null;
     @DbColumn(ignore = true)
     @JSONField(serialize = false, deserialize = false)
     private transient int oldHashCode = -1;

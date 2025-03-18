@@ -495,6 +495,13 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         return findBySql(cls, sql, args);
     }
 
+    public <R extends Entity> R findByWhere(String tableName, Class<R> cls, String sqlWhere, Object... args) {
+        TableMapping tableMapping = tableMapping(cls);
+        String sql = ddlBuilder.buildSelectSql(tableMapping, tableName);
+        sql += " where " + sqlWhere;
+        return findBySql(cls, sql, args);
+    }
+
     public <R extends Entity> R findBySql(Class<R> cls, String sql, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
         AtomicReference<R> ret = new AtomicReference<>();
