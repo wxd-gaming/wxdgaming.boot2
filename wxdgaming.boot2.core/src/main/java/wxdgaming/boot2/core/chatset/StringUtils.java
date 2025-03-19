@@ -262,4 +262,13 @@ public class StringUtils {
         return sb.toString();
     }
 
+    public static int hasLength(String str, char c) {
+        int len = 0;
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == c)
+                len++;
+        }
+        return len;
+    }
+
 }

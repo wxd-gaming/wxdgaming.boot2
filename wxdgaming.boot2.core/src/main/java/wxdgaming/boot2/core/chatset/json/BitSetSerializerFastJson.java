@@ -1,6 +1,5 @@
 package wxdgaming.boot2.core.chatset.json;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.DefaultJSONParser;
 import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
 import com.alibaba.fastjson.serializer.JSONSerializer;
@@ -31,7 +30,7 @@ public class BitSetSerializerFastJson implements ObjectSerializer, ObjectDeseria
     /** 由于集合序列化后为子类,再进行反序列化时,无法还原原对象,需要修改反序列化方法,手动修改反序列化逻辑 */
     @Override
     public Object deserialze(DefaultJSONParser parser, Type type, Object fieldName) {
-        long[] js = JSON.parseObject(parser.parse(fieldName).toString(), long[].class);
+        long[] js = parser.parseObject(long[].class);
         return BitSet.valueOf(js);
     }
 

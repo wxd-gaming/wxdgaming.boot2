@@ -7,6 +7,8 @@ import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.chatset.json.ParameterizedTypeImpl;
+import wxdgaming.boot2.core.lang.ConfigString;
+import wxdgaming.boot2.core.lang.TimeValue;
 import wxdgaming.boot2.core.reflect.FieldUtils;
 import wxdgaming.boot2.core.reflect.MethodUtil;
 import wxdgaming.boot2.core.reflect.ReflectContext;
@@ -141,9 +143,14 @@ public class TableMapping {
             fieldMapping.columnType = ColumnType.Byte;
         } else if (short.class.isAssignableFrom(type) || Short.class.isAssignableFrom(type)) {
             fieldMapping.columnType = ColumnType.Short;
-        } else if (int.class.isAssignableFrom(type) || Integer.class.isAssignableFrom(type) || AtomicInteger.class.isAssignableFrom(type)) {
+        } else if (int.class.isAssignableFrom(type)
+                   || Integer.class.isAssignableFrom(type)
+                   || AtomicInteger.class.isAssignableFrom(type)) {
             fieldMapping.columnType = ColumnType.Int;
-        } else if (long.class.isAssignableFrom(type) || Long.class.isAssignableFrom(type) || AtomicLong.class.isAssignableFrom(type)) {
+        } else if (long.class.isAssignableFrom(type)
+                   || Long.class.isAssignableFrom(type)
+                   || AtomicLong.class.isAssignableFrom(type)
+                   || TimeValue.class.isAssignableFrom(type)) {
             fieldMapping.columnType = ColumnType.Long;
         } else if (float.class.isAssignableFrom(type) || Float.class.isAssignableFrom(type)) {
             fieldMapping.columnType = ColumnType.Float;
@@ -153,7 +160,9 @@ public class TableMapping {
             if (fieldMapping.length == 0)
                 fieldMapping.length = 65535;
             fieldMapping.columnType = ColumnType.Blob;
-        } else if (String.class.isAssignableFrom(type) || Enum.class.isAssignableFrom(type)) {
+        } else if (String.class.isAssignableFrom(type)
+                   || Enum.class.isAssignableFrom(type)
+                   || ConfigString.class.isAssignableFrom(type)) {
             if (fieldMapping.length == 0)
                 fieldMapping.length = 256;
             fieldMapping.columnType = ColumnType.String;
@@ -237,11 +246,15 @@ public class TableMapping {
                         case Long -> {
                             if (object instanceof AtomicLong atomicLong) {
                                 object = atomicLong.get();
+                            } else if (object instanceof TimeValue timeValue) {
+                                object = timeValue.longValue();
                             }
                         }
                         case String -> {
-                            if (object instanceof Enum) {
-                                object = ((Enum<?>) object).name();
+                            if (object instanceof Enum<?> enumObject) {
+                                object = enumObject.name();
+                            } else if (object instanceof ConfigString configString) {
+                                object = configString.getValue();
                             } else if (!(object instanceof String)) {
                                 object = FastJsonUtil.toJSONString(object, FastJsonUtil.Writer_Features_Type_Name_NOT_ROOT);
                             }
@@ -334,40 +347,70 @@ public class TableMapping {
             }
 
             if (AtomicReference.class.isAssignableFrom(getFileType())) {
-                Class tType = ReflectContext.getTType(getField().getGenericType(), 0);
-                if (!String.class.isAssignableFrom(tType)) {
-                    object = FastJsonUtil.parse(object.toString(), tType);
+                Class<?> tType = ReflectContext.getTType(getField().getGenericType(), 0);
+                if (String.class.isAssignableFrom(tType)) {
+                    return new AtomicReference<>(object);
                 }
-                return new AtomicReference<>(object);
+                object = FastJsonUtil.parse(object.toString(), tType);
             }
 
             switch (getColumnType()) {
+                case Blob -> {
+                    return FastJsonUtil.parse((byte[]) object, getJsonType());
+                }
                 case Bool -> {
                     if (AtomicBoolean.class.isAssignableFrom(getFileType())) {
                         return new AtomicBoolean(Boolean.parseBoolean(object.toString()));
+                    }
+                    if (object instanceof Boolean b) {
+                        return b;
                     }
                     return Boolean.parseBoolean(object.toString());
                 }
                 case Int -> {
                     if (AtomicInteger.class.isAssignableFrom(getFileType())) {
-                        return new AtomicInteger(Integer.parseInt(object.toString()));
+                        if (object instanceof Number number) {
+                            return new AtomicInteger(number.intValue());
+                        } else {
+                            return new AtomicInteger(Integer.parseInt(object.toString()));
+                        }
+                    }
+                    if (object instanceof Number number) {
+                        return number.intValue();
                     }
                     return Integer.parseInt(object.toString());
                 }
                 case Long -> {
                     if (AtomicLong.class.isAssignableFrom(getFileType())) {
-                        return new AtomicLong(Long.parseLong(object.toString()));
+                        if (object instanceof Number number) {
+                            return new AtomicLong(number.longValue());
+                        } else {
+                            return new AtomicLong(Long.parseLong(object.toString()));
+                        }
+                    }
+                    if (TimeValue.class.isAssignableFrom(getFileType())) {
+                        if (object instanceof Number number) {
+                            return new TimeValue(number.longValue());
+                        } else {
+                            return new TimeValue(Long.parseLong(object.toString()));
+                        }
+                    }
+                    if (object instanceof Number number) {
+                        return number.longValue();
                     }
                     return Long.parseLong(object.toString());
                 }
                 case Double -> {
+                    if (object instanceof Number number) {
+                        return number.doubleValue();
+                    }
                     return Double.parseDouble(object.toString());
                 }
                 case Float -> {
+                    if (object instanceof Number number) {
+                        return number.floatValue();
+                    }
                     return Float.parseFloat(object.toString());
-                }
-                case Blob -> {
-                    return FastJsonUtil.parse((byte[]) object, getJsonType());
                 }
                 case null, default -> {
                     if (BitSet.class.isAssignableFrom(getFileType())) {
@@ -377,6 +420,8 @@ public class TableMapping {
                         }
                     } else if (Enum.class.isAssignableFrom(getFileType())) {
                         return Enum.valueOf((Class<Enum>) getFileType(), object.toString());
+                    } else if (ConfigString.class.isAssignableFrom(getFileType())) {
+                        return new ConfigString(object.toString());
                     }
                     return FastJsonUtil.parse(object.toString(), getJsonType());
                 }

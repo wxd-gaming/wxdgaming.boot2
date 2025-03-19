@@ -1,8 +1,8 @@
 html, body {width: 100%;height: 100%;overflow: hidden;font-size: 12px;}
 
-html, body, div, table, thead, tbody, tr, th, td, a, object, iframe, h1, h3, ul, li, dt, dl, label, span, strong {
+html, body, div, table, thead, tbody, tr, th, td, a, object, iframe, h1, h3, ul, li, dt, dl, label, span, strong, select, input, button {
     padding: 0;margin: 0;border: 0;box-sizing: border-box;border-collapse: collapse;border-spacing: 0;
-    }
+}
 
 div.body {width: 100%;height: 100%;overflow: auto;}
 
@@ -42,9 +42,9 @@ a:hover, a:active { color: #33be85; }
     left: 50%;top: 28%; transform: translate(-50%, 0);max-width: 55%;min-width: 320px;
     border-radius: 6px 6px 3px 3px;border: #95B8E7 1px solid;color: rgba(0, 0, 0, 1);background: linear-gradient(to bottom, #EFF5FF 0, #E0ECFF 20%);
     text-align: left;vertical-align: center; word-wrap: break-word;white-space: normal;box-shadow: 0 0 20px 10px rgba(110, 54, 54, 0.2); /*毛玻璃*/
-    }
+}
 
-.message_alert_bg .message_alert_box strong {display: block;width: calc(100% - 20px);height:20px;color: #0E2D5F;}
+.message_alert_bg .message_alert_box strong {display: block;width: calc(100% - 20px);height: 20px;color: #0E2D5F;}
 
 .message_alert_bg .message_alert_box div button {border-radius: 4px;border: 1px solid #bbb;padding: 5px 15px;margin-right: 15px;color: #444;cursor: pointer;}
 
@@ -53,7 +53,7 @@ a:hover, a:active { color: #33be85; }
     border: #95B8E7 1px solid;color: #000000;background-color: #ffffff;
     min-width: 300px; min-height: 140px; overflow: hidden;text-align: left;vertical-align: center;
     word-wrap: break-word;white-space: normal;
-    }
+}
 
 .message_alert_bg .message_alert_box .message_alert_c .message_alert_c_1 {display: block;overflow: auto;}
 
@@ -63,19 +63,19 @@ a:hover, a:active { color: #33be85; }
     display: block; position: absolute;padding-top: 100px;left: 50%;top: 0px;
     transform: translate(-50%, 0);min-width: 1px;
     z-index: 9999999;text-align: center;max-width: 55%;
-    }
+}
 
 .message_notice_bg .message_notice_box {
     display: block;position: relative; padding: 3px;margin-top: 5px;box-shadow: 0 0 10px 5px rgba(110, 54, 54, 0.2); /*毛玻璃*/
     border-radius: 4px;border: #95B8E7 1px solid;color: rgba(0, 0, 0, 1);background: linear-gradient(to bottom, #EFF5FF 0, #E0ECFF 20%);
-    }
+}
 
 .message_notice_bg .message_notice_c {
     display: block;padding: 8px;
     border: #95B8E7 1px solid;background-color: #ffffff;min-width: 60px; min-height: 40px;
     overflow: auto;text-align: left;vertical-align: center;
     word-wrap: break-word;white-space: normal;
-    }
+}
 
 .message_title_tips {
     display: none;padding: 12px;
@@ -83,7 +83,7 @@ a:hover, a:active { color: #33be85; }
     position: absolute;min-width: 120px; max-width: 45%;min-height: 40px;
     overflow: hidden;text-align: left;vertical-align: center;font-weight: bold;
     z-index: 99999;word-wrap: break-word;white-space: normal;
-    }
+}
 
 
 .upload_file_bg { display: block; position: absolute;background: rgba(69, 68, 68, 0.2); width: 100%;height: 100%;left: 0px;top: 0px; z-index: 9099; }
@@ -93,7 +93,7 @@ a:hover, a:active { color: #33be85; }
     left: 50%;top: 28%; transform: translate(-50%, 0);
     border-radius: 6px 6px 3px 3px;border: #95B8E7 1px solid;color: rgba(0, 0, 0, 1);background: linear-gradient(to bottom, #EFF5FF 0, #E0ECFF 20%);
     text-align: left;vertical-align: center; word-wrap: break-word;white-space: normal;box-shadow: 0 0 20px 10px rgba(110, 54, 54, 0.2); /*毛玻璃*/
-    }
+}
 
 .upload_file_bg .upload_file_box strong {padding-left: 3px;color: #0E2D5F;}
 
@@ -104,8 +104,12 @@ a:hover, a:active { color: #33be85; }
     border: #95B8E7 1px solid;color: #000000;background-color: #ffffff;
     width: 360px; overflow: hidden;text-align: left;vertical-align: center;
     word-wrap: break-word;white-space: normal;
-    }
+}
 
 .upload_file_bg .upload_file_c .upload_file_c_1 {display: block;overflow: auto;}
 
 .upload_file_bg .upload_file_c .upload_file_c_b { position: absolute;bottom: 15px;right: 30px; }
+
+.btn_box input, .btn_box select {margin-top: 5px;margin-left: 10px;width: 160px;height: 22px;line-height: 22px;border: #4c4c4c 1px solid;border-radius: 5px;}
+
+.btn_box button {margin-top: 5px;color: rgb(255, 253, 253); background-color: rgb(241, 52, 10); border: none;padding: 8px 15px;}

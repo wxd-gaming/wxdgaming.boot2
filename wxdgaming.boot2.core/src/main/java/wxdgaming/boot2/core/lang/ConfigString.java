@@ -1,6 +1,5 @@
 package wxdgaming.boot2.core.lang;
 
-import com.alibaba.fastjson.annotation.JSONCreator;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import wxdgaming.boot2.core.chatset.StringUtils;
@@ -14,7 +13,7 @@ import java.util.List;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2024-10-08 20:44
  **/
-public class ConfigString extends ObjectBase {
+public class ConfigString {
 
     @Getter @JSONField(ordinal = 1)
     String value;
@@ -41,8 +40,7 @@ public class ConfigString extends ObjectBase {
     private transient List<float[]> floatArrayList = null;
     private transient List<String[]> stringArrayList = null;
 
-    @JSONCreator
-    public ConfigString(@JSONField(name = "value") String value) {
+    public ConfigString(String value) {
         this.value = value;
     }
 
@@ -197,5 +195,9 @@ public class ConfigString extends ObjectBase {
             stringArrayList = String2StringArrayList.parse(value);
         }
         return stringArrayList;
+    }
+
+    @Override public String toString() {
+        return value;
     }
 }

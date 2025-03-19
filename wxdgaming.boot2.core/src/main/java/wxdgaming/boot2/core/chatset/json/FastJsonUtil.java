@@ -10,6 +10,8 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import wxdgaming.boot2.core.function.SLFunction1;
 import wxdgaming.boot2.core.io.Objects;
+import wxdgaming.boot2.core.lang.ConfigString;
+import wxdgaming.boot2.core.lang.TimeValue;
 import wxdgaming.boot2.core.lang.bit.BitFlag;
 
 import java.lang.reflect.Type;
@@ -98,6 +100,12 @@ public class FastJsonUtil {
 
         SerializeConfig.getGlobalInstance().put(BitFlag.class, BitFlagSerializerFastJson.default_instance);
         ParserConfig.getGlobalInstance().putDeserializer(BitFlag.class, BitFlagSerializerFastJson.default_instance);
+
+        SerializeConfig.getGlobalInstance().put(TimeValue.class, TimeValueSerializerFastJson.default_instance);
+        ParserConfig.getGlobalInstance().putDeserializer(TimeValue.class, TimeValueSerializerFastJson.default_instance);
+
+        SerializeConfig.getGlobalInstance().put(ConfigString.class, ConfigStringSerializerFastJson.default_instance);
+        ParserConfig.getGlobalInstance().putDeserializer(ConfigString.class, ConfigStringSerializerFastJson.default_instance);
 
     }
 
