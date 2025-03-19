@@ -97,7 +97,6 @@ public class HttpListenerContent {
             HttpRequest httpRequest = httpMapping == null ? null : httpMapping.httpRequest();
             Method method = httpMapping == null ? null : httpMapping.method();
 
-
             Object filterMatch = runApplication.classWithSuper(HttpFilter.class)
                     .map(httpFilter -> httpFilter.doFilter(httpRequest, method, uriPath, httpContext))
                     .filter(Objects::nonNull)
@@ -119,7 +118,7 @@ public class HttpListenerContent {
                 HttpListenerTrigger httpListenerTrigger = new HttpListenerTrigger(httpMapping, runApplication, httpContext);
                 httpListenerTrigger.submit();
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error("dispatch error", e);
         }
     }

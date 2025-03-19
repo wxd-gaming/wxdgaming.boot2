@@ -199,4 +199,10 @@ class CASCacheArea<K, V> implements ICacheArea<K, V> {
         invalidateAll();
     }
 
+    /** 丢弃当前缓存 */
+    @Deprecated
+    @Override public void discard() {
+        nodes = new ConcurrentHashMap<>();
+    }
+
 }

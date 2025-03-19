@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+
+        // 定义异步函数 b，返回一个 Promise
+        function asyncFun(call) {
+            let promise = new Promise((resolve, reject) => {
+                resolve();
+            });
+            promise.then(call);
+            return promise;
+        }
+
+        function testa() {
+            alert("test");
+        }
+
+        function testb() {
+            asyncFun(() => {
+                testa()
+            });
+            console.log("1111");
+        }
+
+        testb();
+        console.log("2222");
+
+
+        // 定义函数 a
+        async function a() {
+            console.log('函数 a 开始执行');
+            // 调用异步函数 b，不使用 await 等待其完成
+            let p = asyncFun(() => {
+                console.log('异步函数 b 的 Promise 已解决');
+            });
+            console.log('函数 a 继续执行');
+            await p;
+            console.log('函数 b 继续执行');
+        }
+
+        // 调用函数 a
+        a();
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>

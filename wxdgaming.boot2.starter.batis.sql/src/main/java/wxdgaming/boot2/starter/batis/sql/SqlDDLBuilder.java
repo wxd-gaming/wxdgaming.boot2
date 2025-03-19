@@ -141,15 +141,15 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
 
     /** 根据主键列构建where */
     public String buildKeyWhere(TableMapping tableMapping) {
-        String sql = "";
+        StringBuilder sql = new StringBuilder();
         for (TableMapping.FieldMapping fieldMapping : tableMapping.getKeyFields()) {
             if (!sql.isEmpty()) {
-                sql += " and ";
+                sql.append(" and ");
             }
-            sql += "`" + fieldMapping.getColumnName() + "`" + "=" + build$$(fieldMapping);
+            sql.append("`").append(fieldMapping.getColumnName()).append("`").append("=").append(build$$(fieldMapping));
         }
-        sql = buildSql$$(sql);
-        return sql;
+        sql = new StringBuilder(buildSql$$(sql.toString()));
+        return sql.toString();
     }
 
     /** insert into */
@@ -210,6 +210,10 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
                     return sql;
                 }
         );
+    }
+
+    public String buildDeleteSql(TableMapping tableMapping, String tableName) {
+        return buildSql$$("delete from `" + tableName + "` where " + buildKeyWhere(tableMapping));
     }
 
     @Override public Object[] buildKeyParams(TableMapping tableMapping, Object bean) {

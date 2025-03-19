@@ -270,4 +270,14 @@ class LRUCacheArea<K, V> implements ICacheArea<K, V> {
         invalidateAll();
     }
 
+    /** 丢弃当前缓存 */
+    @Deprecated
+    @Override public void discard() {
+        readLock.lock();
+        try {
+            nodes = new HashMap<>();
+        } finally {
+            readLock.unlock();
+        }
+    }
 }

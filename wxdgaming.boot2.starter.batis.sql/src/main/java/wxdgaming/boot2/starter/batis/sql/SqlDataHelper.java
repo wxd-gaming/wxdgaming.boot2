@@ -540,4 +540,45 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         this.executeUpdate(sql, objects);
     }
 
+    @Override public void delete(Entity entity) {
+        TableMapping tableMapping = ddlBuilder.tableMapping(entity.getClass());
+        executeUpdate(ddlBuilder.buildDeleteSql(tableMapping, tableMapping.getTableName()), ddlBuilder.buildKeyParams(tableMapping, entity));
+    }
+
+    @Override public <R extends Entity> void deleteByKey(Class<R> cls, Object... args) {
+        TableMapping tableMapping = ddlBuilder.tableMapping(cls);
+        executeUpdate(ddlBuilder.buildDeleteSql(tableMapping, tableMapping.getTableName()), args);
+    }
+
+    @Override public <R extends Entity> void deleteByKey(String tableName, Class<R> cls, Object... args) {
+        TableMapping tableMapping = ddlBuilder.tableMapping(cls);
+        executeUpdate(ddlBuilder.buildDeleteSql(tableMapping, tableName), args);
+    }
+
+    @Override public <R extends Entity> void deleteByWhere(Class<R> cls, String where, Object... args) {
+        TableMapping tableMapping = ddlBuilder.tableMapping(cls);
+        deleteByWhere(tableMapping.getTableName(), where, args);
+    }
+
+    @Override public void deleteByWhere(String tableName, String where, Object... args) {
+        String sql = "delete from `" + tableName + "` where " + where;
+        String string = ddlBuilder.buildSql$$(sql);
+        executeUpdate(string, args);
+    }
+
+    @Override public void truncates() {
+        findTableMap().forEach((tableName, tableComment) -> {
+            truncate(tableName);
+        });
+    }
+
+    @Override public <R extends Entity> void truncate(Class<R> cls) {
+        super.truncate(cls);
+    }
+
+    @Override public void truncate(String tableName) {
+        String sqlStr = "TRUNCATE TABLE `" + tableName + "`";
+        String string = ddlBuilder.buildSql$$(sqlStr);
+        executeUpdate(string);
+    }
 }

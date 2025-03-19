@@ -87,6 +87,15 @@ const wxd = {
         await promise;
     },
 
+    /**开启异步执行函数*/
+    asyncFun: function (call) {
+        let promise = new Promise((resolve, reject) => {
+            resolve();
+        });
+        promise.then(call);
+        return promise;
+    },
+
     /** 从 Cookie 获取登录授权 */
     getAuthor: function () {
         return wxd.getCookie("authorization");
@@ -299,19 +308,19 @@ const wxd = {
      * @param parent 父窗体
      */
     loading: function (img, w, h, parent) {
+        wxd.asyncFun(() => {
+            if (wxd.isNull(img)) img = "/loading-2.gif";
+            if (wxd.isNull(w)) w = "54px";
+            if (wxd.isNull(h)) h = "54px";
 
-        if (wxd.isNull(img)) img = "/loading-2.gif";
-        if (wxd.isNull(w)) w = "54px";
-        if (wxd.isNull(h)) h = "54px";
-
-        let load_div = `
-<div class="full_loading_bg">
-    <img style="width: ${w};height: ${h};" src="${img}">
-</div>
-`;
-        if (wxd.isNull(parent)) parent = document.body;
-        $(parent).append(load_div);
-
+            let load_div = `
+                <div class="full_loading_bg">
+                    <img style="width: ${w};height: ${h};" src="${img}">
+                </div>
+                `;
+            if (wxd.isNull(parent)) parent = document.body;
+            $(parent).append(load_div);
+        });
     },
 
     /** 关闭 loading 层 */

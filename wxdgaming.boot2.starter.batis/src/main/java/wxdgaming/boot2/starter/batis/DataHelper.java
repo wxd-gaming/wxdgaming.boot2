@@ -96,4 +96,26 @@ public abstract class DataHelper<DDL extends DDLBuilder> {
 
     public abstract void update(Entity entity);
 
+    public abstract void delete(Entity entity);
+
+    public abstract <R extends Entity> void deleteByKey(Class<R> cls, Object... args);
+
+    public abstract <R extends Entity> void deleteByKey(String tableName, Class<R> cls, Object... args);
+
+    public abstract <R extends Entity> void deleteByWhere(Class<R> cls, String where, Object... args);
+
+    public abstract void deleteByWhere(String tableName, String where, Object... args);
+
+    /** 清库 */
+    public abstract void truncates();
+
+    /** 清空表 */
+    public <R extends Entity> void truncate(Class<R> cls) {
+        TableMapping tableMapping = tableMapping(cls);
+        truncate(tableMapping.getTableName());
+    }
+
+    /** 清空表 */
+    public abstract void truncate(String tableName);
+
 }

@@ -35,7 +35,12 @@ interface ICacheArea<K, V> {
 
     Collection<V> values();
 
+    /** 正常关闭 */
     void shutdown();
+
+    /** 丢弃当前缓存，直接从内存删除删除很危险的 */
+    @Deprecated
+    void discard();
 
     String getCacheName();
 

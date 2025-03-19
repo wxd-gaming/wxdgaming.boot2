@@ -125,6 +125,15 @@ public final class Cache<K, V> {
         }
     }
 
+    /** 丢弃所有缓存对象，非常危险 */
+    @Deprecated
+    public void discard() {
+        for (int i = 0; i < cacheAreaMap.length; i++) {
+            ICacheArea<K, V> kviCacheArea = cacheAreaMap[i];
+            kviCacheArea.discard();
+        }
+    }
+
     private Cache(String cacheName) {
         this.cacheName = cacheName;
     }

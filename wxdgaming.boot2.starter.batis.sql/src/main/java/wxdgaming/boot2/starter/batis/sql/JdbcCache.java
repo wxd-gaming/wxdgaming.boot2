@@ -97,6 +97,11 @@ public class JdbcCache<E extends Entity, Key> {
     }
 
     /** 强制缓存过期 */
+    public void invalidateAll() {
+        cache.invalidateAll();
+    }
+
+    /** 强制缓存过期 */
     public void invalidate(Key key) {
         cache.invalidate(key);
     }
@@ -105,4 +110,9 @@ public class JdbcCache<E extends Entity, Key> {
         return cache.values();
     }
 
+    /** 丢弃所有缓存，操作非常危险 */
+    @Deprecated
+    public void discard() {
+        cache.discard();
+    }
 }
