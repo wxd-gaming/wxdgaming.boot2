@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 import wxdgaming.boot2.core.function.Consumer2;
 import wxdgaming.boot2.core.function.Function1;
 import wxdgaming.boot2.core.function.Function2;
+import wxdgaming.boot2.core.threading.TimerJob;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.util.Collection;
@@ -32,6 +33,7 @@ public abstract class Cache<K, V> {
     @Builder.Default
     protected long heartTimeMs = 1000;
     protected Consumer2<K, V> heartListener;
+    protected TimerJob[] timerJobs = null;
 
     public void start() {
         AssertUtil.assertTrue(this.area > 0, "area must > 0");
@@ -44,6 +46,7 @@ public abstract class Cache<K, V> {
         if (this.heartTimeMs > expireAfterWriteMs && this.heartTimeMs > expireAfterReadMs) {
             throw new RuntimeException("心跳时间必须小于过期时间");
         }
+        AssertUtil.assertTrue(this.timerJobs == null, "重复调用 start");
     }
 
     /** 关闭缓存 */
@@ -84,6 +87,9 @@ public abstract class Cache<K, V> {
 
     /** 强制过期所有缓存 */
     public abstract void invalidateAll();
+
+    /** 获取所有缓存 */
+    public abstract Collection<K> keys();
 
     /** 获取所有缓存 */
     public abstract Collection<V> values();

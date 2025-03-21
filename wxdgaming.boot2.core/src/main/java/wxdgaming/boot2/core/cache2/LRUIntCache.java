@@ -10,6 +10,7 @@ import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.threading.TimerJob;
 import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * cas 类型的缓存
+ * lru 类型的缓存
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-03-20 16:14
@@ -29,7 +30,6 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
 
     List<CacheLock> reentrantLocks;
     List<Int2ObjectOpenHashMap<CacheHolder<V>>> nodes;
-    TimerJob[] timerJobs;
 
     /** 计算内存大小 注意特别耗时，并且可能死循环 */
     @Deprecated
@@ -235,6 +235,25 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
                 cacheLock.writeLock.unlock();
             }
         }
+    }
+
+    @Override public Collection<Integer> keys() {
+        List<Integer> result = new ArrayList<>();
+        for (int i = 0; i < nodes.size(); i++) {
+            CacheLock cacheLock = reentrantLocks.get(i);
+            cacheLock.readLock.lock();
+            try {
+                Int2ObjectOpenHashMap<CacheHolder<V>> node = nodes.get(i);
+                List<Integer> tmp = new ArrayList<>(node.size());
+                for (Int2ObjectMap.Entry<CacheHolder<V>> holderLongEntry : node.int2ObjectEntrySet()) {
+                    tmp.add(holderLongEntry.getIntKey());
+                }
+                result.addAll(tmp);
+            } finally {
+                cacheLock.readLock.unlock();
+            }
+        }
+        return result;
     }
 
     /** 拷贝所有元素 */

@@ -1,7 +1,7 @@
 package wxdgaming.boot2.core.cache2;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -19,30 +19,31 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * lru 类型的缓存
+ * lru 类型的缓存 仅有key的缓存
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-03-20 16:14
  **/
 @Slf4j
 @SuperBuilder
-public class LRUInt2IntCache extends Cache<Integer, Integer> {
+public class LRULongKeyCache extends Cache<Long, Boolean> {
 
     List<CacheLock> reentrantLocks;
-    List<Int2ObjectOpenHashMap<CacheHolderInt>> nodes;
+    List<Long2ObjectOpenHashMap<CacheHolderNone>> nodes;
+
 
     /** 计算内存大小 注意特别耗时，并且可能死循环 */
     @Deprecated
     public long memorySize() {
         long size = 0;
-        for (Int2ObjectOpenHashMap<CacheHolderInt> node : nodes) {
+        for (Long2ObjectOpenHashMap<CacheHolderNone> node : nodes) {
             size += Data2Size.totalSize0(node);
         }
         return size;
     }
 
-    CacheHolderInt newCacheHolder(Integer value) {
-        CacheHolderInt cacheHolder = new CacheHolderInt(value);
+    CacheHolderNone newCacheHolder() {
+        CacheHolderNone cacheHolder = new CacheHolderNone();
         cacheHolder.setLastHeartTime(MyClock.millis() + heartTimeMs);
         if (this.expireAfterWriteMs > 0) {
             cacheHolder.setExpireEndTime(MyClock.millis() + expireAfterWriteMs);
@@ -50,7 +51,7 @@ public class LRUInt2IntCache extends Cache<Integer, Integer> {
         return cacheHolder;
     }
 
-    void refresh(CacheHolderInt cacheHolder) {
+    void refresh(CacheHolderNone cacheHolder) {
         if (this.expireAfterReadMs > 0) {
             cacheHolder.setExpireEndTime(MyClock.millis() + expireAfterReadMs);
         }
@@ -59,6 +60,7 @@ public class LRUInt2IntCache extends Cache<Integer, Integer> {
     public void start() {
         super.start();
         initNodes();
+        AssertUtil.assertTrue(this.loader == null, "不支持调用 load 函数");
         this.timerJobs = new TimerJob[this.area];
 
         for (int i = 0; i < this.area; i++) {
@@ -68,23 +70,23 @@ public class LRUInt2IntCache extends Cache<Integer, Integer> {
                     CacheLock cacheLock = reentrantLocks.get(hashIndex);
                     cacheLock.writeLock.lock();
                     try {
-                        ObjectIterator<Int2ObjectMap.Entry<CacheHolderInt>> iterator = nodes.get(hashIndex).int2ObjectEntrySet().iterator();
+                        ObjectIterator<Long2ObjectMap.Entry<CacheHolderNone>> iterator = nodes.get(hashIndex).long2ObjectEntrySet().iterator();
                         long millis = MyClock.millis();
                         while (iterator.hasNext()) {
-                            Int2ObjectMap.Entry<CacheHolderInt> next = iterator.next();
-                            CacheHolderInt holder = next.getValue();
+                            Long2ObjectMap.Entry<CacheHolderNone> next = iterator.next();
+                            CacheHolderNone holder = next.getValue();
                             if (millis > holder.getExpireEndTime()) {
                                 boolean remove = true;
-                                if (LRUInt2IntCache.this.removalListener != null) {
-                                    remove = LRUInt2IntCache.this.removalListener.apply(next.getIntKey(), holder.getValue());
+                                if (LRULongKeyCache.this.removalListener != null) {
+                                    remove = LRULongKeyCache.this.removalListener.apply(next.getLongKey(), true);
                                 }
                                 if (remove)
                                     iterator.remove();
                                 else
                                     refresh(holder);/*移除缓存失败刷新一次*/
                             } else {
-                                if (LRUInt2IntCache.this.heartListener != null && millis > holder.getLastHeartTime()) {
-                                    LRUInt2IntCache.this.heartListener.accept(next.getIntKey(), holder.getValue());
+                                if (LRULongKeyCache.this.heartListener != null && millis > holder.getLastHeartTime()) {
+                                    LRULongKeyCache.this.heartListener.accept(next.getLongKey(), true);
                                 }
                             }
                         }
@@ -107,10 +109,10 @@ public class LRUInt2IntCache extends Cache<Integer, Integer> {
 
     private void initNodes() {
         List<CacheLock> tmpLock = new ArrayList<>(this.area);
-        List<Int2ObjectOpenHashMap<CacheHolderInt>> tmpNodes = new ArrayList<>(this.area);
+        List<Long2ObjectOpenHashMap<CacheHolderNone>> tmpNodes = new ArrayList<>(this.area);
         for (int i = 0; i < this.area; i++) {
             tmpLock.add(new CacheLock());
-            tmpNodes.add(new Int2ObjectOpenHashMap<>());
+            tmpNodes.add(new Long2ObjectOpenHashMap<>());
         }
 
         this.reentrantLocks = Collections.unmodifiableList(tmpLock);
@@ -124,48 +126,48 @@ public class LRUInt2IntCache extends Cache<Integer, Integer> {
         invalidateAll();
     }
 
-    @Override public boolean has(Integer k) {
+    @Override public boolean has(Long k) {
         int hashIndex = hashIndex(k);
         CacheLock cacheLock = reentrantLocks.get(hashIndex);
         cacheLock.readLock.lock();
         try {
-            return nodes.get(hashIndex).containsKey(k.intValue());
+            return nodes.get(hashIndex).containsKey(k.longValue());
         } finally {
             cacheLock.readLock.unlock();
         }
     }
 
-    @Override public Integer get(Integer k) throws NullPointerException {
-        Integer ifPresent = getIfPresent(k);
+    @Override public Boolean get(Long k) throws NullPointerException {
+        Boolean ifPresent = getIfPresent(k);
         if (ifPresent == null) {
             throw new NullPointerException(String.format("cache key=%s value is null", k));
         }
         return ifPresent;
     }
 
-    @Override public Integer getIfPresent(Integer k) {
+    @Override public Boolean getIfPresent(Long k) {
         int hashIndex = hashIndex(k);
-        CacheHolderInt cacheHolder = null;
+        CacheHolderNone cacheHolder = null;
         CacheLock cacheLock = reentrantLocks.get(hashIndex);
         cacheLock.readLock.lock();
         try {
-            cacheHolder = nodes.get(hashIndex).get(k.intValue());
+            cacheHolder = nodes.get(hashIndex).get(k.longValue());
         } finally {
             cacheLock.readLock.unlock();
         }
         if (cacheHolder == null) {
             cacheLock.writeLock.lock();
             try {
-                cacheHolder = nodes.get(hashIndex).get(k.intValue());
+                cacheHolder = nodes.get(hashIndex).get(k.longValue());
                 if (cacheHolder == null) {
                     /*双重锁确保正确命中*/
-                    if (LRUInt2IntCache.this.loader == null)
+                    if (LRULongKeyCache.this.loader == null)
                         return null;
-                    Integer apply = LRUInt2IntCache.this.loader.apply(k);
+                    Boolean apply = LRULongKeyCache.this.loader.apply(k);
                     if (apply == null)
                         return null;
-                    cacheHolder = newCacheHolder(apply);
-                    nodes.get(hashIndex).put(k.intValue(), cacheHolder);
+                    cacheHolder = newCacheHolder();
+                    nodes.get(hashIndex).put(k.longValue(), cacheHolder);
                 }
             } finally {
                 cacheLock.writeLock.unlock();
@@ -173,46 +175,46 @@ public class LRUInt2IntCache extends Cache<Integer, Integer> {
         }
         if (cacheHolder == null) return null;
         refresh(cacheHolder);
-        return cacheHolder.getValue();
+        return true;
     }
 
-    @Override public Integer put(Integer k, Integer v) {
+    @Override public Boolean put(Long k, Boolean v) {
         int hashIndex = hashIndex(k);
         CacheLock cacheLock = reentrantLocks.get(hashIndex);
         cacheLock.writeLock.lock();
         try {
-            CacheHolderInt cacheHolder = newCacheHolder(v);
-            CacheHolderInt old = nodes.get(hashIndex).put(k.intValue(), cacheHolder);
-            return old == null ? null : old.getValue();
+            CacheHolderNone cacheHolder = newCacheHolder();
+            CacheHolderNone old = nodes.get(hashIndex).put(k.longValue(), cacheHolder);
+            return old != null;
         } finally {
             cacheLock.writeLock.unlock();
         }
     }
 
-    @Override public Integer putIfAbsent(Integer k, Integer v) {
+    @Override public Boolean putIfAbsent(Long k, Boolean v) {
         int hashIndex = hashIndex(k);
         CacheLock cacheLock = reentrantLocks.get(hashIndex);
         cacheLock.writeLock.lock();
         try {
-            CacheHolderInt cacheHolder = newCacheHolder(v);
-            CacheHolderInt old = nodes.get(hashIndex).putIfAbsent(k, cacheHolder);
-            return old == null ? null : old.getValue();
+            CacheHolderNone cacheHolder = newCacheHolder();
+            CacheHolderNone old = nodes.get(hashIndex).putIfAbsent(k, cacheHolder);
+            return old != null;
         } finally {
             cacheLock.writeLock.unlock();
         }
     }
 
-    @Override public Integer invalidate(Integer k) {
+    @Override public Boolean invalidate(Long k) {
         int hashIndex = hashIndex(k);
         CacheLock cacheLock = reentrantLocks.get(hashIndex);
         cacheLock.writeLock.lock();
         try {
-            CacheHolderInt cacheHolder = nodes.get(hashIndex).get(k.intValue());
+            CacheHolderNone cacheHolder = nodes.get(hashIndex).get(k.longValue());
             if (cacheHolder == null) {
                 return null;
             }
             cacheHolder.setExpireEndTime(0);
-            return cacheHolder.getValue();
+            return true;
         } finally {
             cacheLock.writeLock.unlock();
         }
@@ -223,8 +225,8 @@ public class LRUInt2IntCache extends Cache<Integer, Integer> {
             CacheLock cacheLock = reentrantLocks.get(i);
             cacheLock.writeLock.lock();
             try {
-                Int2ObjectOpenHashMap<CacheHolderInt> node = nodes.get(i);
-                for (CacheHolderInt holder : node.values()) {
+                Long2ObjectOpenHashMap<CacheHolderNone> node = nodes.get(i);
+                for (CacheHolderNone holder : node.values()) {
                     holder.setExpireEndTime(0);
                 }
             } finally {
@@ -233,16 +235,16 @@ public class LRUInt2IntCache extends Cache<Integer, Integer> {
         }
     }
 
-    @Override public Collection<Integer> keys() {
-        List<Integer> result = new ArrayList<>();
+    @Override public Collection<Long> keys() {
+        List<Long> result = new ArrayList<>();
         for (int i = 0; i < nodes.size(); i++) {
             CacheLock cacheLock = reentrantLocks.get(i);
             cacheLock.readLock.lock();
             try {
-                Int2ObjectOpenHashMap<CacheHolderInt> node = nodes.get(i);
-                List<Integer> tmp = new ArrayList<>(node.size());
-                for (Int2ObjectMap.Entry<CacheHolderInt> holderLongEntry : node.int2ObjectEntrySet()) {
-                    tmp.add(holderLongEntry.getIntKey());
+                Long2ObjectOpenHashMap<CacheHolderNone> node = nodes.get(i);
+                List<Long> tmp = new ArrayList<>(node.size());
+                for (Long2ObjectMap.Entry<CacheHolderNone> holderLongEntry : node.long2ObjectEntrySet()) {
+                    tmp.add(holderLongEntry.getLongKey());
                 }
                 result.addAll(tmp);
             } finally {
@@ -253,23 +255,8 @@ public class LRUInt2IntCache extends Cache<Integer, Integer> {
     }
 
     /** 拷贝所有元素 */
-    @Override public Collection<Integer> values() {
-        List<Integer> result = new ArrayList<>();
-        for (int i = 0; i < nodes.size(); i++) {
-            CacheLock cacheLock = reentrantLocks.get(i);
-            cacheLock.readLock.lock();
-            try {
-                Int2ObjectOpenHashMap<CacheHolderInt> node = nodes.get(i);
-                List<Integer> tmp = new ArrayList<>(node.size());
-                for (CacheHolderInt holder : node.values()) {
-                    tmp.add(holder.getValue());
-                }
-                result.addAll(tmp);
-            } finally {
-                cacheLock.readLock.unlock();
-            }
-        }
-        return result;
+    @Override public Collection<Boolean> values() {
+        throw new UnsupportedOperationException("不支持");
     }
 
     @Override public long size() {
@@ -278,7 +265,7 @@ public class LRUInt2IntCache extends Cache<Integer, Integer> {
             CacheLock cacheLock = reentrantLocks.get(i);
             cacheLock.readLock.lock();
             try {
-                Int2ObjectOpenHashMap<CacheHolderInt> node = nodes.get(i);
+                Long2ObjectOpenHashMap<CacheHolderNone> node = nodes.get(i);
                 size += node.size();
             } finally {
                 cacheLock.readLock.unlock();
@@ -288,7 +275,7 @@ public class LRUInt2IntCache extends Cache<Integer, Integer> {
     }
 
     @Deprecated
-    @Override public void discard(Integer k) {
+    @Override public void discard(Long k) {
         int hashIndex = hashIndex(k);
         CacheLock cacheLock = reentrantLocks.get(hashIndex);
         cacheLock.writeLock.lock();

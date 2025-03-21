@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * cas 类型的缓存
+ * lru 类型的缓存
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-03-20 16:14
@@ -29,7 +29,6 @@ public class LRULong2LongCache extends Cache<Long, Long> {
 
     List<CacheLock> reentrantLocks;
     List<Long2ObjectOpenHashMap<CacheHolderLong>> nodes;
-    TimerJob[] timerJobs;
 
     /** 计算内存大小 注意特别耗时，并且可能死循环 */
     @Deprecated
@@ -235,6 +234,25 @@ public class LRULong2LongCache extends Cache<Long, Long> {
                 cacheLock.writeLock.unlock();
             }
         }
+    }
+
+    @Override public Collection<Long> keys() {
+        List<Long> result = new ArrayList<>();
+        for (int i = 0; i < nodes.size(); i++) {
+            CacheLock cacheLock = reentrantLocks.get(i);
+            cacheLock.readLock.lock();
+            try {
+                Long2ObjectOpenHashMap<CacheHolderLong> node = nodes.get(i);
+                List<Long> tmp = new ArrayList<>(node.size());
+                for (Long2ObjectMap.Entry<CacheHolderLong> holderLongEntry : node.long2ObjectEntrySet()) {
+                    tmp.add(holderLongEntry.getLongKey());
+                }
+                result.addAll(tmp);
+            } finally {
+                cacheLock.readLock.unlock();
+            }
+        }
+        return result;
     }
 
     /** 拷贝所有元素 */

@@ -7,12 +7,13 @@ import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.threading.TimerJob;
 import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * cas 类型的缓存
+ * lru 类型的缓存
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-03-20 16:14
@@ -23,7 +24,6 @@ public class LRUCache<K, V> extends Cache<K, V> {
 
     List<CacheLock> reentrantLocks;
     List<HashMap<K, CacheHolder<V>>> nodes;
-    TimerJob[] timerJobs;
 
     /** 计算内存大小 注意特别耗时，并且可能死循环 */
     @Deprecated
@@ -225,6 +225,25 @@ public class LRUCache<K, V> extends Cache<K, V> {
                 cacheLock.writeLock.unlock();
             }
         }
+    }
+
+    @Override public Collection<K> keys() {
+        List<K> result = new ArrayList<>();
+        for (int i = 0; i < nodes.size(); i++) {
+            CacheLock cacheLock = reentrantLocks.get(i);
+            cacheLock.readLock.lock();
+            try {
+                HashMap<K, CacheHolder<V>> node = nodes.get(i);
+                List<K> tmp = new ArrayList<>(node.size());
+                for (Map.Entry<K, CacheHolder<V>> holderLongEntry : node.entrySet()) {
+                    tmp.add(holderLongEntry.getKey());
+                }
+                result.addAll(tmp);
+            } finally {
+                cacheLock.readLock.unlock();
+            }
+        }
+        return result;
     }
 
     /** 拷贝所有元素 */
