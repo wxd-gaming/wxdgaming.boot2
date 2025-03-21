@@ -1,31 +1,32 @@
 package code;
 
 import com.alibaba.fastjson.JSON;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import com.carrotsearch.hppc.IntIntHashMap;
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.cursors.IntIntCursor;
+import com.carrotsearch.hppc.cursors.IntObjectCursor;
 import org.junit.Test;
 import org.junit.jupiter.api.RepeatedTest;
 import wxdgaming.boot2.core.format.data.Data2Size;
 import wxdgaming.boot2.core.lang.DiffTime;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class FastUtilTest {
+public class HppcTest {
 
     static int count = 500000;
 
     @Test
     public void f1() {
-        Int2IntOpenHashMap map = new Int2IntOpenHashMap();
+        IntIntHashMap map = new IntIntHashMap();
         map.put(1, 1);
-        int merge = map.merge(1, 1, Math::addExact);
         map.addTo(1, 100);
-        System.out.println(merge);
         String jsonString = JSON.toJSONString(map);
         System.out.println(jsonString);
-        Int2IntOpenHashMap map1 = JSON.parseObject(jsonString, Int2IntOpenHashMap.class);
+        IntIntHashMap map1 = JSON.parseObject(jsonString, IntIntHashMap.class);
         System.out.println(map1);
     }
 
@@ -35,11 +36,11 @@ public class FastUtilTest {
         Data2Size.totalSize0(this.hashCode());
         {
             DiffTime diffTime = new DiffTime();
-            Int2IntOpenHashMap map = new Int2IntOpenHashMap(count);
+            IntIntHashMap map = new IntIntHashMap(count);
             for (int i = 0; i < count; i++) {
                 map.put(i, 1);
             }
-            System.out.println("Int2IntOpenHashMap - " + diffTime.diff() + " ms");
+            System.out.println("IntIntHashMap - " + diffTime.diff() + " ms");
             // System.out.println(Data2Size.totalSizes0(map));
         }
         System.out.println("-----------------------------------------------");
@@ -75,15 +76,16 @@ public class FastUtilTest {
         System.out.println("-----------------------------------------------");
         {
             DiffTime diffTime = new DiffTime();
-            Int2IntOpenHashMap map = new Int2IntOpenHashMap(count);
+            IntIntHashMap map = new IntIntHashMap(count);
             for (int i = 0; i < count; i++) {
                 map.put(i, 1);
             }
             AtomicInteger count2 = new AtomicInteger();
-            for (Map.Entry<Integer, Integer> integerEntry : map.int2IntEntrySet()) {
-                count2.addAndGet(integerEntry.getValue());
+
+            for (IntIntCursor cursor : map) {
+                count2.addAndGet(cursor.value);
             }
-            System.out.println("Int2IntOpenHashMap - " + diffTime.diff() + " ms");
+            System.out.println("IntIntHashMap - " + diffTime.diff() + " ms");
 
             // System.out.println(Data2Size.totalSizes0(map));
         }
@@ -110,15 +112,15 @@ public class FastUtilTest {
         System.out.println("-----------------------------------------------");
         {
             DiffTime diffTime = new DiffTime();
-            Int2ObjectOpenHashMap<Object> map = new Int2ObjectOpenHashMap<>(16);
+            IntObjectHashMap<Object> map = new IntObjectHashMap<>(16);
             for (int i = 0; i < count; i++) {
                 map.put(i, String.valueOf(i));
             }
             AtomicInteger count2 = new AtomicInteger();
-            for (Map.Entry<Integer, Object> integerEntry : map.int2ObjectEntrySet()) {
-                count2.addAndGet(integerEntry.getKey());
+            for (IntObjectCursor<Object> cursor : map) {
+                count2.addAndGet(cursor.key);
             }
-            System.out.println("Int2IntOpenHashMap - " + diffTime.diff() + " ms");
+            System.out.println("IntObjectHashMap - " + diffTime.diff() + " ms");
             // System.out.println(Data2Size.totalSizes0(map));
         }
         System.out.println("================================================");
@@ -146,7 +148,7 @@ public class FastUtilTest {
         System.out.println("-----------------------------------------------");
         {
             DiffTime diffTime = new DiffTime();
-            Int2ObjectOpenHashMap<Object> map = new Int2ObjectOpenHashMap<>(count + 100);
+            IntObjectHashMap<Object> map = new IntObjectHashMap<>(count + 100);
             for (int i = 0; i < count; i++) {
                 map.put(i, String.valueOf(i));
             }
@@ -155,7 +157,7 @@ public class FastUtilTest {
                 Object object = map.get(i);
                 if (object != null) count2.incrementAndGet();
             }
-            System.out.println("Int2IntOpenHashMap - " + diffTime.diff() + " ms");
+            System.out.println("IntObjectHashMap - " + diffTime.diff() + " ms");
             // System.out.println(Data2Size.totalSizes0(map));
         }
         System.out.println("================================================");
@@ -182,7 +184,7 @@ public class FastUtilTest {
         }
         System.out.println("-----------------------------------------------");
         {
-            Int2ObjectOpenHashMap<Object> map = new Int2ObjectOpenHashMap<>(count + 100);
+            IntObjectHashMap<Object> map = new IntObjectHashMap<>(count + 100);
             for (int i = 0; i < count; i++) {
                 map.put(i, String.valueOf(i));
             }
@@ -192,7 +194,7 @@ public class FastUtilTest {
                 Object object = map.get(i);
                 if (object != null) count2.incrementAndGet();
             }
-            System.out.println("Int2IntOpenHashMap - " + diffTime.diff() + " ms");
+            System.out.println("IntObjectHashMap - " + diffTime.diff() + " ms");
             // System.out.println(Data2Size.totalSizes0(map));
         }
         System.out.println("================================================");

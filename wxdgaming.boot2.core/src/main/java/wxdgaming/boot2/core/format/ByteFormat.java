@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.util.ConvertUtil;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -20,7 +21,12 @@ import java.io.Serializable;
 @Accessors(chain = true)
 public class ByteFormat implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
+
+    public static String format(long bytes) {
+        ByteFormat byteFormat = new ByteFormat().setAllBytes(bytes);
+        return byteFormat.toString();
+    }
 
     @Getter
     public enum FormatInfo {

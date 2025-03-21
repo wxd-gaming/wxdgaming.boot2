@@ -1,7 +1,8 @@
 package wxdgaming.boot2.starter.batis.sql;
 
 import lombok.Getter;
-import wxdgaming.boot2.core.cache.Cache;
+import wxdgaming.boot2.core.cache2.CASCache;
+import wxdgaming.boot2.core.cache2.Cache;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
@@ -33,12 +34,11 @@ public class JdbcCache<E extends Entity, Key> {
         this.cls = ReflectContext.getTClass(this.getClass());
         this.sqlDataHelper = sqlDataHelper;
         this.tableMapping = this.sqlDataHelper.tableMapping(cls);
-        cache = Cache.<Key, E>builder()
+        cache = CASCache.<Key, E>builder()
                 .cacheName("cache-" + tableMapping.getTableName())
-                .hashArea(hashArea)
-                .expireAfterAccess(expireAfterAccessM, TimeUnit.MINUTES)
-                .delay(1, TimeUnit.MINUTES)
-                .heartTime(1, TimeUnit.MINUTES)
+                .area(hashArea)
+                .expireAfterReadMs(TimeUnit.MINUTES.toMillis(expireAfterAccessM))
+                .heartTimeMs(TimeUnit.MINUTES.toMillis(1))
                 .loader(this::loader)
                 .heartListener(this::heart)
                 .removalListener(this::removed)
@@ -71,8 +71,8 @@ public class JdbcCache<E extends Entity, Key> {
     }
 
     /** 是否包含kay */
-    public boolean containsKey(Key k) {
-        return cache.containsKey(k);
+    public boolean has(Key k) {
+        return cache.has(k);
     }
 
     /** 如果获取数据null 抛出异常 */
@@ -87,7 +87,8 @@ public class JdbcCache<E extends Entity, Key> {
 
     /** 如果数据不存在，不会加载数据库，返回null */
     public E find(Key ID) {
-        return cache.getIfPresent(ID, null);
+        if (!cache.has(ID)) return null;
+        return cache.getIfPresent(ID);
     }
 
     public void put(Key key, E value) {
@@ -112,7 +113,13 @@ public class JdbcCache<E extends Entity, Key> {
 
     /** 丢弃所有缓存，操作非常危险 */
     @Deprecated
-    public void discard() {
-        cache.discard();
+    public void discard(Key key) {
+        cache.discard(key);
+    }
+
+    /** 丢弃所有缓存，操作非常危险 */
+    @Deprecated
+    public void discardAll() {
+        cache.discardAll();
     }
 }

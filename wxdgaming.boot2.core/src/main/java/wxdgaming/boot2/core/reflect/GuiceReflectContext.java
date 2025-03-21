@@ -19,6 +19,7 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -41,7 +42,7 @@ public class GuiceReflectContext {
         this.runApplication = runApplication;
         ArrayList<?> arrayList = new ArrayList<>(classList);
         arrayList.sort(ReflectContext.ComparatorBeanBySort);
-        this.classList = List.copyOf(arrayList);
+        this.classList = Collections.unmodifiableList(arrayList);
     }
 
     /** 所有的类 */

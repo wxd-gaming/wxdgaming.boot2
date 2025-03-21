@@ -108,7 +108,7 @@ public class Objects {
      * <p>如果不存在key，value 存入 map中
      */
     public static int mergeValue(Map<Integer, Integer> map, int key, int mergeValue) {
-        return map.merge(key, mergeValue, Integer::sum);
+        return map.merge(key, mergeValue, Math::addExact);
     }
 
     /**
@@ -117,11 +117,20 @@ public class Objects {
      * <p>如果不存在key，value 存入 map中
      */
     public static long mergeValue(Map<Integer, Long> map, int key, long mergeValue) {
-        return map.merge(key, mergeValue, Long::sum);
+        return map.merge(key, mergeValue, Math::addExact);
     }
 
 
-    /** 数组追加合并 */
+    /**
+     * 数组追加合并
+     *
+     * @param ts  源数组
+     * @param ats 待合并数组
+     * @param <T> 对象
+     * @return 返回新数组
+     * @author: wxd-gaming(無心道, 15388152619)
+     * @version: 2025-03-20 14:45
+     */
     public static <T> T[] merge(T[] ts, T... ats) {
         T[] ts1 = Arrays.copyOf(ts, ts.length + ats.length);
         if (ts1.length - ts.length >= 0)
@@ -132,11 +141,11 @@ public class Objects {
     /**
      * 合并数组
      *
-     * @param <T>
-     * @param first
-     * @param rest
-     * @param length
-     * @return
+     * @param <T>    对象
+     * @param first  源数组
+     * @param rest   待合并数组
+     * @param length 合并数组长度
+     * @return 新数组
      */
     public static <T> T[] merge(T[] first, T[] rest, int length) {
         int totalLength = first.length + length;
@@ -149,10 +158,10 @@ public class Objects {
     /**
      * 合并数组
      *
-     * @param first
-     * @param rest
-     * @param length
-     * @return
+     * @param first  源数组
+     * @param rest   待合并数组
+     * @param length 合并数组长度
+     * @return 新数组
      */
     public static byte[] mergeBytes(byte[] first, byte[] rest, int length) {
         int totalLength = first.length + length;

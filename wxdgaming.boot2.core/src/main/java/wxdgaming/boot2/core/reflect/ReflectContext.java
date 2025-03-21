@@ -137,7 +137,7 @@ public class ReflectContext {
     public ReflectContext(Collection<Class<?>> classList) {
         ArrayList<Class<?>> classes = new ArrayList<>(classList);
         classes.sort(ComparatorClassBySort);
-        this.classList = List.copyOf(classes);
+        this.classList = Collections.unmodifiableList(classes);
     }
 
     /** 所有的类 */

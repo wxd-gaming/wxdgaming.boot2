@@ -15,6 +15,7 @@ import wxdgaming.boot2.core.util.ConvertUtil;
 import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,8 +89,8 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
             }
         });
         /*不可变的列表*/
-        this.dataList = List.copyOf(modelList);
-        this.dataMap = Map.copyOf(modeMap);
+        this.dataList = Collections.unmodifiableList(modelList);
+        this.dataMap = Collections.unmodifiableMap(modeMap);
         return this;
     }
 

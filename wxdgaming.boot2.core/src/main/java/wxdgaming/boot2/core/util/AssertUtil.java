@@ -91,14 +91,6 @@ public class AssertUtil {
         }
     }
 
-    /** 参数是 null 抛出异常 */
-    public static String assertNotNull(String object) {
-        if (object == null) {
-            throw assertException("参数 null");
-        }
-        return object;
-    }
-
     /** null empty */
     public static void assertNullEmpty(Object source, String message) {
         if (source == null

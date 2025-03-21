@@ -5,7 +5,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
-import wxdgaming.boot2.core.cache.Cache;
+import wxdgaming.boot2.core.cache2.CASCache;
+import wxdgaming.boot2.core.cache2.Cache;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.format.HexId;
 import wxdgaming.boot2.core.zip.GzipUtil;
@@ -35,9 +36,9 @@ public class RpcService {
     public RpcService(RpcListenerFactory rpcListenerFactory) {
         this.rpcListenerFactory = rpcListenerFactory;
         this.hexId = new HexId(BootConfig.getIns().sid());
-        this.rpcCache = Cache.<Long, CompletableFuture<JSONObject>>builder()
+        this.rpcCache = CASCache.<Long, CompletableFuture<JSONObject>>builder()
                 .cacheName("rpc-server")
-                .expireAfterWrite(60, TimeUnit.SECONDS)
+                .expireAfterWriteMs(TimeUnit.SECONDS.toMillis(60))
                 .removalListener((key, value) -> {
                     log.debug("rpcCache remove key:{}", key);
                     value.completeExceptionally(new RuntimeException("time out"));

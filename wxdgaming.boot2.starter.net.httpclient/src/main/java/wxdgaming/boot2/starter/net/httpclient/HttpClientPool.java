@@ -18,7 +18,8 @@ import org.apache.hc.core5.http.config.Registry;
 import org.apache.hc.core5.http.config.RegistryBuilder;
 import org.apache.hc.core5.util.TimeValue;
 import wxdgaming.boot2.core.BootConfig;
-import wxdgaming.boot2.core.cache.Cache;
+import wxdgaming.boot2.core.cache2.CASCache;
+import wxdgaming.boot2.core.cache2.Cache;
 import wxdgaming.boot2.core.function.Function1;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
 
@@ -43,10 +44,9 @@ public class HttpClientPool {
 
     static {
         HttpClientConfig clientConfig = BootConfig.getIns().getNestedValue("http.client", HttpClientConfig.class, HttpClientConfig.DEFAULT);
-        HTTP_CLIENT_CACHE = Cache.<String, HttpClientPool>builder()
+        HTTP_CLIENT_CACHE = CASCache.<String, HttpClientPool>builder()
                 .cacheName("http-client")
-                .delay(clientConfig.getResetTimeM(), TimeUnit.MINUTES)
-                .expireAfterWrite(clientConfig.getResetTimeM(), TimeUnit.MINUTES)
+                .expireAfterWriteMs(TimeUnit.MINUTES.toMillis(clientConfig.getResetTimeM()))
                 .loader((Function1<String, HttpClientPool>) s -> build(clientConfig))
                 .removalListener((k, pool) -> {
                     ExecutorUtil.getInstance().getLogicExecutor().schedule(

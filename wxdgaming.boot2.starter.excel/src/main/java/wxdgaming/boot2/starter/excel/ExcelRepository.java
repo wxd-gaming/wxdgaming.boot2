@@ -187,7 +187,7 @@ public class ExcelRepository implements Serializable {
                     }
                 }
 
-                tableData.rows = rows;
+                tableData.rows = Collections.unmodifiableMap(rows);
 
                 tableInfoMap.put(tableData.getTableName(), tableData);
             }

@@ -3,6 +3,7 @@ package wxdgaming.boot2.core.lang;
 import com.alibaba.fastjson.JSONObject;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -14,7 +15,7 @@ import java.util.Map;
 public class RunResult extends JSONObject {
 
     /** 不可变更的 */
-    public static final RunResult OK = new RunResult(Map.copyOf(ok()));
+    public static final RunResult OK = new RunResult(Collections.unmodifiableMap(ok()));
 
     public static RunResult parse(String json) {
         return FastJsonUtil.parse(json, RunResult.class);
