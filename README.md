@@ -1,9 +1,11 @@
-# wxd-gaming-mariadb
+# wxdgaming.boot2
 
-#### 介绍
+## 更新仓库地址
 
-基于mariadb 使用javafx 创建的数据库项目，
-采用graalvm编译的windows数据库db，可以认为是绿色版mysql数据库
+github https://github.com/orgs/wxd-gaming/repositories<br>
+gitee &nbsp;&nbsp;&nbsp;https://gitee.com/wxd-gaming<br>
+博客首页 https://www.cnblogs.com/wxd-gameing<br>
+B站 https://www.bilibili.com/list/316421251
 
 #### 软件架构
 
@@ -20,14 +22,8 @@
 | starter.net.server     | 网络监听，端口同时支持 http, websocket, tcp |
 | starter.schedule       | 定时任务模块                           |
 | game.test              | 容器启动测试模块                         |
+| game.test-scrtip       | 容器启动测试模块脚本模块实现热更新                |
 | boot.yml               | 容器采用yml作为启动配置                    |
-
-#### 软件编译
-
-maven
-windows x64 编译： builder\build.bat
-<br>
-linux x64 编译： builder\build.sh
 
 ### 配置
 
