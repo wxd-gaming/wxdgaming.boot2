@@ -34,7 +34,7 @@ public class JdbcCache<E extends Entity, Key> {
         this.cls = ReflectContext.getTClass(this.getClass());
         this.sqlDataHelper = sqlDataHelper;
         this.tableMapping = this.sqlDataHelper.tableMapping(cls);
-        cache = CASCache.<Key, E>builder()
+        this.cache = CASCache.<Key, E>builder()
                 .cacheName("cache-" + tableMapping.getTableName())
                 .area(hashArea)
                 .expireAfterReadMs(TimeUnit.MINUTES.toMillis(expireAfterAccessM))
@@ -43,6 +43,11 @@ public class JdbcCache<E extends Entity, Key> {
                 .heartListener(this::heart)
                 .removalListener(this::removed)
                 .build();
+        this.start();
+    }
+
+    public void start() {
+        getCache().start();
     }
 
     public void shutdown() {
