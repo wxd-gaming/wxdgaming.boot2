@@ -1,4 +1,4 @@
-package wxdgaming.boot2.core;
+package wxdgaming.boot2.core.ann;
 
 import java.lang.annotation.Documented;
 

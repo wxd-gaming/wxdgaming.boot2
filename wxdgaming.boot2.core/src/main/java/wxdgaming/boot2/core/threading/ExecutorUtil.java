@@ -8,7 +8,7 @@ import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.function.ConsumerE0;
 import wxdgaming.boot2.core.lang.Tick;
-import wxdgaming.boot2.core.shutdown;
+import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.GlobalUtil;
 

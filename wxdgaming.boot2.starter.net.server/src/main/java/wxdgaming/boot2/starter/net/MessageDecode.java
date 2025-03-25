@@ -171,7 +171,7 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
     }
 
     protected void dispatch(SocketSession socketSession, String messageBytes) throws Exception {
-        IWebSocketStringListener instance = protoListenerFactory.getRunApplication().classWithSuper(IWebSocketStringListener.class).findFirst().orElse(null);
+        IWebSocketStringListener instance = protoListenerFactory.getIWebSocketStringListener();
         if (instance != null) {
             instance.onMessage(socketSession, messageBytes);
         } else {

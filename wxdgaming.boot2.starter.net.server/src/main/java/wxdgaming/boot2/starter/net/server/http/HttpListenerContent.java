@@ -14,6 +14,7 @@ import wxdgaming.boot2.starter.net.ann.RequestMapping;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * http 监听 绑定工厂
@@ -27,12 +28,15 @@ public class HttpListenerContent {
 
     final HttpServerConfig httpServerConfig;
     final RunApplication runApplication;
+    final List<HttpFilter> httpFilterList;
 
     final HashMap<String, HttpMapping> httpMappingMap = new HashMap<>();
 
     public HttpListenerContent(HttpServerConfig httpServerConfig, RunApplication runApplication) {
         this.httpServerConfig = Objects.returnNonNull(httpServerConfig, HttpServerConfig.INSTANCE);
         this.runApplication = runApplication;
+
+        this.httpFilterList = runApplication.classWithSuper(HttpFilter.class).toList();
 
         runApplication.getGuiceReflectContext()
                 .withMethodAnnotated(HttpRequest.class)
@@ -97,7 +101,7 @@ public class HttpListenerContent {
             HttpRequest httpRequest = httpMapping == null ? null : httpMapping.httpRequest();
             Method method = httpMapping == null ? null : httpMapping.method();
 
-            Object filterMatch = runApplication.classWithSuper(HttpFilter.class)
+            Object filterMatch = httpFilterList.stream()
                     .map(httpFilter -> httpFilter.doFilter(httpRequest, method, uriPath, httpContext))
                     .filter(Objects::nonNull)
                     .findFirst()

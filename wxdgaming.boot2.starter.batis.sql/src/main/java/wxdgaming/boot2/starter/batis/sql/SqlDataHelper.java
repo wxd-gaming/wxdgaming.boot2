@@ -11,7 +11,7 @@ import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.reflect.ReflectContext;
-import wxdgaming.boot2.core.shutdown;
+import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.starter.batis.DataHelper;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;

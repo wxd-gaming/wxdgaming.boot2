@@ -3,7 +3,7 @@ package wxdgaming.boot2.starter.batis;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.shutdown;
+import wxdgaming.boot2.core.ann.shutdown;
 
 import java.sql.Connection;
 import java.util.List;

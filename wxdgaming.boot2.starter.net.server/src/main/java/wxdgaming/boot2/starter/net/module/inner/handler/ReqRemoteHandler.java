@@ -56,14 +56,7 @@ public class ReqRemoteHandler {
                 }
                 return;
             }
-            RpcRequest rpcRequest = rpcMapping.rpcRequest();
-            Method method = rpcMapping.method();
-            boolean allMatch = rpcListenerFactory.getRpcListenerContent().getRunApplication()
-                    .classWithSuper(RpcFilter.class)
-                    .allMatch(filter -> filter.doFilter(rpcRequest, method, lowerCase, socketSession, paramObject));
-            if (!allMatch) {
-                return;
-            }
+
             RpcListenerTrigger rpcListenerTrigger = new RpcListenerTrigger(
                     rpcMapping,
                     rpcService,
@@ -72,6 +65,14 @@ public class ReqRemoteHandler {
                     rpcId,
                     paramObject
             );
+
+            boolean allMatch = rpcListenerFactory.getRpcListenerContent().getRunApplication()
+                    .classWithSuper(RpcFilter.class)
+                    .allMatch(filter -> filter.doFilter(rpcListenerTrigger, lowerCase, socketSession, paramObject));
+            if (!allMatch) {
+                return;
+            }
+
             rpcListenerTrigger.submit();
         } catch (Throwable e) {
             if (e instanceof InvocationTargetException) {

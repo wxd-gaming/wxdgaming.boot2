@@ -8,6 +8,8 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.starter.net.SocketSession;
 
+import java.util.List;
+
 /**
  * 派发器
  *
@@ -21,11 +23,15 @@ public class ProtoListenerFactory {
 
     /** 相当于用 read and copy write方式作为线程安全性 */
     ProtoListenerContent protoListenerContent = null;
+    IWebSocketStringListener iWebSocketStringListener = null;
+    List<ProtoFilter> protoFilters;
 
     @Init
     @Sort(6)
     public void init(RunApplication runApplication) {
         protoListenerContent = new ProtoListenerContent(runApplication);
+        iWebSocketStringListener = runApplication.classWithSuper(IWebSocketStringListener.class).findFirst().orElse(null);
+        protoFilters = runApplication.classWithSuper(ProtoFilter.class).toList();
     }
 
     public RunApplication getRunApplication() {
@@ -42,6 +48,11 @@ public class ProtoListenerFactory {
             throw new RuntimeException("未找到消息id: %s".formatted(messageId));
         }
         ProtoListenerTrigger protoListenerTrigger = new ProtoListenerTrigger(mapping, protoListenerContent.getRunApplication(), socketSession, messageId, data);
+        boolean allMatch = protoFilters.stream()
+                .allMatch(filter -> filter.doFilter(protoListenerTrigger, socketSession, protoListenerTrigger.getPojoBase()));
+        if (!allMatch) {
+            return;
+        }
         protoListenerTrigger.submit();
     }
 

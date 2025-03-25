@@ -6,7 +6,7 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.shutdown;
+import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.threading.*;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;

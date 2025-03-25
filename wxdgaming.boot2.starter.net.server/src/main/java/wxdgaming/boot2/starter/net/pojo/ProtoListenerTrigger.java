@@ -1,12 +1,14 @@
 package wxdgaming.boot2.starter.net.pojo;
 
 import com.google.inject.Injector;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Qualifier;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.starter.net.SocketSession;
 
@@ -20,13 +22,14 @@ import java.lang.reflect.Type;
  * @version: 2025-02-18 08:45
  **/
 @Slf4j
+@Getter
 public class ProtoListenerTrigger extends Event {
 
     private final ProtoMapping protoMapping;
     private final RunApplication runApplication;
     private final SocketSession socketSession;
     private final int messageId;
-    private final byte[] bytes;
+    private final PojoBase pojoBase;
 
     public ProtoListenerTrigger(ProtoMapping protoMapping, RunApplication runApplication, SocketSession socketSession, int messageId, byte[] bytes) {
         super(protoMapping.method());
@@ -34,7 +37,8 @@ public class ProtoListenerTrigger extends Event {
         this.runApplication = runApplication;
         this.socketSession = socketSession;
         this.messageId = messageId;
-        this.bytes = bytes;
+        pojoBase = ReflectContext.newInstance(protoMapping.pojoClass());
+        pojoBase.decode(bytes);
     }
 
     @Override public void onEvent() throws Exception {
@@ -42,8 +46,6 @@ public class ProtoListenerTrigger extends Event {
             if (log.isDebugEnabled()) {
                 log.debug("收到消息：{} {} {}", socketSession, messageId, protoMapping.pojoClass().getSimpleName());
             }
-            PojoBase pojoBase = protoMapping.pojoClass().getDeclaredConstructor().newInstance();
-            pojoBase.decode(bytes);
             protoMapping.method().invoke(protoMapping.ins(), injectorParameters(runApplication, socketSession, pojoBase));
         } catch (Throwable e) {
             log.error("{} messageId={}, {}", socketSession, messageId, protoMapping.pojoClass().getSimpleName(), e);

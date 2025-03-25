@@ -2,9 +2,6 @@ package wxdgaming.boot2.starter.net.module.inner;
 
 import com.alibaba.fastjson.JSONObject;
 import wxdgaming.boot2.starter.net.SocketSession;
-import wxdgaming.boot2.starter.net.ann.RpcRequest;
-
-import java.lang.reflect.Method;
 
 /**
  * http 请求接口过滤器
@@ -14,8 +11,7 @@ import java.lang.reflect.Method;
  **/
 public abstract class RpcFilter {
 
-    public abstract boolean doFilter(RpcRequest rpcRequest,
-                                     Method method,
+    public abstract boolean doFilter(RpcListenerTrigger rpcListenerTrigger,
                                      String cmd,
                                      SocketSession socketSession,
                                      JSONObject paramObject);
