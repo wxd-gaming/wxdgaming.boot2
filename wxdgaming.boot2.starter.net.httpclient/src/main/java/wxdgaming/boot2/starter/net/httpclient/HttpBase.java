@@ -200,7 +200,7 @@ public abstract class HttpBase<H extends HttpBase> {
         httpRequestBase.setConfig(requestConfig);
 
         for (Map.Entry<String, String> entry : reqHeaderMap.entrySet()) {
-            httpRequestBase.setHeader(entry.getKey().toString(), entry.getValue());
+            httpRequestBase.setHeader(entry.getKey(), entry.getValue());
         }
 
         /*告诉服务器我支持gzip*/

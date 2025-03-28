@@ -38,6 +38,7 @@ public class RpcService {
         this.hexId = new HexId(BootConfig.getIns().sid());
         this.rpcCache = CASCache.<Long, CompletableFuture<JSONObject>>builder()
                 .cacheName("rpc-server")
+                .heartTimeMs(TimeUnit.SECONDS.toMillis(1))
                 .expireAfterWriteMs(TimeUnit.SECONDS.toMillis(60))
                 .removalListener((key, value) -> {
                     log.debug("rpcCache remove key:{}", key);
@@ -45,6 +46,7 @@ public class RpcService {
                     return true;
                 })
                 .build();
+        this.rpcCache.start();
     }
 
     public CompletableFuture<JSONObject> responseFuture(long rpcId) {

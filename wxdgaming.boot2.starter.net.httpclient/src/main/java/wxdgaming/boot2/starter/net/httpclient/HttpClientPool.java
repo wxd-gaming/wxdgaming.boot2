@@ -11,11 +11,6 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
-import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
-import org.apache.hc.core5.http.config.Registry;
-import org.apache.hc.core5.http.config.RegistryBuilder;
 import org.apache.hc.core5.util.TimeValue;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.cache2.CASCache;
@@ -23,10 +18,6 @@ import wxdgaming.boot2.core.cache2.Cache;
 import wxdgaming.boot2.core.function.Function1;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import java.security.cert.X509Certificate;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -57,6 +48,7 @@ public class HttpClientPool {
                     return true;
                 })
                 .build();
+        HTTP_CLIENT_CACHE.start();
     }
 
     public static HttpClientPool getDefault() {
@@ -108,28 +100,8 @@ public class HttpClientPool {
         lock.lock();
         try {
             try {
-                SSLContext sslContext = SSLContext.getInstance(clientConfig.getSslProtocol());
-                X509TrustManager tm = new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() {return null;}
-
-                    public void checkClientTrusted(X509Certificate[] xcs, String str) {}
-
-                    public void checkServerTrusted(X509Certificate[] xcs, String str) {}
-                };
-
-                sslContext.init(null, new TrustManager[]{tm}, null);
-
-                SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sslContext, (s, sslSession) -> true);
-
-
-                Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
-                        .register("http", PlainConnectionSocketFactory.getSocketFactory())
-                        .register("https", sslSocketFactory)
-                        .build();
-
                 // 初始化http连接池
-
-                connPoolMng = new PoolingHttpClientConnectionManager(registry);
+                connPoolMng = new PoolingHttpClientConnectionManager();
                 // 设置总的连接数为200，每个路由的最大连接数为20
                 connPoolMng.setMaxTotal(clientConfig.getMax());
                 connPoolMng.setDefaultMaxPerRoute(clientConfig.getCore());

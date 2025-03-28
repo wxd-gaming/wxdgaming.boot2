@@ -73,7 +73,7 @@ public class Main {
                     socketSession.write("我是文本消息");
                 },
                 10000,
-                300,
+                30000,
                 TimeUnit.MILLISECONDS
         );
 
