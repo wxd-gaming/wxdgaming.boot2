@@ -63,15 +63,15 @@ public class ScriptApi {
         return "ok";
     }
 
-    @Scheduled("*/30")
-    public void timer() {
-        log.info("{}", "timer()");
-    }
-
-    @Scheduled("*/30")
-    @ExecutorWith(useVirtualThread = true)
-    public void timerAsync() {
-        log.info("{}", "timerAsync()");
-    }
+    // @Scheduled("*/30")
+    // public void timer() {
+    //     log.info("{}", "timer()");
+    // }
+    //
+    // @Scheduled("*/30")
+    // @ExecutorWith(useVirtualThread = true)
+    // public void timerAsync() {
+    //     log.info("{}", "timerAsync()");
+    // }
 
 }

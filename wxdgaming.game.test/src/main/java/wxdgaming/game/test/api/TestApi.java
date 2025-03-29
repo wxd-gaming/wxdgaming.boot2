@@ -7,13 +7,14 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Body;
 import wxdgaming.boot2.core.ann.Param;
 import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.threading.ExecutorConfig;
-import wxdgaming.boot2.core.threading.ExecutorWith;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;
-import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author: wxd-gaming(無心道, 15388152619)
@@ -23,6 +24,15 @@ import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 @Singleton
 @RequestMapping(path = "/")
 public class TestApi {
+
+    public ConcurrentHashMap<String, String> strMap = new ConcurrentHashMap<>();
+
+    private ConcurrentHashMap<String, String> str2Map = new ConcurrentHashMap<>();
+
+    public TestApi() {
+        strMap.put("a", "b");
+        str2Map.put("a", "b");
+    }
 
     @HttpRequest()
     public String index(RunApplication runApplication,
@@ -63,15 +73,20 @@ public class TestApi {
         return "ok";
     }
 
-    @Scheduled("*/30")
-    public void timer() {
-        log.info("{}", "timer()");
-    }
+    // @Scheduled("*/30")
+    // public void timer() {
+    //     log.info("{}", "timer()");
+    // }
+    //
+    // @Scheduled("*/30")
+    // @ExecutorWith(useVirtualThread = true)
+    // public void timerAsync() {
+    //     log.info("{}", "timerAsync()");
+    // }
 
-    @Scheduled("*/30")
-    @ExecutorWith(useVirtualThread = true)
-    public void timerAsync() {
-        log.info("{}", "timerAsync()");
+
+    public void print() {
+        log.info("{} {}", "print()", FastJsonUtil.toJSONString(strMap));
     }
 
 }
