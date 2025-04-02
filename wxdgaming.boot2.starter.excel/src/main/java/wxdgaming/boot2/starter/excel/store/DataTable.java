@@ -7,7 +7,7 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.format.StreamWriter;
 import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.lang.ObjectBase;
-import wxdgaming.boot2.core.reflect.FieldUtils;
+import wxdgaming.boot2.core.reflect.FieldUtil;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.core.util.AnnUtil;
 import wxdgaming.boot2.core.util.ConvertUtil;
@@ -38,7 +38,7 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
 
     public DataTable() {
         tClass = ReflectContext.getTClass(this.getClass());
-        fieldMap = FieldUtils.getFields(tClass, false);
+        fieldMap = FieldUtil.getFields(false, tClass);
         dataMapping = AnnUtil.ann(tClass, DataMapping.class, true);
     }
 

@@ -9,7 +9,7 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.chatset.json.ParameterizedTypeImpl;
 import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.boot2.core.lang.TimeValue;
-import wxdgaming.boot2.core.reflect.FieldUtils;
+import wxdgaming.boot2.core.reflect.FieldUtil;
 import wxdgaming.boot2.core.reflect.MethodUtil;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.core.util.AnnUtil;
@@ -89,7 +89,7 @@ public class TableMapping {
         this.tableName = tableName(cls);
         this.tableComment = tableComment(cls);
 
-        Map<String, Field> fields = FieldUtils.getFields(cls, false);
+        Map<String, Field> fields = FieldUtil.getFields(false, cls);
         for (Map.Entry<String, Field> entry : fields.entrySet()) {
             Field field = entry.getValue();
             DbColumn dbColumn = AnnUtil.ann(field, DbColumn.class);

@@ -17,7 +17,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -36,18 +35,13 @@ public class GuiceReflectContext {
 
     private final RunApplication runApplication;
     /** 所有的类 */
-    private final List<Object> classList;
+    private final List<Content<Object>> classList;
 
-    public GuiceReflectContext(RunApplication runApplication, Collection<?> classList) {
+    public GuiceReflectContext(RunApplication runApplication, Collection<Object> classList) {
         this.runApplication = runApplication;
-        ArrayList<?> arrayList = new ArrayList<>(classList);
-        arrayList.sort(ReflectContext.ComparatorBeanBySort);
-        this.classList = Collections.unmodifiableList(arrayList);
-    }
-
-    /** 所有的类 */
-    public Stream<Object> classStream() {
-        return classList.stream();
+        this.classList = classList.stream().sorted(ReflectContext.ComparatorBeanBySort)
+                .map(Content::new)
+                .toList();
     }
 
     /** 父类或者接口 */
@@ -57,7 +51,7 @@ public class GuiceReflectContext {
 
     /** 父类或者接口 */
     public <U> Stream<U> classWithSuper(Class<U> cls, Predicate<U> predicate) {
-        Stream<U> tmp = classStream().filter(o -> cls.isAssignableFrom(o.getClass())).map(cls::cast);
+        Stream<U> tmp = stream().filter(content -> content.withSuper(cls)).map(cls::cast);
         if (predicate != null) tmp = tmp.filter(predicate);
         return tmp;
     }
@@ -69,12 +63,14 @@ public class GuiceReflectContext {
 
     /** 所有添加了这个注解的类 */
     public Stream<Object> classWithAnnotated(Class<? extends Annotation> annotation, Predicate<Object> predicate) {
-        Stream<Object> tmp = classStream().filter(o -> AnnUtil.ann(o.getClass(), annotation) != null);
+        Stream<Object> tmp = stream()
+                .filter(content -> content.withAnnotated(annotation))
+                .map(content -> content.instance);
         if (predicate != null) tmp = tmp.filter(predicate);
         return tmp;
     }
 
-    public Stream<Content<?>> stream() {
+    public Stream<Content<Object>> stream() {
         return classList.stream().map(Content::new);
     }
 
@@ -107,7 +103,7 @@ public class GuiceReflectContext {
     public Stream<MethodContent> withMethodAnnotated(Class<? extends Annotation> annotation, Predicate<MethodContent> predicate) {
         Stream<MethodContent> methodStream = stream()
                 .flatMap(content -> content.methodsWithAnnotated(annotation)
-                        .map(m -> new MethodContent(content.t, m))
+                        .map(m -> new MethodContent(content.instance, m))
                 )
                 .sorted(MethodContent::compareTo);
 
@@ -167,24 +163,30 @@ public class GuiceReflectContext {
     @Getter
     public static class Content<T> {
 
-        private final T t;
+        private final T instance;
+        /** 所有的字段 */
+        private final Collection<Field> fields;
+        /** 所有的方法 */
+        private final Collection<Method> methods;
 
         public static <U> Content<U> of(U cls) {
             return new Content<>(cls);
         }
 
-        Content(T t) {
-            this.t = t;
+        Content(T instance) {
+            this.instance = instance;
+            this.fields = Collections.unmodifiableCollection(FieldUtil.getFields(false, instance.getClass()).values());
+            this.methods = Collections.unmodifiableCollection(MethodUtil.readAllMethod(false, instance.getClass()).values());
         }
 
         /** 是否添加了注解 */
         public boolean withAnnotated(Class<? extends Annotation> annotation) {
-            return AnnUtil.ann(t.getClass(), annotation) != null;
+            return AnnUtil.ann(instance.getClass(), annotation) != null;
         }
 
-        /** 所有的方法 */
-        public Collection<Method> getMethods() {
-            return MethodUtil.readAllMethod(t.getClass()).values();
+        /** 是否添加了注解 */
+        public boolean withSuper(Class<?> cls) {
+            return cls.isAssignableFrom(instance.getClass());
         }
 
         /** 所有的方法 */
@@ -195,11 +197,6 @@ public class GuiceReflectContext {
         /** 所有添加了这个注解的方法 */
         public Stream<Method> methodsWithAnnotated(Class<? extends Annotation> annotation) {
             return methodStream().filter(m -> AnnUtil.ann(m, annotation) != null);
-        }
-
-        /** 所有的字段 */
-        public Collection<Field> getFields() {
-            return FieldUtils.getFields(t.getClass(), false).values();
         }
 
         /** 所有的字段 */

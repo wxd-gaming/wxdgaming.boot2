@@ -50,7 +50,7 @@ public abstract class RunApplication {
                 Object valued = BootConfig.getIns().value(field.getAnnotation(Value.class), field.getType());
                 try {
                     if (valued != null) {
-                        field.set(content.getT(), valued);
+                        field.set(content.getInstance(), valued);
                     }
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
