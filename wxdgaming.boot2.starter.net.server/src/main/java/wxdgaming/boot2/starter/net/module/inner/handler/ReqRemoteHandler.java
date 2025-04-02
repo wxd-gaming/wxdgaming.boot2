@@ -6,7 +6,6 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.core.threading.ExecutorWith;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
@@ -48,7 +47,8 @@ public class ReqRemoteHandler {
 
         try {
             String lowerCase = cmd.toLowerCase();
-            RpcMapping rpcMapping = rpcListenerFactory.getRpcListenerContent().getRpcMappingMap().get(lowerCase);
+            RpcListenerContent rpcListenerContent = rpcListenerFactory.getRpcListenerContent();
+            RpcMapping rpcMapping = rpcListenerContent.getRpcMappingMap().get(lowerCase);
             if (rpcMapping == null) {
                 if (rpcId > 0) {
                     rpcService.response(socketSession, rpcId, RunResult.error(9, "not cmd path"));
@@ -59,14 +59,13 @@ public class ReqRemoteHandler {
             RpcListenerTrigger rpcListenerTrigger = new RpcListenerTrigger(
                     rpcMapping,
                     rpcService,
-                    rpcListenerFactory.getRpcListenerContent().getRunApplication(),
+                    rpcListenerContent.getRunApplication(),
                     socketSession,
                     rpcId,
                     paramObject
             );
 
-            boolean allMatch = rpcListenerFactory.getRpcListenerContent().getRunApplication()
-                    .classWithSuper(RpcFilter.class)
+            boolean allMatch = rpcListenerContent.getRpcFilterList().stream()
                     .allMatch(filter -> filter.doFilter(rpcListenerTrigger, lowerCase, socketSession, paramObject));
             if (!allMatch) {
                 return;

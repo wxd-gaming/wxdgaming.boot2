@@ -70,22 +70,22 @@ public final class ExecutorUtil implements Serializable {
 
     public void init() {
         Logger logger = LogbackUtil.logger();
-        ExecutorConfig defaultConfig = BootConfig.getIns().defaultConfig();
+        ExecutorConfig basicConfig = BootConfig.getIns().defaultConfig();
         if (logger.isDebugEnabled()) {
-            logger.debug("ExecutorUtil init default config: {}", defaultConfig.toJSONString());
+            logger.debug("ExecutorUtil init basic config: {}", basicConfig.toJSONString());
         }
-        defaultExecutor = newExecutorServices("default-executor", defaultConfig.getCoreSize(), defaultConfig.getMaxSize(), defaultConfig.getMaxQueueSize());
+        defaultExecutor = newExecutorServices("basic-executor", basicConfig.getCoreSize(), basicConfig.getMaxSize(), basicConfig.getMaxQueueSize());
         ExecutorConfig logicConfig = BootConfig.getIns().logicConfig();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("ExecutorUtil init logic config: {}", defaultConfig.toJSONString());
+            logger.debug("ExecutorUtil init logic config: {}", logicConfig.toJSONString());
         }
 
         logicExecutor = newExecutorServices("logic-executor", logicConfig.getCoreSize(), logicConfig.getMaxSize(), logicConfig.getMaxQueueSize());
         ExecutorConfig virtualConfig = BootConfig.getIns().virtualConfig();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("ExecutorUtil init virtual config: {}", defaultConfig.toJSONString());
+            logger.debug("ExecutorUtil init virtual config: {}", virtualConfig.toJSONString());
         }
 
         virtualExecutor = newExecutorVirtualServices("virtual-executor", virtualConfig.getCoreSize(), virtualConfig.getMaxSize(), virtualConfig.getMaxQueueSize());
