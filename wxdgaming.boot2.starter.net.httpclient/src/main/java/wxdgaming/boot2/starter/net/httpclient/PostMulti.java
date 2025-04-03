@@ -8,6 +8,7 @@ import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import wxdgaming.boot2.starter.net.http.HttpDataAction;
 
@@ -45,7 +46,7 @@ public class PostMulti extends HttpBase<PostMulti> {
                     builder.addTextBody(key, String.valueOf(objectObjectEntry.getValue()));
                 }
             }
-            org.apache.hc.core5.http.HttpEntity build = builder.build();
+            HttpEntity build = builder.build();
             httpRequest.setEntity(build);
             if (log.isDebugEnabled()) {
                 String s = new String(readBytes(build));

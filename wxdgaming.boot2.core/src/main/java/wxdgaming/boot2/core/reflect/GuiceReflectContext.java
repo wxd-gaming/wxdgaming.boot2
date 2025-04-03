@@ -40,7 +40,7 @@ public class GuiceReflectContext {
     public GuiceReflectContext(RunApplication runApplication, Collection<Object> classList) {
         this.runApplication = runApplication;
         this.classList = classList.stream().sorted(ReflectContext.ComparatorBeanBySort)
-                .map(Content::new)
+                .map(Content::of)
                 .toList();
     }
 
@@ -51,7 +51,7 @@ public class GuiceReflectContext {
 
     /** 父类或者接口 */
     public <U> Stream<U> classWithSuper(Class<U> cls, Predicate<U> predicate) {
-        Stream<U> tmp = stream().filter(content -> content.withSuper(cls)).map(cls::cast);
+        Stream<U> tmp = stream().filter(content -> content.withSuper(cls)).map(content -> cls.cast(content.instance));
         if (predicate != null) tmp = tmp.filter(predicate);
         return tmp;
     }
@@ -71,7 +71,7 @@ public class GuiceReflectContext {
     }
 
     public Stream<Content<Object>> stream() {
-        return classList.stream().map(Content::new);
+        return classList.stream();
     }
 
     /** 父类或者接口 */
@@ -81,17 +81,20 @@ public class GuiceReflectContext {
 
     /** 父类或者接口 */
     public <U> Stream<Content<U>> withSuper(Class<U> cls, Predicate<U> predicate) {
-        return classWithSuper(cls, predicate).map(Content::new);
+        return stream().filter(content -> content.withSuper(cls))
+                .map(content -> (Content<U>) (content))
+                .filter(content -> predicate == null || predicate.test(content.instance));
     }
 
     /** 所有添加了这个注解的类 */
-    public Stream<Content<?>> withAnnotated(Class<? extends Annotation> annotation) {
+    public Stream<Content<Object>> withAnnotated(Class<? extends Annotation> annotation) {
         return withAnnotated(annotation, null);
     }
 
     /** 所有添加了这个注解的类 */
-    public Stream<Content<?>> withAnnotated(Class<? extends Annotation> annotation, Predicate<Object> predicate) {
-        return classWithAnnotated(annotation, predicate).map(Content::new);
+    public Stream<Content<Object>> withAnnotated(Class<? extends Annotation> annotation, Predicate<Object> predicate) {
+        return stream().filter(content -> content.withAnnotated(annotation))
+                .filter(content -> predicate == null || predicate.test(content.instance));
     }
 
     /** 所有bean里面的方法，添加了注解的 */
@@ -102,8 +105,9 @@ public class GuiceReflectContext {
     /** 所有添加了这个注解的类 */
     public Stream<MethodContent> withMethodAnnotated(Class<? extends Annotation> annotation, Predicate<MethodContent> predicate) {
         Stream<MethodContent> methodStream = stream()
-                .flatMap(content -> content.methodsWithAnnotated(annotation)
-                        .map(m -> new MethodContent(content.instance, m))
+                .flatMap(content ->
+                        content.methodsWithAnnotated(annotation)
+                                .map(m -> new MethodContent(content.instance, m))
                 )
                 .sorted(MethodContent::compareTo);
 
@@ -114,7 +118,9 @@ public class GuiceReflectContext {
     }
 
     public void executeMethodWithAnnotated(Class<? extends Annotation> annotation) {
-        withMethodAnnotated(annotation).forEach(MethodContent::invoke);
+        Stream<MethodContent> methodContentStream = withMethodAnnotated(annotation);
+        List<MethodContent> list = methodContentStream.toList();
+        list.forEach(MethodContent::invoke);
     }
 
     public Object[] injectorParameters(Object bean, Method method) {
@@ -209,6 +215,9 @@ public class GuiceReflectContext {
             return fieldStream().filter(f -> AnnUtil.ann(f, annotation) != null);
         }
 
+        @Override public String toString() {
+            return "Content{" + "instance=" + instance + '}';
+        }
     }
 
     @Getter
@@ -249,6 +258,13 @@ public class GuiceReflectContext {
                 return method.getName().compareTo(o.method.getName());
             }
             return Integer.compare(o1Sort, o2Sort);
+        }
+
+        @Override public String toString() {
+            return "MethodContent{" +
+                   "ins=" + ins +
+                   ", method=" + method +
+                   '}';
         }
     }
 
