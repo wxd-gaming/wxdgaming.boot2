@@ -7,6 +7,7 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
 import wxdgaming.boot2.core.loader.RemoteClassLoader;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
+import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.starter.net.httpclient.HttpBuilder;
 import wxdgaming.boot2.starter.net.httpclient.PostText;
@@ -25,7 +26,7 @@ import java.util.Map;
 public class RemoteRun {
 
     static {
-        ExecutorUtil.getInstance().init();
+        ExecutorUtilImpl.getInstance().init();
     }
 
     @Test

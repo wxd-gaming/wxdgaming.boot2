@@ -10,6 +10,7 @@ import wxdgaming.boot2.core.format.ByteFormat;
 import wxdgaming.boot2.core.function.Function1;
 import wxdgaming.boot2.core.lang.DiffTime;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
+import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 import wxdgaming.boot2.core.util.RandomUtils;
 
 import java.util.concurrent.CountDownLatch;
@@ -25,7 +26,7 @@ public class Cache2Test {
     static int sleepTimeMs = 12000;
 
     static {
-        ExecutorUtil.getInstance().init();
+        ExecutorUtilImpl.getInstance().init();
         LogbackUtil.refreshLoggerLevel(Level.INFO);
     }
 
@@ -134,7 +135,7 @@ public class Cache2Test {
         AtomicReference string = new AtomicReference();
         CountDownLatch latch = new CountDownLatch((int) maxSize);
         for (long i = 0; i < maxSize; i++) {
-            ExecutorUtil.getInstance().getLogicExecutor().execute(() -> {
+            ExecutorUtilImpl.getInstance().getLogicExecutor().execute(() -> {
                 string.set(cache.getIfPresent(RandomUtils.random(maxSize)));
                 latch.countDown();
             });

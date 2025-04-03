@@ -16,6 +16,7 @@ import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
+import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.SessionGroup;
@@ -216,7 +217,7 @@ public abstract class SocketClient {
 
         log.info("{} 链接异常 {} 秒 重连", this.hashCode(), l);
 
-        ExecutorUtil.getInstance().getLogicExecutor().schedule(this::connect, l, TimeUnit.SECONDS);
+        ExecutorUtilImpl.getInstance().getLogicExecutor().schedule(this::connect, l, TimeUnit.SECONDS);
         return true;
     }
 

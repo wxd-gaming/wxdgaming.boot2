@@ -31,10 +31,7 @@ public abstract class Event implements Runnable, RunMonitor {
     /** 队列名称 */
     @Setter protected String queueName = "";
 
-    protected ThreadContext threadContext = null;
-
     public Event() {
-        recordThreadContext();
     }
 
     public Event(Method method) {
@@ -68,22 +65,10 @@ public abstract class Event implements Runnable, RunMonitor {
         this.warningTime = warningTime;
     }
 
-    /** 添加线程上下文 */
-    public void recordThreadContext() {
-        if (threadContext == null)
-            this.threadContext = new ThreadContext(ThreadContext.context());
-    }
 
     @Override public final void run() {
         try {
-            try {
-                ThreadContext.set(threadContext);
-                ThreadContext.putContent("threadName", threadName);
-                ThreadContext.putContent("queueName", queueName);
-                onEvent();
-            } finally {
-                ThreadContext.cleanup();
-            }
+            onEvent();
         } catch (Throwable e) {
             GlobalUtil.exception(taskInfoString, e);
         }
@@ -95,11 +80,11 @@ public abstract class Event implements Runnable, RunMonitor {
     public final void submit() {
         IExecutorServices executor;
         if (StringUtils.isNotBlank(getThreadName())) {
-            executor = ExecutorUtil.getInstance().All_THREAD_LOCAL.get(getThreadName());
+            executor = ExecutorUtilImpl.getInstance().All_THREAD_LOCAL.get(getThreadName());
         } else if (isVt()) {
-            executor = ExecutorUtil.getInstance().getVirtualExecutor();
+            executor = ExecutorUtilImpl.getInstance().getVirtualExecutor();
         } else {
-            executor = ExecutorUtil.getInstance().getLogicExecutor();
+            executor = ExecutorUtilImpl.getInstance().getLogicExecutor();
         }
         executor.submit(getQueueName(), this, 3);
     }

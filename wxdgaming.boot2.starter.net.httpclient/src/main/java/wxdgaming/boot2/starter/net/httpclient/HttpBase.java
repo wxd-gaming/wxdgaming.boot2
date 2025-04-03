@@ -15,6 +15,7 @@ import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
+import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.starter.net.http.HttpHeadNameType;
 import wxdgaming.boot2.starter.net.http.HttpHeadValueType;
@@ -120,7 +121,7 @@ public abstract class HttpBase<H extends HttpBase> {
         stackTraceElements = new StackTraceElement[stackTrace.length - stackTraceIndex];
         System.arraycopy(stackTrace, stackTraceIndex, stackTraceElements, 0, stackTraceElements.length);
         final CompletableFuture<Response<H>> future = new CompletableFuture<>();
-        ExecutorUtil.getInstance().getVirtualExecutor().submit(new Event(Throw.ofString(stackTraceElements[0]) + " " + HttpBase.this.response.toString(), logTime, waringTime) {
+        ExecutorUtilImpl.getInstance().getVirtualExecutor().submit(new Event(Throw.ofString(stackTraceElements[0]) + " " + HttpBase.this.response.toString(), logTime, waringTime) {
 
             @Override public void onEvent() throws Exception {
                 try {

@@ -128,7 +128,18 @@ public class ThreadContext extends JSONObject {
     }
 
     public ThreadContext(Map m) {
-        super(m);
+        super();
+        putAll(m);
+    }
+
+    /** 获取当前任务所在队列 */
+    public ExecutorQueue queue() {
+        return (ExecutorQueue) get("queue");
+    }
+
+    /** 获取当然任务队列名 */
+    public String queueName() {
+        return getString("queueName");
     }
 
 }

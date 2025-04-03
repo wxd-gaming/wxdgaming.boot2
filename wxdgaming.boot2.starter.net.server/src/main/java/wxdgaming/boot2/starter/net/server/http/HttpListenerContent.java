@@ -8,6 +8,7 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
+import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 import wxdgaming.boot2.core.util.AnnUtil;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
@@ -113,7 +114,7 @@ public class HttpListenerContent {
             }
             if (httpMapping == null) {
                 HttpFileEvent httpFileEvent = new HttpFileEvent(httpContext);
-                ExecutorUtil.getInstance().getVirtualExecutor().execute(httpFileEvent);
+                ExecutorUtilImpl.getInstance().getVirtualExecutor().execute(httpFileEvent);
             } else {
                 if (this.httpServerConfig.isShowRequest()) {
                     StringBuilder showLog = httpContext.showLog();

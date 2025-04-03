@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.format.data.Data2Size;
 import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
+import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 import wxdgaming.boot2.core.threading.TimerJob;
 import wxdgaming.boot2.core.timer.MyClock;
 
@@ -92,7 +93,7 @@ public class LRULong2LongCache extends Cache<Long, Long> {
                     }
                 }
             };
-            TimerJob timerJob = ExecutorUtil.getInstance()
+            TimerJob timerJob = ExecutorUtilImpl.getInstance()
                     .getDefaultExecutor()
                     .scheduleAtFixedDelay(
                             heartEvent,

@@ -70,6 +70,8 @@ public class ExecutorQueue implements Runnable {
                     lock.unlock();
                 }
                 if (executorServiceJob != null) {
+                    executorServiceJob.threadContext.put("queueName", queueName);
+                    executorServiceJob.threadContext.put("queue", this);
                     executorServiceJob.run();
                 }
             } catch (Throwable throwable) {

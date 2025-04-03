@@ -4,6 +4,7 @@ import wxdgaming.boot2.core.BaseModule;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.core.threading.ExecutorUtil;
+import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 
 /**
  * 线程模块
@@ -19,8 +20,8 @@ class ApplicationModule extends BaseModule {
     }
 
     @Override protected void bind() throws Throwable {
-        ExecutorUtil.getInstance().init();
-        bindInstance(ExecutorUtil.getInstance());
+        ExecutorUtil impl = ExecutorUtilImpl.impl();
+        bindInstance(impl);
     }
 
 }

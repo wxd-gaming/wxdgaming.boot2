@@ -6,9 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.function.ConsumerE0;
 import wxdgaming.boot2.core.lang.Tick;
-import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.GlobalUtil;
 
@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -27,25 +28,8 @@ import java.util.concurrent.locks.ReentrantLock;
 @Getter
 public final class ExecutorUtil implements Serializable {
 
-    @Getter private static ExecutorUtil instance = new ExecutorUtil();
-
-    public static void resetInstance() {
-        executorIgnoredException(instance.TIMER_THREAD::clear);
-        executorIgnoredException(instance.TIMER_THREAD::interrupt);
-        executorIgnoredException(instance.TIMER_THREAD::join);
-        executorIgnoredException(instance.GUARD_THREAD::interrupt);
-        executorIgnoredException(instance.GUARD_THREAD::join);
-        instance.All_THREAD_LOCAL.values().forEach(executorServices -> {
-            System.out.println("shutdown executorServices start: " + executorServices.getName());
-            executorIgnoredException(executorServices::terminate);
-            System.out.println("shutdown executorServices end: " + executorServices.getName());
-        });
-        instance.All_THREAD_LOCAL.clear();
-        instance = new ExecutorUtil();
-    }
-
     /** 忽略异常 */
-    public static void executorIgnoredException(ConsumerE0 ce) {
+    void executorIgnoredException(ConsumerE0 ce) {
         try {
             ce.accept();
         } catch (Throwable ignored) {}
@@ -95,10 +79,21 @@ public final class ExecutorUtil implements Serializable {
 
     }
 
+    ExecutorUtil() {}
+
     @shutdown
     @Sort(1001)
     public void shutdown() {
-        resetInstance();
+        executorIgnoredException(TIMER_THREAD::clear);
+        TIMER_THREAD.closing.set(true);
+        executorIgnoredException(TIMER_THREAD::join);
+        GUARD_THREAD.closing.set(true);
+        All_THREAD_LOCAL.values().forEach(executorServices -> {
+            System.out.println("shutdown executorServices start: " + executorServices.getName());
+            executorIgnoredException(executorServices::terminate);
+            System.out.println("shutdown executorServices end: " + executorServices.getName());
+        });
+        All_THREAD_LOCAL.clear();
     }
 
     /**
@@ -179,10 +174,10 @@ public final class ExecutorUtil implements Serializable {
         return Optional.ofNullable(CurrentThread.get()).map(s -> s.queueName).orElse("");
     }
 
-    ExecutorUtil() {}
-
     /** 守护线程 */
     protected class GuardThread extends Thread implements Serializable {
+
+        final AtomicBoolean closing = new AtomicBoolean(false);
 
         protected GuardThread() {
             super("guard-thread");
@@ -192,7 +187,7 @@ public final class ExecutorUtil implements Serializable {
         @Override public void run() {
             Tick tick = new Tick(50, 10, TimeUnit.SECONDS);
             Logger logger = LoggerFactory.getLogger(this.getClass());
-            while (!Thread.currentThread().isInterrupted()) {
+            while (!closing.get()) {
                 try {
                     try {
                         tick.waitNext();
@@ -204,8 +199,9 @@ public final class ExecutorUtil implements Serializable {
                             LoggerFactory.getLogger(this.getClass()).info(stringBuilder.toString());
                         }
                     } catch (Throwable throwable) {
-                        if (!(throwable instanceof InterruptedException))
-                            GlobalUtil.exception("guard-thread", throwable);
+                        if (throwable instanceof InterruptedException)
+                            break;
+                        GlobalUtil.exception("guard-thread", throwable);
                     }
                 } catch (Throwable throwable) {/*不能加东西，log也有可能异常*/}
             }
@@ -215,6 +211,7 @@ public final class ExecutorUtil implements Serializable {
 
     protected class TimerThread extends Thread {
 
+        final AtomicBoolean closing = new AtomicBoolean(false);
         final ReentrantLock relock = new ReentrantLock();
         private LinkedList<TimerJob> timerJobs = new LinkedList<>();
 
@@ -245,7 +242,7 @@ public final class ExecutorUtil implements Serializable {
         @Override public void run() {
             Tick tick = new Tick(1, 2, TimeUnit.MILLISECONDS);
             Logger logger = LoggerFactory.getLogger(this.getClass());
-            while (!Thread.currentThread().isInterrupted()) {
+            while (!closing.get()) {
                 try {
                     tick.waitNext();
                     relock.lock();

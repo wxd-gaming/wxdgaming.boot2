@@ -27,11 +27,11 @@ public final class ExecutorServices implements IExecutorServices {
 
     ExecutorServices(String name, boolean daemon, int coreSize, int maxSize, int queueCheckSize) {
 
-        if (ExecutorUtil.getInstance().All_THREAD_LOCAL.containsKey(name)) {
+        if (ExecutorUtilImpl.getInstance().All_THREAD_LOCAL.containsKey(name)) {
             throw new RuntimeException("已经存在线程池：" + name);
         }
 
-        ExecutorUtil.getInstance().All_THREAD_LOCAL.put(name, this);
+        ExecutorUtilImpl.getInstance().All_THREAD_LOCAL.put(name, this);
 
         threadPoolExecutor = new ThreadPoolExecutors(
                 name,

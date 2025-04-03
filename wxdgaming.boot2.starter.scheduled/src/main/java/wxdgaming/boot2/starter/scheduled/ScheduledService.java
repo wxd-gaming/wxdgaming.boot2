@@ -34,7 +34,7 @@ public class ScheduledService {
     protected IExecutorServices defaultExecutor;
 
     public ScheduledService(ExecutorConfig config) {
-        defaultExecutor = ExecutorUtil.getInstance().newExecutorServices("scheduled-executor", config.getCoreSize(), config.getCoreSize(), config.getMaxQueueSize());
+        defaultExecutor = ExecutorUtilImpl.getInstance().newExecutorServices("scheduled-executor", config.getCoreSize(), config.getCoreSize(), config.getMaxQueueSize());
         this.config = config;
     }
 
@@ -60,7 +60,7 @@ public class ScheduledService {
     @Sort(99999998)
     public void start() {
         ScheduleTrigger scheduleTrigger = new ScheduleTrigger();
-        job = ExecutorUtil.getInstance().getDefaultExecutor().scheduleAtFixedDelay(
+        job = ExecutorUtilImpl.getInstance().getDefaultExecutor().scheduleAtFixedDelay(
                 "scheduled-timer",
                 scheduleTrigger,
                 10,

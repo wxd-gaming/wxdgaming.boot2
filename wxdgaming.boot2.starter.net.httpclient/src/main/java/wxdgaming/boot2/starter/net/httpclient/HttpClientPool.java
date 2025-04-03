@@ -16,7 +16,7 @@ import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.cache2.CASCache;
 import wxdgaming.boot2.core.cache2.Cache;
 import wxdgaming.boot2.core.function.Function1;
-import wxdgaming.boot2.core.threading.ExecutorUtil;
+import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -40,7 +40,7 @@ public class HttpClientPool {
                 .expireAfterWriteMs(TimeUnit.MINUTES.toMillis(clientConfig.getResetTimeM()))
                 .loader((Function1<String, HttpClientPool>) s -> build(clientConfig))
                 .removalListener((k, pool) -> {
-                    ExecutorUtil.getInstance().getLogicExecutor().schedule(
+                    ExecutorUtilImpl.getInstance().getLogicExecutor().schedule(
                             pool::shutdown,
                             30,
                             TimeUnit.SECONDS
