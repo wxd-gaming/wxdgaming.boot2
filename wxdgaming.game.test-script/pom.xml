@@ -27,6 +27,12 @@
             <artifactId>wxdgaming.game.test</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+            <version>3.7.4</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
