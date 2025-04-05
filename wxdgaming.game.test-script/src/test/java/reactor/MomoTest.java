@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import wxdgaming.boot2.core.threading.ExecutorUtil;
+import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 public class MomoTest {
 
     static {
-        ExecutorUtil.getInstance().init();
+        ExecutorUtilImpl.getInstance().init();
     }
 
     public Mono<String> getUserInfo(String userId) {
@@ -27,7 +27,7 @@ public class MomoTest {
     }
 
     public Mono<String> getUserInfo1(String userId) {
-        CompletableFuture<String> stringCompletableFuture = ExecutorUtil.getInstance().getLogicExecutor().completableFuture(() -> {
+        CompletableFuture<String> stringCompletableFuture = ExecutorUtilImpl.getInstance().getLogicExecutor().completableFuture(() -> {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
