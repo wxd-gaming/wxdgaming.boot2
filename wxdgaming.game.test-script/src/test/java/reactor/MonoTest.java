@@ -16,10 +16,10 @@ import java.util.concurrent.CompletableFuture;
  * @version: 2025-03-29 22:10
  **/
 @Slf4j
-public class MomoTest {
+public class MonoTest {
 
     static {
-        ExecutorUtilImpl.getInstance().init();
+        ExecutorUtilImpl.impl();
     }
 
     public Mono<String> getUserInfo(String userId) {
@@ -38,6 +38,19 @@ public class MomoTest {
         return Mono.fromFuture(stringCompletableFuture);
     }
 
+    public Mono<String> getUserInfo2(String userId) {
+        return Mono.fromSupplier(() -> {
+            log.info("out2");
+            return "getUserInfo2";
+        });
+    }
+
+    public Mono<String> getUserInfo3(String userId) {
+        return Mono.fromFuture(CompletableFuture.supplyAsync(() -> {
+            log.info("out3");
+            return "getUserInfo3";
+        }));
+    }
 
     @Test
     public void t0() throws Exception {
@@ -50,6 +63,9 @@ public class MomoTest {
 
         getUserInfo("userId").subscribe(log::info);
         getUserInfo1("userId").subscribe(log::info);
+        Thread.sleep(3000);
+        getUserInfo2("userId").subscribe(log::info);
+        getUserInfo3("userId").subscribe(log::info);
         Thread.sleep(10000);
     }
 
