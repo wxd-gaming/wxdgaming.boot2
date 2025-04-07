@@ -69,4 +69,8 @@ public class MonoTest {
         Thread.sleep(10000);
     }
 
+    @Test
+    public void t1() throws Exception {
+    }
+
 }

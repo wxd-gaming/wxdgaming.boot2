@@ -11,10 +11,10 @@ import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.NoHttpResponseException;
+import reactor.core.publisher.Mono;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.threading.Event;
-import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.starter.net.http.HttpHeadNameType;
@@ -68,55 +68,11 @@ public abstract class HttpBase<H extends HttpBase> {
         }
     }
 
-    public CompletableFuture<Response<H>> async() {
+    public Mono<Response<H>> async() {
         return sendAsync(3);
     }
 
-    public void async(Consumer<Response<H>> consumer) {
-        sendAsync(3)
-                .thenApply(response -> {
-                    consumer.accept(response);
-                    return null;
-                })
-                .exceptionally(throwable -> {
-                    actionThrowable(throwable);
-                    return null;
-                });
-    }
-
-    public CompletableFuture<String> asyncString() {
-        return sendAsync(3).thenApply(httpResponse -> httpResponse.bodyString());
-    }
-
-    public void asyncString(Consumer<String> consumer) {
-        sendAsync(3)
-                .thenApply(httpResponse -> {
-                    consumer.accept(httpResponse.bodyString());
-                    return null;
-                })
-                .exceptionally(throwable -> {
-                    actionThrowable(throwable);
-                    return null;
-                });
-    }
-
-    public CompletableFuture<RunResult> asyncSyncJson() {
-        return sendAsync(3).thenApply(Response::bodySyncJson);
-    }
-
-    public void asyncSyncJson(Consumer<RunResult> consumer) {
-        sendAsync(3)
-                .thenApply(httpResponse -> {
-                    consumer.accept(httpResponse.bodySyncJson());
-                    return null;
-                })
-                .exceptionally(throwable -> {
-                    actionThrowable(throwable);
-                    return null;
-                });
-    }
-
-    CompletableFuture<Response<H>> sendAsync(int stackTraceIndex) {
+    Mono<Response<H>> sendAsync(int stackTraceIndex) {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         stackTraceElements = new StackTraceElement[stackTrace.length - stackTraceIndex];
         System.arraycopy(stackTrace, stackTraceIndex, stackTraceElements, 0, stackTraceElements.length);
@@ -125,15 +81,14 @@ public abstract class HttpBase<H extends HttpBase> {
 
             @Override public void onEvent() throws Exception {
                 try {
-                    request();
-                    future.complete(response);
+                    future.complete(request());
                 } catch (Throwable throwable) {
                     future.completeExceptionally(throwable);
                 }
             }
 
         }, stackTraceIndex + 2);
-        return future;
+        return Mono.fromCompletionStage(future);
     }
 
     public void actionThrowable(Throwable throwable) {

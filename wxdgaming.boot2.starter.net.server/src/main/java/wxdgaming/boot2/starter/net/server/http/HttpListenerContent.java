@@ -76,7 +76,7 @@ public class HttpListenerContent {
                     }
 
                     String lowerCase = path.toLowerCase();
-                    JavassistInvoke javassistInvoke = javassistInvoke.of(ins, method);
+                    JavassistInvoke javassistInvoke = JavassistInvoke.of(ins, method);
                     HttpMapping httpMapping = new HttpMapping(methodRequestMapping, lowerCase, javassistInvoke);
 
                     HttpMapping old = httpMappingMap.put(lowerCase, httpMapping);
