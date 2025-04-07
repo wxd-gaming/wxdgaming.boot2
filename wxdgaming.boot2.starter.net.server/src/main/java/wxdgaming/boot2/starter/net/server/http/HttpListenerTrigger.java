@@ -33,7 +33,7 @@ public class HttpListenerTrigger extends Event {
     private final HttpContext httpContext;
 
     public HttpListenerTrigger(HttpMapping httpMapping, RunApplication runApplication, HttpContext httpContext) {
-        super(httpMapping.javaAssistInvoke().getMethod());
+        super(httpMapping.javassistInvoke().getMethod());
         this.httpMapping = httpMapping;
         this.runApplication = runApplication;
         this.httpContext = httpContext;
@@ -42,8 +42,8 @@ public class HttpListenerTrigger extends Event {
     @Override public String getTaskInfoString() {
         return "HttpListenerTrigger: %s; %s.%s()".formatted(
                 httpMapping.path(),
-                httpMapping.javaAssistInvoke().getInstance().getClass().getName(),
-                httpMapping.javaAssistInvoke().getMethod().getName()
+                httpMapping.javassistInvoke().getInstance().getClass().getName(),
+                httpMapping.javassistInvoke().getMethod().getName()
         );
     }
 
@@ -58,7 +58,7 @@ public class HttpListenerTrigger extends Event {
         }
         try {
             ThreadContext.putContent("http-path", httpMapping.path());
-            Object invoke = httpMapping.javaAssistInvoke().invoke(injectorParameters(runApplication, httpContext));
+            Object invoke = httpMapping.javassistInvoke().invoke(injectorParameters(runApplication, httpContext));
             if (invoke != null) {
                 httpContext.getResponse().response(invoke);
             } else {
@@ -79,7 +79,7 @@ public class HttpListenerTrigger extends Event {
     }
 
     public Object[] injectorParameters(RunApplication runApplication, HttpContext httpContext) {
-        Parameter[] parameters = httpMapping.javaAssistInvoke().getMethod().getParameters();
+        Parameter[] parameters = httpMapping.javassistInvoke().getMethod().getParameters();
         Object[] params = new Object[parameters.length];
         for (int i = 0; i < params.length; i++) {
             Parameter parameter = parameters[i];

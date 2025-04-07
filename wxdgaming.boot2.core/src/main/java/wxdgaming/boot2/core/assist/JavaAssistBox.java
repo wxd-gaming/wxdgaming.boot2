@@ -4,7 +4,6 @@ import javassist.*;
 import lombok.Getter;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -189,10 +188,9 @@ public class JavaAssistBox {
             }
         }
 
-        public <R> R toInstance(Object... params) {
+        public <R> R toInstance() {
             try {
-                Class[] array = Arrays.stream(params).map(Object::getClass).toArray(value -> new Class[0]);
-                return (R) loadClass().getDeclaredConstructor(array).newInstance(params);
+                return (R) loadClass().getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
