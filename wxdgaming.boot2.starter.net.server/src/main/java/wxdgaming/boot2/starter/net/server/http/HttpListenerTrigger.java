@@ -33,14 +33,18 @@ public class HttpListenerTrigger extends Event {
     private final HttpContext httpContext;
 
     public HttpListenerTrigger(HttpMapping httpMapping, RunApplication runApplication, HttpContext httpContext) {
-        super(httpMapping.method());
+        super(httpMapping.javaAssistInvoke().getMethod());
         this.httpMapping = httpMapping;
         this.runApplication = runApplication;
         this.httpContext = httpContext;
     }
 
     @Override public String getTaskInfoString() {
-        return "HttpListenerTrigger: " + httpMapping.path() + "; " + httpMapping.ins().getClass().getName() + "." + httpMapping.method().getName() + "()";
+        return "HttpListenerTrigger: %s; %s.%s()".formatted(
+                httpMapping.path(),
+                httpMapping.javaAssistInvoke().getInstance().getClass().getName(),
+                httpMapping.javaAssistInvoke().getMethod().getName()
+        );
     }
 
     @Override public void onEvent() throws Exception {
@@ -54,7 +58,7 @@ public class HttpListenerTrigger extends Event {
         }
         try {
             ThreadContext.putContent("http-path", httpMapping.path());
-            Object invoke = httpMapping.method().invoke(httpMapping.ins(), injectorParameters(runApplication, httpContext));
+            Object invoke = httpMapping.javaAssistInvoke().invoke(injectorParameters(runApplication, httpContext));
             if (invoke != null) {
                 httpContext.getResponse().response(invoke);
             } else {
@@ -74,8 +78,8 @@ public class HttpListenerTrigger extends Event {
         }
     }
 
-    public Object[] injectorParameters(RunApplication runApplication, HttpContext context) {
-        Parameter[] parameters = httpMapping.method().getParameters();
+    public Object[] injectorParameters(RunApplication runApplication, HttpContext httpContext) {
+        Parameter[] parameters = httpMapping.javaAssistInvoke().getMethod().getParameters();
         Object[] params = new Object[parameters.length];
         for (int i = 0; i < params.length; i++) {
             Parameter parameter = parameters[i];
@@ -91,13 +95,13 @@ public class HttpListenerTrigger extends Event {
                 params[i] = parameterType.cast(runApplication.getInjector());
                 continue;
             } else if (HttpContext.class.isAssignableFrom(parameterType)) {
-                params[i] = parameterType.cast(context);
+                params[i] = parameterType.cast(httpContext);
                 continue;
             } else if (HttpContext.Request.class.isAssignableFrom(parameterType)) {
-                params[i] = parameterType.cast(context.getRequest());
+                params[i] = parameterType.cast(httpContext.getRequest());
                 continue;
             } else if (HttpContext.Response.class.isAssignableFrom(parameterType)) {
-                params[i] = parameterType.cast(context.getResponse());
+                params[i] = parameterType.cast(httpContext.getResponse());
                 continue;
             }
             /*实现注入*/
@@ -124,9 +128,9 @@ public class HttpListenerTrigger extends Event {
                     try {
 
                         if (param.nestedPath()) {
-                            o = FastJsonUtil.getNestedValue(context.getRequest().getReqParams(), name, parameterizedType);
+                            o = FastJsonUtil.getNestedValue(httpContext.getRequest().getReqParams(), name, parameterizedType);
                         } else {
-                            o = context.getRequest().getReqParams().getObject(name, parameterizedType);
+                            o = httpContext.getRequest().getReqParams().getObject(name, parameterizedType);
                         }
                         if (o == null && StringUtils.isNotBlank(param.defaultValue())) {
                             o = FastJsonUtil.parse(param.defaultValue(), parameterizedType);
@@ -146,8 +150,8 @@ public class HttpListenerTrigger extends Event {
                 Body body = parameter.getAnnotation(Body.class);
                 if (body != null) {
                     Object o = null;
-                    if (StringUtils.isNotBlank(context.getRequest().getReqContent())) {
-                        o = context.getRequest().getReqParams().toJavaObject(parameterType);
+                    if (StringUtils.isNotBlank(httpContext.getRequest().getReqContent())) {
+                        o = httpContext.getRequest().getReqParams().toJavaObject(parameterType);
                     }
                     if (o == null && StringUtils.isNotBlank(body.defaultValue())) {
                         o = body.defaultValue();
