@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
 
 import java.util.List;
@@ -48,10 +49,16 @@ public class ProtoListenerFactory {
             throw new RuntimeException("未找到消息id: %s".formatted(messageId));
         }
         ProtoListenerTrigger protoListenerTrigger = new ProtoListenerTrigger(mapping, protoListenerContent.getRunApplication(), socketSession, messageId, data);
-        boolean allMatch = protoFilters.stream()
-                .allMatch(filter -> filter.doFilter(protoListenerTrigger, socketSession, protoListenerTrigger.getPojoBase()));
+        if (log.isDebugEnabled()) {
+            log.debug("收到消息：{} {} {}", socketSession, messageId, protoListenerTrigger.getPojoBase());
+        }
+        boolean allMatch = protoFilters.stream().allMatch(filter -> filter.doFilter(protoListenerTrigger));
         if (!allMatch) {
             return;
+        }
+        if (StringUtils.isBlank(protoListenerTrigger.getQueueName())) {
+            /*这里相当于绑定每个session的队列*/
+            protoListenerTrigger.setQueueName(socketSession.getChannel().id().asLongText());
         }
         protoListenerTrigger.submit();
     }

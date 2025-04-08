@@ -75,7 +75,7 @@ public abstract class MessageEncode extends ChannelOutboundHandlerAdapter {
                     super.write(ctx, byteBuf, promise);
                 }
                 if (log.isDebugEnabled()) {
-                    log.debug("发送消息：{} {}, {}", session, msgId, pojoBase.getClass().getSimpleName());
+                    log.debug("发送消息：{} {}, {}", session, msgId, pojoBase);
                 }
             }
             case byte[] bytes -> {

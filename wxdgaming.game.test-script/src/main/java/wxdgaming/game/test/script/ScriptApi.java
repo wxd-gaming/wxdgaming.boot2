@@ -10,6 +10,7 @@ import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.threading.ExecutorConfig;
 import wxdgaming.boot2.core.threading.ExecutorWith;
+import wxdgaming.boot2.core.threading.ThreadContext;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;
@@ -52,15 +53,15 @@ public class ScriptApi {
     }
 
     @RpcRequest
-    public String rpcIndex(JSONObject paramData) {
-        log.info("{}", paramData);
-        throw new RuntimeException("test");
+    public JSONObject rpcIndex(JSONObject paramData) {
+        log.info("{} {}", paramData, ThreadContext.context().queueName());
+        return paramData;
     }
 
     @RpcRequest
-    public String rpcIndex2(JSONObject paramData) {
-        log.info("{}", paramData);
-        return "ok";
+    public JSONObject rpcIndex2(JSONObject paramData) {
+        log.info("{} {}", paramData, ThreadContext.context().queueName());
+        return paramData;
     }
 
     // @Scheduled("*/30")

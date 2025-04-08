@@ -3,6 +3,7 @@ package wxdgaming.boot2.starter.net.module.inner;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
+import wxdgaming.boot2.core.assist.JavassistInvoke;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.util.AnnUtil;
@@ -68,14 +69,15 @@ public class RpcListenerContent {
                     }
 
                     String lowerCase = path.toLowerCase();
-                    RpcMapping rpcMapping = new RpcMapping(methodRequestMapping, lowerCase, ins, method);
+                    JavassistInvoke javassistInvoke = JavassistInvoke.of(ins, method);
+                    RpcMapping rpcMapping = new RpcMapping(methodRequestMapping, lowerCase, javassistInvoke);
 
                     RpcMapping old = rpcMappingMap.put(lowerCase, rpcMapping);
-                    if (old != null && !Objects.equals(old.ins().getClass().getName(), ins.getClass().getName())) {
+                    if (old != null && !Objects.equals(old.javassistInvoke().getInstance().getClass().getName(), ins.getClass().getName())) {
                         String formatted = "重复路由监听 %s old = %s - new = %s"
                                 .formatted(
                                         lowerCase,
-                                        old.ins().getClass().getName(),
+                                        old.javassistInvoke().getInstance().getClass().getName(),
                                         ins.getClass().getName()
                                 );
                         throw new RuntimeException(formatted);

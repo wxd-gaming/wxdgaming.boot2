@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.cache2.CASCache;
 import wxdgaming.boot2.core.cache2.Cache;
@@ -53,22 +54,23 @@ public class RpcService {
         return rpcCache.getIfPresent(rpcId);
     }
 
-    public CompletableFuture<JSONObject> request(SocketSession socketSession, String cmd, Object params) {
+    public Mono<JSONObject> request(SocketSession socketSession, String cmd, Object params) {
         return request(socketSession, cmd, params, !socketSession.isEnabledScheduledFlush());
     }
 
-    public CompletableFuture<JSONObject> request(SocketSession socketSession, String cmd, Object params, boolean immediate) {
+    public Mono<JSONObject> request(SocketSession socketSession, String cmd, Object params, boolean immediate) {
         return request(socketSession, cmd, JSONObject.toJSONString(params), immediate);
     }
 
-    public CompletableFuture<JSONObject> request(SocketSession socketSession, String cmd, String params) {
+    public Mono<JSONObject> request(SocketSession socketSession, String cmd, String params) {
         return request(socketSession, cmd, params, !socketSession.isEnabledScheduledFlush());
     }
 
-    public CompletableFuture<JSONObject> request(SocketSession socketSession, String cmd, String params, boolean immediate) {
+    public Mono<JSONObject> request(SocketSession socketSession, String cmd, String params, boolean immediate) {
         CompletableFuture<JSONObject> completableFuture = new CompletableFuture<>();
         ReqRemote reqRemote = new ReqRemote();
         reqRemote
+                .setUid(hexId.newId())
                 .setCmd(cmd)
                 .setParams(params);
 
@@ -76,12 +78,13 @@ public class RpcService {
             reqRemote.setGzip(1);
             reqRemote.setParams(GzipUtil.gzip2String(reqRemote.getParams()));
         }
+        Mono<JSONObject> jsonObjectMono = Mono.fromCompletionStage(completableFuture);
         rpcCache.put(reqRemote.getUid(), completableFuture);
         if (immediate)
             socketSession.writeAndFlush(reqRemote);
         else
             socketSession.write(reqRemote);
-        return completableFuture;
+        return jsonObjectMono;
     }
 
     public void response(SocketSession socketSession, long rpcId, Object data) {

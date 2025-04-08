@@ -35,7 +35,7 @@ public class WxdApplication {
 
     @Getter static RunApplicationMain runApplicationMain;
 
-    public static RunApplication run(Class<?>... classes) {
+    public static RunApplicationMain run(Class<?>... classes) {
         if (isRunning.get()) {
             throw new RuntimeException("boot2-starter is running");
         }
@@ -67,31 +67,7 @@ public class WxdApplication {
 
             Injector injector = Guice.createInjector(Stage.PRODUCTION, collect);
             runApplicationMain = injector.getInstance(RunApplicationMain.class);
-
             runApplicationMain.init();
-
-            runApplicationMain.executeMethodWithAnnotated(Init.class);
-            runApplicationMain.executeMethodWithAnnotated(Start.class);
-
-            JvmUtil.addShutdownHook(() -> {
-                System.out.println("--------------------------shutdown---------------------------");
-                runApplicationMain.executeMethodWithAnnotated(shutdown.class);
-            });
-
-            StringBuilder stringAppend = new StringBuilder(1024);
-
-            String printString = FileReadUtil.readString("print.txt");
-
-            int len = 60;
-
-            stringAppend.append("\n\n")
-                    .append(printString)
-                    .append("\n")
-                    .append("    -[ " + StringUtils.padRight("debug = " + BootConfig.getIns().isDebug() + " | " + JvmUtil.processIDString(), len, ' ') + " ]-\n")
-                    .append("    -[ " + StringUtils.padRight(BootConfig.getIns().sid() + " | " + BootConfig.getIns().sname(), len, ' ') + " ]-\n")
-                    .append("    -[ " + StringUtils.padRight(JvmUtil.timeZone(), len, ' ') + " ]-\n");
-            stringAppend.append("\n");
-            log.warn(stringAppend.toString());
 
             return runApplicationMain;
         } catch (Throwable throwable) {

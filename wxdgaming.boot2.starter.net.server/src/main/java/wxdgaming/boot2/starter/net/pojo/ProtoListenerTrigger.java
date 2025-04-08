@@ -29,31 +29,28 @@ public class ProtoListenerTrigger extends Event {
     private final RunApplication runApplication;
     private final SocketSession socketSession;
     private final int messageId;
-    private final PojoBase pojoBase;
+    private final byte[] bytes;
+    private PojoBase pojoBase;
 
     public ProtoListenerTrigger(ProtoMapping protoMapping, RunApplication runApplication, SocketSession socketSession, int messageId, byte[] bytes) {
-        super(protoMapping.method());
+        super(protoMapping.javassistInvoke().getMethod());
         this.protoMapping = protoMapping;
         this.runApplication = runApplication;
         this.socketSession = socketSession;
         this.messageId = messageId;
-        pojoBase = ReflectContext.newInstance(protoMapping.pojoClass());
-        pojoBase.decode(bytes);
+        this.bytes = bytes;
     }
 
     @Override public void onEvent() throws Exception {
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("收到消息：{} {} {}", socketSession, messageId, protoMapping.pojoClass().getSimpleName());
-            }
-            protoMapping.method().invoke(protoMapping.ins(), injectorParameters(runApplication, socketSession, pojoBase));
+            protoMapping.javassistInvoke().invoke(injectorParameters());
         } catch (Throwable e) {
             log.error("{} messageId={}, {}", socketSession, messageId, protoMapping.pojoClass().getSimpleName(), e);
         }
     }
 
-    public Object[] injectorParameters(RunApplication runApplication, SocketSession socketSession, PojoBase pojoBase) {
-        Parameter[] parameters = protoMapping.method().getParameters();
+    public Object[] injectorParameters() {
+        Parameter[] parameters = protoMapping.javassistInvoke().getMethod().getParameters();
         Object[] params = new Object[parameters.length];
         for (int i = 0; i < params.length; i++) {
             Parameter parameter = parameters[i];
@@ -71,8 +68,8 @@ public class ProtoListenerTrigger extends Event {
             } else if (SocketSession.class.isAssignableFrom(parameterType)) {
                 params[i] = parameterType.cast(socketSession);
                 continue;
-            } else if (pojoBase.getClass().isAssignableFrom(parameterType)) {
-                params[i] = parameterType.cast(pojoBase);
+            } else if (protoMapping.pojoClass().isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(getPojoBase());
                 continue;
             }
             /*实现注入*/
@@ -95,5 +92,13 @@ public class ProtoListenerTrigger extends Event {
             }
         }
         return params;
+    }
+
+    public PojoBase getPojoBase() {
+        if (pojoBase == null) {
+            pojoBase = ReflectContext.newInstance(protoMapping.pojoClass());
+            pojoBase.decode(bytes);
+        }
+        return pojoBase;
     }
 }
