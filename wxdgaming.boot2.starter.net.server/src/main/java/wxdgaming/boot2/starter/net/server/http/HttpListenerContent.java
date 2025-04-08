@@ -5,7 +5,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
-import wxdgaming.boot2.core.assist.JavassistInvoke;
+import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
@@ -76,15 +76,15 @@ public class HttpListenerContent {
                     }
 
                     String lowerCase = path.toLowerCase();
-                    JavassistInvoke javassistInvoke = JavassistInvoke.of(ins, method);
-                    HttpMapping httpMapping = new HttpMapping(methodRequestMapping, lowerCase, javassistInvoke);
+                    JavassistProxy javassistProxy = JavassistProxy.of(ins, method);
+                    HttpMapping httpMapping = new HttpMapping(methodRequestMapping, lowerCase, javassistProxy);
 
                     HttpMapping old = httpMappingMap.put(lowerCase, httpMapping);
-                    if (old != null && !Objects.equals(old.javassistInvoke().getInstance().getClass().getName(), ins.getClass().getName())) {
+                    if (old != null && !Objects.equals(old.javassistProxy().getInstance().getClass().getName(), ins.getClass().getName())) {
                         String formatted = "重复路由监听 %s old = %s - new = %s"
                                 .formatted(
                                         lowerCase,
-                                        old.javassistInvoke().getInstance().getClass().getName(),
+                                        old.javassistProxy().getInstance().getClass().getName(),
                                         ins.getClass().getName()
                                 );
                         throw new RuntimeException(formatted);
@@ -101,7 +101,7 @@ public class HttpListenerContent {
             String lowerCase = uriPath.toLowerCase();
             HttpMapping httpMapping = httpMappingMap.get(lowerCase);
             HttpRequest httpRequest = httpMapping == null ? null : httpMapping.httpRequest();
-            Method method = httpMapping == null ? null : httpMapping.javassistInvoke().getMethod();
+            Method method = httpMapping == null ? null : httpMapping.javassistProxy().getMethod();
 
             Object filterMatch = httpFilterList.stream()
                     .map(httpFilter -> httpFilter.doFilter(httpRequest, method, uriPath, httpContext))

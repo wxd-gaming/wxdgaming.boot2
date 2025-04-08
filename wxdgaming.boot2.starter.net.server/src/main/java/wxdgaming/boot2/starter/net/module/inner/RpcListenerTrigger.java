@@ -50,13 +50,13 @@ public class RpcListenerTrigger extends Event {
     }
 
     @Override public String getTaskInfoString() {
-        return "RpcListenerTrigger: " + rpcMapping.path() + "; " + rpcMapping.javassistInvoke().getInstance().getClass().getName() + "." + rpcMapping.javassistInvoke().getMethod().getName() + "()";
+        return "RpcListenerTrigger: " + rpcMapping.path() + "; " + rpcMapping.javassistProxy().getInstance().getClass().getName() + "." + rpcMapping.javassistProxy().getMethod().getName() + "()";
     }
 
     @Override public void onEvent() {
         try {
-            Object invoke = rpcMapping.javassistInvoke().invoke(injectorParameters());
-            if (rpcMapping.javassistInvoke().getMethod().getReturnType() == void.class) {
+            Object invoke = rpcMapping.javassistProxy().proxyInvoke(injectorParameters());
+            if (rpcMapping.javassistProxy().getMethod().getReturnType() == void.class) {
                 invoke = null;
             }
             if (rpcId > 0) {
@@ -83,7 +83,7 @@ public class RpcListenerTrigger extends Event {
     }
 
     public Object[] injectorParameters() {
-        Parameter[] parameters = rpcMapping.javassistInvoke().getMethod().getParameters();
+        Parameter[] parameters = rpcMapping.javassistProxy().getMethod().getParameters();
         Object[] params = new Object[parameters.length];
         for (int i = 0; i < params.length; i++) {
             Parameter parameter = parameters[i];

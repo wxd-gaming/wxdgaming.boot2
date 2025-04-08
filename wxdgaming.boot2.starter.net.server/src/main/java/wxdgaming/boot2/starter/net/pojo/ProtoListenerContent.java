@@ -3,7 +3,7 @@ package wxdgaming.boot2.starter.net.pojo;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
-import wxdgaming.boot2.core.assist.JavassistInvoke;
+import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.util.AnnUtil;
@@ -46,16 +46,16 @@ public class ProtoListenerContent {
                     }
                     int messageId = messageId(pojoClass);
 
-                    JavassistInvoke javassistInvoke = JavassistInvoke.of(ins, method);
+                    JavassistProxy javassistProxy = JavassistProxy.of(ins, method);
 
-                    ProtoMapping mapping = new ProtoMapping(methodRequestMapping, messageId, pojoClass, javassistInvoke);
+                    ProtoMapping mapping = new ProtoMapping(methodRequestMapping, messageId, pojoClass, javassistProxy);
 
                     ProtoMapping old = mappingMap.put(messageId, mapping);
-                    if (old != null && !Objects.equals(old.javassistInvoke().getInstance().getClass().getName(), ins.getClass().getName())) {
+                    if (old != null && !Objects.equals(old.javassistProxy().getInstance().getClass().getName(), ins.getClass().getName())) {
                         String formatted = "重复路由监听 %s, old = %s - new = %s"
                                 .formatted(
                                         messageId,
-                                        old.javassistInvoke().getInstance().getClass().getName(),
+                                        old.javassistProxy().getInstance().getClass().getName(),
                                         ins.getClass().getName()
                                 );
                         throw new RuntimeException(formatted);

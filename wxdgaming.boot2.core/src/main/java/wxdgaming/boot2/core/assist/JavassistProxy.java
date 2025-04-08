@@ -13,10 +13,10 @@ import java.lang.reflect.Method;
  **/
 @Slf4j
 @Getter
-public class JavassistInvoke {
+public class JavassistProxy {
 
     /** 创建代理对象 */
-    public static JavassistInvoke of(Object invokeInstance, Method method) {
+    public static JavassistProxy of(Object invokeInstance, Method method) {
         Class<?> invokeClass = invokeInstance.getClass();
         StringBuilder stringBuilder = new StringBuilder();
         StringBuilder stringBuilderArgs = new StringBuilder();
@@ -58,7 +58,7 @@ public class JavassistInvoke {
         if (log.isDebugEnabled()) {
             log.debug("\n{}", methodBody);
         }
-        JavaAssistBox.JavaAssist javaAssist = JavaAssistBox.DefaultJavaAssistBox.extendSuperclass(JavassistInvoke.class, invokeClass.getClassLoader());
+        JavaAssistBox.JavaAssist javaAssist = JavaAssistBox.DefaultJavaAssistBox.extendSuperclass(JavassistProxy.class, invokeClass.getClassLoader());
         javaAssist.createMethod(methodBody);
         if (log.isDebugEnabled()) {
             javaAssist.writeFile("target/bin");
@@ -72,9 +72,9 @@ public class JavassistInvoke {
         // } catch (Exception e) {
         //     throw new RuntimeException(e);
         // }
-        JavassistInvoke javassistInvoke = javaAssist.toInstance();
-        javassistInvoke.init(invokeInstance, method);
-        return javassistInvoke;
+        JavassistProxy javassistProxy = javaAssist.toInstance();
+        javassistProxy.init(invokeInstance, method);
+        return javassistProxy;
     }
 
 
@@ -86,7 +86,7 @@ public class JavassistInvoke {
         this.method = method;
     }
 
-    public Object invoke(Object[] args) {
+    public Object proxyInvoke(Object[] args) {
         throw new RuntimeException("not implement");
     }
 

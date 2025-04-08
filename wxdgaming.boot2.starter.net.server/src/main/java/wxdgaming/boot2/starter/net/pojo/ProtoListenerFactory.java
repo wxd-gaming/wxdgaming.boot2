@@ -43,11 +43,13 @@ public class ProtoListenerFactory {
         return protoListenerContent.messageId(pojoClass);
     }
 
+    /** 这里是由netty的work线程触发 */
     public void dispatch(SocketSession socketSession, int messageId, byte[] data) {
         ProtoMapping mapping = protoListenerContent.getMappingMap().get(messageId);
         if (mapping == null) {
             throw new RuntimeException("未找到消息id: %s".formatted(messageId));
         }
+        /*根据映射解析生成触发事件*/
         ProtoListenerTrigger protoListenerTrigger = new ProtoListenerTrigger(mapping, protoListenerContent.getRunApplication(), socketSession, messageId, data);
         if (log.isDebugEnabled()) {
             log.debug("收到消息：{} {} {}", socketSession, messageId, protoListenerTrigger.getPojoBase());
@@ -60,6 +62,7 @@ public class ProtoListenerFactory {
             /*这里相当于绑定每个session的队列*/
             protoListenerTrigger.setQueueName(socketSession.getChannel().id().asLongText());
         }
+        /*提交到对应的线程和队列*/
         protoListenerTrigger.submit();
     }
 

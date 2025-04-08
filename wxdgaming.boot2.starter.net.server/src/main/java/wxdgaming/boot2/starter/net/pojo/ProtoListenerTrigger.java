@@ -33,7 +33,7 @@ public class ProtoListenerTrigger extends Event {
     private PojoBase pojoBase;
 
     public ProtoListenerTrigger(ProtoMapping protoMapping, RunApplication runApplication, SocketSession socketSession, int messageId, byte[] bytes) {
-        super(protoMapping.javassistInvoke().getMethod());
+        super(protoMapping.javassistProxy().getMethod());
         this.protoMapping = protoMapping;
         this.runApplication = runApplication;
         this.socketSession = socketSession;
@@ -43,14 +43,14 @@ public class ProtoListenerTrigger extends Event {
 
     @Override public void onEvent() throws Exception {
         try {
-            protoMapping.javassistInvoke().invoke(injectorParameters());
+            protoMapping.javassistProxy().proxyInvoke(injectorParameters());
         } catch (Throwable e) {
             log.error("{} messageId={}, {}", socketSession, messageId, protoMapping.pojoClass().getSimpleName(), e);
         }
     }
 
     public Object[] injectorParameters() {
-        Parameter[] parameters = protoMapping.javassistInvoke().getMethod().getParameters();
+        Parameter[] parameters = protoMapping.javassistProxy().getMethod().getParameters();
         Object[] params = new Object[parameters.length];
         for (int i = 0; i < params.length; i++) {
             Parameter parameter = parameters[i];
