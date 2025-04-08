@@ -20,7 +20,7 @@ public class JavassistProxy {
         Class<?> invokeClass = invokeInstance.getClass();
         StringBuilder stringBuilder = new StringBuilder();
         StringBuilder stringBuilderArgs = new StringBuilder();
-        stringBuilder.append("public Object invoke(Object[] args) {\n");
+        stringBuilder.append("public Object proxyInvoke(Object[] args) {\n");
         Class<?>[] parameterTypes = method.getParameterTypes();
         for (int i = 0; i < parameterTypes.length; i++) {
             Class<?> parameterType = parameterTypes[i];
@@ -74,6 +74,8 @@ public class JavassistProxy {
         // }
         JavassistProxy javassistProxy = javaAssist.toInstance();
         javassistProxy.init(invokeInstance, method);
+        javaAssist.getCtClass().defrost();
+        javaAssist.getCtClass().detach();
         return javassistProxy;
     }
 

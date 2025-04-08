@@ -5,8 +5,9 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Sort;
-import wxdgaming.boot2.core.assist.JavaAssistBox;
+import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.DiffTime;
 import wxdgaming.boot2.core.reflect.MethodUtil;
 import wxdgaming.boot2.core.threading.Event;
@@ -19,7 +20,6 @@ import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -38,7 +38,7 @@ public class ScheduledInfo extends Event implements Comparable<ScheduledInfo> {
     protected int index;
     protected final Object instance;
     protected final Method method;
-    protected ScheduledProxy scheduledProxy;
+    protected JavassistProxy scheduledProxy;
     /** 和method是互斥的 */
     protected Runnable scheduledTask;
     protected final CronExpress cronExpress;
@@ -54,27 +54,8 @@ public class ScheduledInfo extends Event implements Comparable<ScheduledInfo> {
         super(method);
         this.instance = instance;
         this.method = method;
-        JavaAssistBox.JavaAssist javaAssist = JavaAssistBox.DefaultJavaAssistBox.extendSuperclass(
-                ScheduledProxy.class,
-                instance.getClass().getClassLoader()
-        );
 
-        javaAssist.importPackage(AtomicReference.class);
-        javaAssist.importPackage(ScheduledProxy.class);
-        javaAssist.importPackage(instance.getClass());
-
-        String formatted = """
-                    public void proxy(Object ins) throws Throwable {
-                        ((%s)ins).%s();
-                    }
-                """
-                .formatted(instance.getClass().getName(), method.getName());
-        // System.out.println(formatted);
-        javaAssist.createMethod(formatted);
-
-        scheduledProxy = javaAssist.toInstance();
-        javaAssist.getCtClass().defrost();
-        javaAssist.getCtClass().detach();
+        scheduledProxy = JavassistProxy.of(instance, method);
 
         if (StringUtils.isNotBlank(scheduled.name())) {
             this.name = "[scheduled-job]" + scheduled.name();
@@ -140,7 +121,7 @@ public class ScheduledInfo extends Event implements Comparable<ScheduledInfo> {
     @Override public void onEvent() {
         try {
             if (scheduledProxy != null) {
-                scheduledProxy.proxy(instance);
+                scheduledProxy.proxyInvoke(Objects.ZERO_ARRAY);
             } else {
                 scheduledTask.run();
             }

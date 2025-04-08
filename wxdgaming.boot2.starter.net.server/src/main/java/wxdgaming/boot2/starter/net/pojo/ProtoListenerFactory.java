@@ -60,7 +60,7 @@ public class ProtoListenerFactory {
         }
         if (StringUtils.isBlank(protoListenerTrigger.getQueueName())) {
             /*这里相当于绑定每个session的队列*/
-            protoListenerTrigger.setQueueName(socketSession.getChannel().id().asLongText());
+            protoListenerTrigger.setQueueName("session-" + String.valueOf(socketSession.getChannel().id().asShortText().hashCode() % 16));
         }
         /*提交到对应的线程和队列*/
         protoListenerTrigger.submit();

@@ -45,7 +45,7 @@ public class ProtoListenerTrigger extends Event {
         try {
             protoMapping.javassistProxy().proxyInvoke(injectorParameters());
         } catch (Throwable e) {
-            log.error("{} messageId={}, {}", socketSession, messageId, protoMapping.pojoClass().getSimpleName(), e);
+            log.error("{} messageId={}, {}", socketSession, messageId, getPojoBase(), e);
         }
     }
 
