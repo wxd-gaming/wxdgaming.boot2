@@ -14,6 +14,7 @@ import wxdgaming.boot2.core.threading.ThreadContext;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;
+import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -74,11 +75,11 @@ public class TestApi {
         return paramData;
     }
 
-    // @Scheduled("*/30")
-    // public void timer() {
-    //     log.info("{}", "timer()");
-    // }
-    //
+    @Scheduled("*")
+    public void timer() {
+        log.info("{}", "timer()");
+    }
+
     // @Scheduled("*/30")
     // @ExecutorWith(useVirtualThread = true)
     // public void timerAsync() {

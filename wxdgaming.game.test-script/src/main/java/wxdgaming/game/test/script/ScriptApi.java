@@ -9,12 +9,10 @@ import wxdgaming.boot2.core.ann.Param;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.threading.ExecutorConfig;
-import wxdgaming.boot2.core.threading.ExecutorWith;
 import wxdgaming.boot2.core.threading.ThreadContext;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;
-import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 
 /**
  * @author: wxd-gaming(無心道, 15388152619)
@@ -53,8 +51,8 @@ public class ScriptApi {
     }
 
     @RpcRequest
-    public JSONObject rpcIndex(JSONObject paramData) {
-        log.info("{} {}", paramData, ThreadContext.context().queueName());
+    public JSONObject rpcIndex(@Param(path = "a", defaultValue = "2") String a, JSONObject paramData) {
+        log.info("{} {} {}", a, paramData, ThreadContext.context().queueName());
         return paramData;
     }
 
