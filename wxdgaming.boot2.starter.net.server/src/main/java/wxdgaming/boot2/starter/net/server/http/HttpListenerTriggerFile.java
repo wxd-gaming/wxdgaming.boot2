@@ -4,6 +4,8 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Throw;
+import wxdgaming.boot2.core.cache2.CASCache;
+import wxdgaming.boot2.core.cache2.Cache;
 import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.lang.Tuple2;
 import wxdgaming.boot2.core.threading.Event;
@@ -15,6 +17,7 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 /**
  * http 监听 事件
@@ -23,15 +26,26 @@ import java.util.Locale;
  * @version: 2025-02-13 16:29
  **/
 @Slf4j
-public class HttpFileEvent extends Event {
+public class HttpListenerTriggerFile extends Event {
 
     /** 过期时间格式化 */
     public static SimpleDateFormat ExpiresFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss", Locale.ENGLISH);
+    public static Cache<String, byte[]> cache;
 
+    static {
+        cache = CASCache.<String, byte[]>builder()
+                .expireAfterWriteMs(TimeUnit.HOURS.toMillis(2))
+                .heartTimeMs(TimeUnit.HOURS.toMillis(1))
+                .loader((key) -> {
+                    Tuple2<Path, byte[]> inputStream = FileUtil.findInputStream(HttpListenerTriggerFile.class.getClassLoader(), key);
+                    return inputStream != null ? inputStream.getRight() : null;
+                })
+                .build();
+    }
 
     private final HttpContext httpContext;
 
-    public HttpFileEvent(HttpContext httpContext) {
+    public HttpListenerTriggerFile(HttpContext httpContext) {
         super();
         this.httpContext = httpContext;
     }
@@ -39,7 +53,7 @@ public class HttpFileEvent extends Event {
     @Override public void onEvent() throws Exception {
         String htmlPath = "html" + httpContext.getRequest().getUriPath();
         try {
-            Tuple2<Path, byte[]> inputStream = FileUtil.findInputStream(this.getClass().getClassLoader(), htmlPath);
+            byte[] inputStream = cache.getIfPresent(htmlPath);
             if (inputStream != null) {
                 HttpHeadValueType contentType = HttpHeadValueType.findContentType(htmlPath);
                 /*如果是固有资源增加缓存效果*/
@@ -55,7 +69,7 @@ public class HttpFileEvent extends Event {
                             .append("\n=============================================输出================================================")
                             .append("\n").append(HttpHeaderNames.CONTENT_TYPE).append("=").append(contentType)
                             .append("\n")
-                            .append(HttpHeaderNames.CONTENT_LENGTH).append("=").append(inputStream.getRight().length)
+                            .append(HttpHeaderNames.CONTENT_LENGTH).append("=").append(inputStream.length)
                             .append("\n")
                             .append("file path = ").append(new File(htmlPath).getCanonicalPath())
                             .append("\n=============================================结束================================================")
@@ -63,7 +77,7 @@ public class HttpFileEvent extends Event {
                     log.debug(stringBuilder.toString());
                     stringBuilder.setLength(0);
                 }
-                httpContext.getResponse().response(inputStream.getRight());
+                httpContext.getResponse().response(inputStream);
                 return;
             }
             httpContext.getResponse().setStatus(HttpResponseStatus.NOT_FOUND);

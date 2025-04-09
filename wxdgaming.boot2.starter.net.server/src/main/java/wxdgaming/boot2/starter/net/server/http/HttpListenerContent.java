@@ -93,41 +93,4 @@ public class HttpListenerContent {
                 });
     }
 
-    public void dispatch(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) {
-        try {
-            HttpContext httpContext = new HttpContext(this.httpServerConfig, ctx, fullHttpRequest);
-
-            String uriPath = httpContext.getRequest().getUriPath();
-            String lowerCase = uriPath.toLowerCase();
-            HttpMapping httpMapping = httpMappingMap.get(lowerCase);
-            HttpRequest httpRequest = httpMapping == null ? null : httpMapping.httpRequest();
-            Method method = httpMapping == null ? null : httpMapping.javassistProxy().getMethod();
-
-            Object filterMatch = httpFilterList.stream()
-                    .map(httpFilter -> httpFilter.doFilter(httpRequest, method, uriPath, httpContext))
-                    .filter(Objects::nonNull)
-                    .findFirst()
-                    .orElse(null);
-
-            if (filterMatch != null) {
-                httpContext.getResponse().response(filterMatch);
-                return;
-            }
-            if (httpMapping == null) {
-                HttpFileEvent httpFileEvent = new HttpFileEvent(httpContext);
-                ExecutorUtilImpl.getInstance().getVirtualExecutor().execute(httpFileEvent);
-            } else {
-                if (this.httpServerConfig.isShowRequest()) {
-                    StringBuilder showLog = httpContext.showLog();
-                    log.info("{}", showLog);
-                }
-                HttpListenerTrigger httpListenerTrigger = new HttpListenerTrigger(httpMapping, runApplication, httpContext);
-                httpListenerTrigger.submit();
-            }
-        } catch (Throwable e) {
-            log.error("dispatch error", e);
-        }
-    }
-
-
 }

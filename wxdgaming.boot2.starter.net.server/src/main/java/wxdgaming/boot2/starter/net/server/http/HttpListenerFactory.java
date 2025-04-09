@@ -9,6 +9,11 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.io.Objects;
+import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
+import wxdgaming.boot2.starter.net.ann.HttpRequest;
+
+import java.lang.reflect.Method;
 
 /**
  * http 监听 绑定工厂
@@ -21,6 +26,8 @@ import wxdgaming.boot2.core.ann.Value;
 @Singleton
 public class HttpListenerFactory {
 
+    RunApplication runApplication;
+    HttpServerConfig httpServerConfig;
     /** 相当于用 read and copy write方式作为线程安全性 */
     HttpListenerContent httpListenerContent;
 
@@ -28,11 +35,44 @@ public class HttpListenerFactory {
     @Sort(7)
     public void init(RunApplication runApplication,
                      @Value(path = "socket.server.http", nestedPath = true, required = false) HttpServerConfig httpServerConfig) {
-        httpListenerContent = new HttpListenerContent(httpServerConfig, runApplication);
+        this.httpServerConfig = httpServerConfig;
+        this.runApplication = runApplication;
+        this.httpListenerContent = new HttpListenerContent(httpServerConfig, runApplication);
     }
 
     public void dispatch(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) {
-        httpListenerContent.dispatch(ctx, fullHttpRequest);
-    }
+        try {
+            HttpContext httpContext = new HttpContext(this.httpServerConfig, ctx, fullHttpRequest);
 
+            String uriPath = httpContext.getRequest().getUriPath();
+            String lowerCase = uriPath.toLowerCase();
+            HttpMapping httpMapping = this.httpListenerContent.getHttpMappingMap().get(lowerCase);
+            HttpRequest httpRequest = httpMapping == null ? null : httpMapping.httpRequest();
+            Method method = httpMapping == null ? null : httpMapping.javassistProxy().getMethod();
+
+            Object filterMatch = this.httpListenerContent.getHttpFilterList().stream()
+                    .map(httpFilter -> httpFilter.doFilter(httpRequest, method, uriPath, httpContext))
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse(null);
+
+            if (filterMatch != null) {
+                httpContext.getResponse().response(filterMatch);
+                return;
+            }
+            if (httpMapping == null) {
+                HttpListenerTriggerFile httpListenerTriggerFile = new HttpListenerTriggerFile(httpContext);
+                ExecutorUtilImpl.getInstance().getVirtualExecutor().execute(httpListenerTriggerFile);
+            } else {
+                if (this.httpServerConfig.isShowRequest()) {
+                    StringBuilder showLog = httpContext.showLog();
+                    log.info("{}", showLog);
+                }
+                HttpListenerTrigger httpListenerTrigger = new HttpListenerTrigger(httpMapping, runApplication, httpContext);
+                httpListenerTrigger.submit();
+            }
+        } catch (Throwable e) {
+            log.error("dispatch error", e);
+        }
+    }
 }
