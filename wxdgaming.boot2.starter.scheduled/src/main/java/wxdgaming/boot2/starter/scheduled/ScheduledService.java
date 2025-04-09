@@ -31,10 +31,10 @@ public class ScheduledService {
     protected List<ScheduledInfo> jobList = new ArrayList<>();
 
     protected final ExecutorConfig config;
-    protected IExecutorServices defaultExecutor;
+    protected IExecutorServices executorServices;
 
     public ScheduledService(ExecutorConfig config) {
-        defaultExecutor = ExecutorUtilImpl.getInstance().newExecutorServices("scheduled-executor", config.getCoreSize(), config.getCoreSize(), config.getMaxQueueSize());
+        executorServices = ExecutorUtilImpl.getInstance().newExecutorServices("scheduled-executor", config.getCoreSize(), config.getCoreSize(), config.getMaxQueueSize());
         this.config = config;
     }
 
@@ -132,7 +132,7 @@ public class ScheduledService {
             } else {
                 /*同步执行*/
                 scheduledInfo.startExecTime.reset();
-                defaultExecutor.submit(scheduledInfo);
+                executorServices.submit(scheduledInfo);
                 float v = scheduledInfo.startExecTime.diff();
                 if (v > logTime) {
                     String msg = "执行：" + scheduledInfo.getName() + ", 耗时：" + v + " ms";

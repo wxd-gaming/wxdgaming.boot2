@@ -70,8 +70,8 @@ public class TestApi {
     }
 
     @RpcRequest
-    public JSONObject rpcIndex2(JSONObject paramData) {
-        log.info("{} {}", paramData, ThreadContext.context().queueName());
+    public JSONObject rpcIndex2(JSONObject paramData, @Param(path = "a", nestedPath = true) String a) {
+        log.info("{} {} {}", a, paramData, ThreadContext.context().queueName());
         return paramData;
     }
 
