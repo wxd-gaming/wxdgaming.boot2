@@ -127,7 +127,7 @@ public abstract class HttpBase<H extends HttpBase> {
         } finally {
             close();
         }
-        throw new RuntimeException(exception);
+        throw Throw.of(exception);
     }
 
     protected abstract void request0() throws IOException;
