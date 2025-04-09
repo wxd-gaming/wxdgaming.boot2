@@ -2,12 +2,6 @@ package code;
 
 import java.lang.reflect.Method;
 
-// 定义一个简单的类
-class SimpleClass {
-    public void simpleMethod() {
-        // 简单的空方法
-    }
-}
 
 public class ReflectionPerformanceTest {
 
@@ -15,6 +9,13 @@ public class ReflectionPerformanceTest {
         for (int i = 0; i < 10; i++) {
             proxy();
             System.out.println("=======================================");
+        }
+    }
+
+    // 定义一个简单的类
+    static class SimpleClass {
+        public void simpleMethod() {
+            // 简单的空方法
         }
     }
 
