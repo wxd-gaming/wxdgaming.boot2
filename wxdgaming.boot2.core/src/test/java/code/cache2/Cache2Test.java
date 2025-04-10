@@ -26,7 +26,7 @@ public class Cache2Test {
     static int sleepTimeMs = 12000;
 
     static {
-        ExecutorUtilImpl.getInstance().init();
+        ExecutorUtilImpl.impl();
         LogbackUtil.refreshLoggerLevel(Level.INFO);
     }
 

@@ -52,7 +52,7 @@ public final class ExecutorUtil implements Serializable {
     /** 属于后台线程池, 虚拟线程池，一旦收到停服新号，线程立马关闭了 */
     private IExecutorServices virtualExecutor = null;
 
-    public void init() {
+    void init() {
         Logger logger = LogbackUtil.logger();
         ExecutorConfig basicConfig = BootConfig.getIns().defaultConfig();
         if (logger.isDebugEnabled()) {
