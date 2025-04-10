@@ -4,18 +4,16 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.format.data.Data2Size;
 import wxdgaming.boot2.core.threading.Event;
-import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 import wxdgaming.boot2.core.threading.TimerJob;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- * cas 类型的缓存
+ * cas 类型的缓存, 具有防止缓存穿透效果
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-03-20 16:14
@@ -39,14 +37,21 @@ public class CASCache<K, V> extends Cache<K, V> {
     CacheHolder<V> newCacheHolder(V value) {
         CacheHolder<V> cacheHolder = new CacheHolder<>(value);
         cacheHolder.setLastHeartTime(MyClock.millis() + heartTimeMs);
-        if (this.expireAfterWriteMs > 0) {
-            cacheHolder.setExpireEndTime(MyClock.millis() + expireAfterWriteMs);
+        if (value == null) {
+            /*TODO 防止缓存穿透设置过期时间3秒钟*/
+            cacheHolder.setExpireEndTime(MyClock.millis() + TimeUnit.SECONDS.toMillis(3));
+        } else {
+            if (this.expireAfterWriteMs > 0) {
+                cacheHolder.setExpireEndTime(MyClock.millis() + expireAfterWriteMs);
+            }
+            refresh(cacheHolder);
         }
         return cacheHolder;
     }
 
     void refresh(CacheHolder<V> cacheHolder) {
-        if (this.expireAfterReadMs > 0) {
+        if (cacheHolder.getValue() != null && this.expireAfterReadMs > 0) {
+            /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
             cacheHolder.setExpireEndTime(MyClock.millis() + expireAfterReadMs);
         }
     }
@@ -66,7 +71,8 @@ public class CASCache<K, V> extends Cache<K, V> {
                         CacheHolder<V> holder = next.getValue();
                         if (millis > holder.getExpireEndTime()) {
                             boolean remove = true;
-                            if (CASCache.this.removalListener != null) {
+                            if (holder.getValue() != null && CASCache.this.removalListener != null) {
+                                /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
                                 remove = CASCache.this.removalListener.apply(next.getKey(), holder.getValue());
                             }
                             if (remove)
@@ -74,7 +80,8 @@ public class CASCache<K, V> extends Cache<K, V> {
                             else
                                 refresh(holder);/*移除缓存失败刷新一次*/
                         } else {
-                            if (CASCache.this.heartListener != null && millis > holder.getLastHeartTime()) {
+                            if (holder.getValue() != null && CASCache.this.heartListener != null && millis > holder.getLastHeartTime()) {
+                                /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
                                 CASCache.this.heartListener.accept(next.getKey(), holder.getValue());
                             }
                         }
@@ -127,9 +134,7 @@ public class CASCache<K, V> extends Cache<K, V> {
         CacheHolder<V> cacheHolder = nodes.get(hashIndex).computeIfAbsent(k, c -> {
             if (CASCache.this.loader == null) return null;
             V apply = CASCache.this.loader.apply(k);
-            if (apply == null) {
-                return null;
-            }
+            /*TODO 即便是数据库 null 也要缓存, 防止缓存穿透*/
             return newCacheHolder(apply);
         });
         if (cacheHolder == null) return null;
@@ -172,7 +177,10 @@ public class CASCache<K, V> extends Cache<K, V> {
 
     @Override public Collection<K> keys() {
         return nodes.stream()
-                .flatMap(v -> v.keySet().stream())
+                .flatMap(v -> v.entrySet().stream())
+                /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                .filter(v -> v.getValue() != null)
+                .map(Map.Entry::getKey)
                 .toList();
     }
 
@@ -180,6 +188,8 @@ public class CASCache<K, V> extends Cache<K, V> {
     @Override public Collection<V> values() {
         return nodes.stream()
                 .flatMap(v -> v.values().stream())
+                /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                .filter(v -> v.getValue() != null)
                 .map(CacheHolder::getValue)
                 .toList();
     }
