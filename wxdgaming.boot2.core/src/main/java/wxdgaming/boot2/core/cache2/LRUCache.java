@@ -37,14 +37,21 @@ public class LRUCache<K, V> extends Cache<K, V> {
     CacheHolder<V> newCacheHolder(V value) {
         CacheHolder<V> cacheHolder = new CacheHolder<>(value);
         cacheHolder.setLastHeartTime(MyClock.millis() + heartTimeMs);
-        if (this.expireAfterWriteMs > 0) {
-            cacheHolder.setExpireEndTime(MyClock.millis() + expireAfterWriteMs);
+        if (value == null) {
+            /*TODO 防止缓存穿透设置过期时间3秒钟*/
+            cacheHolder.setExpireEndTime(MyClock.millis() + nullValueTimeMs);
+        } else {
+            if (this.expireAfterWriteMs > 0) {
+                cacheHolder.setExpireEndTime(MyClock.millis() + expireAfterWriteMs);
+            }
+            refresh(cacheHolder);
         }
         return cacheHolder;
     }
 
     void refresh(CacheHolder<V> cacheHolder) {
-        if (this.expireAfterReadMs > 0) {
+        if (cacheHolder.getValue() != null && this.expireAfterReadMs > 0) {
+            /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
             cacheHolder.setExpireEndTime(MyClock.millis() + expireAfterReadMs);
         }
     }
@@ -68,7 +75,8 @@ public class LRUCache<K, V> extends Cache<K, V> {
                             CacheHolder<V> holder = next.getValue();
                             if (millis > holder.getExpireEndTime()) {
                                 boolean remove = true;
-                                if (LRUCache.this.removalListener != null) {
+                                if (holder.getValue() != null && LRUCache.this.removalListener != null) {
+                                    /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
                                     remove = LRUCache.this.removalListener.apply(next.getKey(), holder.getValue());
                                 }
                                 if (remove)
@@ -76,7 +84,8 @@ public class LRUCache<K, V> extends Cache<K, V> {
                                 else
                                     refresh(holder);/*移除缓存失败刷新一次*/
                             } else {
-                                if (LRUCache.this.heartListener != null && millis > holder.getLastHeartTime()) {
+                                if (holder.getValue() != null && LRUCache.this.heartListener != null && millis > holder.getLastHeartTime()) {
+                                    /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
                                     LRUCache.this.heartListener.accept(next.getKey(), holder.getValue());
                                 }
                             }
@@ -147,16 +156,15 @@ public class LRUCache<K, V> extends Cache<K, V> {
             cacheLock.readLock.unlock();
         }
         if (cacheHolder == null) {
+            /*双重锁确保正确命中*/
+            if (LRUCache.this.loader == null)
+                return null;
             cacheLock.writeLock.lock();
             try {
                 cacheHolder = nodes.get(hashIndex).get(k);
                 if (cacheHolder == null) {
-                    /*双重锁确保正确命中*/
-                    if (LRUCache.this.loader == null)
-                        return null;
                     V apply = LRUCache.this.loader.apply(k);
-                    if (apply == null)
-                        return null;
+                    /*TODO 即便是数据库 null 也要缓存, 防止缓存穿透*/
                     cacheHolder = newCacheHolder(apply);
                     nodes.get(hashIndex).put(k, cacheHolder);
                 }
@@ -235,6 +243,9 @@ public class LRUCache<K, V> extends Cache<K, V> {
                 HashMap<K, CacheHolder<V>> node = nodes.get(i);
                 List<K> tmp = new ArrayList<>(node.size());
                 for (Map.Entry<K, CacheHolder<V>> holderLongEntry : node.entrySet()) {
+                    if (holderLongEntry.getValue() == null) {
+                        continue;
+                    }
                     tmp.add(holderLongEntry.getKey());
                 }
                 result.addAll(tmp);
@@ -255,6 +266,9 @@ public class LRUCache<K, V> extends Cache<K, V> {
                 HashMap<K, CacheHolder<V>> node = nodes.get(i);
                 List<V> tmp = new ArrayList<>(node.size());
                 for (CacheHolder<V> holder : node.values()) {
+                    if (holder == null) {
+                        continue;
+                    }
                     tmp.add(holder.getValue());
                 }
                 result.addAll(tmp);

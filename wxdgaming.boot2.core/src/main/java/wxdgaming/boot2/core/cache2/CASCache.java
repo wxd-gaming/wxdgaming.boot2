@@ -39,7 +39,7 @@ public class CASCache<K, V> extends Cache<K, V> {
         cacheHolder.setLastHeartTime(MyClock.millis() + heartTimeMs);
         if (value == null) {
             /*TODO 防止缓存穿透设置过期时间3秒钟*/
-            cacheHolder.setExpireEndTime(MyClock.millis() + TimeUnit.SECONDS.toMillis(3));
+            cacheHolder.setExpireEndTime(MyClock.millis() + nullValueTimeMs);
         } else {
             if (this.expireAfterWriteMs > 0) {
                 cacheHolder.setExpireEndTime(MyClock.millis() + expireAfterWriteMs);

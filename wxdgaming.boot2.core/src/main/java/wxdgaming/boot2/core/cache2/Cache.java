@@ -32,6 +32,9 @@ public abstract class Cache<K, V> {
     protected long expireAfterWriteMs;
     @Builder.Default
     protected long heartTimeMs = 1000;
+    /** 防止缓存穿透，空值设置过期时间 */
+    @Builder.Default
+    protected long nullValueTimeMs = 3000;
     protected Consumer2<K, V> heartListener;
     protected TimerJob[] timerJobs = null;
 

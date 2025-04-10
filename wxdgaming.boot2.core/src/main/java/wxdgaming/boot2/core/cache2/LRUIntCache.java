@@ -43,14 +43,21 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
     CacheHolder<V> newCacheHolder(V value) {
         CacheHolder<V> cacheHolder = new CacheHolder<>(value);
         cacheHolder.setLastHeartTime(MyClock.millis() + heartTimeMs);
-        if (this.expireAfterWriteMs > 0) {
-            cacheHolder.setExpireEndTime(MyClock.millis() + expireAfterWriteMs);
+        if (value == null) {
+            /*TODO 防止缓存穿透设置过期时间3秒钟*/
+            cacheHolder.setExpireEndTime(MyClock.millis() + nullValueTimeMs);
+        } else {
+            if (this.expireAfterWriteMs > 0) {
+                cacheHolder.setExpireEndTime(MyClock.millis() + expireAfterWriteMs);
+            }
+            refresh(cacheHolder);
         }
         return cacheHolder;
     }
 
     void refresh(CacheHolder<V> cacheHolder) {
-        if (this.expireAfterReadMs > 0) {
+        if (cacheHolder.getValue() != null && this.expireAfterReadMs > 0) {
+            /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
             cacheHolder.setExpireEndTime(MyClock.millis() + expireAfterReadMs);
         }
     }
@@ -74,7 +81,8 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
                             CacheHolder<V> holder = next.getValue();
                             if (millis > holder.getExpireEndTime()) {
                                 boolean remove = true;
-                                if (LRUIntCache.this.removalListener != null) {
+                                if (holder.getValue() == null && LRUIntCache.this.removalListener != null) {
+                                    /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
                                     remove = LRUIntCache.this.removalListener.apply(next.getIntKey(), holder.getValue());
                                 }
                                 if (remove)
@@ -82,7 +90,8 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
                                 else
                                     refresh(holder);/*移除缓存失败刷新一次*/
                             } else {
-                                if (LRUIntCache.this.heartListener != null && millis > holder.getLastHeartTime()) {
+                                if (holder.getValue() == null && LRUIntCache.this.heartListener != null && millis > holder.getLastHeartTime()) {
+                                    /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
                                     LRUIntCache.this.heartListener.accept(next.getIntKey(), holder.getValue());
                                 }
                             }
@@ -157,16 +166,15 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
             cacheLock.readLock.unlock();
         }
         if (cacheHolder == null) {
+            if (LRUIntCache.this.loader == null)
+                return null;
             cacheLock.writeLock.lock();
             try {
                 cacheHolder = nodes.get(hashIndex).get(k);
                 if (cacheHolder == null) {
                     /*双重锁确保正确命中*/
-                    if (LRUIntCache.this.loader == null)
-                        return null;
                     V apply = LRUIntCache.this.loader.apply(k);
-                    if (apply == null)
-                        return null;
+                    /*TODO 即便是数据库 null 也要缓存, 防止缓存穿透*/
                     cacheHolder = newCacheHolder(apply);
                     nodes.get(hashIndex).put(k, cacheHolder);
                 }
@@ -245,6 +253,8 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
                 Int2ObjectOpenHashMap<CacheHolder<V>> node = nodes.get(i);
                 List<Integer> tmp = new ArrayList<>(node.size());
                 for (Int2ObjectMap.Entry<CacheHolder<V>> holderLongEntry : node.int2ObjectEntrySet()) {
+                    if (holderLongEntry.getValue().getValue() == null)
+                        continue;
                     tmp.add(holderLongEntry.getIntKey());
                 }
                 result.addAll(tmp);
@@ -265,6 +275,7 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
                 Int2ObjectOpenHashMap<CacheHolder<V>> node = nodes.get(i);
                 List<V> tmp = new ArrayList<>(node.size());
                 for (CacheHolder<V> holder : node.values()) {
+                    if (holder.getValue() == null) continue;
                     tmp.add(holder.getValue());
                 }
                 result.addAll(tmp);
