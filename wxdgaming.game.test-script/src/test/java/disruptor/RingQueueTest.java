@@ -1,5 +1,7 @@
 package disruptor;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.junit.Test;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.RepeatedTest;
@@ -16,12 +18,12 @@ public class RingQueueTest {
         // for (int i = 0; i < 10; i++) {
         //     ringQueue.add("1");
         // }
-
+        // JSON.toJSONString(ringQueue, SerializerFeature.WriteClassName);
         for (int i = 0; i < 10; i++) {
             final int finalI = i;
             Thread.ofPlatform().start(() -> {
                 while (true) {
-                    LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(500));
+                    LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(300));
                     ringQueue.add(String.valueOf(1));
                     System.out.println("添加" + finalI);
                 }
