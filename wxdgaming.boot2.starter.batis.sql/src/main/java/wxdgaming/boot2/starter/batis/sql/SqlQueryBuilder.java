@@ -170,7 +170,7 @@ public abstract class SqlQueryBuilder {
 
     /** 返回第一列 */
     public <R> List<R> executeList(Class<R> resultClass) {
-        return sqlDataHelper.executeList(buildSelectSql(), resultClass, getParameters());
+        return sqlDataHelper.executeScalarList(buildSelectSql(), resultClass, getParameters());
     }
 
 }

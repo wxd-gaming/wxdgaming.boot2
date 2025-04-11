@@ -102,7 +102,7 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
     @Override public void checkTable(Map<String, LinkedHashMap<String, JSONObject>> databseTableMap, TableMapping tableMapping, String tableName, String tableComment) {
         super.checkTable(databseTableMap, tableMapping, tableName, tableComment);
 
-        List<String> indexList = executeList("SELECT indexname FROM pg_indexes WHERE tablename=?", String.class, tableName);
+        List<String> indexList = executeScalarList("SELECT indexname FROM pg_indexes WHERE tablename=?", String.class, tableName);
 
         /*TODO 处理索引*/
         LinkedHashMap<String, TableMapping.FieldMapping> columnMap = tableMapping.getColumns();

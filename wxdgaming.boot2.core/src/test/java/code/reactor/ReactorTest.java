@@ -131,4 +131,12 @@ public class ReactorTest {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void r5() {
+        Mono<String> ss = Mono.just("ss");
+        ss.subscribe(v -> log.info("1{}", v));
+        ss.doOnSuccess(v -> log.info("2{}", v));
+    }
+
 }

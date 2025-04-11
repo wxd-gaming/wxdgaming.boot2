@@ -8,10 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
-import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.core.ann.shutdown;
+import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.starter.batis.DataHelper;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
@@ -19,7 +18,6 @@ import wxdgaming.boot2.starter.batis.ann.DbTable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -287,42 +285,16 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
 
     /** 返回第一行，第一列 */
     public <R> R executeScalar(String sql, Class<R> cls, Object... params) {
-        AtomicReference<R> ret = new AtomicReference<>();
-        this.queryResultSet(sql, params, resultSet -> {
-            try {
-                Object object = resultSet.getObject(1);
-                if (object != null) {
-                    if (cls.isAssignableFrom(object.getClass())) {
-                        ret.set(cls.cast(object));
-                    } else {
-                        ret.set(FastJsonUtil.parse(String.valueOf(object), cls));
-                    }
-                }
-                return false;
-            } catch (SQLException e) {
-                throw Throw.of(getDbName() + " " + sql, e);
-            }
-        });
-        return ret.get();
+        try (SqlQueryResult sqlQueryResult = this.queryResultSet(sql, params)) {
+            return sqlQueryResult.scalar(cls);
+        }
     }
 
     /** 返回第一列 */
-    public <R> List<R> executeList(String sql, Class<R> cls, Object... params) {
-        List<R> results = new ArrayList<>();
-        this.queryResultSet(sql, params, resultSet -> {
-            try {
-                Object object = resultSet.getObject(1);
-                if (cls.isAssignableFrom(object.getClass())) {
-                    results.add(cls.cast(object));
-                } else {
-                    results.add(FastJsonUtil.parse(String.valueOf(object), cls));
-                }
-                return true;
-            } catch (SQLException e) {
-                throw Throw.of(getDbName() + " " + sql, e);
-            }
-        });
-        return results;
+    public <R> List<R> executeScalarList(String sql, Class<R> cls, Object... params) {
+        try (SqlQueryResult sqlQueryResult = this.queryResultSet(sql, params)) {
+            return sqlQueryResult.scalarList(cls);
+        }
     }
 
     @Override public List<JSONObject> queryListByEntity(Class<? extends Entity> cls) {
@@ -352,66 +324,32 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
     }
 
     public List<JSONObject> queryList(String sql, Object... params) {
-        List<JSONObject> rows = new ArrayList<>();
-        this.query(sql, params, rows::add);
-        return rows;
+        try (SqlQueryResult sqlQueryResult = this.queryResultSet(sql, params)) {
+            return sqlQueryResult.rowList();
+        }
     }
 
     /** 返回第一条 */
     public JSONObject queryTop(String sql, Object... params) {
-        AtomicReference<JSONObject> result = new AtomicReference<>();
-        this.query(sql, params, row -> {
-            result.set(row);
-            return false;
-        });
-        return result.get();
+        try (SqlQueryResult sqlQueryResult = this.queryResultSet(sql, params)) {
+            if (sqlQueryResult.hasNext()) {
+                return sqlQueryResult.row();
+            }
+        }
+        return null;
     }
 
     public void query(String sql, Object[] params, Predicate<JSONObject> consumer) {
-        this.queryResultSet(sql, params, resultSet -> {
-            try {
-                JSONObject jsonObject = new JSONObject(true);
-                ResultSetMetaData metaData = resultSet.getMetaData();
-                for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                    String columnName = metaData.getColumnName(i);
-                    Object columnValue = resultSet.getObject(i);
-                    jsonObject.put(columnName, columnValue);
-                }
-                if (!consumer.test(jsonObject))
-                    return false;
-                return true;
-            } catch (Exception e) {
-                throw Throw.of(getDbName() + " " + sql, e);
+        try (SqlQueryResult sqlQueryResult = this.queryResultSet(sql, params)) {
+            while (sqlQueryResult.hasNext()) {
+                if (!consumer.test(sqlQueryResult.row()))
+                    return;
             }
-        });
-
+        }
     }
 
-    public void queryResultSet(String sql, Object[] params, Predicate<java.sql.ResultSet> consumer) {
-        try (Connection connection = connection(); PreparedStatement statement = connection.prepareStatement(sql)) {
-            if (params != null) {
-                for (int i = 0; i < params.length; i++) {
-                    Object param = params[i];
-                    statement.setObject(i + 1, param);
-                }
-            }
-
-            if (sqlConfig.isDebug()) {
-                log.info(
-                        "\n {} query sql: \n{}",
-                        getDbName(), statement.toString()
-                );
-            }
-
-            try (java.sql.ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    if (!consumer.test(resultSet))
-                        break;
-                }
-            }
-        } catch (Exception e) {
-            throw Throw.of(getDbName() + " " + sql, e);
-        }
+    public SqlQueryResult queryResultSet(String sql, Object... params) {
+        return new SqlQueryResult(this, sql, params);
     }
 
     @Override public <R extends Entity> List<R> findList(Class<R> cls) {

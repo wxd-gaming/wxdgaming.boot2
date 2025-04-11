@@ -41,7 +41,7 @@ public class MysqlDataHelper extends SqlDataHelper<MySqlDDLBuilder> {
 
         /*TODO 处理索引*/
 
-        List<String> indexList = executeList(
+        List<String> indexList = executeScalarList(
                 "SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA =? AND TABLE_NAME = ?",
                 String.class,
                 getDbName(),
@@ -70,7 +70,7 @@ public class MysqlDataHelper extends SqlDataHelper<MySqlDDLBuilder> {
 
     /** 获取指定表的所有分区 */
     public List<String> queryPartition(String tableName) {
-        return executeList("""
+        return executeScalarList("""
                 SELECT
                 PARTITION_NAME
                 FROM
