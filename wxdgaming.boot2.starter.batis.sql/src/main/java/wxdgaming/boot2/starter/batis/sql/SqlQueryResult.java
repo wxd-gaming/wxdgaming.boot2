@@ -88,6 +88,9 @@ public class SqlQueryResult implements AutoCloseable {
         ArrayList<R> objectList = new ArrayList<>();
         while (hasNext()) {
             Object object = getScalar();
+            if (object == null) {
+                continue;
+            }
             if (cls.isAssignableFrom(object.getClass())) {
                 objectList.add(cls.cast(object));
             } else {
