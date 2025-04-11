@@ -370,7 +370,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
     public void query(String sql, Object[] params, Predicate<JSONObject> consumer) {
         this.queryResultSet(sql, params, resultSet -> {
             try {
-                JSONObject jsonObject = new JSONObject();
+                JSONObject jsonObject = new JSONObject(true);
                 ResultSetMetaData metaData = resultSet.getMetaData();
                 for (int i = 1; i <= metaData.getColumnCount(); i++) {
                     String columnName = metaData.getColumnName(i);
