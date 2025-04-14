@@ -8,7 +8,7 @@ import wxdgaming.boot2.starter.net.httpclient.HttpBuilder;
 public class HttpClientTest {
 
     static {
-        ExecutorUtilImpl.getInstance().init();
+        ExecutorUtilImpl.impl();
     }
 
     @Test

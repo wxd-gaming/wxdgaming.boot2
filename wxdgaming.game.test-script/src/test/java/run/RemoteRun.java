@@ -26,7 +26,7 @@ import java.util.Map;
 public class RemoteRun {
 
     static {
-        ExecutorUtilImpl.getInstance().init();
+        ExecutorUtilImpl.impl();
     }
 
     @Test
