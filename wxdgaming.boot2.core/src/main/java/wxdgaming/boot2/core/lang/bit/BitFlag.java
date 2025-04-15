@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.lang.bit;
 
 import lombok.Getter;
 import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -67,19 +68,28 @@ public class BitFlag implements Serializable {
      * @return
      */
     public BitFlag addFlag(int index) {
-        if (index < 1) {
-            throw new UnsupportedOperationException("index 大于 0");
-        }
+        AssertUtil.assertTrue(index > 0, "index 大于 0");
         final int flag1 = (index - 1) % 64;
         addFlag(index, 1L << flag1);
         return this;
     }
 
+    /**
+     * 添加一个状态
+     *
+     * @param fgs 状态
+     * @return
+     */
+    public BitFlag addFlags(BitFlagGroup... fgs) {
+        for (BitFlagGroup flagGroup : fgs) {
+            addFlagRange(flagGroup.getIndex(), flagGroup.getEnd(), flagGroup.getFlag());
+        }
+        return this;
+    }
+
     /** 追加覆盖 */
     public BitFlag addFlag(int index, long value) {
-        if (index < 1) {
-            throw new UnsupportedOperationException("index 大于 0");
-        }
+        AssertUtil.assertTrue(index > 0, "index 大于 0");
         index--;
         final int flag0 = index / 64;
         checkBounds(flag0);
@@ -138,11 +148,22 @@ public class BitFlag implements Serializable {
         return this;
     }
 
+    /**
+     * 移除一个标记
+     *
+     * @param fgs 状态
+     * @return
+     */
+    public BitFlag removeFlags(BitFlagGroup... fgs) {
+        for (BitFlagGroup flagGroup : fgs) {
+            removeFlagRange(flagGroup.getIndex(), flagGroup.getEnd());
+        }
+        return this;
+    }
+
     /** 移除一个标记 */
     public BitFlag removeFlag(int index) {
-        if (index < 1) {
-            throw new UnsupportedOperationException("index 大于 0");
-        }
+        AssertUtil.assertTrue(index > 0, "index 大于 0");
         final int flag1 = (index - 1) % 64;
         removeFlag(index, 1L << flag1);
         return this;
@@ -158,9 +179,7 @@ public class BitFlag implements Serializable {
      * @version: 2024-06-13 14:09
      */
     public BitFlag removeFlag(int index, long value) {
-        if (index < 1) {
-            throw new UnsupportedOperationException("index 大于 0");
-        }
+        AssertUtil.assertTrue(index > 0, "index 大于 0");
         index--;
         final int flag0 = index / 64;
         checkBounds(flag0);
@@ -203,9 +222,7 @@ public class BitFlag implements Serializable {
 
     /** 是否包含一个标记 */
     public boolean hasFlag(int index) {
-        if (index < 1) {
-            throw new UnsupportedOperationException("index 大于 0");
-        }
+        AssertUtil.assertTrue(index > 0, "index 大于 0");
         index--;
         final int flag0 = index / 64;
         final int flag1 = index % 64;
