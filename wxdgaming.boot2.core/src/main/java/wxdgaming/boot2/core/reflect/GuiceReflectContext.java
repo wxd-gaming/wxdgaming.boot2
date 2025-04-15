@@ -20,6 +20,7 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -36,12 +37,41 @@ public class GuiceReflectContext {
     private final RunApplication runApplication;
     /** 所有的类 */
     private final List<Content<Object>> classList;
+    /** 实现了某个注解的类 */
+    private final ConcurrentHashMap<Class<? extends Annotation>, List<Content<Object>>> annotationCacheMap = new ConcurrentHashMap<>();
+    /** 继承某个类接口或者实现某个接口 */
+    private final ConcurrentHashMap<Class<?>, List<Content<Object>>> superCacheMap = new ConcurrentHashMap<>();
 
     public GuiceReflectContext(RunApplication runApplication, Collection<Object> classList) {
         this.runApplication = runApplication;
         this.classList = classList.stream().sorted(ReflectContext.ComparatorBeanBySort)
                 .map(Content::of)
                 .toList();
+    }
+
+    /** 所有的类 */
+    public Stream<Content<Object>> stream() {
+        return classList.stream();
+    }
+
+    /** 继承某个类接口或者实现某个接口 */
+    Stream<Content<Object>> classWithSuperStream(Class<?> cls) {
+        return superCacheMap.computeIfAbsent(cls, k ->
+                        classList.stream()
+                                .filter(content -> content.withSuper(cls))
+                                .toList()
+                )
+                .stream();
+    }
+
+    /** 实现了某个注解的类 */
+    Stream<Content<Object>> classWithAnnotatedStream(Class<? extends Annotation> annotation) {
+        return annotationCacheMap.computeIfAbsent(annotation, k ->
+                        classList.stream()
+                                .filter(content -> content.withAnnotated(annotation))
+                                .toList()
+                )
+                .stream();
     }
 
     /** 父类或者接口 */
@@ -51,7 +81,7 @@ public class GuiceReflectContext {
 
     /** 父类或者接口 */
     public <U> Stream<U> classWithSuper(Class<U> cls, Predicate<U> predicate) {
-        Stream<U> tmp = stream().filter(content -> content.withSuper(cls)).map(content -> cls.cast(content.instance));
+        Stream<U> tmp = classWithSuperStream(cls).map(content -> cls.cast(content.instance));
         if (predicate != null) tmp = tmp.filter(predicate);
         return tmp;
     }
@@ -63,15 +93,9 @@ public class GuiceReflectContext {
 
     /** 所有添加了这个注解的类 */
     public Stream<Object> classWithAnnotated(Class<? extends Annotation> annotation, Predicate<Object> predicate) {
-        Stream<Object> tmp = stream()
-                .filter(content -> content.withAnnotated(annotation))
-                .map(content -> content.instance);
+        Stream<Object> tmp = classWithAnnotatedStream(annotation).map(Content::getInstance);
         if (predicate != null) tmp = tmp.filter(predicate);
         return tmp;
-    }
-
-    public Stream<Content<Object>> stream() {
-        return classList.stream();
     }
 
     /** 父类或者接口 */
@@ -81,9 +105,9 @@ public class GuiceReflectContext {
 
     /** 父类或者接口 */
     public <U> Stream<Content<U>> withSuper(Class<U> cls, Predicate<U> predicate) {
-        return stream().filter(content -> content.withSuper(cls))
-                .map(content -> (Content<U>) (content))
-                .filter(content -> predicate == null || predicate.test(content.instance));
+        Stream<Content<U>> tmp = classWithSuperStream(cls).map(content -> (Content<U>) content);
+        if (predicate != null) tmp = tmp.filter(content -> predicate.test(content.getInstance()));
+        return tmp;
     }
 
     /** 所有添加了这个注解的类 */
@@ -93,8 +117,9 @@ public class GuiceReflectContext {
 
     /** 所有添加了这个注解的类 */
     public Stream<Content<Object>> withAnnotated(Class<? extends Annotation> annotation, Predicate<Object> predicate) {
-        return stream().filter(content -> content.withAnnotated(annotation))
-                .filter(content -> predicate == null || predicate.test(content.instance));
+        Stream<Content<Object>> tmp = classWithAnnotatedStream(annotation);
+        if (predicate != null) tmp = tmp.filter(content -> predicate.test(content.instance));
+        return tmp;
     }
 
     /** 所有bean里面的方法，添加了注解的 */
