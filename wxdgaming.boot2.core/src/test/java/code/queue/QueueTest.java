@@ -1,8 +1,5 @@
-package disruptor;
+package code.queue;
 
-import com.lmax.disruptor.RingBuffer;
-import lombok.Getter;
-import lombok.Setter;
 import org.junit.Test;
 import org.junit.jupiter.api.RepeatedTest;
 
@@ -12,9 +9,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class QueueTest {
 
-    static int threadCount = 10;
-    static final int capacity = (int) Math.pow(2, 22);
+    static final int capacity = 1000000;
     static long start = 0;
+    static int threadCount = 10;
 
     static void start() {
         start = System.nanoTime();
@@ -29,8 +26,8 @@ public class QueueTest {
     public void arrayQueue() throws InterruptedException {
         ArrayBlockingQueue<Object> queue = new ArrayBlockingQueue<>(capacity);
         start();
+        CountDownLatch countDownLatch = new CountDownLatch(capacity);
         int threadCapacity = capacity / threadCount;
-        CountDownLatch countDownLatch = new CountDownLatch(threadCapacity * threadCount);
         for (int i = 0; i < threadCount; i++) {
             Thread.ofPlatform().start(() -> {
                 for (int j = 0; j < threadCapacity; j++) {
@@ -57,8 +54,8 @@ public class QueueTest {
     public void linkedQueue() throws InterruptedException {
         LinkedBlockingQueue<Object> queue = new LinkedBlockingQueue<>(capacity);
         start();
+        CountDownLatch countDownLatch = new CountDownLatch(capacity);
         int threadCapacity = capacity / threadCount;
-        CountDownLatch countDownLatch = new CountDownLatch(threadCapacity * threadCount);
         for (int i = 0; i < threadCount; i++) {
             Thread.ofPlatform().start(() -> {
                 for (int j = 0; j < threadCapacity; j++) {
@@ -85,8 +82,8 @@ public class QueueTest {
     public void ringQueue() throws InterruptedException {
         RingQueue<Object> queue = new RingQueue<>(capacity);
         start();
+        CountDownLatch countDownLatch = new CountDownLatch(capacity);
         int threadCapacity = capacity / threadCount;
-        CountDownLatch countDownLatch = new CountDownLatch(threadCapacity * threadCount);
         for (int i = 0; i < threadCount; i++) {
             Thread.ofPlatform().start(() -> {
                 for (int j = 0; j < threadCapacity; j++) {
@@ -102,44 +99,6 @@ public class QueueTest {
         }
         countDownLatch.await();
         end("ringQueue");
-    }
-
-    @Getter
-    @Setter
-    public static class Event {
-
-        private String value;
-
-    }
-
-    public static class EventFactory implements com.lmax.disruptor.EventFactory<Event> {
-
-        @Override
-        public Event newInstance() {
-            return new Event();
-        }
-
-    }
-
-    @Test
-    @RepeatedTest(10)
-    public void ringBuffer() throws InterruptedException {
-        RingBuffer<Event> queue = RingBuffer.createSingleProducer(new EventFactory(), capacity);
-        start();
-        int threadCapacity = capacity / threadCount;
-        CountDownLatch countDownLatch = new CountDownLatch(threadCapacity * threadCount);
-        for (int i = 0; i < threadCount; i++) {
-            Thread.ofPlatform().start(() -> {
-                for (int j = 0; j < threadCapacity; j++) {
-                    long next = queue.next();
-                    queue.get(next).setValue(String.valueOf(j));
-                    queue.publish(next);
-                    countDownLatch.countDown();
-                }
-            });
-        }
-        countDownLatch.await();
-        end("ringBuffer");
     }
 
 }
