@@ -1,6 +1,7 @@
 package wxdgaming.boot2.starter.batis;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.util.TypeUtils;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.Throw;
@@ -365,7 +366,7 @@ public class TableMapping {
                 Class<? extends Converter> cls = ann.value();
                 Converter<Object, Object> converter = ConvertFactory.getConverter(cls);
                 if (converter != null) {
-                    Object parsed = FastJsonUtil.parse(object.toString(), converter.getClazzY());
+                    Object parsed = TypeUtils.cast(object.toString(), converter.getClazzY());
                     return converter.fromDb(getJsonType(), parsed);
                 }
             }
