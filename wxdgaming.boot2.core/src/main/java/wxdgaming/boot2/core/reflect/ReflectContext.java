@@ -7,7 +7,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.slf4j.LoggerFactory;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.io.FileReadUtil;
 
 import java.io.File;
@@ -103,11 +103,11 @@ public class ReflectContext {
         return (Class) params[index];
     }
 
-    /** 根据 {@link Sort} 注解排序，如果值相同使用类名值排序 */
+    /** 根据 {@link Order} 注解排序，如果值相同使用类名值排序 */
     public static Comparator<Class<?>> ComparatorClassBySort = new Comparator<Class<?>>() {
         @Override public int compare(Class<?> o1, Class<?> o2) {
-            int o1Sort = AnnUtil.annOpt(o1, Sort.class).map(Sort::value).orElse(999999);
-            int o2Sort = AnnUtil.annOpt(o2, Sort.class).map(Sort::value).orElse(999999);
+            int o1Sort = AnnUtil.annOpt(o1, Order.class).map(Order::value).orElse(999999);
+            int o2Sort = AnnUtil.annOpt(o2, Order.class).map(Order::value).orElse(999999);
             if (o1Sort == o2Sort) {
                 /*如果排序值相同，采用名字排序*/
                 return o1.getName().compareTo(o2.getName());
@@ -116,17 +116,10 @@ public class ReflectContext {
         }
     };
 
-
-    /** 根据 {@link Sort} 注解排序，如果值相同使用类名值排序 */
+    /** 根据 {@link Order} 注解排序，如果值相同使用类名值排序 */
     public static Comparator<Object> ComparatorBeanBySort = new Comparator<Object>() {
         @Override public int compare(Object o1, Object o2) {
-            int o1Sort = AnnUtil.annOpt(o1.getClass(), Sort.class).map(Sort::value).orElse(999999);
-            int o2Sort = AnnUtil.annOpt(o2.getClass(), Sort.class).map(Sort::value).orElse(999999);
-            if (o1Sort == o2Sort) {
-                /*如果排序值相同，采用名字排序*/
-                return o1.getClass().getName().compareTo(o2.getClass().getName());
-            }
-            return Integer.compare(o1Sort, o2Sort);
+            return ComparatorClassBySort.compare(o1.getClass(), o2.getClass());
         }
     };
 

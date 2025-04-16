@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
@@ -65,8 +65,8 @@ public class ScheduledInfo extends Event implements Comparable<ScheduledInfo> {
 
         this.async = AnnUtil.ann(method, ExecutorWith.class) != null;
 
-        final Sort sortAnn = AnnUtil.ann(method, Sort.class);
-        this.index = sortAnn == null ? 999999 : sortAnn.value();
+        final Order orderAnn = AnnUtil.ann(method, Order.class);
+        this.index = orderAnn == null ? 999999 : orderAnn.value();
         this.scheduleAtFixedRate = scheduled.scheduleAtFixedRate();
         this.cronExpress = new CronExpress(scheduled.value(), TimeUnit.SECONDS, 0);
 

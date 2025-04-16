@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.threading.*;
@@ -57,7 +57,7 @@ public class ScheduledService {
     }
 
     @Start
-    @Sort(99999998)
+    @Order(99999998)
     public void start() {
         ScheduleTrigger scheduleTrigger = new ScheduleTrigger();
         job = ExecutorUtilImpl.getInstance().getDefaultExecutor().scheduleAtFixedDelay(
@@ -70,7 +70,7 @@ public class ScheduledService {
     }
 
     @shutdown
-    @Sort(1000)
+    @Order(1000)
     public void shutdown() {
         log.info("线程 Scheduled 调度器 退出");
         if (job != null) {

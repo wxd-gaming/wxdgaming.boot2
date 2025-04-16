@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wxdgaming.boot2.core.BootConfig;
-import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.function.ConsumerE0;
 import wxdgaming.boot2.core.lang.Tick;
@@ -82,7 +82,7 @@ public final class ExecutorUtil implements Serializable {
     ExecutorUtil() {}
 
     @shutdown
-    @Sort(1001)
+    @Order(1001)
     public void shutdown() {
         executorIgnoredException(TIMER_THREAD::clear);
         TIMER_THREAD.closing.set(true);

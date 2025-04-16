@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Qualifier;
-import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.threading.ThreadContext;
@@ -240,7 +240,7 @@ public class GuiceReflectContext {
         }
 
         @Override public String toString() {
-            return "Content{" + "instance=" + instance + '}';
+            return "Content{instance=%s}".formatted(instance);
         }
     }
 
@@ -267,14 +267,14 @@ public class GuiceReflectContext {
 
         @Override public int compareTo(MethodContent o) {
 
-            int o1Sort = AnnUtil.annOpt(method, Sort.class)
-                    .or(() -> AnnUtil.annOpt(ins.getClass(), Sort.class))
-                    .map(Sort::value)
+            int o1Sort = AnnUtil.annOpt(method, Order.class)
+                    .or(() -> AnnUtil.annOpt(ins.getClass(), Order.class))
+                    .map(Order::value)
                     .orElse(999999);
 
-            int o2Sort = AnnUtil.annOpt(o.method, Sort.class)
-                    .or(() -> AnnUtil.annOpt(o.ins.getClass(), Sort.class))
-                    .map(Sort::value)
+            int o2Sort = AnnUtil.annOpt(o.method, Order.class)
+                    .or(() -> AnnUtil.annOpt(o.ins.getClass(), Order.class))
+                    .map(Order::value)
                     .orElse(999999);
 
             if (o1Sort == o2Sort) {
@@ -285,10 +285,7 @@ public class GuiceReflectContext {
         }
 
         @Override public String toString() {
-            return "MethodContent{" +
-                   "ins=" + ins +
-                   ", method=" + method +
-                   '}';
+            return "MethodContent{ins=%s, method=%s}".formatted(ins, method);
         }
     }
 

@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
 
@@ -28,7 +28,7 @@ public class ProtoListenerFactory {
     List<ProtoFilter> protoFilters;
 
     @Init
-    @Sort(6)
+    @Order(6)
     public void init(RunApplication runApplication) {
         protoListenerContent = new ProtoListenerContent(runApplication);
         iWebSocketStringListener = runApplication.classWithSuper(IWebSocketStringListener.class).findFirst().orElse(null);

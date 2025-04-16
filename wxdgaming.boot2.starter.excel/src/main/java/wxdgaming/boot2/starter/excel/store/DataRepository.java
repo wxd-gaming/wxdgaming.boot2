@@ -6,7 +6,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.reflect.ReflectContext;
@@ -40,7 +40,7 @@ public class DataRepository {
     }
 
     @Start
-    @Sort(1)
+    @Order(1)
     public void load(@Value(path = "data.json.path", nestedPath = true, required = false) String jsonPath,
                      @Value(path = "data.json.scan", nestedPath = true, required = false) String scanPackageName) {
         this.jsonPath = jsonPath;

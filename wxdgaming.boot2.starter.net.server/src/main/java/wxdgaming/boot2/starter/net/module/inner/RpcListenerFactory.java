@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.Order;
 
 /**
  * rpc 监听 绑定工厂
@@ -22,7 +22,7 @@ public class RpcListenerFactory {
     RpcListenerContent rpcListenerContent = null;
 
     @Init
-    @Sort(9)
+    @Order(9)
     public void init(RunApplication runApplication) {
         rpcListenerContent = new RpcListenerContent(runApplication);
     }

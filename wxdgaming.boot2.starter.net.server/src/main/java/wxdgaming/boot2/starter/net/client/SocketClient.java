@@ -12,10 +12,9 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.shutdown;
-import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.NioFactory;
@@ -74,7 +73,7 @@ public abstract class SocketClient {
     }
 
     @Start
-    @Sort(2000)
+    @Order(2000)
     public void start(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
 
         SocketClientDeviceHandler socketClientDeviceHandler = new SocketClientDeviceHandler();
@@ -145,7 +144,7 @@ public abstract class SocketClient {
 
     protected void addChanelHandler(SocketChannel socketChannel, ChannelPipeline pipeline) {}
 
-    @Sort(100)
+    @Order(100)
     @shutdown
     public void shutdown() {
         closed = true;

@@ -8,7 +8,7 @@ import io.netty.util.concurrent.ScheduledFuture;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.util.BytesUnit;
@@ -47,7 +47,7 @@ public class SocketServer {
     }
 
     @Start
-    @Sort(1000)
+    @Order(1000)
     public void start(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
 
         SocketServerDeviceHandler socketServerDeviceHandler = new SocketServerDeviceHandler(config);
@@ -122,7 +122,7 @@ public class SocketServer {
     }
 
     @shutdown
-    @Sort(100)
+    @Order(100)
     public void shutdown() {
         if (scheduledFuture != null) {
             scheduledFuture.cancel(false);

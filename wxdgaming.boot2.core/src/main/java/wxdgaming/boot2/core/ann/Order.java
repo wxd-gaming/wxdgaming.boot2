@@ -12,7 +12,7 @@ import java.lang.annotation.ElementType;
         ElementType.PARAMETER,
         ElementType.LOCAL_VARIABLE
 })
-public @interface Sort {
+public @interface Order {
 
     int value() default 99999;
 

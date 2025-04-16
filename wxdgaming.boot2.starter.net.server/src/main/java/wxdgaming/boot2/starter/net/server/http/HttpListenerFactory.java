@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
@@ -32,7 +32,7 @@ public class HttpListenerFactory {
     HttpListenerContent httpListenerContent;
 
     @Init
-    @Sort(7)
+    @Order(7)
     public void init(RunApplication runApplication,
                      @Value(path = "socket.server.http", nestedPath = true, required = false) HttpServerConfig httpServerConfig) {
         this.httpServerConfig = httpServerConfig;

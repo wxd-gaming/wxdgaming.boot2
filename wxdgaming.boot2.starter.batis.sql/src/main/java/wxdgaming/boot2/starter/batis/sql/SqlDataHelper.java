@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.Sort;
+import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.chatset.StringUtils;
@@ -52,7 +52,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
     }
 
     @Start()
-    @Sort(100)
+    @Order(100)
     public void start() {
         if (StringUtils.isNotBlank(sqlConfig.getScanPackage())) {
             Map<String, LinkedHashMap<String, JSONObject>> tableStructMap = findTableStructMap();
@@ -69,7 +69,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
     }
 
     @shutdown
-    @Sort(Integer.MAX_VALUE/*最后关闭*/)
+    @Order(Integer.MAX_VALUE/*最后关闭*/)
     public void shutdown() {
         if (this.dataBatch != null)
             this.dataBatch.shutdown();
