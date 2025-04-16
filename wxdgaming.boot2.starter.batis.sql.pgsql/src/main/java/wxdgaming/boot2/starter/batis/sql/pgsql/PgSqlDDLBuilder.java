@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.batis.sql.pgsql;
 
-import wxdgaming.boot2.core.util.AnnUtil;
+import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;

@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.batis.sql.pgsql;
 
 import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.util.AnnUtil;
+import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlDDLBuilder;
 import wxdgaming.boot2.starter.batis.sql.ann.Partition;

@@ -13,7 +13,7 @@ import wxdgaming.boot2.core.reflect.MethodUtil;
 import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.core.threading.ExecutorWith;
 import wxdgaming.boot2.core.timer.CronExpress;
-import wxdgaming.boot2.core.util.AnnUtil;
+import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 

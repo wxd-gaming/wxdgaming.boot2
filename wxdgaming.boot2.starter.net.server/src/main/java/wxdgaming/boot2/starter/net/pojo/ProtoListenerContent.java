@@ -6,7 +6,7 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
-import wxdgaming.boot2.core.util.AnnUtil;
+import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 
 import java.lang.reflect.Method;

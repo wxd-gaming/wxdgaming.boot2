@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.util.AnnUtil;
+import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.util.GlobalUtil;
 
 import java.lang.reflect.Method;

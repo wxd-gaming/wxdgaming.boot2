@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.batis.sql;
 
 import com.alibaba.fastjson.JSONObject;
-import wxdgaming.boot2.core.util.AnnUtil;
+import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.DDLBuilder;
 import wxdgaming.boot2.starter.batis.Entity;

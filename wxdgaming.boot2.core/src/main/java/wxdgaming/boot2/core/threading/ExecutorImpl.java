@@ -1,7 +1,7 @@
 package wxdgaming.boot2.core.threading;
 
 
-import wxdgaming.boot2.core.util.AnnUtil;
+import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.chatset.StringUtils;
 
 import java.lang.reflect.Method;

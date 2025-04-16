@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.io.FileReadUtil;
-import wxdgaming.boot2.core.util.AnnUtil;
 
 import java.io.File;
 import java.io.InputStream;

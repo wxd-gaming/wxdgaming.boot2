@@ -9,7 +9,7 @@ import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.core.reflect.FieldUtil;
 import wxdgaming.boot2.core.reflect.ReflectContext;
-import wxdgaming.boot2.core.util.AnnUtil;
+import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.util.ConvertUtil;
 
 import java.io.Serial;

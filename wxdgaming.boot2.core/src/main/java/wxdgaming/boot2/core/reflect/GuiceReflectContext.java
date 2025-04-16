@@ -10,7 +10,6 @@ import wxdgaming.boot2.core.ann.Sort;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.threading.ThreadContext;
-import wxdgaming.boot2.core.util.AnnUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

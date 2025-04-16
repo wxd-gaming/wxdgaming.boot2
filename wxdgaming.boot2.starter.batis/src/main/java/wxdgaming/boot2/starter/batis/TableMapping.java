@@ -13,7 +13,7 @@ import wxdgaming.boot2.core.lang.TimeValue;
 import wxdgaming.boot2.core.reflect.FieldUtil;
 import wxdgaming.boot2.core.reflect.MethodUtil;
 import wxdgaming.boot2.core.reflect.ReflectContext;
-import wxdgaming.boot2.core.util.AnnUtil;
+import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.starter.batis.ann.Convert;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
