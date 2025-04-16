@@ -87,7 +87,7 @@ public class SqlQueryResult implements AutoCloseable {
     public <R> List<R> scalarList(Class<R> cls) {
         ArrayList<R> objectList = new ArrayList<>();
         while (hasNext()) {
-            Object object = getScalar();
+            Object object = get(1);
             if (object == null) {
                 continue;
             }
@@ -103,7 +103,7 @@ public class SqlQueryResult implements AutoCloseable {
     public List<Object> getScalarList() {
         ArrayList<Object> objectList = new ArrayList<>();
         while (hasNext()) {
-            objectList.add(getScalar());
+            objectList.add(get(1));
         }
         return objectList;
     }

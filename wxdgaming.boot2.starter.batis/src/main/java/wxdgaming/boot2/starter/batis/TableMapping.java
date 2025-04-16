@@ -13,8 +13,11 @@ import wxdgaming.boot2.core.reflect.FieldUtil;
 import wxdgaming.boot2.core.reflect.MethodUtil;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.core.util.AnnUtil;
+import wxdgaming.boot2.starter.batis.ann.Convert;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
+import wxdgaming.boot2.starter.batis.convert.ConvertFactory;
+import wxdgaming.boot2.starter.batis.convert.Converter;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -226,6 +229,16 @@ public class TableMapping {
         public Object toDbValue(Object bean) {
             try {
                 Object object = getFieldValue(bean);
+
+                Convert ann = AnnUtil.ann(getField(), Convert.class);
+                if (ann != null) {
+                    Class<? extends Converter> cls = ann.value();
+                    Converter<Object, Object> converter = ConvertFactory.getConverter(cls);
+                    if (converter != null) {
+                        return converter.toDb(object);
+                    }
+                }
+
                 if (object != null) {
                     if (object instanceof AtomicReference<?> atomicReference) {
                         object = atomicReference.get();
@@ -307,7 +320,7 @@ public class TableMapping {
                             fieldValue.addAll((Set) colValue);
                         } else if (AtomicReference.class.isAssignableFrom(getFileType())) {
                             if (!(colValue instanceof AtomicReference)) {
-                                final AtomicReference fieldValue = (AtomicReference) getFieldValue(bean);
+                                final AtomicReference<Object> fieldValue = (AtomicReference) getFieldValue(bean);
                                 fieldValue.set(colValue);
                             }
                         } else {
@@ -323,7 +336,7 @@ public class TableMapping {
                         }
                     } else if (AtomicReference.class.isAssignableFrom(getFileType())) {
                         if (!(colValue instanceof AtomicReference)) {
-                            final AtomicReference fieldValue = (AtomicReference) getFieldValue(bean);
+                            final AtomicReference<Object> fieldValue = (AtomicReference) getFieldValue(bean);
                             fieldValue.set(colValue);
                         }
                     } else {
@@ -342,8 +355,19 @@ public class TableMapping {
             if (object == null) {
                 return null;
             }
+
             if (getFileType().isAssignableFrom(object.getClass())) {
                 return object;
+            }
+
+            Convert ann = AnnUtil.ann(getField(), Convert.class);
+            if (ann != null) {
+                Class<? extends Converter> cls = ann.value();
+                Converter<Object, Object> converter = ConvertFactory.getConverter(cls);
+                if (converter != null) {
+                    Object parsed = FastJsonUtil.parse(object.toString(), converter.getClazzY());
+                    return converter.fromDb(getJsonType(), parsed);
+                }
             }
 
             if (AtomicReference.class.isAssignableFrom(getFileType())) {
@@ -366,6 +390,18 @@ public class TableMapping {
                         return b;
                     }
                     return Boolean.parseBoolean(object.toString());
+                }
+                case Byte -> {
+                    if (object instanceof Number b) {
+                        return b.byteValue();
+                    }
+                    return Byte.parseByte(object.toString());
+                }
+                case Short -> {
+                    if (object instanceof Number b) {
+                        return b.shortValue();
+                    }
+                    return Short.parseShort(object.toString());
                 }
                 case Int -> {
                     if (AtomicInteger.class.isAssignableFrom(getFileType())) {
