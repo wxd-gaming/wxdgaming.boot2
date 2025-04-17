@@ -52,8 +52,8 @@ public class QueueTest {
         end("arrayQueue");
     }
 
-    @Test
-    @RepeatedTest(10)
+    // @Test
+    // @RepeatedTest(10)
     public void linkedQueue() throws InterruptedException {
         LinkedBlockingQueue<Object> queue = new LinkedBlockingQueue<>(capacity);
         start();
@@ -104,6 +104,38 @@ public class QueueTest {
         end("ringQueue");
     }
 
+    @Test
+    @RepeatedTest(10)
+    public void ringQueue2() throws InterruptedException {
+        RingBlockingQueue<Object> queue = new RingBlockingQueue<>(capacity);
+        start();
+        int threadCapacity = capacity / threadCount;
+        CountDownLatch countDownLatch = new CountDownLatch(threadCapacity * threadCount);
+        for (int i = 0; i < threadCount; i++) {
+            Thread.ofPlatform().start(() -> {
+                for (int j = 0; j < threadCapacity; j++) {
+                    try {
+                        queue.add(j);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+            Thread.ofPlatform().start(() -> {
+                for (int k = 0; k < threadCapacity; k++) {
+                    try {
+                        queue.take();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    countDownLatch.countDown();
+                }
+            });
+        }
+        countDownLatch.await();
+        end("ringQueue2");
+    }
+
     @Getter
     @Setter
     public static class Event {
@@ -121,8 +153,8 @@ public class QueueTest {
 
     }
 
-    @Test
-    @RepeatedTest(10)
+    // @Test
+    // @RepeatedTest(10)
     public void ringBuffer() throws InterruptedException {
         RingBuffer<Event> queue = RingBuffer.createSingleProducer(new EventFactory(), capacity);
         start();
