@@ -3,6 +3,7 @@ package wxdgaming.boot2.core.loader;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.*;
@@ -131,14 +132,14 @@ public class ClassDirLoader extends URLClassLoader implements Serializable {
             action(url);
         }
         JDKVersion jdkVersion = JDKVersion.runTimeJDKVersion();
-        System.out.println("class loader jdk_version：" + jdkVersion.getCurVersionString());
+        LoggerFactory.getLogger(this.getClass()).debug("class loader jdk_version：{}", jdkVersion.getCurVersionString());
     }
 
     public ClassDirLoader(ClassLoader parent, String... urls) {
         super(new URL[0], parent);
         addURL(urls);
         JDKVersion jdkVersion = JDKVersion.runTimeJDKVersion();
-        System.out.println("class loader jdk_version：" + jdkVersion.getCurVersionString());
+        LoggerFactory.getLogger(this.getClass()).debug("class loader jdk_version：{}", jdkVersion.getCurVersionString());
     }
 
     /** 可以添加资源文件夹 */

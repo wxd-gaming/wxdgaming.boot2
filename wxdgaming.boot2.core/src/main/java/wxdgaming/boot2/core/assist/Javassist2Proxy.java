@@ -2,8 +2,11 @@ package wxdgaming.boot2.core.assist;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.loader.JavaCoderCompile;
+import wxdgaming.boot2.core.reflect.ReflectContext;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * assist asm 的代理类
@@ -13,13 +16,22 @@ import java.lang.reflect.Method;
  **/
 @Slf4j
 @Getter
-public class JavassistProxy {
+public class Javassist2Proxy {
+
+    static AtomicLong implementationId = new AtomicLong(0);
 
     /** 创建代理对象 */
-    public static JavassistProxy of(Object invokeInstance, Method method) {
+    public static Javassist2Proxy of(Object invokeInstance, Method method) {
         Class<?> invokeClass = invokeInstance.getClass();
         StringBuilder stringBuilder = new StringBuilder();
         StringBuilder stringBuilderArgs = new StringBuilder();
+        stringBuilder.append("package ").append(invokeClass.getPackageName()).append(";\n");
+        stringBuilder.append("import ").append(Javassist2Proxy.class.getName()).append(";\n");
+
+        final long incrementAndGet = implementationId.incrementAndGet();
+
+        stringBuilder.append("public class Javassist2ProxyImpl%s extends %s { \n".formatted(incrementAndGet, Javassist2Proxy.class.getName()));
+
         stringBuilder.append("public Object proxyInvoke(Object[] args) {\n");
         Class<?>[] parameterTypes = method.getParameterTypes();
         for (int i = 0; i < parameterTypes.length; i++) {
@@ -45,7 +57,12 @@ public class JavassistProxy {
                 stringBuilderArgs.append("(" + parameterType.getName() + ")args[").append(i).append("]");
             }
         }
-        stringBuilder.append("    ").append(invokeClass.getName()).append(" proxy = ").append("(").append(invokeClass.getName()).append(")instance;").append("\n");
+
+        String invokeClassName = invokeClass.getName();
+
+        invokeClassName = invokeClassName.replace("$", ".");
+
+        stringBuilder.append("    ").append(invokeClassName).append(" proxy = ").append("(").append(invokeClassName).append(")instance;").append("\n");
         stringBuilder.append("    ").append("Object result = ").append("null").append(";").append("\n");
         if (method.getReturnType() != void.class) {
             stringBuilder.append("    ").append("result = proxy.").append(method.getName()).append("(").append(stringBuilderArgs).append(");").append("\n");
@@ -53,30 +70,28 @@ public class JavassistProxy {
             stringBuilder.append("    ").append("proxy.").append(method.getName()).append("(\n").append(stringBuilderArgs).append("\n);").append("\n");
         }
         stringBuilder.append("    ").append("return result;").append("\n");
+        stringBuilder.append("}\n");
         stringBuilder.append("}");
-        String methodBody = stringBuilder.toString();
+        String javaCoder = stringBuilder.toString();
         if (log.isDebugEnabled()) {
-            log.debug("\n{}", methodBody);
+            log.debug("\n{}", javaCoder);
         }
-        JavassistBox.JavaAssist javaAssist = JavassistBox.defaultJavassistBox.extendSuperclass(JavassistProxy.class, invokeClass.getClassLoader());
-        javaAssist.createMethod(methodBody);
-        if (log.isDebugEnabled()) {
-            javaAssist.writeFile("target/bin");
+
+        String className = invokeClass.getPackageName() + ".Javassist2ProxyImpl" + incrementAndGet;
+
+        try {
+            Class<?> javassistProxy = new JavaCoderCompile()
+                    .parentClassLoader(invokeClass.getClassLoader())
+                    .compilerCode(javaCoder)
+                    .classLoader()
+                    .loadClass(className);
+            Javassist2Proxy javassist2Proxy = (Javassist2Proxy) ReflectContext.newInstance(javassistProxy);
+            javassist2Proxy.init(invokeInstance, method);
+            return javassist2Proxy;
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
-        // try {
-        //     ClassDirLoader classDirLoader = new ClassDirLoader("target/bin");
-        //     Class<?> aClass = classDirLoader.loadClass(javaAssist.getCtClass().getName());
-        //     JavassistInvoke newInstance = (JavassistInvoke) aClass.getDeclaredConstructor().newInstance();
-        //     newInstance.init(invokeInstance, method);
-        //     return newInstance;
-        // } catch (Exception e) {
-        //     throw new RuntimeException(e);
-        // }
-        JavassistProxy javassistProxy = javaAssist.toInstance();
-        javassistProxy.init(invokeInstance, method);
-        javaAssist.getCtClass().defrost();
-        javaAssist.getCtClass().detach();
-        return javassistProxy;
+
     }
 
 

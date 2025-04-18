@@ -4,6 +4,7 @@ import lombok.experimental.Accessors;
 
 import javax.tools.*;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -59,7 +60,7 @@ public class JavaCoderCompile {
      * @param javaCoder
      * @return
      */
-    public JavaCoderCompile compilerCode(String javaCoder) throws Exception {
+    public JavaCoderCompile compilerCode(String javaCoder) {
         // 类全名
         String fullClassName = JavaFileObject4StringCode.readFullClassName(javaCoder);
         // 构造源代码对象
@@ -72,12 +73,16 @@ public class JavaCoderCompile {
     /**
      * @param sourceDir 需要编译的文件路径
      */
-    public JavaCoderCompile compilerJava(String sourceDir) throws Exception {
-        final Collection<File> sourceFileList = Files.walk(Paths.get(sourceDir), 99)
-                .filter(v -> v.toString().endsWith(".java"))
-                .map(Path::toFile)
-                .toList();
-        compilerJava(sourceDir, sourceFileList);
+    public JavaCoderCompile compilerJava(String sourceDir) {
+        try {
+            final Collection<File> sourceFileList = Files.walk(Paths.get(sourceDir), 99)
+                    .filter(v -> v.toString().endsWith(".java"))
+                    .map(Path::toFile)
+                    .toList();
+            compilerJava(sourceDir, sourceFileList);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return this;
     }
 
@@ -88,7 +93,7 @@ public class JavaCoderCompile {
      * @param sourceFileList 文件列表
      * @return
      */
-    public JavaCoderCompile compilerJava(String sourceDir, Collection<File> sourceFileList) throws Exception {
+    public JavaCoderCompile compilerJava(String sourceDir, Collection<File> sourceFileList) {
         if (URLUtil.printLogger)
             System.out.println(String.format("compiler 目录：%s/%s, 文件数量：%s", System.getProperty("user.dir"), sourceDir, sourceFileList.size()));
         if (!sourceFileList.isEmpty()) {
@@ -102,7 +107,7 @@ public class JavaCoderCompile {
      * @param sourceDir     可以null
      * @param compilerFiles 需要编译的文件
      */
-    public JavaCoderCompile compilerJava(String sourceDir, Iterable<? extends JavaFileObject> compilerFiles) throws Exception {
+    public JavaCoderCompile compilerJava(String sourceDir, Iterable<? extends JavaFileObject> compilerFiles) {
         JDKVersion jdkVersion = JDKVersion.runTimeJDKVersion();
         if (URLUtil.printLogger)
             System.out.println(String.format(
@@ -169,7 +174,7 @@ public class JavaCoderCompile {
                         .append(" pos:").append(oDiagnostic.getStartPosition());
             }
 
-            throw new Exception(sb.toString());
+            throw new RuntimeException(sb.toString());
         }
         return this;
     }
@@ -192,7 +197,7 @@ public class JavaCoderCompile {
 
     /** 当前编译器，所有类的加载器 */
     public ClassDirLoader classLoader() {
-        return classLoader(this.parentClassLoader, "target/classes", true);
+        return classLoader(this.parentClassLoader, "target/bin", true);
     }
 
     /**
@@ -204,7 +209,7 @@ public class JavaCoderCompile {
      * @version: 2024-04-04 23:31
      */
     public ClassDirLoader classLoader(boolean forceClear) {
-        return classLoader(this.parentClassLoader, "target/classes", forceClear);
+        return classLoader(this.parentClassLoader, "target/bin", forceClear);
     }
 
     /**

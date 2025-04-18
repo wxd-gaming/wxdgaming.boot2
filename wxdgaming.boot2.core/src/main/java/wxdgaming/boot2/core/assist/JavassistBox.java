@@ -13,21 +13,21 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @version: 2023-12-06 20:07
  **/
 @Getter
-public class JavaAssistBox {
+public class JavassistBox {
 
     public static String javaClassPath() {
         return System.getProperty("java.class.path");
     }
 
-    public static JavaAssistBox DefaultJavaAssistBox = JavaAssistBox.of();
+    public static JavassistBox defaultJavassistBox = JavassistBox.of();
 
-    public static JavaAssistBox of() {
-        return new JavaAssistBox();
+    public static JavassistBox of() {
+        return new JavassistBox();
     }
 
     static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger();
 
-    private JavaAssistBox() {
+    private JavassistBox() {
     }
 
     public ClassPool build(ClassLoader classLoader) {
