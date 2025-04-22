@@ -1,8 +1,6 @@
 package wxdgaming.boot2.core;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Injector;
-import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.matcher.Matchers;
 import lombok.Getter;
@@ -60,6 +58,7 @@ public abstract class BaseModule extends AbstractModule {
         binder().requireExactBindingAnnotations();
         // binder().disableCircularProxies();/*禁用循环依赖*/
 
+        /*绑定实现*/
         bindListener(Matchers.any(), new PostConstructListener());
 
         try {
