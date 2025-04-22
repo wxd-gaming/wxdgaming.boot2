@@ -18,6 +18,7 @@ public class TaskInfo {
     private int cfgId;
 
     private long acceptTime;
+    private boolean complete = false;
     /** 是否领取奖励 */
     private boolean rewards = false;
     /** key:完成条件, value:当前进度 */

@@ -4,14 +4,19 @@ import com.google.inject.Singleton;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.condition.Condition;
+import wxdgaming.boot2.core.lang.condition.UpdateType;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlService;
 import wxdgaming.game.test.bean.role.Player;
+import wxdgaming.game.test.bean.task.TaskInfo;
 import wxdgaming.game.test.bean.task.TaskPack;
 import wxdgaming.game.test.script.task.init.ConditionInitValueHandler;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 任务模块
@@ -54,17 +59,39 @@ public class TaskModuleScript {
         return pgsqlService.getCacheService().cache(TaskPack.class, player.getUid());
     }
 
+    public Condition getCondition(int id) {
+        return new Condition(1, 1, 1, UpdateType.Add);
+    }
+
     public ITaskScript getTaskScript(int taskType) {
         ITaskScript taskScript = taskScriptImplHashMap.get(taskType);
         AssertUtil.assertNull(taskScript, "任务类型不存在：" + taskType);
         return taskScript;
     }
 
+    /** 初始化任务的时候调用变量初始化，比如接取任务的初始化当前等级 */
+    public void initTask(Player player, TaskInfo taskInfo, Map<Integer, Long> conditions) {
+        for (Map.Entry<Integer, Long> entry : conditions.entrySet()) {
+            Integer conditionId = entry.getKey();
+            Condition condition = getCondition(conditionId);
+            ConditionInitValueHandler conditionInitValueHandler = conditionInitValueHandlerMap.get(condition);
+            if (conditionInitValueHandler != null) {
+                long initValue = conditionInitValueHandler.initValue(player, condition);
+                taskInfo.getProgresses().put(conditionId, initValue);
+            }
+        }
+    }
+
     public void update(Player player, Serializable k1, Serializable k2, Serializable k3, long targetValue) {
         TaskPack taskPack = getTaskPack(player);
         targetValue = replace(player, k1, k2, k3, targetValue);
+        List<TaskInfo> changes = new ArrayList<>();
         for (ITaskScript taskScript : taskScriptImplHashMap.values()) {
-            taskScript.update(player, taskPack, k1, k2, k3, targetValue);
+            taskScript.update(player, taskPack, changes, k1, k2, k3, targetValue);
+        }
+        /* TODO发送变更列表 */
+        for (TaskInfo taskInfo : changes) {
+
         }
     }
 

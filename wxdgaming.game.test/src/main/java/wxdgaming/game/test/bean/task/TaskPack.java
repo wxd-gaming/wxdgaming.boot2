@@ -2,6 +2,7 @@ package wxdgaming.game.test.bean.task;
 
 import lombok.Getter;
 import lombok.Setter;
+import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
 import wxdgaming.boot2.starter.batis.EntityLongUID;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
 
@@ -22,6 +23,6 @@ public class TaskPack extends EntityLongUID {
     /** 任务完成ID key:任务类型, value: 完成的id集合 */
     private HashMap<Integer, ArrayList<Integer>> taskFinishList = new HashMap<>();
     /** key:任务类型, value: 任务列表 */
-    private HashMap<Integer, ArrayList<TaskInfo>> tasks = new HashMap<>();
+    private ConcurrentTable<Integer, Integer, TaskInfo> tasks = new ConcurrentTable<>();
 
 }

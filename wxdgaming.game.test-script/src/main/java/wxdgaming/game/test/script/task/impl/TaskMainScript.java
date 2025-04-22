@@ -1,13 +1,15 @@
 package wxdgaming.game.test.script.task.impl;
 
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.bean.task.TaskInfo;
 import wxdgaming.game.test.bean.task.TaskPack;
 import wxdgaming.game.test.script.task.ITaskScript;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 主线任务实现类
@@ -15,6 +17,7 @@ import java.util.ArrayList;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-04-22 10:46
  **/
+@Slf4j
 @Singleton
 public class TaskMainScript extends ITaskScript {
 
@@ -24,31 +27,29 @@ public class TaskMainScript extends ITaskScript {
 
     /** 初始化 */
     @Override public void initTask(Player player, TaskPack taskPack) {
-        ArrayList<TaskInfo> taskInfos = taskPack.getTasks().computeIfAbsent(type(), l -> new ArrayList<>());
-        if (taskInfos.isEmpty()) {
+        Map<Integer, TaskInfo> integerTaskInfoMap = taskPack.getTasks().get(type());
+        if (integerTaskInfoMap == null || integerTaskInfoMap.isEmpty()) {
             TaskInfo taskInfo = new TaskInfo();
             taskInfo.setCfgId(1);
-            /*TODO 考虑初始化进度，比如当前等级*/
-            taskInfos.add(taskInfo);
+            taskModuleScript.initTask(player, taskInfo, null/*TODO读取配置表*/);
+            taskPack.getTasks().put(type(), taskInfo.getCfgId(), taskInfo);
+            log.info("{} 初始化任务：{}", player, taskInfo);
         }
     }
 
     /** 接受任务 */
     @Override public void acceptTask(Player player, TaskPack taskPack, int taskId) {
-        ArrayList<TaskInfo> taskInfos = taskPack.getTasks().get(type());
-        TaskInfo taskInfo = taskInfos.getFirst();
+        super.acceptTask(player, taskPack, taskId);
     }
 
     /** 更新 */
-    @Override public void update(Player player, TaskPack taskPack, Serializable k1, Serializable k2, Serializable k3, long targetValue) {
-        ArrayList<TaskInfo> taskInfos = taskPack.getTasks().get(type());
-        TaskInfo taskInfo = taskInfos.getFirst();
+    @Override public void update(Player player, TaskPack taskPack, List<TaskInfo> changes, Serializable k1, Serializable k2, Serializable k3, long targetValue) {
+        super.update(player, taskPack, changes, k1, k2, k3, targetValue);
     }
 
     /** 提交任务 */
     @Override public void submitTask(Player player, TaskPack taskPack, int taskId) {
-        ArrayList<TaskInfo> taskInfos = taskPack.getTasks().get(type());
-        TaskInfo taskInfo = taskInfos.getFirst();
+        super.submitTask(player, taskPack, taskId);
     }
 
 }
