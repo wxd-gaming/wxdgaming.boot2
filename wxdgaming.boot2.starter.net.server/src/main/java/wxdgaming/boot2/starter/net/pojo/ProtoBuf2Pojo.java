@@ -247,7 +247,7 @@ public class ProtoBuf2Pojo {
                         %s
                             ;
                         
-                            private static final Map<Integer, %s> static_map = MapOf.asMap(%s::getCode, %s.values());
+                            private static final Map<Integer, %s> static_map = MapOf.ofMap(%s::getCode, %s.values());
                         
                             public static %s valueOf(int code) {
                                 return static_map.get(code);
@@ -275,7 +275,7 @@ public class ProtoBuf2Pojo {
                             %s
                                 ;
                         
-                                private static final Map<Integer, %s> static_map = MapOf.asMap(%s::getCode, %s.values());
+                                private static final Map<Integer, %s> static_map = MapOf.ofMap(%s::getCode, %s.values());
                         
                                 public static %s valueOf(int code) {
                                     return static_map.get(code);

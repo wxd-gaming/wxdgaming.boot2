@@ -19,6 +19,8 @@ import java.util.HashMap;
 @DbTable
 public class TaskPack extends EntityLongUID {
 
+    /** 任务完成ID key:任务类型, value: 完成的id集合 */
+    private HashMap<Integer, ArrayList<Integer>> taskFinishList = new HashMap<>();
     /** key:任务类型, value: 任务列表 */
     private HashMap<Integer, ArrayList<TaskInfo>> tasks = new HashMap<>();
 

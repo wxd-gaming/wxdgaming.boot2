@@ -4,7 +4,10 @@ import com.google.inject.Singleton;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.condition.Condition;
+import wxdgaming.boot2.core.util.AssertUtil;
+import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlService;
 import wxdgaming.game.test.bean.role.Player;
+import wxdgaming.game.test.bean.task.TaskPack;
 import wxdgaming.game.test.script.task.init.ConditionInitValueHandler;
 
 import java.io.Serializable;
@@ -21,9 +24,13 @@ public class TaskModuleScript {
 
     private HashMap<Integer, ITaskScript> taskScriptImplHashMap = new HashMap<>();
     private HashMap<Condition, ConditionInitValueHandler> conditionInitValueHandlerMap = new HashMap<>();
+    protected RunApplication runApplication;
+    protected PgsqlService pgsqlService;
 
     @Init
-    public void init(RunApplication runApplication) {
+    public void init(RunApplication runApplication, PgsqlService pgsqlService) {
+        this.runApplication = runApplication;
+        this.pgsqlService = pgsqlService;
         HashMap<Condition, ConditionInitValueHandler> tmpConditionInitValueHandlerMap = new HashMap<>();
         runApplication.classWithSuper(ConditionInitValueHandler.class)
                 .forEach(conditionInitValueHandler -> {
@@ -43,10 +50,21 @@ public class TaskModuleScript {
         taskScriptImplHashMap = tmpTaskScriptImplHashMap;
     }
 
+    public TaskPack getTaskPack(Player player) {
+        return pgsqlService.getCacheService().cache(TaskPack.class, player.getUid());
+    }
+
+    public ITaskScript getTaskScript(int taskType) {
+        ITaskScript taskScript = taskScriptImplHashMap.get(taskType);
+        AssertUtil.assertNull(taskScript, "任务类型不存在：" + taskType);
+        return taskScript;
+    }
+
     public void update(Player player, Serializable k1, Serializable k2, Serializable k3, long targetValue) {
+        TaskPack taskPack = getTaskPack(player);
         targetValue = replace(player, k1, k2, k3, targetValue);
         for (ITaskScript taskScript : taskScriptImplHashMap.values()) {
-            taskScript.update(player, k1, k2, k3, targetValue);
+            taskScript.update(player, taskPack, k1, k2, k3, targetValue);
         }
     }
 

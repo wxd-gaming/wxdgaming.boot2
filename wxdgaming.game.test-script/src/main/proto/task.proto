@@ -1,0 +1,36 @@
+syntax = "proto3";
+//把文件拆分
+option java_multiple_files = true;
+//导出包名
+option java_package = "wxdgaming.game.test.script";
+
+//任务类型
+enum TaskType {
+  TASK_TYPE_NONE = 0;
+  Main = 1;
+}
+
+//接受任务
+message ReqAcceptTask  {
+  TaskType taskType           = 1;
+  int32 taskId                = 2;
+}
+
+//接受任务
+message ResAcceptTask  {
+  TaskType taskType           = 1;
+  int32 taskId                = 2;
+}
+
+//提交任务
+message ReqSubmitTask  {
+  TaskType taskType           = 1;
+  int32 taskId                = 2;
+}
+
+//提交任务
+message ResSubmitTask  {
+  TaskType taskType           = 1;
+  int32 taskId                = 2;
+}
+
