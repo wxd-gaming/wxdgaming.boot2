@@ -3,6 +3,8 @@ package run;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import run.entity.EntityTest;
+import run.entity.Table2;
+import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
@@ -22,15 +24,17 @@ public class PgsqlTest {
 
     private static PgsqlDataHelper dataHelper;
 
+
     static {
+        ExecutorUtilImpl.impl();
         SqlConfig sqlConfig = new SqlConfig();
         sqlConfig.setDebug(true);
         sqlConfig.setDriverClassName("org.postgresql.Driver");
         sqlConfig.setUrl("jdbc:postgresql://192.168.137.10:5432/test2");
         sqlConfig.setUsername("postgres");
         sqlConfig.setPassword("test");
+        sqlConfig.setScanPackage(EntityTest.class.getPackageName());
         dataHelper = new PgsqlDataHelper(sqlConfig);
-        dataHelper.checkTable(EntityTest.class);
         TableMapping tableMapping = dataHelper.tableMapping(EntityTest.class);
         /*TODO 处理分区表 */
         LocalDateTime localDate = LocalDateTime.now();
@@ -57,6 +61,19 @@ public class PgsqlTest {
         dataHelper.update(entityTest);
         dataHelper.save(entityTest);
         EntityTest byKey = dataHelper.findByKey(EntityTest.class, uid, yyyyMMdd);
+        System.out.println(byKey);
+    }
+
+    @Test
+    public void t2() {
+        long uid = System.currentTimeMillis();
+        Table2 table2 = new Table2();
+        table2.setUid(uid);
+        table2.setName("测试" + uid);
+        dataHelper.insert(table2);
+        dataHelper.update(table2);
+        dataHelper.save(table2);
+        Table2 byKey = dataHelper.getCacheService().cache(Table2.class, uid);
         System.out.println(byKey);
     }
 

@@ -17,21 +17,38 @@ import java.util.concurrent.TimeUnit;
  * @version: 2025-02-17 11:28
  **/
 @Getter
-public class JdbcCache<E extends Entity, Key> {
+public class SqlDataCache<E extends Entity, Key> {
 
-    protected final Class<E> cls;
-    protected final TableMapping tableMapping;
-    protected final SqlDataHelper<?> sqlDataHelper;
-    protected final Cache<Key, E> cache;
+    protected Class<E> cls;
+    protected TableMapping tableMapping;
+    protected SqlDataHelper<?> sqlDataHelper;
+    protected Cache<Key, E> cache;
 
     /**
      * 构建
      *
-     * @param sqlDataHelper      数据库
-     * @param expireAfterAccessM 滑动缓存过期时间
+     * @param sqlDataHelper      数据库操作
+     * @param hashArea           分区数量
+     * @param expireAfterAccessM 过期时间，单位分钟
      */
-    public JdbcCache(SqlDataHelper<?> sqlDataHelper, int hashArea, int expireAfterAccessM) {
-        this.cls = ReflectContext.getTClass(this.getClass());
+    public SqlDataCache(SqlDataHelper<?> sqlDataHelper, int hashArea, int expireAfterAccessM) {
+        this.init(ReflectContext.getTClass(this.getClass()), sqlDataHelper, hashArea, expireAfterAccessM);
+    }
+
+    /**
+     * 构建
+     *
+     * @param cls                绑定表实体类
+     * @param sqlDataHelper      数据库操作
+     * @param hashArea           分区数量
+     * @param expireAfterAccessM 过期时间，单位分钟
+     */
+    public SqlDataCache(Class<E> cls, SqlDataHelper<?> sqlDataHelper, int hashArea, int expireAfterAccessM) {
+        this.init(cls, sqlDataHelper, hashArea, expireAfterAccessM);
+    }
+
+    protected void init(Class<E> cls, SqlDataHelper<?> sqlDataHelper, int hashArea, int expireAfterAccessM) {
+        this.cls = cls;
         this.sqlDataHelper = sqlDataHelper;
         this.tableMapping = this.sqlDataHelper.tableMapping(cls);
         this.cache = CASCache.<Key, E>builder()

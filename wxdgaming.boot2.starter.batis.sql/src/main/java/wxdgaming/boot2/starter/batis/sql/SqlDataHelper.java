@@ -40,6 +40,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
     protected final SqlConfig sqlConfig;
     protected final HikariDataSource hikariDataSource;
     protected SqlDataBatch dataBatch;
+    protected final SqlDataCacheService cacheService;
 
     public SqlDataHelper(SqlConfig sqlConfig, DDL ddl) {
         super(ddl);
@@ -49,6 +50,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         if (sqlConfig.getBatchThreadSize() > 0) {
             initDataBatch();
         }
+        cacheService = new SqlDataCacheService(this);
     }
 
     @Start()
@@ -388,9 +390,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
      * @param sql  查询的sql
      * @param args 参数
      * @param <R>  实体模型
-     * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-02-16 01:13
+     * @return 查询结果
      */
     public <R extends Entity> List<R> findListBySql(Class<R> cls, String sql, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
