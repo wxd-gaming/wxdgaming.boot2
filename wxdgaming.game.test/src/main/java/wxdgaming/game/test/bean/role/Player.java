@@ -1,12 +1,15 @@
-package wxdgaming.game.test.bean.entity;
+package wxdgaming.game.test.bean.role;
 
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
+import wxdgaming.boot2.starter.batis.ann.DbTable;
 import wxdgaming.game.test.bean.MapKey;
 import wxdgaming.game.test.bean.MapNpc;
 import wxdgaming.game.test.bean.Vector3D;
+
+import java.util.HashMap;
 
 /**
  * 角色
@@ -16,12 +19,18 @@ import wxdgaming.game.test.bean.Vector3D;
  **/
 @Getter
 @Setter
+@DbTable
 public class Player extends MapNpc {
 
+    @DbColumn(index = true, length = 64)
+    private String account;
+    @DbColumn(columnType = ColumnType.Json, length = 2048)
+    private HashMap<String, Object> clientData = new HashMap<>();
     /** 上一次进入的地图 */
-    @DbColumn(columnType = ColumnType.Json, length = 64)
+    @DbColumn(columnType = ColumnType.Json, length = 128)
     private MapKey lastMapKey;
     /** 上一次所在地图坐标， */
+    @DbColumn(columnType = ColumnType.Json, length = 128)
     private Vector3D lastPosition = new Vector3D();
     /** 朝向 */
     private int lastDirection;

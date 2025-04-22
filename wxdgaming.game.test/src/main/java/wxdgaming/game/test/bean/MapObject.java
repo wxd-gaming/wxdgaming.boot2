@@ -35,5 +35,4 @@ public class MapObject extends GameBase {
     private MapObjectType mapObjectType;
     @DbColumn(ignore = true)
     private BitFlag status = new BitFlag();
-
 }

@@ -1,8 +1,9 @@
-package wxdgaming.game.test.bean.entity;
+package wxdgaming.game.test.bean.task;
 
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.starter.batis.EntityLongUID;
+import wxdgaming.boot2.starter.batis.ann.DbTable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import java.util.HashMap;
  **/
 @Getter
 @Setter
+@DbTable
 public class TaskPack extends EntityLongUID {
 
     public enum TaskType {
