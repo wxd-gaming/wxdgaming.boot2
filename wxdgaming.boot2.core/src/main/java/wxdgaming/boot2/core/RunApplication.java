@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Binding;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -109,7 +110,11 @@ public abstract class RunApplication {
 
     /** 执行包含某个注解的方法 */
     public void executeMethodWithAnnotated(Class<? extends Annotation> annotation) {
-        guiceReflectContext.executeMethodWithAnnotated(annotation);
+        executeMethodWithAnnotated(annotation, null);
+    }
+
+    public void executeMethodWithAnnotated(Class<? extends Annotation> annotation, JSONObject jsonObject) {
+        guiceReflectContext.executeMethodWithAnnotated(annotation, jsonObject);
     }
 
 }

@@ -1,14 +1,15 @@
 package wxdgaming.boot2.core.reflect;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
-import wxdgaming.boot2.core.ann.Qualifier;
-import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.ann.ThreadParam;
-import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.Throw;
+import wxdgaming.boot2.core.ann.*;
+import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.threading.ThreadContext;
 
 import java.lang.annotation.Annotation;
@@ -141,13 +142,13 @@ public class GuiceReflectContext {
         return methodStream;
     }
 
-    public void executeMethodWithAnnotated(Class<? extends Annotation> annotation) {
+    public void executeMethodWithAnnotated(Class<? extends Annotation> annotation, JSONObject jsonObject) {
         Stream<MethodContent> methodContentStream = withMethodAnnotated(annotation);
         List<MethodContent> list = methodContentStream.toList();
-        list.forEach(MethodContent::invoke);
+        list.forEach(methodContent -> methodContent.invoke(jsonObject));
     }
 
-    public Object[] injectorParameters(Object bean, Method method) {
+    public Object[] injectorParameters(Object bean, Method method, JSONObject paramObject) {
         Parameter[] parameters = method.getParameters();
         Object[] params = new Object[parameters.length];
         for (int i = 0; i < params.length; i++) {
@@ -175,6 +176,32 @@ public class GuiceReflectContext {
                 ThreadParam threadParam = parameter.getAnnotation(ThreadParam.class);
                 if (threadParam != null) {
                     params[i] = ThreadContext.context(threadParam, parameterizedType);
+                    continue;
+                }
+            }
+            {
+                Param param = parameter.getAnnotation(Param.class);
+                if (param != null) {
+                    String name = param.path();
+                    Object o = null;
+                    try {
+                        if (paramObject != null) {
+                            if (param.nestedPath()) {
+                                o = FastJsonUtil.getNestedValue(paramObject, name, parameterizedType);
+                            } else {
+                                o = paramObject.getObject(name, parameterizedType);
+                            }
+                        }
+                        if (o == null && StringUtils.isNotBlank(param.defaultValue())) {
+                            o = FastJsonUtil.parse(param.defaultValue(), parameterizedType);
+                        }
+                    } catch (Exception e) {
+                        throw Throw.of("param 参数：" + name, e);
+                    }
+                    if (param.required() && o == null) {
+                        throw new RuntimeException("param:" + name + " is null");
+                    }
+                    params[i] = o;
                     continue;
                 }
             }
@@ -255,10 +282,10 @@ public class GuiceReflectContext {
             this.method = method;
         }
 
-        public Object invoke() {
+        public Object invoke(JSONObject jsonObject) {
             try {
                 log.debug("{}.{}", ins.getClass().getSimpleName(), this.method.getName());
-                Object[] objects = GuiceReflectContext.this.injectorParameters(ins, method);
+                Object[] objects = GuiceReflectContext.this.injectorParameters(ins, method, jsonObject);
                 return method.invoke(ins, objects);
             } catch (Exception e) {
                 throw new RuntimeException(e);

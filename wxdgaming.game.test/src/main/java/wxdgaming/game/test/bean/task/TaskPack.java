@@ -19,10 +19,7 @@ import java.util.HashMap;
 @DbTable
 public class TaskPack extends EntityLongUID {
 
-    public enum TaskType {
-        Main;
-    }
-
-    private HashMap<TaskType, ArrayList<TaskInfo>> tasks = new HashMap<>();
+    /** key:任务类型, value: 任务列表 */
+    private HashMap<Integer, ArrayList<TaskInfo>> tasks = new HashMap<>();
 
 }

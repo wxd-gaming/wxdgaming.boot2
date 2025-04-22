@@ -1,0 +1,29 @@
+syntax = "proto3";
+//把文件拆分
+option java_multiple_files = true;
+//导出包名
+option java_package = "wxdgaming.game.test.script";
+
+//执行同步等待消息
+message ReqLogin {
+  string account                       = 1;
+  string token                         = 2;//用于验证的令牌
+}
+
+message ReqLogout {
+
+}
+
+//选择角色
+message ReqChooseRole {
+
+}
+
+message ReqHeartbeat {
+
+}
+
+message ResHeartbeat {
+
+}
+
