@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Body;
+import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Param;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
@@ -16,6 +17,9 @@ import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -27,13 +31,19 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequestMapping(path = "/")
 public class TestApi {
 
-    public ConcurrentHashMap<String, String> strMap = new ConcurrentHashMap<>();
+    RunApplication runApplication;
 
+    public ConcurrentHashMap<String, String> strMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, String> str2Map = new ConcurrentHashMap<>();
 
     public TestApi() {
         strMap.put("a", "b");
         str2Map.put("a", "b");
+    }
+
+    @Init
+    public void init(RunApplication runApplication) {
+        this.runApplication = runApplication;
     }
 
     @HttpRequest()
@@ -78,6 +88,19 @@ public class TestApi {
     @Scheduled("*")
     public void timer() {
         log.info("{}", "timer()");
+        runApplication.executeMethodWithAnnotated(RunTest.class, 1, 2);
+    }
+
+    @Documented
+    @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
+    @Target({java.lang.annotation.ElementType.METHOD})
+    @interface RunTest {
+
+    }
+
+    @RunTest
+    public void runTestParam(@Value(path = "sid") int sid, int a, int b) {
+        log.info("{} sid={}, a={}, b={}", "runTest()", sid, a, b);
     }
 
     // @Scheduled("*/30")

@@ -109,12 +109,8 @@ public abstract class RunApplication {
     }
 
     /** 执行包含某个注解的方法 */
-    public void executeMethodWithAnnotated(Class<? extends Annotation> annotation) {
-        executeMethodWithAnnotated(annotation, null);
-    }
-
-    public void executeMethodWithAnnotated(Class<? extends Annotation> annotation, JSONObject jsonObject) {
-        guiceReflectContext.executeMethodWithAnnotated(annotation, jsonObject);
+    public void executeMethodWithAnnotated(Class<? extends Annotation> annotation, Object... args) {
+        guiceReflectContext.executeMethodWithAnnotated(annotation, args);
     }
 
 }

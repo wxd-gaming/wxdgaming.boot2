@@ -1,15 +1,11 @@
 package wxdgaming.boot2.core.reflect;
 
-import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
-import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.*;
-import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.threading.ThreadContext;
 
 import java.lang.annotation.Annotation;
@@ -142,15 +138,16 @@ public class GuiceReflectContext {
         return methodStream;
     }
 
-    public void executeMethodWithAnnotated(Class<? extends Annotation> annotation, JSONObject jsonObject) {
+    public void executeMethodWithAnnotated(Class<? extends Annotation> annotation, Object... args) {
         Stream<MethodContent> methodContentStream = withMethodAnnotated(annotation);
         List<MethodContent> list = methodContentStream.toList();
-        list.forEach(methodContent -> methodContent.invoke(jsonObject));
+        list.forEach(methodContent -> methodContent.invoke(args));
     }
 
-    public Object[] injectorParameters(Object bean, Method method, JSONObject paramObject) {
+    public Object[] injectorParameters(Object bean, Method method, Object... args) {
         Parameter[] parameters = method.getParameters();
         Object[] params = new Object[parameters.length];
+        HolderArgument holderArgument = new HolderArgument(args);
         for (int i = 0; i < params.length; i++) {
             Parameter parameter = parameters[i];
             Class<?> parameterType = parameter.getType();
@@ -180,28 +177,9 @@ public class GuiceReflectContext {
                 }
             }
             {
-                Param param = parameter.getAnnotation(Param.class);
+                HoldParam param = parameter.getAnnotation(HoldParam.class);
                 if (param != null) {
-                    String name = param.path();
-                    Object o = null;
-                    try {
-                        if (paramObject != null) {
-                            if (param.nestedPath()) {
-                                o = FastJsonUtil.getNestedValue(paramObject, name, parameterizedType);
-                            } else {
-                                o = paramObject.getObject(name, parameterizedType);
-                            }
-                        }
-                        if (o == null && StringUtils.isNotBlank(param.defaultValue())) {
-                            o = FastJsonUtil.parse(param.defaultValue(), parameterizedType);
-                        }
-                    } catch (Exception e) {
-                        throw Throw.of("param 参数：" + name, e);
-                    }
-                    if (param.required() && o == null) {
-                        throw new RuntimeException("param:" + name + " is null");
-                    }
-                    params[i] = o;
+                    params[i] = holderArgument.get();
                     continue;
                 }
             }
@@ -209,12 +187,30 @@ public class GuiceReflectContext {
                 params[i] = runApplication.getInstance(parameterType);
             } catch (Exception e) {
                 Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
-                if (qualifier != null && qualifier.required()) {
+                if (qualifier == null) {
+                    params[i] = holderArgument.get();
+                    continue;
+                } else if (qualifier.required()) {
                     throw new RuntimeException("bean:" + parameterType.getName() + " is not bind");
                 }
             }
         }
         return params;
+    }
+
+    static class HolderArgument {
+
+        private final Object[] arguments;
+        private int argumentIndex = 0;
+
+        public HolderArgument(Object[] arguments) {
+            this.arguments = arguments;
+        }
+
+        public <R> R get() {
+            return (R) arguments[argumentIndex++];
+        }
+
     }
 
     @Getter
@@ -282,10 +278,10 @@ public class GuiceReflectContext {
             this.method = method;
         }
 
-        public Object invoke(JSONObject jsonObject) {
+        public Object invoke(Object... args) {
             try {
                 log.debug("{}.{}", ins.getClass().getSimpleName(), this.method.getName());
-                Object[] objects = GuiceReflectContext.this.injectorParameters(ins, method, jsonObject);
+                Object[] objects = GuiceReflectContext.this.injectorParameters(ins, method, args);
                 return method.invoke(ins, objects);
             } catch (Exception e) {
                 throw new RuntimeException(e);

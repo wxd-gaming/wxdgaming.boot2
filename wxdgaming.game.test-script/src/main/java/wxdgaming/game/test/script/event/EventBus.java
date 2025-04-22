@@ -1,6 +1,5 @@
 package wxdgaming.game.test.script.event;
 
-import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Singleton;
 import wxdgaming.boot2.core.RunApplication;
 
@@ -21,7 +20,7 @@ public class EventBus {
         this.runApplication = runApplication;
     }
 
-    public void post(Class<? extends Annotation> eventClass, JSONObject args) {
+    public void post(Class<? extends Annotation> eventClass, Object... args) {
         runApplication.executeMethodWithAnnotated(eventClass, args);
     }
 
