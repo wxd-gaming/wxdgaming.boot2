@@ -7,7 +7,7 @@ import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.test.script.role.message.ResHeartbeat;
 
 /**
- * 
+ * null
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: v1.1
@@ -16,6 +16,7 @@ import wxdgaming.game.test.script.role.message.ResHeartbeat;
 @Singleton
 public class ResHeartbeatHandler {
 
+    /** null */
     @ProtoRequest
     public void resHeartbeat(SocketSession socketSession, ResHeartbeat req) {
 

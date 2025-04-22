@@ -8,14 +8,16 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import wxdgaming.boot2.core.ann.Comment;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 
 
-/** 执行同步等待消息 */
+/** 登录请求 */
 @Getter
 @Setter
 @Accessors(chain = true)
+@Comment("登录请求")
 public class ReqLogin extends PojoBase {
 
     /**  */

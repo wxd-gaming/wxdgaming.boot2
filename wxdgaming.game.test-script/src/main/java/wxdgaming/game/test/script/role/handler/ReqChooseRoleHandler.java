@@ -7,7 +7,7 @@ import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.test.script.role.message.ReqChooseRole;
 
 /**
- * 
+ * 选择角色
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: v1.1
@@ -16,6 +16,7 @@ import wxdgaming.game.test.script.role.message.ReqChooseRole;
 @Singleton
 public class ReqChooseRoleHandler {
 
+    /** 选择角色 */
     @ProtoRequest
     public void reqChooseRole(SocketSession socketSession, ReqChooseRole req) {
 

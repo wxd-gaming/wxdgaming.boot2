@@ -7,7 +7,7 @@ import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.test.script.role.message.ReqLogout;
 
 /**
- * 
+ * null
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: v1.1
@@ -16,6 +16,7 @@ import wxdgaming.game.test.script.role.message.ReqLogout;
 @Singleton
 public class ReqLogoutHandler {
 
+    /** null */
     @ProtoRequest
     public void reqLogout(SocketSession socketSession, ReqLogout req) {
 

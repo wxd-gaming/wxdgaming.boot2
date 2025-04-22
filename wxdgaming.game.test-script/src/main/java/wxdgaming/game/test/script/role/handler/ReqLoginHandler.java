@@ -36,9 +36,6 @@ public class ReqLoginHandler {
         eventBus.post(OnLoginBefore.class, player);
 
         eventBus.post(OnLogin.class, player, 1, 1);
-
-        eventBus.post(OnLogin.class, player);
-
     }
 
 }

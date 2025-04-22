@@ -6,12 +6,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.ann.Comment;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.lang.ObjectBase;
+import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
@@ -49,6 +51,7 @@ public class ProtoBuf2Pojo {
 
                     TreeSet<String> imports = new TreeSet<>();
                     imports.add(Tag.class.getName());
+                    imports.add(Comment.class.getName());
                     imports.add(Getter.class.getName());
                     imports.add(Setter.class.getName());
                     imports.add(PojoBase.class.getName());
@@ -198,10 +201,11 @@ public class ProtoBuf2Pojo {
                         @Getter
                         @Setter
                         @Accessors(chain = true)
+                        @Comment("%s")
                         public class %s extends PojoBase {
                         %s
                         }
-                        """.formatted(comment, className, f);
+                        """.formatted(comment, comment, className, f);
             } else {
                 return """
                         
@@ -209,10 +213,11 @@ public class ProtoBuf2Pojo {
                             @Getter
                             @Setter
                             @Accessors(chain = true)
+                            @Comment("%s")
                             public static class %s extends PojoBase {
                             %s
                             }
-                        """.formatted(comment, className, f);
+                        """.formatted(comment, comment, className, f);
             }
         }
 
@@ -237,6 +242,7 @@ public class ProtoBuf2Pojo {
                 return """
                         /** %s */
                         @Getter
+                        @Comment("%s")
                         public enum %s {
                         %s
                             ;
@@ -257,13 +263,14 @@ public class ProtoBuf2Pojo {
                                 this.command = command;
                             }
                         }
-                        """.formatted(comment, className, f, className, className, className, className, className);
+                        """.formatted(comment, comment, className, f, className, className, className, className, className);
             } else {
                 return """
                         
                         
                             /** %s */
                             @Getter
+                            @Comment("%s")
                             public enum %s {
                             %s
                                 ;
@@ -284,7 +291,7 @@ public class ProtoBuf2Pojo {
                                     this.command = command;
                                 }
                             }
-                        """.formatted(comment, className, f, className, className, className, className, className);
+                        """.formatted(comment, comment, className, f, className, className, className, className, className);
             }
         }
 
@@ -433,6 +440,9 @@ public class ProtoBuf2Pojo {
         if (exists) {
             return;
         }
+
+        Comment ann = AnnUtil.ann(cls, Comment.class);
+
         TreeSet<String> imports = new TreeSet<>();
         imports.add(ProtoRequest.class.getName());
         imports.add(Slf4j.class.getName());
@@ -441,6 +451,8 @@ public class ProtoBuf2Pojo {
         imports.add(cls.getName());
 
         String importString = imports.stream().map(s -> "import " + s + ";").collect(Collectors.joining("\n"));
+
+        String comment = ann.value();
 
         String spiCode = """
                 package %s;
@@ -457,12 +469,13 @@ public class ProtoBuf2Pojo {
                 @Singleton
                 public class %s {
                 
+                    /** %s */
                     @ProtoRequest
                     public void %s(SocketSession socketSession, %s req) {
                 
                     }
                 
-                }""".formatted(packageName, importString, "", className, StringUtils.lowerFirst(cls.getSimpleName()), cls.getSimpleName());
+                }""".formatted(packageName, importString, comment, className, comment, StringUtils.lowerFirst(cls.getSimpleName()), cls.getSimpleName());
 
         System.out.println(spiCode);
         FileWriteUtil.writeString(fileName, spiCode);
