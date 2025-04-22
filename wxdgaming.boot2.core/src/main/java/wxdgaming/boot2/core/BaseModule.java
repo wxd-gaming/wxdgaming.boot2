@@ -1,7 +1,10 @@
 package wxdgaming.boot2.core;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
+import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.google.inject.matcher.Matchers;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.reflect.ReflectContext;
@@ -57,12 +60,20 @@ public abstract class BaseModule extends AbstractModule {
         binder().requireExactBindingAnnotations();
         // binder().disableCircularProxies();/*禁用循环依赖*/
 
+        bindListener(Matchers.any(), new PostConstructListener());
+
         try {
             bind();
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
+
+    // @Provides
+    // @Singleton
+    // public Injector injector(Injector injector) {
+    //     return injector;
+    // }
 
     protected abstract void bind() throws Throwable;
 

@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.assist;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.BootConfig;
 
 import java.lang.reflect.Method;
 
@@ -55,12 +56,13 @@ public class JavassistProxy {
         stringBuilder.append("    ").append("return result;").append("\n");
         stringBuilder.append("}");
         String methodBody = stringBuilder.toString();
-        if (log.isDebugEnabled()) {
-            log.debug("\n{}", methodBody);
+        boolean nestedValue = BootConfig.getIns().getNestedValue("javassist.proxy.debug", Boolean.class, false);
+        if (nestedValue) {
+            log.info("\n{}", methodBody);
         }
         JavassistBox.JavaAssist javaAssist = JavassistBox.defaultJavassistBox.extendSuperclass(JavassistProxy.class, invokeClass.getClassLoader());
         javaAssist.createMethod(methodBody);
-        if (log.isDebugEnabled()) {
+        if (nestedValue) {
             javaAssist.writeFile("target/bin");
         }
         // try {

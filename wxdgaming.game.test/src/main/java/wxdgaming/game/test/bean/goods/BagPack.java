@@ -3,6 +3,7 @@ package wxdgaming.game.test.bean.goods;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.starter.batis.EntityLongUID;
+import wxdgaming.boot2.starter.batis.ann.DbTable;
 
 /**
  * 背包容器
@@ -12,6 +13,7 @@ import wxdgaming.boot2.starter.batis.EntityLongUID;
  **/
 @Getter
 @Setter
+@DbTable
 public class BagPack extends EntityLongUID {
 
 }
