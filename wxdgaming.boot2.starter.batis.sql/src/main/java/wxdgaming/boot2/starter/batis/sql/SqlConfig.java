@@ -54,10 +54,18 @@ public class SqlConfig extends ObjectBase {
     /** 线程池单次批处理提交的数量 */
     @JSONField(ordinal = 13)
     private int batchSubmitSize = 500;
+    /** 连接池配置缓存限制 */
     @JSONField(ordinal = 14)
     private int prepStmtCacheSize = 500;
+    /** 连接池配置缓存限制 */
     @JSONField(ordinal = 15)
     private int prepStmtCacheSqlLimit = 100;
+    /** cache分区 */
+    @JSONField(ordinal = 15)
+    private int cacheArea = 1;
+    /** cache过期时间 */
+    @JSONField(ordinal = 15)
+    private int cacheExpireAfterAccessM = 120;
 
     public String dbName() {
         String dbName = url;

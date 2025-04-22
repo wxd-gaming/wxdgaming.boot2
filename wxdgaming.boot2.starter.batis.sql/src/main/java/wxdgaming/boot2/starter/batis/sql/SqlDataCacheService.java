@@ -25,17 +25,34 @@ public class SqlDataCacheService {
      * 通过cache获取对象
      *
      * @param cls 返回的数据实体类
+     * @param <E> 实体模型
+     * @param <K> 主键类型
+     * @return 缓存集合
+     */
+    public <E extends Entity, K> SqlDataCache<E, K> cache(Class<E> cls) {
+        SqlDataCache sqlDataCache = jdbcCacheMap.computeIfAbsent(
+                cls,
+                l -> new SqlDataCache<>(
+                        cls,
+                        this.sqlDataHelper,
+                        this.sqlDataHelper.getSqlConfig().getCacheArea(),
+                        this.sqlDataHelper.getSqlConfig().getCacheExpireAfterAccessM()
+                )
+        );
+        return sqlDataCache;
+    }
+
+    /**
+     * 通过cache获取对象
+     *
+     * @param cls 返回的数据实体类
      * @param k   主键值
-     * @param <R> 实体模型
+     * @param <E> 实体模型
      * @param <K> 主键类型
      * @return 实体对象
      */
-    public <R extends Entity, K> R cache(Class<R> cls, K k) {
-        SqlDataCache<?, ?> sqlDataCache = jdbcCacheMap.computeIfAbsent(
-                cls,
-                l -> new SqlDataCache<>(cls, this.sqlDataHelper, 1, 120)
-        );
-        return ((SqlDataCache<R, K>) sqlDataCache).get(k);
+    public <E extends Entity, K> E cache(Class<E> cls, K k) {
+        return cache(cls).get(k);
     }
 
 }
