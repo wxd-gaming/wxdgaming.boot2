@@ -16,6 +16,7 @@ import wxdgaming.boot2.starter.batis.EntityLongUID;
 public class Item extends EntityLongUID {
 
     private int cfgId;
+    private boolean bind;
     private long count;
     private long createTime;
     /** 过期时间 */
