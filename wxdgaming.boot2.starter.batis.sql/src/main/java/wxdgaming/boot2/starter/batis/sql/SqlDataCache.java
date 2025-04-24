@@ -1,8 +1,8 @@
 package wxdgaming.boot2.starter.batis.sql;
 
 import lombok.Getter;
-import wxdgaming.boot2.core.cache2.CASCache;
 import wxdgaming.boot2.core.cache2.Cache;
+import wxdgaming.boot2.core.cache2.LRUCache;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
@@ -51,7 +51,7 @@ public class SqlDataCache<E extends Entity, Key> {
         this.cls = cls;
         this.sqlDataHelper = sqlDataHelper;
         this.tableMapping = this.sqlDataHelper.tableMapping(cls);
-        this.cache = CASCache.<Key, E>builder()
+        this.cache = LRUCache.<Key, E>builder()
                 .cacheName("cache-" + tableMapping.getTableName())
                 .area(hashArea)
                 .expireAfterReadMs(TimeUnit.MINUTES.toMillis(expireAfterAccessM))
@@ -98,7 +98,7 @@ public class SqlDataCache<E extends Entity, Key> {
     }
 
     /** 如果获取数据null 抛出异常 */
-    public E get(Key key) {
+    public E get(Key key) throws NullPointerException {
         return cache.get(key);
     }
 
@@ -117,6 +117,12 @@ public class SqlDataCache<E extends Entity, Key> {
         sqlDataHelper.save(value);
         value.setNewEntity(false);
         cache.put(key, value);
+    }
+
+    public E putIfAbsent(Key key, E value) {
+        sqlDataHelper.save(value);
+        value.setNewEntity(false);
+        return cache.putIfAbsent(key, value);
     }
 
     /** 强制缓存过期 */

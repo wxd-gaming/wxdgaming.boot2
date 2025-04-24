@@ -73,6 +73,8 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
     @shutdown
     @Order(Integer.MAX_VALUE/*最后关闭*/)
     public void shutdown() {
+        if (this.cacheService != null)
+            this.cacheService.shutdown();
         if (this.dataBatch != null)
             this.dataBatch.shutdown();
         this.hikariDataSource.close();

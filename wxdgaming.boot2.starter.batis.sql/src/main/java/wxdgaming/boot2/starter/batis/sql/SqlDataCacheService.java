@@ -1,6 +1,7 @@
 package wxdgaming.boot2.starter.batis.sql;
 
 import lombok.Getter;
+import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.starter.batis.Entity;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,6 +20,11 @@ public class SqlDataCacheService {
 
     public SqlDataCacheService(SqlDataHelper<?> sqlDataHelper) {
         this.sqlDataHelper = sqlDataHelper;
+    }
+
+    @shutdown
+    public void shutdown() {
+        jdbcCacheMap.values().forEach(SqlDataCache::shutdown);
     }
 
     /**
@@ -51,8 +57,21 @@ public class SqlDataCacheService {
      * @param <K> 主键类型
      * @return 实体对象
      */
-    public <E extends Entity, K> E cache(Class<E> cls, K k) {
+    public <E extends Entity, K> E cache(Class<E> cls, K k) throws NullPointerException {
         return cache(cls).get(k);
+    }
+
+    /**
+     * 通过cache获取对象
+     *
+     * @param cls 返回的数据实体类
+     * @param k   主键值
+     * @param <E> 实体模型
+     * @param <K> 主键类型
+     * @return 实体对象
+     */
+    public <E extends Entity, K> E cacheIfPresent(Class<E> cls, K k) {
+        return cache(cls).getIfPresent(k);
     }
 
 }

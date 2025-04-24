@@ -60,7 +60,7 @@ public class ScheduledService {
     @Order(99999998)
     public void start() {
         ScheduleTrigger scheduleTrigger = new ScheduleTrigger();
-        job = ExecutorUtilImpl.getInstance().getDefaultExecutor().scheduleAtFixedDelay(
+        job = ExecutorUtilImpl.getInstance().getBasicExecutor().scheduleAtFixedDelay(
                 "scheduled-timer",
                 scheduleTrigger,
                 10,
