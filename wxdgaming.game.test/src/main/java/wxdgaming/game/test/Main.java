@@ -1,10 +1,11 @@
 package wxdgaming.game.test;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 import wxdgaming.boot2.core.CoreScan;
-import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
 import wxdgaming.boot2.core.reflect.ReflectContext;
@@ -62,41 +63,39 @@ public class Main {
 
         runApplication.start();
 
-        ExecutorUtilImpl.getInstance().getDefaultExecutor().scheduleAtFixedDelay(
+        ExecutorUtilImpl.getInstance().getBasicExecutor().schedule(
                 () -> {
                     RpcService rpcService = runApplication.getInstance(RpcService.class);
                     SocketClient client = runApplication.getInstance(SocketClient.class);
                     SocketSession socketSession = client.idleNullException();
-                    rpcService.request(socketSession, "rpcIndex", RunResult.ok().fluentPut("a", "1"))
+                    Mono<JSONObject> request = rpcService.request(socketSession, "rpcIndex", MapOf.newJSONObject().fluentPut("a", "1"));
+                    request
                             .subscribe((jsonObject) -> {
                                 log.info("rpcIndex response {}", jsonObject);
                             }, throwable -> {
                                 log.error("rpcIndex", throwable);
                             });
-                    rpcService.request(socketSession, "rpcIndex2", RunResult.ok().fluentPut("a", "2"))
+                    rpcService.request(socketSession, "rpcIndex2", MapOf.newJSONObject().fluentPut("a", "2"))
                             .subscribe((jsonObject) -> {
                                 log.info("rpcIndex2 response {}", jsonObject);
                             }, throwable -> {
                                 log.error("rpcIndex2", throwable);
                             });
 
-                    rpcService.request(socketSession, "script/rpcIndex", RunResult.ok().fluentPut("a", "3"))
+                    rpcService.request(socketSession, "script/rpcIndex", MapOf.newJSONObject().fluentPut("a", "3"))
                             .subscribe((jsonObject) -> {
                                 log.info("script/rpcIndex response {}", jsonObject);
                             }, throwable -> {
                                 log.error("script/rpcIndex", throwable);
                             });
-                    rpcService.request(socketSession, "script/rpcIndex2", RunResult.ok().fluentPut("a", "4"))
-                            .subscribe((jsonObject) -> {
-                                log.info("script/rpcIndex2 response {}", jsonObject);
-                            }, throwable -> {
-                                log.error("script/rpcIndex2", throwable);
-                            });
+
+                    JSONObject block = rpcService.request(socketSession, "script/rpcIndex2", MapOf.newJSONObject().fluentPut("a", "4")).block();
+                    log.info("script/rpcIndex2 同步回调结果 {}", block);
 
                     socketSession.write("我是文本消息");
+                   Thread.ofPlatform().start(()-> System.exit(0));
                 },
-                5,
-                3,
+                10,
                 TimeUnit.SECONDS
         );
 

@@ -35,7 +35,12 @@ public class ItemBag {
     }
 
     public boolean isFull() {
-        return items.size() >= initGrid + buyGrid + googsGrid;
+        return freeGrid() < 1;
+    }
+
+    /** 剩余格子数 */
+    public int freeGrid() {
+        return (initGrid + buyGrid + googsGrid) - items.size();
     }
 
 }

@@ -12,12 +12,18 @@ import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.test.bean.goods.BagPack;
 import wxdgaming.game.test.bean.goods.Item;
 import wxdgaming.game.test.bean.goods.ItemBag;
+import wxdgaming.game.test.bean.goods.ItemCfg;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.module.data.DataCenterService;
 import wxdgaming.game.test.script.goods.gain.GainScript;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
+import java.util.stream.Collectors;
 
 /**
  * 背包逻辑脚本
@@ -35,15 +41,37 @@ public class BagModuleScript extends HoldRunApplication implements InitPrint {
     @Inject
     public BagModuleScript(DataCenterService dataCenterService) {
         this.dataCenterService = dataCenterService;
+    }
+
+    @Init
+    @Override public void init(RunApplication runApplication) {
+        super.init(runApplication);
         {
-            Table<Integer, Integer, GainScript> gainScriptTable = new Table<>();
+            Table<Integer, Integer, GainScript> tmpGainScriptTable = new Table<>();
             runApplication.classWithSuper(GainScript.class)
                     .forEach(gainScript -> {
-                        GainScript old = gainScriptTable.put(gainScript.type(), gainScript.subType(), gainScript);
+                        GainScript old = tmpGainScriptTable.put(gainScript.type(), gainScript.subType(), gainScript);
                         AssertUtil.assertTrue(old == null, "重复注册类型：" + gainScript.type() + " 子类型：" + gainScript.subType());
                     });
-            this.gainScriptTable = gainScriptTable;
+            this.gainScriptTable = tmpGainScriptTable;
         }
+
+        Thread.ofPlatform().start(() -> {
+            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(3));
+            Player player = new Player();
+            player.setUid(System.nanoTime());
+            player.setName("无心道");
+
+            dataCenterService.getPgsqlService().getCacheService().cache(Player.class).put(player.getUid(), player);
+
+            ItemCfg.ItemCfgBuilder builder = ItemCfg.builder();
+            List<ItemCfg> rewards = new ArrayList<>();
+            rewards.add(builder.cfgId(10001).count(100).build());
+            rewards.add(builder.cfgId(30001).count(100).build());
+            gainItems4Cfg(player, rewards, "业务号:", System.nanoTime(), "完成任务:", 1001);
+
+        });
+
     }
 
     public GainScript getGainScript(int type, int subtype) {
@@ -57,9 +85,19 @@ public class BagModuleScript extends HoldRunApplication implements InitPrint {
         return gainScript;
     }
 
-    @Init
-    @Override public void init(RunApplication runApplication) {
-        super.init(runApplication);
+    public List<Item> newItems(ItemCfg itemCfg) {
+        return newItems(List.of(itemCfg));
+    }
+
+    public List<Item> newItems(List<ItemCfg> itemCfgs) {
+        List<Item> items = new ArrayList<>();
+        for (ItemCfg itemCfg : itemCfgs) {
+            int type = 0;
+            int subtype = 0;
+            GainScript gainScript = getGainScript(type, subtype);
+            gainScript.newItem(items, itemCfg);
+        }
+        return items;
     }
 
     public ItemBag itemBag(BagPack bagPack, int bagType) {
@@ -74,15 +112,29 @@ public class BagModuleScript extends HoldRunApplication implements InitPrint {
         return getGainScript(type, subtype).gainCount(player, itemBag, itemCfgId);
     }
 
-    /** 默认是往背包添加 */
-    public void gainItems(Player player, List<Item> items) {
+    /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
+    public boolean gainItems4Cfg(Player player, List<ItemCfg> itemCfgs, Object... args) {
+        List<Item> items = newItems(itemCfgs);
         BagPack bagPack = dataCenterService.bagPack(player.getUid());
-        gainItems(player, bagPack, 1, items);
+        ItemBag itemBag = itemBag(bagPack, 1);
+        if (itemBag.freeGrid() < items.size())
+            return false;/* TODO 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
+        gainItems(player, itemBag, items, args);
+        return true;
     }
 
-    public void gainItems(Player player, BagPack bagPack, int bagType, List<Item> items) {
-        ItemBag itemBag = itemBag(bagPack, bagType);
+    /** 默认是往背包添加 */
+    public void gainItems(Player player, List<Item> items, Object... args) {
+        BagPack bagPack = dataCenterService.bagPack(player.getUid());
+        ItemBag itemBag = itemBag(bagPack, 1);
+        gainItems(player, itemBag, items, args);
+    }
+
+    private void gainItems(Player player, ItemBag itemBag, List<Item> items, Object... args) {
         Iterator<Item> iterator = items.iterator();
+
+        String collect = Arrays.stream(args).map(String::valueOf).collect(Collectors.joining(" "));
+
         while (iterator.hasNext()) {
             Item newItem = iterator.next();
 
@@ -96,9 +148,13 @@ public class BagModuleScript extends HoldRunApplication implements InitPrint {
             long change = newItem.getCount();
 
             boolean gain = gainScript.gain(player, itemBag, newItem);
-            if (gain) {
+
+            if (gain || newItem.getCount() != change) {
                 long newCount = gainScript.gainCount(player, itemBag, newItem.getCfgId());
-                log.info("{} 获得道具：{} {} + {} = {}", player, newItem.getCfgId(), change, oldCount, newCount);
+                log.info("{} 获得道具：{}({}-xxx) {} + {} = {}, 变更原因：{}", player, newItem.getUid(), newItem.getCfgId(), oldCount, change, newCount, collect);
+            }
+
+            if (gain) {
                 iterator.remove();
             } else {
                 /* TODO 背包已满 */

@@ -21,6 +21,14 @@ public class BagPack extends EntityLongUID {
     /** key:背包类型, value:{key:道具id, value:道具} */
     private HashMap<Integer, ItemBag> items = new HashMap<>();
 
+    public boolean isFull() {
+        ItemBag itemBag = items.get(1);
+        return itemBag.isFull();
+    }
 
+    public int freeGrid() {
+        ItemBag itemBag = items.get(1);
+        return itemBag.freeGrid();
+    }
 
 }

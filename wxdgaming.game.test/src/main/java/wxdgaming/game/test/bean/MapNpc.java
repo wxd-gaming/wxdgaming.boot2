@@ -21,4 +21,7 @@ public class MapNpc extends MapObject {
     /** 体力 */
     private int physical;
 
+    public MapNpc() {
+        this.setMapObjectType(MapObjectType.Npc);
+    }
 }

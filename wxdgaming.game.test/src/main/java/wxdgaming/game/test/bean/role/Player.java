@@ -35,4 +35,7 @@ public class Player extends MapNpc {
     /** 朝向 */
     private int lastDirection;
 
+    public Player() {
+        this.setMapObjectType(MapObjectType.Player);
+    }
 }

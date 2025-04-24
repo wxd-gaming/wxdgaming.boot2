@@ -4,28 +4,29 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlService;
+import wxdgaming.game.test.bean.goods.ItemCfg;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.bean.task.TaskInfo;
 import wxdgaming.game.test.bean.task.TaskPack;
 import wxdgaming.game.test.script.event.OnLogin;
+import wxdgaming.game.test.script.goods.BagModuleScript;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class ITaskScript {
 
     protected RunApplication runApplication;
     protected PgsqlService pgsqlService;
     protected TaskModuleScript taskModuleScript;
+    protected BagModuleScript bagModuleScript;
 
     @Init
-    public void init(RunApplication runApplication, PgsqlService pgsqlService, TaskModuleScript taskModuleScript) {
+    public void init(RunApplication runApplication, PgsqlService pgsqlService, TaskModuleScript taskModuleScript, BagModuleScript bagModuleScript) {
         this.runApplication = runApplication;
         this.pgsqlService = pgsqlService;
         this.taskModuleScript = taskModuleScript;
+        this.bagModuleScript = bagModuleScript;
     }
 
     public abstract int type();
@@ -90,6 +91,13 @@ public abstract class ITaskScript {
     /** 提交任务 */
     public void submitTask(Player player, TaskPack taskPack, int taskId) {
         TaskInfo taskInfo = taskPack.getTasks().get(type(), taskId);
+
+        ItemCfg.ItemCfgBuilder builder = ItemCfg.builder();
+        List<ItemCfg> rewards = new ArrayList<>();
+        rewards.add(builder.cfgId(10001).count(100).build());
+        rewards.add(builder.cfgId(30001).count(100).build());
+        bagModuleScript.gainItems4Cfg(player, rewards, "业务号:", System.nanoTime(), "完成任务:", taskId);
+
     }
 
 }

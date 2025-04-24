@@ -35,4 +35,8 @@ public class MapObject extends GameBase {
     private MapObjectType mapObjectType;
     @DbColumn(ignore = true)
     private BitFlag status = new BitFlag();
+
+    @Override public String toString() {
+        return "%s{uid=%s, name='%s'}".formatted(this.getClass().getSimpleName(), getUid(), name);
+    }
 }

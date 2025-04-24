@@ -85,7 +85,7 @@ public class TestApi {
         return paramData;
     }
 
-    @Scheduled("*")
+    @Scheduled("0 0")
     public void timer() {
         log.info("{}", "timer()");
         runApplication.executeMethodWithAnnotated(RunTest.class, 1, 2);
