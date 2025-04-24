@@ -96,7 +96,7 @@ public class LRUCache<K, V> extends Cache<K, V> {
                 }
             };
             TimerJob timerJob = ExecutorUtilImpl.getInstance()
-                    .getDefaultExecutor()
+                    .getBasicExecutor()
                     .scheduleAtFixedDelay(
                             heartEvent,
                             this.heartTimeMs,
@@ -197,6 +197,9 @@ public class LRUCache<K, V> extends Cache<K, V> {
         try {
             CacheHolder<V> cacheHolder = newCacheHolder(v);
             CacheHolder<V> old = nodes.get(hashIndex).putIfAbsent(k, cacheHolder);
+            if (old != null && old.getValue() == null) {
+                nodes.get(hashIndex).put(k, cacheHolder);
+            }
             return old == null ? null : old.getValue();
         } finally {
             cacheLock.writeLock.unlock();
@@ -225,9 +228,16 @@ public class LRUCache<K, V> extends Cache<K, V> {
             cacheLock.writeLock.lock();
             try {
                 HashMap<K, CacheHolder<V>> node = nodes.get(i);
-                for (CacheHolder<V> holder : node.values()) {
+                for (Map.Entry<K, CacheHolder<V>> entry : node.entrySet()) {
+                    K key = entry.getKey();
+                    CacheHolder<V> holder = entry.getValue();
                     holder.setExpireEndTime(0);
+                    if (LRUCache.this.removalListener != null && holder.getValue() != null) {
+                        /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                        LRUCache.this.removalListener.apply(key, holder.getValue());
+                    }
                 }
+                node.clear();
             } finally {
                 cacheLock.writeLock.unlock();
             }

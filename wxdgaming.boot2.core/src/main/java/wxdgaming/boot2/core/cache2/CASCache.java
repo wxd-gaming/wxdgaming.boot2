@@ -89,7 +89,7 @@ public class CASCache<K, V> extends Cache<K, V> {
                 }
             };
             TimerJob timerJob = ExecutorUtilImpl.getInstance()
-                    .getDefaultExecutor()
+                    .getBasicExecutor()
                     .scheduleAtFixedDelay(
                             heartEvent,
                             this.heartTimeMs,
@@ -153,6 +153,9 @@ public class CASCache<K, V> extends Cache<K, V> {
         int hashIndex = hashIndex(k);
         CacheHolder<V> cacheHolder = newCacheHolder(v);
         CacheHolder<V> old = nodes.get(hashIndex).putIfAbsent(k, cacheHolder);
+        if (old != null && old.getValue() == null) {
+            nodes.get(hashIndex).put(k, cacheHolder);
+        }
         return old == null ? null : old.getValue();
     }
 
@@ -169,8 +172,16 @@ public class CASCache<K, V> extends Cache<K, V> {
     @Override public void invalidateAll() {
         for (int i = 0; i < nodes.size(); i++) {
             ConcurrentHashMap<K, CacheHolder<V>> node = nodes.get(i);
-            for (CacheHolder<V> holder : node.values()) {
-                holder.setExpireEndTime(0);
+            Iterator<Map.Entry<K, CacheHolder<V>>> iterator = node.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<K, CacheHolder<V>> next = iterator.next();
+                K key = next.getKey();
+                CacheHolder<V> holder = next.getValue();
+                if (holder.getValue() != null && CASCache.this.removalListener != null) {
+                    /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                    CASCache.this.removalListener.apply(key, holder.getValue());
+                }
+                iterator.remove();
             }
         }
     }

@@ -46,7 +46,7 @@ public final class ExecutorUtil implements Serializable {
     /** 全部初始化的 */
     public final ConcurrentHashMap<String, IExecutorServices> All_THREAD_LOCAL = new ConcurrentHashMap<>();
     /** 属于后台线程池, 默认线程池， 一旦收到停服新号，线程立马关闭了 */
-    private IExecutorServices defaultExecutor = null;
+    private IExecutorServices basicExecutor = null;
     /** 属于后台线程池, 逻辑线程池，一旦收到停服新号，线程立马关闭了 */
     private IExecutorServices logicExecutor = null;
     /** 属于后台线程池, 虚拟线程池，一旦收到停服新号，线程立马关闭了 */
@@ -58,7 +58,7 @@ public final class ExecutorUtil implements Serializable {
         if (logger.isDebugEnabled()) {
             logger.debug("ExecutorUtil init basic config: {}", basicConfig.toJSONString());
         }
-        defaultExecutor = newExecutorServices("basic-executor", basicConfig.getCoreSize(), basicConfig.getMaxSize(), basicConfig.getMaxQueueSize());
+        basicExecutor = newExecutorServices("basic-executor", basicConfig.getCoreSize(), basicConfig.getMaxSize(), basicConfig.getMaxQueueSize());
         ExecutorConfig logicConfig = BootConfig.getIns().logicConfig();
 
         if (logger.isDebugEnabled()) {
@@ -87,7 +87,6 @@ public final class ExecutorUtil implements Serializable {
         executorIgnoredException(TIMER_THREAD::clear);
         TIMER_THREAD.closing.set(true);
         executorIgnoredException(TIMER_THREAD::join);
-        GUARD_THREAD.closing.set(true);
         All_THREAD_LOCAL.values().forEach(executorServices -> {
             System.out.println("shutdown executorServices start: " + executorServices.getName());
             executorIgnoredException(executorServices::terminate);

@@ -102,7 +102,7 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
                 }
             };
             TimerJob timerJob = ExecutorUtilImpl.getInstance()
-                    .getDefaultExecutor()
+                    .getBasicExecutor()
                     .scheduleAtFixedDelay(
                             heartEvent,
                             this.heartTimeMs,
@@ -194,6 +194,9 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
         try {
             CacheHolder<V> cacheHolder = newCacheHolder(v);
             CacheHolder<V> old = nodes.get(hashIndex).put(k.intValue(), cacheHolder);
+            if (old != null && old.getValue() == null) {
+                nodes.get(hashIndex).put(k.intValue(), cacheHolder);
+            }
             return old == null ? null : old.getValue();
         } finally {
             cacheLock.writeLock.unlock();
@@ -235,9 +238,16 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
             cacheLock.writeLock.lock();
             try {
                 Int2ObjectOpenHashMap<CacheHolder<V>> node = nodes.get(i);
-                for (CacheHolder<V> holder : node.values()) {
-                    holder.setExpireEndTime(0);
+                Int2ObjectMap.FastEntrySet<CacheHolder<V>> entries = node.int2ObjectEntrySet();
+                for (Int2ObjectMap.Entry<CacheHolder<V>> entry : entries) {
+                    int intKey = entry.getIntKey();
+                    CacheHolder<V> holder = entry.getValue();
+                    if (LRUIntCache.this.removalListener != null && holder.getValue() != null) {
+                        /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                        LRUIntCache.this.removalListener.apply(intKey, holder.getValue());
+                    }
                 }
+                node.clear();
             } finally {
                 cacheLock.writeLock.unlock();
             }

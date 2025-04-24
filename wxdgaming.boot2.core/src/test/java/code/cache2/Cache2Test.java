@@ -5,11 +5,13 @@ import ch.qos.logback.core.LogbackUtil;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import wxdgaming.boot2.core.cache2.*;
+import wxdgaming.boot2.core.cache2.CASCache;
+import wxdgaming.boot2.core.cache2.Cache;
+import wxdgaming.boot2.core.cache2.LRUCache;
+import wxdgaming.boot2.core.cache2.LRULongCache;
 import wxdgaming.boot2.core.format.ByteFormat;
 import wxdgaming.boot2.core.function.Function1;
 import wxdgaming.boot2.core.lang.DiffTime;
-import wxdgaming.boot2.core.threading.ExecutorUtil;
 import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 import wxdgaming.boot2.core.util.RandomUtils;
 
@@ -98,7 +100,7 @@ public class Cache2Test {
 
     @Test
     public void LRULong2LongCache() throws InterruptedException {
-        LRULong2LongCache builder = LRULong2LongCache.builder()
+        LRULongCache<Long> builder = LRULongCache.<Long>builder()
                 .cacheName("LRULong2LongCache")
                 .area(area)
                 .heartTimeMs(heartTimeMs)
