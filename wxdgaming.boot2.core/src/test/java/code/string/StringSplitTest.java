@@ -6,7 +6,7 @@ import org.junit.jupiter.api.RepeatedTest;
 import java.util.Arrays;
 import java.util.List;
 
-public class SplitTest {
+public class StringSplitTest {
 
     @Test
     @RepeatedTest(10)
@@ -36,6 +36,16 @@ public class SplitTest {
             List<String> s = StringSplit.split("mongo:key:2:test", ":");
         }
         System.out.printf("%12s %7.2f ms%n", "diySplit2", (System.nanoTime() - start) / 10000 / 100f);
+    }
+
+    @Test
+    @RepeatedTest(10)
+    public void diySplitFirst() {
+        long start = System.nanoTime();
+        for (int i = 0; i < 1000000; i++) {
+            String s = new StringSplit("mongo:key:2:test", ":").first();
+        }
+        System.out.printf("%12s %7.2f ms%n", "diySplitFirst", (System.nanoTime() - start) / 10000 / 100f);
     }
 
     @Test
