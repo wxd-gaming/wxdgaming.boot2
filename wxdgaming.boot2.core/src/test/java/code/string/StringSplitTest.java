@@ -3,14 +3,11 @@ package code.string;
 import org.junit.Test;
 import org.junit.jupiter.api.RepeatedTest;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringJoiner;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class StringSplitTest {
 
-    static final String delim = "ac";
+    static final String delim = ":";
     static final String source = new StringJoiner(delim).add("mongo").add("key").add("2").add("test").toString();
 
     @Test
@@ -35,6 +32,30 @@ public class StringSplitTest {
             }
         }
         System.out.printf("%24s %7.2f ms%n", "stringTokenizer", (System.nanoTime() - start) / 10000 / 100f);
+    }
+
+
+    /** 按照单字符切割最快性能最好 */
+    @Test
+    @RepeatedTest(10)
+    public void stringTokenizerList() {
+        long start = System.nanoTime();
+        for (int i = 0; i < 1000000; i++) {
+            List<String> strings = stringTokenizerSplit();
+        }
+        System.out.printf("%24s %7.2f ms%n", "stringTokenizerList", (System.nanoTime() - start) / 10000 / 100f);
+    }
+
+
+    /** 按照单字符切割最快性能最好 */
+    public List<String> stringTokenizerSplit() {
+        List<String> list = new ArrayList<>();
+        StringTokenizer stringTokenizer = new StringTokenizer(source, delim);
+        while (stringTokenizer.hasMoreTokens()) {
+            String string = stringTokenizer.nextToken();
+            list.add(string);
+        }
+        return list;
     }
 
     /** 综合性能最好，最灵活 */
