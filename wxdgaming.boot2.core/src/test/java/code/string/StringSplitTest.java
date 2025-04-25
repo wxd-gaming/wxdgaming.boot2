@@ -15,7 +15,7 @@ public class StringSplitTest {
         for (int i = 0; i < 1000000; i++) {
             String[] s = "mongo:key:2:test".split(":");
         }
-        System.out.printf("%12s %7.2f ms%n", "stringSplit", (System.nanoTime() - start) / 10000 / 100f);
+        System.out.printf("%20s %7.2f ms%n", "String.Split", (System.nanoTime() - start) / 10000 / 100f);
     }
 
     @Test
@@ -25,7 +25,7 @@ public class StringSplitTest {
         for (int i = 0; i < 1000000; i++) {
             List<String> s = new StringSplit("mongo:key:2:test", ":").getList();
         }
-        System.out.printf("%12s %7.2f ms%n", "diySplit", (System.nanoTime() - start) / 10000 / 100f);
+        System.out.printf("%20s %7.2f ms%n", "new StringSplit", (System.nanoTime() - start) / 10000 / 100f);
     }
 
     @Test
@@ -35,18 +35,22 @@ public class StringSplitTest {
         for (int i = 0; i < 1000000; i++) {
             List<String> s = StringSplit.split("mongo:key:2:test", ":");
         }
-        System.out.printf("%12s %7.2f ms%n", "diySplit2", (System.nanoTime() - start) / 10000 / 100f);
+        System.out.printf("%20s %7.2f ms%n", "static StringSplit", (System.nanoTime() - start) / 10000 / 100f);
     }
 
     @Test
     @RepeatedTest(10)
-    public void diySplitFirst() {
+    public void stringSplitIterable() {
         long start = System.nanoTime();
         for (int i = 0; i < 1000000; i++) {
-            String s = new StringSplit("mongo:key:2:test", ":").first();
+            StringSplitIterable stringSplitIterable = new StringSplitIterable("mongo:key:2:test", ":");
+            while (stringSplitIterable.hasNext()) {
+                String s = stringSplitIterable.next();
+            }
         }
-        System.out.printf("%12s %7.2f ms%n", "diySplitFirst", (System.nanoTime() - start) / 10000 / 100f);
+        System.out.printf("%20s %7.2f ms%n", "stringSplitIterable", (System.nanoTime() - start) / 10000 / 100f);
     }
+
 
     @Test
     public void diySplit3() {
