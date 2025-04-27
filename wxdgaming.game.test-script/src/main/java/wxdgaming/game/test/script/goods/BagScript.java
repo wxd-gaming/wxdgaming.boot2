@@ -56,23 +56,6 @@ public class BagScript extends HoldRunApplication implements InitPrint {
                     });
             this.gainScriptTable = tmpGainScriptTable;
         }
-        //
-        // Thread.ofPlatform().start(() -> {
-        //     LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(3));
-        //     Player player = new Player();
-        //     player.setUid(System.nanoTime());
-        //     player.setName("无心道");
-        //     player.setAccount(StringUtils.randomString(8));
-        //
-        //     dataCenterService.getPgsqlService().getCacheService().cache(Player.class).put(player.getUid(), player);
-        //
-        //     ItemCfg.ItemCfgBuilder builder = ItemCfg.builder();
-        //     List<ItemCfg> rewards = new ArrayList<>();
-        //     rewards.add(builder.cfgId(10001).count(100).build());
-        //     rewards.add(builder.cfgId(30001).count(100).build());
-        //     gainItems4Cfg(player, rewards, "业务号:", System.nanoTime(), "完成任务:", 1001);
-        //
-        // });
     }
 
     /** 创建角色之后创建背包 */
