@@ -63,41 +63,41 @@ public class Main {
 
         runApplication.start();
 
-        ExecutorUtilImpl.getInstance().getBasicExecutor().schedule(
-                () -> {
-                    RpcService rpcService = runApplication.getInstance(RpcService.class);
-                    SocketClient client = runApplication.getInstance(SocketClient.class);
-                    SocketSession socketSession = client.idleNullException();
-                    Mono<JSONObject> request = rpcService.request(socketSession, "rpcIndex", MapOf.newJSONObject().fluentPut("a", "1"));
-                    request
-                            .subscribe((jsonObject) -> {
-                                log.info("rpcIndex response {}", jsonObject);
-                            }, throwable -> {
-                                log.error("rpcIndex", throwable);
-                            });
-                    rpcService.request(socketSession, "rpcIndex2", MapOf.newJSONObject().fluentPut("a", "2"))
-                            .subscribe((jsonObject) -> {
-                                log.info("rpcIndex2 response {}", jsonObject);
-                            }, throwable -> {
-                                log.error("rpcIndex2", throwable);
-                            });
-
-                    rpcService.request(socketSession, "script/rpcIndex", MapOf.newJSONObject().fluentPut("a", "3"))
-                            .subscribe((jsonObject) -> {
-                                log.info("script/rpcIndex response {}", jsonObject);
-                            }, throwable -> {
-                                log.error("script/rpcIndex", throwable);
-                            });
-
-                    JSONObject block = rpcService.request(socketSession, "script/rpcIndex2", MapOf.newJSONObject().fluentPut("a", "4")).block();
-                    log.info("script/rpcIndex2 同步回调结果 {}", block);
-
-                    socketSession.write("我是文本消息");
-                   // Thread.ofPlatform().start(()-> System.exit(0));
-                },
-                10,
-                TimeUnit.SECONDS
-        );
+        // ExecutorUtilImpl.getInstance().getBasicExecutor().schedule(
+        //         () -> {
+        //             RpcService rpcService = runApplication.getInstance(RpcService.class);
+        //             SocketClient client = runApplication.getInstance(SocketClient.class);
+        //             SocketSession socketSession = client.idleNullException();
+        //             Mono<JSONObject> request = rpcService.request(socketSession, "rpcIndex", MapOf.newJSONObject().fluentPut("a", "1"));
+        //             request
+        //                     .subscribe((jsonObject) -> {
+        //                         log.info("rpcIndex response {}", jsonObject);
+        //                     }, throwable -> {
+        //                         log.error("rpcIndex", throwable);
+        //                     });
+        //             rpcService.request(socketSession, "rpcIndex2", MapOf.newJSONObject().fluentPut("a", "2"))
+        //                     .subscribe((jsonObject) -> {
+        //                         log.info("rpcIndex2 response {}", jsonObject);
+        //                     }, throwable -> {
+        //                         log.error("rpcIndex2", throwable);
+        //                     });
+        //
+        //             rpcService.request(socketSession, "script/rpcIndex", MapOf.newJSONObject().fluentPut("a", "3"))
+        //                     .subscribe((jsonObject) -> {
+        //                         log.info("script/rpcIndex response {}", jsonObject);
+        //                     }, throwable -> {
+        //                         log.error("script/rpcIndex", throwable);
+        //                     });
+        //
+        //             JSONObject block = rpcService.request(socketSession, "script/rpcIndex2", MapOf.newJSONObject().fluentPut("a", "4")).block();
+        //             log.info("script/rpcIndex2 同步回调结果 {}", block);
+        //
+        //             socketSession.write("我是文本消息");
+        //            // Thread.ofPlatform().start(()-> System.exit(0));
+        //         },
+        //         10,
+        //         TimeUnit.SECONDS
+        // );
 
     }
 
