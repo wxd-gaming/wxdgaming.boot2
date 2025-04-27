@@ -10,6 +10,10 @@ public class StringSplitTest {
     static final String delim = ":";
     static final String source = new StringJoiner(delim).add("mongo").add("key").add("2").add("test").toString();
 
+    static {
+        System.out.println(source);
+    }
+
     @Test
     @RepeatedTest(10)
     public void stringSplit() {

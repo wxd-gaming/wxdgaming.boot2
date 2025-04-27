@@ -22,6 +22,8 @@
         <module>wxdgaming.boot2.starter.net.server</module>
         <module>wxdgaming.boot2.starter.scheduled</module>
         <module>wxdgaming.game.test</module>
+        <module>wxdgaming.game.test-message</module>
+        <module>wxdgaming.game.test-robot</module>
         <module>wxdgaming.game.test-script</module>
     </modules>
 

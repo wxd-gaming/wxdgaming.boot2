@@ -1,7 +1,7 @@
 package wxdgaming.game.test.script.event;
 
 import com.google.inject.Singleton;
-import wxdgaming.boot2.core.RunApplication;
+import wxdgaming.boot2.core.HoldRunApplication;
 
 import java.lang.annotation.Annotation;
 
@@ -12,16 +12,10 @@ import java.lang.annotation.Annotation;
  * @version: 2025-04-22 10:59
  **/
 @Singleton
-public class EventBus {
+public class EventBus extends HoldRunApplication {
 
-    private RunApplication runApplication;
-
-    public void init(RunApplication runApplication) {
-        this.runApplication = runApplication;
-    }
-
-    public void post(Class<? extends Annotation> eventClass, Object... args) {
-        runApplication.executeMethodWithAnnotated(eventClass, args);
+    public void post(Class<? extends Annotation> annotation, Object... args) {
+        getRunApplication().getGuiceReflectContext().executeMethodWithAnnotatedException(annotation, args);
     }
 
 }

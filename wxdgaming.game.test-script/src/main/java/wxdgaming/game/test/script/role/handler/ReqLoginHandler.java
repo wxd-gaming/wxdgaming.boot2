@@ -2,14 +2,15 @@ package wxdgaming.game.test.script.role.handler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlService;
+import wxdgaming.boot2.core.util.JwtUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
-import wxdgaming.game.test.bean.role.Player;
+import wxdgaming.game.test.module.data.DataCenterService;
 import wxdgaming.game.test.script.event.EventBus;
-import wxdgaming.game.test.script.event.OnLogin;
-import wxdgaming.game.test.script.event.OnLoginBefore;
+import wxdgaming.game.test.script.role.PlayerScript;
 import wxdgaming.game.test.script.role.message.ReqLogin;
 
 /**
@@ -21,21 +22,37 @@ import wxdgaming.game.test.script.role.message.ReqLogin;
 public class ReqLoginHandler {
 
     private final EventBus eventBus;
-    private final PgsqlService psqlService;
+    private final DataCenterService dataCenterService;
+    private final PlayerScript playerScript;
+
 
     @Inject
-    public ReqLoginHandler(EventBus eventBus, PgsqlService psqlService) {
+    public ReqLoginHandler(EventBus eventBus, DataCenterService dataCenterService, PlayerScript playerScript) {
         this.eventBus = eventBus;
-        this.psqlService = psqlService;
+        this.dataCenterService = dataCenterService;
+        this.playerScript = playerScript;
     }
 
     @ProtoRequest
     public void reqLogin(SocketSession socketSession, ReqLogin req) {
-        long playerId = 1;
-        Player player = psqlService.getCacheService().cache(Player.class, playerId);
-        eventBus.post(OnLoginBefore.class, player);
 
-        eventBus.post(OnLogin.class, player, 1, 1);
+        log.info("登录请求:{}", req);
+
+        int sid = req.getSid();
+        String account = req.getAccount();
+        String token = req.getToken();
+
+        Jws<Claims> claimsJws = JwtUtils.parseJWT(token);
+        String tokenAccount = claimsJws.getPayload().get("account", String.class);
+        String platform = claimsJws.getPayload().get("platform", String.class);
+        String channel = claimsJws.getPayload().get("channel", String.class);
+
+        socketSession.attribute("account", account);
+        socketSession.attribute("sid", sid);
+
+        playerScript.sendPlayerList(socketSession, sid, account);
+
+        log.info("登录完成:{}", account);
     }
 
 }

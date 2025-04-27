@@ -9,7 +9,7 @@ import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.bean.task.TaskInfo;
 import wxdgaming.game.test.bean.task.TaskPack;
 import wxdgaming.game.test.script.event.OnLogin;
-import wxdgaming.game.test.script.goods.BagModuleScript;
+import wxdgaming.game.test.script.goods.BagScript;
 
 import java.io.Serializable;
 import java.util.*;
@@ -19,14 +19,14 @@ public abstract class ITaskScript {
     protected RunApplication runApplication;
     protected PgsqlService pgsqlService;
     protected TaskModuleScript taskModuleScript;
-    protected BagModuleScript bagModuleScript;
+    protected BagScript bagScript;
 
     @Init
-    public void init(RunApplication runApplication, PgsqlService pgsqlService, TaskModuleScript taskModuleScript, BagModuleScript bagModuleScript) {
+    public void init(RunApplication runApplication, PgsqlService pgsqlService, TaskModuleScript taskModuleScript, BagScript bagScript) {
         this.runApplication = runApplication;
         this.pgsqlService = pgsqlService;
         this.taskModuleScript = taskModuleScript;
-        this.bagModuleScript = bagModuleScript;
+        this.bagScript = bagScript;
     }
 
     public abstract int type();
@@ -96,7 +96,7 @@ public abstract class ITaskScript {
         List<ItemCfg> rewards = new ArrayList<>();
         rewards.add(builder.cfgId(10001).count(100).build());
         rewards.add(builder.cfgId(30001).count(100).build());
-        bagModuleScript.gainItems4Cfg(player, rewards, "业务号:", System.nanoTime(), "完成任务:", taskId);
+        bagScript.gainItems4Cfg(player, System.nanoTime(), rewards, "完成任务:", taskId);
 
     }
 

@@ -39,7 +39,7 @@ public class CurrencyGainScript extends GainScript {
         return itemBag.getCurrencyMap().getOrDefault(cfgId, 0L);
     }
 
-    @Override public boolean gain(Player player, ItemBag itemBag, Item newItem) {
+    @Override public boolean gain(Player player, ItemBag itemBag, long serialNumber, Item newItem) {
         int cfgId = newItem.getCfgId();
         long count = newItem.getCount();
         itemBag.getCurrencyMap().merge(cfgId, count, Math::addExact);

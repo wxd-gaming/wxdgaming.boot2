@@ -156,11 +156,10 @@ public abstract class SocketClient {
             log.error("{} 连接数已经达到最大连接数：{}", this.getClass().getSimpleName(), config.getMaxConnectionCount());
             return;
         }
-        ChannelFuture connect = connect(null);
         try {
+            ChannelFuture connect = connect(null);
             connect.sync();
-        } catch (InterruptedException e) {
-        }
+        } catch (Exception ignored) {}
     }
 
     public ChannelFuture connect(Consumer<SocketSession> consumer) {
@@ -169,7 +168,7 @@ public abstract class SocketClient {
                     Throwable cause = future.cause();
                     if (cause != null) {
                         log.error("{} connect error {}", this.getClass().getSimpleName(), cause.toString());
-                        if (reconnection()) {
+                        if (reconnection(consumer)) {
                             log.info("{} reconnection", this.getClass().getSimpleName());
                         }
                         return;
@@ -193,7 +192,7 @@ public abstract class SocketClient {
                     /*添加事件，如果链接关闭了触发*/
                     socketSession.getChannel().closeFuture().addListener(closeFuture -> {
                         sessionGroup.remove(socketSession);
-                        reconnection();
+                        reconnection(consumer);
                     });
 
                     if (consumer != null) {
@@ -204,7 +203,7 @@ public abstract class SocketClient {
 
     AtomicLong atomicLong = new AtomicLong();
 
-    protected boolean reconnection() {
+    protected boolean reconnection(Consumer<SocketSession> consumer) {
 
         if (closed || !config.isEnabledReconnection())
             return false;
@@ -216,7 +215,7 @@ public abstract class SocketClient {
 
         log.info("{} 链接异常 {} 秒 重连", this.hashCode(), l);
 
-        ExecutorUtilImpl.getInstance().getLogicExecutor().schedule(this::connect, l, TimeUnit.SECONDS);
+        ExecutorUtilImpl.getInstance().getLogicExecutor().schedule(() -> this.connect(consumer), l, TimeUnit.SECONDS);
         return true;
     }
 

@@ -5,14 +5,12 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
+import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.*;
 import wxdgaming.boot2.core.threading.ThreadContext;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -142,6 +140,19 @@ public class GuiceReflectContext {
         Stream<MethodContent> methodContentStream = withMethodAnnotated(annotation);
         List<MethodContent> list = methodContentStream.toList();
         list.forEach(methodContent -> methodContent.invoke(args));
+    }
+
+    /** 遇到异常会继续执行 */
+    public void executeMethodWithAnnotatedException(Class<? extends Annotation> annotation, Object... args) {
+        Stream<MethodContent> methodContentStream = withMethodAnnotated(annotation);
+        List<MethodContent> list = methodContentStream.toList();
+        list.forEach(methodContent -> {
+            try {
+                methodContent.invoke(args);
+            } catch (Exception e) {
+                log.error("执行方法异常：{}-{}", methodContent.getMethod(), methodContent.getMethod().getName(), e);
+            }
+        });
     }
 
     public Object[] injectorParameters(Object bean, Method method, Object... args) {
@@ -283,8 +294,11 @@ public class GuiceReflectContext {
                 log.debug("{}.{}", ins.getClass().getSimpleName(), this.method.getName());
                 Object[] objects = GuiceReflectContext.this.injectorParameters(ins, method, args);
                 return method.invoke(ins, objects);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            } catch (Throwable throwable) {
+                if (throwable instanceof InvocationTargetException) {
+                    throwable = throwable.getCause();
+                }
+                throw Throw.of(throwable);
             }
         }
 

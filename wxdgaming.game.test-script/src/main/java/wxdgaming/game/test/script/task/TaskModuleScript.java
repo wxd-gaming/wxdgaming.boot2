@@ -1,15 +1,17 @@
 package wxdgaming.game.test.script.task;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.lang.condition.UpdateType;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlService;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.bean.task.TaskInfo;
 import wxdgaming.game.test.bean.task.TaskPack;
+import wxdgaming.game.test.module.data.DataCenterService;
 import wxdgaming.game.test.script.task.init.ConditionInitValueHandler;
 
 import java.io.Serializable;
@@ -25,17 +27,19 @@ import java.util.Map;
  * @version: 2025-04-21 20:43
  **/
 @Singleton
-public class TaskModuleScript {
+public class TaskModuleScript extends HoldRunApplication {
 
+    private final DataCenterService dataCenterService;
     private HashMap<Integer, ITaskScript> taskScriptImplHashMap = new HashMap<>();
     private HashMap<Condition, ConditionInitValueHandler> conditionInitValueHandlerMap = new HashMap<>();
-    protected RunApplication runApplication;
-    protected PgsqlService pgsqlService;
+
+    @Inject
+    public TaskModuleScript(DataCenterService dataCenterService) {
+        this.dataCenterService = dataCenterService;
+    }
 
     @Init
-    public void init(RunApplication runApplication, PgsqlService pgsqlService) {
-        this.runApplication = runApplication;
-        this.pgsqlService = pgsqlService;
+    public void init(RunApplication runApplication) {
         HashMap<Condition, ConditionInitValueHandler> tmpConditionInitValueHandlerMap = new HashMap<>();
         runApplication.classWithSuper(ConditionInitValueHandler.class)
                 .forEach(conditionInitValueHandler -> {
@@ -56,7 +60,7 @@ public class TaskModuleScript {
     }
 
     public TaskPack getTaskPack(Player player) {
-        return pgsqlService.getCacheService().cache(TaskPack.class, player.getUid());
+        return dataCenterService.taskPack(player.getUid());
     }
 
     public Condition getCondition(int id) {

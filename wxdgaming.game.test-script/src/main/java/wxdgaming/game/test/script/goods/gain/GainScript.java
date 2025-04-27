@@ -68,7 +68,7 @@ public class GainScript extends HoldRunApplication {
     }
 
     /** 将道具添加进入背包 */
-    public boolean gain(Player player, ItemBag itemBag, Item newItem) {
+    public boolean gain(Player player, ItemBag itemBag, long serialNumber, Item newItem) {
         long count = newItem.getCount();
         for (Item value : itemBag.getItems()) {
             /* TODO 叠加 */

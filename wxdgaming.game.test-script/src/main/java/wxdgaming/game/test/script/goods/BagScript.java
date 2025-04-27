@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.LockSupport;
 import java.util.stream.Collectors;
 
 /**
@@ -33,13 +31,13 @@ import java.util.stream.Collectors;
  **/
 @Slf4j
 @Singleton
-public class BagModuleScript extends HoldRunApplication implements InitPrint {
+public class BagScript extends HoldRunApplication implements InitPrint {
 
     private final DataCenterService dataCenterService;
     Table<Integer, Integer, GainScript> gainScriptTable = new Table<>();
 
     @Inject
-    public BagModuleScript(DataCenterService dataCenterService) {
+    public BagScript(DataCenterService dataCenterService) {
         this.dataCenterService = dataCenterService;
     }
 
@@ -55,22 +53,23 @@ public class BagModuleScript extends HoldRunApplication implements InitPrint {
                     });
             this.gainScriptTable = tmpGainScriptTable;
         }
-
-        Thread.ofPlatform().start(() -> {
-            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(3));
-            Player player = new Player();
-            player.setUid(System.nanoTime());
-            player.setName("无心道");
-
-            dataCenterService.getPgsqlService().getCacheService().cache(Player.class).put(player.getUid(), player);
-
-            ItemCfg.ItemCfgBuilder builder = ItemCfg.builder();
-            List<ItemCfg> rewards = new ArrayList<>();
-            rewards.add(builder.cfgId(10001).count(100).build());
-            rewards.add(builder.cfgId(30001).count(100).build());
-            gainItems4Cfg(player, rewards, "业务号:", System.nanoTime(), "完成任务:", 1001);
-
-        });
+        //
+        // Thread.ofPlatform().start(() -> {
+        //     LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(3));
+        //     Player player = new Player();
+        //     player.setUid(System.nanoTime());
+        //     player.setName("无心道");
+        //     player.setAccount(StringUtils.randomString(8));
+        //
+        //     dataCenterService.getPgsqlService().getCacheService().cache(Player.class).put(player.getUid(), player);
+        //
+        //     ItemCfg.ItemCfgBuilder builder = ItemCfg.builder();
+        //     List<ItemCfg> rewards = new ArrayList<>();
+        //     rewards.add(builder.cfgId(10001).count(100).build());
+        //     rewards.add(builder.cfgId(30001).count(100).build());
+        //     gainItems4Cfg(player, rewards, "业务号:", System.nanoTime(), "完成任务:", 1001);
+        //
+        // });
 
     }
 
@@ -113,24 +112,24 @@ public class BagModuleScript extends HoldRunApplication implements InitPrint {
     }
 
     /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
-    public boolean gainItems4Cfg(Player player, List<ItemCfg> itemCfgs, Object... args) {
+    public boolean gainItems4Cfg(Player player, long serialNumber, List<ItemCfg> itemCfgs, Object... args) {
         List<Item> items = newItems(itemCfgs);
         BagPack bagPack = dataCenterService.bagPack(player.getUid());
         ItemBag itemBag = itemBag(bagPack, 1);
         if (itemBag.freeGrid() < items.size())
             return false;/* TODO 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
-        gainItems(player, itemBag, items, args);
+        gainItems(player, itemBag, serialNumber, items, args);
         return true;
     }
 
     /** 默认是往背包添加 */
-    public void gainItems(Player player, List<Item> items, Object... args) {
+    public void gainItems(Player player, long serialNumber, List<Item> items, Object... args) {
         BagPack bagPack = dataCenterService.bagPack(player.getUid());
         ItemBag itemBag = itemBag(bagPack, 1);
-        gainItems(player, itemBag, items, args);
+        gainItems(player, itemBag, serialNumber, items, args);
     }
 
-    private void gainItems(Player player, ItemBag itemBag, List<Item> items, Object... args) {
+    private void gainItems(Player player, ItemBag itemBag, long serialNumber, List<Item> items, Object... args) {
         Iterator<Item> iterator = items.iterator();
 
         String collect = Arrays.stream(args).map(String::valueOf).collect(Collectors.joining(" "));
@@ -147,11 +146,11 @@ public class BagModuleScript extends HoldRunApplication implements InitPrint {
             long oldCount = gainScript.gainCount(player, itemBag, newItem.getCfgId());
             long change = newItem.getCount();
 
-            boolean gain = gainScript.gain(player, itemBag, newItem);
+            boolean gain = gainScript.gain(player, itemBag, serialNumber, newItem);
 
             if (gain || newItem.getCount() != change) {
                 long newCount = gainScript.gainCount(player, itemBag, newItem.getCfgId());
-                log.info("{} 获得道具：{}({}-xxx) {} + {} = {}, 变更原因：{}", player, newItem.getUid(), newItem.getCfgId(), oldCount, change, newCount, collect);
+                log.info("{} 业务流水号：{} 获得道具：{}({}-xxx) {} + {} = {}, 变更原因：{}", player, serialNumber, newItem.getUid(), newItem.getCfgId(), oldCount, change, newCount, collect);
             }
 
             if (gain) {

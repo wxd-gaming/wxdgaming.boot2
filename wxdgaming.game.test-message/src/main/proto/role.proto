@@ -1,0 +1,61 @@
+syntax = "proto3";
+//把文件拆分
+option java_multiple_files = true;
+//导出包名
+option java_package = "wxdgaming.game.test.script";
+
+//登录请求
+message ReqLogin {
+  string account                       = 1;
+  string token                         = 2;//用于验证的令牌
+  int32 sid                            = 3;//当前选择的区服id
+  repeated MapBean clientParams        = 4;//客户端特殊列表
+}
+
+message MapBean {
+  string key                           = 1;
+  string value                         = 2;
+}
+
+//登录响应
+message ResLogin {
+  repeated RoleBean roles                 = 1;
+}
+
+//角色信息
+message RoleBean {
+  int64 rid                           = 1;
+  string name                         = 2;
+  int32 level                         = 3;
+  int64 exp                           = 4;
+}
+
+//创建角色
+message ReqCreateRole {
+  string name                         = 1;//角色名
+  int32 sex                           = 2;//性别
+  int32 job                           = 3;//职业
+}
+
+//创建角色响应
+message ResCreateRole {
+  RoleBean role                       = 1;
+}
+
+message ReqLogout {
+
+}
+
+//选择角色
+message ReqChooseRole {
+  int64 rid                           = 1;//角色id
+}
+
+message ReqHeartbeat {
+
+}
+
+message ResHeartbeat {
+
+}
+

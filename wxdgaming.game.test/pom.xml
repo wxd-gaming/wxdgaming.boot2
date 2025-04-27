@@ -47,6 +47,11 @@
             <artifactId>wxdgaming.boot2.starter.scheduled</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>wxdgaming.boot2</groupId>
+            <artifactId>wxdgaming.game.test-message</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -22,6 +22,9 @@ import java.util.HashMap;
 @DbTable
 public class Player extends MapNpc {
 
+    /** 是否已经删除 */
+    private boolean del;
+    private int sid;
     @DbColumn(index = true, length = 64)
     private String account;
     @DbColumn(columnType = ColumnType.Json, length = 2048)
@@ -34,8 +37,11 @@ public class Player extends MapNpc {
     private Vector3D lastPosition = new Vector3D();
     /** 朝向 */
     private int lastDirection;
+    private int sex;
+    private int job;
 
     public Player() {
         this.setMapObjectType(MapObjectType.Player);
     }
+
 }

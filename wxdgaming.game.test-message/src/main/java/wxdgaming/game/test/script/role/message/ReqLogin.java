@@ -13,12 +13,20 @@ import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 
 
-/** 选择角色 */
+/** 登录请求 */
 @Getter
 @Setter
 @Accessors(chain = true)
-@Comment("选择角色")
-public class ReqChooseRole extends PojoBase {
+@Comment("登录请求")
+public class ReqLogin extends PojoBase {
 
+    /**  */
+    @Tag(1) private String account;
+    /** 用于验证的令牌 */
+    @Tag(2) private String token;
+    /** 当前选择的区服id */
+    @Tag(3) private int sid;
+    /** 客户端特殊列表 */
+    @Tag(4) private List<MapBean> clientParams = new ArrayList<>();
 
 }

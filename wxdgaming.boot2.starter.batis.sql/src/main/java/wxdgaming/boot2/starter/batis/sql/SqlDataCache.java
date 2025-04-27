@@ -55,7 +55,7 @@ public class SqlDataCache<E extends Entity, Key> {
                 .cacheName("cache-" + tableMapping.getTableName())
                 .area(hashArea)
                 .expireAfterReadMs(TimeUnit.MINUTES.toMillis(expireAfterAccessM))
-                .heartTimeMs(TimeUnit.MINUTES.toMillis(1))
+                .heartTimeMs(TimeUnit.SECONDS.toMillis(10))
                 .loader(this::loader)
                 .heartListener(this::heart)
                 .removalListener(this::removed)

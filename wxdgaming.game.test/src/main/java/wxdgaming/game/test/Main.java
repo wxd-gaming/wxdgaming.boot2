@@ -93,7 +93,7 @@ public class Main {
                     log.info("script/rpcIndex2 同步回调结果 {}", block);
 
                     socketSession.write("我是文本消息");
-                   Thread.ofPlatform().start(()-> System.exit(0));
+                   // Thread.ofPlatform().start(()-> System.exit(0));
                 },
                 10,
                 TimeUnit.SECONDS
