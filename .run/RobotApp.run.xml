@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ClientApp" type="Application" factoryName="Application" nameIsGenerated="true">
-    <option name="MAIN_CLASS_NAME" value="wxdgaming.game.test.ClientApp" />
+  <configuration default="false" name="RobotApp" type="Application" factoryName="Application" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="wxdgaming.game.test.RobotApp" />
     <module name="wxdgaming.game.test-robot" />
     <extension name="coverage">
       <pattern>

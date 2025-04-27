@@ -15,7 +15,7 @@ import wxdgaming.boot2.starter.RunApplicationSub;
 import wxdgaming.boot2.starter.WxdApplication;
 import wxdgaming.boot2.starter.batis.sql.pgsql.MysqlScan;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
-import wxdgaming.boot2.starter.net.NetScan;
+import wxdgaming.boot2.starter.net.SocketScan;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.SocketClient;
 import wxdgaming.boot2.starter.net.module.inner.RpcService;
@@ -31,7 +31,7 @@ public class Main {
         RunApplicationMain runApplication = WxdApplication.run(
                 CoreScan.class,
                 ScheduledScan.class,
-                NetScan.class,
+                SocketScan.class,
                 PgsqlScan.class,
                 MysqlScan.class,
                 Main.class

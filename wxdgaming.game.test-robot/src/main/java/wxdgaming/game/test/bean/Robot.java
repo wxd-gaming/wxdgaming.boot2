@@ -25,6 +25,7 @@ public class Robot {
 
     private SocketSession socketSession;
     private boolean sendLogin;
+    private boolean loginEnd;
 
     @Override public String toString() {
         return "Robot{rid=%d, account='%s', name='%s'}".formatted(rid, account, name);

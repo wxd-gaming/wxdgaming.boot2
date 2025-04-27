@@ -6,5 +6,5 @@ package wxdgaming.boot2.starter.net;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-18 08:34
  **/
-public class NetScan {
+public class SocketScan {
 }

@@ -9,6 +9,7 @@ import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.bean.task.TaskInfo;
 import wxdgaming.game.test.bean.task.TaskPack;
 import wxdgaming.game.test.script.event.OnLogin;
+import wxdgaming.game.test.script.event.OnLoginBefore;
 import wxdgaming.game.test.script.goods.BagScript;
 
 import java.io.Serializable;
@@ -36,9 +37,17 @@ public abstract class ITaskScript {
     }
 
     /** 登录的时候检查任务 */
-    @OnLogin public void onLogin(Player player) {
+    @OnLoginBefore
+    public void onLoginBefore(Player player) {
         TaskPack taskPack = getTaskPack(player);
         initTask(player, taskPack);
+    }
+
+    /** 登录的时候检查任务 */
+    @OnLogin
+    public void onLogin(Player player) {
+        TaskPack taskPack = getTaskPack(player);
+        /*推送数据的*/
     }
 
     /** 初始化 */

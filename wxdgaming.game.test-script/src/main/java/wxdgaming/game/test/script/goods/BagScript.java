@@ -15,6 +15,8 @@ import wxdgaming.game.test.bean.goods.ItemBag;
 import wxdgaming.game.test.bean.goods.ItemCfg;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.module.data.DataCenterService;
+import wxdgaming.game.test.script.event.OnLogin;
+import wxdgaming.game.test.script.event.OnLoginBefore;
 import wxdgaming.game.test.script.goods.gain.GainScript;
 
 import java.util.ArrayList;
@@ -70,7 +72,18 @@ public class BagScript extends HoldRunApplication implements InitPrint {
         //     gainItems4Cfg(player, rewards, "业务号:", System.nanoTime(), "完成任务:", 1001);
         //
         // });
+    }
 
+
+    /** 登录的时候检查背包问题 */
+    @OnLoginBefore
+    public void onLoginBefore(Player player) {
+    }
+
+    /** 登录的时候推送背包 */
+    @OnLogin
+    public void onLogin(Player player) {
+        /*推送数据的*/
     }
 
     public GainScript getGainScript(int type, int subtype) {
