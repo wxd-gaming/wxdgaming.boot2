@@ -46,8 +46,7 @@ public class BagScript extends HoldRunApplication implements InitPrint {
     }
 
     @Init
-    @Override public void init(RunApplication runApplication) {
-        super.init(runApplication);
+    public void init(RunApplication runApplication) {
         {
             Table<Integer, Integer, GainScript> tmpGainScriptTable = new Table<>();
             runApplication.classWithSuper(GainScript.class)

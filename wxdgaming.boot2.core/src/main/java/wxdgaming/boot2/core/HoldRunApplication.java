@@ -2,6 +2,7 @@ package wxdgaming.boot2.core;
 
 import lombok.Getter;
 import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.Order;
 
 /**
  * 持有RunApplication
@@ -15,7 +16,8 @@ public abstract class HoldRunApplication {
     protected RunApplication runApplication;
 
     @Init
-    public void init(RunApplication runApplication) {
+    @Order(1)
+    public void initHold(RunApplication runApplication) {
         this.runApplication = runApplication;
     }
 

@@ -1,9 +1,8 @@
 package wxdgaming.game.test.script.task;
 
-import wxdgaming.boot2.core.RunApplication;
+import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.condition.Condition;
-import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlService;
 import wxdgaming.game.test.bean.goods.ItemCfg;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.bean.task.TaskInfo;
@@ -15,17 +14,13 @@ import wxdgaming.game.test.script.goods.BagScript;
 import java.io.Serializable;
 import java.util.*;
 
-public abstract class ITaskScript {
+public abstract class ITaskScript extends HoldRunApplication {
 
-    protected RunApplication runApplication;
-    protected PgsqlService pgsqlService;
-    protected TaskModuleScript taskModuleScript;
     protected BagScript bagScript;
+    protected TaskModuleScript taskModuleScript;
 
     @Init
-    public void init(RunApplication runApplication, PgsqlService pgsqlService, TaskModuleScript taskModuleScript, BagScript bagScript) {
-        this.runApplication = runApplication;
-        this.pgsqlService = pgsqlService;
+    public void init(TaskModuleScript taskModuleScript, BagScript bagScript) {
         this.taskModuleScript = taskModuleScript;
         this.bagScript = bagScript;
     }
