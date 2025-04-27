@@ -76,7 +76,7 @@ public class BagScript extends HoldRunApplication implements InitPrint {
         // });
     }
 
-    /** 创建角色之后赠送初始化道具 */
+    /** 创建角色之后创建背包 */
     @OnCreateRole
     @Order(1)
     public void onCreateRoleInitBag(Player player) {
