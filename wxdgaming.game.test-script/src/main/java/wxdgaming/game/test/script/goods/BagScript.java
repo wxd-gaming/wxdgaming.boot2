@@ -7,6 +7,7 @@ import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.test.bean.goods.BagPack;
@@ -15,6 +16,7 @@ import wxdgaming.game.test.bean.goods.ItemBag;
 import wxdgaming.game.test.bean.goods.ItemCfg;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.module.data.DataCenterService;
+import wxdgaming.game.test.script.event.OnCreateRole;
 import wxdgaming.game.test.script.event.OnLogin;
 import wxdgaming.game.test.script.event.OnLoginBefore;
 import wxdgaming.game.test.script.goods.gain.GainScript;
@@ -74,6 +76,16 @@ public class BagScript extends HoldRunApplication implements InitPrint {
         // });
     }
 
+    /** 创建角色之后赠送初始化道具 */
+    @OnCreateRole
+    @Order(1)
+    public void onCreateRoleInitBag(Player player) {
+        BagPack bagPack = new BagPack();
+        bagPack.setUid(player.getUid());
+        bagPack.getItems().put(1, new ItemBag(100));/*背包*/
+        bagPack.getItems().put(2, new ItemBag(100));/*仓库*/
+        dataCenterService.getPgsqlService().getCacheService().cache(BagPack.class).put(player.getUid(), bagPack);
+    }
 
     /** 登录的时候检查背包问题 */
     @OnLoginBefore
