@@ -3,6 +3,9 @@ package wxdgaming.game.test.module.data;
 import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Start;
@@ -38,6 +41,8 @@ public class DataCenterService {
     final ConcurrentHashMap<String, Long> name2RidMap = new ConcurrentHashMap<>();
     /** 角色id和名字的映射 key:roleId, value:name */
     final ConcurrentHashMap<Long, String> rid2NameMap = new ConcurrentHashMap<>();
+
+    final ChannelGroup onlinePlayerGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
     @Inject
     public DataCenterService(PgsqlService pgsqlService) {

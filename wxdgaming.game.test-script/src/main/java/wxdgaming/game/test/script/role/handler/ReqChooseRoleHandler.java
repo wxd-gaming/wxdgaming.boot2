@@ -11,6 +11,7 @@ import wxdgaming.game.test.script.event.EventBus;
 import wxdgaming.game.test.script.event.OnLogin;
 import wxdgaming.game.test.script.event.OnLoginBefore;
 import wxdgaming.game.test.script.role.message.ReqChooseRole;
+import wxdgaming.game.test.script.role.message.ResChooseRole;
 
 import java.util.HashSet;
 
@@ -47,11 +48,16 @@ public class ReqChooseRoleHandler {
         }
 
         Player player = dataCenterService.player(rid);
+        /*绑定*/
+        socketSession.attribute("player", player);
         log.info("sid={}, {} 触发登录之前校验事件", sid, player);
         eventBus.post(OnLoginBefore.class, player);
+        ResChooseRole resChooseRole = new ResChooseRole();
+        socketSession.write(resChooseRole);
         log.info("sid={}, {} 触发登录事件", sid, player);
         eventBus.post(OnLogin.class, player, 1, 1);
         log.info("sid={}, {} 选择角色成功", sid, player);
+        dataCenterService.getOnlinePlayerGroup().add(socketSession.getChannel());
     }
 
 }

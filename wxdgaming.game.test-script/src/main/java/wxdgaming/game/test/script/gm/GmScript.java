@@ -50,10 +50,13 @@ public class GmScript {
                     return RunResult.ok().data(result);
                 }
             }
-
         }
-
         return RunResult.error("没有找到对应的动态脚本");
+    }
+
+    @HttpRequest()
+    public RunResult gm(HttpContext httpContext, @Param(path = "cmd") String cmd, @Param(path = "params") String params) throws Exception {
+        return RunResult.error("没有权限");
     }
 
 }

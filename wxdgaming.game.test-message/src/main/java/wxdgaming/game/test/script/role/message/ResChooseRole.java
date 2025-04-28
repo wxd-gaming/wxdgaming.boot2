@@ -13,14 +13,12 @@ import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 
 
-/** 心跳包响应 */
+/** 选择角色响应 */
 @Getter
 @Setter
 @Accessors(chain = true)
-@Comment("心跳包响应")
-public class ResHeartbeat extends PojoBase {
+@Comment("选择角色响应")
+public class ResChooseRole extends PojoBase {
 
-    /** 当前服务器utc时间戳 */
-    @Tag(1) private long timestamp;
 
 }

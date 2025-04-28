@@ -1,10 +1,13 @@
 package wxdgaming.game.test.bean.role;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
+import wxdgaming.boot2.starter.net.SocketSession;
+import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.game.test.bean.MapKey;
 import wxdgaming.game.test.bean.MapNpc;
 import wxdgaming.game.test.bean.Vector3D;
@@ -40,8 +43,20 @@ public class Player extends MapNpc {
     private int sex;
     private int job;
 
+    @DbColumn(ignore = true)
+    @JSONField(serialize = false, deserialize = false)
+    private transient SocketSession socketSession;
+
     public Player() {
         this.setMapObjectType(MapObjectType.Player);
+    }
+
+    public void write(PojoBase pojoBase) {
+        getSocketSession().write(pojoBase);
+    }
+
+    public void writeAndFlush(PojoBase pojoBase) {
+        getSocketSession().writeAndFlush(pojoBase);
     }
 
 }

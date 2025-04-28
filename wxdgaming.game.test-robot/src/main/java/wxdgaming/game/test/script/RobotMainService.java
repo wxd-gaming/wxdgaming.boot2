@@ -3,6 +3,8 @@ package wxdgaming.game.test.script;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.jsonwebtoken.JwtBuilder;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import lombok.Getter;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.util.JwtUtils;
@@ -10,6 +12,8 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.SocketClientImpl;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.test.bean.Robot;
+import wxdgaming.game.test.script.chat.message.ChatType;
+import wxdgaming.game.test.script.chat.message.ReqChatMessage;
 import wxdgaming.game.test.script.role.message.ReqHeartbeat;
 import wxdgaming.game.test.script.role.message.ReqLogin;
 
@@ -35,8 +39,10 @@ public class RobotMainService {
 
     @Start
     public void start() {
-        String account = "test2";
-        robotMap.put(account, new Robot().setAccount(account).setName(account));
+        for (int i = 0; i < 10; i++) {
+            String account = "test" + (i + 1);
+            robotMap.put(account, new Robot().setAccount(account).setName(account));
+        }
     }
 
     /** 1秒一次主循环 */
@@ -53,6 +59,13 @@ public class RobotMainService {
                     String token = jwtBuilder.compact();
 
                     robot.setSocketSession(connect);
+                    connect.getChannel().closeFuture().addListener(new ChannelFutureListener() {
+                        @Override public void operationComplete(ChannelFuture future) throws Exception {
+                            robot.setSendLogin(false);
+                            robot.setLoginEnd(false);
+                            robot.setSocketSession(null);
+                        }
+                    });
                     connect.attribute("robot", robot);
 
                     connect.write(new ReqLogin().setAccount(robot.getAccount()).setSid(1).setToken(token));
@@ -65,4 +78,16 @@ public class RobotMainService {
         }
     }
 
+    /** 1秒一次主循环 */
+    @Scheduled("*/30")
+    public void timer30() {
+        for (Robot robot : robotMap.values()) {
+            if (robot.isLoginEnd()) {
+                ReqChatMessage reqChatMessage = new ReqChatMessage();
+                reqChatMessage.setType(ChatType.Chat_TYPE_World);
+                reqChatMessage.setContent("你好");
+                robot.getSocketSession().write(reqChatMessage);
+            }
+        }
+    }
 }

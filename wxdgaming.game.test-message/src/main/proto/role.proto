@@ -51,10 +51,17 @@ message ReqChooseRole {
   int64 rid                           = 1;//角色id
 }
 
+//选择角色响应
+message ResChooseRole {
+
+}
+
+//心跳包
 message ReqHeartbeat {
 
 }
 
+//心跳包响应
 message ResHeartbeat {
   int64 timestamp                     = 1;//当前服务器utc时间戳
 }
