@@ -39,6 +39,14 @@ public class DisruptorMultipleEventsExample {
         }
     }
 
+    @Slf4j
+    static class EventString2Handler implements com.lmax.disruptor.EventHandler<Event> {
+        @Override
+        public void onEvent(Event eventString, long sequence, boolean endOfBatch) {
+            log.info("处理 EventString2: " + eventString);
+        }
+    }
+
 
     // 定义事件处理程序
     @Slf4j
@@ -80,7 +88,7 @@ public class DisruptorMultipleEventsExample {
         );
 
         // 这个位置是消费者
-        disruptor.handleEventsWith(new EventStringHandler(), new EventStringHandler());
+        disruptor.handleEventsWith(new EventStringHandler(), new EventString2Handler());
 
         // 启动 Disruptor
         disruptor.start();
@@ -91,7 +99,7 @@ public class DisruptorMultipleEventsExample {
         // 创建多个生产者
         EventProducer producer1 = new EventProducer(ringBuffer);
         for (int i = 0; i < 5; i++) {
-            producer1.produceEvent("producer1 - number " + i);
+            producer1.produceEvent("producer1 - string " + i);
         }
         Thread.sleep(3000);
         // 关闭 Disruptor 和线程池

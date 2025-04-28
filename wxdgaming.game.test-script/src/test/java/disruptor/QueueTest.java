@@ -52,8 +52,8 @@ public class QueueTest {
         end("arrayQueue");
     }
 
-    // @Test
-    // @RepeatedTest(10)
+    @Test
+    @RepeatedTest(10)
     public void linkedQueue() throws InterruptedException {
         LinkedBlockingQueue<Object> queue = new LinkedBlockingQueue<>(capacity);
         start();
@@ -80,8 +80,8 @@ public class QueueTest {
         end("linkedQueue");
     }
 
-    @Test
-    @RepeatedTest(10)
+    // @Test
+    // @RepeatedTest(10)
     public void ringQueue() throws InterruptedException {
         RingQueue<Object> queue = new RingQueue<>(capacity);
         start();
@@ -104,8 +104,8 @@ public class QueueTest {
         end("ringQueue");
     }
 
-    @Test
-    @RepeatedTest(10)
+    // @Test
+    // @RepeatedTest(10)
     public void ringQueue2() throws InterruptedException {
         RingBlockingQueue<Object> queue = new RingBlockingQueue<>(capacity);
         start();
@@ -153,8 +153,8 @@ public class QueueTest {
 
     }
 
-    // @Test
-    // @RepeatedTest(10)
+    @Test
+    @RepeatedTest(10)
     public void ringBuffer() throws InterruptedException {
         RingBuffer<Event> queue = RingBuffer.createSingleProducer(new EventFactory(), capacity);
         start();
