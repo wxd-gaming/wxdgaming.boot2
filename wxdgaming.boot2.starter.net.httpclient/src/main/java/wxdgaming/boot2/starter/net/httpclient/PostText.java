@@ -24,7 +24,7 @@ import java.util.Map;
 @Accessors(chain = true)
 public class PostText extends HttpBase<PostText> {
 
-    private ContentType contentType = ContentType.APPLICATION_FORM_URLENCODED;
+    private ContentType contentType = HttpConst.APPLICATION_FORM_URLENCODED;
     private String params = "";
 
     public PostText(HttpClientPool httpClientPool, String uriPath) {
