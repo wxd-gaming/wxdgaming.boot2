@@ -34,7 +34,7 @@ public class PostText extends HttpBase<PostText> {
     @Override public void request0() throws IOException {
         HttpPost httpRequest = createPost();
         if (null != params) {
-            byte[] bytes = params.getBytes(StandardCharsets.UTF_8);
+            byte[] bytes = params.getBytes(contentType.getCharset());
             if (bytes.length > 512) {
                 // 设置请求头，告知服务器请求内容使用 Gzip 压缩
                 httpRequest.setHeader("Content-Encoding", "gzip");
