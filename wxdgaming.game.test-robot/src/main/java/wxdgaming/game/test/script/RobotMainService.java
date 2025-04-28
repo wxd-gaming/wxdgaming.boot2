@@ -10,6 +10,7 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.SocketClientImpl;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.test.bean.Robot;
+import wxdgaming.game.test.script.role.message.ReqHeartbeat;
 import wxdgaming.game.test.script.role.message.ReqLogin;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,6 +58,9 @@ public class RobotMainService {
                     connect.write(new ReqLogin().setAccount(robot.getAccount()).setSid(1).setToken(token));
 
                 });
+            } else {
+                ReqHeartbeat reqHeartbeat = new ReqHeartbeat();
+                socketSession.write(reqHeartbeat);
             }
         }
     }

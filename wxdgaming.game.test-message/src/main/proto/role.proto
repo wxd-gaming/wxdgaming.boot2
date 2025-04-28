@@ -56,6 +56,6 @@ message ReqHeartbeat {
 }
 
 message ResHeartbeat {
-
+  int64 timestamp                     = 1;//当前服务器utc时间戳
 }
 
