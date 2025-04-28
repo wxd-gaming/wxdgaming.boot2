@@ -51,6 +51,10 @@ public class Player extends MapNpc {
         this.setMapObjectType(MapObjectType.Player);
     }
 
+    public boolean checkOnline() {
+        return getSocketSession() != null && getSocketSession().isOpen();
+    }
+
     public void write(PojoBase pojoBase) {
         getSocketSession().write(pojoBase);
     }
