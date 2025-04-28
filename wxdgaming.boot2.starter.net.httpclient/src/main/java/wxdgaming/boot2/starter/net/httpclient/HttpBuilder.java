@@ -56,7 +56,7 @@ public class HttpBuilder {
     }
 
     public static PostText postJson(HttpClientPool httpClientPool, String uriPath) {
-        return new PostText(httpClientPool, uriPath).setContentType(ContentType.APPLICATION_JSON);
+        return new PostText(httpClientPool, uriPath).setContentType(HttpConst.APPLICATION_JSON);
     }
 
 }

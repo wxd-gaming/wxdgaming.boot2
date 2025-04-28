@@ -100,7 +100,7 @@ public class PostText extends HttpBase<PostText> {
     }
 
     public PostText setParamsJson(String params) {
-        return setParams(ContentType.APPLICATION_JSON, params);
+        return setParams(HttpConst.APPLICATION_JSON, params);
     }
 
     public PostText setParams(ContentType contentType, String params) {

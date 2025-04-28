@@ -23,7 +23,7 @@ import java.util.Map;
 @Accessors(chain = true)
 public class PostMulti extends HttpBase<PostMulti> {
 
-    private ContentType contentType = ContentType.MULTIPART_FORM_DATA;
+    private ContentType contentType = HttpConst.MULTIPART_FORM_DATA;
     private HashMap<Object, Object> objMap = new HashMap<>();
 
     public PostMulti(HttpClientPool httpClientPool, String uriPath) {
