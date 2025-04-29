@@ -397,11 +397,12 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
     public <R extends Entity> List<R> findListBySql(Class<R> cls, String sql, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
         List<R> ret = new ArrayList<>();
-        query(sql, args, row -> {
-            R entity = ddlBuilder.data2Object(tableMapping, row);
-            ret.add(entity);
-            return true;
-        });
+        try (SqlQueryResult sqlQueryResult = this.queryResultSet(sql, args)) {
+            while (sqlQueryResult.hasNext()) {
+                R entity = ddlBuilder.data2Object(tableMapping, sqlQueryResult.row());
+                ret.add(entity);
+            }
+        }
         return ret;
     }
 

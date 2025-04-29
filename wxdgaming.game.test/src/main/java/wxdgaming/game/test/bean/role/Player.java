@@ -1,6 +1,7 @@
 package wxdgaming.game.test.bean.role;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.starter.batis.ColumnType;
@@ -42,6 +43,7 @@ public class Player extends MapNpc {
     private int lastDirection;
     private int sex;
     private int job;
+    private Int2IntOpenHashMap useCDKeyMap = new Int2IntOpenHashMap();
 
     @DbColumn(ignore = true)
     @JSONField(serialize = false, deserialize = false)
