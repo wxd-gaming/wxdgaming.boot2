@@ -2,7 +2,7 @@ package wxdgaming.game.test.bean.global;
 
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.lang.ObjectBase;
+import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
 
@@ -15,7 +15,7 @@ import wxdgaming.boot2.starter.batis.ann.DbTable;
 @Getter
 @Setter
 @DbTable
-public class GlobalDataEntity extends ObjectBase {
+public class GlobalDataEntity extends Entity {
 
     @DbColumn(key = true)
     private int id;
@@ -23,5 +23,6 @@ public class GlobalDataEntity extends ObjectBase {
     private int sid;
     private boolean merge;
     private GlobalData data;
+
 
 }

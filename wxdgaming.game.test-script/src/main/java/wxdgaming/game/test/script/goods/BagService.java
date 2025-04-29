@@ -20,6 +20,7 @@ import wxdgaming.game.test.script.event.OnCreateRole;
 import wxdgaming.game.test.script.event.OnLogin;
 import wxdgaming.game.test.script.event.OnLoginBefore;
 import wxdgaming.game.test.script.goods.gain.GainScript;
+import wxdgaming.game.test.script.tips.TipsService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,12 +38,14 @@ import java.util.stream.Collectors;
 @Singleton
 public class BagService extends HoldRunApplication implements InitPrint {
 
-    private final DataCenterService dataCenterService;
     Table<Integer, Integer, GainScript> gainScriptTable = new Table<>();
+    private final DataCenterService dataCenterService;
+    private final TipsService tipsService;
 
     @Inject
-    public BagService(DataCenterService dataCenterService) {
+    public BagService(DataCenterService dataCenterService, TipsService tipsService) {
         this.dataCenterService = dataCenterService;
+        this.tipsService = tipsService;
     }
 
     @Init
@@ -127,6 +130,15 @@ public class BagService extends HoldRunApplication implements InitPrint {
             return false;/* TODO 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
         gainItems(player, itemBag, serialNumber, items, args);
         return true;
+    }
+
+    /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
+    public boolean gainItems4CfgNotice(Player player, long serialNumber, List<ItemCfg> itemCfgs, Object... args) {
+        boolean gained = gainItems4Cfg(player, serialNumber, itemCfgs, args);
+        if (!gained) {
+            tipsService.tips(player.getSocketSession(), "背包已满");
+        }
+        return gained;
     }
 
     /** 默认是往背包添加 */
