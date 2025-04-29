@@ -4,12 +4,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
+import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.module.data.DataCenterService;
 import wxdgaming.game.test.script.event.OnLogin;
 import wxdgaming.game.test.script.event.OnLoginBefore;
+import wxdgaming.game.test.script.event.OnLogout;
 import wxdgaming.game.test.script.role.message.ReqChooseRole;
 import wxdgaming.game.test.script.role.message.ResChooseRole;
 
@@ -46,6 +48,13 @@ public class ReqChooseRoleHandler extends HoldRunApplication {
         }
 
         Player player = dataCenterService.player(rid);
+        player.setSocketSession(socketSession);
+        socketSession.getChannel().closeFuture().addListener(future -> {
+            if (Objects.equals(socketSession, player.getSocketSession())) {
+                log.info("sid={}, {} 触发登出事件", sid, player);
+                runApplication.executeMethodWithAnnotatedException(OnLogout.class, player);
+            }
+        });
         /*绑定*/
         socketSession.attribute("player", player);
         log.info("sid={}, {} 触发登录之前校验事件", sid, player);
