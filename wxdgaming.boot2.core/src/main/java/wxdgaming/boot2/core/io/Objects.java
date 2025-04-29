@@ -238,4 +238,13 @@ public class Objects {
         throw new NullPointerException();
     }
 
+    /** 反转数组 */
+    public static int[] reverse(int[] ints) {
+        int[] ints1 = new int[ints.length];
+        for (int i = 0; i < ints.length; i++) {
+            ints1[i] = ints[ints.length - i - 1];
+        }
+        return ints1;
+    }
+
 }
