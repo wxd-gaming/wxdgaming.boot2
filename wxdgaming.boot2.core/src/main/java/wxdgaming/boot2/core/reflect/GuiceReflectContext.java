@@ -136,13 +136,14 @@ public class GuiceReflectContext {
         return methodStream;
     }
 
+    /** 执行循环过程中某一个函数执行失败中断执行 */
     public void executeMethodWithAnnotated(Class<? extends Annotation> annotation, Object... args) {
         Stream<MethodContent> methodContentStream = withMethodAnnotated(annotation);
         List<MethodContent> list = methodContentStream.toList();
         list.forEach(methodContent -> methodContent.invoke(args));
     }
 
-    /** 遇到异常会继续执行 */
+    /** 执行循环过程中某一个函数执行失败会继续执行其它函数 */
     public void executeMethodWithAnnotatedException(Class<? extends Annotation> annotation, Object... args) {
         Stream<MethodContent> methodContentStream = withMethodAnnotated(annotation);
         List<MethodContent> list = methodContentStream.toList();

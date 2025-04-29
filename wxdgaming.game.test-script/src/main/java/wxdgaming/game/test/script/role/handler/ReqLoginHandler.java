@@ -5,11 +5,11 @@ import com.google.inject.Singleton;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.util.JwtUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.test.module.data.DataCenterService;
-import wxdgaming.game.test.script.event.EventBus;
 import wxdgaming.game.test.script.role.PlayerScript;
 import wxdgaming.game.test.script.role.message.ReqLogin;
 import wxdgaming.game.test.script.tips.TipsScript;
@@ -20,16 +20,14 @@ import wxdgaming.game.test.script.tips.TipsScript;
  **/
 @Slf4j
 @Singleton
-public class ReqLoginHandler {
+public class ReqLoginHandler extends HoldRunApplication {
 
-    private final EventBus eventBus;
     private final DataCenterService dataCenterService;
     private final PlayerScript playerScript;
     private final TipsScript tipsScript;
 
     @Inject
-    public ReqLoginHandler(EventBus eventBus, DataCenterService dataCenterService, PlayerScript playerScript, TipsScript tipsScript) {
-        this.eventBus = eventBus;
+    public ReqLoginHandler(DataCenterService dataCenterService, PlayerScript playerScript, TipsScript tipsScript) {
         this.dataCenterService = dataCenterService;
         this.playerScript = playerScript;
         this.tipsScript = tipsScript;

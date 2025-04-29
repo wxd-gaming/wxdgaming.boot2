@@ -3,13 +3,13 @@ package wxdgaming.game.test.script.role.handler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.util.ObjectLockUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.module.data.DataCenterService;
-import wxdgaming.game.test.script.event.EventBus;
 import wxdgaming.game.test.script.event.OnCreateRole;
 import wxdgaming.game.test.script.role.PlayerScript;
 import wxdgaming.game.test.script.role.message.ReqCreateRole;
@@ -25,16 +25,14 @@ import java.util.HashSet;
  **/
 @Slf4j
 @Singleton
-public class ReqCreateRoleHandler {
+public class ReqCreateRoleHandler extends HoldRunApplication {
 
-    private final EventBus eventBus;
     private final DataCenterService dataCenterService;
     private final PlayerScript playerScript;
     private final TipsScript tipsScript;
 
     @Inject
-    public ReqCreateRoleHandler(EventBus eventBus, DataCenterService dataCenterService, PlayerScript playerScript, TipsScript tipsScript) {
-        this.eventBus = eventBus;
+    public ReqCreateRoleHandler(DataCenterService dataCenterService, PlayerScript playerScript, TipsScript tipsScript) {
         this.dataCenterService = dataCenterService;
         this.playerScript = playerScript;
         this.tipsScript = tipsScript;
@@ -91,7 +89,7 @@ public class ReqCreateRoleHandler {
         } finally {
             ObjectLockUtil.unlock("role_" + name);
         }
-        eventBus.post(OnCreateRole.class, player);
+        runApplication.executeMethodWithAnnotatedException(OnCreateRole.class, player);
         playerScript.sendPlayerList(socketSession, sid, account);
     }
 

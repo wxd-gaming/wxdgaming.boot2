@@ -1,6 +1,5 @@
 package wxdgaming.boot2.core;
 
-import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Binding;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -108,9 +107,14 @@ public abstract class RunApplication {
         return guiceReflectContext.classWithAnnotated(annotation);
     }
 
-    /** 执行包含某个注解的方法 */
+    /** 执行循环过程中某一个函数执行失败中断执行 */
     public void executeMethodWithAnnotated(Class<? extends Annotation> annotation, Object... args) {
         guiceReflectContext.executeMethodWithAnnotated(annotation, args);
+    }
+
+    /** 执行循环过程中某一个函数执行失败会继续执行其它函数 */
+    public void executeMethodWithAnnotatedException(Class<? extends Annotation> annotation, Object... args) {
+        guiceReflectContext.executeMethodWithAnnotatedException(annotation, args);
     }
 
 }
