@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.test.bean.goods.ItemCfg;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.script.event.OnCreateRole;
-import wxdgaming.game.test.script.goods.BagScript;
+import wxdgaming.game.test.script.goods.BagService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +21,11 @@ import java.util.List;
 @Singleton
 public class PlayerCreateEvent {
 
-    final BagScript bagScript;
+    final BagService bagService;
 
     @Inject
-    public PlayerCreateEvent(BagScript bagScript) {
-        this.bagScript = bagScript;
+    public PlayerCreateEvent(BagService bagService) {
+        this.bagService = bagService;
     }
 
     /** 创建角色之后赠送初始化道具 */
@@ -37,7 +37,7 @@ public class PlayerCreateEvent {
         rewards.add(builder.cfgId(10001).count(100).build());
         rewards.add(builder.cfgId(30001).count(100).build());
         long serialNumber = System.nanoTime();
-        bagScript.gainItems4Cfg(player, serialNumber, rewards, "赠送初始化道具:", 1001);
+        bagService.gainItems4Cfg(player, serialNumber, rewards, "赠送初始化道具:", 1001);
     }
 
 }

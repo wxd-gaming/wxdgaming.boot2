@@ -31,7 +31,7 @@ public class TaskMainScript extends ITaskScript {
         if (integerTaskInfoMap == null || integerTaskInfoMap.isEmpty()) {
             TaskInfo taskInfo = new TaskInfo();
             taskInfo.setCfgId(1);
-            taskModuleScript.initTask(player, taskInfo, null/*TODO读取配置表*/);
+            taskService.initTask(player, taskInfo, null/*TODO读取配置表*/);
             taskPack.getTasks().put(type(), taskInfo.getCfgId(), taskInfo);
             log.info("{} 初始化任务：{}", player, taskInfo);
         }

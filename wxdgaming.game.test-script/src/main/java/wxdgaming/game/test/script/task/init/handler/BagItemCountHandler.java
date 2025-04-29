@@ -7,7 +7,7 @@ import wxdgaming.boot2.core.lang.condition.UpdateType;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlService;
 import wxdgaming.game.test.bean.goods.BagPack;
 import wxdgaming.game.test.bean.role.Player;
-import wxdgaming.game.test.script.goods.BagScript;
+import wxdgaming.game.test.script.goods.BagService;
 import wxdgaming.game.test.script.task.init.ConditionInitValueHandler;
 
 /**
@@ -20,10 +20,10 @@ import wxdgaming.game.test.script.task.init.ConditionInitValueHandler;
 public class BagItemCountHandler implements ConditionInitValueHandler {
 
     private final PgsqlService psqlService;
-    private final BagScript bagsModuleScript;
+    private final BagService bagsModuleScript;
 
     @Inject
-    public BagItemCountHandler(PgsqlService psqlService, BagScript bagsModuleScript) {
+    public BagItemCountHandler(PgsqlService psqlService, BagService bagsModuleScript) {
         this.psqlService = psqlService;
         this.bagsModuleScript = bagsModuleScript;
     }

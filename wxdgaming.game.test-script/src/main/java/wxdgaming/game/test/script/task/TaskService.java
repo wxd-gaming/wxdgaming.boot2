@@ -27,14 +27,14 @@ import java.util.Map;
  * @version: 2025-04-21 20:43
  **/
 @Singleton
-public class TaskModuleScript extends HoldRunApplication {
+public class TaskService extends HoldRunApplication {
 
     private final DataCenterService dataCenterService;
     private HashMap<Integer, ITaskScript> taskScriptImplHashMap = new HashMap<>();
     private HashMap<Condition, ConditionInitValueHandler> conditionInitValueHandlerMap = new HashMap<>();
 
     @Inject
-    public TaskModuleScript(DataCenterService dataCenterService) {
+    public TaskService(DataCenterService dataCenterService) {
         this.dataCenterService = dataCenterService;
     }
 

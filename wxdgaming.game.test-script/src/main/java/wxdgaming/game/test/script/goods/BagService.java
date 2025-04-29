@@ -35,13 +35,13 @@ import java.util.stream.Collectors;
  **/
 @Slf4j
 @Singleton
-public class BagScript extends HoldRunApplication implements InitPrint {
+public class BagService extends HoldRunApplication implements InitPrint {
 
     private final DataCenterService dataCenterService;
     Table<Integer, Integer, GainScript> gainScriptTable = new Table<>();
 
     @Inject
-    public BagScript(DataCenterService dataCenterService) {
+    public BagService(DataCenterService dataCenterService) {
         this.dataCenterService = dataCenterService;
     }
 

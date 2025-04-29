@@ -17,7 +17,7 @@ import java.util.HashMap;
  **/
 @Slf4j
 @Singleton
-public class ChatScript extends HoldRunApplication {
+public class ChatService extends HoldRunApplication {
 
     HashMap<ChatType, ChatHandler> chatHandlerMap = new HashMap<>();
 

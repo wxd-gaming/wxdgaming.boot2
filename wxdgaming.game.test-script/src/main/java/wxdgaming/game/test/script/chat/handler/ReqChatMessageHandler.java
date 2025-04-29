@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
-import wxdgaming.game.test.script.chat.ChatScript;
+import wxdgaming.game.test.script.chat.ChatService;
 import wxdgaming.game.test.script.chat.message.ReqChatMessage;
 
 /**
@@ -18,17 +18,17 @@ import wxdgaming.game.test.script.chat.message.ReqChatMessage;
 @Singleton
 public class ReqChatMessageHandler {
 
-    private final ChatScript chatScript;
+    private final ChatService chatService;
 
     @Inject
-    public ReqChatMessageHandler(ChatScript chatScript) {
-        this.chatScript = chatScript;
+    public ReqChatMessageHandler(ChatService chatService) {
+        this.chatService = chatService;
     }
 
     /** 请求聊天 */
     @ProtoRequest
     public void reqChatMessage(SocketSession socketSession, ReqChatMessage req) {
-        chatScript.chatHandler(req.getType()).chat(socketSession, req);
+        chatService.chatHandler(req.getType()).chat(socketSession, req);
     }
 
 }

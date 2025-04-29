@@ -37,11 +37,11 @@ public class PrivateChatHandler extends ChatHandler {
         Player player = socketSession.attribute("player");
         Player targetPlayer = dataCenterService.player(req.getTargetId());
         if (targetPlayer == null) {
-            tipsScript.tips(socketSession, "目标玩家不存在");
+            tipsService.tips(socketSession, "目标玩家不存在");
             return;
         }
         if (!targetPlayer.checkOnline()) {
-            tipsScript.tips(socketSession, "目标玩家不在线");
+            tipsService.tips(socketSession, "目标玩家不在线");
             return;
         }
         ResChatMessage res = new ResChatMessage();

@@ -11,9 +11,9 @@ import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.module.data.DataCenterService;
 import wxdgaming.game.test.script.event.OnCreateRole;
-import wxdgaming.game.test.script.role.PlayerScript;
+import wxdgaming.game.test.script.role.PlayerService;
 import wxdgaming.game.test.script.role.message.ReqCreateRole;
-import wxdgaming.game.test.script.tips.TipsScript;
+import wxdgaming.game.test.script.tips.TipsService;
 
 import java.util.HashSet;
 
@@ -28,14 +28,14 @@ import java.util.HashSet;
 public class ReqCreateRoleHandler extends HoldRunApplication {
 
     private final DataCenterService dataCenterService;
-    private final PlayerScript playerScript;
-    private final TipsScript tipsScript;
+    private final PlayerService playerService;
+    private final TipsService tipsService;
 
     @Inject
-    public ReqCreateRoleHandler(DataCenterService dataCenterService, PlayerScript playerScript, TipsScript tipsScript) {
+    public ReqCreateRoleHandler(DataCenterService dataCenterService, PlayerService playerService, TipsService tipsService) {
         this.dataCenterService = dataCenterService;
-        this.playerScript = playerScript;
-        this.tipsScript = tipsScript;
+        this.playerService = playerService;
+        this.tipsService = tipsService;
     }
 
     /** 创建角色 */
@@ -49,7 +49,7 @@ public class ReqCreateRoleHandler extends HoldRunApplication {
         if (longs != null && longs.size() >= 10) {
             /*创建角色错误*/
             log.error("sid={}, account={} 创建角色错误 角色数量超过10个", sid, account);
-            this.tipsScript.tips(socketSession, "角色数量超过10个");
+            this.tipsService.tips(socketSession, "角色数量超过10个");
             return;
         }
 
@@ -58,7 +58,7 @@ public class ReqCreateRoleHandler extends HoldRunApplication {
         if (StringUtils.isBlank(name) | name.length() < 2 || name.length() > 12) {
             /*创建角色错误*/
             log.error("sid={}, account={} 创建角色错误 角色名 {} 字符范围不合符", sid, account, name);
-            this.tipsScript.tips(socketSession, "角色名长度2-12");
+            this.tipsService.tips(socketSession, "角色名长度2-12");
             return;
         }
         ObjectLockUtil.lock("role_" + name);
@@ -68,7 +68,7 @@ public class ReqCreateRoleHandler extends HoldRunApplication {
             if (containsKey) {
                 /*创建角色错误*/
                 log.error("sid={}, account={} 创建角色错误 角色名 {} 已存在", sid, account, name);
-                this.tipsScript.tips(socketSession, "角色名已存在");
+                this.tipsService.tips(socketSession, "角色名已存在");
                 return;
             }
 
@@ -90,7 +90,7 @@ public class ReqCreateRoleHandler extends HoldRunApplication {
             ObjectLockUtil.unlock("role_" + name);
         }
         runApplication.executeMethodWithAnnotatedException(OnCreateRole.class, player);
-        playerScript.sendPlayerList(socketSession, sid, account);
+        playerService.sendPlayerList(socketSession, sid, account);
     }
 
 }

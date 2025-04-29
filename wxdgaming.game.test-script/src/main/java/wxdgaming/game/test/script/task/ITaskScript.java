@@ -9,26 +9,26 @@ import wxdgaming.game.test.bean.task.TaskInfo;
 import wxdgaming.game.test.bean.task.TaskPack;
 import wxdgaming.game.test.script.event.OnLogin;
 import wxdgaming.game.test.script.event.OnLoginBefore;
-import wxdgaming.game.test.script.goods.BagScript;
+import wxdgaming.game.test.script.goods.BagService;
 
 import java.io.Serializable;
 import java.util.*;
 
 public abstract class ITaskScript extends HoldRunApplication {
 
-    protected BagScript bagScript;
-    protected TaskModuleScript taskModuleScript;
+    protected BagService bagService;
+    protected TaskService taskService;
 
     @Init
-    public void init(TaskModuleScript taskModuleScript, BagScript bagScript) {
-        this.taskModuleScript = taskModuleScript;
-        this.bagScript = bagScript;
+    public void init(TaskService taskService, BagService bagService) {
+        this.taskService = taskService;
+        this.bagService = bagService;
     }
 
     public abstract int type();
 
     public TaskPack getTaskPack(Player player) {
-        return taskModuleScript.getTaskPack(player);
+        return taskService.getTaskPack(player);
     }
 
     /** 登录的时候检查任务 */
@@ -65,7 +65,7 @@ public abstract class ITaskScript extends HoldRunApplication {
             for (Map.Entry<Integer, Long> entry : taskTargets.entrySet()) {
                 Integer conditionId = entry.getKey();/*条件id*/
                 Long targetProgress = entry.getValue();/*条件完成目标*/
-                Condition condition = taskModuleScript.getCondition(conditionId);
+                Condition condition = taskService.getCondition(conditionId);
                 if (condition.equals(k1, k2, k3)) {
                     Long progress = progresses.getOrDefault(conditionId, 0L);
                     long update = condition.getUpdateType().update(progress, targetValue);
@@ -100,7 +100,7 @@ public abstract class ITaskScript extends HoldRunApplication {
         List<ItemCfg> rewards = new ArrayList<>();
         rewards.add(builder.cfgId(10001).count(100).build());
         rewards.add(builder.cfgId(30001).count(100).build());
-        bagScript.gainItems4Cfg(player, System.nanoTime(), rewards, "完成任务:", taskId);
+        bagService.gainItems4Cfg(player, System.nanoTime(), rewards, "完成任务:", taskId);
 
     }
 

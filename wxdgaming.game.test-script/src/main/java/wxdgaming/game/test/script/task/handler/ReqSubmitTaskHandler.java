@@ -8,7 +8,7 @@ import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.bean.task.TaskPack;
 import wxdgaming.game.test.script.task.ITaskScript;
-import wxdgaming.game.test.script.task.TaskModuleScript;
+import wxdgaming.game.test.script.task.TaskService;
 import wxdgaming.game.test.script.task.message.ReqSubmitTask;
 
 /**
@@ -21,11 +21,11 @@ import wxdgaming.game.test.script.task.message.ReqSubmitTask;
 @Singleton
 public class ReqSubmitTaskHandler {
 
-    TaskModuleScript taskModuleScript;
+    TaskService taskService;
 
     @Inject
-    public ReqSubmitTaskHandler(TaskModuleScript taskModuleScript) {
-        this.taskModuleScript = taskModuleScript;
+    public ReqSubmitTaskHandler(TaskService taskService) {
+        this.taskService = taskService;
     }
 
     /** 提交任务 */
@@ -34,8 +34,8 @@ public class ReqSubmitTaskHandler {
         Player player = socketSession.attribute("player");
         int taskType = req.getTaskType().getCode();
         int taskId = req.getTaskId();
-        TaskPack taskPack = taskModuleScript.getTaskPack(player);
-        ITaskScript taskScript = taskModuleScript.getTaskScript(taskType);
+        TaskPack taskPack = taskService.getTaskPack(player);
+        ITaskScript taskScript = taskService.getTaskScript(taskType);
         taskScript.submitTask(player, taskPack, taskId);
     }
 

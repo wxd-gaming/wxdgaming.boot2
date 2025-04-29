@@ -18,12 +18,12 @@ import java.util.HashSet;
  **/
 @Slf4j
 @Singleton
-public class PlayerScript extends HoldRunApplication {
+public class PlayerService extends HoldRunApplication {
 
     final DataCenterService dataCenterService;
 
     @Inject
-    public PlayerScript(DataCenterService dataCenterService) {
+    public PlayerService(DataCenterService dataCenterService) {
         this.dataCenterService = dataCenterService;
     }
 

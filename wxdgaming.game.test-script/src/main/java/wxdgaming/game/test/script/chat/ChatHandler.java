@@ -6,7 +6,7 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.test.script.chat.message.ChatType;
 import wxdgaming.game.test.script.chat.message.ReqChatMessage;
-import wxdgaming.game.test.script.tips.TipsScript;
+import wxdgaming.game.test.script.tips.TipsService;
 
 /**
  * 聊天接口
@@ -18,11 +18,11 @@ import wxdgaming.game.test.script.tips.TipsScript;
 @Singleton
 public class ChatHandler {
 
-    protected TipsScript tipsScript;
+    protected TipsService tipsService;
 
     @Init
-    public void init(TipsScript tipsScript) {
-        this.tipsScript = tipsScript;
+    public void init(TipsService tipsService) {
+        this.tipsService = tipsService;
     }
 
     public ChatType chatType() {
@@ -30,7 +30,7 @@ public class ChatHandler {
     }
 
     public void chat(SocketSession socketSession, ReqChatMessage req) {
-        tipsScript.tips(socketSession, "暂未实现");
+        tipsService.tips(socketSession, "暂未实现");
     }
 
 }

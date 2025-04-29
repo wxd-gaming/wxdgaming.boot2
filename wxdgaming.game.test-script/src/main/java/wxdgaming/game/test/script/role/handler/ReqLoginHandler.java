@@ -10,9 +10,9 @@ import wxdgaming.boot2.core.util.JwtUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.test.module.data.DataCenterService;
-import wxdgaming.game.test.script.role.PlayerScript;
+import wxdgaming.game.test.script.role.PlayerService;
 import wxdgaming.game.test.script.role.message.ReqLogin;
-import wxdgaming.game.test.script.tips.TipsScript;
+import wxdgaming.game.test.script.tips.TipsService;
 
 /**
  * @author: wxd-gaming(無心道, 15388152619)
@@ -23,14 +23,14 @@ import wxdgaming.game.test.script.tips.TipsScript;
 public class ReqLoginHandler extends HoldRunApplication {
 
     private final DataCenterService dataCenterService;
-    private final PlayerScript playerScript;
-    private final TipsScript tipsScript;
+    private final PlayerService playerService;
+    private final TipsService tipsService;
 
     @Inject
-    public ReqLoginHandler(DataCenterService dataCenterService, PlayerScript playerScript, TipsScript tipsScript) {
+    public ReqLoginHandler(DataCenterService dataCenterService, PlayerService playerService, TipsService tipsService) {
         this.dataCenterService = dataCenterService;
-        this.playerScript = playerScript;
-        this.tipsScript = tipsScript;
+        this.playerService = playerService;
+        this.tipsService = tipsService;
     }
 
     @ProtoRequest
@@ -49,12 +49,12 @@ public class ReqLoginHandler extends HoldRunApplication {
             socketSession.attribute("account", account);
             socketSession.attribute("sid", sid);
 
-            playerScript.sendPlayerList(socketSession, sid, account);
+            playerService.sendPlayerList(socketSession, sid, account);
 
             log.info("登录完成:{}", account);
         } catch (Exception e) {
             log.error("登录失败 {}", req, e);
-            tipsScript.tips(socketSession, "服务器异常");
+            tipsService.tips(socketSession, "服务器异常");
         }
     }
 

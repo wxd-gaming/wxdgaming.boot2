@@ -19,12 +19,12 @@ import java.util.List;
  **/
 @Slf4j
 @Singleton
-public class TipsScript {
+public class TipsService {
 
     final ProtoListenerFactory probeListenerFactory;
 
     @Inject
-    public TipsScript(ProtoListenerFactory probeListenerFactory) {
+    public TipsService(ProtoListenerFactory probeListenerFactory) {
         this.probeListenerFactory = probeListenerFactory;
     }
 
