@@ -35,7 +35,7 @@ public class PlayerGmScript {
     @GM
     public Object addExp(Player player, String[] args) {
         long exp = Long.parseLong(args[1]);
-        this.playerService.addExp(player, exp, "gm命令");
+        this.playerService.addExp(player, exp, "gm命令", System.currentTimeMillis());
         return null;
     }
 

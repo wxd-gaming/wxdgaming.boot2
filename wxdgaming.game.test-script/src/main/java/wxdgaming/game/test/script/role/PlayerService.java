@@ -54,7 +54,7 @@ public class PlayerService extends HoldRunApplication {
         while (tmp >= 100L * player.getLevel()) {
             /*假设升级需要100*/
             tmp -= 100L * player.getLevel();
-            addLevel(player, 1, args);
+            addLevel(player, 1, args, "经验升级");
         }
         player.setExp(tmp);
         ResUpdateExp resUpdateLevel = new ResUpdateExp().setExp(player.getExp());
@@ -69,9 +69,9 @@ public class PlayerService extends HoldRunApplication {
         /*触发升级, 比如功能开放监听需要*/
         runApplication.executeMethodWithAnnotatedException(OnLevelUp.class, player, lv);
         /*触发当前等级*/
-        runApplication.executeMethodWithAnnotatedException(OnTask.class, player, TaskEvent.builder().k1("level").targetValue(player.getLevel()));
+        runApplication.executeMethodWithAnnotatedException(OnTask.class, player, TaskEvent.builder().k1("level").targetValue(player.getLevel()).build());
         /*触发提升等级*/
-        runApplication.executeMethodWithAnnotatedException(OnTask.class, player, TaskEvent.builder().k1("levelup").targetValue(lv));
+        runApplication.executeMethodWithAnnotatedException(OnTask.class, player, TaskEvent.builder().k1("levelup").targetValue(lv).build());
     }
 
 }

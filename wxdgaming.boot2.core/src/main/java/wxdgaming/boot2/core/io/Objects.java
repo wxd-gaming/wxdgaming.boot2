@@ -249,7 +249,14 @@ public class Objects {
     }
 
     public static String toString(Object... args) {
-        return Arrays.stream(args).map(String::valueOf).collect(Collectors.joining(" "));
+        return Arrays.stream(args)
+                .map(a -> {
+                    if (a instanceof Object[] os) {
+                        return Objects.toString(os);
+                    }
+                    return String.valueOf(a);
+                })
+                .collect(Collectors.joining(" "));
     }
 
 }
