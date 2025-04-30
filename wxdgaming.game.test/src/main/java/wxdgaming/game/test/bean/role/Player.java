@@ -39,6 +39,7 @@ public class Player extends MapNpc {
     /** 上一次所在地图坐标， */
     @DbColumn(columnType = ColumnType.Json, length = 128)
     private Vector3D lastPosition = new Vector3D();
+    private long lastLoginTime;
     /** 朝向 */
     private int lastDirection;
     private int sex;
