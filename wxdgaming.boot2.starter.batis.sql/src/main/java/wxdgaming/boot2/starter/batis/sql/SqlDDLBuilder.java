@@ -216,7 +216,7 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
         return buildSql$$("delete from `" + tableName + "` where " + buildKeyWhere(tableMapping));
     }
 
-    @Override public Object[] buildKeyParams(TableMapping tableMapping, Object bean) {
+    @Override public Object[] buildKeyParams(TableMapping tableMapping, Entity bean) {
         List<Object> params = new ArrayList<>();
         for (TableMapping.FieldMapping fieldMapping : tableMapping.getKeyFields()) {
             params.add(fieldMapping.toDbValue(bean));
@@ -224,22 +224,24 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
         return params.toArray();
     }
 
-    @Override public Object[] buildInsertParams(TableMapping tableMapping, Object bean) {
+    @Override public Object[] buildInsertParams(TableMapping tableMapping, Entity entity) {
+        entity.saveRefresh();
         List<Object> params = new ArrayList<>();
         for (TableMapping.FieldMapping fieldMapping : tableMapping.getColumns().values()) {
-            params.add(fieldMapping.toDbValue(bean));
+            params.add(fieldMapping.toDbValue(entity));
         }
         return params.toArray();
     }
 
-    @Override public Object[] builderUpdateParams(TableMapping tableMapping, Object bean) {
+    @Override public Object[] builderUpdateParams(TableMapping tableMapping, Entity entity) {
+        entity.saveRefresh();
         List<Object> params = new ArrayList<>();
         for (TableMapping.FieldMapping fieldMapping : tableMapping.getColumns().values()) {
             if (fieldMapping.isKey()) continue;
-            params.add(fieldMapping.toDbValue(bean));
+            params.add(fieldMapping.toDbValue(entity));
         }
         for (TableMapping.FieldMapping fieldMapping : tableMapping.getKeyFields()) {
-            params.add(fieldMapping.toDbValue(bean));
+            params.add(fieldMapping.toDbValue(entity));
         }
         return params.toArray();
     }

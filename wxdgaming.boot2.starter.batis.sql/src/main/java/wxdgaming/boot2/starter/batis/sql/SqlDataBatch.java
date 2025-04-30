@@ -118,6 +118,7 @@ public abstract class SqlDataBatch extends DataBatch {
             String tableName = TableMapping.beanTableName(entity);
             TableMapping tableMapping = sqlDataHelper.tableMapping(entity.getClass());
             String insertSql = sqlDataHelper.getDdlBuilder().buildInsertSql(tableMapping, tableName);
+
             Object[] keyParams = sqlDataHelper.getDdlBuilder().buildKeyParams(tableMapping, entity);
             Object[] insertParams = sqlDataHelper.getDdlBuilder().buildInsertParams(tableMapping, entity);
             BatchParam batchParam = new BatchParam(entity, keyParams, insertParams);
@@ -135,6 +136,7 @@ public abstract class SqlDataBatch extends DataBatch {
             String tableName = TableMapping.beanTableName(entity);
             TableMapping tableMapping = sqlDataHelper.tableMapping(entity.getClass());
             String updateSql = sqlDataHelper.getDdlBuilder().buildUpdateSql(tableMapping, tableName);
+
             Object[] keyParams = sqlDataHelper.getDdlBuilder().buildKeyParams(tableMapping, entity);
             Object[] updateParams = sqlDataHelper.getDdlBuilder().builderUpdateParams(tableMapping, entity);
             BatchParam batchParam = new BatchParam(entity, keyParams, updateParams);

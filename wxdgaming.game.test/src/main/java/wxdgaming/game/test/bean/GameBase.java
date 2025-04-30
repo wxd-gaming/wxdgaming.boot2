@@ -2,7 +2,7 @@ package wxdgaming.game.test.bean;
 
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.starter.batis.EntityLongUID;
+import wxdgaming.boot2.core.lang.ObjectBase;
 
 /**
  * 基类
@@ -12,8 +12,9 @@ import wxdgaming.boot2.starter.batis.EntityLongUID;
  **/
 @Getter
 @Setter
-public class GameBase extends EntityLongUID {
+public class GameBase extends ObjectBase {
 
+    private long uid = 0;
     private long createTime;
 
 }

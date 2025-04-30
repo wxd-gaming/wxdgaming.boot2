@@ -3,8 +3,9 @@ package wxdgaming.game.test.module.data;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlService;
 import wxdgaming.game.test.bean.global.DataBase;
@@ -29,8 +30,8 @@ public class GlobalDataService extends HoldRunApplication {
     private final ConcurrentTable<Integer, GlobalDataType, GlobalDataEntity> globalDataTable = new ConcurrentTable<>();
 
 
-    @Init
-    public void init(@Value(path = "sid") int sid, PgsqlService pgsqlService) {
+    @Start
+    public void start(@Value(path = "sid") int sid, PgsqlService pgsqlService) {
         this.sid = sid;
         this.pgsqlService = pgsqlService;
         List<GlobalDataEntity> list = this.pgsqlService.findListByWhere(GlobalDataEntity.class, "merge = ?", false);
@@ -38,6 +39,13 @@ public class GlobalDataService extends HoldRunApplication {
             GlobalDataType globalDataType = GlobalDataType.ofOrException(entity.getId());
             globalDataTable.put(entity.getSid(), globalDataType, entity);
         }
+    }
+
+    @shutdown
+    public void shutdown() {
+        globalDataTable.forEach(globalDataEntity -> {
+            pgsqlService.dataBatch().save(globalDataEntity);
+        });
     }
 
     public <T extends DataBase> T get(GlobalDataType type) {

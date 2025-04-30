@@ -3,6 +3,7 @@ package wxdgaming.boot2.starter.batis;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 
 /**
@@ -13,6 +14,7 @@ import wxdgaming.boot2.starter.batis.ann.DbColumn;
  **/
 @Getter
 @Setter
+@Accessors(chain = true)
 public class EntityLongUID extends Entity {
 
     @DbColumn(key = true)

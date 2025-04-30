@@ -5,10 +5,12 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.ObjectLockUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.test.bean.role.Player;
+import wxdgaming.game.test.bean.role.RoleEntity;
 import wxdgaming.game.test.module.data.DataCenterService;
 import wxdgaming.game.test.script.event.OnCreateRole;
 import wxdgaming.game.test.script.role.PlayerService;
@@ -82,7 +84,9 @@ public class ReqCreateRoleHandler extends HoldRunApplication {
             player.setSex(sex);
             player.setJob(job);
             log.info("sid={}, account={}, 创建角色：{}", sid, account, player);
-            dataCenterService.getPgsqlService().getCacheService().cache(Player.class).put(player.getUid(), player);
+            dataCenterService.getPgsqlService().getCacheService()
+                    .cache(RoleEntity.class)
+                    .put(player.getUid(), new RoleEntity().setUid(player.getUid()).setPlayer(player));
             dataCenterService.getAccount2RidsMap().computeIfAbsent(sid, account, l -> new HashSet<>()).add(player.getUid());
             dataCenterService.getName2RidMap().put(name, player.getUid());
             dataCenterService.getRid2NameMap().put(player.getUid(), name);

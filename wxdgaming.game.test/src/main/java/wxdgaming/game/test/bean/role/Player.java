@@ -23,7 +23,6 @@ import java.util.HashMap;
  **/
 @Getter
 @Setter
-@DbTable
 public class Player extends MapNpc {
 
     /** 是否已经删除 */

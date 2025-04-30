@@ -16,7 +16,7 @@ import wxdgaming.boot2.starter.batis.ann.DbTable;
 @Getter
 @Setter
 @Accessors(chain = true)
-@DbTable
+@DbTable(tableName = "global_data")
 public class GlobalDataEntity extends Entity {
 
     @DbColumn(key = true)

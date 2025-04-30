@@ -41,4 +41,7 @@ public abstract class Entity extends ObjectBase {
         return false;
     }
 
+    /** 保存到数据库 */
+    public void saveRefresh() {}
+
 }

@@ -46,7 +46,9 @@ public class TipsService {
         ResTips resTips = new ResTips();
         resTips.setType(tipsType);
         resTips.setContent(tips);
-        resTips.getParams().addAll(params);
+        if (params != null) {
+            resTips.getParams().addAll(params);
+        }
         if (responseClass != null) {
             int messageId = probeListenerFactory.messageId(responseClass);
             resTips.setResMessageId(messageId);

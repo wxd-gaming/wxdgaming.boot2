@@ -35,27 +35,32 @@ public final class RunApplicationMain extends RunApplication {
 
     public void start() {
 
-        executeMethodWithAnnotated(Start.class);
+        try {
+            executeMethodWithAnnotated(Start.class);
 
-        JvmUtil.addShutdownHook(() -> {
-            System.out.println("--------------------------shutdown---------------------------");
-            executeMethodWithAnnotated(shutdown.class);
-        });
+            JvmUtil.addShutdownHook(() -> {
+                System.out.println("--------------------------shutdown---------------------------");
+                executeMethodWithAnnotated(shutdown.class);
+            });
 
-        StringBuilder stringAppend = new StringBuilder(1024);
+            StringBuilder stringAppend = new StringBuilder(1024);
 
-        String printString = FileReadUtil.readString("print.txt");
+            String printString = FileReadUtil.readString("print.txt");
 
-        int len = 60;
+            int len = 60;
 
-        stringAppend.append("\n\n")
-                .append(printString)
-                .append("\n")
-                .append("    -[ " + StringUtils.padRight("debug = " + BootConfig.getIns().isDebug() + " | " + JvmUtil.processIDString(), len, ' ') + " ]-\n")
-                .append("    -[ " + StringUtils.padRight(BootConfig.getIns().sid() + " | " + BootConfig.getIns().sname(), len, ' ') + " ]-\n")
-                .append("    -[ " + StringUtils.padRight(JvmUtil.timeZone(), len, ' ') + " ]-\n");
-        stringAppend.append("\n");
-        log.warn(stringAppend.toString());
+            stringAppend.append("\n\n")
+                    .append(printString)
+                    .append("\n")
+                    .append("    -[ " + StringUtils.padRight("debug = " + BootConfig.getIns().isDebug() + " | " + JvmUtil.processIDString(), len, ' ') + " ]-\n")
+                    .append("    -[ " + StringUtils.padRight(BootConfig.getIns().sid() + " | " + BootConfig.getIns().sname(), len, ' ') + " ]-\n")
+                    .append("    -[ " + StringUtils.padRight(JvmUtil.timeZone(), len, ' ') + " ]-\n");
+            stringAppend.append("\n");
+            log.warn(stringAppend.toString());
+        } catch (Throwable e) {
+            log.error("start error", e);
+            System.exit(1);
+        }
     }
 
 }

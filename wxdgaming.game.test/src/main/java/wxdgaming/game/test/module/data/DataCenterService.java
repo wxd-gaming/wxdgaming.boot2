@@ -16,6 +16,7 @@ import wxdgaming.boot2.starter.batis.sql.SqlQueryResult;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlService;
 import wxdgaming.game.test.bean.goods.BagPack;
 import wxdgaming.game.test.bean.role.Player;
+import wxdgaming.game.test.bean.role.RoleEntity;
 import wxdgaming.game.test.bean.task.TaskPack;
 
 import java.util.HashSet;
@@ -52,7 +53,7 @@ public class DataCenterService {
     public void start(@Value(path = "sid") int sid) {
         hexid = new HexId(sid);
         itemHexid = new HexId(sid);
-        String sql = "SELECT uid,sid,name,account FROM player where del=?";
+        String sql = "SELECT uid,sid,name,account FROM role where del=?";
         try (SqlQueryResult sqlQueryResult = pgsqlService.queryResultSet(sql, false)) {
             while (sqlQueryResult.hasNext()) {
                 JSONObject row = sqlQueryResult.row();
@@ -68,7 +69,8 @@ public class DataCenterService {
     }
 
     public Player player(long uid) {
-        return pgsqlService.getCacheService().cacheIfPresent(Player.class, uid);
+        RoleEntity roleEntity = pgsqlService.getCacheService().cacheIfPresent(RoleEntity.class, uid);
+        return roleEntity == null ? null : roleEntity.getPlayer();
     }
 
     public BagPack bagPack(long uid) {
