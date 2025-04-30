@@ -9,6 +9,7 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.collection.Table;
+import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.test.bean.goods.BagPack;
 import wxdgaming.game.test.bean.goods.Item;
@@ -151,7 +152,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
     private void gainItems(Player player, ItemBag itemBag, long serialNumber, List<Item> items, Object... args) {
         Iterator<Item> iterator = items.iterator();
 
-        String collect = Arrays.stream(args).map(String::valueOf).collect(Collectors.joining(" "));
+        String collect = Objects.toString(args);
 
         while (iterator.hasNext()) {
             Item newItem = iterator.next();

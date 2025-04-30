@@ -10,6 +10,7 @@ import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.starter.batis.DataHelper;
 import wxdgaming.boot2.starter.batis.Entity;
@@ -283,7 +284,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
                 connection.commit();
             return i;
         } catch (Exception e) {
-            throw Throw.of(getDbName() + " " + sql, e);
+            throw Throw.of(getDbName() + " " + sql + " " + Objects.toString(params), e);
         }
     }
 

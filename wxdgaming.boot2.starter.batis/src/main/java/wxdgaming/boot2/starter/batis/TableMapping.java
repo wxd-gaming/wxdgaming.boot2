@@ -270,7 +270,7 @@ public class TableMapping {
                             } else if (object instanceof ConfigString configString) {
                                 object = configString.getValue();
                             } else if (!(object instanceof String)) {
-                                object = FastJsonUtil.toJSONString(object, FastJsonUtil.Writer_Features_Type_Name_NOT_ROOT);
+                                object = FastJsonUtil.toJSONString(object, FastJsonUtil.Writer_Type_Name_Features_K_V_String);
                             }
                         }
                         case Json -> {
@@ -278,7 +278,7 @@ public class TableMapping {
                                 long[] longArray = bitSet.toLongArray();
                                 object = FastJsonUtil.toJSONString(longArray);
                             } else if (!(object instanceof String)) {
-                                object = FastJsonUtil.toJSONString(object, FastJsonUtil.Writer_Features);
+                                object = FastJsonUtil.toJSONString(object, FastJsonUtil.Writer_Type_Name_Features_K_V_String);
                             }
                         }
                         case Blob -> {

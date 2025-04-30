@@ -12,6 +12,7 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 数据对象合并
@@ -245,6 +246,10 @@ public class Objects {
             ints1[i] = ints[ints.length - i - 1];
         }
         return ints1;
+    }
+
+    public static String toString(Object... args) {
+        return Arrays.stream(args).map(String::valueOf).collect(Collectors.joining(" "));
     }
 
 }

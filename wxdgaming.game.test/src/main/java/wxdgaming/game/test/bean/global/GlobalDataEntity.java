@@ -3,6 +3,7 @@ package wxdgaming.game.test.bean.global;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
@@ -24,6 +25,7 @@ public class GlobalDataEntity extends Entity {
     @DbColumn(key = true)
     private int sid;
     private boolean merge;
+    @DbColumn(columnType = ColumnType.Json)
     private DataBase data;
 
     public GlobalDataType dataType() {

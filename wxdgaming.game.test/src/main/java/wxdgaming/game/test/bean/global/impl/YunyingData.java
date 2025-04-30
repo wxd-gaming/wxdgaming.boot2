@@ -4,7 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.game.test.bean.global.DataBase;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * 运营数据
@@ -17,8 +18,12 @@ import java.util.HashSet;
 public class YunyingData extends DataBase {
 
     /** 拥有gm权限的账号 */
-    private HashSet<String> gmAccountSet = new HashSet<>();
+    private ArrayList<String> gmAccountSet = new ArrayList<>();
     /** 拥有gm权限的角色id */
-    private HashSet<Long> gmPlayerIdSet = new HashSet<>();
+    private ArrayList<Long> gmPlayerIdSet = new ArrayList<>();
+    /** 禁止登录 */
+    private HashMap<String, Long> banLogin4AccountMap = new HashMap<>();
+    /** 禁止登录 */
+    private HashMap<Long, Long> banLogin4RidMap = new HashMap<>();
 
 }

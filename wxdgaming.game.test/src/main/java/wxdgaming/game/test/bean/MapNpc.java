@@ -14,6 +14,7 @@ import lombok.Setter;
 public class MapNpc extends MapObject {
 
     private int level;
+    private long exp;
     /** 血量 */
     private long hp;
     /** 魔法 */

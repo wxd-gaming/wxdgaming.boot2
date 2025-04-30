@@ -8,6 +8,7 @@ import io.netty.channel.ChannelFutureListener;
 import lombok.Getter;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.util.JwtUtils;
+import wxdgaming.boot2.core.util.RandomUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.SocketClientImpl;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
@@ -90,4 +91,18 @@ public class RobotMainService {
             }
         }
     }
+
+    /** 1秒一次主循环 */
+    @Scheduled(value = "*/5", async = true)
+    public void timer60() {
+        for (Robot robot : robotMap.values()) {
+            if (robot.isLoginEnd()) {
+                ReqChatMessage reqChatMessage = new ReqChatMessage();
+                reqChatMessage.setType(ChatType.Chat_TYPE_World);
+                reqChatMessage.setContent("@gm addexp " + RandomUtils.random(20, 100));
+                robot.getSocketSession().write(reqChatMessage);
+            }
+        }
+    }
+
 }

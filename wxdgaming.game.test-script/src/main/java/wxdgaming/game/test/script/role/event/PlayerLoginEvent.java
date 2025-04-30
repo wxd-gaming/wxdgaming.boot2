@@ -30,7 +30,7 @@ public class PlayerLoginEvent extends HoldRunApplication {
     /** 创建角色之后赠送初始化道具 */
     @Order(1)
     @OnLoginBefore
-    public void onLoginBefore(Player player, SocketSession socketSession) {
+    public void onLoginBefore(Player player) {
         log.info("玩家上线:{}, {}", player, player.getSocketSession());
         /*触发任务登录次数*/
         runApplication.executeMethodWithAnnotatedException(OnTask.class, player, TaskEvent.builder().k1("login").targetValue(1).build());
@@ -44,7 +44,7 @@ public class PlayerLoginEvent extends HoldRunApplication {
     /** 创建角色之后赠送初始化道具 */
     @Order(1)
     @OnLogin
-    public void onLogin(Player player, SocketSession socketSession) {
+    public void onLogin(Player player) {
         log.info("玩家上线:{}, {}", player, player.getSocketSession());
 
     }
