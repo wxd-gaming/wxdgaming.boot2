@@ -3,7 +3,7 @@ package gm;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.game.test.api.TestApi;
-import wxdgaming.game.test.script.gm.IGmDynamic;
+import wxdgaming.game.test.script.http.gm.dynamiccode.IGmDynamic;
 
 import java.lang.reflect.Field;
 

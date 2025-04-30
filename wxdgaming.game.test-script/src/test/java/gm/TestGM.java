@@ -1,7 +1,7 @@
 package gm;
 
 import wxdgaming.boot2.core.RunApplication;
-import wxdgaming.game.test.script.gm.IGmDynamic;
+import wxdgaming.game.test.script.http.gm.dynamiccode.IGmDynamic;
 
 public class TestGM implements IGmDynamic {
 

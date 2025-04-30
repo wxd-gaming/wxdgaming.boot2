@@ -44,7 +44,7 @@ public class RemoteRun {
         jsonObject.put("sign", "ABC");/*签名*/
         jsonObject.put("code", URLEncoder.encode(base64, StandardCharsets.UTF_8));/*代码*/
 
-        PostText postText = HttpBuilder.postJson("http://localhost:8000/gm/dynamic", jsonObject.toJSONString());
+        PostText postText = HttpBuilder.postJson("http://localhost:8000/888/dynamic", jsonObject.toJSONString());
         String string = postText.request().bodyString();
         System.out.println(string);
 
