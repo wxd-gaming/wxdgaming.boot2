@@ -117,4 +117,8 @@ public abstract class RunApplication {
         guiceReflectContext.executeMethodWithAnnotatedException(annotation, args);
     }
 
+    /** 所有bean里面的方法，添加了注解的 */
+    public Stream<GuiceReflectContext.MethodContent> withMethodAnnotated(Class<? extends Annotation> annotation) {
+        return guiceReflectContext.withMethodAnnotated(annotation, null);
+    }
 }
