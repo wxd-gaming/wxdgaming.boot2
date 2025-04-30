@@ -12,9 +12,9 @@ import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.bean.task.TaskInfo;
 import wxdgaming.game.test.bean.task.TaskPack;
 import wxdgaming.game.test.module.data.DataCenterService;
+import wxdgaming.game.test.script.event.OnTask;
 import wxdgaming.game.test.script.task.init.ConditionInitValueHandler;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -86,12 +86,13 @@ public class TaskService extends HoldRunApplication {
         }
     }
 
-    public void update(Player player, Serializable k1, Serializable k2, Serializable k3, long targetValue) {
+    @OnTask
+    public void update(Player player, TaskEvent taskEvent) {
         TaskPack taskPack = getTaskPack(player);
-        targetValue = replace(player, k1, k2, k3, targetValue);
+        replace(player, taskEvent);
         List<TaskInfo> changes = new ArrayList<>();
         for (ITaskScript taskScript : taskScriptImplHashMap.values()) {
-            taskScript.update(player, taskPack, changes, k1, k2, k3, targetValue);
+            taskScript.update(player, taskPack, changes, taskEvent);
         }
         /* TODO发送变更列表 */
         for (TaskInfo taskInfo : changes) {
@@ -99,8 +100,7 @@ public class TaskService extends HoldRunApplication {
         }
     }
 
-    long replace(Player player, Serializable k1, Serializable k2, Serializable k3, long targetValue) {
-        return targetValue;
+    void replace(Player player, TaskEvent taskEvent) {
     }
 
 }

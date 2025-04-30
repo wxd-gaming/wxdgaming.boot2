@@ -12,8 +12,10 @@ import wxdgaming.game.test.module.data.DataCenterService;
 import wxdgaming.game.test.script.event.OnLogin;
 import wxdgaming.game.test.script.event.OnLoginBefore;
 import wxdgaming.game.test.script.event.OnLogout;
+import wxdgaming.game.test.script.event.OnTask;
 import wxdgaming.game.test.script.role.message.ReqChooseRole;
 import wxdgaming.game.test.script.role.message.ResChooseRole;
+import wxdgaming.game.test.script.task.TaskEvent;
 
 import java.util.HashSet;
 
@@ -65,6 +67,7 @@ public class ReqChooseRoleHandler extends HoldRunApplication {
         runApplication.executeMethodWithAnnotatedException(OnLogin.class, player, 1, 1);
         log.info("sid={}, {} 选择角色成功", sid, player);
         dataCenterService.getOnlinePlayerGroup().add(socketSession.getChannel());
+
     }
 
 }

@@ -11,7 +11,6 @@ import wxdgaming.game.test.script.event.OnLogin;
 import wxdgaming.game.test.script.event.OnLoginBefore;
 import wxdgaming.game.test.script.goods.BagService;
 
-import java.io.Serializable;
 import java.util.*;
 
 public abstract class ITaskScript extends HoldRunApplication {
@@ -54,21 +53,20 @@ public abstract class ITaskScript extends HoldRunApplication {
     }
 
     /** 更新 */
-    public void update(Player player, TaskPack taskPack, List<TaskInfo> changes, Serializable k1, Serializable k2, Serializable k3, long targetValue) {
+    public void update(Player player, TaskPack taskPack, List<TaskInfo> changes, TaskEvent taskEvent) {
         Collection<TaskInfo> taskInfos = taskPack.getTasks().get(type()).values();
         for (TaskInfo taskInfo : taskInfos) {
             HashMap<Integer, Long> progresses = taskInfo.getProgresses();
             int completeSize = 0;
             Map<Integer, Long> taskTargets = new HashMap<>();
-            taskTargets.put(1, 1L);
-            /*TODO 这里应该读取配置表循环条件*/
+            taskTargets.put(1, 1L); /*TODO 这里应该读取配置表循环条件*/
             for (Map.Entry<Integer, Long> entry : taskTargets.entrySet()) {
                 Integer conditionId = entry.getKey();/*条件id*/
                 Long targetProgress = entry.getValue();/*条件完成目标*/
                 Condition condition = taskService.getCondition(conditionId);
-                if (condition.equals(k1, k2, k3)) {
+                if (condition.equals(taskEvent.getK1(), taskEvent.getK2(), taskEvent.getK3())) {
                     Long progress = progresses.getOrDefault(conditionId, 0L);
-                    long update = condition.getUpdateType().update(progress, targetValue);
+                    long update = condition.getUpdateType().update(progress, taskEvent.getTargetValue());
                     taskInfo.getProgresses().put(conditionId, update);
                     if (update >= targetProgress) {
                         completeSize++;
@@ -76,6 +74,7 @@ public abstract class ITaskScript extends HoldRunApplication {
                 }
             }
             if (completeSize > 0) {
+                /*如果有条件完成了，检查该任务是否所有条件都完成*/
                 completeSize = 0;
                 for (Map.Entry<Integer, Long> entry : taskTargets.entrySet()) {
                     Integer conditionId = entry.getKey();/*条件id*/

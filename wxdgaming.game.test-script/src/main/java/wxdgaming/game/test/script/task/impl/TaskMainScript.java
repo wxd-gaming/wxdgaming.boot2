@@ -6,6 +6,7 @@ import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.bean.task.TaskInfo;
 import wxdgaming.game.test.bean.task.TaskPack;
 import wxdgaming.game.test.script.task.ITaskScript;
+import wxdgaming.game.test.script.task.TaskEvent;
 
 import java.io.Serializable;
 import java.util.List;
@@ -43,8 +44,8 @@ public class TaskMainScript extends ITaskScript {
     }
 
     /** 更新 */
-    @Override public void update(Player player, TaskPack taskPack, List<TaskInfo> changes, Serializable k1, Serializable k2, Serializable k3, long targetValue) {
-        super.update(player, taskPack, changes, k1, k2, k3, targetValue);
+    @Override public void update(Player player, TaskPack taskPack, List<TaskInfo> changes, TaskEvent taskEvent) {
+        super.update(player, taskPack, changes, taskEvent);
     }
 
     /** 提交任务 */
