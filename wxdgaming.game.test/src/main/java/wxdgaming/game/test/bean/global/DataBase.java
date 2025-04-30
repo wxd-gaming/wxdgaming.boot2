@@ -12,7 +12,7 @@ import wxdgaming.boot2.core.lang.ObjectBase;
  **/
 @Getter
 @Setter
-public abstract class GlobalData extends ObjectBase {
+public abstract class DataBase extends ObjectBase {
 
 
 }

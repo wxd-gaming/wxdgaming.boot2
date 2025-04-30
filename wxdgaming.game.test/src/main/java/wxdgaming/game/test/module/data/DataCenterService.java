@@ -41,7 +41,6 @@ public class DataCenterService {
     final ConcurrentHashMap<String, Long> name2RidMap = new ConcurrentHashMap<>();
     /** 角色id和名字的映射 key:roleId, value:name */
     final ConcurrentHashMap<Long, String> rid2NameMap = new ConcurrentHashMap<>();
-
     final ChannelGroup onlinePlayerGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
     @Inject
