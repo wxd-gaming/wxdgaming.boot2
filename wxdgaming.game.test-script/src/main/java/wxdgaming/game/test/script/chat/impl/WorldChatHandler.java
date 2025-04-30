@@ -32,8 +32,7 @@ public class WorldChatHandler extends ChatHandler {
         return ChatType.Chat_TYPE_World;
     }
 
-    public void chat(SocketSession socketSession, ReqChatMessage req) {
-        Player player = socketSession.attribute("player");
+    public void chat(SocketSession socketSession, Player player, ReqChatMessage req) {
         ResChatMessage res = new ResChatMessage();
         res.setType(req.getType());
         res.setContent(req.getContent());

@@ -33,8 +33,7 @@ public class PrivateChatHandler extends ChatHandler {
         return ChatType.Chat_TYPE_Private;
     }
 
-    public void chat(SocketSession socketSession, ReqChatMessage req) {
-        Player player = socketSession.attribute("player");
+    public void chat(SocketSession socketSession, Player player, ReqChatMessage req) {
         Player targetPlayer = dataCenterService.player(req.getTargetId());
         if (targetPlayer == null) {
             tipsService.tips(socketSession, "目标玩家不存在");

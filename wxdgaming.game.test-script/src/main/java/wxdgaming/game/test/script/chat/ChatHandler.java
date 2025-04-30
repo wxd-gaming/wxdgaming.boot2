@@ -4,6 +4,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.starter.net.SocketSession;
+import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.script.chat.message.ChatType;
 import wxdgaming.game.test.script.chat.message.ReqChatMessage;
 import wxdgaming.game.test.script.tips.TipsService;
@@ -29,7 +30,7 @@ public class ChatHandler {
         return ChatType.Chat_TYPE_NONE;
     }
 
-    public void chat(SocketSession socketSession, ReqChatMessage req) {
+    public void chat(SocketSession socketSession, Player player, ReqChatMessage req) {
         tipsService.tips(socketSession, "暂未实现");
     }
 
