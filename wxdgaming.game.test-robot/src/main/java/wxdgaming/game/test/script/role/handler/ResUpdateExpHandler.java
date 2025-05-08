@@ -20,7 +20,7 @@ public class ResUpdateExpHandler {
     /** 更新经验 */
     @ProtoRequest
     public void resUpdateExp(SocketSession socketSession, ResUpdateExp req) {
-        Robot robot = socketSession.attribute("robot");
+        Robot robot = socketSession.bindData("robot");
         robot.setExp(req.getExp());
         log.info("{} 更新经验:{}", robot, req);
     }

@@ -3,6 +3,7 @@ package wxdgaming.game.test.bean.role;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.EntityLongUID;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
@@ -28,6 +29,7 @@ public class RoleEntity extends EntityLongUID {
     String account;
     @DbColumn(index = true)
     boolean del;
+    @DbColumn(length = Integer.MAX_VALUE)
     private Player player;
 
     @Override public void saveRefresh() {

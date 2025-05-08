@@ -17,9 +17,9 @@ import java.util.function.Supplier;
  **/
 @Getter
 public enum GlobalDataType {
-    None(0, "默认值", null),
-    ServerData(1, "全服数据", () -> new ServerData()),
-    YunyingData(11, "运营数据", () -> new YunyingData()),
+    None(0, "默认值", null, null),
+    SERVERDATA(1, "全服数据", ServerData.class, ServerData::new),
+    YUNYINGDATA(11, "运营数据", YunyingData.class, YunyingData::new),
     ;
 
     private static final Map<Integer, GlobalDataType> static_map = MapOf.ofMap(GlobalDataType::getCode, GlobalDataType.values());
@@ -36,11 +36,13 @@ public enum GlobalDataType {
 
     private final int code;
     private final String comment;
+    private final Class<? extends DataBase> dataClass;
     private final Supplier<DataBase> supplier;
 
-    GlobalDataType(int code, String comment, Supplier<DataBase> supplier) {
+    GlobalDataType(int code, String comment, Class<? extends DataBase> dataClass, Supplier<DataBase> supplier) {
         this.code = code;
         this.comment = comment;
+        this.dataClass = dataClass;
         this.supplier = supplier;
     }
 

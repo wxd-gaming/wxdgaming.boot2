@@ -292,7 +292,8 @@ public class GuiceReflectContext {
 
         public Object invoke(Object... args) {
             try {
-                log.debug("{}.{}", ins.getClass().getSimpleName(), this.method.getName());
+                if (log.isTraceEnabled())
+                    log.trace("{}.{}", ins.getClass().getSimpleName(), this.method.getName());
                 Object[] objects = GuiceReflectContext.this.injectorParameters(ins, method, args);
                 return method.invoke(ins, objects);
             } catch (Throwable throwable) {

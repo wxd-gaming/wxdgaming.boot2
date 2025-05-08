@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.test.bean.goods.ItemCfg;
 import wxdgaming.game.test.bean.role.Player;
-import wxdgaming.game.test.script.event.OnCreateRole;
+import wxdgaming.game.test.event.OnCreateRole;
 import wxdgaming.game.test.script.goods.BagService;
 
 import java.util.ArrayList;

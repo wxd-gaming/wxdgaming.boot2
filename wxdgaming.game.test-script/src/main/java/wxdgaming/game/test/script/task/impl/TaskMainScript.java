@@ -28,11 +28,11 @@ public class TaskMainScript extends ITaskScript {
 
     /** 初始化 */
     @Override public void initTask(Player player, TaskPack taskPack) {
-        Map<Integer, TaskInfo> integerTaskInfoMap = taskPack.getTasks().get(type());
-        if (integerTaskInfoMap == null || integerTaskInfoMap.isEmpty()) {
+        Map<Integer, TaskInfo> integerTaskInfoMap = taskPack.getTasks().row(type());
+        if (integerTaskInfoMap.isEmpty()) {
             TaskInfo taskInfo = new TaskInfo();
             taskInfo.setCfgId(1);
-            taskService.initTask(player, taskInfo, null/*TODO读取配置表*/);
+            taskService.initTask(player, taskInfo, Map.of()/*TODO读取配置表*/);
             taskPack.getTasks().put(type(), taskInfo.getCfgId(), taskInfo);
             log.info("{} 初始化任务：{}", player, taskInfo);
         }

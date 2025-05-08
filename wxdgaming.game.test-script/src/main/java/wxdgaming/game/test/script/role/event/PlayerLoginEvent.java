@@ -5,12 +5,13 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Order;
+import wxdgaming.boot2.core.lang.bit.BitFlag;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.boot2.starter.net.SocketSession;
+import wxdgaming.game.test.bean.StatusConst;
 import wxdgaming.game.test.bean.role.Player;
-import wxdgaming.game.test.script.event.OnLogin;
-import wxdgaming.game.test.script.event.OnLoginBefore;
-import wxdgaming.game.test.script.event.OnTask;
+import wxdgaming.game.test.event.OnLogin;
+import wxdgaming.game.test.event.OnLoginBefore;
+import wxdgaming.game.test.event.OnTask;
 import wxdgaming.game.test.script.task.TaskEvent;
 
 /**
@@ -32,6 +33,8 @@ public class PlayerLoginEvent extends HoldRunApplication {
     @OnLoginBefore
     public void onLoginBefore(Player player) {
         log.info("玩家上线:{}, {}", player, player.getSocketSession());
+        player.setStatus(new BitFlag());
+        player.getStatus().addFlags(StatusConst.Online);
         /*触发任务登录次数*/
         runApplication.executeMethodWithAnnotatedException(OnTask.class, player, TaskEvent.builder().k1("login").targetValue(1).build());
         if (!MyClock.isSameDay(player.getLastLoginTime())) {

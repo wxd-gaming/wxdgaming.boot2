@@ -4,15 +4,13 @@ import com.alibaba.fastjson.annotation.JSONField;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.starter.batis.ColumnType;
-import wxdgaming.boot2.starter.batis.ann.DbColumn;
-import wxdgaming.boot2.starter.batis.ann.DbTable;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.game.test.bean.MapKey;
 import wxdgaming.game.test.bean.MapNpc;
 import wxdgaming.game.test.bean.Vector3D;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -28,15 +26,11 @@ public class Player extends MapNpc {
     /** 是否已经删除 */
     private boolean del;
     private int sid;
-    @DbColumn(index = true, length = 64)
     private String account;
-    @DbColumn(columnType = ColumnType.Json, length = 2048)
     private HashMap<String, Object> clientData = new HashMap<>();
     /** 上一次进入的地图 */
-    @DbColumn(columnType = ColumnType.Json, length = 128)
     private MapKey lastMapKey;
     /** 上一次所在地图坐标， */
-    @DbColumn(columnType = ColumnType.Json, length = 128)
     private Vector3D lastPosition = new Vector3D();
     private long lastLoginTime;
     /** 朝向 */
@@ -45,7 +39,8 @@ public class Player extends MapNpc {
     private int job;
     private Int2IntOpenHashMap useCDKeyMap = new Int2IntOpenHashMap();
 
-    @DbColumn(ignore = true)
+    @JSONField(serialize = false, deserialize = false)
+    private transient ArrayList<Runnable> eventList = new ArrayList<>();
     @JSONField(serialize = false, deserialize = false)
     private transient SocketSession socketSession;
 

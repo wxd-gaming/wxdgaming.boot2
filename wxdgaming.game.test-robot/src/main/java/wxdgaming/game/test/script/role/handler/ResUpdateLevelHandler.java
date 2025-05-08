@@ -20,7 +20,7 @@ public class ResUpdateLevelHandler {
     /** 更新等级 */
     @ProtoRequest
     public void resUpdateLevel(SocketSession socketSession, ResUpdateLevel req) {
-        Robot robot = socketSession.attribute("robot");
+        Robot robot = socketSession.bindData("robot");
         robot.setLevel(req.getLevel());
         log.info("{} 更新等级:{}", robot, req);
     }

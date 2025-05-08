@@ -79,21 +79,25 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
                         while (iterator.hasNext()) {
                             Int2ObjectMap.Entry<CacheHolder<V>> next = iterator.next();
                             CacheHolder<V> holder = next.getValue();
-                            if (millis > holder.getExpireEndTime()) {
-                                boolean remove = true;
-                                if (holder.getValue() == null && LRUIntCache.this.removalListener != null) {
-                                    /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                                    remove = LRUIntCache.this.removalListener.apply(next.getIntKey(), holder.getValue());
+                            try {
+                                if (millis > holder.getExpireEndTime()) {
+                                    boolean remove = true;
+                                    if (holder.getValue() == null && LRUIntCache.this.removalListener != null) {
+                                        /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                                        remove = LRUIntCache.this.removalListener.apply(next.getIntKey(), holder.getValue());
+                                    }
+                                    if (remove)
+                                        iterator.remove();
+                                    else
+                                        refresh(holder);/*移除缓存失败刷新一次*/
+                                } else {
+                                    if (holder.getValue() == null && LRUIntCache.this.heartListener != null && millis > holder.getLastHeartTime()) {
+                                        /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                                        LRUIntCache.this.heartListener.accept(next.getIntKey(), holder.getValue());
+                                    }
                                 }
-                                if (remove)
-                                    iterator.remove();
-                                else
-                                    refresh(holder);/*移除缓存失败刷新一次*/
-                            } else {
-                                if (holder.getValue() == null && LRUIntCache.this.heartListener != null && millis > holder.getLastHeartTime()) {
-                                    /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                                    LRUIntCache.this.heartListener.accept(next.getIntKey(), holder.getValue());
-                                }
+                            } catch (Exception e) {
+                                log.error("CASCache 心跳异常 {}", holder.getValue(), e);
                             }
                         }
                     } finally {
@@ -243,8 +247,12 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
                     int intKey = entry.getIntKey();
                     CacheHolder<V> holder = entry.getValue();
                     if (LRUIntCache.this.removalListener != null && holder.getValue() != null) {
-                        /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                        LRUIntCache.this.removalListener.apply(intKey, holder.getValue());
+                        try {
+                            /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                            LRUIntCache.this.removalListener.apply(intKey, holder.getValue());
+                        } catch (Exception e) {
+                            log.error("removalListener 执行异常 {}", holder.getValue(), e);
+                        }
                     }
                 }
                 node.clear();

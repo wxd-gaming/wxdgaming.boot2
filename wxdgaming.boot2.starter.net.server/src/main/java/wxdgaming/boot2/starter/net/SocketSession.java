@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter.net;
 
+import com.alibaba.fastjson.JSONObject;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -43,6 +44,7 @@ public class SocketSession {
     /** 帧最大字节数 */
     private long maxFrameBytes = -1;
     private final TickCount receiveMessageTick = new TickCount(1000);
+    private final JSONObject bindData = new JSONObject();
 
     public SocketSession(Type type, Channel channel, Boolean webSocket, boolean enabledScheduledFlush) {
         this.uid = ATOMIC_LONG.get();
@@ -53,12 +55,13 @@ public class SocketSession {
         ChannelUtil.attr(this.channel, ChannelUtil.SOCKET_SESSION_KEY, this);
     }
 
-    public <R> R attribute(String key) {
-        return ChannelUtil.attr(this.channel, key);
+    public <R> R bindData(String key) {
+        return (R) bindData.get(key);
     }
 
-    public void attribute(String key, Object value) {
-        ChannelUtil.attr(this.channel, key, value);
+    public SocketSession bindData(String key, Object value) {
+        bindData.put(key, value);
+        return this;
     }
 
     public String getIP() {
@@ -136,9 +139,10 @@ public class SocketSession {
 
     @Override public String toString() {
         return """
-                【%s - %s%s%s】""".formatted(
+                【%s - %s%s%s%s】""".formatted(
                 type.name(),
                 ChannelUtil.ctxTostring(channel),
+                getBindData().isEmpty() ? "" : ", bindData: " + getBindData().entrySet().stream().map(v->v.getKey() + "=" + v.getValue()).reduce((a,b)->a + "," + b).orElse(""),
                 isWebSocket() ? ", websocket" : "",
                 isSsl() ? ", ssl" : ""
         );

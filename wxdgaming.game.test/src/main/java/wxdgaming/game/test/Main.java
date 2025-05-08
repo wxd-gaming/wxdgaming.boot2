@@ -1,28 +1,20 @@
 package wxdgaming.game.test;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
 import wxdgaming.boot2.core.reflect.ReflectContext;
-import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 import wxdgaming.boot2.starter.RunApplicationMain;
 import wxdgaming.boot2.starter.RunApplicationSub;
 import wxdgaming.boot2.starter.WxdApplication;
 import wxdgaming.boot2.starter.batis.sql.pgsql.MysqlScan;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
 import wxdgaming.boot2.starter.net.SocketScan;
-import wxdgaming.boot2.starter.net.SocketSession;
-import wxdgaming.boot2.starter.net.client.SocketClient;
-import wxdgaming.boot2.starter.net.module.inner.RpcService;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 
 import java.io.File;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class Main {
@@ -36,31 +28,7 @@ public class Main {
                 MysqlScan.class,
                 Main.class
         );
-
-        /* script.jar */
-        String classDir = "script.jar";
-        ClassDirLoader classDirLoader;
-        if (new File(classDir).exists()) {
-            try {
-                classDirLoader = new ClassDirLoader(classDir);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            try {
-                new JavaCoderCompile().parentClassLoader(Main.class.getClassLoader())
-                        .compilerJava("wxdgaming.game.test-script/src/main/java")
-                        .outPutFile("target/bin", true);
-                classDirLoader = new ClassDirLoader("target/bin");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        ReflectContext reflectContext = ReflectContext.Builder.of(classDirLoader, "wxdgaming.game.test.script").build();
-        RunApplicationSub runApplicationSub = WxdApplication.createRunApplicationSub(reflectContext);
-        runApplicationSub.executeMethodWithAnnotated(Init.class);
-        log.info("热更新重载");
-
+        loadScript();
         runApplication.start();
 
         // ExecutorUtilImpl.getInstance().getBasicExecutor().schedule(
@@ -99,6 +67,34 @@ public class Main {
         //         TimeUnit.SECONDS
         // );
 
+    }
+
+    public static void loadScript() {
+
+        /* script.jar */
+        String classDir = "script.jar";
+        ClassDirLoader classDirLoader;
+        if (new File(classDir).exists()) {
+            try {
+                classDirLoader = new ClassDirLoader(classDir);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try {
+                new JavaCoderCompile().parentClassLoader(Main.class.getClassLoader())
+                        .compilerJava("wxdgaming.game.test-script/src/main/java")
+                        .outPutFile("target/bin", true);
+                classDirLoader = new ClassDirLoader("target/bin");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        ReflectContext reflectContext = ReflectContext.Builder.of(classDirLoader, "wxdgaming.game.test.script").build();
+        RunApplicationSub runApplicationSub = WxdApplication.createRunApplicationSub(reflectContext);
+        runApplicationSub.executeMethodWithAnnotated(Init.class);
+        log.info("加载脚本模块完成");
     }
 
 }

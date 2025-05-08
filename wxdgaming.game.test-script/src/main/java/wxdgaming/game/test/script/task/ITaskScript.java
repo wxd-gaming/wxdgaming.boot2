@@ -7,8 +7,8 @@ import wxdgaming.game.test.bean.goods.ItemCfg;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.bean.task.TaskInfo;
 import wxdgaming.game.test.bean.task.TaskPack;
-import wxdgaming.game.test.script.event.OnLogin;
-import wxdgaming.game.test.script.event.OnLoginBefore;
+import wxdgaming.game.test.event.OnLogin;
+import wxdgaming.game.test.event.OnLoginBefore;
 import wxdgaming.game.test.script.goods.BagService;
 
 import java.util.*;
@@ -54,7 +54,7 @@ public abstract class ITaskScript extends HoldRunApplication {
 
     /** 更新 */
     public void update(Player player, TaskPack taskPack, List<TaskInfo> changes, TaskEvent taskEvent) {
-        Collection<TaskInfo> taskInfos = taskPack.getTasks().get(type()).values();
+        Collection<TaskInfo> taskInfos = taskPack.getTasks().row(type()).values();
         for (TaskInfo taskInfo : taskInfos) {
             HashMap<Integer, Long> progresses = taskInfo.getProgresses();
             int completeSize = 0;

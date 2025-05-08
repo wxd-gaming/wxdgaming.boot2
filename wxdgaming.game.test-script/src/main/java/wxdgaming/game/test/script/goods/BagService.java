@@ -17,17 +17,15 @@ import wxdgaming.game.test.bean.goods.ItemBag;
 import wxdgaming.game.test.bean.goods.ItemCfg;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.module.data.DataCenterService;
-import wxdgaming.game.test.script.event.OnCreateRole;
-import wxdgaming.game.test.script.event.OnLogin;
-import wxdgaming.game.test.script.event.OnLoginBefore;
+import wxdgaming.game.test.event.OnCreateRole;
+import wxdgaming.game.test.event.OnLogin;
+import wxdgaming.game.test.event.OnLoginBefore;
 import wxdgaming.game.test.script.goods.gain.GainScript;
 import wxdgaming.game.test.script.tips.TipsService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 背包逻辑脚本

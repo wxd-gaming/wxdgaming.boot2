@@ -5,14 +5,13 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.ObjectLockUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.bean.role.RoleEntity;
 import wxdgaming.game.test.module.data.DataCenterService;
-import wxdgaming.game.test.script.event.OnCreateRole;
+import wxdgaming.game.test.event.OnCreateRole;
 import wxdgaming.game.test.script.role.PlayerService;
 import wxdgaming.game.test.script.role.message.ReqCreateRole;
 import wxdgaming.game.test.script.tips.TipsService;
@@ -44,8 +43,8 @@ public class ReqCreateRoleHandler extends HoldRunApplication {
     @ProtoRequest
     public void reqCreateRole(SocketSession socketSession, ReqCreateRole req) {
 
-        String account = socketSession.attribute("account");
-        Integer sid = socketSession.attribute("sid");
+        Integer sid = socketSession.getBindData().getInteger("sid");
+        String account = socketSession.getBindData().getString("account");
 
         HashSet<Long> longs = dataCenterService.getAccount2RidsMap().get(sid, account);
         if (longs != null && longs.size() >= 10) {

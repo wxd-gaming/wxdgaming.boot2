@@ -18,7 +18,7 @@ import wxdgaming.boot2.starter.batis.ann.DbColumn;
 public class EntityLongUID extends Entity {
 
     @DbColumn(key = true)
-    @JSONField(ordinal = 1)
+    @JSONField(ordinal = -9999)
     private long uid = 0;
 
     public int intUid() {

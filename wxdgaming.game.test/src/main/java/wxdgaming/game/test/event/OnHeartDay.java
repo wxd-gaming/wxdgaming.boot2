@@ -1,15 +1,15 @@
-package wxdgaming.game.test.script.event;
+package wxdgaming.game.test.event;
 
 import java.lang.annotation.*;
 
 /**
- * 触发任务
+ * 跨天
  *
  * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-30 13:34
+ * @version: 2025-05-08 13:15
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface OnTask {
+public @interface OnHeartDay {
 }

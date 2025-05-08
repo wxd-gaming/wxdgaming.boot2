@@ -32,7 +32,7 @@ public class ReqUseCdKeyHandler {
     @ProtoRequest
     @ExecutorWith(queueName = "use-cdKey")
     public void reqUseCdKey(SocketSession socketSession, ReqUseCdKey req) {
-        Player player = socketSession.attribute("player");
+        Player player = socketSession.bindData("player");
         cdKeyService.use(player, req.getCdKey());
     }
 

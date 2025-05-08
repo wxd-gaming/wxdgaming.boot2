@@ -19,7 +19,7 @@ public class ResHeartbeatHandler {
     /** null */
     @ProtoRequest
     public void resHeartbeat(SocketSession socketSession, ResHeartbeat req) {
-        Object robot = socketSession.attribute("robot");
+        Object robot = socketSession.bindData("robot");
         if (log.isDebugEnabled()) {
             log.debug("{} 心跳成功 {}", robot, req.getTimestamp());
         }

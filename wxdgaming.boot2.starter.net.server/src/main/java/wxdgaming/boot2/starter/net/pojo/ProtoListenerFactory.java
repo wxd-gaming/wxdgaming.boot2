@@ -51,16 +51,19 @@ public class ProtoListenerFactory {
         }
         /*根据映射解析生成触发事件*/
         ProtoListenerTrigger protoListenerTrigger = new ProtoListenerTrigger(mapping, protoListenerContent.getRunApplication(), socketSession, messageId, data);
-        if (log.isDebugEnabled()) {
-            log.debug("收到消息：{} {} {}", socketSession, messageId, protoListenerTrigger.getPojoBase());
-        }
         boolean allMatch = protoFilters.stream().allMatch(filter -> filter.doFilter(protoListenerTrigger));
         if (!allMatch) {
+            if (log.isDebugEnabled()) {
+                log.debug("收到消息：{} msgId={}, {} - 被过滤器剔除无需执行", socketSession, messageId, protoListenerTrigger.getPojoBase());
+            }
             return;
         }
         if (StringUtils.isBlank(protoListenerTrigger.getQueueName())) {
             /*这里相当于绑定每个session的队列*/
             protoListenerTrigger.setQueueName("session-" + String.valueOf(socketSession.getChannel().id().asShortText().hashCode() % 16));
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("收到消息：{} queue={}, msgId={}, {}", socketSession, protoListenerTrigger.getQueueName(), messageId, protoListenerTrigger.getPojoBase());
         }
         /*提交到对应的线程和队列*/
         protoListenerTrigger.submit();

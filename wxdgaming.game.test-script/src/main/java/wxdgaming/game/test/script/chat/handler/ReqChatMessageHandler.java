@@ -41,10 +41,10 @@ public class ReqChatMessageHandler {
     /** 请求聊天 */
     @ProtoRequest
     public void reqChatMessage(SocketSession socketSession, ReqChatMessage req) {
-        Player player = socketSession.attribute("player");
+        Player player = socketSession.bindData("player");
         String content = req.getContent();
         if (content.startsWith("@gm")) {
-            YunyingData yunyingData = globalDataService.get(GlobalDataType.YunyingData);
+            YunyingData yunyingData = globalDataService.get(GlobalDataType.YUNYINGDATA);
             if (BootConfig.getIns().isDebug()
                 || yunyingData.getGmAccountSet().contains(player.getAccount())
                 || yunyingData.getGmPlayerIdSet().contains(player.getUid())) {

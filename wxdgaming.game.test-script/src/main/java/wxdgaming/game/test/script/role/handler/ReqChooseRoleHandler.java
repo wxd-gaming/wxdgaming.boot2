@@ -8,14 +8,12 @@ import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.test.bean.role.Player;
+import wxdgaming.game.test.event.OnLogin;
+import wxdgaming.game.test.event.OnLoginBefore;
+import wxdgaming.game.test.event.OnLogout;
 import wxdgaming.game.test.module.data.DataCenterService;
-import wxdgaming.game.test.script.event.OnLogin;
-import wxdgaming.game.test.script.event.OnLoginBefore;
-import wxdgaming.game.test.script.event.OnLogout;
-import wxdgaming.game.test.script.event.OnTask;
 import wxdgaming.game.test.script.role.message.ReqChooseRole;
 import wxdgaming.game.test.script.role.message.ResChooseRole;
-import wxdgaming.game.test.script.task.TaskEvent;
 
 import java.util.HashSet;
 
@@ -40,8 +38,8 @@ public class ReqChooseRoleHandler extends HoldRunApplication {
     @ProtoRequest
     public void reqChooseRole(SocketSession socketSession, ReqChooseRole req) {
         long rid = req.getRid();
-        Integer sid = socketSession.attribute("sid");
-        String account = socketSession.attribute("account");
+        Integer sid = socketSession.bindData("sid");
+        String account = socketSession.bindData("account");
         HashSet<Long> longs = dataCenterService.getAccount2RidsMap().get(sid, account);
         if (longs == null || !longs.contains(rid)) {
             /*选择角色错误*/
@@ -58,7 +56,7 @@ public class ReqChooseRoleHandler extends HoldRunApplication {
             }
         });
         /*绑定*/
-        socketSession.attribute("player", player);
+        socketSession.bindData("player", player);
         log.info("sid={}, {} 触发登录之前校验事件", sid, player);
         runApplication.executeMethodWithAnnotatedException(OnLoginBefore.class, player);
         ResChooseRole resChooseRole = new ResChooseRole();

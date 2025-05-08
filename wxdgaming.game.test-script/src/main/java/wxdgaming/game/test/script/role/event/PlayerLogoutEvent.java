@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.test.bean.StatusConst;
 import wxdgaming.game.test.bean.role.Player;
-import wxdgaming.game.test.script.event.OnLogout;
+import wxdgaming.game.test.event.OnLogout;
 
 /**
  * 角色创建事件
@@ -24,7 +24,7 @@ public class PlayerLogoutEvent {
     /** 创建角色之后赠送初始化道具 */
     @OnLogout
     public void onLogout(Player player) {
-        log.info("玩家下线:{}, {}", player, player.getSocketSession());
+        log.info("玩家下线: {}", player.getSocketSession());
         player.setSocketSession(null);
         player.getStatus().addFlags(StatusConst.Offline);
     }

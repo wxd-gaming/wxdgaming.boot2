@@ -31,7 +31,7 @@ public class ReqAcceptTaskHandler {
     /** 接受任务 */
     @ProtoRequest
     public void reqAcceptTask(SocketSession socketSession, ReqAcceptTask req) {
-        Player player = socketSession.attribute("player");
+        Player player = socketSession.bindData("player");
         int taskType = req.getTaskType().getCode();
         int taskId = req.getTaskId();
         TaskPack taskPack = taskService.getTaskPack(player);

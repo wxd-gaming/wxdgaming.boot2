@@ -80,21 +80,25 @@ public class LRULongCache<V> extends Cache<Long, V> {
                         while (iterator.hasNext()) {
                             Long2ObjectMap.Entry<CacheHolder<V>> next = iterator.next();
                             CacheHolder<V> holder = next.getValue();
-                            if (millis > holder.getExpireEndTime()) {
-                                boolean remove = true;
-                                if (holder.getValue() != null && LRULongCache.this.removalListener != null) {
-                                    /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                                    remove = LRULongCache.this.removalListener.apply(next.getLongKey(), holder.getValue());
+                            try {
+                                if (millis > holder.getExpireEndTime()) {
+                                    boolean remove = true;
+                                    if (holder.getValue() != null && LRULongCache.this.removalListener != null) {
+                                        /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                                        remove = LRULongCache.this.removalListener.apply(next.getLongKey(), holder.getValue());
+                                    }
+                                    if (remove)
+                                        iterator.remove();
+                                    else
+                                        refresh(holder);/*移除缓存失败刷新一次*/
+                                } else {
+                                    if (holder.getValue() != null && LRULongCache.this.heartListener != null && millis > holder.getLastHeartTime()) {
+                                        /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                                        LRULongCache.this.heartListener.accept(next.getLongKey(), holder.getValue());
+                                    }
                                 }
-                                if (remove)
-                                    iterator.remove();
-                                else
-                                    refresh(holder);/*移除缓存失败刷新一次*/
-                            } else {
-                                if (holder.getValue() != null && LRULongCache.this.heartListener != null && millis > holder.getLastHeartTime()) {
-                                    /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                                    LRULongCache.this.heartListener.accept(next.getLongKey(), holder.getValue());
-                                }
+                            } catch (Exception e) {
+                                log.error("CASCache 心跳异常 {}", holder.getValue(), e);
                             }
                         }
                     } finally {
@@ -240,8 +244,12 @@ public class LRULongCache<V> extends Cache<Long, V> {
                     long longKey = entry.getLongKey();
                     CacheHolder<V> holder = entry.getValue();
                     if (LRULongCache.this.removalListener != null && holder.getValue() != null) {
-                        /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                        LRULongCache.this.removalListener.apply(longKey, holder.getValue());
+                        try {
+                            /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                            LRULongCache.this.removalListener.apply(longKey, holder.getValue());
+                        } catch (Exception e) {
+                            log.error("removalListener 执行异常 {}", holder.getValue(), e);
+                        }
                     }
                 }
                 node.clear();

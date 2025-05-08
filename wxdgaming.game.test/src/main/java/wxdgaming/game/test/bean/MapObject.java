@@ -23,7 +23,6 @@ public class MapObject extends GameBase {
         Item,
     }
 
-    @DbColumn(columnType = ColumnType.Json, length = 64)
     private MapKey mapKey;
 
     private Vector3D position = new Vector3D();
@@ -33,7 +32,6 @@ public class MapObject extends GameBase {
     private int cfgId;
     private String name;
     private MapObjectType mapObjectType;
-    @DbColumn(ignore = true)
     private BitFlag status = new BitFlag();
 
     @Override public String toString() {

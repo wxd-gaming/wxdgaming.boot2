@@ -69,21 +69,25 @@ public class CASCache<K, V> extends Cache<K, V> {
                     while (iterator.hasNext()) {
                         Map.Entry<K, CacheHolder<V>> next = iterator.next();
                         CacheHolder<V> holder = next.getValue();
-                        if (millis > holder.getExpireEndTime()) {
-                            boolean remove = true;
-                            if (holder.getValue() != null && CASCache.this.removalListener != null) {
-                                /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                                remove = CASCache.this.removalListener.apply(next.getKey(), holder.getValue());
+                        try {
+                            if (millis > holder.getExpireEndTime()) {
+                                boolean remove = true;
+                                if (holder.getValue() != null && CASCache.this.removalListener != null) {
+                                    /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                                    remove = CASCache.this.removalListener.apply(next.getKey(), holder.getValue());
+                                }
+                                if (remove)
+                                    iterator.remove();
+                                else
+                                    refresh(holder);/*移除缓存失败刷新一次*/
+                            } else {
+                                if (holder.getValue() != null && CASCache.this.heartListener != null && millis > holder.getLastHeartTime()) {
+                                    /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                                    CASCache.this.heartListener.accept(next.getKey(), holder.getValue());
+                                }
                             }
-                            if (remove)
-                                iterator.remove();
-                            else
-                                refresh(holder);/*移除缓存失败刷新一次*/
-                        } else {
-                            if (holder.getValue() != null && CASCache.this.heartListener != null && millis > holder.getLastHeartTime()) {
-                                /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                                CASCache.this.heartListener.accept(next.getKey(), holder.getValue());
-                            }
+                        } catch (Exception e) {
+                            log.error("CASCache 心跳异常 {}", holder.getValue(), e);
                         }
                     }
                 }
@@ -178,8 +182,12 @@ public class CASCache<K, V> extends Cache<K, V> {
                 K key = next.getKey();
                 CacheHolder<V> holder = next.getValue();
                 if (holder.getValue() != null && CASCache.this.removalListener != null) {
-                    /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                    CASCache.this.removalListener.apply(key, holder.getValue());
+                    try {
+                        /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                        CASCache.this.removalListener.apply(key, holder.getValue());
+                    } catch (Exception e) {
+                        log.error("removalListener 执行异常 {}", holder.getValue(), e);
+                    }
                 }
                 iterator.remove();
             }

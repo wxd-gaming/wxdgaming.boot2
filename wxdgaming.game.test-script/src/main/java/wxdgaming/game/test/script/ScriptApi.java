@@ -14,6 +14,9 @@ import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
+
 /**
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-14 19:22
@@ -30,6 +33,15 @@ public class ScriptApi {
                         @Body(defaultValue = "1") String body,
                         @Param(path = "b1", defaultValue = "2") int b1) {
         return "index";
+    }
+
+    @HttpRequest()
+    public RunResult stop() {
+        Thread.ofPlatform().start(() -> {
+            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
+            System.exit(1);
+        });
+        return RunResult.ok();
     }
 
     @HttpRequest()

@@ -40,7 +40,7 @@ public final class RunApplicationMain extends RunApplication {
 
             JvmUtil.addShutdownHook(() -> {
                 System.out.println("--------------------------shutdown---------------------------");
-                executeMethodWithAnnotated(shutdown.class);
+                executeMethodWithAnnotatedException(shutdown.class);
             });
 
             StringBuilder stringAppend = new StringBuilder(1024);

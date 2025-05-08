@@ -10,10 +10,10 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.chatset.json.ParameterizedTypeImpl;
 import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.boot2.core.lang.TimeValue;
+import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.FieldUtil;
 import wxdgaming.boot2.core.reflect.MethodUtil;
 import wxdgaming.boot2.core.reflect.ReflectContext;
-import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.starter.batis.ann.Convert;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
@@ -164,14 +164,10 @@ public class TableMapping {
             if (fieldMapping.length == 0)
                 fieldMapping.length = 65535;
             fieldMapping.columnType = ColumnType.Blob;
-        } else if (String.class.isAssignableFrom(type)
-                   || Enum.class.isAssignableFrom(type)
-                   || ConfigString.class.isAssignableFrom(type)) {
-            if (fieldMapping.length == 0)
-                fieldMapping.length = 256;
-            fieldMapping.columnType = ColumnType.String;
         } else {
-            fieldMapping.columnType = ColumnType.Json;
+            if (fieldMapping.length == 0)
+                fieldMapping.length = 255;
+            fieldMapping.columnType = ColumnType.String;
         }
     }
 
@@ -270,7 +266,7 @@ public class TableMapping {
                             } else if (object instanceof ConfigString configString) {
                                 object = configString.getValue();
                             } else if (!(object instanceof String)) {
-                                object = FastJsonUtil.toJSONString(object, FastJsonUtil.Writer_Type_Name_Features_K_V_String);
+                                object = FastJsonUtil.toJSONString(object, FastJsonUtil.Writer_Features_Type_Name);
                             }
                         }
                         case Json -> {
@@ -278,7 +274,7 @@ public class TableMapping {
                                 long[] longArray = bitSet.toLongArray();
                                 object = FastJsonUtil.toJSONString(longArray);
                             } else if (!(object instanceof String)) {
-                                object = FastJsonUtil.toJSONString(object, FastJsonUtil.Writer_Type_Name_Features_K_V_String);
+                                object = FastJsonUtil.toJSONString(object, FastJsonUtil.Writer_Features_Type_Name);
                             }
                         }
                         case Blob -> {

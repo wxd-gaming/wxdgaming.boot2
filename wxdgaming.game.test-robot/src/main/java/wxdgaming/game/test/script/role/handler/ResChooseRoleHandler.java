@@ -20,7 +20,7 @@ public class ResChooseRoleHandler {
     /** 选择角色响应 */
     @ProtoRequest
     public void resChooseRole(SocketSession socketSession, ResChooseRole req) {
-        Robot robot = socketSession.attribute("robot");
+        Robot robot = socketSession.bindData("robot");
         robot.setLoginEnd(true);
     }
 

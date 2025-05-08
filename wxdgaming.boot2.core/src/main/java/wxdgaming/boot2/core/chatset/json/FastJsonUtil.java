@@ -46,6 +46,8 @@ public class FastJsonUtil {
     /** 包含类型字段，全部转换成字符串的json */
     public static final SerializerFeature[] Writer_Type_Name_Features_Key_String;
     /** 包含类型字段，全部转换成字符串的json */
+    public static final SerializerFeature[] Writer_Type_Name_Features_Value_String;
+    /** 包含类型字段，全部转换成字符串的json */
     public static final SerializerFeature[] Writer_Type_Name_Features_K_V_String;
     /**
      * 这个是会给所有的值对象加入引号，不管是否是字符串；
@@ -72,7 +74,7 @@ public class FastJsonUtil {
                 SerializerFeature.WriteNullStringAsEmpty,           /*String字段如果为null,输出为"",而非null*/
                 SerializerFeature.SkipTransientField,               /*忽律 transient*/
                 SerializerFeature.WriteEnumUsingName,               /*枚举用 toString() */
-                SerializerFeature.IgnoreNonFieldGetter,             /*忽略 没有 get 属性 继续写入*/
+                // SerializerFeature.IgnoreNonFieldGetter,             /*忽略 没有 get 属性 继续写入*/
                 SerializerFeature.DisableCircularReferenceDetect,   /*屏蔽循环引用*/
                 SerializerFeature.SortField,                        /*排序*/
                 SerializerFeature.MapSortField                      /*排序*/
@@ -95,8 +97,8 @@ public class FastJsonUtil {
         Writer_Features_K_V_String = Objects.merge(Writer_Features_Key_String, SerializerFeature.WriteNonStringValueAsString);/*所有的 value 都用引号*/
 
         Writer_Type_Name_Features_Key_String = Objects.merge(Writer_Features_Type_Name, SerializerFeature.WriteNonStringKeyAsString);/*所有的 key 都用引号*/
-        Writer_Type_Name_Features_K_V_String = Objects.merge(Writer_Type_Name_Features_Key_String, SerializerFeature.WriteNonStringValueAsString);/*所有的 value 都用引号*/
-
+        Writer_Type_Name_Features_Value_String = Objects.merge(Writer_Features_Type_Name, SerializerFeature.WriteNonStringValueAsString);/*所有的 key 都用引号*/
+        Writer_Type_Name_Features_K_V_String = Objects.merge(Writer_Features_Type_Name, SerializerFeature.WriteNonStringKeyAsString, SerializerFeature.WriteNonStringValueAsString);/*所有的 value 都用引号*/
 
         Writer_Features_Fmt_Key_String = Objects.merge(Writer_Features_Key_String, SerializerFeature.PrettyFormat);/*所有的 key 都用引号*/
         Writer_Features_Fmt_K_V_String = Objects.merge(Writer_Features_K_V_String, SerializerFeature.PrettyFormat);/*所有的 value 都用引号*/

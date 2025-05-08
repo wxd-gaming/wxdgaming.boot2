@@ -40,7 +40,7 @@ public class RobotMainService {
 
     @Start
     public void start() {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 2; i++) {
             String account = "test" + (i + 1);
             robotMap.put(account, new Robot().setAccount(account).setName(account));
         }
@@ -67,7 +67,7 @@ public class RobotMainService {
                             robot.setSocketSession(null);
                         }
                     });
-                    connect.attribute("robot", robot);
+                    connect.bindData("robot", robot);
 
                     connect.write(new ReqLogin().setAccount(robot.getAccount()).setSid(1).setToken(token));
 

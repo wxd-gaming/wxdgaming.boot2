@@ -31,7 +31,7 @@ public class ReqSubmitTaskHandler {
     /** 提交任务 */
     @ProtoRequest
     public void reqSubmitTask(SocketSession socketSession, ReqSubmitTask req) {
-        Player player = socketSession.attribute("player");
+        Player player = socketSession.bindData("player");
         int taskType = req.getTaskType().getCode();
         int taskId = req.getTaskId();
         TaskPack taskPack = taskService.getTaskPack(player);

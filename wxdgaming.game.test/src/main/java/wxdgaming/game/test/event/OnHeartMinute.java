@@ -1,14 +1,15 @@
-package wxdgaming.game.test.script.event;
+package wxdgaming.game.test.event;
 
 import java.lang.annotation.*;
 
 /**
- * 登录事件
+ * 每分钟
  *
  * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-22 11:31
+ * @version: 2025-05-08 13:15
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface OnLogout {}
+public @interface OnHeartMinute {
+}

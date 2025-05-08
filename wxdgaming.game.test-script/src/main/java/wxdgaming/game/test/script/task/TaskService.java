@@ -12,7 +12,7 @@ import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.bean.task.TaskInfo;
 import wxdgaming.game.test.bean.task.TaskPack;
 import wxdgaming.game.test.module.data.DataCenterService;
-import wxdgaming.game.test.script.event.OnTask;
+import wxdgaming.game.test.event.OnTask;
 import wxdgaming.game.test.script.task.init.ConditionInitValueHandler;
 
 import java.util.ArrayList;

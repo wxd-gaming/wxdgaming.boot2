@@ -19,7 +19,7 @@ public class ResChatMessageHandler {
     /** 聊天响应 */
     @ProtoRequest
     public void resChatMessage(SocketSession socketSession, ResChatMessage req) {
-        Object robot = socketSession.attribute("robot");
+        Object robot = socketSession.bindData("robot");
         log.info("{} 收到聊天响应：{}", robot, req);
     }
 

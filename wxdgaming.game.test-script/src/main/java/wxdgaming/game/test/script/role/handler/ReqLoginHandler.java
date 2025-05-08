@@ -46,8 +46,10 @@ public class ReqLoginHandler extends HoldRunApplication {
             String platform = claimsJws.getPayload().get("platform", String.class);
             String channel = claimsJws.getPayload().get("channel", String.class);
 
-            socketSession.attribute("account", account);
-            socketSession.attribute("sid", sid);
+            socketSession
+                    .bindData("sid", sid)
+                    .bindData("account", account)
+                    .bindData("platform", platform);
 
             playerService.sendPlayerList(socketSession, sid, account);
 

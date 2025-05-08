@@ -25,7 +25,7 @@ public class ResLoginHandler {
     /** 登录响应 */
     @ProtoRequest
     public void resLogin(SocketSession socketSession, ResLogin req) {
-        Robot robot = socketSession.attribute("robot");
+        Robot robot = socketSession.bindData("robot");
         log.info("登录响应:{}", req);
         List<RoleBean> roles = req.getRoles();
         if (roles.isEmpty()) {

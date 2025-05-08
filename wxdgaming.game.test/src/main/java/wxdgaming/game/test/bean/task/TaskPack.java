@@ -1,9 +1,11 @@
 package wxdgaming.game.test.bean.task;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
+import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.starter.batis.EntityLongUID;
+import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
 
 import java.util.ArrayList;
@@ -21,8 +23,12 @@ import java.util.HashMap;
 public class TaskPack extends EntityLongUID {
 
     /** 任务完成ID key:任务类型, value: 完成的id集合 */
+    @JSONField(ordinal = 11)
+    @DbColumn(length = Integer.MAX_VALUE)
     private HashMap<Integer, ArrayList<Integer>> taskFinishList = new HashMap<>();
     /** key:任务类型, value: 任务列表 */
-    private ConcurrentTable<Integer, Integer, TaskInfo> tasks = new ConcurrentTable<>();
+    @JSONField(ordinal = 12)
+    @DbColumn(length = Integer.MAX_VALUE)
+    private Table<Integer, Integer, TaskInfo> tasks = new Table<>();
 
 }

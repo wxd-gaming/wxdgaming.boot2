@@ -1,4 +1,4 @@
-package wxdgaming.game.test.script.event;
+package wxdgaming.game.test.event;
 
 import java.lang.annotation.*;
 
