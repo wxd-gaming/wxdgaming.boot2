@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.lang.condition;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -23,6 +24,7 @@ public class ConditionProgress implements Serializable {
     /** 当前进度 */
     private long progress;
 
+    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public boolean isFinish() {
         return false;

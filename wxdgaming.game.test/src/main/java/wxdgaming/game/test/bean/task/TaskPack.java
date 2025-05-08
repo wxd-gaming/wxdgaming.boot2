@@ -3,7 +3,7 @@ package wxdgaming.game.test.bean.task;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.collection.Table;
+import wxdgaming.boot2.core.collection.ints.IntIntObjectTable;
 import wxdgaming.boot2.starter.batis.EntityLongUID;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
@@ -29,6 +29,6 @@ public class TaskPack extends EntityLongUID {
     /** key:任务类型, value: 任务列表 */
     @JSONField(ordinal = 12)
     @DbColumn(length = Integer.MAX_VALUE)
-    private Table<Integer, Integer, TaskInfo> tasks = new Table<>();
+    private IntIntObjectTable<TaskInfo> tasks = new IntIntObjectTable<>();
 
 }

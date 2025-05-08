@@ -3,9 +3,12 @@ package code;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.collect.Lists;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import com.google.common.collect.Maps;
+import lombok.Getter;
+import lombok.Setter;
 import org.junit.Test;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.game.test.bean.global.GlobalDataEntity;
 import wxdgaming.game.test.bean.global.impl.YunyingData;
 import wxdgaming.game.test.bean.role.Player;
@@ -16,7 +19,7 @@ import wxdgaming.game.test.bean.task.TaskPack;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class JsonTypeStringTest {
+public class FastJsonTypeStringTest {
 
     @Test
     public void t1() {
@@ -61,11 +64,65 @@ public class JsonTypeStringTest {
         System.out.println(JSON.toJSONString(taskPack));
         System.out.println(FastJsonUtil.toJSONString(taskPack, new SerializerFeature[0]));
         System.out.println(taskPack.toString());
-        String jsonString = FastJsonUtil.toJSONString(taskPack, FastJsonUtil.Writer_Features_Type_Name);
+        String jsonString = FastJsonUtil.toJsonFmtWriteType(taskPack);
         System.out.println(jsonString);
         TaskPack parse = FastJsonUtil.parse(jsonString, TaskPack.class);
-        System.out.println(parse);
+        System.out.println(FastJsonUtil.toJsonFmtWriteType(parse));
     }
 
+    @Test
+    public void t5() {
+        Pack pack = new Pack();
+        HashMap<Long, String> value = Maps.newHashMap();
+        value.put(1L, "1");
+        pack.intIntObjectTable.put(1, 1, 1);
+        pack.table.put(1, value);
+        System.out.println(JSON.toJSONString(pack));
+        System.out.println(FastJsonUtil.toJSONString(pack, new SerializerFeature[0]));
+        System.out.println(pack.toString());
+        String jsonString = FastJsonUtil.toJSONString(pack, FastJsonUtil.Writer_Type_Name_Features_K_V_String);
+        System.out.println(jsonString);
+        Pack parse = FastJsonUtil.parse(jsonString, Pack.class);
+        System.out.println(parse.toString());
+    }
+
+    @Getter
+    @Setter
+    public static class Pack extends ObjectBase {
+        HashMap<Integer, HashMap<Long, String>> table = new HashMap<>();
+        IntIntIntTable intIntObjectTable = new IntIntIntTable();
+    }
+
+    @Getter
+    @Setter
+    public static class IntIntIntTable {
+
+        private final HashMap<Integer, HashMap<Integer, Integer>> nodes = new HashMap<>();
+
+        public HashMap<Integer, Integer> row(Integer r) {
+            return nodes.computeIfAbsent(r, k -> new HashMap<>());
+        }
+
+        public Integer put(Integer r, Integer c, Integer v) {
+            return row(r).put(c, v);
+        }
+
+    }
+
+    @Getter
+    @Setter
+    public static class IntIntObjectTable<V> {
+
+        private final HashMap<Integer, HashMap<Integer, V>> nodes = new HashMap<>();
+
+        public HashMap<Integer, V> row(Integer r) {
+            return nodes.computeIfAbsent(r, k -> new HashMap<>());
+        }
+
+        public V put(Integer r, Integer c, V v) {
+            return row(r).put(c, v);
+        }
+
+    }
 
 }

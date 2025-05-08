@@ -1,15 +1,16 @@
 package wxdgaming.boot2.starter.excel.store;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.format.StreamWriter;
 import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.lang.ObjectBase;
+import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.FieldUtil;
 import wxdgaming.boot2.core.reflect.ReflectContext;
-import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.util.ConvertUtil;
 
 import java.io.Serial;
@@ -108,17 +109,20 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
         return dataMap.containsKey(key);
     }
 
+    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public int dbSize() {
         return this.dataList.size();
     }
 
     /** 初始化，做一些构建相关的操作 */
+    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public void initDb() {
     }
 
     /** 检查数据合法性 */
+    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public void checkData(Map<Class<?>, DataTable<?>> store) {
     }

@@ -81,7 +81,7 @@ public class FastJsonUtil {
         };
 
         Reader_Features = new Feature[]{
-                Feature.OrderedField,
+                // Feature.OrderedField,
                 Feature.SupportAutoType
         };
 

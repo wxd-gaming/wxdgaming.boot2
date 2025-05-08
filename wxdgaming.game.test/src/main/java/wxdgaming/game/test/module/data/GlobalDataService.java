@@ -56,7 +56,7 @@ public class GlobalDataService extends HoldRunApplication {
                         new GlobalDataEntity()
                                 .setId(type.getCode())
                                 .setSid(sid)
-                                .setData(type.getSupplier().get())
+                                .setData(type.getFactory().get())
         ).getData();
         return (T) data;
     }

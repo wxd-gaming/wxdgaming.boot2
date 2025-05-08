@@ -1,6 +1,7 @@
 package wxdgaming.game.test.bean.role;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,8 +40,10 @@ public class Player extends MapNpc {
     private int job;
     private Int2IntOpenHashMap useCDKeyMap = new Int2IntOpenHashMap();
 
+    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient ArrayList<Runnable> eventList = new ArrayList<>();
+    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient SocketSession socketSession;
 

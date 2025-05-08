@@ -1,6 +1,7 @@
 package wxdgaming.game.test.bean.buff;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -25,11 +26,13 @@ public class Buff extends ObjectBase {
     private long endTime;
     private int interval;
 
+    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public boolean checkStart() {
         return MyClock.millis() > startTime;
     }
 
+    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public boolean checkEnd() {
         return MyClock.millis() > endTime;

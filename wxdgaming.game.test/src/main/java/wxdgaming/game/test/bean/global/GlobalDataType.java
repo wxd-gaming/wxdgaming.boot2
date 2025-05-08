@@ -37,13 +37,13 @@ public enum GlobalDataType {
     private final int code;
     private final String comment;
     private final Class<? extends DataBase> dataClass;
-    private final Supplier<DataBase> supplier;
+    private final Supplier<DataBase> factory;
 
-    GlobalDataType(int code, String comment, Class<? extends DataBase> dataClass, Supplier<DataBase> supplier) {
+    GlobalDataType(int code, String comment, Class<? extends DataBase> dataClass, Supplier<DataBase> factory) {
         this.code = code;
         this.comment = comment;
         this.dataClass = dataClass;
-        this.supplier = supplier;
+        this.factory = factory;
     }
 
 }
