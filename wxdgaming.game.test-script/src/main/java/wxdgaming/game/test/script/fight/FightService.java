@@ -34,8 +34,14 @@ public class FightService extends HoldRunApplication {
         actionImplMap = map;
     }
 
-    public void changeHp(Player player, long change) {
-
+    public void changeHp(Player player, long change, String msg) {
+        long oldHp = player.getHp();
+        player.setHp(oldHp + change);
+        if (player.getHp() > player.maxHp()) {
+            player.setHp(player.maxHp());
+        }
+        log.info("{} 改变血量 {} -> {} -> {}, 原因: {}", player, oldHp, change, player.getHp(), msg);
+        player.sendHp();
     }
 
     public List<MapNpc> selectAttack(MapNpc player) {

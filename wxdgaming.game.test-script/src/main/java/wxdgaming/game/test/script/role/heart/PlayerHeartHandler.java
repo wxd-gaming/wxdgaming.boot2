@@ -1,10 +1,12 @@
 package wxdgaming.game.test.script.role.heart;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.threading.ThreadContext;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.event.*;
+import wxdgaming.game.test.script.fight.FightService;
 
 /**
  * 角色的心跳执行
@@ -16,6 +18,13 @@ import wxdgaming.game.test.event.*;
 @Singleton
 public class PlayerHeartHandler {
 
+    final FightService fightService;
+
+    @Inject
+    public PlayerHeartHandler(FightService fightService) {
+        this.fightService = fightService;
+    }
+
     @OnHeart
     public void onHeart(Player player, long mille) {
         // log.info("onHeart:{}", player);
@@ -24,6 +33,11 @@ public class PlayerHeartHandler {
     @OnHeartSecond
     public void onHeartSecond(Player player, int second) {
         // log.info("onHeartSecond: {} {} {}", second, player, ThreadContext.context().queueName());
+        if (second % 10 == 0) {
+            if (player.getHp() < player.maxHp()) {
+                fightService.changeHp(player, 10, "心跳回血");
+            }
+        }
     }
 
     @OnHeartMinute
