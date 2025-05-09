@@ -76,7 +76,7 @@ socket:
     writeByteBufM: 12                                          #发送缓冲区大小 单位MB
 data:
   json:
-    path: "json"
+    path: "cfg_json"
     scan: "wxdgaming.game.test.cfg"
 db:
   pgsql:

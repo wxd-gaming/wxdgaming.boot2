@@ -34,10 +34,13 @@ public class PlayerCreateEvent {
         log.info("角色创建:{}", player);
         ItemCfg.ItemCfgBuilder builder = ItemCfg.builder();
         List<ItemCfg> rewards = new ArrayList<>();
-        rewards.add(builder.cfgId(10001).count(100).build());
-        rewards.add(builder.cfgId(30001).count(100).build());
+        rewards.add(builder.cfgId(1).count(100).build());
+        rewards.add(builder.cfgId(2).count(100).build());
+        rewards.add(builder.cfgId(3).count(10000).build());
+        rewards.add(builder.cfgId(4).count(10000).build());
+        rewards.add(builder.cfgId(5).count(1).build());
         long serialNumber = System.nanoTime();
-        bagService.gainItems4Cfg(player, serialNumber, rewards, "赠送初始化道具:", 1001);
+        bagService.gainItems4Cfg(player, serialNumber, rewards, "创角赠送道具:", 1001);
     }
 
 }

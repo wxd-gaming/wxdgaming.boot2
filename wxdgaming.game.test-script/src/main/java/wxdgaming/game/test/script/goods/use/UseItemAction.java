@@ -1,6 +1,7 @@
 package wxdgaming.game.test.script.goods.use;
 
 import wxdgaming.game.test.bean.goods.Item;
+import wxdgaming.game.test.bean.goods.ItemTypeConst;
 import wxdgaming.game.test.bean.role.Player;
 
 /**
@@ -9,11 +10,9 @@ import wxdgaming.game.test.bean.role.Player;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-04-22 17:27
  **/
-public abstract class IUseItem {
+public abstract class UseItemAction {
 
-    public abstract int type();
-
-    public abstract int subType();
+    public abstract ItemTypeConst type();
 
     public abstract boolean canUse(Player player, Item item);
 

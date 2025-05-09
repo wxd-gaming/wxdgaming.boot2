@@ -1,14 +1,17 @@
 package wxdgaming.game.test.script.goods.gain;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
-import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.game.test.bean.goods.Item;
 import wxdgaming.game.test.bean.goods.ItemBag;
 import wxdgaming.game.test.bean.goods.ItemCfg;
+import wxdgaming.game.test.bean.goods.ItemTypeConst;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.module.data.DataCenterService;
+import wxdgaming.game.test.script.goods.BagService;
+import wxdgaming.game.test.script.role.PlayerService;
 
 import java.util.List;
 
@@ -22,19 +25,13 @@ import java.util.List;
 @Singleton
 public class GainScript extends HoldRunApplication {
 
-    DataCenterService dataCenterService;
+    @Inject protected DataCenterService dataCenterService;
+    @Inject protected PlayerService playerService;
+    @Inject protected BagService bagService;
 
-    @Init
-    public void init(DataCenterService dataCenterService) {
-        this.dataCenterService = dataCenterService;
-    }
 
-    public int type() {
-        return 0;
-    }
-
-    public int subType() {
-        return 0;
+    public ItemTypeConst type() {
+        return ItemTypeConst.NONE;
     }
 
     /** 创建道具 */
@@ -68,7 +65,7 @@ public class GainScript extends HoldRunApplication {
     }
 
     /** 将道具添加进入背包 */
-    public boolean gain(Player player, ItemBag itemBag, long serialNumber, Item newItem) {
+    public boolean gain(Player player, ItemBag itemBag, long serialNumber, Item newItem, Object... args) {
         long count = newItem.getCount();
         for (Item value : itemBag.getItems()) {
             /* TODO 叠加 */
@@ -91,7 +88,7 @@ public class GainScript extends HoldRunApplication {
         /* TODO 叠加过后剩余的 */
         newItem.setCount(count);
         if (count > 0) {
-            if (itemBag.isFull()) {
+            if (itemBag.checkFull()) {
                 /* TODO 背包已满 */
                 return false;
             }

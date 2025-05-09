@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.test.bean.goods.Item;
 import wxdgaming.game.test.bean.goods.ItemBag;
 import wxdgaming.game.test.bean.goods.ItemCfg;
+import wxdgaming.game.test.bean.goods.ItemTypeConst;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.script.goods.gain.GainScript;
 
@@ -20,12 +21,8 @@ import java.util.List;
 @Singleton
 public class CurrencyGainScript extends GainScript {
 
-    @Override public int type() {
-        return 1;
-    }
-
-    @Override public int subType() {
-        return super.subType();
+    @Override public ItemTypeConst type() {
+        return ItemTypeConst.CurrencyType;
     }
 
     @Override public void newItem(List<Item> items, ItemCfg itemCfg) {
@@ -39,7 +36,7 @@ public class CurrencyGainScript extends GainScript {
         return itemBag.getCurrencyMap().getOrDefault(cfgId, 0L);
     }
 
-    @Override public boolean gain(Player player, ItemBag itemBag, long serialNumber, Item newItem) {
+    @Override public boolean gain(Player player, ItemBag itemBag, long serialNumber, Item newItem, Object... args) {
         int cfgId = newItem.getCfgId();
         long count = newItem.getCount();
         itemBag.getCurrencyMap().merge(cfgId, count, Math::addExact);

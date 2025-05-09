@@ -25,7 +25,7 @@ public class BagPack extends EntityLongUID {
 
     public boolean isFull() {
         ItemBag itemBag = items.get(1);
-        return itemBag.isFull();
+        return itemBag.checkFull();
     }
 
     public int freeGrid() {

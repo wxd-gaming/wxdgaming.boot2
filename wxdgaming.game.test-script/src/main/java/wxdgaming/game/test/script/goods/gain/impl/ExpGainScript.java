@@ -8,24 +8,27 @@ import wxdgaming.game.test.bean.goods.ItemTypeConst;
 import wxdgaming.game.test.bean.role.Player;
 
 /**
- * 公会货币的获得
+ * 货币的获得
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-04-23 17:35
  **/
 @Slf4j
 @Singleton
-public class GuildCurrencyGainScript extends CurrencyGainScript {
+public class ExpGainScript extends CurrencyGainScript {
 
     @Override public ItemTypeConst type() {
-        return ItemTypeConst.GuildCurrencyType;
+        return ItemTypeConst.EXP;
     }
 
     @Override public long gainCount(Player player, ItemBag itemBag, int cfgId) {
-        return super.gainCount(player, itemBag, cfgId);
+        return player.getExp();
     }
 
     @Override public boolean gain(Player player, ItemBag itemBag, long serialNumber, Item newItem, Object... args) {
-        return super.gain(player, itemBag, serialNumber, newItem);
+        long count = newItem.getCount();
+        playerService.addExp(player, count, args);
+        return true;
     }
+
 }

@@ -56,10 +56,16 @@ public class Player extends MapNpc {
     }
 
     public void write(PojoBase pojoBase) {
+        if (!checkOnline()) {
+            return;
+        }
         getSocketSession().write(pojoBase);
     }
 
     public void writeAndFlush(PojoBase pojoBase) {
+        if (!checkOnline()) {
+            return;
+        }
         getSocketSession().writeAndFlush(pojoBase);
     }
 

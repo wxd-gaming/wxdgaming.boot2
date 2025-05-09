@@ -43,6 +43,9 @@ public class TipsService {
 
     public void tips(SocketSession socketSession, TipsType tipsType, String tips, List<String> params, Class<? extends PojoBase> responseClass) {
         log.info("提示: {}", tips);
+        if (socketSession == null) {
+            return;
+        }
         ResTips resTips = new ResTips();
         resTips.setType(tipsType);
         resTips.setContent(tips);

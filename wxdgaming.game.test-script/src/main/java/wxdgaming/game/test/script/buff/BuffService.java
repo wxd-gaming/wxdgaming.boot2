@@ -16,7 +16,7 @@ import wxdgaming.game.test.event.OnHeart;
 public class BuffService {
 
     @OnHeart
-    public void onHeartBuffAction(MapNpc mapNpc, int second) {
+    public void onHeartBuffAction(MapNpc mapNpc, long mill) {
 
     }
 

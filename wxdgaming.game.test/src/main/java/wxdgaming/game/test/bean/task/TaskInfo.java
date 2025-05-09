@@ -3,6 +3,7 @@ package wxdgaming.game.test.bean.task;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import wxdgaming.boot2.core.lang.ObjectBase;
 
 import java.util.HashMap;
 
@@ -15,7 +16,7 @@ import java.util.HashMap;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class TaskInfo {
+public class TaskInfo extends ObjectBase {
 
     private int cfgId;
 

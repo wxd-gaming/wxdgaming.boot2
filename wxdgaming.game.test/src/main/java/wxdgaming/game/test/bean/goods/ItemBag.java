@@ -34,7 +34,7 @@ public class ItemBag {
         this.initGrid = initGrid;
     }
 
-    public boolean isFull() {
+    public boolean checkFull() {
         return freeGrid() < 1;
     }
 
