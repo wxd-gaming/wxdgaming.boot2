@@ -74,6 +74,10 @@ socket:
     readTimeout: 0
     recvByteBufM: 12                                           #接收缓冲区大小 单位MB
     writeByteBufM: 12                                          #发送缓冲区大小 单位MB
+data:
+  json:
+    path: "json"
+    scan: "wxdgaming.game.test.cfg"
 db:
   pgsql:
     debug: false                                                 #调试模式将会显示sql语句

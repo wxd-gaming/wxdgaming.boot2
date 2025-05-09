@@ -23,7 +23,7 @@ public class PlayerHeartHandler {
 
     @OnHeartSecond
     public void onHeartSecond(Player player, int second) {
-        log.info("onHeartSecond:{} {}", player, ThreadContext.context().queueName());
+        log.info("onHeartSecond: {} {} {}", second, player, ThreadContext.context().queueName());
     }
 
     @OnHeartMinute

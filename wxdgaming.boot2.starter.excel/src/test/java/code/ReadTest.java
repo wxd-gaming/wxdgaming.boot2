@@ -21,7 +21,7 @@ public class ReadTest {
 
     @Test
     public void t10() {
-        ExcelRepository excelReader = new ExcelRepository();
+        ExcelRepository excelReader = ExcelRepository.getIns();
         excelReader.readExcel(Paths.get("src/main/resources/范例.xlsx"), "");
         excelReader.outJsonFile("target/out/json");
         excelReader.getTableInfoMap().values().forEach(tableInfo -> {
@@ -53,7 +53,7 @@ public class ReadTest {
     @Test
     public void createExcelCode() {
         System.out.println(JvmUtil.userHome());
-        ExcelRepository excelReader = new ExcelRepository();
+        ExcelRepository excelReader = ExcelRepository.getIns();
         excelReader.readExcel(Paths.get("src/main/resources/范例.xlsx"), "");
         excelReader.getTableInfoMap().values().forEach(tableInfo -> {
             CreateJavaCode.getIns().createCode(tableInfo, "src/test/java", "wxdgaming.entity", "");
