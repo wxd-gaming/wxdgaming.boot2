@@ -7,4 +7,9 @@ package wxdgaming.game.test.bean;
  * @version: 2025-04-15 17:36
  **/
 public class MapMonster extends MapNpc {
+
+    public MapMonster() {
+        this.setMapObjectType(MapObjectType.Monster);
+    }
+
 }

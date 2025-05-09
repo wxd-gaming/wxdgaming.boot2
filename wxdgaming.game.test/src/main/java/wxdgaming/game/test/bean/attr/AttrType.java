@@ -14,11 +14,13 @@ import java.util.Map;
  **/
 @Getter
 public enum AttrType {
-    HP(1, "血量"),
-    MAXHP(2, "最大血量"),
+    HP(1, "生命"),
+    MAXHP(2, "最大生命"),
     体力(3, "体力"),
     攻击(4, "攻击力"),
     防御(5, "防御"),
+    MP(101, "魔法"),
+    MAXMP(102, "最大魔法"),
     ;
 
     private static final Map<Integer, AttrType> static_map = MapOf.ofMap(AttrType::getCode, AttrType.values());

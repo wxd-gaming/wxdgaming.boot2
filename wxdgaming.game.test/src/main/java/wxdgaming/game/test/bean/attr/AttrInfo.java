@@ -11,8 +11,19 @@ import java.util.HashMap;
  **/
 public class AttrInfo extends HashMap<AttrType, Long> {
 
+    public AttrInfo() {
+    }
+
+    public AttrInfo(AttrInfo attrInfo) {
+        this.append(attrInfo);
+    }
+
     @Override public Long get(Object key) {
         return super.getOrDefault(key, 0L);
+    }
+
+    public void append(AttrInfo attrInfo) {
+        attrInfo.forEach((k, v) -> this.merge(k, v, Math::addExact));
     }
 
     public Long add(AttrType attrType, Long value) {

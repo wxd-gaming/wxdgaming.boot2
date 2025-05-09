@@ -1,0 +1,17 @@
+syntax = "proto3";
+//把文件拆分
+option java_multiple_files = true;
+//导出包名
+option java_package = "wxdgaming.game.test.script";
+
+//属性
+message AttrBean {
+  int32 attrId                        = 1;//属性id
+  int64 value                         = 2;//属性值
+}
+
+//更新属性
+message ResUpdateAttr {
+  int64 uid                           = 1;//变更的场景对象id
+  repeated AttrBean attrs             = 2;//属性列表
+}

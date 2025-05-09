@@ -75,3 +75,8 @@ message ResUpdateExp {
 message ResUpdateLevel {
   int32 level                         = 1;//当前等级
 }
+
+//更新战斗力
+message ResUpdateFightValue {
+  int64 fightValue                    = 1;//当前战斗力
+}

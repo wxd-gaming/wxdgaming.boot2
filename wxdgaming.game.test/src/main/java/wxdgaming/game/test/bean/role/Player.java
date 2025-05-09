@@ -10,6 +10,9 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.game.test.bean.MapKey;
 import wxdgaming.game.test.bean.MapNpc;
 import wxdgaming.game.test.bean.Vector3D;
+import wxdgaming.game.test.bean.attr.AttrType;
+import wxdgaming.game.test.script.global.message.AttrBean;
+import wxdgaming.game.test.script.global.message.ResUpdateAttr;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,6 +56,28 @@ public class Player extends MapNpc {
 
     public boolean checkOnline() {
         return getSocketSession() != null && getSocketSession().isOpen();
+    }
+
+    /** 推送生命变化 */
+    public void sendHp() {
+        if (!checkOnline()) {
+            return;
+        }
+        ResUpdateAttr resUpdateAttr = new ResUpdateAttr();
+        resUpdateAttr.getAttrs().add(new AttrBean().setAttrId(AttrType.HP.getCode()).setValue(getHp()));
+        resUpdateAttr.getAttrs().add(new AttrBean().setAttrId(AttrType.MAXHP.getCode()).setValue(maxHp()));
+        write(resUpdateAttr);
+    }
+
+    /** 推送魔法变化 */
+    public void sendMp() {
+        if (!checkOnline()) {
+            return;
+        }
+        ResUpdateAttr resUpdateAttr = new ResUpdateAttr();
+        resUpdateAttr.getAttrs().add(new AttrBean().setAttrId(AttrType.MP.getCode()).setValue(getMp()));
+        resUpdateAttr.getAttrs().add(new AttrBean().setAttrId(AttrType.MAXMP.getCode()).setValue(maxMp()));
+        write(resUpdateAttr);
     }
 
     public void write(PojoBase pojoBase) {
