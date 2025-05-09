@@ -4,6 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import wxdgaming.boot2.core.Throw;
+import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.format.StreamWriter;
 import wxdgaming.boot2.core.io.FileReadUtil;
@@ -49,6 +50,9 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
         }
         jsonPath += dataMapping.name() + ".json";
         String json = FileReadUtil.readString(jsonPath);
+        if (StringUtils.isBlank(json)) {
+            throw new RuntimeException("加载配置表：" + this.getClass().getSimpleName() + " 查询文件失败：" + jsonPath);
+        }
         return setModelList(FastJsonUtil.parseArray(json, tClass));
     }
 

@@ -1,6 +1,5 @@
 package wxdgaming.boot2.starter.excel.store;
 
-import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -23,13 +22,18 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Getter
 @Accessors(chain = true)
-@Singleton
 public class DataRepository {
+
+    @Getter private static final DataRepository ins = new DataRepository();
+
     private String jsonPath;
     private String scanPackageName;
     @Setter private ClassLoader classLoader;
     /** 存储数据表 */
     private Map<Class<?>, DataTable<?>> dataTableMap = new ConcurrentHashMap<>();
+
+    private DataRepository() {
+    }
 
     public <D extends DataKey, T extends DataTable<D>> T dataTable(Class<T> dataTableClass) {
         return (T) dataTableMap.computeIfAbsent(dataTableClass, k -> buildDataTable(k));
@@ -57,12 +61,8 @@ public class DataRepository {
         ReflectContext reflectContext = ReflectContext.Builder.of(classLoader, scanPackageName).build();
         reflectContext.classWithSuper(DataTable.class, null)
                 .forEach(dataTableClass -> {
-                    try {
-                        DataTable<?> dataTable = buildDataTable(dataTableClass);
-                        tmpDataTableMap.put(dataTableClass, dataTable);
-                    } catch (Exception e) {
-                        log.error("load data table error", e);
-                    }
+                    DataTable<?> dataTable = buildDataTable(dataTableClass);
+                    tmpDataTableMap.put(dataTableClass, dataTable);
                 });
         for (DataTable<?> dataTable : tmpDataTableMap.values()) {
             dataTable.checkData(tmpDataTableMap);

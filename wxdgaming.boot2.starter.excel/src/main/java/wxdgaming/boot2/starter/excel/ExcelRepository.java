@@ -1,6 +1,5 @@
 package wxdgaming.boot2.starter.excel;
 
-import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -16,8 +15,6 @@ import wxdgaming.boot2.core.util.ConvertUtil;
 import wxdgaming.boot2.starter.excel.store.ICreateCode;
 
 import java.io.InputStream;
-import java.io.Serial;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -34,14 +31,16 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 @Slf4j
 @Getter
-@Singleton
-public class ExcelRepository implements Serializable {
+public class ExcelRepository {
 
-    @Serial private static final long serialVersionUID = 1L;
+    @Getter private static final ExcelRepository ins = new ExcelRepository();
 
     private final String[] String_Split = {"[,，]", "[:：]"};
 
     private final Map<String, TableData> tableInfoMap = new ConcurrentHashMap<>();
+
+    private ExcelRepository() {
+    }
 
     public Optional<TableData> tableData(String tableName) {
         return Optional.ofNullable(tableInfoMap.get(tableName));

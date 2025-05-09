@@ -11,7 +11,9 @@ import wxdgaming.game.test.bean.global.impl.YunyingData;
 import wxdgaming.game.test.bean.task.TaskInfo;
 import wxdgaming.game.test.bean.task.TaskPack;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class JacksonTypeStringTest {
 

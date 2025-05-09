@@ -11,8 +11,12 @@ import wxdgaming.boot2.starter.RunApplicationSub;
 import wxdgaming.boot2.starter.WxdApplication;
 import wxdgaming.boot2.starter.batis.sql.pgsql.MysqlScan;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
+import wxdgaming.boot2.starter.excel.DataExcelScan;
+import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.boot2.starter.net.SocketScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
+import wxdgaming.game.test.cfg.QPlayerTable;
+import wxdgaming.game.test.cfg.bean.QPlayer;
 
 import java.io.File;
 
@@ -20,17 +24,25 @@ import java.io.File;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        RunApplicationMain runApplication = WxdApplication.run(
-                CoreScan.class,
-                ScheduledScan.class,
-                SocketScan.class,
-                PgsqlScan.class,
-                MysqlScan.class,
-                Main.class
-        );
-        loadScript();
-        runApplication.start();
-
+        try {
+            RunApplicationMain runApplication = WxdApplication.run(
+                    CoreScan.class,
+                    DataExcelScan.class,
+                    ScheduledScan.class,
+                    SocketScan.class,
+                    PgsqlScan.class,
+                    MysqlScan.class,
+                    Main.class
+            );
+            loadScript();
+            runApplication.start();
+            QPlayerTable qPlayerTable = DataRepository.getIns().dataTable(QPlayerTable.class);
+            QPlayer qPlayer = qPlayerTable.get(1);
+            log.info("{}", qPlayer);
+        } catch (Throwable throwable) {
+            log.error("启动失败", throwable);
+            System.exit(99);
+        }
         // ExecutorUtilImpl.getInstance().getBasicExecutor().schedule(
         //         () -> {
         //             RpcService rpcService = runApplication.getInstance(RpcService.class);
