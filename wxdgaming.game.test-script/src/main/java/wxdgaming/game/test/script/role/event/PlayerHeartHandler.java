@@ -11,6 +11,8 @@ import wxdgaming.game.test.event.*;
 import wxdgaming.game.test.script.fight.FightService;
 import wxdgaming.game.test.script.task.TaskEvent;
 
+import java.util.concurrent.BlockingQueue;
+
 /**
  * 角色的心跳执行
  *
@@ -31,6 +33,17 @@ public class PlayerHeartHandler extends HoldRunApplication {
     @OnHeart
     public void onHeart(Player player, long mille) {
         // log.info("onHeart:{}", player);
+        BlockingQueue<Runnable> eventList = player.getEventList();
+        for (int i = 0; i < 30; i++) {
+            /*相当于每帧最多处理30个事件*/
+            if (eventList.isEmpty()) break;
+            Runnable runnable = eventList.poll();
+            try {
+                runnable.run();
+            } catch (Exception e) {
+                log.error("onHeart:{}", e.getMessage(), e);
+            }
+        }
     }
 
     @OnHeartSecond

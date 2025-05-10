@@ -5,6 +5,7 @@ import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.starter.net.pojo.ProtoFilter;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerTrigger;
+import wxdgaming.game.test.bean.MapKey;
 import wxdgaming.game.test.bean.role.Player;
 
 /**
@@ -19,10 +20,13 @@ public class ProtoQueueDrive implements ProtoFilter {
 
     @Override
     public boolean doFilter(ProtoListenerTrigger protoListenerTrigger) {
-        if (StringUtils.isBlank(protoListenerTrigger.getQueueName())) {
-            Player player = protoListenerTrigger.getSocketSession().bindData("player");
-            if (player != null) {
+        Player player = protoListenerTrigger.getSocketSession().bindData("player");
+        if (player != null) {
+            if (StringUtils.isBlank(protoListenerTrigger.getQueueName())) {
                 protoListenerTrigger.setQueueName("drive-" + (player.getUid() % BootConfig.getIns().logicConfig().getMaxSize()));
+            } else if ("map-drive".equalsIgnoreCase(protoListenerTrigger.getQueueName())) {
+                MapKey mapKey = player.getMapKey();
+
             }
         }
         return true;

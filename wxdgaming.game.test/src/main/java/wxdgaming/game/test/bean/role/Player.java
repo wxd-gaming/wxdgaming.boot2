@@ -14,8 +14,9 @@ import wxdgaming.game.test.bean.attr.AttrType;
 import wxdgaming.game.test.script.global.message.AttrBean;
 import wxdgaming.game.test.script.global.message.ResUpdateAttr;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * 角色
@@ -55,7 +56,7 @@ public class Player extends MapNpc {
     private transient long lastUpdateOnlineTime = 0;
     @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
-    private transient ArrayList<Runnable> eventList = new ArrayList<>();
+    private transient BlockingQueue<Runnable> eventList = new ArrayBlockingQueue<>(1024);
     @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient SocketSession socketSession;
