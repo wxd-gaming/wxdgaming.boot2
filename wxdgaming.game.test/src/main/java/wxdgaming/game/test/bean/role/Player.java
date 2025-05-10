@@ -36,13 +36,23 @@ public class Player extends MapNpc {
     private MapKey lastMapKey;
     /** 上一次所在地图坐标， */
     private Vector3D lastPosition = new Vector3D();
+
+    private long lastLoginDayTime;
     private long lastLoginTime;
+    private long lastLogoutTime;
     /** 朝向 */
     private int lastDirection;
     private int sex;
     private int job;
     private Int2IntOpenHashMap useCDKeyMap = new Int2IntOpenHashMap();
-
+    /** 本次在线秒数 */
+    private transient long onlineMills = 0;
+    /** 总计在线秒数 */
+    private long onlineTotalMills = 0;
+    /** 最后一次刷新总计在线秒数时间 */
+    @JsonIgnore
+    @JSONField(serialize = false, deserialize = false)
+    private transient long lastUpdateOnlineTime = 0;
     @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient ArrayList<Runnable> eventList = new ArrayList<>();

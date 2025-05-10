@@ -19,12 +19,12 @@ import java.util.List;
  **/
 @Slf4j
 @Singleton
-public class PlayerCreateEvent {
+public class PlayerCreateHandler {
 
     final BagService bagService;
 
     @Inject
-    public PlayerCreateEvent(BagService bagService) {
+    public PlayerCreateHandler(BagService bagService) {
         this.bagService = bagService;
     }
 

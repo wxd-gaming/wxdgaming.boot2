@@ -15,10 +15,10 @@ import wxdgaming.game.test.event.OnLogout;
  **/
 @Slf4j
 @Singleton
-public class PlayerLogoutEvent {
+public class PlayerLogoutHandler {
 
     @Inject
-    public PlayerLogoutEvent() {
+    public PlayerLogoutHandler() {
     }
 
     /** 创建角色之后赠送初始化道具 */

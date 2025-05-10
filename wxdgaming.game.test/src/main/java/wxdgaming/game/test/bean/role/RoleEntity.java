@@ -3,7 +3,6 @@ package wxdgaming.game.test.bean.role;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.EntityLongUID;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
@@ -29,6 +28,11 @@ public class RoleEntity extends EntityLongUID {
     String account;
     @DbColumn(index = true)
     boolean del;
+    long lastLoginTime;
+    long lastLogoutTime;
+    /** 在线毫秒数 */
+    long totalOnlineMills;
+    /** 角色数据 */
     @DbColumn(length = Integer.MAX_VALUE)
     private Player player;
 
@@ -41,10 +45,14 @@ public class RoleEntity extends EntityLongUID {
         name = player.getName();
         account = player.getAccount();
         del = player.isDel();
+        lastLoginTime = player.getLastLoginTime();
+        lastLogoutTime = player.getLastLogoutTime();
+        totalOnlineMills = player.getOnlineTotalMills();
     }
 
     @Override public RoleEntity setUid(long uid) {
         super.setUid(uid);
         return this;
     }
+
 }
