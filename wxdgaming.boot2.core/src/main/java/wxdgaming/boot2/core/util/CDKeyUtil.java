@@ -1,10 +1,11 @@
 package wxdgaming.boot2.core.util;
 
+import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 
 public class CDKeyUtil {
 
@@ -13,25 +14,25 @@ public class CDKeyUtil {
 
 
     /* key算法 12位id | 42位时间戳 | 9位自增 */
-    public static List<String> cdKey(long cdKeyId, int num) {
+    public static Collection<String> cdKey(long cdKeyId, int num) {
         return cdKey(AES_KEY_ENCODE, cdKeyId, num);
     }
 
-    public static List<String> cdKey(int[] encode, long cdKeyId, int num) {
-        AssertUtil.assertTrue(num <= 511, "cdKeyId 最大生成 511 个");
+    public static Collection<String> cdKey(int[] encode, final long cdKeyId, int num) {
+        final long randomMax = 281474976710655L;
         AssertUtil.assertTrue(cdKeyId < 4095, "cdKeyId 最大 4095");
-        cdKeyId = cdKeyId << 51;
-        /*时间戳用42位*/
-        long second = System.currentTimeMillis();
-        cdKeyId = cdKeyId | second << 9;
-        List<String> list = new ArrayList<>();
-        for (int i = 0; i < num; i++) {
-            cdKeyId += 1;
-            BigInteger bigInteger = new BigInteger(String.valueOf(cdKeyId));
+        HashSet<String> list = new HashSet<>();
+        while (num > 0) {
+            long random = Long.parseLong("1" + StringUtils.randomString(StringUtils.NUMBER_CHARS, 14));
+            AssertUtil.assertTrue(random < randomMax, "random 错误");
+            long randomKey = random << 12 | cdKeyId;
+            BigInteger bigInteger = new BigInteger(String.valueOf(randomKey));
             String string = bigInteger.toString(36);
             String upperCase = string.toUpperCase();
             upperCase = AesUtil.convert_ASE(upperCase, encode);
-            list.add(upperCase);
+            if (list.add(upperCase)) {
+                num--;
+            }
         }
         return list;
     }
@@ -44,7 +45,8 @@ public class CDKeyUtil {
         cdKey = AesUtil.convert_ASE(cdKey, decode);
         BigInteger bigInteger = new BigInteger(cdKey, 36);
         long longValue = bigInteger.longValue();
-        long cdKeyId = longValue >> 51;
+        long d = 0B1111_1111_1111L;
+        long cdKeyId = longValue & d;
         return (int) cdKeyId;
     }
 

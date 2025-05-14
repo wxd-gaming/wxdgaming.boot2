@@ -1,6 +1,7 @@
 package wxdgaming.game.test.module.data;
 
 import com.google.inject.Singleton;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Start;
@@ -8,6 +9,7 @@ import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlService;
+import wxdgaming.game.test.bean.BackendConfig;
 import wxdgaming.game.test.bean.global.DataBase;
 import wxdgaming.game.test.bean.global.GlobalDataEntity;
 import wxdgaming.game.test.bean.global.GlobalDataType;
@@ -21,6 +23,7 @@ import java.util.List;
  * @version: 2025-04-30 11:05
  **/
 @Slf4j
+@Getter
 @Singleton
 public class GlobalDataService extends HoldRunApplication {
 
@@ -28,7 +31,8 @@ public class GlobalDataService extends HoldRunApplication {
     private PgsqlService pgsqlService;
     /** key: sid, key: type, value: 数据 */
     private final ConcurrentTable<Integer, GlobalDataType, GlobalDataEntity> globalDataTable = new ConcurrentTable<>();
-
+    @Value(path = "backends")
+    private BackendConfig backendConfig;
 
     @Start
     public void start(@Value(path = "sid") int sid, PgsqlService pgsqlService) {

@@ -28,7 +28,7 @@ public class ResRemoteHandler {
         this.rpcService = rpcService;
     }
 
-    @ProtoRequest
+    @ProtoRequest(ignoreQueue = true)
     public void resRemote(SocketSession socketSession, ResRemote req) {
         long rpcId = req.getUid();
         String token = req.getToken();

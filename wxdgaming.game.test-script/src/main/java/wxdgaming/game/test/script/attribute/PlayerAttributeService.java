@@ -38,7 +38,7 @@ public class PlayerAttributeService extends HoldRunApplication {
         runApplication.classWithSuper(CalculatorAction.class)
                 .forEach(calculatorAction -> {
                     MapObject.MapObjectType mapObjectType = calculatorAction.mapObjectType();
-                    if (mapObjectType != MapObject.MapObjectType.Player) {
+                    if (mapObjectType != null && mapObjectType != MapObject.MapObjectType.Player) {
                         return;
                     }
                     CalculatorAction old = tmp.put(calculatorAction.calculatorType().getCode(), calculatorAction);

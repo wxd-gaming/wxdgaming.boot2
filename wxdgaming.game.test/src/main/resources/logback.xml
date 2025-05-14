@@ -40,7 +40,7 @@
             <charset>utf-8</charset>
         </encoder>
         <!-- 过滤重设时间，一般是当调试服务器或者调试活动的时候手动改时间需要触发 -->
-        <filter class="wxdgaming.boot.core.logback.LogbackResetTimeFilter">
+        <filter class="ch.qos.logback.core.LogbackResetTimeFilter">
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
@@ -63,7 +63,7 @@
     <logger name="org.mongodb.driver" level="info" additivity="false"/>
 
     <!-- 生产环境下，将此级别配置为适合的级别，以免日志文件太多或影响程序性能 -->
-    <root level="DEBUG"> <!-- ERROR, WARN, INFO, DEBUG -->
+    <root level="INFO"> <!-- ERROR, WARN, INFO, DEBUG -->
         <appender-ref ref="file_info"/>
         <appender-ref ref="file_error"/>
         <!-- 生产环境将请stdout,testfile去掉 -->

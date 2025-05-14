@@ -21,7 +21,7 @@ import wxdgaming.game.test.script.attribute.CalculatorType;
 public class BaseCalculatorActionImpl extends CalculatorAction {
 
     @Override public MapObject.MapObjectType mapObjectType() {
-        return MapObject.MapObjectType.Npc;
+        return MapObject.MapObjectType.Monster;
     }
 
     @Override public CalculatorType calculatorType() {

@@ -621,6 +621,7 @@ public class MyClock {
         return formatDate(SDF_YYYYMMDD, cal.getTime());
     }
 
+    /** 当前时间追加偏移量 */
     public static long currentOffsetTimeMillis(int offsetDays, int hour, int minute, int second) {
         return millis()
                + TimeUnit.DAYS.toMillis(offsetDays)

@@ -73,30 +73,4 @@ public class DataCenterService {
         return roleEntity == null ? null : roleEntity.getPlayer();
     }
 
-    public BagPack bagPack(long uid) {
-        BagPack bagPack = pgsqlService.getCacheService().cacheIfPresent(BagPack.class, uid);
-        if (bagPack == null) {
-            bagPack = new BagPack();
-            bagPack.setUid(uid);
-            BagPack old = pgsqlService.getCacheService().cache(BagPack.class).putIfAbsent(uid, bagPack);
-            if (old != null) {
-                bagPack = old;
-            }
-        }
-        return bagPack;
-    }
-
-    public TaskPack taskPack(long uid) {
-        TaskPack taskPack = pgsqlService.getCacheService().cacheIfPresent(TaskPack.class, uid);
-        if (taskPack == null) {
-            taskPack = new TaskPack();
-            taskPack.setUid(uid);
-            TaskPack old = pgsqlService.getCacheService().cache(TaskPack.class).putIfAbsent(uid, taskPack);
-            if (old != null) {
-                taskPack = old;
-            }
-        }
-        return taskPack;
-    }
-
 }

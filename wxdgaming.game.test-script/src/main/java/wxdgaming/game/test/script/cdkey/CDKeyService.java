@@ -1,17 +1,21 @@
 package wxdgaming.game.test.script.cdkey;
 
+import com.alibaba.fastjson.TypeReference;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.boot2.core.util.CDKeyUtil;
-import wxdgaming.game.test.bean.entity.UseCDKeyRecord;
+import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.starter.net.httpclient.HttpBuilder;
+import wxdgaming.boot2.starter.net.httpclient.PostText;
+import wxdgaming.game.test.bean.BackendConfig;
 import wxdgaming.game.test.bean.goods.ItemCfg;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.module.data.DataCenterService;
-import wxdgaming.game.test.script.cdkey.bean.CDKeyEntity;
+import wxdgaming.game.test.script.cdkey.bean.CDKeyReward;
 import wxdgaming.game.test.script.cdkey.message.ResUseCdKey;
 import wxdgaming.game.test.script.goods.BagService;
 import wxdgaming.game.test.script.tips.TipsService;
@@ -32,10 +36,14 @@ import java.util.List;
 @Singleton
 public class CDKeyService {
 
-    private HashMap<Integer, CDKeyEntity> cdKeyMap = new HashMap<>();
     private final DataCenterService dataCenterService;
     private final TipsService tipsService;
     private final BagService bagService;
+    private BackendConfig backendConfig;
+
+    public void init(@Value(path = "backends") BackendConfig backendConfig) {
+        this.backendConfig = backendConfig;
+    }
 
     @Inject
     public CDKeyService(DataCenterService dataCenterService, TipsService tipsService, BagService bagService) {
@@ -45,58 +53,29 @@ public class CDKeyService {
     }
 
     public void use(Player player, String cdKey) {
-        int cdKeyId = CDKeyUtil.getCdKeyId(cdKey);
-        CDKeyEntity cdKeyEntity = cdKeyMap.get(cdKeyId);
-        if (cdKeyEntity == null) {
-            tipsService.tips(player.getSocketSession(), "激活码异常");
+
+        String url = backendConfig.getUrl();
+        url = url + "/cdkey/use";
+
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("gameId", backendConfig.getGameId());
+        params.put("appToken", backendConfig.getAppToken());
+        params.put("key", cdKey);
+        params.put("account", player.getAccount());
+        params.put("rid", player.getUid());
+
+        PostText postText = HttpBuilder.postJson(url, FastJsonUtil.toJSONString(params));
+        RunResult runResult = postText.request().bodyRunResult();
+
+        if (runResult.isError()) {
+            tipsService.tips(player.getSocketSession(), runResult.msg());
             return;
         }
 
-        Runnable sourceCall = null;
-
-        if (cdKeyEntity.getUseType() == 1) {
-            int useCount = player.getUseCDKeyMap().getOrDefault(cdKeyId, 0);
-            if (useCount >= cdKeyEntity.getUseCount()) {
-                tipsService.tips(player.getSocketSession(), "激活码使用次数已达上限");
-                return;
-            }
-            sourceCall = () -> {
-                /* 添加使用次数 */
-                player.getUseCDKeyMap().put(cdKeyId, useCount + 1);
-            };
-        } else if (cdKeyEntity.getUseType() == 2) {
-            UseCDKeyRecord useCDKeyRecord = dataCenterService.getPgsqlService().findByKey(UseCDKeyRecord.class, cdKey);
-            if (useCDKeyRecord == null) {
-                useCDKeyRecord = new UseCDKeyRecord();
-                useCDKeyRecord.setCdkey(cdKey);
-                useCDKeyRecord.setSid(player.getSid());
-            }
-
-            if (useCDKeyRecord.getUseCount() != cdKeyEntity.getUseCount()) {
-                tipsService.tips(player.getSocketSession(), "激活码使用次数已达上限");
-                return;
-            }
-
-            final UseCDKeyRecord useCDKeyRecordFinal = useCDKeyRecord;
-
-            sourceCall = () -> {
-                /* 添加使用次数 */
-                useCDKeyRecordFinal.setUseCount(useCDKeyRecordFinal.getUseCount() + 1);
-                useCDKeyRecordFinal.setLastUseTime(MyClock.millis());
-                dataCenterService.getPgsqlService().save(useCDKeyRecordFinal);
-            };
-
-        } else if (cdKeyEntity.getUseType() == 3) {
-            /*检查一下 cdkey 是否全局唯一， 比如 redis */
-            sourceCall = () -> {
-
-            };
-        } else {
-            throw new RuntimeException("激活码类型异常");
-        }
+        ArrayList<CDKeyReward> rewardCfgList = runResult.getObject("rewards", new TypeReference<ArrayList<CDKeyReward>>() {});
 
         List<ItemCfg> rewards = new ArrayList<>();
-        for (CDKeyEntity.CDKeyReward reward : cdKeyEntity.getRewards()) {
+        for (CDKeyReward reward : rewardCfgList) {
             ItemCfg itemCfg = ItemCfg.builder()
                     .cfgId(reward.getItemId())
                     .count(reward.getCount())
@@ -108,11 +87,9 @@ public class CDKeyService {
 
         long nanoTime = System.nanoTime();
 
-        if (!bagService.gainItems4Cfg(player, nanoTime, rewards, "use cdkey", cdKey, cdKeyId)) {
+        if (!bagService.gainItems4Cfg(player, nanoTime, rewards, "use cdkey", cdKey, runResult.getIntValue("cid"), runResult.getString("comment"))) {
             return;
         }
-
-        sourceCall.run();
 
         ResUseCdKey resUseCdKey = new ResUseCdKey();
         resUseCdKey.setCdKey(cdKey);

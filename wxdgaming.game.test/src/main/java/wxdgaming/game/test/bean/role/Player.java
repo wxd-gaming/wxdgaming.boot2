@@ -11,6 +11,10 @@ import wxdgaming.game.test.bean.MapKey;
 import wxdgaming.game.test.bean.MapNpc;
 import wxdgaming.game.test.bean.Vector3D;
 import wxdgaming.game.test.bean.attr.AttrType;
+import wxdgaming.game.test.bean.goods.BagPack;
+import wxdgaming.game.test.bean.mail.MailPack;
+import wxdgaming.game.test.bean.task.TaskPack;
+import wxdgaming.game.test.bean.vip.VipInfo;
 import wxdgaming.game.test.script.global.message.AttrBean;
 import wxdgaming.game.test.script.global.message.ResUpdateAttr;
 
@@ -37,23 +41,16 @@ public class Player extends MapNpc {
     private MapKey lastMapKey;
     /** 上一次所在地图坐标， */
     private Vector3D lastPosition = new Vector3D();
-
-    private long lastLoginDayTime;
-    private long lastLoginTime;
-    private long lastLogoutTime;
     /** 朝向 */
     private int lastDirection;
     private int sex;
     private int job;
     private Int2IntOpenHashMap useCDKeyMap = new Int2IntOpenHashMap();
-    /** 本次在线秒数 */
-    private transient long onlineMills = 0;
-    /** 总计在线秒数 */
-    private long onlineTotalMills = 0;
-    /** 最后一次刷新总计在线秒数时间 */
-    @JsonIgnore
-    @JSONField(serialize = false, deserialize = false)
-    private transient long lastUpdateOnlineTime = 0;
+    private OnlineInfo onlineInfo = new OnlineInfo();
+    private VipInfo vipInfo = new VipInfo();
+    private BagPack bagPack = new BagPack();
+    private TaskPack taskPack = new TaskPack();
+    private MailPack mailPack = new MailPack();
     @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient BlockingQueue<Runnable> eventList = new ArrayBlockingQueue<>(1024);

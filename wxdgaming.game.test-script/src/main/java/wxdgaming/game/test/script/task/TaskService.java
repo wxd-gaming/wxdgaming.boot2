@@ -11,8 +11,8 @@ import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.bean.task.TaskInfo;
 import wxdgaming.game.test.bean.task.TaskPack;
-import wxdgaming.game.test.module.data.DataCenterService;
 import wxdgaming.game.test.event.OnTask;
+import wxdgaming.game.test.module.data.DataCenterService;
 import wxdgaming.game.test.script.task.init.ConditionInitValueHandler;
 
 import java.util.ArrayList;
@@ -59,10 +59,6 @@ public class TaskService extends HoldRunApplication {
         taskScriptImplHashMap = tmpTaskScriptImplHashMap;
     }
 
-    public TaskPack getTaskPack(Player player) {
-        return dataCenterService.taskPack(player.getUid());
-    }
-
     public Condition getCondition(int id) {
         return new Condition(1, 1, 1, UpdateType.Add);
     }
@@ -88,7 +84,7 @@ public class TaskService extends HoldRunApplication {
 
     @OnTask
     public void update(Player player, TaskEvent taskEvent) {
-        TaskPack taskPack = getTaskPack(player);
+        TaskPack taskPack = player.getTaskPack();
         replace(player, taskEvent);
         List<TaskInfo> changes = new ArrayList<>();
         for (ITaskScript taskScript : taskScriptImplHashMap.values()) {

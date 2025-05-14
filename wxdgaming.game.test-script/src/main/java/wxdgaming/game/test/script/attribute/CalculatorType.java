@@ -16,6 +16,9 @@ public enum CalculatorType {
 
     BASE(1, "基础属性"),
     EQUIPMENT(2, "装备属性"),
+    BUFF(3, "buff属性"),
+    SKILL(4, "技能属性"),
+    GM(5, "gm属性"),
     ;
 
     private static final Map<Integer, CalculatorType> static_map = MapOf.ofMap(CalculatorType::getCode, CalculatorType.values());

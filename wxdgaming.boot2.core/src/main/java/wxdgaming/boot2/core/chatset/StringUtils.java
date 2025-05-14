@@ -33,6 +33,8 @@ public class StringUtils {
     /** 只保留数字 */
     public static final Pattern PATTERN_REPLACE_UUU_2 = Pattern.compile("[^0-9]");
 
+    public static final char[] NUMBER_CHARS = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '9'};
+
     /** 保留数值字 */
     public static String retainNumbers(String source) {
         return PATTERN_REPLACE_UUU_2.matcher(source).replaceAll("");

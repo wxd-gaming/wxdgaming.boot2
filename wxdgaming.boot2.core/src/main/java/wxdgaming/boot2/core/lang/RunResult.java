@@ -41,6 +41,14 @@ public class RunResult extends JSONObject {
         super(map);
     }
 
+    public boolean isOk() {
+        return code() == 1;
+    }
+
+    public boolean isError() {
+        return code() != 1;
+    }
+
     public int code() {
         return getIntValue("code");
     }

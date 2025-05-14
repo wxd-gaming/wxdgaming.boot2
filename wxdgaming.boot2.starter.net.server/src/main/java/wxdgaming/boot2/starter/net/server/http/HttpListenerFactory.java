@@ -11,6 +11,7 @@ import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
+import wxdgaming.boot2.core.threading.ThreadContext;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 
 import java.lang.reflect.Method;
@@ -42,6 +43,8 @@ public class HttpListenerFactory {
 
     public void dispatch(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) {
         try {
+            ThreadContext.cleanup();
+
             HttpContext httpContext = new HttpContext(this.httpServerConfig, ctx, fullHttpRequest);
 
             String uriPath = httpContext.getRequest().getUriPath();

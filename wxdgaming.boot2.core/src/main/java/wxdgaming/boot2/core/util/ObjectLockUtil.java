@@ -1,7 +1,10 @@
 package wxdgaming.boot2.core.util;
 
-import java.util.HashMap;
+import wxdgaming.boot2.core.cache2.CacheLock;
+import wxdgaming.boot2.core.cache2.LRUCache;
+
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * 重入锁,单例锁
@@ -11,34 +14,38 @@ import java.util.concurrent.locks.ReentrantLock;
  **/
 public class ObjectLockUtil {
 
-    static final ReentrantLock GlobalLock = new ReentrantLock();
-    private static final HashMap<Object, LockObject> _instances = new HashMap<>();
+    /** 缓存锁 */
+    static final LRUCache<Object, LockObject> cache = LRUCache.<Object, LockObject>builder()
+            .area(1)
+            .heartTimeMs(3000)
+            .expireAfterReadMs(3000)
+            .loader(k -> new LockObject())
+            .removalListener((o, lockObject) -> lockObject.count <= 0)
+            .build();
+
+    static final CacheLock cacheLock = cache.getReentrantLocks().getFirst();
+    static final ReentrantReadWriteLock.WriteLock writeLock = cacheLock.getWriteLock();
 
     public static void lock(Object key) {
         LockObject lockObject;
-        GlobalLock.lock();
+        writeLock.lock();
         try {
-            lockObject = _instances.computeIfAbsent(key, k -> new LockObject());
+            lockObject = cache.get(key);
             lockObject.count++;
         } finally {
-            GlobalLock.unlock();
+            writeLock.unlock();
         }
         lockObject.reentrantLock.lock();
     }
 
     public static void unlock(Object key) {
         LockObject lockObject;
-        GlobalLock.lock();
+        writeLock.lock();
         try {
-            lockObject = _instances.get(key);
-            if (lockObject != null) {
-                lockObject.count--;
-                if (lockObject.count <= 0) {
-                    _instances.remove(key);
-                }
-            }
+            lockObject = cache.get(key);
+            lockObject.count--;
         } finally {
-            GlobalLock.unlock();
+            writeLock.unlock();
         }
         lockObject.reentrantLock.unlock();
     }

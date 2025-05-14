@@ -44,6 +44,16 @@ public class FightService extends HoldRunApplication {
         player.sendHp();
     }
 
+    public void changeMp(Player player, long change, String msg) {
+        long oldMp = player.getMp();
+        player.setMp(oldMp + change);
+        if (player.getMp() > player.maxMp()) {
+            player.setMp(player.maxMp());
+        }
+        log.info("{} 改变魔量 {} -> {} -> {}, 原因: {}", player, oldMp, change, player.getMp(), msg);
+        player.sendHp();
+    }
+
     public List<MapNpc> selectAttack(MapNpc player) {
         return null;
     }

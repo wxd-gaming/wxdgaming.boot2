@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.cache2;
 
+import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.format.data.Data2Size;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  * @version: 2025-03-20 16:14
  **/
 @Slf4j
+@Getter
 @SuperBuilder
 public class LRUCache<K, V> extends Cache<K, V> {
 

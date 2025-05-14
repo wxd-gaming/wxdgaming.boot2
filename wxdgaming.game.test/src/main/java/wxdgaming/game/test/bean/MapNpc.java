@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.game.test.bean.attr.AttrInfo;
 import wxdgaming.game.test.bean.attr.AttrType;
+import wxdgaming.game.test.bean.buff.Buff;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -27,14 +29,26 @@ public class MapNpc extends MapObject {
     private long mp;
     /** 体力 */
     private int physical;
+    private ArrayList<Buff> buffs = new ArrayList<>();
     private long fightValue;
     private AttrInfo finalAttrInfo = new AttrInfo();
+    /** gm的固定属性 */
+    private AttrInfo gmAttrInfo = new AttrInfo();
+    /** gm的百分比提升属性 */
+    private AttrInfo gmAttrProInfo = new AttrInfo();
+    /** 临时属性 */
+    @JsonIgnore
+    @JSONField(serialize = false, deserialize = false)
+    private transient AttrInfo tmpAttrInfo = new AttrInfo();
+    /** 临时百分比提升属性 */
+    @JsonIgnore
+    @JSONField(serialize = false, deserialize = false)
+    private transient AttrInfo tmpAttrProInfo = new AttrInfo();
     /** 分组属性 */
     @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient HashMap<Integer, AttrInfo> attrMap = new HashMap<>();
     /** 分组百分比属性 */
-
     @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient HashMap<Integer, AttrInfo> attrProMap = new HashMap<>();

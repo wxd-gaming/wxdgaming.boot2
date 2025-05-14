@@ -34,8 +34,8 @@ public class ReqSubmitTaskHandler {
         Player player = socketSession.bindData("player");
         int taskType = req.getTaskType().getCode();
         int taskId = req.getTaskId();
-        TaskPack taskPack = taskService.getTaskPack(player);
         ITaskScript taskScript = taskService.getTaskScript(taskType);
+        TaskPack taskPack = player.getTaskPack();
         taskScript.submitTask(player, taskPack, taskId);
     }
 

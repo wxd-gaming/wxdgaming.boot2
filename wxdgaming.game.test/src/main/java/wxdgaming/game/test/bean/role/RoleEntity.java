@@ -3,6 +3,7 @@ package wxdgaming.game.test.bean.role;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.EntityLongUID;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
@@ -24,16 +25,25 @@ public class RoleEntity extends EntityLongUID {
     int sid;
     @DbColumn(index = true, length = 18)
     String name;
+    @DbColumn(index = true)
+    int lv;
+    @DbColumn(index = true)
+    int vipLv;
     @DbColumn(index = true, length = 64)
     String account;
     @DbColumn(index = true)
     boolean del;
+    /** 最好登录时间 */
+    @DbColumn(index = true)
     long lastLoginTime;
+    /** 最好退出登录时间 */
+    @DbColumn(index = true)
     long lastLogoutTime;
     /** 在线毫秒数 */
+    @DbColumn(index = true)
     long totalOnlineMills;
     /** 角色数据 */
-    @DbColumn(length = Integer.MAX_VALUE)
+    @DbColumn(length = Integer.MAX_VALUE, columnType = ColumnType.String)
     private Player player;
 
     @Override public void saveRefresh() {
@@ -45,9 +55,9 @@ public class RoleEntity extends EntityLongUID {
         name = player.getName();
         account = player.getAccount();
         del = player.isDel();
-        lastLoginTime = player.getLastLoginTime();
-        lastLogoutTime = player.getLastLogoutTime();
-        totalOnlineMills = player.getOnlineTotalMills();
+        lastLoginTime = player.getOnlineInfo().getLastLoginTime();
+        lastLogoutTime = player.getOnlineInfo().getLastLogoutTime();
+        totalOnlineMills = player.getOnlineInfo().getOnlineTotalMills();
     }
 
     @Override public RoleEntity setUid(long uid) {

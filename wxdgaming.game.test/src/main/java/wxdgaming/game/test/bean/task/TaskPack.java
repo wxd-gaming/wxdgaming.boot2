@@ -4,9 +4,8 @@ import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.collection.ints.IntIntObjectTable;
-import wxdgaming.boot2.starter.batis.EntityLongUID;
+import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
-import wxdgaming.boot2.starter.batis.ann.DbTable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,8 +18,7 @@ import java.util.HashMap;
  **/
 @Getter
 @Setter
-@DbTable
-public class TaskPack extends EntityLongUID {
+public class TaskPack extends ObjectBase {
 
     /** 任务完成ID key:任务类型, value: 完成的id集合 */
     @JSONField(ordinal = 11)

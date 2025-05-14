@@ -2,7 +2,7 @@ package wxdgaming.game.test.bean;
 
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.lang.ObjectBase;
+import wxdgaming.boot2.core.lang.ObjectLong;
 
 /**
  * 基类
@@ -12,9 +12,8 @@ import wxdgaming.boot2.core.lang.ObjectBase;
  **/
 @Getter
 @Setter
-public class GameBase extends ObjectBase {
+public class GameBase extends ObjectLong {
 
-    private long uid = 0;
     private long createTime;
 
 }

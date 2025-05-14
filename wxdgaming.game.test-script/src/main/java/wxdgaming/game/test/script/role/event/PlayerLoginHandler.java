@@ -35,11 +35,11 @@ public class PlayerLoginHandler extends HoldRunApplication {
         log.info("玩家上线:{}, {}", player, player.getSocketSession());
         player.setStatus(new BitFlag());
         player.getStatus().addFlags(StatusConst.Online);
-        player.setLastLoginTime(MyClock.millis());
+        player.getOnlineInfo().setLastLoginTime(MyClock.millis());
         /*触发任务登录次数*/
         runApplication.executeMethodWithAnnotatedException(OnTask.class, player, TaskEvent.builder().k1("login").targetValue(1).build());
-        if (!MyClock.isSameDay(player.getLastLoginDayTime())) {
-            player.setLastLoginDayTime(MyClock.millis());
+        if (!MyClock.isSameDay(player.getOnlineInfo().getLastLoginDayTime())) {
+            player.getOnlineInfo().setLastLoginDayTime(MyClock.millis());
             /*触发任务登录天数*/
             runApplication.executeMethodWithAnnotatedException(OnTask.class, player, TaskEvent.builder().k1("loginDay").targetValue(1).build());
         }

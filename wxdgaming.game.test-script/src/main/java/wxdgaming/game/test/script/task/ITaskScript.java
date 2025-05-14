@@ -26,21 +26,17 @@ public abstract class ITaskScript extends HoldRunApplication {
 
     public abstract int type();
 
-    public TaskPack getTaskPack(Player player) {
-        return taskService.getTaskPack(player);
-    }
-
     /** 登录的时候检查任务 */
     @OnLoginBefore
     public void onLoginBefore(Player player) {
-        TaskPack taskPack = getTaskPack(player);
+        TaskPack taskPack = player.getTaskPack();
         initTask(player, taskPack);
     }
 
     /** 登录的时候检查任务 */
     @OnLogin
     public void onLogin(Player player) {
-        TaskPack taskPack = getTaskPack(player);
+        TaskPack taskPack = player.getTaskPack();
         /*推送数据的*/
     }
 

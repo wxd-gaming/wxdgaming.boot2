@@ -4,8 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.lang.condition.UpdateType;
-import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlService;
-import wxdgaming.game.test.bean.goods.BagPack;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.script.goods.BagService;
 import wxdgaming.game.test.script.task.init.ConditionInitValueHandler;
@@ -19,13 +17,11 @@ import wxdgaming.game.test.script.task.init.ConditionInitValueHandler;
 @Singleton
 public class BagItemCountHandler implements ConditionInitValueHandler {
 
-    private final PgsqlService psqlService;
-    private final BagService bagsModuleScript;
+    private final BagService bagService;
 
     @Inject
-    public BagItemCountHandler(PgsqlService psqlService, BagService bagsModuleScript) {
-        this.psqlService = psqlService;
-        this.bagsModuleScript = bagsModuleScript;
+    public BagItemCountHandler(BagService bagsModuleScript) {
+        this.bagService = bagsModuleScript;
     }
 
     @Override public Condition condition() {
@@ -33,9 +29,8 @@ public class BagItemCountHandler implements ConditionInitValueHandler {
     }
 
     @Override public long initValue(Player player, Condition condition) {
-        BagPack bagPack = psqlService.getCacheService().cache(BagPack.class, player.getUid());
-
-        return player.getLevel();
+        int itemCfg = Integer.parseInt(condition.getK2().toString());
+        return bagService.itemCount(player, 1, itemCfg);
     }
 
 }

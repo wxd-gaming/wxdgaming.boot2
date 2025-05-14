@@ -3,7 +3,10 @@ package wxdgaming.game.test.script.buff;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.test.bean.MapNpc;
+import wxdgaming.game.test.bean.buff.Buff;
 import wxdgaming.game.test.event.OnHeart;
+
+import java.util.ArrayList;
 
 /**
  * buff管理
@@ -17,6 +20,7 @@ public class BuffService {
 
     @OnHeart
     public void onHeartBuffAction(MapNpc mapNpc, long mill) {
+        ArrayList<Buff> buffs = mapNpc.getBuffs();
 
     }
 

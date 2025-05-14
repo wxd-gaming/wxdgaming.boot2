@@ -17,4 +17,7 @@ public @interface ProtoRequest {
 
     /** 备注 */
     String comment() default "";
+
+    /** 特殊用法，忽略队列效果 */
+    boolean ignoreQueue() default false;
 }

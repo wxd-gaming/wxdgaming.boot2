@@ -4,6 +4,7 @@ package wxdgaming.game.test.bean.global;
 import lombok.Getter;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.game.test.bean.global.impl.ServerData;
+import wxdgaming.game.test.bean.global.impl.ServerMailData;
 import wxdgaming.game.test.bean.global.impl.YunyingData;
 
 import java.util.Map;
@@ -19,6 +20,7 @@ import java.util.function.Supplier;
 public enum GlobalDataType {
     None(0, "默认值", null, null),
     SERVERDATA(1, "全服数据", ServerData.class, ServerData::new),
+    SERVER_MAIL_DATA(2, "全服邮件数据", ServerMailData.class, ServerMailData::new),
     YUNYINGDATA(11, "运营数据", YunyingData.class, YunyingData::new),
     ;
 

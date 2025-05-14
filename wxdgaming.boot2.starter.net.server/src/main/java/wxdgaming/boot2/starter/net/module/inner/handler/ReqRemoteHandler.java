@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.core.threading.ThreadContext;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
@@ -31,7 +32,7 @@ public class ReqRemoteHandler {
         this.rpcListenerFactory = rpcListenerFactory;
     }
 
-    @ProtoRequest
+    @ProtoRequest(ignoreQueue = true)
     public void reqRemote(SocketSession socketSession, ReqRemote req) {
         long rpcId = req.getUid();
         String cmd = req.getCmd();
@@ -56,6 +57,7 @@ public class ReqRemoteHandler {
                 return;
             }
 
+            ThreadContext.cleanup();
             RpcListenerTrigger rpcListenerTrigger = new RpcListenerTrigger(
                     rpcMapping,
                     rpcService,

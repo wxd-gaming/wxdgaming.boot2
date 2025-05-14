@@ -75,11 +75,9 @@ public class BagService extends HoldRunApplication implements InitPrint {
     @OnCreateRole
     @Order(1)
     public void onCreateRoleInitBag(Player player) {
-        BagPack bagPack = new BagPack();
-        bagPack.setUid(player.getUid());
+        BagPack bagPack = player.getBagPack();
         bagPack.getItems().put(1, new ItemBag(100));/*背包*/
         bagPack.getItems().put(2, new ItemBag(100));/*仓库*/
-        dataCenterService.getPgsqlService().getCacheService().cache(BagPack.class).put(player.getUid(), bagPack);
     }
 
     /** 登录的时候检查背包问题 */
@@ -125,7 +123,8 @@ public class BagService extends HoldRunApplication implements InitPrint {
     }
 
     /** 获取背包指定道具数量 */
-    public long itemCount(Player player, BagPack bagPack, int bagType, int itemCfgId) {
+    public long itemCount(Player player, int bagType, int itemCfgId) {
+        BagPack bagPack = player.getBagPack();
         ItemBag itemBag = itemBag(bagPack, bagType);
         QItem qItem = dataRepository.dataTable(QItemTable.class, itemCfgId);
         int type = qItem.getItemType();
@@ -136,7 +135,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
     /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
     public boolean gainItems4Cfg(Player player, long serialNumber, List<ItemCfg> itemCfgs, Object... args) {
         List<Item> items = newItems(itemCfgs);
-        BagPack bagPack = dataCenterService.bagPack(player.getUid());
+        BagPack bagPack = player.getBagPack();
         ItemBag itemBag = itemBag(bagPack, 1);
         if (itemBag.freeGrid() < items.size()) {
             if (log.isDebugEnabled()) {
@@ -159,7 +158,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
 
     /** 默认是往背包添加 */
     public void gainItems(Player player, long serialNumber, List<Item> items, Object... args) {
-        BagPack bagPack = dataCenterService.bagPack(player.getUid());
+        BagPack bagPack = player.getBagPack();
         ItemBag itemBag = itemBag(bagPack, 1);
         gainItems(player, itemBag, serialNumber, items, args);
     }

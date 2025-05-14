@@ -75,19 +75,19 @@ public class TestApi {
 
     @RpcRequest
     public JSONObject rpcIndex(JSONObject paramData) {
-        log.info("{} {}", paramData, ThreadContext.context().queueName());
+        log.debug("{} {}", paramData, ThreadContext.context().queueName());
         return paramData;
     }
 
     @RpcRequest
     public JSONObject rpcIndex2(JSONObject paramData, @Param(path = "a", nestedPath = true) String a) {
-        log.info("{} {} {}", a, paramData, ThreadContext.context().queueName());
+        log.debug("{} {} {}", a, paramData, ThreadContext.context().queueName());
         return paramData;
     }
 
     @Scheduled("0 0")
     public void timer() {
-        log.info("{}", "timer()");
+        log.debug("{}", "timer()");
         runApplication.executeMethodWithAnnotated(RunTest.class, 1, 2);
     }
 

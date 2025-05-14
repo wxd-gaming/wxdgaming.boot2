@@ -57,10 +57,10 @@ public class PlayerHeartHandler extends HoldRunApplication {
         long millis = MyClock.millis();
         {
             /*记录在线时长*/
-            long diff = millis - player.getLastUpdateOnlineTime();
-            player.setOnlineMills(player.getOnlineMills() + diff);
-            player.setOnlineTotalMills(player.getOnlineTotalMills() + diff);
-            player.setLastUpdateOnlineTime(millis);
+            long diff = millis - player.getOnlineInfo().getLastUpdateOnlineTime();
+            player.getOnlineInfo().setOnlineMills(player.getOnlineInfo().getOnlineMills() + diff);
+            player.getOnlineInfo().setOnlineTotalMills(player.getOnlineInfo().getOnlineTotalMills() + diff);
+            player.getOnlineInfo().setLastUpdateOnlineTime(millis);
             runApplication.executeMethodWithAnnotatedException(OnTask.class, player, TaskEvent.builder().k1("onlineTime").targetValue(diff).build());
         }
 

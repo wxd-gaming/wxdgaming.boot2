@@ -7,6 +7,7 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.threading.ThreadContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 
 import java.util.List;
@@ -49,6 +50,7 @@ public class ProtoListenerFactory {
         if (mapping == null) {
             throw new RuntimeException("未找到消息id: %s".formatted(messageId));
         }
+        ThreadContext.cleanup();
         /*根据映射解析生成触发事件*/
         ProtoListenerTrigger protoListenerTrigger = new ProtoListenerTrigger(mapping, protoListenerContent.getRunApplication(), socketSession, messageId, data);
         boolean allMatch = protoFilters.stream().allMatch(filter -> filter.doFilter(protoListenerTrigger));
@@ -58,9 +60,11 @@ public class ProtoListenerFactory {
             }
             return;
         }
-        if (StringUtils.isBlank(protoListenerTrigger.getQueueName())) {
-            /*这里相当于绑定每个session的队列*/
-            protoListenerTrigger.setQueueName("session-" + String.valueOf(socketSession.getChannel().id().asShortText().hashCode() % 16));
+        if (!mapping.protoRequest().ignoreQueue()) {
+            if (StringUtils.isBlank(protoListenerTrigger.getQueueName())) {
+                /*这里相当于绑定每个session的队列*/
+                protoListenerTrigger.setQueueName("session-" + String.valueOf(socketSession.getChannel().id().asShortText().hashCode() % 16));
+            }
         }
         if (log.isDebugEnabled()) {
             log.debug("收到消息：{} queue={}, msgId={}, {}", socketSession, protoListenerTrigger.getQueueName(), messageId, protoListenerTrigger.getPojoBase());
