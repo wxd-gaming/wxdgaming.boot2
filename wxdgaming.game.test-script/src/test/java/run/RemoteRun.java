@@ -6,8 +6,6 @@ import wxdgaming.boot2.core.chatset.Base64Util;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
 import wxdgaming.boot2.core.loader.RemoteClassLoader;
-import wxdgaming.boot2.core.threading.ExecutorUtil;
-import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.starter.net.httpclient.HttpBuilder;
 import wxdgaming.boot2.starter.net.httpclient.PostText;
@@ -24,10 +22,6 @@ import java.util.Map;
  * @version: 2025-03-29 19:00
  **/
 public class RemoteRun {
-
-    static {
-        ExecutorUtilImpl.impl();
-    }
 
     @Test
     public void remoteRun() throws Exception {

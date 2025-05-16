@@ -2,9 +2,9 @@ package wxdgaming.boot2.starter;
 
 import wxdgaming.boot2.core.BaseModule;
 import wxdgaming.boot2.core.ann.Order;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
+import wxdgaming.boot2.core.executor.ExecutorService;
 import wxdgaming.boot2.core.reflect.ReflectContext;
-import wxdgaming.boot2.core.threading.ExecutorUtil;
-import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 
 /**
  * 线程模块
@@ -20,8 +20,7 @@ class ApplicationModule extends BaseModule {
     }
 
     @Override protected void bind() throws Throwable {
-        ExecutorUtil impl = ExecutorUtilImpl.impl();
-        bindInstance(impl);
+        ExecutorService executorServiceBasic = ExecutorFactory.EXECUTOR_SERVICE_BASIC;
     }
 
 }

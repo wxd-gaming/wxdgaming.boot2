@@ -22,9 +22,9 @@ public class ProtoQueueDrive implements ProtoFilter {
     public boolean doFilter(ProtoListenerTrigger protoListenerTrigger) {
         Player player = protoListenerTrigger.getSocketSession().bindData("player");
         if (player != null) {
-            if (StringUtils.isBlank(protoListenerTrigger.getQueueName())) {
-                protoListenerTrigger.setQueueName("drive-" + (player.getUid() % BootConfig.getIns().logicConfig().getMaxSize()));
-            } else if ("map-drive".equalsIgnoreCase(protoListenerTrigger.getQueueName())) {
+            if (StringUtils.isBlank(protoListenerTrigger.queueName())) {
+                protoListenerTrigger.setQueueName("drive-" + (player.getUid() % BootConfig.getIns().logicConfig().getCoreSize()));
+            } else if ("map-drive".equalsIgnoreCase(protoListenerTrigger.queueName())) {
                 MapKey mapKey = player.getMapKey();
 
             }

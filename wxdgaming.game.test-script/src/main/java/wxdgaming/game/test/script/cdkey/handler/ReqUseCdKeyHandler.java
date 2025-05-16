@@ -3,7 +3,7 @@ package wxdgaming.game.test.script.cdkey.handler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.threading.ExecutorWith;
+import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.test.bean.role.Player;

@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.shutdown;
-import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.SessionGroup;
@@ -215,7 +215,7 @@ public abstract class SocketClient {
 
         log.info("{} 链接异常 {} 秒 重连", this.hashCode(), l);
 
-        ExecutorUtilImpl.getInstance().getLogicExecutor().schedule(() -> this.connect(consumer), l, TimeUnit.SECONDS);
+        ExecutorFactory.EXECUTOR_SERVICE_LOGIC.schedule(() -> this.connect(consumer), l, TimeUnit.SECONDS);
         return true;
     }
 

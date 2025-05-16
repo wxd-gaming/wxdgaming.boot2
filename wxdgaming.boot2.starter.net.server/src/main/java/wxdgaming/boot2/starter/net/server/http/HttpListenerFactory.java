@@ -9,9 +9,9 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.io.Objects;
-import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
-import wxdgaming.boot2.core.threading.ThreadContext;
+import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 
 import java.lang.reflect.Method;
@@ -65,7 +65,7 @@ public class HttpListenerFactory {
             }
             if (httpMapping == null) {
                 HttpListenerTriggerFile httpListenerTriggerFile = new HttpListenerTriggerFile(httpContext);
-                ExecutorUtilImpl.getInstance().getVirtualExecutor().execute(httpListenerTriggerFile);
+                ExecutorFactory.EXECUTOR_SERVICE_VIRTUAL.execute(httpListenerTriggerFile);
             } else {
                 if (this.httpServerConfig.isShowRequest()) {
                     StringBuilder showLog = httpContext.showLog();

@@ -6,10 +6,10 @@ import lombok.experimental.SuperBuilder;
 import wxdgaming.boot2.core.function.Consumer2;
 import wxdgaming.boot2.core.function.Function1;
 import wxdgaming.boot2.core.function.Function2;
-import wxdgaming.boot2.core.threading.TimerJob;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.util.Collection;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * cache
@@ -36,7 +36,7 @@ public abstract class Cache<K, V> {
     @Builder.Default
     protected long nullValueTimeMs = 3000;
     protected Consumer2<K, V> heartListener;
-    protected TimerJob[] timerJobs = null;
+    protected ScheduledFuture<?>[] timerJobs = null;
 
     public void start() {
         AssertUtil.assertTrue(this.area > 0, "area must > 0");

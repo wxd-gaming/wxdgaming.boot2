@@ -7,13 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.executor.IExecutorQueue;
 import wxdgaming.boot2.core.io.Objects;
-import wxdgaming.boot2.core.lang.DiffTime;
-import wxdgaming.boot2.core.reflect.MethodUtil;
-import wxdgaming.boot2.core.threading.Event;
-import wxdgaming.boot2.core.threading.ExecutorWith;
-import wxdgaming.boot2.core.timer.CronExpress;
 import wxdgaming.boot2.core.reflect.AnnUtil;
+import wxdgaming.boot2.core.reflect.MethodUtil;
+import wxdgaming.boot2.core.timer.CronExpress;
 import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 
@@ -32,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class ScheduledInfo extends Event implements Comparable<ScheduledInfo> {
+public class ScheduledInfo extends ExecutorEvent implements Runnable, IExecutorQueue, Comparable<ScheduledInfo> {
 
     protected String name;
     protected int index;
@@ -46,8 +45,6 @@ public class ScheduledInfo extends Event implements Comparable<ScheduledInfo> {
     protected final boolean scheduleAtFixedRate;
     protected final ReentrantLock lock = new ReentrantLock();
     protected final AtomicBoolean runEnd = new AtomicBoolean(true);
-    protected final boolean async;
-    protected DiffTime startExecTime = new DiffTime();
     protected long nextRunTime = -1;
 
     public ScheduledInfo(Object instance, Method method, Scheduled scheduled) {
@@ -63,18 +60,12 @@ public class ScheduledInfo extends Event implements Comparable<ScheduledInfo> {
             this.name = "[scheduled-job]" + instance.getClass().getName() + "." + method.getName();
         }
 
-        this.async = AnnUtil.ann(method, ExecutorWith.class) != null;
-
         final Order orderAnn = AnnUtil.ann(method, Order.class);
         this.index = orderAnn == null ? 999999 : orderAnn.value();
         this.scheduleAtFixedRate = scheduled.scheduleAtFixedRate();
         this.cronExpress = new CronExpress(scheduled.value(), TimeUnit.SECONDS, 0);
-
     }
 
-    @Override public String getTaskInfoString() {
-        return name;
-    }
 
     /**
      * 秒 分 时 日 月 星期 年
@@ -102,7 +93,6 @@ public class ScheduledInfo extends Event implements Comparable<ScheduledInfo> {
 
         this.index = 999999;
         this.scheduleAtFixedRate = scheduleAtFixedRate;
-        this.async = false;
         this.cronExpress = new CronExpress(scheduled, TimeUnit.SECONDS, 0);
     }
 
@@ -118,7 +108,15 @@ public class ScheduledInfo extends Event implements Comparable<ScheduledInfo> {
         return millis >= getNextRunTime();
     }
 
-    @Override public void onEvent() {
+    public boolean isAsync() {
+        return executorWith != null;
+    }
+
+    @Override public String getStack() {
+        return this.name;
+    }
+
+    @Override public void onEvent() throws Exception {
         try {
             if (scheduledProxy != null) {
                 scheduledProxy.proxyInvoke(Objects.ZERO_ARRAY);

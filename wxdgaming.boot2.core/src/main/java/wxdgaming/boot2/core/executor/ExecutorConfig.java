@@ -1,4 +1,4 @@
-package wxdgaming.boot2.core.threading;
+package wxdgaming.boot2.core.executor;
 
 import com.alibaba.fastjson.annotation.JSONCreator;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -14,24 +14,20 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 @Getter
 public class ExecutorConfig extends ObjectBase {
 
-    public static final ExecutorConfig DEFAULT_INSTANCE = new ExecutorConfig(2, 4, 5000);
-    public static final ExecutorConfig LOGIC_INSTANCE = new ExecutorConfig(2, 4, 5000);
-    public static final ExecutorConfig VIRTUAL_INSTANCE = new ExecutorConfig(100, 200, 5000);
+    public static final ExecutorConfig DEFAULT_INSTANCE = new ExecutorConfig(2, 5000);
+    public static final ExecutorConfig LOGIC_INSTANCE = new ExecutorConfig(8, 5000);
+    public static final ExecutorConfig VIRTUAL_INSTANCE = new ExecutorConfig(100, 5000);
 
     @JSONField(ordinal = 1)
     private final int coreSize;
-    @JSONField(ordinal = 2)
-    private final int maxSize;
     @JSONField(ordinal = 3)
     private final int maxQueueSize;
 
     @JSONCreator
     public ExecutorConfig(
             @JSONField(name = "coreSize", defaultValue = "2") int coreSize,
-            @JSONField(name = "maxSize", defaultValue = "4") int maxSize,
             @JSONField(name = "maxQueueSize", defaultValue = "5000") int maxQueueSize) {
         this.coreSize = coreSize;
-        this.maxSize = maxSize;
         this.maxQueueSize = maxQueueSize;
     }
 }

@@ -9,10 +9,10 @@ import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.*;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
-import wxdgaming.boot2.core.threading.Event;
-import wxdgaming.boot2.core.threading.ThreadContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 
 import java.lang.reflect.InvocationTargetException;
@@ -26,7 +26,7 @@ import java.lang.reflect.Type;
  * @version: 2025-02-18 09:15
  **/
 @Slf4j
-public class RpcListenerTrigger extends Event {
+public class RpcListenerTrigger extends ExecutorEvent {
 
     private final RpcMapping rpcMapping;
     private final RpcService rpcService;
@@ -49,8 +49,12 @@ public class RpcListenerTrigger extends Event {
         this.paramObject = paramObject;
     }
 
-    @Override public String getTaskInfoString() {
-        return "RpcListenerTrigger: " + rpcMapping.path() + "; " + rpcMapping.javassistProxy().getInstance().getClass().getName() + "." + rpcMapping.javassistProxy().getMethod().getName() + "()";
+    @Override public String getStack() {
+        return "RpcListenerTrigger: %s; %s.%s()".formatted(
+                rpcMapping.path(),
+                rpcMapping.javassistProxy().getInstance().getClass().getName(),
+                rpcMapping.javassistProxy().getMethod().getName()
+        );
     }
 
     @Override public void onEvent() {

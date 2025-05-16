@@ -7,13 +7,17 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.shutdown;
-import wxdgaming.boot2.core.threading.*;
+import wxdgaming.boot2.core.executor.ExecutorConfig;
+import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
+import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,15 +30,15 @@ import java.util.concurrent.TimeUnit;
 @Getter
 public class ScheduledService {
 
-    protected Job job;
+    protected ScheduledFuture<?> future;
     /*                          类名字                  方法名    实例 */
     protected List<ScheduledInfo> jobList = new ArrayList<>();
 
     protected final ExecutorConfig config;
-    protected IExecutorServices executorServices;
+    protected ExecutorServicePlatform executorServicePlatform;
 
     public ScheduledService(ExecutorConfig config) {
-        executorServices = ExecutorUtilImpl.getInstance().newExecutorServices("scheduled-executor", config.getCoreSize(), config.getCoreSize(), config.getMaxQueueSize());
+        executorServicePlatform = ExecutorFactory.create("scheduled-executor", config.getCoreSize());
         this.config = config;
     }
 
@@ -60,8 +64,7 @@ public class ScheduledService {
     @Order(99999998)
     public void start() {
         ScheduleTrigger scheduleTrigger = new ScheduleTrigger();
-        job = ExecutorUtilImpl.getInstance().getBasicExecutor().scheduleAtFixedDelay(
-                "scheduled-timer",
+        future = executorServicePlatform.scheduleAtFixedRate(
                 scheduleTrigger,
                 10,
                 10,
@@ -73,9 +76,9 @@ public class ScheduledService {
     @Order(1000)
     public void shutdown() {
         log.info("线程 Scheduled 调度器 退出");
-        if (job != null) {
-            job.cancel();
-            job = null;
+        if (future != null) {
+            future.cancel(true);
+            future = null;
         }
     }
 
@@ -85,10 +88,14 @@ public class ScheduledService {
 
 
     /** 触发器 */
-    protected class ScheduleTrigger extends Event {
+    protected class ScheduleTrigger extends ExecutorEvent {
 
         public ScheduleTrigger() {
-            super("任务调度器", 33, 500);
+            super();
+        }
+
+        @Override public String queueName() {
+            return "scheduled-timer";
         }
 
         int curSecond = -1;
@@ -131,13 +138,7 @@ public class ScheduledService {
                 scheduledInfo.submit();
             } else {
                 /*同步执行*/
-                scheduledInfo.startExecTime.reset();
-                executorServices.submit(scheduledInfo);
-                float v = scheduledInfo.startExecTime.diff();
-                if (v > logTime) {
-                    String msg = "执行：" + scheduledInfo.getName() + ", 耗时：" + v + " ms";
-                    log.info(msg);
-                }
+                scheduledInfo.run();
             }
             return true;
         }

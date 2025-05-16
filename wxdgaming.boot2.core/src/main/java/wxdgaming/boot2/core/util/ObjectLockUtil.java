@@ -15,16 +15,22 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class ObjectLockUtil {
 
     /** 缓存锁 */
-    static final LRUCache<Object, LockObject> cache = LRUCache.<Object, LockObject>builder()
-            .area(1)
-            .heartTimeMs(3000)
-            .expireAfterReadMs(3000)
-            .loader(k -> new LockObject())
-            .removalListener((o, lockObject) -> lockObject.count <= 0)
-            .build();
+    static final LRUCache<Object, LockObject> cache;
+    static final CacheLock cacheLock;
+    static final ReentrantReadWriteLock.WriteLock writeLock;
 
-    static final CacheLock cacheLock = cache.getReentrantLocks().getFirst();
-    static final ReentrantReadWriteLock.WriteLock writeLock = cacheLock.getWriteLock();
+    static {
+        cache = LRUCache.<Object, LockObject>builder()
+                .area(1)
+                .heartTimeMs(3000)
+                .expireAfterReadMs(3000)
+                .loader(k -> new LockObject())
+                .removalListener((o, lockObject) -> lockObject.count <= 0)
+                .build();
+        cache.start();
+        cacheLock = cache.getReentrantLocks().getFirst();
+        writeLock = cacheLock.getWriteLock();
+    }
 
     public static void lock(Object key) {
         LockObject lockObject;

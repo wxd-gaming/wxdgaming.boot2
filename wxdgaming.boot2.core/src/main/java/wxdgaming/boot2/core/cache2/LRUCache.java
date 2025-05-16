@@ -3,13 +3,12 @@ package wxdgaming.boot2.core.cache2;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.format.data.Data2Size;
-import wxdgaming.boot2.core.threading.Event;
-import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
-import wxdgaming.boot2.core.threading.TimerJob;
 import wxdgaming.boot2.core.timer.MyClock;
 
 import java.util.*;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -61,12 +60,12 @@ public class LRUCache<K, V> extends Cache<K, V> {
     public void start() {
         super.start();
         initNodes();
-        this.timerJobs = new TimerJob[this.area];
+        this.timerJobs = new ScheduledFuture<?>[this.area];
 
         for (int i = 0; i < this.area; i++) {
             final int hashIndex = i;
-            Event heartEvent = new Event(500, 1000) {
-                @Override public void onEvent() throws Exception {
+            Runnable heartEvent = new Runnable() {
+                @Override public void run() {
                     CacheLock cacheLock = reentrantLocks.get(hashIndex);
                     cacheLock.writeLock.lock();
                     try {
@@ -101,14 +100,12 @@ public class LRUCache<K, V> extends Cache<K, V> {
                     }
                 }
             };
-            TimerJob timerJob = ExecutorUtilImpl.getInstance()
-                    .getBasicExecutor()
-                    .scheduleAtFixedDelay(
-                            heartEvent,
-                            this.heartTimeMs,
-                            this.heartTimeMs,
-                            TimeUnit.MILLISECONDS
-                    );
+            ScheduledFuture<?> timerJob = ExecutorFactory.EXECUTOR_SERVICE_BASIC.scheduleAtFixedRate(
+                    heartEvent,
+                    this.heartTimeMs,
+                    this.heartTimeMs,
+                    TimeUnit.MILLISECONDS
+            );
             this.timerJobs[i] = timerJob;
         }
     }
@@ -126,8 +123,8 @@ public class LRUCache<K, V> extends Cache<K, V> {
     }
 
     @Override public void shutdown() {
-        for (TimerJob timerJob : timerJobs) {
-            timerJob.cancel();
+        for (ScheduledFuture<?> timerJob : timerJobs) {
+            timerJob.cancel(true);
         }
         invalidateAll();
     }

@@ -7,7 +7,7 @@ import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.*;
-import wxdgaming.boot2.core.threading.ThreadContext;
+import wxdgaming.boot2.core.executor.ThreadContext;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;

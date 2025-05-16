@@ -1,4 +1,4 @@
-package wxdgaming.boot2.core.threading;
+package wxdgaming.boot2.core.executor;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;

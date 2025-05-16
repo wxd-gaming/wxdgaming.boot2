@@ -7,7 +7,7 @@ import com.mysql.cj.jdbc.Driver;
 import org.junit.Test;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.collection.MapOf;
-import wxdgaming.boot2.core.threading.ExecutorConfig;
+import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.util.YamlUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 import wxdgaming.boot2.starter.net.client.SocketClientConfig;

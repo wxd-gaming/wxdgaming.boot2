@@ -5,9 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.threading.Event;
-import wxdgaming.boot2.core.threading.ExecutorUtil;
-import wxdgaming.boot2.core.threading.TimerJob;
+import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.event.*;
@@ -15,6 +14,7 @@ import wxdgaming.game.test.event.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,41 +30,41 @@ public class PlayerDrive extends HoldRunApplication {
     private final HashMap<Integer, PlayerDriveContent> playerDriveContentMap = new HashMap<>();
 
     @Start
-    public void start(ExecutorUtil executorUtil) {
-        int maxSize = BootConfig.getIns().logicConfig().getMaxSize();
+    public void start() {
+        int maxSize = BootConfig.getIns().logicConfig().getCoreSize();
         for (int i = 0; i < maxSize; i++) {
-            PlayerDriveContent driveContent = new PlayerDriveContent();
+            PlayerDriveContent driveContent = new PlayerDriveContent("drive-" + i);
             playerDriveContentMap.put(i, driveContent);
-            driveContent.timerJob = executorUtil.getLogicExecutor().scheduleAtFixedDelay("drive-" + i, driveContent, 33, 33, TimeUnit.MILLISECONDS);
+            driveContent.timerJob = ExecutorFactory.EXECUTOR_SERVICE_LOGIC.scheduleAtFixedRate(driveContent, 33, 33, TimeUnit.MILLISECONDS);
         }
     }
 
     @OnLogin
     public void addPlayer(Player player) {
         int driveId = (int) (player.getUid() % playerDriveContentMap.size());
-        PlayerDriveContent playerDriveContent = playerDriveContentMap.computeIfAbsent(driveId, k -> new PlayerDriveContent());
+        PlayerDriveContent playerDriveContent = playerDriveContentMap.get(driveId);
         playerDriveContent.playerMap.put(player.getUid(), player);
     }
 
     @OnLogout
     public void removePlayer(Player player) {
         int driveId = (int) (player.getUid() % playerDriveContentMap.size());
-        PlayerDriveContent playerDriveContent = playerDriveContentMap.computeIfAbsent(driveId, k -> new PlayerDriveContent());
+        PlayerDriveContent playerDriveContent = playerDriveContentMap.get(driveId);
         playerDriveContent.playerMap.remove(player.getUid());
     }
 
-    public class PlayerDriveContent extends Event {
+    public class PlayerDriveContent extends ExecutorEvent {
 
         private int lsatSecond = -1;
         private int lsatMinute = -1;
         private int lsatHour = -1;
         private int lastDay = -1;
-        TimerJob timerJob;
+        ScheduledFuture<?> timerJob;
         private final ConcurrentSkipListMap<Long, Player> playerMap = new ConcurrentSkipListMap<>();
 
-        public PlayerDriveContent() {
+        public PlayerDriveContent(String queueName) {
+            this.queueName = queueName;
         }
-
 
         @Override public void onEvent() throws Exception {
             long millis = MyClock.millis();

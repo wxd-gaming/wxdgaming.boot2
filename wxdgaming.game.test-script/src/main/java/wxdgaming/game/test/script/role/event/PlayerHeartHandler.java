@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
-import wxdgaming.boot2.core.threading.ThreadContext;
+import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.event.*;

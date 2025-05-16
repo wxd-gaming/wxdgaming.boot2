@@ -7,9 +7,9 @@ import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Qualifier;
 import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
 import wxdgaming.boot2.core.reflect.ReflectContext;
-import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.starter.net.SocketSession;
 
 import java.lang.reflect.Parameter;
@@ -23,7 +23,7 @@ import java.lang.reflect.Type;
  **/
 @Slf4j
 @Getter
-public class ProtoListenerTrigger extends Event {
+public class ProtoListenerTrigger extends ExecutorEvent {
 
     private final ProtoMapping protoMapping;
     private final RunApplication runApplication;
@@ -33,12 +33,15 @@ public class ProtoListenerTrigger extends Event {
     private PojoBase pojoBase;
 
     public ProtoListenerTrigger(ProtoMapping protoMapping, RunApplication runApplication, SocketSession socketSession, int messageId, byte[] bytes) {
-        super(protoMapping.javassistProxy().getMethod());
         this.protoMapping = protoMapping;
         this.runApplication = runApplication;
         this.socketSession = socketSession;
         this.messageId = messageId;
         this.bytes = bytes;
+    }
+
+    @Override public String getStack() {
+        return "ProtoListenerTrigger %s messageId=%s, %s".formatted(socketSession, messageId, getPojoBase());
     }
 
     @Override public void onEvent() throws Exception {

@@ -6,11 +6,11 @@ import reactor.core.publisher.Mono;
 import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.collection.MapOf;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.lang.DiffTime;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
 import wxdgaming.boot2.core.reflect.ReflectContext;
-import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 import wxdgaming.boot2.starter.RunApplicationMain;
 import wxdgaming.boot2.starter.RunApplicationSub;
 import wxdgaming.boot2.starter.WxdApplication;
@@ -50,7 +50,7 @@ public class Main {
             QPlayer qPlayer = qPlayerTable.get(1);
             log.info("{}", qPlayer);
 
-            ExecutorUtilImpl.getInstance().getBasicExecutor().schedule(
+            ExecutorFactory.EXECUTOR_SERVICE_BASIC.schedule(
                     () -> {
                         RpcService rpcService = runApplication.getInstance(RpcService.class);
                         SocketClient client = runApplication.getInstance(SocketClient.class);

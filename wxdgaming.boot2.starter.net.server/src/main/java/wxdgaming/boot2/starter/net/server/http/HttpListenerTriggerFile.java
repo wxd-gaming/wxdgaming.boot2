@@ -6,9 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.cache2.CASCache;
 import wxdgaming.boot2.core.cache2.Cache;
+import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.lang.Tuple2;
-import wxdgaming.boot2.core.threading.Event;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.net.http.HttpHeadValueType;
 
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  * @version: 2025-02-13 16:29
  **/
 @Slf4j
-public class HttpListenerTriggerFile extends Event {
+public class HttpListenerTriggerFile extends ExecutorEvent {
 
     /** 过期时间格式化 */
     public static SimpleDateFormat ExpiresFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss", Locale.ENGLISH);

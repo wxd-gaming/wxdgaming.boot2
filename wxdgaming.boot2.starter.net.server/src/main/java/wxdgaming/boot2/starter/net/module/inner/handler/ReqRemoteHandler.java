@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.core.threading.ThreadContext;
+import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;

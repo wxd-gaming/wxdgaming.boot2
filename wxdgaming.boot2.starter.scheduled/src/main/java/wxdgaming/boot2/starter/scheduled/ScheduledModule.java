@@ -2,8 +2,8 @@ package wxdgaming.boot2.starter.scheduled;
 
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ServiceModule;
+import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.reflect.ReflectContext;
-import wxdgaming.boot2.core.threading.ExecutorConfig;
 
 /**
  * 模块
@@ -13,7 +13,7 @@ import wxdgaming.boot2.core.threading.ExecutorConfig;
  **/
 public class ScheduledModule extends ServiceModule {
 
-    public static final ExecutorConfig DEFAULT_INSTANCE = new ExecutorConfig(1, 1, 5000);
+    public static final ExecutorConfig DEFAULT_INSTANCE = new ExecutorConfig(1, 5000);
 
     public ScheduledModule(ReflectContext reflectContext) {
         super(reflectContext);

@@ -9,10 +9,10 @@ import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.*;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
-import wxdgaming.boot2.core.threading.Event;
-import wxdgaming.boot2.core.threading.ThreadContext;
 import wxdgaming.boot2.core.util.GlobalUtil;
 
 import java.lang.reflect.InvocationTargetException;
@@ -26,7 +26,7 @@ import java.lang.reflect.Type;
  * @version: 2025-02-13 16:29
  **/
 @Slf4j
-public class HttpListenerTrigger extends Event {
+public class HttpListenerTrigger extends ExecutorEvent {
 
     private final HttpMapping httpMapping;
     private final RunApplication runApplication;
@@ -39,7 +39,7 @@ public class HttpListenerTrigger extends Event {
         this.httpContext = httpContext;
     }
 
-    @Override public String getTaskInfoString() {
+    @Override public String getStack() {
         return "HttpListenerTrigger: %s; %s.%s()".formatted(
                 httpMapping.path(),
                 httpMapping.javassistProxy().getInstance().getClass().getName(),

@@ -7,7 +7,7 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.threading.ThreadContext;
+import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 
 import java.util.List;
@@ -61,13 +61,13 @@ public class ProtoListenerFactory {
             return;
         }
         if (!mapping.protoRequest().ignoreQueue()) {
-            if (StringUtils.isBlank(protoListenerTrigger.getQueueName())) {
+            if (StringUtils.isBlank(protoListenerTrigger.queueName())) {
                 /*这里相当于绑定每个session的队列*/
                 protoListenerTrigger.setQueueName("session-" + String.valueOf(socketSession.getChannel().id().asShortText().hashCode() % 16));
             }
         }
         if (log.isDebugEnabled()) {
-            log.debug("收到消息：{} queue={}, msgId={}, {}", socketSession, protoListenerTrigger.getQueueName(), messageId, protoListenerTrigger.getPojoBase());
+            log.debug("收到消息：{} queue={}, msgId={}, {}", socketSession, protoListenerTrigger.queueName(), messageId, protoListenerTrigger.getPojoBase());
         }
         /*提交到对应的线程和队列*/
         protoListenerTrigger.submit();

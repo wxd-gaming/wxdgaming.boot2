@@ -4,9 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.lang.Tuple2;
-import wxdgaming.boot2.core.threading.ExecutorConfig;
 import wxdgaming.boot2.core.util.JvmUtil;
 import wxdgaming.boot2.core.util.YamlUtil;
 
@@ -86,8 +86,8 @@ public class BootConfig {
         return sname;
     }
 
-    public ExecutorConfig defaultConfig() {
-        return getNestedValue("executor.default", ExecutorConfig.class, ExecutorConfig.DEFAULT_INSTANCE);
+    public ExecutorConfig basicConfig() {
+        return getNestedValue("executor.basic", ExecutorConfig.class, ExecutorConfig.DEFAULT_INSTANCE);
     }
 
     public ExecutorConfig logicConfig() {

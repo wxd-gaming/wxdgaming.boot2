@@ -13,9 +13,7 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.NoHttpResponseException;
 import reactor.core.publisher.Mono;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.core.threading.Event;
-import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.starter.net.http.HttpHeadNameType;
 import wxdgaming.boot2.starter.net.http.HttpHeadValueType;
@@ -28,7 +26,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 /**
  * http构建协议
@@ -49,7 +46,6 @@ public abstract class HttpBase<H extends HttpBase> {
     protected final Map<String, String> reqHeaderMap = new LinkedHashMap<>();
 
     protected final Response<H> response;
-    protected StackTraceElement[] stackTraceElements;
 
     public HttpBase(HttpClientPool httpClientPool, String uriPath) {
         this.httpClientPool = httpClientPool;
@@ -69,25 +65,7 @@ public abstract class HttpBase<H extends HttpBase> {
     }
 
     public Mono<Response<H>> async() {
-        return sendAsync(3);
-    }
-
-    Mono<Response<H>> sendAsync(int stackTraceIndex) {
-        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        stackTraceElements = new StackTraceElement[stackTrace.length - stackTraceIndex];
-        System.arraycopy(stackTrace, stackTraceIndex, stackTraceElements, 0, stackTraceElements.length);
-        final CompletableFuture<Response<H>> future = new CompletableFuture<>();
-        ExecutorUtilImpl.getInstance().getVirtualExecutor().submit(new Event(Throw.ofString(stackTraceElements[0]) + " " + HttpBase.this.response.toString(), logTime, waringTime) {
-
-            @Override public void onEvent() throws Exception {
-                try {
-                    future.complete(request());
-                } catch (Throwable throwable) {
-                    future.completeExceptionally(throwable);
-                }
-            }
-
-        }, stackTraceIndex + 2);
+        CompletableFuture<Response<H>> future = ExecutorFactory.EXECUTOR_SERVICE_VIRTUAL.future(this::request);
         return Mono.fromCompletionStage(future);
     }
 

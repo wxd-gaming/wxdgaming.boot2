@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import run.entity.EntityTest;
 import run.entity.Table2;
-import wxdgaming.boot2.core.threading.ExecutorUtilImpl;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
@@ -26,7 +25,6 @@ public class PgsqlTest {
 
 
     static {
-        ExecutorUtilImpl.impl();
         SqlConfig sqlConfig = new SqlConfig();
         sqlConfig.setDebug(true);
         sqlConfig.setDriverClassName("org.postgresql.Driver");
