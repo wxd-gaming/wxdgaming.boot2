@@ -41,6 +41,7 @@ public class HttpListenerTriggerFile extends ExecutorEvent {
                     return inputStream != null ? inputStream.getRight() : null;
                 })
                 .build();
+        cache.start();
     }
 
     private final HttpContext httpContext;
