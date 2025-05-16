@@ -1,9 +1,10 @@
 package wxdgaming.boot2.core.executor;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
 
 /**
  * 虚拟线程执行器
@@ -11,7 +12,7 @@ import java.util.function.Supplier;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-05-15 11:41
  **/
-public class ExecutorServiceVirtual implements ExecutorService {
+public class ExecutorServiceVirtual extends ExecutorService {
 
     protected final LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     protected final ConcurrentMap<String, ExecutorQueue> queueMap = new ConcurrentHashMap<>();
@@ -26,18 +27,32 @@ public class ExecutorServiceVirtual implements ExecutorService {
     }
 
     @Override public void execute(Runnable command) {
+        ExecutorJob executorJob;
         if (!(command instanceof ExecutorQueue)) {
-            if (command instanceof IExecutorQueue iExecutorQueue) {
+            if (!(command instanceof ExecutorJob)) {
+                executorJob = new ExecutorJob(command);
+            } else {
+                executorJob = (ExecutorJob) command;
+            }
+
+            if (!(command instanceof ExecutorJobScheduled.ScheduledExecutorJob) && executorJob.threadContext == null) {
+                /*TODO 任务添加线程上下文*/
+                executorJob.threadContext = new ThreadContext(ThreadContext.context());
+            }
+
+            if (executorJob instanceof IExecutorQueue iExecutorQueue) {
                 if (Utils.isNotBlank(iExecutorQueue.queueName())) {
-                    this.queueMap
+                    queueMap
                             .computeIfAbsent(iExecutorQueue.queueName(), k -> new ExecutorQueue(this))
-                            .execute(command);
+                            .execute(executorJob);
                     return;
                 }
             }
+        } else {
+            executorJob = (ExecutorJob) command;
         }
-        ExecutorJobVirtual executorJob = new ExecutorJobVirtual(command);
-        this.queue.add(executorJob);
+        ExecutorJobVirtual executorJobVirtual = new ExecutorJobVirtual(executorJob);
+        this.queue.add(executorJobVirtual);
         checkExecute();
     }
 

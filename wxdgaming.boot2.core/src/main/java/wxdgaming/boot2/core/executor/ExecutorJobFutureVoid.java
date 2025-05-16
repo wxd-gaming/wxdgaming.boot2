@@ -28,11 +28,16 @@ class ExecutorJobFutureVoid extends ExecutorJob implements Runnable, IExecutorQu
     @Override public void run() {
         try {
             ExecutorMonitor.put(this);
+            if (this.getThreadContext() != null) {
+                ThreadContext.context().putAll(this.getThreadContext());
+            }
             getRunnable().run();
             future.complete(null);
         } catch (Throwable throwable) {
             future.completeExceptionally(throwable);
         } finally {
+            this.threadContext = null;
+            ThreadContext.cleanup();
             ExecutorMonitor.release();
             runAfter();
         }

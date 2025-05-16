@@ -23,7 +23,7 @@ class ExecutorJobScheduled implements Runnable {
     /** 如果true 如果当前正在运行不执行下一次 */
     private final boolean atFixedRate;
     private final AtomicBoolean running = new AtomicBoolean(false);
-    @Setter private ScheduledFuture<?> schedule;
+    @Setter private ScheduledFuture<?> scheduledFuture;
 
     /**
      * 定时器任务
@@ -38,13 +38,17 @@ class ExecutorJobScheduled implements Runnable {
     }
 
     /** 对任务进行一次包装 */
-    private class ScheduledExecutorJob extends ExecutorJob implements IExecutorQueue {
+    public class ScheduledExecutorJob extends ExecutorJob implements IExecutorQueue {
 
         final IExecutorQueue iExecutorQueue;
 
         public ScheduledExecutorJob(Runnable runnable) {
             super(runnable);
             iExecutorQueue = getRunnable() instanceof IExecutorQueue ? ((IExecutorQueue) getRunnable()) : null;
+        }
+
+        @Override protected ThreadContext getThreadContext() {
+            return null;
         }
 
         @Override public String queueName() {

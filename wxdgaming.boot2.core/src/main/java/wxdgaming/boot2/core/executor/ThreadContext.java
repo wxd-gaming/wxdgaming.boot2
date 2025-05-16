@@ -21,7 +21,7 @@ import java.util.Map;
 @Getter
 public class ThreadContext extends JSONObject {
 
-    private static final ThreadLocal<ThreadContext> local = new InheritableThreadLocal<>();
+    private static final ThreadLocal<ThreadContext> local = new ThreadLocal<>();
 
     public static <R> R context(ThreadParam threadParam, Type type) {
         String name = threadParam.path();

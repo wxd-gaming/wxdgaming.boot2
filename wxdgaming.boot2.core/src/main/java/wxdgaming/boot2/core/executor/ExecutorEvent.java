@@ -2,7 +2,6 @@ package wxdgaming.boot2.core.executor;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 
 import java.lang.reflect.Method;
@@ -40,10 +39,15 @@ public abstract class ExecutorEvent extends ExecutorJob implements IExecutorQueu
     @Override public void run() {
         try {
             ExecutorMonitor.put(this);
+            if (this.getThreadContext() != null) {
+                ThreadContext.context().putAll(this.getThreadContext());
+            }
             onEvent();
         } catch (Throwable throwable) {
             log.error("{}", getStack(), throwable);
         } finally {
+            this.threadContext = null;
+            ThreadContext.cleanup();
             ExecutorMonitor.release();
             runAfter();
         }
@@ -55,7 +59,7 @@ public abstract class ExecutorEvent extends ExecutorJob implements IExecutorQueu
         ExecutorService executorService = ExecutorFactory.EXECUTOR_SERVICE_LOGIC;
         if (executorWith != null) {
             String threadName = executorWith.threadName();
-            if (StringUtils.isNotBlank(threadName)) {
+            if (Utils.isNotBlank(threadName)) {
                 executorService = ExecutorFactory.getExecutor(threadName);
             }
         }

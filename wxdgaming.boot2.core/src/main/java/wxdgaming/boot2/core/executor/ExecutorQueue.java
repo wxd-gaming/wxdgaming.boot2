@@ -27,10 +27,17 @@ public class ExecutorQueue extends ExecutorJob implements Executor {
     }
 
     @Override public void execute(Runnable command) {
+        ExecutorJob executorJob;
         if (!(command instanceof ExecutorJob)) {
-            command = new ExecutorJob(command);
+            executorJob = new ExecutorJob(command);
+        } else {
+            executorJob = (ExecutorJob) command;
         }
-        queue.add((ExecutorJob) command);
+        if (!(command instanceof ExecutorJobScheduled.ScheduledExecutorJob) && executorJob.threadContext == null) {
+            /*TODO 任务添加线程上下文*/
+            executorJob.threadContext = new ThreadContext(ThreadContext.context());
+        }
+        queue.add(executorJob);
         checkExecute(false);
     }
 
@@ -65,6 +72,7 @@ public class ExecutorQueue extends ExecutorJob implements Executor {
         } catch (Throwable throwable) {
             log.error("{}", stack, throwable);
         } finally {
+            ThreadContext.cleanup();
             ExecutorMonitor.release();
             checkExecute(true);
         }

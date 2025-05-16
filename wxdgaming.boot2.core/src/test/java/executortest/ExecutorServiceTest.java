@@ -13,18 +13,25 @@ public class ExecutorServiceTest {
     public static void main(String[] args) {
         ExecutorServicePlatform executorServicePlatform = ExecutorFactory.create("4", 10);
 
-        MyRunnable myRunnable = new MyRunnable();
-        executorServicePlatform.schedule(
-                myRunnable,
-                1,
-                TimeUnit.SECONDS
-        );
+        {
+            ThreadContext.context().put("test", "myRunnable");
+            executorServicePlatform.execute(new MyRunnable());
+            MyRunnable myRunnable = new MyRunnable();
+            executorServicePlatform.schedule(
+                    myRunnable,
+                    1,
+                    TimeUnit.SECONDS
+            );
 
-        executorServicePlatform.schedule(
-                myRunnable.myRunnableQueue,
-                1,
-                TimeUnit.SECONDS
-        );
+            ThreadContext.cleanup();
+
+            executorServicePlatform.schedule(
+                    myRunnable.myRunnableQueue,
+                    1,
+                    TimeUnit.SECONDS
+            );
+
+        }
 
         executorServicePlatform.schedule(
                 new MyRunnableQueue(),
@@ -65,7 +72,7 @@ public class ExecutorServiceTest {
         }
 
         @Override public void onEvent() throws Exception {
-            log.info("1 {}", Utils.stack());
+            log.info("1 {} {}", Utils.stack(), ThreadContext.context().get("test"));
             throw new RuntimeException("1");
         }
     }
@@ -77,7 +84,7 @@ public class ExecutorServiceTest {
         }
 
         @Override public void onEvent() throws Exception {
-            log.info("1 {}", getStack());
+            log.info("1 {} {}", getStack(), ThreadContext.context().get("test"));
         }
 
     }
@@ -94,7 +101,7 @@ public class ExecutorServiceTest {
                 log.info("MyTimerRunnable cancel");
             }
             LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(5));
-            log.info("MyTimerRunnable {}", c);
+            log.info("MyTimerRunnable {}  {}", c, ThreadContext.context().get("test"));
         }
 
     }
@@ -104,7 +111,7 @@ public class ExecutorServiceTest {
 
         @Override public void run() {
             LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(5));
-            log.info("MyTimerRunnable2");
+            log.info("MyTimerRunnable2  {}", ThreadContext.context().get("test"));
         }
 
     }
@@ -119,9 +126,9 @@ public class ExecutorServiceTest {
 
         @Override public void run() {
             scheduledFuture.cancel(true);
-            log.info("MyTimerRunnable2Queue cancel");
+            log.info("MyTimerRunnable2Queue cancel {}", ThreadContext.context().get("test"));
             LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(5));
-            log.info("MyTimerRunnable2Queue");
+            log.info("MyTimerRunnable2Queue {}", ThreadContext.context().get("test"));
         }
 
     }

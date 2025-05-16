@@ -31,12 +31,17 @@ class ExecutorJobFuture<T> extends ExecutorJob implements Runnable, IExecutorQue
     @Override public void run() {
         try {
             ExecutorMonitor.put(this);
+            if (this.getThreadContext() != null) {
+                ThreadContext.context().putAll(this.getThreadContext());
+            }
             future.complete(this.supplier.get());
         } catch (Throwable throwable) {
             future.completeExceptionally(throwable);
         } finally {
-            runAfter();
+            this.threadContext = null;
+            ThreadContext.cleanup();
             ExecutorMonitor.release();
+            runAfter();
         }
     }
 }
