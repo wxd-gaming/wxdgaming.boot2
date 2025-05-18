@@ -42,7 +42,7 @@ public class MapOf implements Serializable {
 
 
     public static JSONObject newJSONObject() {
-        return new JSONObject(true);
+        return new JSONObject();
     }
 
     public static JSONObject newJSONObject(String key, Object value) {
