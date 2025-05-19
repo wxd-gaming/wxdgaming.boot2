@@ -65,7 +65,7 @@ public abstract class HttpBase<H extends HttpBase> {
     }
 
     public Mono<Response<H>> async() {
-        CompletableFuture<Response<H>> future = ExecutorFactory.EXECUTOR_SERVICE_VIRTUAL.future(this::request);
+        CompletableFuture<Response<H>> future = ExecutorFactory.getExecutorServiceVirtual().future(this::request);
         return Mono.fromCompletionStage(future);
     }
 

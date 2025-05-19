@@ -100,7 +100,7 @@ public class LRUCache<K, V> extends Cache<K, V> {
                     }
                 }
             };
-            ScheduledFuture<?> timerJob = ExecutorFactory.EXECUTOR_SERVICE_BASIC.scheduleAtFixedRate(
+            ScheduledFuture<?> timerJob = ExecutorFactory.getExecutorServiceBasic().scheduleAtFixedRate(
                     heartEvent,
                     this.heartTimeMs,
                     this.heartTimeMs,

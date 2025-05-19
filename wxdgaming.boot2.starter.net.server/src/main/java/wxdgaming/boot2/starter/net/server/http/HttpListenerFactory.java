@@ -65,7 +65,7 @@ public class HttpListenerFactory {
             }
             if (httpMapping == null) {
                 HttpListenerTriggerFile httpListenerTriggerFile = new HttpListenerTriggerFile(httpContext);
-                ExecutorFactory.EXECUTOR_SERVICE_VIRTUAL.execute(httpListenerTriggerFile);
+                ExecutorFactory.getExecutorServiceVirtual().execute(httpListenerTriggerFile);
             } else {
                 if (this.httpServerConfig.isShowRequest()) {
                     StringBuilder showLog = httpContext.showLog();

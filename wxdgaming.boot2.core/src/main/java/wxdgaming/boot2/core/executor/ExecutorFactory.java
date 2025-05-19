@@ -5,6 +5,7 @@ import wxdgaming.boot2.core.BootConfig;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 线程执行器工厂
@@ -14,15 +15,26 @@ import java.util.concurrent.ScheduledExecutorService;
  **/
 public class ExecutorFactory {
 
-    static final ExecutorMonitor EXECUTOR_MONITOR = new ExecutorMonitor();
-    static final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-    static final ConcurrentHashMap<String, ExecutorService> EXECUTOR_MAP = new ConcurrentHashMap<>();
+    private static final AtomicBoolean InitEnd = new AtomicBoolean();
+    private static ExecutorMonitor EXECUTOR_MONITOR;
+    private static ScheduledExecutorService scheduledExecutorService;
+    private static ConcurrentHashMap<String, ExecutorService> EXECUTOR_MAP;
 
-    public static ExecutorService EXECUTOR_SERVICE_BASIC;
-    public static ExecutorService EXECUTOR_SERVICE_LOGIC;
-    public static ExecutorService EXECUTOR_SERVICE_VIRTUAL;
+    private static ExecutorService EXECUTOR_SERVICE_BASIC;
+    private static ExecutorService EXECUTOR_SERVICE_LOGIC;
+    private static ExecutorService EXECUTOR_SERVICE_VIRTUAL;
 
-    static {
+    static void check() {
+        if (!InitEnd.get() && InitEnd.compareAndSet(false, true)) {
+            init();
+            InitEnd.set(true);
+        }
+    }
+
+    static void init() {
+        EXECUTOR_MAP = new ConcurrentHashMap<>();
+        EXECUTOR_MONITOR = new ExecutorMonitor();
+        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         BootConfig bootConfig = BootConfig.getIns();
         EXECUTOR_SERVICE_BASIC = create("basic", bootConfig.basicConfig().getCoreSize());
         EXECUTOR_SERVICE_LOGIC = create("logic", bootConfig.logicConfig().getCoreSize());
@@ -30,19 +42,48 @@ public class ExecutorFactory {
     }
 
     public static ExecutorService getExecutor(String name) {
-        return EXECUTOR_MAP.get(name);
+        return getExecutorMap().get(name);
     }
 
     public static ExecutorServicePlatform create(String name, int corePoolSize) {
         ExecutorServicePlatform executorServicePlatform = new ExecutorServicePlatform(name, corePoolSize);
-        EXECUTOR_MAP.put(name, executorServicePlatform);
+        getExecutorMap().put(name, executorServicePlatform);
         return executorServicePlatform;
     }
 
     public static ExecutorServiceVirtual createVirtual(String name, int corePoolSize) {
         ExecutorServiceVirtual executorServiceVirtual = new ExecutorServiceVirtual(name, corePoolSize);
-        EXECUTOR_MAP.put(name, executorServiceVirtual);
+        getExecutorMap().put(name, executorServiceVirtual);
         return executorServiceVirtual;
     }
 
+    public static ExecutorMonitor getExecutorMonitor() {
+        check();
+        return EXECUTOR_MONITOR;
+    }
+
+    public static ScheduledExecutorService getScheduledExecutorService() {
+        check();
+        return scheduledExecutorService;
+    }
+
+    public static ConcurrentHashMap<String, ExecutorService> getExecutorMap() {
+        check();
+        return EXECUTOR_MAP;
+    }
+
+    public static ExecutorService getExecutorServiceBasic() {
+        check();
+        return EXECUTOR_SERVICE_BASIC;
+    }
+
+    public static ExecutorService getExecutorServiceLogic() {
+        check();
+        return EXECUTOR_SERVICE_LOGIC;
+    }
+
+    public static ExecutorService getExecutorServiceVirtual() {
+        check();
+        return EXECUTOR_SERVICE_VIRTUAL;
+    }
 }

@@ -56,7 +56,7 @@ public abstract class ExecutorEvent extends ExecutorJob implements IExecutorQueu
     public abstract void onEvent() throws Exception;
 
     public void submit() {
-        ExecutorService executorService = ExecutorFactory.EXECUTOR_SERVICE_LOGIC;
+        ExecutorService executorService = ExecutorFactory.getExecutorServiceLogic();
         if (executorWith != null) {
             String threadName = executorWith.threadName();
             if (Utils.isNotBlank(threadName)) {

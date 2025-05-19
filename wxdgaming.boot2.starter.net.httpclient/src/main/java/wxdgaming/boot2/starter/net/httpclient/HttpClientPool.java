@@ -40,7 +40,7 @@ public class HttpClientPool {
                 .expireAfterWriteMs(TimeUnit.MINUTES.toMillis(clientConfig.getResetTimeM()))
                 .loader((Function1<String, HttpClientPool>) s -> build(clientConfig))
                 .removalListener((k, pool) -> {
-                    ExecutorFactory.EXECUTOR_SERVICE_LOGIC.schedule(
+                    ExecutorFactory.getExecutorServiceLogic().schedule(
                             pool::shutdown,
                             30,
                             TimeUnit.SECONDS

@@ -215,7 +215,7 @@ public abstract class SocketClient {
 
         log.info("{} 链接异常 {} 秒 重连", this.hashCode(), l);
 
-        ExecutorFactory.EXECUTOR_SERVICE_LOGIC.schedule(() -> this.connect(consumer), l, TimeUnit.SECONDS);
+        ExecutorFactory.getExecutorServiceLogic().schedule(() -> this.connect(consumer), l, TimeUnit.SECONDS);
         return true;
     }
 

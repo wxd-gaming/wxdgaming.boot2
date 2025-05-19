@@ -23,7 +23,7 @@ public class MonoTest {
     }
 
     public Mono<String> getUserInfo1(String userId) {
-        CompletableFuture<String> stringCompletableFuture = ExecutorFactory.EXECUTOR_SERVICE_LOGIC.future(() -> {
+        CompletableFuture<String> stringCompletableFuture = ExecutorFactory.getExecutorServiceLogic().future(() -> {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {

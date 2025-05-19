@@ -35,7 +35,7 @@ public class PlayerDrive extends HoldRunApplication {
         for (int i = 0; i < maxSize; i++) {
             PlayerDriveContent driveContent = new PlayerDriveContent("drive-" + i);
             playerDriveContentMap.put(i, driveContent);
-            driveContent.timerJob = ExecutorFactory.EXECUTOR_SERVICE_LOGIC.scheduleAtFixedRate(driveContent, 33, 33, TimeUnit.MILLISECONDS);
+            driveContent.timerJob = ExecutorFactory.getExecutorServiceLogic().scheduleAtFixedRate(driveContent, 33, 33, TimeUnit.MILLISECONDS);
         }
     }
 

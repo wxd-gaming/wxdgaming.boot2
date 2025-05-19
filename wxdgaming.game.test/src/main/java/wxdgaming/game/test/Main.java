@@ -50,7 +50,7 @@ public class Main {
             QPlayer qPlayer = qPlayerTable.get(1);
             log.info("{}", qPlayer);
 
-            ExecutorFactory.EXECUTOR_SERVICE_BASIC.schedule(
+            ExecutorFactory.getExecutorServiceBasic().schedule(
                     () -> {
                         RpcService rpcService = runApplication.getInstance(RpcService.class);
                         SocketClient client = runApplication.getInstance(SocketClient.class);

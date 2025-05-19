@@ -105,7 +105,7 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
                 }
             };
 
-            ScheduledFuture<?> timerJob = ExecutorFactory.EXECUTOR_SERVICE_BASIC.scheduleAtFixedRate(
+            ScheduledFuture<?> timerJob = ExecutorFactory.getExecutorServiceBasic().scheduleAtFixedRate(
                     heartEvent,
                     this.heartTimeMs,
                     this.heartTimeMs,

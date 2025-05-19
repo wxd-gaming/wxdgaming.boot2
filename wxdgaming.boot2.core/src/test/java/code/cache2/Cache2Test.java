@@ -136,7 +136,7 @@ public class Cache2Test {
         AtomicReference string = new AtomicReference();
         CountDownLatch latch = new CountDownLatch((int) maxSize);
         for (long i = 0; i < maxSize; i++) {
-            ExecutorFactory.EXECUTOR_SERVICE_LOGIC.execute(() -> {
+            ExecutorFactory.getExecutorServiceLogic().execute(() -> {
                 string.set(cache.getIfPresent(RandomUtils.random(maxSize)));
                 latch.countDown();
             });
