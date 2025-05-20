@@ -25,6 +25,7 @@
         <module>wxdgaming.game.test-message</module>
         <module>wxdgaming.game.test-robot</module>
         <module>wxdgaming.game.test-script</module>
+        <module>wxdgaming.boot2.starter.batis.rdb</module>
     </modules>
 
     <properties>
