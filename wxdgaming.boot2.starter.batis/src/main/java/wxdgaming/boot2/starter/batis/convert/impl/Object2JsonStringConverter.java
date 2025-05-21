@@ -14,7 +14,7 @@ import java.lang.reflect.Type;
 public class Object2JsonStringConverter extends Converter<Object, String> {
 
     @Override public String toDb(Object o) {
-        return FastJsonUtil.toJSONString(o, FastJsonUtil.Writer_Type_Name_Features_K_V_String);
+        return FastJsonUtil.toJSONString(o);
     }
 
     @Override public Object fromDb(Type type, String json) {
