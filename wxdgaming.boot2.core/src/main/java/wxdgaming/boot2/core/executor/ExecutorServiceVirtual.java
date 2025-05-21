@@ -14,8 +14,8 @@ import java.util.concurrent.locks.ReentrantLock;
  **/
 public class ExecutorServiceVirtual extends ExecutorService {
 
-    protected final LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
-    protected final ConcurrentMap<String, ExecutorQueue> queueMap = new ConcurrentHashMap<>();
+    private final LinkedBlockingQueue<ExecutorJobVirtual> queue = new LinkedBlockingQueue<>();
+    private final ConcurrentMap<String, ExecutorQueue> queueMap = new ConcurrentHashMap<>();
     protected final ReentrantLock reentrantLock = new ReentrantLock();
     protected final AtomicInteger threadSize = new AtomicInteger();
     protected final Thread.Builder.OfVirtual ofVirtual;
@@ -52,8 +52,7 @@ public class ExecutorServiceVirtual extends ExecutorService {
             executorJob = (ExecutorJob) command;
         }
         ExecutorJobVirtual executorJobVirtual = new ExecutorJobVirtual(executorJob);
-        this.queue.add(executorJobVirtual);
-        checkExecute();
+        checkExecute(executorJobVirtual);
     }
 
     private class ExecutorJobVirtual extends ExecutorJob {
@@ -66,22 +65,29 @@ public class ExecutorServiceVirtual extends ExecutorService {
             reentrantLock.lock();
             try {
                 threadSize.decrementAndGet();
-                checkExecute();
+                checkExecute(null);
             } finally {
                 reentrantLock.unlock();
             }
         }
     }
 
-    protected void checkExecute() {
+    protected void checkExecute(ExecutorJobVirtual executorJobVirtual) {
         reentrantLock.lock();
         try {
             if (threadSize.get() < this.core) {
-                Runnable task = queue.poll();
+                Runnable task;
+                if (executorJobVirtual != null) {
+                    task = executorJobVirtual;
+                } else {
+                    task = queue.poll();
+                }
                 if (task != null) {
                     threadSize.incrementAndGet();
                     this.ofVirtual.start(task);
                 }
+            } else {
+                this.queue.add(executorJobVirtual);
             }
         } finally {
             reentrantLock.unlock();
