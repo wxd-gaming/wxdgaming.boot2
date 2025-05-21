@@ -1,0 +1,46 @@
+package wxdgaming.boot2.core.rank;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import wxdgaming.boot2.core.lang.ObjectBase;
+
+import java.util.HashMap;
+import java.util.Objects;
+
+/**
+ * 排行榜分数
+ *
+ * @author: wxd-gaming(無心道, 15388152619)
+ * @version: 2025-05-20 20:57
+ **/
+@Getter
+@Setter
+@Accessors(chain = true)
+public class RankScore extends ObjectBase implements Comparable<RankScore> {
+
+    private String key;
+    private long score;
+    private long timestamp;
+    private HashMap<String, String> other = new HashMap<>();
+
+    @Override public int compareTo(RankScore o) {
+        if (this.score != o.score)
+            return Long.compare(o.score, this.score);
+        if (this.timestamp != o.timestamp)
+            return Long.compare(o.timestamp, this.timestamp);
+        return o.key.compareTo(this.key);
+    }
+
+    @Override public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        RankScore rankScore = (RankScore) o;
+        return Objects.equals(getKey(), rankScore.getKey());
+    }
+
+    @Override public int hashCode() {
+        return Objects.hashCode(getKey());
+    }
+
+}
