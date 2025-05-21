@@ -27,7 +27,7 @@ public class DiffTime {
 
     /** 从初始化到调用的时间差 */
     public float diff() {
-        return (System.nanoTime() - startTime) / 10000 / 100f;
+        return (System.nanoTime() - startTime) / 100 / 10000f;
     }
 
     /** 从初始化到调用的时间差 */
@@ -37,7 +37,7 @@ public class DiffTime {
 
     /** 从初始化到调用的时间差 */
     public long diffLong() {
-        return (System.nanoTime() - startTime) / 10000 / 100;
+        return (System.nanoTime() - startTime) / 1000000;
     }
 
 }
