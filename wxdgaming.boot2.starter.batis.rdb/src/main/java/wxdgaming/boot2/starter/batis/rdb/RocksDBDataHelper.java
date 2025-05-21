@@ -24,17 +24,24 @@ public class RocksDBDataHelper {
     final RocksDB db;
     final Options options;
 
-    public RocksDBDataHelper() {
+    public RocksDBDataHelper(RocksDBConfig rdbConfig) {
+        this(
+                new Options()
+                        .setCreateIfMissing(rdbConfig.isCreateIfMissing())       // 自动创建数据库
+                        .setMaxOpenFiles(rdbConfig.getMaxOpenFiles())          // 最大打开文件数
+                        .setWriteBufferSize(rdbConfig.getWriteBufferSize()) // 64MB 写缓冲区
+                        .setMaxWriteBufferNumber(rdbConfig.getMaxWriteBufferNumber())     // 写缓冲区数量
+                        .setCompressionType(CompressionType.SNAPPY_COMPRESSION) // 压缩算法
+                ,
+                rdbConfig.getDbPath()
+        );
+    }
+
+    public RocksDBDataHelper(Options options, String path) {
         // 配置数据库选项
-        options = new Options();
-        options.setCreateIfMissing(true)       // 自动创建数据库
-                .setMaxOpenFiles(1000)          // 最大打开文件数
-                .setWriteBufferSize(64 * 1024 * 1024) // 64MB 写缓冲区
-                .setMaxWriteBufferNumber(3)     // 写缓冲区数量
-                .setCompressionType(CompressionType.SNAPPY_COMPRESSION); // 压缩算法
-        // 打开数据库
+        this.options = options;
         try {
-            db = RocksDB.open(options, "rocksdb");
+            db = RocksDB.open(options, path);
         } catch (RocksDBException e) {
             throw new RuntimeException(e);
         }
