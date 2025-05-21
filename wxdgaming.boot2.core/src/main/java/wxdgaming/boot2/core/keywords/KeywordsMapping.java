@@ -29,9 +29,9 @@ public class KeywordsMapping {
         String source = "我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无法我无你好法我无法为你妈的各位各位";
 
         System.out.println(FastJsonUtil.toJSONStringAsFmt(keywordsMapping));
+        System.out.println(keywordsMapping.replace(source, '*'));
         DiffTime diffTime = new DiffTime();
         for (int i = 0; i < 10; i++) {
-
             diffTime.reset();
             boolean contains = keywordsMapping.contains(source);
             float diff = diffTime.diff();
@@ -67,6 +67,31 @@ public class KeywordsMapping {
         return false;
     }
 
+    public String replace(String str, char replacement) {
+        if (str == null || str.isBlank()) {
+            return str;
+        }
+        char[] charArray = str.toCharArray();
+        for (int i = 0; i < charArray.length; i++) {
+            Map o = map;
+            for (int k = i; k < charArray.length; k++) {
+                char c = charArray[k];
+                Map tmp = (Map) o.get(c);
+                if (tmp == null) {
+                    break;
+                }
+                o = tmp;
+                if (o.get("end") != null) {
+                    for (int j = i; j <= k; j++) {
+                        charArray[j] = replacement;
+                    }
+                    i = k - 1;
+                    break;
+                }
+            }
+        }
+        return new String(charArray);
+    }
 
     public List<String> words(String str) {
         if (str == null || str.isBlank()) {
