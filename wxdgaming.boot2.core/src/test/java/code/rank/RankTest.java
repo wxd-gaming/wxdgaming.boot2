@@ -34,7 +34,7 @@ public class RankTest {
         int rank = rankMap.rank("1000");
         System.out.println(diffTime.diff() + "ms " + rank);
         diffTime.reset();
-        List<RankScore> topN = rankMap.getTopN(1000);
+        List<RankScore> topN = rankMap.topN(1000);
         System.out.println(diffTime.diff() + "ms");
         diffTime.reset();
         for (RankScore rankScore : topN) {

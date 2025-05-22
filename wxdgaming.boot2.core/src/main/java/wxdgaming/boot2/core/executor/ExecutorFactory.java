@@ -36,30 +36,25 @@ public class ExecutorFactory {
         EXECUTOR_MONITOR = new ExecutorMonitor();
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         BootConfig bootConfig = BootConfig.getIns();
-        EXECUTOR_SERVICE_BASIC = create("basic", bootConfig.basicConfig().getCoreSize());
-        EXECUTOR_SERVICE_LOGIC = create("logic", bootConfig.logicConfig().getCoreSize());
-        EXECUTOR_SERVICE_VIRTUAL = createVirtual("virtual", bootConfig.virtualConfig().getCoreSize());
+        EXECUTOR_SERVICE_BASIC = create("basic", bootConfig.basicConfig().getCoreSize(), bootConfig.basicConfig().getMaxQueueSize());
+        EXECUTOR_SERVICE_LOGIC = create("logic", bootConfig.logicConfig().getCoreSize(), bootConfig.logicConfig().getMaxQueueSize());
+        EXECUTOR_SERVICE_VIRTUAL = createVirtual("virtual", bootConfig.virtualConfig().getCoreSize(), bootConfig.virtualConfig().getMaxQueueSize());
     }
 
     public static ExecutorService getExecutor(String name) {
         return getExecutorMap().get(name);
     }
 
-    public static ExecutorServicePlatform create(String name, int corePoolSize) {
-        ExecutorServicePlatform executorServicePlatform = new ExecutorServicePlatform(name, corePoolSize);
+    public static ExecutorServicePlatform create(String name, int corePoolSize, int queueSize) {
+        ExecutorServicePlatform executorServicePlatform = new ExecutorServicePlatform(name, corePoolSize, queueSize);
         getExecutorMap().put(name, executorServicePlatform);
         return executorServicePlatform;
     }
 
-    public static ExecutorServiceVirtual createVirtual(String name, int corePoolSize) {
-        ExecutorServiceVirtual executorServiceVirtual = new ExecutorServiceVirtual(name, corePoolSize);
+    public static ExecutorServiceVirtual createVirtual(String name, int corePoolSize, int queueSize) {
+        ExecutorServiceVirtual executorServiceVirtual = new ExecutorServiceVirtual(name, corePoolSize, queueSize);
         getExecutorMap().put(name, executorServiceVirtual);
         return executorServiceVirtual;
-    }
-
-    public static ExecutorMonitor getExecutorMonitor() {
-        check();
-        return EXECUTOR_MONITOR;
     }
 
     public static ScheduledExecutorService getScheduledExecutorService() {

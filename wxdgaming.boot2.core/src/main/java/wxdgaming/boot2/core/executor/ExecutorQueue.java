@@ -2,8 +2,10 @@ package wxdgaming.boot2.core.executor;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -19,14 +21,20 @@ public class ExecutorQueue extends ExecutorJob implements Executor {
     private final Executor executor;
     private final ReentrantLock reentrantLock = new ReentrantLock();
     private final AtomicBoolean running = new AtomicBoolean(false);
-    private final LinkedBlockingQueue<ExecutorJob> queue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<ExecutorJob> queue;
+    private final int queueSize;
 
-    public ExecutorQueue(Executor executor) {
+    public ExecutorQueue(Executor executor, int queueSize) {
         super(null);
         this.executor = executor;
+        queue = new ArrayBlockingQueue<>(queueSize);
+        this.queueSize = queueSize;
     }
 
     @Override public void execute(Runnable command) {
+        if (queue.size() > queueSize) {
+            throw new RejectedExecutionException("Queue is full");
+        }
         ExecutorJob executorJob;
         if (!(command instanceof ExecutorJob)) {
             executorJob = new ExecutorJob(command);

@@ -11,7 +11,7 @@ import java.util.concurrent.locks.LockSupport;
 public class ExecutorServiceTest {
 
     public static void main(String[] args) {
-        ExecutorServicePlatform executorServicePlatform = ExecutorFactory.create("4", 10);
+        ExecutorServicePlatform executorServicePlatform = ExecutorFactory.create("4", 10, 100);
 
         {
             ThreadContext.context().put("test", "myRunnable");

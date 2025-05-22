@@ -1,9 +1,9 @@
 package executortest;
 
+import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorServiceVirtual;
 import wxdgaming.boot2.core.executor.IExecutorQueue;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
@@ -13,7 +13,13 @@ public class ExecutorServiceVirtualTest {
 
     public static void main(String[] args) {
 
-        ExecutorServiceVirtual executorService = ExecutorFactory.createVirtual("4", 100);
+        ExecutorServiceVirtual executorService = ExecutorFactory.createVirtual("4", 1, 5);
+        executorService.execute(new MyRunnable());
+        executorService.execute(new MyRunnable());
+        executorService.execute(new MyRunnable());
+        executorService.execute(new MyRunnable());
+        executorService.execute(new MyRunnable());
+        executorService.execute(new MyRunnable());
         executorService.execute(new MyRunnable());
         executorService.execute(new MyRunnable());
         executorService.execute(new MyRunnableQueue());
