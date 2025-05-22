@@ -15,8 +15,8 @@ executor:
     maxQueueSize: 50000
 http:
   client:
-    core: 20                            #连接池的核心连接数
-    max: 300                            #连接池的最大连接数
+    routeMaxSize: 20                    #连接池的核心连接数
+    totalMaxSize: 300                   #连接池的最大连接数
     resetTimeM: 30                      #连接池重置时间，时间太长连接池会异常 单位分钟
     sslProtocol: TLS                    #ssl 类型
     connectTimeOut: 3000                #创建连接超时时间

@@ -15,17 +15,19 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 public class HttpClientConfig extends ObjectBase {
 
     public static final HttpClientConfig DEFAULT = new HttpClientConfig(
-            20, 300,
+            500, 5000,
             30,
             3000, 3000, 3000, 30000,
             "TLS",
             true
     );
 
+    /** 每个路由创建的最大连接数 */
     @JSONField(ordinal = 1)
-    private final int core;
+    private final int routeMaxSize;
+    /** 总链接数 */
     @JSONField(ordinal = 2)
-    private final int max;
+    private final int totalMaxSize;
     @JSONField(ordinal = 3)
     private final int resetTimeM;
     @JSONField(ordinal = 4)
@@ -42,8 +44,8 @@ public class HttpClientConfig extends ObjectBase {
     private final boolean autoUseGzip;
 
     @JSONCreator
-    public HttpClientConfig(@JSONField(name = "core") int core,
-                            @JSONField(name = "max") int max,
+    public HttpClientConfig(@JSONField(name = "routeMaxSize") int routeMaxSize,
+                            @JSONField(name = "totalMaxSize") int totalMaxSize,
                             @JSONField(name = "resetTimeM") int resetTimeM,
                             @JSONField(name = "connectionRequestTimeout") int connectionRequestTimeout,
                             @JSONField(name = "connectTimeOut") int connectTimeOut,
@@ -51,8 +53,8 @@ public class HttpClientConfig extends ObjectBase {
                             @JSONField(name = "keepAliveTimeout") int keepAliveTimeout,
                             @JSONField(name = "sslProtocol", defaultValue = "TLS") String sslProtocol,
                             @JSONField(name = "autoUseGzip", defaultValue = "false") boolean autoUseGzip) {
-        this.core = core;
-        this.max = max;
+        this.routeMaxSize = routeMaxSize;
+        this.totalMaxSize = totalMaxSize;
         this.resetTimeM = resetTimeM;
         this.connectionRequestTimeout = connectionRequestTimeout;
         this.connectTimeOut = connectTimeOut;

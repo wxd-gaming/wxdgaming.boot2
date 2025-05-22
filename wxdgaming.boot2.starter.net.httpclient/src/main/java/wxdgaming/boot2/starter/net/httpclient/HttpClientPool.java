@@ -103,8 +103,8 @@ public class HttpClientPool {
                 // 初始化http连接池
                 connPoolMng = new PoolingHttpClientConnectionManager();
                 // 设置总的连接数为200，每个路由的最大连接数为20
-                connPoolMng.setMaxTotal(clientConfig.getMax());
-                connPoolMng.setDefaultMaxPerRoute(clientConfig.getCore());
+                connPoolMng.setMaxTotal(clientConfig.getTotalMaxSize());
+                connPoolMng.setDefaultMaxPerRoute(clientConfig.getRouteMaxSize());
                 ConnectionConfig connectionConfig = ConnectionConfig.custom()
                         .setConnectTimeout(clientConfig.getConnectTimeOut(), TimeUnit.MILLISECONDS)
                         .setSocketTimeout(clientConfig.getConnectTimeOut(), TimeUnit.MILLISECONDS)
