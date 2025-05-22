@@ -12,12 +12,11 @@ import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
 import wxdgaming.boot2.core.format.HexId;
+import wxdgaming.boot2.core.keywords.KeywordsMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryResult;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlService;
-import wxdgaming.game.test.bean.goods.BagPack;
 import wxdgaming.game.test.bean.role.Player;
 import wxdgaming.game.test.bean.role.RoleEntity;
-import wxdgaming.game.test.bean.task.TaskPack;
 
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,6 +42,7 @@ public class DataCenterService {
     /** 角色id和名字的映射 key:roleId, value:name */
     final ConcurrentHashMap<Long, String> rid2NameMap = new ConcurrentHashMap<>();
     final ChannelGroup onlinePlayerGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    final KeywordsMapping keywordsMapping = new KeywordsMapping();
 
     @Inject
     public DataCenterService(PgsqlService pgsqlService) {

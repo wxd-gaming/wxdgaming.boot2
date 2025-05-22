@@ -62,6 +62,14 @@ public class ReqCreateRoleHandler extends HoldRunApplication {
             this.tipsService.tips(socketSession, "角色名长度2-12");
             return;
         }
+
+        boolean contains = dataCenterService.getKeywordsMapping().contains(name);
+        if (contains) {
+            /*触发敏感词库*/
+            log.error("sid={}, account={} 创建角色错误 角色名 {} 有敏感字", sid, account, name);
+            this.tipsService.tips(socketSession, "角色名不合符规范");
+            return;
+        }
         ObjectLockUtil.lock("role_" + name);
         try {
 

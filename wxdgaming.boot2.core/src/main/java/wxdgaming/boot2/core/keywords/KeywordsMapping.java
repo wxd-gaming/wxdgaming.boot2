@@ -44,6 +44,23 @@ public class KeywordsMapping {
         }
     }
 
+    public void reset() {
+        map = new HashMap<>();
+    }
+
+    /** 请注意非线程安全的 */
+    public void add(String str) {
+        if (str == null || str.isBlank()) {
+            return;
+        }
+        char[] charArray = str.toCharArray();
+        Map o = map;
+        for (char c : charArray) {
+            o = (Map) o.computeIfAbsent(c, k -> new HashMap<>());
+        }
+        o.put("end", "0");
+    }
+
     public boolean contains(String str) {
         if (str == null || str.isBlank()) {
             return false;
@@ -121,18 +138,6 @@ public class KeywordsMapping {
             }
         }
         return strings;
-    }
-
-    public void add(String str) {
-        if (str == null || str.isBlank()) {
-            return;
-        }
-        char[] charArray = str.toCharArray();
-        Map o = map;
-        for (char c : charArray) {
-            o = (Map) o.computeIfAbsent(c, k -> new HashMap<>());
-        }
-        o.put("end", "0");
     }
 
 }

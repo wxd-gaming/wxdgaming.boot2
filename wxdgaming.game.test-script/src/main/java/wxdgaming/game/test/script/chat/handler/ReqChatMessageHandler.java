@@ -9,6 +9,7 @@ import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.test.bean.global.GlobalDataType;
 import wxdgaming.game.test.bean.global.impl.YunyingData;
 import wxdgaming.game.test.bean.role.Player;
+import wxdgaming.game.test.module.data.DataCenterService;
 import wxdgaming.game.test.module.data.GlobalDataService;
 import wxdgaming.game.test.script.chat.ChatService;
 import wxdgaming.game.test.script.chat.message.ReqChatMessage;
@@ -26,13 +27,15 @@ import wxdgaming.game.test.script.tips.TipsService;
 public class ReqChatMessageHandler {
 
     private final GlobalDataService globalDataService;
+    private final DataCenterService dataCenterService;
     private final ChatService chatService;
     private final TipsService tipsService;
     private final GmService gmService;
 
     @Inject
-    public ReqChatMessageHandler(GlobalDataService globalDataService, ChatService chatService, TipsService tipsService, GmService gmService) {
+    public ReqChatMessageHandler(GlobalDataService globalDataService, DataCenterService dataCenterService, ChatService chatService, TipsService tipsService, GmService gmService) {
         this.globalDataService = globalDataService;
+        this.dataCenterService = dataCenterService;
         this.chatService = chatService;
         this.tipsService = tipsService;
         this.gmService = gmService;
@@ -41,8 +44,10 @@ public class ReqChatMessageHandler {
     /** 请求聊天 */
     @ProtoRequest
     public void reqChatMessage(SocketSession socketSession, ReqChatMessage req) {
+
         Player player = socketSession.bindData("player");
         String content = req.getContent();
+        log.info("{} 聊天消息 {}", player, req);
         if (content.startsWith("@gm")) {
             YunyingData yunyingData = globalDataService.get(GlobalDataType.YUNYINGDATA);
             if (BootConfig.getIns().isDebug()
@@ -60,6 +65,11 @@ public class ReqChatMessageHandler {
             tipsService.tips(socketSession, "等级不足10级");
             return;
         }
+
+        /*TODO敏感词过滤*/
+        String replace = dataCenterService.getKeywordsMapping().replace(content, '*');
+        req.setContent(replace);
+
         chatService.chatHandler(req.getType()).chat(socketSession, player, req);
     }
 
