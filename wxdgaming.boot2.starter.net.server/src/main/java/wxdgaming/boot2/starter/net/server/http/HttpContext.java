@@ -26,7 +26,6 @@ import wxdgaming.boot2.starter.net.http.HttpHeadValueType;
 import wxdgaming.boot2.starter.net.ssl.WxdOptionalSslHandler;
 
 import java.io.File;
-import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
@@ -114,15 +113,12 @@ public class HttpContext implements AutoCloseable {
         /** 完整content参数 */
         private String reqContent = "";
         private final CookiePack reqCookies = new CookiePack();
-        private HttpPostMultipartRequestDecoder httpDecoder;
         /** post或者get完整参数 */
         private JSONObject reqParams;
         /*上传的文件集合*/
         private Map<String, FileUpload> uploadFileMap;
         /** 域名 */
         private String domainName;
-        /** 绑定 */
-        private URI uri;
         private String uriPath;
         /** 完整的url */
         private String completeUri;
@@ -133,12 +129,6 @@ public class HttpContext implements AutoCloseable {
         }
 
         @Override public void close() {
-            try {
-                if (httpDecoder != null) {
-                    httpDecoder.cleanFiles();
-                    httpDecoder.destroy();
-                }
-            } catch (Exception ignored) {}
             try {
                 fullHttpRequest.content().release();
             } catch (Exception e) {
@@ -164,9 +154,7 @@ public class HttpContext implements AutoCloseable {
             this.reqCookies.decodeServerCookie(this.header(HttpHeaderNames.COOKIE));
 
             String host = this.header(HttpHeaderNames.HOST);
-            String uriString = this.getFullHttpRequest().uri();
-            URI uriPath = new URI(uriString);
-            String uriPathString = uriPath.getPath();
+            String uriPathString = this.getFullHttpRequest().uri();
             uriPathString = HttpDataAction.rawUrlDecode(uriPathString);
             if (uriPathString.length() > 1) {
                 if (uriPathString.endsWith("/")) {
@@ -178,24 +166,26 @@ public class HttpContext implements AutoCloseable {
                 uriPathString = "/index.html";
             }
 
-            this.uri = uriPath;
             String http = ssl() ? "https" : "http";
             this.uriPath = uriPathString;
             this.domainName = http + "://" + host;
             this.completeUri = this.domainName + uriPathString;
-            actionGetData();
             actionPostData();
+            actionGetData();
         }
 
         protected void actionGetData() throws Exception {
-            if (this.getUri() != null) {
-                String queryString = this.getUri().getQuery();
-                if (StringUtils.isNotBlank(queryString)) {
-                    if (!this.reqContent.isEmpty()) {
-                        this.reqContent += "&";
+            if (StringUtils.isNotBlank(this.uriPath)) {
+                int index = this.uriPath.indexOf("?");
+                if (index > -1) {
+                    String queryString = this.uriPath.substring(index + 1);
+                    if (StringUtils.isNotBlank(queryString)) {
+                        if (!this.reqContent.isEmpty()) {
+                            this.reqContent += "&";
+                        }
+                        this.reqContent += queryString;
+                        HttpDataAction.httpDataDecoder(getReqParams(), queryString);
                     }
-                    this.reqContent += queryString;
-                    HttpDataAction.httpDataDecoder(getReqParams(), this.reqContent);
                 }
             }
         }
@@ -205,11 +195,14 @@ public class HttpContext implements AutoCloseable {
          * @throws Exception
          */
         protected void actionPostData() throws Exception {
+            if (fullHttpRequest.method() == HttpMethod.GET) {
+                return;
+            }
             if (isMultipart()) {
-                httpDecoder = new HttpPostMultipartRequestDecoder(factory, fullHttpRequest, StandardCharsets.UTF_8);
-                httpDecoder.setDiscardThreshold(0);
-                httpDecoder.offer(fullHttpRequest);
+                InterfaceHttpPostRequestDecoder httpDecoder = new HttpPostMultipartRequestDecoder(factory, fullHttpRequest, StandardCharsets.UTF_8);
                 try {
+                    httpDecoder.setDiscardThreshold(0);
+                    httpDecoder.offer(fullHttpRequest);
                     while (httpDecoder.hasNext()) {
                         InterfaceHttpData data = httpDecoder.next();
                         if (data.getHttpDataType() == InterfaceHttpData.HttpDataType.Attribute) {
@@ -234,25 +227,30 @@ public class HttpContext implements AutoCloseable {
                             }
                         }
                     }
-                } catch (HttpPostRequestDecoder.EndOfDataDecoderException e) {
+                } catch (HttpPostRequestDecoder.EndOfDataDecoderException ignored) {
                     /*这里无需打印*/
+                } finally {
+                    try {
+                        httpDecoder.cleanFiles();
+                    } catch (Exception ignored) {}
+                    try {
+                        httpDecoder.destroy();
+                    } catch (Exception ignored) {}
                 }
                 this.reqContent = HttpDataAction.httpData(this.getReqParams());
             } else {
                 byte[] bytes = ByteBufUtil.getBytes(fullHttpRequest.content());
                 this.reqContent = new String(bytes, StandardCharsets.UTF_8);
                 this.reqContent = URLDecoder.decode(this.reqContent, StandardCharsets.UTF_8);
-                if (this.reqContentType.contains("json")) {
+                if (this.reqContentType.contains("x-www-form-urlencoded")) {
+                    HttpDataAction.httpDataDecoder(getReqParams(), this.reqContent);
+                } else if (this.reqContentType.contains("json")) {
                     if (StringUtils.isNotBlank(this.reqContent)) {
                         final JSONObject jsonObject = FastJsonUtil.parse(this.reqContent);
                         if (jsonObject != null && !jsonObject.isEmpty()) {
                             this.getReqParams().putAll(jsonObject);
                         }
                     }
-                } else if (this.reqContentType.contains("xml") || this.reqContentType.contains("pure-text")) {
-
-                } else {
-                    HttpDataAction.httpDataDecoder(getReqParams(), this.reqContent);
                 }
             }
         }

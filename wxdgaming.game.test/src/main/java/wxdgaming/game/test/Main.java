@@ -55,29 +55,29 @@ public class Main {
                         RpcService rpcService = runApplication.getInstance(RpcService.class);
                         SocketClient client = runApplication.getInstance(SocketClient.class);
                         SocketSession socketSession = client.idleNullException();
-                        for (int k = 0; k < 5; k++) {
-                            DiffTime diffTime = new DiffTime();
-                            int rcount = 10_0000;
-                            CountDownLatch countDownLatch = new CountDownLatch(rcount);
-                            for (int i = 0; i < rcount; i++) {
-                                Mono<JSONObject> request = rpcService.request(socketSession, "rpcIndex", MapOf.newJSONObject().fluentPut("a", "1"));
-                                request
-                                        .subscribe((jsonObject) -> {
-                                            countDownLatch.countDown();
-                                            log.debug("rpcIndex response {}", jsonObject);
-                                        }, throwable -> {
-                                            countDownLatch.countDown();
-                                            log.error("rpcIndex", throwable);
-                                        });
-                            }
-                            try {
-                                countDownLatch.await();
-                            } catch (InterruptedException e) {
-                                throw new RuntimeException(e);
-                            }
-                            float diff = diffTime.diff();
-                            log.info("总耗时:{}ms", diff);
-                        }
+                        // for (int k = 0; k < 5; k++) {
+                        //     DiffTime diffTime = new DiffTime();
+                        //     int rcount = 10_0000;
+                        //     CountDownLatch countDownLatch = new CountDownLatch(rcount);
+                        //     for (int i = 0; i < rcount; i++) {
+                        //         Mono<JSONObject> request = rpcService.request(socketSession, "rpcIndex", MapOf.newJSONObject().fluentPut("a", "1"));
+                        //         request
+                        //                 .subscribe((jsonObject) -> {
+                        //                     countDownLatch.countDown();
+                        //                     log.debug("rpcIndex response {}", jsonObject);
+                        //                 }, throwable -> {
+                        //                     countDownLatch.countDown();
+                        //                     log.error("rpcIndex", throwable);
+                        //                 });
+                        //     }
+                        //     try {
+                        //         countDownLatch.await();
+                        //     } catch (InterruptedException e) {
+                        //         throw new RuntimeException(e);
+                        //     }
+                        //     float diff = diffTime.diff();
+                        //     log.info("总耗时:{}ms", diff);
+                        // }
                         // rpcService.request(socketSession, "rpcIndex2", MapOf.newJSONObject().fluentPut("a", "2"))
                         //         .subscribe((jsonObject) -> {
                         //             log.info("rpcIndex2 response {}", jsonObject);

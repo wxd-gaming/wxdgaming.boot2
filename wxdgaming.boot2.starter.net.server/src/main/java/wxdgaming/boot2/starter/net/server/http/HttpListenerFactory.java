@@ -1,8 +1,10 @@
 package wxdgaming.boot2.starter.net.server.http;
 
 import com.google.inject.Singleton;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
@@ -10,11 +12,14 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
-import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.io.Objects;
+import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
+import wxdgaming.boot2.starter.net.http.HttpHeadValueType;
 
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 
 /**
  * http 监听 绑定工厂
@@ -76,6 +81,16 @@ public class HttpListenerFactory {
             }
         } catch (Throwable e) {
             log.error("dispatch error", e);
+            RunResult serverError = RunResult.error("server error");
+            ByteBuf byteBuf = Unpooled.wrappedBuffer(serverError.toJSONString().getBytes(StandardCharsets.UTF_8));
+            DefaultFullHttpResponse response = new DefaultFullHttpResponse(fullHttpRequest.protocolVersion(), HttpResponseStatus.INTERNAL_SERVER_ERROR, byteBuf);
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE, HttpHeadValueType.Json);
+            /* TODO 非复用的连接池 */
+            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
+            ctx.writeAndFlush(response).addListener(future -> {
+                ctx.disconnect();
+                ctx.close();
+            });
         }
     }
 }

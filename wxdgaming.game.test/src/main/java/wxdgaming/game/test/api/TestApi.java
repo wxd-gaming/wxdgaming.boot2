@@ -10,8 +10,8 @@ import wxdgaming.boot2.core.ann.Param;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ExecutorConfig;
-import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;
@@ -44,6 +44,11 @@ public class TestApi {
     @Init
     public void init(RunApplication runApplication) {
         this.runApplication = runApplication;
+    }
+
+    @HttpRequest(path = "user/login")
+    public String userLogin(RunApplication runApplication) {
+        return "index";
     }
 
     @HttpRequest()
