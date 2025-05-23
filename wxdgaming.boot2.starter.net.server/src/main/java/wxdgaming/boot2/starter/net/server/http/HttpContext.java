@@ -110,6 +110,8 @@ public class HttpContext implements AutoCloseable {
 
         private String reqContentType;
         private boolean content_gzip = false;
+        /** url参数 */
+        private String queryString = "";
         /** 完整content参数 */
         private String reqContent = "";
         private final CookiePack reqCookies = new CookiePack();
@@ -178,12 +180,8 @@ public class HttpContext implements AutoCloseable {
             if (StringUtils.isNotBlank(this.uriPath)) {
                 int index = this.uriPath.indexOf("?");
                 if (index > -1) {
-                    String queryString = this.uriPath.substring(index + 1);
+                    this.queryString = this.uriPath.substring(index + 1);
                     if (StringUtils.isNotBlank(queryString)) {
-                        if (!this.reqContent.isEmpty()) {
-                            this.reqContent += "&";
-                        }
-                        this.reqContent += queryString;
                         HttpDataAction.httpDataDecoder(getReqParams(), queryString);
                     }
                 }
@@ -198,7 +196,8 @@ public class HttpContext implements AutoCloseable {
             if (fullHttpRequest.method() == HttpMethod.GET) {
                 return;
             }
-            if (isMultipart()) {
+            boolean multipart = HttpPostRequestDecoder.isMultipart(fullHttpRequest);
+            if (multipart) {
                 InterfaceHttpPostRequestDecoder httpDecoder = new HttpPostMultipartRequestDecoder(factory, fullHttpRequest, StandardCharsets.UTF_8);
                 try {
                     httpDecoder.setDiscardThreshold(0);
@@ -213,10 +212,8 @@ public class HttpContext implements AutoCloseable {
                             } else {
                                 get = attribute.getValue();
                             }
-                            if (isMultipart()) {
-                                /*多段式提交的话，会多包装了一层*/
-                                get = URLDecoder.decode(get, StandardCharsets.UTF_8);
-                            }
+                            /*多段式提交的话，会多包装了一层*/
+                            get = URLDecoder.decode(get, StandardCharsets.UTF_8);
                             this.getReqParams().put(data.getName(), get);
                         } else if (data.getHttpDataType() == InterfaceHttpData.HttpDataType.FileUpload) {
                             FileUpload fileUpload = (FileUpload) data;
