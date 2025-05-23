@@ -75,7 +75,7 @@ public class Main {
                         //     } catch (InterruptedException e) {
                         //         throw new RuntimeException(e);
                         //     }
-                        //     float diff = diffTime.diff();
+                        //     float diff = diffTime.diffMs5();
                         //     log.info("总耗时:{}ms", diff);
                         // }
                         // rpcService.request(socketSession, "rpcIndex2", MapOf.newJSONObject().fluentPut("a", "2"))

@@ -18,6 +18,7 @@ import java.util.List;
 public class RankTest {
 
     public static void main(String[] args) {
+        List<RankScore> topN = List.of();
         for (int k = 0; k < 5; k++) {
             RankMap rankMap = new RankMap();
 
@@ -26,25 +27,38 @@ public class RankTest {
             for (int i = 0; i < iCount; i++) {
                 rankMap.updateScore(String.valueOf(i + 1), RandomUtils.random(100, 1000));
             }
-            System.out.println("插入" + iCount + " 对象 " + diffTime.diff() + "ms");
+            System.out.println("插入" + iCount + " 对象 " + diffTime.diffMs5() + "ms");
             diffTime.reset();
             for (int i = 0; i < iCount; i++) {
                 rankMap.updateScore(String.valueOf(i + 1), RandomUtils.random(100, 1000));
             }
-            System.out.println("修改" + iCount + " 对象 " + diffTime.diff() + "ms");
+            System.out.println("修改" + iCount + " 对象 " + diffTime.diffMs5() + "ms");
             String random = String.valueOf(RandomUtils.random(1, iCount));
+            {
+                diffTime.reset();
+                rankMap.updateScore(random, RandomUtils.random(100, 1000));
+                System.out.println("随机修改一个对象 " + random + " - " + diffTime.diffMs5() + "ms ");
+            }
+            {
+                diffTime.reset();
+                int rank = rankMap.rank(random);
+                System.out.println("随机读取一个对象 " + random + " 当前排名 " + rank + " - " + diffTime.diffMs5() + "ms ");
+            }
+            {
+                diffTime.reset();
+                int rank = RandomUtils.random(1, 10);
+                RankScore rankScore = rankMap.topByRank(rank);
+                System.out.println("随机读排名 " + rank + " 对象 " + rankScore.getKey() + " - " + diffTime.diffMs5() + "ms ");
+            }
             diffTime.reset();
-            int rank = rankMap.rank(random);
-            System.out.println("随机读一个 " + random + " 对象 当前排名 " + rank + " - " + diffTime.diff() + "ms ");
-            diffTime.reset();
-            List<RankScore> topN = rankMap.topN(1000);
-            System.out.println("返回前 1000 名 " + diffTime.diff() + "ms");
+            topN = rankMap.topN(100);
+            System.out.println("返回前 100 名 " + diffTime.diffMs5() + "ms");
             diffTime.reset();
             System.out.println("=========================================");
         }
-        // for (RankScore rankScore : topN) {
-        //     log.info("{}", rankScore);
-        // }
+        for (RankScore rankScore : topN) {
+            log.info("{}", rankScore);
+        }
     }
 
 }

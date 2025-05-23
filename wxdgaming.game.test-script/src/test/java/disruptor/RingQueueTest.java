@@ -69,7 +69,7 @@ public class RingQueueTest {
             });
         }
         countDownLatch.await();
-        System.out.println("RingQueue 需要填充: " + (i1 * threadCount) + ", 填充: " + ringBuffer.size() + ", 耗时: " + diffTime.diff() + " ms");
+        System.out.println("RingQueue 需要填充: " + (i1 * threadCount) + ", 填充: " + ringBuffer.size() + ", 耗时: " + diffTime.diffMs5() + " ms");
     }
 
 }

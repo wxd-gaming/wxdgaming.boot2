@@ -40,7 +40,7 @@ public class HppcTest {
             for (int i = 0; i < count; i++) {
                 map.put(i, 1);
             }
-            System.out.println("IntIntHashMap - " + diffTime.diff() + " ms");
+            System.out.println("IntIntHashMap - " + diffTime.diffMs5() + " ms");
             // System.out.println(Data2Size.totalSizes0(map));
         }
         System.out.println("-----------------------------------------------");
@@ -50,7 +50,7 @@ public class HppcTest {
                 map.put(i, 1);
             }
             DiffTime diffTime = new DiffTime();
-            System.out.println("HashMap - " + diffTime.diff() + " ms");
+            System.out.println("HashMap - " + diffTime.diffMs5() + " ms");
             // System.out.println(Data2Size.totalSizes0(map));
         }
         System.out.println("================================================");
@@ -70,7 +70,7 @@ public class HppcTest {
             for (Map.Entry<Integer, Integer> integerEntry : map.entrySet()) {
                 count2.addAndGet(integerEntry.getValue());
             }
-            System.out.println("HashMap - " + diffTime.diff() + " ms");
+            System.out.println("HashMap - " + diffTime.diffMs5() + " ms");
             // System.out.println(Data2Size.totalSizes0(map));
         }
         System.out.println("-----------------------------------------------");
@@ -85,7 +85,7 @@ public class HppcTest {
             for (IntIntCursor cursor : map) {
                 count2.addAndGet(cursor.value);
             }
-            System.out.println("IntIntHashMap - " + diffTime.diff() + " ms");
+            System.out.println("IntIntHashMap - " + diffTime.diffMs5() + " ms");
 
             // System.out.println(Data2Size.totalSizes0(map));
         }
@@ -106,7 +106,7 @@ public class HppcTest {
             for (Map.Entry<Integer, Object> integerEntry : map.entrySet()) {
                 count2.addAndGet(integerEntry.getKey());
             }
-            System.out.println("HashMap - " + diffTime.diff() + " ms");
+            System.out.println("HashMap - " + diffTime.diffMs5() + " ms");
             // System.out.println(Data2Size.totalSizes0(map));
         }
         System.out.println("-----------------------------------------------");
@@ -120,7 +120,7 @@ public class HppcTest {
             for (IntObjectCursor<Object> cursor : map) {
                 count2.addAndGet(cursor.key);
             }
-            System.out.println("IntObjectHashMap - " + diffTime.diff() + " ms");
+            System.out.println("IntObjectHashMap - " + diffTime.diffMs5() + " ms");
             // System.out.println(Data2Size.totalSizes0(map));
         }
         System.out.println("================================================");
@@ -142,7 +142,7 @@ public class HppcTest {
                 Object object = map.get(i);
                 if (object != null) count2.incrementAndGet();
             }
-            System.out.println("HashMap - " + diffTime.diff() + " ms");
+            System.out.println("HashMap - " + diffTime.diffMs5() + " ms");
             // System.out.println(Data2Size.totalSizes0(map));
         }
         System.out.println("-----------------------------------------------");
@@ -157,7 +157,7 @@ public class HppcTest {
                 Object object = map.get(i);
                 if (object != null) count2.incrementAndGet();
             }
-            System.out.println("IntObjectHashMap - " + diffTime.diff() + " ms");
+            System.out.println("IntObjectHashMap - " + diffTime.diffMs5() + " ms");
             // System.out.println(Data2Size.totalSizes0(map));
         }
         System.out.println("================================================");
@@ -179,7 +179,7 @@ public class HppcTest {
                 Object object = map.get(i);
                 if (object != null) count2.incrementAndGet();
             }
-            System.out.println("HashMap - " + diffTime.diff() + " ms");
+            System.out.println("HashMap - " + diffTime.diffMs5() + " ms");
             // System.out.println(Data2Size.totalSizes0(map));
         }
         System.out.println("-----------------------------------------------");
@@ -194,7 +194,7 @@ public class HppcTest {
                 Object object = map.get(i);
                 if (object != null) count2.incrementAndGet();
             }
-            System.out.println("IntObjectHashMap - " + diffTime.diff() + " ms");
+            System.out.println("IntObjectHashMap - " + diffTime.diffMs5() + " ms");
             // System.out.println(Data2Size.totalSizes0(map));
         }
         System.out.println("================================================");

@@ -34,11 +34,11 @@ public class KeywordsMapping {
         for (int i = 0; i < 10; i++) {
             diffTime.reset();
             boolean contains = keywordsMapping.contains(source);
-            float diff = diffTime.diff();
+            float diff = diffTime.diffMs5();
             System.out.println(diff + " ms " + contains);
             diffTime.reset();
             List<String> wordsed = keywordsMapping.words(source);
-            diff = diffTime.diff();
+            diff = diffTime.diffMs5();
             System.out.println(diff + " ms " + wordsed);
             System.out.println("==================================");
         }

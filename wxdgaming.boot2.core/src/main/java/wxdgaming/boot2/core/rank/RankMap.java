@@ -102,6 +102,10 @@ public class RankMap {
         return rankMap.headMap(rankMap.lastKey(), true).keySet().stream().limit(n).toList();
     }
 
+    public RankScore topByRank(int rank) {
+        return rankMap.headMap(rankMap.lastKey(), true).keySet().stream().skip(rank - 1).limit(1).findFirst().orElse(null);
+    }
+
     public List<RankScore> toList() {
         return topN(rankMap.size());
     }

@@ -126,7 +126,7 @@ public class Cache2Test {
         for (long i = 0; i < maxSize; i++) {
             string = cache.getIfPresent(RandomUtils.random(maxSize));
         }
-        log.info("{} 单线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}, 耗时：{} ms", cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string), diffTime.diff());
+        log.info("{} 单线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}, 耗时：{} ms", cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string), diffTime.diffMs5());
         log.info("{} 缓存数量：{}, 内存 {}", cache.getCacheName(), cache.size(), ByteFormat.format(cache.memorySize()));
     }
 
@@ -142,7 +142,7 @@ public class Cache2Test {
             });
         }
         latch.await();
-        log.info("{} 多线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}, 耗时：{} ms", cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string.get()), diffTime.diff());
+        log.info("{} 多线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}, 耗时：{} ms", cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string.get()), diffTime.diffMs5());
         log.info("{} 缓存数量：{}, 内存 {}", cache.getCacheName(), cache.size(), ByteFormat.format(cache.memorySize()));
     }
 

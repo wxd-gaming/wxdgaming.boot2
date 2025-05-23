@@ -25,19 +25,29 @@ public class DiffTime {
         this.startTime = System.nanoTime();
     }
 
-    /** 从初始化到调用的时间差 */
-    public float diff() {
-        return (System.nanoTime() - startTime) / 100 / 10000f;
+    /** 从初始化到调用的时间差, 单位纳秒 */
+    public long diffNs() {
+        return (System.nanoTime() - startTime);
     }
 
-    /** 从初始化到调用的时间差 */
-    public long diff100() {
-        return (System.nanoTime() - startTime) / 10000;
+    /** 从初始化到调用的时间差, 单位微妙 */
+    public long diffUs() {
+        return diffNs() / 1000;
     }
 
-    /** 从初始化到调用的时间差 */
-    public long diffLong() {
-        return (System.nanoTime() - startTime) / 1000000;
+    /** 从初始化到调用的时间差，单位微妙, 保留3位小数 */
+    public float diffUs5() {
+        return diffNs() / 1000f;
+    }
+
+    /** 从初始化到调用的时间差，单位毫秒 */
+    public long diffMs() {
+        return diffNs() / 1000_000;
+    }
+
+    /** 从初始化到调用的时间差，单位毫秒, 保留5位小数 */
+    public float diffMs5() {
+        return diffNs() / 10 / 100000f;
     }
 
 }
