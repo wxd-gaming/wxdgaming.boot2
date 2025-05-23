@@ -1,11 +1,10 @@
 package code.event;
 
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
+import wxdgaming.boot2.core.util.AssertUtil;
 
-import java.util.EventObject;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executor;
 
 /**
  * 事件派发
@@ -16,28 +15,45 @@ import java.util.concurrent.Executor;
 @Slf4j
 public class EventDispatcher {
 
-    @SuppressWarnings("rawtypes")
-    private final ConcurrentHashMap<Class, CopyOnWriteArrayList<CustomEventListener<? extends EventObject>>> listeners = new ConcurrentHashMap<>();
+    // @SuppressWarnings("rawtypes")
+    private final ConcurrentTable<EventType, Class<? extends EventObject>, CopyOnWriteArrayList<EventListener<? extends EventObject>>> listeners = new ConcurrentTable<>();
 
-    public void addListener(CustomEventListener<? extends EventObject> listener) {
-        listeners.computeIfAbsent(listener.getEventClass(), k -> new CopyOnWriteArrayList<>()).add(listener);
+    /** 获取事件类型监听器容器 */
+    private CopyOnWriteArrayList<EventListener<? extends EventObject>> getListeners(EventType eventType, Class<? extends EventObject> eventData) {
+        AssertUtil.assertTrue(eventType != null, "eventType is null");
+        AssertUtil.assertTrue(eventData != null, "eventDataClass is null");
+        return listeners.computeIfAbsent(eventType, eventData, k -> new CopyOnWriteArrayList<>());
     }
 
-    public <E extends EventObject> void removeListener(CustomEventListener<E> listener) {
-        listeners.computeIfAbsent(listener.getEventClass(), k -> new CopyOnWriteArrayList<>()).remove(listener);
+
+    /** 添加监听器 */
+    public <E extends EventObject> void addListener(EventListener<E> listener) {
+        addListener(listener.eventType(), listener);
+    }
+
+    /** 添加监听器 */
+    public <E extends EventObject> void addListener(EventType eventType, EventListener<E> listener) {
+        getListeners(eventType, listener.getEventClass()).add(listener);
+    }
+
+    /** 删除监听器 */
+    public <E extends EventObject> void removeListener(EventListener<E> listener) {
+        removeListener(listener.eventType(), listener);
+    }
+
+    /** 删除监听器 */
+    public <E extends EventObject> void removeListener(EventType eventType, EventListener<E> listener) {
+        getListeners(eventType, listener.getEventClass()).remove(listener);
     }
 
     @SuppressWarnings("unchecked")
-    public <E extends EventObject> void dispatchEvent(E event) {
-        Executor executor = null;
-
-
-        listeners.getOrDefault(event.getClass(), new CopyOnWriteArrayList<>())
-                .forEach(listener -> {
-                    CustomEventListener<E> eventListener = (CustomEventListener<E>) listener;
-                    executor.execute(() -> eventListener.onCustomEvent(event));
-
-                });
+    public <E extends EventObject> void dispatchEvent(EventType eventType, E event) {
+        Class<? extends EventObject> aClass = event.getClass();
+        CopyOnWriteArrayList<EventListener<? extends EventObject>> orDefault = getListeners(eventType, aClass);
+        for (EventListener<? extends EventObject> listener : orDefault) {
+            EventListener<E> eventListener = (EventListener<E>) listener;
+            eventListener.onEvent(event);
+        }
     }
 
 }

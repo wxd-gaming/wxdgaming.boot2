@@ -1,22 +1,20 @@
 package code.event.impl;
 
 import code.event.EventObject;
+import lombok.Builder;
 import lombok.Getter;
 
-
 /**
- * 字符串事件
+ * 多参数
  *
  * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-22 17:29
+ * @version: 2025-05-23 15:08
  **/
 @Getter
-public class StringEvent extends EventObject {
+@Builder
+public class MultipartEvent extends EventObject {
 
     private final String message;
-
-    public StringEvent(String message) {
-        this.message = message;
-    }
+    private final int number;
 
 }
