@@ -75,7 +75,7 @@ public class ExecutorServiceVirtual extends ExecutorService {
         }
     }
 
-    protected void checkExecute(ExecutorJobVirtual executorJobVirtual) {
+    private void checkExecute(ExecutorJobVirtual executorJobVirtual) {
         reentrantLock.lock();
         try {
             if (threadSize.get() < this.core) {
