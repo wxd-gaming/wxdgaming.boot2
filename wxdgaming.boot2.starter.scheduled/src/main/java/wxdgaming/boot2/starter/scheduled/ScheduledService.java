@@ -38,7 +38,7 @@ public class ScheduledService {
     protected ExecutorServicePlatform executorServicePlatform;
 
     public ScheduledService(ExecutorConfig config) {
-        executorServicePlatform = ExecutorFactory.create("scheduled-executor", config.getCoreSize());
+        executorServicePlatform = ExecutorFactory.create("scheduled-executor", config.getCoreSize(), config.getMaxQueueSize());
         this.config = config;
     }
 
