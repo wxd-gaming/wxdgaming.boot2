@@ -45,8 +45,8 @@ socket:
     recvByteBufM: 12                                          #接收缓冲区大小 单位MB
     writeByteBufM: 12                                         #发送缓冲区大小 单位MB
     http:
-      showRequest: false
-      showResponse: false
+      showRequest: true
+      showResponse: true
   client:
     debug: false
     host: 127.0.0.1
