@@ -3,7 +3,7 @@
     <module name="wxdgaming.boot2.core" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="code.*" />
+        <option name="PATTERN" value="code.sort.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
