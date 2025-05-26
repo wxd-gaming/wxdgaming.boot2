@@ -45,10 +45,18 @@ public class ExecutorFactory {
         return getExecutorMap().get(name);
     }
 
+    public static ExecutorServicePlatform create(String name, int corePoolSize) {
+        return create(name, corePoolSize, Integer.MAX_VALUE);
+    }
+
     public static ExecutorServicePlatform create(String name, int corePoolSize, int queueSize) {
         ExecutorServicePlatform executorServicePlatform = new ExecutorServicePlatform(name, corePoolSize, queueSize);
         getExecutorMap().put(name, executorServicePlatform);
         return executorServicePlatform;
+    }
+
+    public static ExecutorServiceVirtual createVirtual(String name, int corePoolSize) {
+        return createVirtual(name, corePoolSize, Integer.MAX_VALUE);
     }
 
     public static ExecutorServiceVirtual createVirtual(String name, int corePoolSize, int queueSize) {

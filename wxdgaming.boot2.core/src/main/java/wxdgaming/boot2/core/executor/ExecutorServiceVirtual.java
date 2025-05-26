@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.executor;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -17,6 +18,7 @@ public class ExecutorServiceVirtual extends ExecutorService {
     private final ReentrantLock reentrantLock = new ReentrantLock();
     private final AtomicInteger threadSize = new AtomicInteger();
     private final Thread.Builder.OfVirtual ofVirtual;
+    private final AtomicBoolean shutdown = new AtomicBoolean(false);
     private final int core;
     /** 队列上限 */
     private final int queueSize;
@@ -29,7 +31,14 @@ public class ExecutorServiceVirtual extends ExecutorService {
         this.queue = new ArrayBlockingQueue<>(queueSize);
     }
 
+    @Override public void shutdown() {
+        shutdown.set(true);
+    }
+
     @Override public void execute(Runnable command) {
+        if (shutdown.get()) {
+            throw new RejectedExecutionException("ExecutorServiceVirtual is shutdown");
+        }
         ExecutorJob executorJob;
         if (!(command instanceof ExecutorQueue)) {
             if (!(command instanceof ExecutorJob)) {
@@ -78,6 +87,7 @@ public class ExecutorServiceVirtual extends ExecutorService {
     private void checkExecute(ExecutorJobVirtual executorJobVirtual) {
         reentrantLock.lock();
         try {
+            if (shutdown.get()) return;
             if (threadSize.get() < this.core) {
                 Runnable task;
                 if (executorJobVirtual != null) {

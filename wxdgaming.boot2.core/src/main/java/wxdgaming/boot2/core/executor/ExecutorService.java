@@ -45,4 +45,7 @@ public abstract class ExecutorService implements Executor {
         executorJobScheduled.setScheduledFuture(scheduledFuture);
         return scheduledFuture;
     }
+
+    public abstract void shutdown();
+
 }
