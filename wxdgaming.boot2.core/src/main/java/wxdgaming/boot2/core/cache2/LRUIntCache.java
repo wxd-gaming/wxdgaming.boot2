@@ -80,11 +80,7 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
                             CacheHolder<V> holder = next.getValue();
                             try {
                                 if (millis > holder.getExpireEndTime()) {
-                                    boolean remove = true;
-                                    if (holder.getValue() == null && LRUIntCache.this.removalListener != null) {
-                                        /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                                        remove = LRUIntCache.this.removalListener.apply(next.getIntKey(), holder.getValue());
-                                    }
+                                    boolean remove = onRemove(next.getIntKey(), holder);
                                     if (remove)
                                         iterator.remove();
                                     else
@@ -218,16 +214,17 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
         }
     }
 
-    @Override public V invalidate(Integer k) {
-        int hashIndex = hashIndex(k);
+    @Override public V invalidate(Integer intKey) {
+        int hashIndex = hashIndex(intKey);
         CacheLock cacheLock = reentrantLocks.get(hashIndex);
         cacheLock.writeLock.lock();
         try {
-            CacheHolder<V> cacheHolder = nodes.get(hashIndex).get(k.intValue());
+            CacheHolder<V> cacheHolder = nodes.get(hashIndex).get(intKey.intValue());
             if (cacheHolder == null) {
                 return null;
             }
             cacheHolder.setExpireEndTime(0);
+            onRemove(intKey, cacheHolder);
             return cacheHolder.getValue();
         } finally {
             cacheLock.writeLock.unlock();
@@ -243,21 +240,26 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
                 Int2ObjectMap.FastEntrySet<CacheHolder<V>> entries = node.int2ObjectEntrySet();
                 for (Int2ObjectMap.Entry<CacheHolder<V>> entry : entries) {
                     int intKey = entry.getIntKey();
-                    CacheHolder<V> holder = entry.getValue();
-                    if (LRUIntCache.this.removalListener != null && holder.getValue() != null) {
-                        try {
-                            /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                            LRUIntCache.this.removalListener.apply(intKey, holder.getValue());
-                        } catch (Exception e) {
-                            log.error("removalListener 执行异常 {}", holder.getValue(), e);
-                        }
-                    }
+                    CacheHolder<V> cacheHolder = entry.getValue();
+                    onRemove(intKey, cacheHolder);
                 }
                 node.clear();
             } finally {
                 cacheLock.writeLock.unlock();
             }
         }
+    }
+
+    boolean onRemove(Integer intKey, CacheHolder<V> cacheHolder) {
+        if (LRUIntCache.this.removalListener != null && cacheHolder.getValue() != null) {
+            try {
+                /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                return LRUIntCache.this.removalListener.apply(intKey, cacheHolder.getValue());
+            } catch (Exception e) {
+                log.error("removalListener 执行异常 {}", cacheHolder.getValue(), e);
+            }
+        }
+        return true;
     }
 
     @Override public Collection<Integer> keys() {

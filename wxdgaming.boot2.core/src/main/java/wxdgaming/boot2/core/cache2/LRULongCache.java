@@ -78,26 +78,22 @@ public class LRULongCache<V> extends Cache<Long, V> {
                         long millis = MyClock.millis();
                         while (iterator.hasNext()) {
                             Long2ObjectMap.Entry<CacheHolder<V>> next = iterator.next();
-                            CacheHolder<V> holder = next.getValue();
+                            CacheHolder<V> cacheHolder = next.getValue();
                             try {
-                                if (millis > holder.getExpireEndTime()) {
-                                    boolean remove = true;
-                                    if (holder.getValue() != null && LRULongCache.this.removalListener != null) {
-                                        /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                                        remove = LRULongCache.this.removalListener.apply(next.getLongKey(), holder.getValue());
-                                    }
+                                if (millis > cacheHolder.getExpireEndTime()) {
+                                    boolean remove = onRemove(next.getLongKey(), cacheHolder);
                                     if (remove)
                                         iterator.remove();
                                     else
-                                        refresh(holder);/*移除缓存失败刷新一次*/
+                                        refresh(cacheHolder);/*移除缓存失败刷新一次*/
                                 } else {
-                                    if (holder.getValue() != null && LRULongCache.this.heartListener != null && millis > holder.getLastHeartTime()) {
+                                    if (cacheHolder.getValue() != null && LRULongCache.this.heartListener != null && millis > cacheHolder.getLastHeartTime()) {
                                         /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                                        LRULongCache.this.heartListener.accept(next.getLongKey(), holder.getValue());
+                                        LRULongCache.this.heartListener.accept(next.getLongKey(), cacheHolder.getValue());
                                     }
                                 }
                             } catch (Exception e) {
-                                log.error("CASCache 心跳异常 {}", holder.getValue(), e);
+                                log.error("CASCache 心跳异常 {}", cacheHolder.getValue(), e);
                             }
                         }
                     } finally {
@@ -214,16 +210,17 @@ public class LRULongCache<V> extends Cache<Long, V> {
         }
     }
 
-    @Override public V invalidate(Long k) {
-        int hashIndex = hashIndex(k);
+    @Override public V invalidate(Long longKey) {
+        int hashIndex = hashIndex(longKey);
         CacheLock cacheLock = reentrantLocks.get(hashIndex);
         cacheLock.writeLock.lock();
         try {
-            CacheHolder<V> cacheHolder = nodes.get(hashIndex).get(k.longValue());
+            CacheHolder<V> cacheHolder = nodes.get(hashIndex).get(longKey.longValue());
             if (cacheHolder == null) {
                 return null;
             }
             cacheHolder.setExpireEndTime(0);
+            onRemove(longKey, cacheHolder);
             return cacheHolder.getValue();
         } finally {
             cacheLock.writeLock.unlock();
@@ -240,20 +237,25 @@ public class LRULongCache<V> extends Cache<Long, V> {
                 for (Long2ObjectMap.Entry<CacheHolder<V>> entry : entries) {
                     long longKey = entry.getLongKey();
                     CacheHolder<V> holder = entry.getValue();
-                    if (LRULongCache.this.removalListener != null && holder.getValue() != null) {
-                        try {
-                            /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                            LRULongCache.this.removalListener.apply(longKey, holder.getValue());
-                        } catch (Exception e) {
-                            log.error("removalListener 执行异常 {}", holder.getValue(), e);
-                        }
-                    }
+                    onRemove(longKey, holder);
                 }
                 node.clear();
             } finally {
                 cacheLock.writeLock.unlock();
             }
         }
+    }
+
+    boolean onRemove(Long intKey, CacheHolder<V> cacheHolder) {
+        if (LRULongCache.this.removalListener != null && cacheHolder.getValue() != null) {
+            try {
+                /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                return LRULongCache.this.removalListener.apply(intKey, cacheHolder.getValue());
+            } catch (Exception e) {
+                log.error("removalListener 执行异常 {}", cacheHolder.getValue(), e);
+            }
+        }
+        return true;
     }
 
     @Override public Collection<Long> keys() {

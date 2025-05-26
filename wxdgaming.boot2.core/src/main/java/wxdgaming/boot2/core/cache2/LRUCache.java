@@ -76,11 +76,7 @@ public class LRUCache<K, V> extends Cache<K, V> {
                             CacheHolder<V> holder = next.getValue();
                             try {
                                 if (millis > holder.getExpireEndTime()) {
-                                    boolean remove = true;
-                                    if (holder.getValue() != null && LRUCache.this.removalListener != null) {
-                                        /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                                        remove = LRUCache.this.removalListener.apply(next.getKey(), holder.getValue());
-                                    }
+                                    boolean remove = onRemove(next.getKey(), holder);
                                     if (remove)
                                         iterator.remove();
                                     else
@@ -219,6 +215,7 @@ public class LRUCache<K, V> extends Cache<K, V> {
                 return null;
             }
             cacheHolder.setExpireEndTime(0);
+            onRemove(k, cacheHolder);
             return cacheHolder.getValue();
         } finally {
             cacheLock.writeLock.unlock();
@@ -235,20 +232,25 @@ public class LRUCache<K, V> extends Cache<K, V> {
                     K key = entry.getKey();
                     CacheHolder<V> holder = entry.getValue();
                     holder.setExpireEndTime(0);
-                    if (LRUCache.this.removalListener != null && holder.getValue() != null) {
-                        try {
-                            /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                            LRUCache.this.removalListener.apply(key, holder.getValue());
-                        } catch (Exception e) {
-                            log.error("removalListener 执行异常 {}", holder.getValue(), e);
-                        }
-                    }
+                    onRemove(key, holder);
                 }
                 node.clear();
             } finally {
                 cacheLock.writeLock.unlock();
             }
         }
+    }
+
+    boolean onRemove(K key, CacheHolder<V> cacheHolder) {
+        if (LRUCache.this.removalListener != null && cacheHolder.getValue() != null) {
+            try {
+                /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                return LRUCache.this.removalListener.apply(key, cacheHolder.getValue());
+            } catch (Exception e) {
+                log.error("removalListener 执行异常 {}", cacheHolder.getValue(), e);
+            }
+        }
+        return true;
     }
 
     @Override public Collection<K> keys() {

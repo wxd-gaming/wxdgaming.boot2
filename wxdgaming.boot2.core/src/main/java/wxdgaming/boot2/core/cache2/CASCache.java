@@ -70,11 +70,7 @@ public class CASCache<K, V> extends Cache<K, V> {
                         CacheHolder<V> holder = next.getValue();
                         try {
                             if (millis > holder.getExpireEndTime()) {
-                                boolean remove = true;
-                                if (holder.getValue() != null && CASCache.this.removalListener != null) {
-                                    /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                                    remove = CASCache.this.removalListener.apply(next.getKey(), holder.getValue());
-                                }
+                                boolean remove = onRemove(next.getKey(), holder);
                                 if (remove)
                                     iterator.remove();
                                 else
@@ -167,6 +163,7 @@ public class CASCache<K, V> extends Cache<K, V> {
             return null;
         }
         cacheHolder.setExpireEndTime(0);
+        onRemove(k, cacheHolder);
         return cacheHolder.getValue();
     }
 
@@ -178,17 +175,22 @@ public class CASCache<K, V> extends Cache<K, V> {
                 Map.Entry<K, CacheHolder<V>> next = iterator.next();
                 K key = next.getKey();
                 CacheHolder<V> holder = next.getValue();
-                if (holder.getValue() != null && CASCache.this.removalListener != null) {
-                    try {
-                        /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
-                        CASCache.this.removalListener.apply(key, holder.getValue());
-                    } catch (Exception e) {
-                        log.error("removalListener 执行异常 {}", holder.getValue(), e);
-                    }
-                }
+                onRemove(key, holder);
                 iterator.remove();
             }
         }
+    }
+
+    boolean onRemove(K key, CacheHolder<V> cacheHolder) {
+        if (CASCache.this.removalListener != null && cacheHolder.getValue() != null) {
+            try {
+                /*TODO 防止缓存穿透 holder.getValue() 可能为 null*/
+                return CASCache.this.removalListener.apply(key, cacheHolder.getValue());
+            } catch (Exception e) {
+                log.error("removalListener 执行异常 {}", cacheHolder.getValue(), e);
+            }
+        }
+        return true;
     }
 
     @Override public Collection<K> keys() {
