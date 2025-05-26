@@ -219,7 +219,7 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
         CacheLock cacheLock = reentrantLocks.get(hashIndex);
         cacheLock.writeLock.lock();
         try {
-            CacheHolder<V> cacheHolder = nodes.get(hashIndex).get(intKey.intValue());
+            CacheHolder<V> cacheHolder = nodes.get(hashIndex).remove(intKey.intValue());
             if (cacheHolder == null) {
                 return null;
             }

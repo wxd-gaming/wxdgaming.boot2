@@ -210,7 +210,7 @@ public class LRUCache<K, V> extends Cache<K, V> {
         CacheLock cacheLock = reentrantLocks.get(hashIndex);
         cacheLock.writeLock.lock();
         try {
-            CacheHolder<V> cacheHolder = nodes.get(hashIndex).get(k);
+            CacheHolder<V> cacheHolder = nodes.get(hashIndex).remove(k);
             if (cacheHolder == null) {
                 return null;
             }

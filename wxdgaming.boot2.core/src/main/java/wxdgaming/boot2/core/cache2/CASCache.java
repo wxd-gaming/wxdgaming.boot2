@@ -158,7 +158,7 @@ public class CASCache<K, V> extends Cache<K, V> {
 
     @Override public V invalidate(K k) {
         int hashIndex = hashIndex(k);
-        CacheHolder<V> cacheHolder = nodes.get(hashIndex).get(k);
+        CacheHolder<V> cacheHolder = nodes.get(hashIndex).remove(k);
         if (cacheHolder == null) {
             return null;
         }

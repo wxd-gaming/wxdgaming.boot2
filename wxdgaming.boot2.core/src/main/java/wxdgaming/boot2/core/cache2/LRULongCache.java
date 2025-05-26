@@ -215,7 +215,7 @@ public class LRULongCache<V> extends Cache<Long, V> {
         CacheLock cacheLock = reentrantLocks.get(hashIndex);
         cacheLock.writeLock.lock();
         try {
-            CacheHolder<V> cacheHolder = nodes.get(hashIndex).get(longKey.longValue());
+            CacheHolder<V> cacheHolder = nodes.get(hashIndex).remove(longKey.longValue());
             if (cacheHolder == null) {
                 return null;
             }
