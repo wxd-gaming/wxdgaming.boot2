@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.lang.Tuple2;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -98,12 +100,50 @@ public class RankMap {
         return new Tuple2<>(r, rankScore);
     }
 
+    public RankScore topByRank(int rank) {
+        return rankMap.headMap(rankMap.lastKey(), true).keySet().stream().skip(rank - 1).limit(1).findFirst().orElse(null);
+    }
+
+    public RankScore topByRank2(int rank) {
+        if (rank < 1) {
+            return null;
+        }
+        if (rank > rankMap.size()) {
+            return null;
+        }
+        int i = 0;
+        for (Map.Entry<RankScore, String> entry : rankMap.entrySet()) {
+            i++;
+            if (i == rank) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
     public List<RankScore> topN(int n) {
+        if (n <= 0) {
+            return List.of();
+        }
+        if (n > rankMap.size()) {
+            return List.copyOf(rankMap.keySet());
+        }
         return rankMap.headMap(rankMap.lastKey(), true).keySet().stream().limit(n).toList();
     }
 
-    public RankScore topByRank(int rank) {
-        return rankMap.headMap(rankMap.lastKey(), true).keySet().stream().skip(rank - 1).limit(1).findFirst().orElse(null);
+    public List<RankScore> topN2(int n) {
+        if (n <= 0) {
+            return List.of();
+        }
+        ArrayList<RankScore> rankScores = new ArrayList<>(n);
+        for (Map.Entry<RankScore, String> entry : rankMap.entrySet()) {
+            RankScore rankScore = entry.getKey();
+            rankScores.add(rankScore);
+            if (rankScores.size() == n) {
+                break;
+            }
+        }
+        return rankScores;
     }
 
     public List<RankScore> toList() {

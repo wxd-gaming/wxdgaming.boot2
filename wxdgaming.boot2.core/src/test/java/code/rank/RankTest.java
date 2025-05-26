@@ -7,6 +7,8 @@ import wxdgaming.boot2.core.rank.RankScore;
 import wxdgaming.boot2.core.util.RandomUtils;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * 测试
@@ -44,17 +46,31 @@ public class RankTest {
                 int rank = rankMap.rank(random);
                 System.out.println("随机读取一个对象 " + random + " 当前排名 " + rank + " - " + diffTime.diffMs5() + "ms ");
             }
+            int randomRank = RandomUtils.random(1, iCount);
             {
                 diffTime.reset();
-                int rank = RandomUtils.random(1, 10);
-                RankScore rankScore = rankMap.topByRank(rank);
-                System.out.println("随机读排名 " + rank + " 对象 " + rankScore.getKey() + " - " + diffTime.diffMs5() + "ms ");
+                RankScore rankScore = rankMap.topByRank(randomRank);
+                System.out.println("随机读排名 " + randomRank + " 对象 " + rankScore.getKey() + " - " + diffTime.diffMs5() + "ms ");
             }
-            diffTime.reset();
-            topN = rankMap.topN(100);
-            System.out.println("返回前 100 名 " + diffTime.diffMs5() + "ms");
-            diffTime.reset();
+            {
+                diffTime.reset();
+                RankScore rankScore = rankMap.topByRank2(randomRank);
+                System.out.println("随机读排名 " + randomRank + " 对象 " + rankScore.getKey() + " - " + diffTime.diffMs5() + "ms ");
+            }
+            int topRank = RandomUtils.random(1, iCount);
+            {
+                diffTime.reset();
+                topN = rankMap.topN(topRank);
+                System.out.println("返回前 " + topRank + " 名 " + diffTime.diffMs5() + "ms");
+            }
+            {
+                diffTime.reset();
+                topN = rankMap.topN2(topRank);
+                System.out.println("返回前 " + topRank + " 名 " + diffTime.diffMs5() + "ms");
+            }
             System.out.println("=========================================");
+            System.gc();
+            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
         }
         for (RankScore rankScore : topN) {
             log.info("{}", rankScore);
