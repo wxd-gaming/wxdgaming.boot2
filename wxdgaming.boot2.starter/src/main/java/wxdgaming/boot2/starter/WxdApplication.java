@@ -6,18 +6,15 @@ import com.google.inject.Stage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.*;
-import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.shutdown;
-import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.collection.SetOf;
-import wxdgaming.boot2.core.io.FileReadUtil;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.reflect.ReflectContext;
-import wxdgaming.boot2.core.util.JvmUtil;
+import wxdgaming.boot2.core.util.DumpUtil;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -68,7 +65,11 @@ public class WxdApplication {
             Injector injector = Guice.createInjector(Stage.PRODUCTION, collect);
             runApplicationMain = injector.getInstance(RunApplicationMain.class);
             runApplicationMain.init();
-
+            ExecutorFactory.getExecutorServiceLogic().scheduleAtFixedRate(() -> {
+                StringBuilder stringAppend = new StringBuilder(1024);
+                DumpUtil.freeMemory(stringAppend);
+                log.info(stringAppend.toString());
+            }, 120, 30, TimeUnit.SECONDS);
             return runApplicationMain;
         } catch (Throwable throwable) {
             log.error("", throwable);
