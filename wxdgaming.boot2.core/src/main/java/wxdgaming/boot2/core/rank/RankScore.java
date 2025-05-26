@@ -28,8 +28,8 @@ public class RankScore extends ObjectBase implements Comparable<RankScore> {
         if (this.score != o.score)
             return Long.compare(o.score, this.score);
         if (this.timestamp != o.timestamp)
-            return Long.compare(o.timestamp, this.timestamp);
-        return o.key.compareTo(this.key);
+            return Long.compare(this.timestamp, o.timestamp);
+        return this.key.compareTo(o.key);
     }
 
     @Override public boolean equals(Object o) {
