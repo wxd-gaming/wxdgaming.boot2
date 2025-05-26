@@ -2,7 +2,7 @@ package code.rank;
 
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.lang.DiffTime;
-import wxdgaming.boot2.core.rank.RankMap;
+import wxdgaming.boot2.core.rank.RankMap2;
 import wxdgaming.boot2.core.rank.RankScore;
 import wxdgaming.boot2.core.util.RandomUtils;
 
@@ -13,13 +13,14 @@ import wxdgaming.boot2.core.util.RandomUtils;
  * @version: 2025-05-20 21:08
  **/
 @Slf4j
-public class RankTest {
+public class RankTest2 {
 
     public static void main(String[] args) {
-        RankMap rankMap = new RankMap();
+        RankMap2 rankMap = new RankMap2();
         for (int k = 0; k < 5; k++) {
             Thread.ofPlatform().start(() -> {
                 StringBuilder stringBuilder = new StringBuilder();
+
                 DiffTime diffTime = new DiffTime();
                 int iCount = 10000;
                 for (int i = 0; i < iCount; i++) {
@@ -44,12 +45,12 @@ public class RankTest {
                 }
                 {
                     diffTime.reset();
-                    int rank = RandomUtils.random(1, 10);
-                    RankScore rankScore = rankMap.topByRank(rank);
+                    int rank = RandomUtils.random(1, iCount);
+                    RankScore rankScore = rankMap.rankDataByRank(rank);
                     stringBuilder.append("随机读取一个排名 " + rank + " 对象 " + rankScore.getKey() + " - " + diffTime.diffUs5() + "us").append("\n");
                 }
                 diffTime.reset();
-                rankMap.topN(100);
+                rankMap.rankBySize(100);
                 stringBuilder.append("返回前 100 名 " + diffTime.diffUs5() + "us").append("\n");
                 stringBuilder.append("=========================================").append("\n");
                 System.out.println(stringBuilder.toString());
