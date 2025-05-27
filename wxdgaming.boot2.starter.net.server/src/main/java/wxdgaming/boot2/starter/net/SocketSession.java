@@ -37,6 +37,8 @@ public class SocketSession {
     private final Type type;
     private final Channel channel;
     private boolean webSocket;
+    /** websocket 握手完成 */
+    private boolean handshake_complete;
     private boolean ssl;
     private final boolean enabledScheduledFlush;
     /** 每秒钟帧的最大数量 */
@@ -55,6 +57,7 @@ public class SocketSession {
         ChannelUtil.attr(this.channel, ChannelUtil.SOCKET_SESSION_KEY, this);
     }
 
+    @SuppressWarnings("unchecked")
     public <R> R bindData(String key) {
         return (R) bindData.get(key);
     }
@@ -142,7 +145,7 @@ public class SocketSession {
                 【%s - %s%s%s%s】""".formatted(
                 type.name(),
                 ChannelUtil.ctxTostring(channel),
-                getBindData().isEmpty() ? "" : ", bindData: " + getBindData().entrySet().stream().map(v->v.getKey() + "=" + v.getValue()).reduce((a,b)->a + "," + b).orElse(""),
+                getBindData().isEmpty() ? "" : ", bindData: " + getBindData().entrySet().stream().map(v -> v.getKey() + "=" + v.getValue()).reduce((a, b) -> a + "," + b).orElse(""),
                 isWebSocket() ? ", websocket" : "",
                 isSsl() ? ", ssl" : ""
         );

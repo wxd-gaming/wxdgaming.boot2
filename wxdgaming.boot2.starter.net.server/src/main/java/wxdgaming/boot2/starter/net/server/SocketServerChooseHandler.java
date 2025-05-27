@@ -81,7 +81,16 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
         /*接受完整的websocket消息 64mb*/
         ctx.pipeline().addBefore("device-handler", "WebSocketAggregator", new WebSocketFrameAggregator(maxContentLength));
         // 用于处理websocket, /ws为访问websocket时的uri
-        WebSocketServerProtocolHandler webSocketServerProtocolHandler = new WebSocketServerProtocolHandler(socketServerConfig.getWebSocketPrefix(), null, false, maxContentLength);
+        WebSocketServerProtocolHandler webSocketServerProtocolHandler = new WebSocketServerProtocolHandler(socketServerConfig.getWebSocketPrefix(), null, false, maxContentLength) {
+
+            @Override public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+                log.debug("{} websocket event triggered {}", ctx.channel(), evt);
+                if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
+                    ChannelUtil.session(ctx.channel()).setHandshake_complete(true);
+                }
+                super.userEventTriggered(ctx, evt);
+            }
+        };
         ctx.pipeline().addBefore("device-handler", "ProtocolHandler", webSocketServerProtocolHandler);
         ChannelUtil.session(ctx.channel()).setWebSocket(true);
     }

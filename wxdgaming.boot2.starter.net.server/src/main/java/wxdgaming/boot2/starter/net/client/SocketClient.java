@@ -17,6 +17,7 @@ import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.util.BytesUnit;
+import wxdgaming.boot2.starter.net.ChannelUtil;
 import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.SessionGroup;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -132,7 +133,15 @@ public abstract class SocketClient {
                             // ChunkedWriteHandler：向客户端发送HTML5文件,文件过大会将内存撑爆
                             pipeline.addBefore("device-handler", "http-chunked", new ChunkedWriteHandler());
                             pipeline.addBefore("device-handler", "websocket-aggregator", new WebSocketFrameAggregator(maxContentLength));
-                            pipeline.addBefore("device-handler", "ProtocolHandler", new WebSocketClientProtocolHandler(newHandshaker()));
+                            pipeline.addBefore("device-handler", "ProtocolHandler", new WebSocketClientProtocolHandler(newHandshaker()) {
+                                @Override public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+                                    log.debug("{} websocket event triggered {}", ctx.channel(), evt);
+                                    if (evt == ClientHandshakeStateEvent.HANDSHAKE_COMPLETE) {
+                                        ChannelUtil.session(ctx.channel()).setHandshake_complete(true);
+                                    }
+                                    super.userEventTriggered(ctx, evt);
+                                }
+                            });
                         }
                         addChanelHandler(socketChannel, pipeline);
                     }
