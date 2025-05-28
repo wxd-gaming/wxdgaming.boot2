@@ -1,0 +1,68 @@
+package wxdgaming.game.server.bean;
+
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
+import wxdgaming.game.server.bean.attr.AttrInfo;
+import wxdgaming.game.server.bean.attr.AttrType;
+import wxdgaming.game.server.bean.buff.Buff;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+/**
+ * 场景精灵对象
+ *
+ * @author: wxd-gaming(無心道, 15388152619)
+ * @version: 2025-04-15 17:31
+ **/
+@Getter
+@Setter
+public class MapNpc extends MapObject {
+
+    private int level;
+    private long exp;
+    /** 生命 */
+    private long hp;
+    /** 魔法 */
+    private long mp;
+    /** 体力 */
+    private int physical;
+    private ArrayList<Buff> buffs = new ArrayList<>();
+    private long fightValue;
+    private AttrInfo finalAttrInfo = new AttrInfo();
+    /** gm的固定属性 */
+    private AttrInfo gmAttrInfo = new AttrInfo();
+    /** gm的百分比提升属性 */
+    private AttrInfo gmAttrProInfo = new AttrInfo();
+    /** 临时属性 */
+    @JsonIgnore
+    @JSONField(serialize = false, deserialize = false)
+    private transient AttrInfo tmpAttrInfo = new AttrInfo();
+    /** 临时百分比提升属性 */
+    @JsonIgnore
+    @JSONField(serialize = false, deserialize = false)
+    private transient AttrInfo tmpAttrProInfo = new AttrInfo();
+    /** 分组属性 */
+    @JsonIgnore
+    @JSONField(serialize = false, deserialize = false)
+    private transient HashMap<Integer, AttrInfo> attrMap = new HashMap<>();
+    /** 分组百分比属性 */
+    @JsonIgnore
+    @JSONField(serialize = false, deserialize = false)
+    private transient HashMap<Integer, AttrInfo> attrProMap = new HashMap<>();
+
+    public MapNpc() {
+        this.setMapObjectType(MapObjectType.Npc);
+    }
+
+    public long maxHp() {
+        return this.getFinalAttrInfo().get(AttrType.MAXHP);
+    }
+
+    public long maxMp() {
+        return this.getFinalAttrInfo().get(AttrType.MAXMP);
+    }
+
+}

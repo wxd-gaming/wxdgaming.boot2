@@ -11,4 +11,4 @@ echo %PATH%
 :: 打印Java版本信息，确认配置成功
 java -version
 
-C:\java\apache-maven-3.6.3\\bin\\mvn compile -T 1C test -Dmaven.compile.fork=true -DfailIfNoTests=false -pl wxdgaming.game.test -am package
+C:\java\apache-maven-3.6.3\\bin\\mvn compile -T 1C test -Dmaven.compile.fork=true -DfailIfNoTests=false -pl wxdgaming.game.server -am package

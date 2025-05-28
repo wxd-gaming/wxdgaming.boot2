@@ -24,13 +24,15 @@ public class ProtoTest {
                 "src/main/java",
                 "wxdgaming.boot2.starter.net.module",
                 "Req",
-                "wxdgaming.boot2.starter.net.module"
+                "wxdgaming.boot2.starter.net.module",
+                null
         );
         ProtoBuf2Pojo.createMapping(
                 "src/main/java",
                 "wxdgaming.boot2.starter.net.module",
                 "Res",
-                "wxdgaming.boot2.starter.net.module"
+                "wxdgaming.boot2.starter.net.module",
+                null
         );
     }
 

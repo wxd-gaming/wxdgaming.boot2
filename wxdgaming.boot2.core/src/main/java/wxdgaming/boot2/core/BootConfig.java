@@ -70,6 +70,14 @@ public class BootConfig {
         return config.getBooleanValue("debug");
     }
 
+    public int gid() {
+        Integer sid = config.getInteger("gid");
+        if (sid == null) {
+            throw new RuntimeException("gid is null");
+        }
+        return sid;
+    }
+
     public int sid() {
         Integer sid = config.getInteger("sid");
         if (sid == null) {

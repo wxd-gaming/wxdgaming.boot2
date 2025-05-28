@@ -264,6 +264,7 @@ public class ReflectContext {
 
         private final ClassLoader classLoader;
         private final String[] packageNames;
+        private Predicate<Class<?>> filter;
         /** 是否读取子包 */
         private boolean findChild = true;
         /** 查找类的时候忽略接口 */
@@ -300,7 +301,12 @@ public class ReflectContext {
         public ReflectContext build() {
             TreeMap<String, Class<?>> classCollection = new TreeMap<>();
             for (String packageName : packageNames) {
-                findClasses(packageName, aClass -> classCollection.put(aClass.getName(), aClass));
+                findClasses(packageName, aClass -> {
+                    if (filter != null && !filter.test(aClass)) {
+                        return;
+                    }
+                    classCollection.put(aClass.getName(), aClass);
+                });
             }
             List<Class<?>> list = classCollection.values()
                     .stream()

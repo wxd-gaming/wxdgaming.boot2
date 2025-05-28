@@ -6,6 +6,8 @@ import java.lang.management.RuntimeMXBean;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 import java.util.function.Function;
 
 /**
@@ -92,9 +94,7 @@ public class JvmUtil {
     public static void halt(int status) {
         for (int kk = 3; kk >= 1; kk--) {
             System.out.println("进程退出倒计时：" + kk + " 秒");
-            try {
-                Thread.sleep(1000);
-            } catch (Exception ignore) {}
+            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
         }
         System.out.println("进程退出：" + status);
         Runtime.getRuntime().halt(status);

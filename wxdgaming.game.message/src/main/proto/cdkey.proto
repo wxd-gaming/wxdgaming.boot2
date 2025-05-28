@@ -1,0 +1,16 @@
+syntax = "proto3";
+//把文件拆分
+option java_multiple_files = true;
+//导出包名
+option java_package = "wxdgaming.game.message";
+
+
+//请求使用cdkey
+message ReqUseCdKey {
+  string cdKey = 1;
+}
+
+//响应使用cdkey
+message ResUseCdKey {
+  string cdKey = 1;
+}

@@ -1,0 +1,31 @@
+syntax = "proto3";
+//把文件拆分
+option java_multiple_files = true;
+//导出包名
+option java_package = "wxdgaming.game.message";
+
+enum ChatType {
+  Chat_TYPE_NONE             = 0;//占位符
+  Chat_TYPE_World            = 1;//世界聊天
+  Chat_TYPE_Private          = 2;//私聊
+  Chat_TYPE_Guild            = 3;//公会聊天
+  Chat_TYPE_System           = 4;//系统消息
+}
+
+//请求聊天
+message ReqChatMessage {
+  ChatType type                         = 1;
+  string content                        = 2;
+  repeated string params                = 3;
+  int64 targetId                        = 4;//私聊就是目标玩家id，公会就是公会id
+}
+
+//聊天响应
+message ResChatMessage {
+  ChatType type                         = 1;
+  string content                        = 2;
+  repeated string params                = 3;
+  int64 targetId                        = 4;//私聊就是目标玩家id，公会就是公会id
+  int64 senderId                        = 5;//发送者id
+  string senderName                     = 6;//发送者名字
+}

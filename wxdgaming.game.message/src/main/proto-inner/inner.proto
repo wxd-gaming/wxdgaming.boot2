@@ -1,0 +1,26 @@
+syntax = "proto3";
+//把文件拆分
+option java_multiple_files = true;
+//导出包名
+option java_package = "wxdgaming.game.message";
+
+//请求转发消息
+message ReqForwardMessage {
+  repeated int64 sessionIds             = 1;//转发的sessionId列表 我需要把消息转发给哪些sessionId
+  repeated int32 gameIds                = 2;//转发的gameId列表 我需要把消息转发给哪些gameId
+  repeated int32 serverIds              = 3;//转发的serverId列表 我需要把消息转发给哪些serverId
+  int32 messageId                       = 4;//消息id
+  bytes messages                        = 5;//消息内容
+}
+
+//请求转发消息
+message ResForwardMessage {
+
+}
+
+message ReqRegisterServer {
+  int32 gameId                          = 1;//游戏id
+  int32 mainSid                         = 2;//主服务器id
+  repeated int32 serverIds              = 3;//服务器id,因为合服可能会导致多个服务器id
+  repeated int32 messageIds             = 4;//监听的消息id列表
+}

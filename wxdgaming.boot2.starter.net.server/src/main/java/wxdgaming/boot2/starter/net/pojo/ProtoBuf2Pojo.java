@@ -18,6 +18,7 @@ import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +46,8 @@ public class ProtoBuf2Pojo {
                 .forEach(filePath -> {
 
                     AtomicBoolean multiple_files = new AtomicBoolean(true);
+
+                    AtomicBoolean clean_files = new AtomicBoolean(false);
 
                     AtomicReference<BeanInfo> comment = new AtomicReference<>(new BeanInfo(multiple_files.get()));
                     AtomicBoolean start = new AtomicBoolean();
@@ -93,15 +97,23 @@ public class ProtoBuf2Pojo {
                             if (multiple_files.get()) {
                                 String p1 = filePath.getFileName().toString().replace(".proto", "").replace("Message", "");
                                 p1 = wxdgaming.boot2.core.chatset.StringUtils.lowerFirst(p1);
-                                String to = "package " + packageName.get() + "." + p1 + ".message;";
+                                String to = "package %s.%s;".formatted(packageName.get(), p1);
                                 to += "\n";
                                 for (String anImport : imports) {
-                                    to += "\nimport " + anImport + ";";
+                                    to += "\nimport %s;".formatted(anImport);
                                 }
                                 to += "\n\n\n";
                                 to += string;
+                                String javaFileName = "%s/%s/%s/%s.java".formatted(outPath, packageName.get().replace(".", "/"), p1, comment.get().getClassName());
+                                File javaFile = new File(javaFileName);
+                                if (clean_files.compareAndSet(false, true)) {
+                                    FileUtil.del(javaFile.getParent());
+                                }
                                 System.out.println(to);
-                                FileWriteUtil.writeString(outPath + "/" + packageName.get().replace(".", "/") + "/" + p1 + "/message/" + comment.get().getClassName() + ".java", to);
+                                FileWriteUtil.writeString(
+                                        javaFile,
+                                        to
+                                );
                             }
                             stringBuilder.append(string);
                             comment.set(new BeanInfo(multiple_files.get()));
@@ -408,17 +420,19 @@ public class ProtoBuf2Pojo {
      * @param outPath         输出路径
      * @param packageName     输出包名
      * @param readPackageName 读取包名
-     * @param spi             要处理的接口 例如Req
+     * @param spi             要处理的接口 例如Req or Res
      * @author: wxd-gaming(無心道, 15388152619)
      * @version: 2025-01-15 14:58
      */
-    public static void createMapping(String outPath, String packageName, String spi, String readPackageName) {
+    public static void createMapping(String outPath, String packageName, String spi, String readPackageName, Predicate<Class<?>> filter) {
         ReflectContext reflectContext = ReflectContext.Builder.of(readPackageName).build();
         reflectContext
                 .withSuper(PojoBase.class)
                 .forEach(pojoBase -> {
-
                     Class<?> cls = pojoBase.getCls();
+                    if (filter != null && !filter.test(cls)) {
+                        return;
+                    }
                     createMapping0(outPath, packageName, spi, cls);
 
                 });
@@ -430,7 +444,7 @@ public class ProtoBuf2Pojo {
             return;
         }
         String[] split = cls.getPackageName().split("[.]");
-        String p1 = split[split.length - 2];
+        String p1 = split[split.length - 1];
         packageName = packageName + "." + p1 + "." + "handler";
         String className = simpleName + "Handler";
         String fileName = outPath + "/" + packageName.replace(".", "/") + "/" + className + ".java";
