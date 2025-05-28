@@ -22,9 +22,13 @@ public class ReqRegisterServer extends PojoBase {
 
     /** 游戏id */
     @Tag(1) private int gameId;
+    /** 主服务器id */
+    @Tag(2) private int mainSid;
     /** 服务器id,因为合服可能会导致多个服务器id */
-    @Tag(2) private List<Integer> serverIds = new ArrayList<>();
+    @Tag(3) private List<Integer> serverIds = new ArrayList<>();
     /** 监听的消息id列表 */
-    @Tag(3) private List<Integer> messageIds = new ArrayList<>();
+    @Tag(4) private List<Integer> messageIds = new ArrayList<>();
+    /** 服务类型 */
+    @Tag(5) private ServiceType serviceType;
 
 }

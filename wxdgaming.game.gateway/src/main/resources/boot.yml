@@ -26,7 +26,7 @@ http:
 socket:
   server:
     debug: false
-    port: 8000
+    port: 8800
     enabledHttp: true                                        #是否启用http
     enabledTcp: true                                         #是否启用tcp
     enabledScheduledFlush: true                             # 开启定时器flush

@@ -6,6 +6,8 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.inner.ReqForwardMessage;
 
+import java.util.List;
+
 /**
  * 请求转发消息
  *
@@ -19,7 +21,11 @@ public class ReqForwardMessageHandler {
     /** 请求转发消息 */
     @ProtoRequest
     public void reqForwardMessage(SocketSession socketSession, ReqForwardMessage req) {
-
+        int messageId = req.getMessageId();
+        byte[] messages = req.getMessages();
+        List<Integer> gameIds = req.getGameIds();
+        List<Integer> serverIds = req.getServerIds();
+        List<Long> sessionIds = req.getSessionIds();
     }
 
 }

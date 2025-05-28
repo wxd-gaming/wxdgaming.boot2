@@ -50,7 +50,6 @@ public class ProtoListenerFactory {
         if (mapping == null) {
             throw new RuntimeException("未找到消息id: %s".formatted(messageId));
         }
-        ThreadContext.cleanup();
         /*根据映射解析生成触发事件*/
         ProtoListenerTrigger protoListenerTrigger = new ProtoListenerTrigger(mapping, protoListenerContent.getRunApplication(), socketSession, messageId, data);
         boolean allMatch = protoFilters.stream().allMatch(filter -> filter.doFilter(protoListenerTrigger));

@@ -15,6 +15,8 @@ import wxdgaming.boot2.core.format.HexId;
 import wxdgaming.boot2.core.keywords.KeywordsMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryResult;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlService;
+import wxdgaming.boot2.starter.net.SocketSession;
+import wxdgaming.game.message.inner.ServiceType;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
 
@@ -43,6 +45,8 @@ public class DataCenterService {
     final ConcurrentHashMap<Long, String> rid2NameMap = new ConcurrentHashMap<>();
     final ChannelGroup onlinePlayerGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     final KeywordsMapping keywordsMapping = new KeywordsMapping();
+    /** 服务映射 */
+    final ConcurrentTable<ServiceType, Long, SocketSession> serviceSocketSessionMapping = new ConcurrentTable<>();
 
     @Inject
     public DataCenterService(PgsqlService pgsqlService) {

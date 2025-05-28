@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
+import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
@@ -38,6 +39,8 @@ public class ReqChooseRoleHandler extends HoldRunApplication {
     @ProtoRequest
     public void reqChooseRole(SocketSession socketSession, ReqChooseRole req) {
         long rid = req.getRid();
+        long clientSessionId = ThreadContext.context().getLongValue("clientSessionId");
+        log.info("选择角色请求:{}, clientSessionId={}", req, clientSessionId);
         Integer sid = socketSession.bindData("sid");
         String account = socketSession.bindData("account");
         HashSet<Long> longs = dataCenterService.getAccount2RidsMap().get(sid, account);
@@ -55,6 +58,7 @@ public class ReqChooseRoleHandler extends HoldRunApplication {
                 runApplication.executeMethodWithAnnotatedException(OnLogout.class, player);
             }
         });
+
         /*绑定*/
         socketSession.bindData("player", player);
         log.info("sid={}, {} 触发登录之前校验事件", sid, player);

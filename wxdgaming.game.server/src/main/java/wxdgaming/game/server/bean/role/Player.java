@@ -57,6 +57,10 @@ public class Player extends MapNpc {
     @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient SocketSession socketSession;
+    /** 通过网关代理的映射 */
+    @JsonIgnore
+    @JSONField(serialize = false, deserialize = false)
+    private transient long sessionId;
 
     public Player() {
         this.setMapObjectType(MapObjectType.Player);

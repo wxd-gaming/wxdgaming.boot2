@@ -6,6 +6,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
+import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.util.JwtUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
@@ -35,8 +36,8 @@ public class ReqLoginHandler extends HoldRunApplication {
 
     @ProtoRequest
     public void reqLogin(SocketSession socketSession, ReqLogin req) {
-
-        log.info("登录请求:{}", req);
+        long clientSessionId = ThreadContext.context().getLongValue("clientSessionId");
+        log.info("登录请求:{}, clientSessionId={}", req, clientSessionId);
         try {
             int sid = req.getSid();
             String account = req.getAccount();

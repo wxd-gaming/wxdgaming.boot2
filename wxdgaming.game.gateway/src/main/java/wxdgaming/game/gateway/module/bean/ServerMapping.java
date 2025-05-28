@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.net.SocketSession;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,5 +27,6 @@ public class ServerMapping extends ObjectBase {
     private String ip;
     private int port;
     private int webPort;
+    private List<Integer> messageIds = new ArrayList<>();
 
 }

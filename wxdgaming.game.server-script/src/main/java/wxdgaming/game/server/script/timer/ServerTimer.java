@@ -8,6 +8,7 @@ import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.message.inner.ReqRegisterServer;
+import wxdgaming.game.message.inner.ServiceType;
 
 import java.util.Collection;
 
@@ -32,7 +33,9 @@ public class ServerTimer extends HoldRunApplication {
     @Scheduled("*/20")
     public void reportGateWay() {
         ReqRegisterServer registerServer = new ReqRegisterServer();
+        registerServer.setServiceType(ServiceType.GAME);
         registerServer.setGameId(BootConfig.getIns().gid());
+        registerServer.setMainSid(BootConfig.getIns().sid());
         registerServer.getServerIds().add(BootConfig.getIns().sid());
         Collection<Integer> values = protoListenerFactory.getProtoListenerContent().getMessage2MappingMap().values();
         registerServer.getMessageIds().addAll(values);

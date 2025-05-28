@@ -11,6 +11,7 @@ import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.AttributeKey;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.starter.net.pojo.IWebSocketStringListener;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
@@ -167,6 +168,7 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
     }
 
     protected void dispatch(SocketSession socketSession, int messageId, byte[] messageBytes) throws Exception {
+        ThreadContext.cleanup();
         protoListenerFactory.dispatch(socketSession, messageId, messageBytes);
     }
 

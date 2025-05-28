@@ -23,12 +23,12 @@ public class ProtoTest {
 
     @Test
     @Order(2)
-    public void buildProtoHandler() {
+    public void buildGameProtoHandler() {
         ProtoBuf2Pojo.createMapping(
                 "src/main/java",
-                "wxdgaming.game.test.script",
+                "wxdgaming.game.server.script",
                 "Req",
-                "wxdgaming.game.message",
+                "wxdgaming.game.message.inner",
                 null
         );
     }

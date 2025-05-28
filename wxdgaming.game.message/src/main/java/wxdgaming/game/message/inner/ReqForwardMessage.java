@@ -30,5 +30,7 @@ public class ReqForwardMessage extends PojoBase {
     @Tag(4) private int messageId;
     /** 消息内容 */
     @Tag(5) private byte[] messages;
+    /** 转发的rid列表 我需要把消息转发给哪些rid */
+    @Tag(6) private List<Long> rids = new ArrayList<>();
 
 }
