@@ -13,6 +13,7 @@ import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnLogin;
 import wxdgaming.game.server.event.OnLoginBefore;
+import wxdgaming.game.server.event.OnLogout;
 import wxdgaming.game.server.module.data.DataCenterService;
 
 import java.util.HashSet;
@@ -49,6 +50,13 @@ public class ReqChooseRoleHandler extends HoldRunApplication {
         }
 
         Player player = dataCenterService.player(rid);
+
+        if (clientSessionMapping.getRid() > 0 && clientSessionMapping.getRid() != player.getUid()) {
+            /*角色切换*/
+            log.info("sid={}, account={} 角色切换 rid={} -> {}", sid, account, clientSessionMapping.getRid(), player.getUid());
+            runApplication.executeMethodWithAnnotatedException(OnLogout.class, clientSessionMapping.getPlayer());
+        }
+
         player.setClientSessionMapping(clientSessionMapping);
         clientSessionMapping.setRid(player.getUid());
         clientSessionMapping.setPlayer(player);
@@ -59,6 +67,7 @@ public class ReqChooseRoleHandler extends HoldRunApplication {
         log.info("sid={}, {} 触发登录之前校验事件", sid, player);
         runApplication.executeMethodWithAnnotatedException(OnLoginBefore.class, player);
         ResChooseRole resChooseRole = new ResChooseRole();
+        resChooseRole.setRid(rid);
         clientSessionMapping.forwardMessage(resChooseRole);
         log.info("sid={}, {} 触发登录事件", sid, player);
         runApplication.executeMethodWithAnnotatedException(OnLogin.class, player, 1, 1);

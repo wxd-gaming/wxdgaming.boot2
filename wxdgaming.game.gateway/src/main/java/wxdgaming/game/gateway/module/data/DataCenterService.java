@@ -63,6 +63,10 @@ public class DataCenterService extends HoldRunApplication {
         }
     }
 
+    public UserMapping getUserMapping(String account) {
+        return userMappings.computeIfAbsent(account, l -> new UserMapping().setAccount(account));
+    }
+
     public SocketSession getClientSession(long sessionId) {
         return socketServer.getSessionGroup().getChannelMap().get(sessionId);
     }

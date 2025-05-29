@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.TestMethodOrder;
 import wxdgaming.boot2.starter.net.pojo.ProtoBuf2Pojo;
 import wxdgaming.game.message.role.ReqLogin;
+import wxdgaming.game.message.role.ResLogin;
 
 import java.util.Objects;
 
@@ -26,20 +27,15 @@ public class GatewayProtoTest {
 
     @Test
     @Order(2)
-    public void buildGatewayProtoHandler() {
-        // ProtoBuf2Pojo.createMapping(
-        //         "src/main/java",
-        //         "wxdgaming.game.gateway.script",
-        //         "Req",
-        //         "wxdgaming.game.message.inner"
-        // );
+    public void buildResGatewayProtoHandler() {
         ProtoBuf2Pojo.createMapping(
                 "src/main/java",
                 "wxdgaming.game.gateway.script",
-                "Req",
+                "Res",
                 "wxdgaming.game.message.role",
-                cls -> Objects.equals(cls, ReqLogin.class),
-                null,
+                cls -> Objects.equals(cls, ResLogin.class)||true,
+                ()-> """
+                        @ThreadParam(path = "forwardMessage") ReqForwardMessage forwardMessage""",
                 null
         );
     }
@@ -47,12 +43,6 @@ public class GatewayProtoTest {
     @Test
     @Order(2)
     public void buildReqGatewayProtoHandler() {
-        // ProtoBuf2Pojo.createMapping(
-        //         "src/main/java",
-        //         "wxdgaming.game.gateway.script",
-        //         "Req",
-        //         "wxdgaming.game.message.inner"
-        // );
         ProtoBuf2Pojo.createMapping(
                 "src/main/java",
                 "wxdgaming.game.gateway.script",

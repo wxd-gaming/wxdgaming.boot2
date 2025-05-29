@@ -12,7 +12,6 @@ import wxdgaming.game.gateway.module.data.DataCenterService;
 import wxdgaming.game.message.inner.ReqForwardMessage;
 import wxdgaming.game.message.role.ResLogin;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -40,15 +39,16 @@ public class ResLoginHandler {
     public void resLogin(SocketSession socketSession, ResLogin req) {
         ReqForwardMessage forwardMessage = ThreadContext.context("forwardMessage");
         List<Long> sessionIds = forwardMessage.getSessionIds();
-        for (Long sessionId : sessionIds) {
-            SocketSession clientSession = dataCenterService.getClientSession(sessionId);
-            String account = forwardMessage.getKvBeansMap().get("account");
-            clientSession.bindData("account", account);
-            clientSession.write(req);
-            UserMapping userMapping = dataCenterService.getUserMappings().computeIfAbsent(account, k -> new UserMapping());
-            userMapping.setSocketSession(clientSession);
-
+        Long sessionId = sessionIds.getFirst();
+        SocketSession clientSession = dataCenterService.getClientSession(sessionId);
+        String account = req.getAccount();
+        clientSession.bindData("account", account);
+        clientSession.write(req);
+        UserMapping userMapping = dataCenterService.getUserMappings().computeIfAbsent(account, k -> new UserMapping());
+        if (userMapping.getSocketSession() != null) {
+            userMapping.getSocketSession().close("被顶号登录");
         }
+        userMapping.setSocketSession(clientSession);
     }
 
 }

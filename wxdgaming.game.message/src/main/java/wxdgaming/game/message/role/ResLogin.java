@@ -32,8 +32,12 @@ public class ResLogin extends PojoBase {
     }
 
 
+    /** 用户id */
+    @Tag(1) private String userId;
+    /** 账号 */
+    @Tag(2) private String account;
     /**  */
-    @Tag(1) private List<RoleBean> roles = new ArrayList<>();
+    @Tag(3) private List<RoleBean> roles = new ArrayList<>();
 
 
 }

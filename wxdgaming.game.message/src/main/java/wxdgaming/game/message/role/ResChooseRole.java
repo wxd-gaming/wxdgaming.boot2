@@ -32,6 +32,8 @@ public class ResChooseRole extends PojoBase {
     }
 
 
+    /** 角色id */
+    @Tag(1) private long rid;
 
 
 }

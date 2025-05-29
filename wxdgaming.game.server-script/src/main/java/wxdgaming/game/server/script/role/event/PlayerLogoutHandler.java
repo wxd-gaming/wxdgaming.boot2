@@ -3,6 +3,7 @@ package wxdgaming.game.server.script.role.event;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.bean.StatusConst;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnLogout;
@@ -30,6 +31,10 @@ public class PlayerLogoutHandler {
     public void onLogout(Player player) {
         log.info("玩家下线: {}", player);
         player.getStatus().addFlags(StatusConst.Offline);
+        ClientSessionMapping clientSessionMapping = player.getClientSessionMapping();
+        clientSessionMapping.setRid(0);
+        clientSessionMapping.setPlayer(null);
+        clientSessionMapping.setSession(null);
         player.setClientSessionMapping(null);
         dataCenterService.getOnlinePlayerGroup().remove(player.getUid());
     }

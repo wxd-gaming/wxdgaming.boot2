@@ -2,6 +2,7 @@ package wxdgaming.game.gateway.bean;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.net.SocketSession;
 
@@ -13,6 +14,7 @@ import wxdgaming.boot2.starter.net.SocketSession;
  **/
 @Getter
 @Setter
+@Accessors(chain = true)
 public class UserMapping extends ObjectBase {
 
     private int chooseServerId;

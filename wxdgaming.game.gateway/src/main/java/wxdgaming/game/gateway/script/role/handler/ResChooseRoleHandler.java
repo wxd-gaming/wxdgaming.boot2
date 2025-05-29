@@ -3,10 +3,11 @@ package wxdgaming.game.gateway.script.role.handler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
+import wxdgaming.game.gateway.bean.UserMapping;
 import wxdgaming.game.gateway.module.data.DataCenterService;
 import wxdgaming.game.message.inner.ReqForwardMessage;
 import wxdgaming.game.message.role.ResChooseRole;
@@ -34,13 +35,15 @@ public class ResChooseRoleHandler {
 
     /** 选择角色响应 */
     @ProtoRequest
-    public void resChooseRole(SocketSession socketSession, ResChooseRole req) {
-        ReqForwardMessage forwardMessage = ThreadContext.context("forwardMessage");
+    public void resChooseRole(SocketSession socketSession, ResChooseRole req, @ThreadParam(path = "forwardMessage") ReqForwardMessage forwardMessage) {
         List<Long> sessionIds = forwardMessage.getSessionIds();
-        for (Long sessionId : sessionIds) {
-            SocketSession clientSession = dataCenterService.getClientSession(sessionId);
-            clientSession.write(req);
-        }
+        Long sessionId = sessionIds.getFirst();
+        SocketSession clientSession = dataCenterService.getClientSession(sessionId);
+        String account = clientSession.bindData("account");
+        long rid = req.getRid();
+        UserMapping userMapping = dataCenterService.getUserMapping(account);
+        userMapping.setChooseRoleId(rid);
+        clientSession.write(req);
     }
 
 }
