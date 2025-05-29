@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
-import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.role.ReqChooseRole;
@@ -36,10 +36,9 @@ public class ReqChooseRoleHandler extends HoldRunApplication {
 
     /** 选择角色 */
     @ProtoRequest
-    public void reqChooseRole(SocketSession socketSession, ReqChooseRole req) {
+    public void reqChooseRole(SocketSession socketSession, ReqChooseRole req, @ThreadParam(path = "clientSessionMapping") ClientSessionMapping clientSessionMapping) {
         long rid = req.getRid();
-        ClientSessionMapping clientSessionMapping = ThreadContext.context("clientSessionMapping");
-        log.info("选择角色请求:{}, clientSessionId={}", req, clientSessionMapping);
+        log.info("选择角色请求:{}, clientSession={}", req, clientSessionMapping);
         Integer sid = clientSessionMapping.getSid();
         String account = clientSessionMapping.getAccount();
         HashSet<Long> longs = dataCenterService.getAccount2RidsMap().get(sid, account);

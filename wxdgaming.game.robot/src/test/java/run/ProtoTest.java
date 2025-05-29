@@ -26,9 +26,11 @@ public class ProtoTest {
     public void buildProtoHandler() {
         ProtoBuf2Pojo.createMapping(
                 "src/main/java",
-                "wxdgaming.game.test.script",
+                "wxdgaming.game.robot.script",
                 "Res",
-                "wxdgaming.game.test.script",
+                "wxdgaming.game.robot.script",
+                null,
+                null,
                 null
         );
     }

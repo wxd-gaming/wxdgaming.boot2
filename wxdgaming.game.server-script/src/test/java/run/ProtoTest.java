@@ -29,7 +29,11 @@ public class ProtoTest {
                 "wxdgaming.game.server.script",
                 "Req",
                 "wxdgaming.game.message",
-                null
+                null,
+                () -> """
+                        @ThreadParam(path = "clientSessionMapping") ClientSessionMapping clientSessionMapping""",
+                () -> """
+                        """
         );
     }
 

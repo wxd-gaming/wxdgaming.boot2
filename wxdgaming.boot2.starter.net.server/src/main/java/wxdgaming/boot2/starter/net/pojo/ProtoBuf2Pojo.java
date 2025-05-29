@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -364,7 +365,7 @@ public class ProtoBuf2Pojo {
      * @author: wxd-gaming(無心道, 15388152619)
      * @version: 2025-01-15 14:58
      */
-    public static void createMapping(String outPath, String packageName, String spi, String readPackageName, Predicate<Class<?>> filter) {
+    public static void createMapping(String outPath, String packageName, String spi, String readPackageName, Predicate<Class<?>> filter, Supplier<String> methodParamsSupplier, Supplier<String> methodContentSupplier) {
         ReflectContext reflectContext = ReflectContext.Builder.of(readPackageName).build();
         reflectContext
                 .withSuper(PojoBase.class)
@@ -373,12 +374,11 @@ public class ProtoBuf2Pojo {
                     if (filter != null && !filter.test(cls)) {
                         return;
                     }
-                    createMapping0(outPath, packageName, spi, cls);
-
+                    createMapping0(outPath, packageName, spi, cls, methodParamsSupplier, methodContentSupplier);
                 });
     }
 
-    public static void createMapping0(String outPath, String packageName, String spi, Class<?> cls) {
+    public static void createMapping0(String outPath, String packageName, String spi, Class<?> cls, Supplier<String> methodParamsSupplier, Supplier<String> methodContentSupplier) {
         String simpleName = cls.getSimpleName();
         if (!simpleName.startsWith(spi)) {
             return;
@@ -407,7 +407,18 @@ public class ProtoBuf2Pojo {
         String importString = imports.stream().map(s -> "import " + s + ";").collect(Collectors.joining("\n"));
 
         String comment = ann.value();
+        String methodContent = "";
+        if (methodContentSupplier != null) {
+            methodContent = methodContentSupplier.get();
+        }
 
+        String methodParams = "";
+        if (methodParamsSupplier != null) {
+            methodParams = methodParamsSupplier.get();
+        }
+        if (StringUtils.isNotBlank(methodParams)) {
+            methodParams = ", " + methodParams;
+        }
         String spiCode = """
                 package %s;
                 
@@ -425,11 +436,11 @@ public class ProtoBuf2Pojo {
                 
                     /** %s */
                     @ProtoRequest
-                    public void %s(SocketSession socketSession, %s req) {
-                
+                    public void %s(SocketSession socketSession, %s req%s) {
+                        %s
                     }
                 
-                }""".formatted(packageName, importString, comment, className, comment, StringUtils.lowerFirst(cls.getSimpleName()), cls.getSimpleName());
+                }""".formatted(packageName, importString, comment, className, comment, StringUtils.lowerFirst(cls.getSimpleName()), cls.getSimpleName(), methodParams, methodContent);
 
         System.out.println(spiCode);
         FileWriteUtil.writeString(fileName, spiCode);

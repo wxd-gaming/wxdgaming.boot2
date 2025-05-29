@@ -6,8 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Qualifier;
+import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -85,11 +87,18 @@ public class ProtoListenerTrigger extends ExecutorEvent {
                 }
             }
 
+            {
+                ThreadParam threadParam = parameter.getAnnotation(ThreadParam.class);
+                if (threadParam != null) {
+                    params[i] = ThreadContext.context(threadParam, parameterizedType);
+                    continue;
+                }
+            }
             try {
                 params[i] = runApplication.getInstance(parameterType);
             } catch (Exception e) {
                 Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
-                if (qualifier != null && qualifier.required()) {
+                if (qualifier == null || qualifier.required()) {
                     throw new RuntimeException("bean:" + parameterType.getName() + " is not bind");
                 }
             }

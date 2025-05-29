@@ -38,7 +38,9 @@ public class GatewayProtoTest {
                 "wxdgaming.game.gateway.script",
                 "Req",
                 "wxdgaming.game.message.role",
-                cls -> Objects.equals(cls, ReqLogin.class)
+                cls -> Objects.equals(cls, ReqLogin.class),
+                null,
+                null
         );
     }
 
@@ -56,7 +58,9 @@ public class GatewayProtoTest {
                 "wxdgaming.game.gateway.script",
                 "Req",
                 "wxdgaming.game.message.gateway",
-                cls -> Objects.equals(cls, ReqLogin.class) || true
+                cls -> Objects.equals(cls, ReqLogin.class) || true,
+                null,
+                null
         );
     }
 

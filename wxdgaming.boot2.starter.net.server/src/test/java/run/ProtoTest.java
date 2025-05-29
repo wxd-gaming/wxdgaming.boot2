@@ -25,6 +25,8 @@ public class ProtoTest {
                 "wxdgaming.boot2.starter.net.module",
                 "Req",
                 "wxdgaming.boot2.starter.net.module",
+                null,
+                null,
                 null
         );
         ProtoBuf2Pojo.createMapping(
@@ -32,6 +34,8 @@ public class ProtoTest {
                 "wxdgaming.boot2.starter.net.module",
                 "Res",
                 "wxdgaming.boot2.starter.net.module",
+                null,
+                null,
                 null
         );
     }
