@@ -187,27 +187,6 @@ public class BitFlag implements Serializable {
         return this;
     }
 
-
-    /** 分组范围内，全部为真 */
-    public boolean hasFlags(int... indexs) {
-        for (int i : indexs) {
-            if (!hasFlag(i)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /** 分组范围内，有一个是真 即为真 */
-    public boolean hasAnyFlags(int... indexs) {
-        for (int i : indexs) {
-            if (hasFlag(i)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /** 分组范围内，有一个是真 即为真 */
     public boolean hasFlagRange(int groupStart, int groupEnd) {
         if (groupEnd < groupStart || groupStart < 0)
@@ -218,6 +197,11 @@ public class BitFlag implements Serializable {
             }
         }
         return false;
+    }
+
+    /** 是否包含一个标记 */
+    public boolean hasFlag(BitFlagGroup bitFlagGroup) {
+        return hasFlag(bitFlagGroup.getFlag());
     }
 
     /** 是否包含一个标记 */

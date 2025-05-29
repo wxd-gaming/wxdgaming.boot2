@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.ChannelUtil;
+import wxdgaming.boot2.starter.net.SessionGroup;
 import wxdgaming.boot2.starter.net.SocketDeviceHandler;
 import wxdgaming.boot2.starter.net.SocketSession;
 
@@ -19,9 +20,11 @@ import wxdgaming.boot2.starter.net.SocketSession;
 public class SocketServerDeviceHandler extends SocketDeviceHandler {
 
     final SocketServerConfig socketServerConfig;
+    private final SessionGroup sessionGroup;
 
-    public SocketServerDeviceHandler(SocketServerConfig socketServerConfig) {
+    public SocketServerDeviceHandler(SocketServerConfig socketServerConfig, SessionGroup sessionGroup) {
         this.socketServerConfig = socketServerConfig;
+        this.sessionGroup = sessionGroup;
     }
 
     @Override public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -41,6 +44,7 @@ public class SocketServerDeviceHandler extends SocketDeviceHandler {
             socketSession.setMaxFrameBytes(BytesUnit.Kb.toBytes(socketServerConfig.getMaxFrameBytes()));
         }
         socketSession.setMaxFrameLength(socketServerConfig.getMaxFrameLength());
+        sessionGroup.add(socketSession);
     }
 
 }

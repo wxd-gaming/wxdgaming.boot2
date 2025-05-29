@@ -2,14 +2,16 @@ package wxdgaming.game.server.script.role.handler;
 
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.role.ReqHeartbeat;
 import wxdgaming.game.message.role.ResHeartbeat;
+import wxdgaming.game.server.bean.ClientSessionMapping;
 
 /**
- * null
+ * 心跳包
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: v1.1
@@ -18,12 +20,13 @@ import wxdgaming.game.message.role.ResHeartbeat;
 @Singleton
 public class ReqHeartbeatHandler {
 
-    /** null */
+    /** 心跳包 */
     @ProtoRequest
     public void reqHeartbeat(SocketSession socketSession, ReqHeartbeat req) {
+        ClientSessionMapping clientSessionMapping = ThreadContext.context("clientSessionMapping");
         ResHeartbeat resHeartbeat = new ResHeartbeat();
         resHeartbeat.setTimestamp(MyClock.millis());
-        socketSession.write(resHeartbeat);
+        clientSessionMapping.forwardMessage(resHeartbeat);
     }
 
 }

@@ -5,13 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.game.message.global.AttrBean;
 import wxdgaming.game.message.global.ResUpdateAttr;
-import wxdgaming.game.server.bean.MapKey;
-import wxdgaming.game.server.bean.MapNpc;
-import wxdgaming.game.server.bean.Vector3D;
+import wxdgaming.game.server.bean.*;
 import wxdgaming.game.server.bean.attr.AttrType;
 import wxdgaming.game.server.bean.goods.BagPack;
 import wxdgaming.game.server.bean.mail.MailPack;
@@ -56,18 +53,14 @@ public class Player extends MapNpc {
     private transient BlockingQueue<Runnable> eventList = new ArrayBlockingQueue<>(1024);
     @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
-    private transient SocketSession socketSession;
-    /** 通过网关代理的映射 */
-    @JsonIgnore
-    @JSONField(serialize = false, deserialize = false)
-    private transient long sessionId;
+    private transient ClientSessionMapping clientSessionMapping;
 
     public Player() {
         this.setMapObjectType(MapObjectType.Player);
     }
 
     public boolean checkOnline() {
-        return getSocketSession() != null && getSocketSession().isOpen();
+        return getClientSessionMapping() != null && getStatus().hasFlag(StatusConst.Online);
     }
 
     /** 推送生命变化 */
@@ -96,14 +89,14 @@ public class Player extends MapNpc {
         if (!checkOnline()) {
             return;
         }
-        getSocketSession().write(pojoBase);
+        getClientSessionMapping().forwardMessage(pojoBase);
     }
 
     public void writeAndFlush(PojoBase pojoBase) {
         if (!checkOnline()) {
             return;
         }
-        getSocketSession().writeAndFlush(pojoBase);
+        getClientSessionMapping().forwardMessage(pojoBase);
     }
 
 }

@@ -73,10 +73,8 @@ public abstract class SocketClient {
         );
     }
 
-    @Start
-    @Order(2000)
-    public void start(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
 
+    public void init(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
         SocketClientDeviceHandler socketClientDeviceHandler = new SocketClientDeviceHandler();
         ClientMessageDecode clientMessageDecode = new ClientMessageDecode(config, protoListenerFactory, httpListenerFactory);
         SSLContext sslContext = config.sslContext();
@@ -146,6 +144,12 @@ public abstract class SocketClient {
                         addChanelHandler(socketChannel, pipeline);
                     }
                 });
+    }
+
+    @Start
+    @Order(2000)
+    public void start(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
+        init(protoListenerFactory, httpListenerFactory);
         for (int i = 0; i < config.getMaxConnectionCount(); i++) {
             connect();
         }
@@ -172,7 +176,11 @@ public abstract class SocketClient {
     }
 
     public ChannelFuture connect(Consumer<SocketSession> consumer) {
-        return bootstrap.connect(config.getHost(), config.getPort())
+        return connect(config.getHost(), config.getPort(), consumer);
+    }
+
+    public ChannelFuture connect(String inetHost, int inetPort, Consumer<SocketSession> consumer) {
+        return bootstrap.connect(inetHost, inetPort)
                 .addListener((ChannelFutureListener) future -> {
                     Throwable cause = future.cause();
                     if (cause != null) {

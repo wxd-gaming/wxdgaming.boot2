@@ -44,7 +44,7 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
             channelRead0(ctx, msg);
         } catch (Throwable throwable) {
             release = true;
-            throw throwable;
+            log.error("{}", ctx, throwable);
         } finally {
             if (release) {
                 ByteBufUtil.release(msg);

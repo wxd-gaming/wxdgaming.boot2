@@ -68,7 +68,7 @@ public class CDKeyService {
         RunResult runResult = postText.request().bodyRunResult();
 
         if (runResult.isError()) {
-            tipsService.tips(player.getSocketSession(), runResult.msg());
+            tipsService.tips(player, runResult.msg());
             return;
         }
 

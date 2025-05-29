@@ -1,4 +1,4 @@
-package wxdgaming.game.message.inner;
+package  wxdgaming.game.message.inner;
 
 import io.protostuff.Tag;
 import java.util.ArrayList;
@@ -19,6 +19,18 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 @Accessors(chain = true)
 @Comment("请求转发消息")
 public class ResForwardMessage extends PojoBase {
+
+    /** 消息ID */
+    public static int _msgId() {
+        return 54343891;
+    }
+
+    /** 消息ID */
+    public int msgId() {
+        return _msgId();
+    }
+
+
 
 
 }

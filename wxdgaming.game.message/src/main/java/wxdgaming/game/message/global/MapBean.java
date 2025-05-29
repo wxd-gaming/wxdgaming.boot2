@@ -1,4 +1,4 @@
-package wxdgaming.game.message.role;
+package  wxdgaming.game.message.global;
 
 import io.protostuff.Tag;
 import java.util.ArrayList;
@@ -20,9 +20,21 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 @Comment("null")
 public class MapBean extends PojoBase {
 
+    /** 消息ID */
+    public static int _msgId() {
+        return 43427292;
+    }
+
+    /** 消息ID */
+    public int msgId() {
+        return _msgId();
+    }
+
+
     /**  */
     @Tag(1) private String key;
     /**  */
     @Tag(2) private String value;
+
 
 }

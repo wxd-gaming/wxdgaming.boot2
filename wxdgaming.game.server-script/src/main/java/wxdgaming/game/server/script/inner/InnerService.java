@@ -9,11 +9,12 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.game.message.inner.ReqForwardMessage;
 import wxdgaming.game.message.inner.ServiceType;
-import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * 内置服务
@@ -35,7 +36,7 @@ public class InnerService extends HoldRunApplication {
     }
 
     ReqForwardMessage buildForwardMessage(PojoBase message) {
-        int messageId = protoListenerFactory.messageId(message.getClass());
+        int messageId = message.msgId();
         byte[] messageBytes = message.encode();
         ReqForwardMessage req = new ReqForwardMessage();
         req.setMessageId(messageId);
@@ -43,30 +44,22 @@ public class InnerService extends HoldRunApplication {
         return req;
     }
 
-    public void forwardMessage(Player player, PojoBase message) {
-        ReqForwardMessage req = buildForwardMessage(message);
-        req.getRids().add(player.getUid());
-        req.getSessionIds().add(player.getSessionId());
-        player.getSocketSession().write(req);
-    }
 
-    public void forwardMessage(ServiceType serviceType, long sessionId, PojoBase message) {
+    public void forwardMessage(SocketSession socketSession, long clientSessionId, PojoBase message, Consumer<ReqForwardMessage> callback) {
         ReqForwardMessage req = buildForwardMessage(message);
-        req.getSessionIds().add(sessionId);
-        SocketSession socketSession = dataCenterService.getServiceSocketSessionMapping().get(serviceType, sessionId);
-        if (socketSession == null) {
-            log.error("转发消息失败，未找到服务：{}，sessionId：{}", serviceType, sessionId);
-            return;
+        req.getSessionIds().add(clientSessionId);
+        if (callback != null) {
+            callback.accept(req);
         }
         socketSession.write(req);
     }
 
-    public void forwardMessage(ServiceType serviceType, List<Long> playerIds, PojoBase message) {
+    public void forwardMessage(ServiceType serviceType, Collection<Long> playerIds, PojoBase message) {
         ReqForwardMessage req = buildForwardMessage(message);
         req.getRids().addAll(playerIds);
         Map<Long, SocketSession> longSocketSessionMap = dataCenterService.getServiceSocketSessionMapping().get(serviceType);
         if (longSocketSessionMap == null) {
-            log.error("转发消息失败{}<UNK>", serviceType);
+            log.error("转发消息失败{} {}", serviceType, message);
             return;
         }
         /*因为不知道玩家在那个网关，所以全部转发*/

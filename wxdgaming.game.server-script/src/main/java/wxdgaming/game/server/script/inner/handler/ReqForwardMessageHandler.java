@@ -9,6 +9,8 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.game.message.inner.ReqForwardMessage;
+import wxdgaming.game.server.bean.ClientSessionMapping;
+import wxdgaming.game.server.module.data.ClientSessionService;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.inner.InnerService;
 
@@ -25,12 +27,14 @@ import java.util.List;
 public class ReqForwardMessageHandler extends HoldRunApplication {
 
     private final InnerService innerService;
+    private final ClientSessionService clientSessionService;
     private final ProtoListenerFactory protoListenerFactory;
     private final DataCenterService dataCenterService;
 
     @Inject
-    public ReqForwardMessageHandler(InnerService innerService, ProtoListenerFactory protoListenerFactory, DataCenterService dataCenterService) {
+    public ReqForwardMessageHandler(InnerService innerService, ClientSessionService clientSessionService, ProtoListenerFactory protoListenerFactory, DataCenterService dataCenterService) {
         this.innerService = innerService;
+        this.clientSessionService = clientSessionService;
         this.protoListenerFactory = protoListenerFactory;
         this.dataCenterService = dataCenterService;
     }
@@ -42,11 +46,17 @@ public class ReqForwardMessageHandler extends HoldRunApplication {
         int messageId = req.getMessageId();
         byte[] messages = req.getMessages();
 
-        for (Long sessionId : sessionIds) {
-            ThreadContext.cleanup();
-            ThreadContext.putContent("clientSessionId", sessionId);
-            protoListenerFactory.dispatch(socketSession, messageId, messages);
+
+        ThreadContext.cleanup();
+        ThreadContext.putContent("forwardMessage", req);
+        String clientSessionId = req.getKvBeansMap().get("clientSessionId");
+        ThreadContext.putContent("clientSessionId", Long.parseLong(clientSessionId));
+        String account = req.getKvBeansMap().get("account");
+        if (account != null) {
+            ClientSessionMapping clientSessionMapping = clientSessionService.getAccountMappingMap().get(account);
+            ThreadContext.putContent("clientSessionMapping", clientSessionMapping);
         }
+        protoListenerFactory.dispatch(socketSession, messageId, messages);
     }
 
 }

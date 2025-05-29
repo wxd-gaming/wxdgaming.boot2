@@ -28,6 +28,6 @@ public class Robot {
     private boolean loginEnd;
 
     @Override public String toString() {
-        return "Robot{rid=%d, account='%s', name='%s'}".formatted(rid, account, name);
+        return "Robot{rid=%d, account='%s', name='%s', lv=%s}".formatted(rid, account, name, level);
     }
 }

@@ -1,4 +1,4 @@
-package wxdgaming.game.message.inner;
+package  wxdgaming.game.message.inner;
 
 import io.protostuff.Tag;
 import java.util.ArrayList;
@@ -20,6 +20,17 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 @Comment("null")
 public class ReqRegisterServer extends PojoBase {
 
+    /** 消息ID */
+    public static int _msgId() {
+        return 54664956;
+    }
+
+    /** 消息ID */
+    public int msgId() {
+        return _msgId();
+    }
+
+
     /** 游戏id */
     @Tag(1) private int gameId;
     /** 主服务器id */
@@ -30,5 +41,6 @@ public class ReqRegisterServer extends PojoBase {
     @Tag(4) private List<Integer> messageIds = new ArrayList<>();
     /** 服务类型 */
     @Tag(5) private ServiceType serviceType;
+
 
 }

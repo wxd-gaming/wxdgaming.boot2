@@ -1,4 +1,4 @@
-package wxdgaming.game.message.global;
+package  wxdgaming.game.message.global;
 
 import io.protostuff.Tag;
 import java.util.ArrayList;
@@ -20,9 +20,21 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 @Comment("属性")
 public class AttrBean extends PojoBase {
 
+    /** 消息ID */
+    public static int _msgId() {
+        return 44783806;
+    }
+
+    /** 消息ID */
+    public int msgId() {
+        return _msgId();
+    }
+
+
     /** 属性id */
     @Tag(1) private int attrId;
     /** 属性值 */
     @Tag(2) private long value;
+
 
 }

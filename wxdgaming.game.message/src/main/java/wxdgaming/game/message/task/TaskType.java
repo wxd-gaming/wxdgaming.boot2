@@ -1,4 +1,4 @@
-package wxdgaming.game.message.task;
+package  wxdgaming.game.message.task;
 
 import io.protostuff.Tag;
 import java.util.ArrayList;

@@ -15,3 +15,8 @@ message ResUpdateAttr {
   int64 uid                           = 1;//变更的场景对象id
   repeated AttrBean attrs             = 2;//属性列表
 }
+
+message MapBean {
+  string key                           = 1;
+  string value                         = 2;
+}

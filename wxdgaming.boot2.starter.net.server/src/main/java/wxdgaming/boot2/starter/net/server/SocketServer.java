@@ -50,7 +50,7 @@ public class SocketServer {
     @Order(1000)
     public void start(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
 
-        SocketServerDeviceHandler socketServerDeviceHandler = new SocketServerDeviceHandler(config);
+        SocketServerDeviceHandler socketServerDeviceHandler = new SocketServerDeviceHandler(config, sessionGroup);
         SocketServerMessageDecode socketServerMessageDecode = new SocketServerMessageDecode(config, protoListenerFactory, httpListenerFactory);
         SSLContext sslContext = config.sslContext();
 

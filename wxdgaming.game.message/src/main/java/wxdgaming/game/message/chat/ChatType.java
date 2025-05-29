@@ -1,4 +1,4 @@
-package wxdgaming.game.message.chat;
+package  wxdgaming.game.message.chat;
 
 import io.protostuff.Tag;
 import java.util.ArrayList;

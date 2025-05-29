@@ -36,6 +36,8 @@ public class SocketSession {
     private final long uid;
     private final Type type;
     private final Channel channel;
+    private final int port;
+    private final int remotePort;
     private boolean webSocket;
     /** websocket 握手完成 */
     private boolean handshake_complete;
@@ -49,11 +51,13 @@ public class SocketSession {
     private final JSONObject bindData = new JSONObject();
 
     public SocketSession(Type type, Channel channel, Boolean webSocket, boolean enabledScheduledFlush) {
-        this.uid = ATOMIC_LONG.get();
+        this.uid = ATOMIC_LONG.incrementAndGet();
         this.type = type;
         this.channel = channel;
         this.webSocket = Boolean.TRUE.equals(webSocket);
         this.enabledScheduledFlush = enabledScheduledFlush;
+        this.port = ChannelUtil.localPort(channel);
+        this.remotePort = ChannelUtil.remotePort(channel);
         ChannelUtil.attr(this.channel, ChannelUtil.SOCKET_SESSION_KEY, this);
     }
 
@@ -83,10 +87,6 @@ public class SocketSession {
         return channel.writeAndFlush(message);
     }
 
-    public ChannelFuture writeAndFlush(PojoBase pojoBase) {
-        return channel.writeAndFlush(pojoBase);
-    }
-
     public ChannelFuture writeAndFlush(ByteBuf byteBuf) {
         if (webSocket) {
             BinaryWebSocketFrame webSocketFrame = new BinaryWebSocketFrame(byteBuf);
@@ -98,10 +98,6 @@ public class SocketSession {
 
     public ChannelFuture write(Object message) {
         return channel.write(message);
-    }
-
-    public ChannelFuture write(PojoBase pojoBase) {
-        return channel.write(pojoBase);
     }
 
     public ChannelFuture write(ByteBuf byteBuf) {
@@ -119,7 +115,13 @@ public class SocketSession {
 
     /** 是否可用 */
     public boolean isOpen() {
-        return channel.isRegistered() && channel.isOpen();
+        boolean b = channel.isRegistered() && channel.isOpen();
+        if (isWebSocket()) {
+            if (!isHandshake_complete()) {
+                b = false;
+            }
+        }
+        return b;
     }
 
     public void close(String string) {

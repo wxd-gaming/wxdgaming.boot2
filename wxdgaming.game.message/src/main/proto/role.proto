@@ -3,6 +3,7 @@ syntax = "proto3";
 option java_multiple_files = true;
 //导出包名
 option java_package = "wxdgaming.game.message";
+import "global.proto";
 
 //登录请求
 message ReqLogin {
@@ -10,11 +11,6 @@ message ReqLogin {
   string token                         = 2;//用于验证的令牌
   int32 sid                            = 3;//当前选择的区服id
   repeated MapBean clientParams        = 4;//客户端特殊列表
-}
-
-message MapBean {
-  string key                           = 1;
-  string value                         = 2;
 }
 
 //登录响应
@@ -53,7 +49,7 @@ message ReqChooseRole {
 
 //选择角色响应
 message ResChooseRole {
-
+  int64 rid                           = 1;//角色id
 }
 
 //心跳包

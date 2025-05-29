@@ -6,6 +6,8 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.Getter;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentLoopList;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * channel 列表
  *
@@ -16,14 +18,17 @@ import wxdgaming.boot2.core.collection.concurrent.ConcurrentLoopList;
 public class SessionGroup extends ConcurrentLoopList<SocketSession> {
 
     protected final ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    protected final ConcurrentHashMap<Long, SocketSession> channelMap = new ConcurrentHashMap<>();
 
     @Override public boolean add(SocketSession session) {
         channelGroup.add(session.getChannel());
+        channelMap.put(session.getUid(), session);
         return super.add(session);
     }
 
     @Override public boolean remove(SocketSession session) {
         channelGroup.remove(session.getChannel());
+        channelMap.remove(session.getUid());
         return super.remove(session);
     }
 

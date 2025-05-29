@@ -11,9 +11,10 @@ import wxdgaming.game.message.role.ResUpdateExp;
 import wxdgaming.game.message.role.ResUpdateLevel;
 import wxdgaming.game.message.role.RoleBean;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.event.OnLevelUp;
 import wxdgaming.game.server.event.OnTask;
+import wxdgaming.game.server.module.data.DataCenterService;
+import wxdgaming.game.server.script.inner.InnerService;
 import wxdgaming.game.server.script.task.TaskEvent;
 
 import java.util.HashSet;
@@ -26,15 +27,17 @@ import java.util.HashSet;
 @Singleton
 public class PlayerService extends HoldRunApplication {
 
+    final InnerService innerService;
     final DataCenterService dataCenterService;
 
     @Inject
-    public PlayerService(DataCenterService dataCenterService) {
+    public PlayerService(InnerService innerService, DataCenterService dataCenterService) {
+        this.innerService = innerService;
         this.dataCenterService = dataCenterService;
     }
 
 
-    public void sendPlayerList(SocketSession socketSession, Integer sid, String account) {
+    public void sendPlayerList(SocketSession socketSession, long clientSessionId, Integer sid, String account) {
         HashSet<Long> longs = dataCenterService.getAccount2RidsMap().get(sid, account);
         ResLogin resLogin = new ResLogin();
         if (longs != null) {
@@ -44,8 +47,10 @@ public class PlayerService extends HoldRunApplication {
                 resLogin.getRoles().add(roleBean);
             }
         }
-        socketSession.write(resLogin);
-        log.info("{} {} 发送角色列表:{}", sid, account, resLogin);
+        innerService.forwardMessage(socketSession, clientSessionId, resLogin, reqForwardMessage -> {
+            reqForwardMessage.getKvBeansMap().put("account", account);
+        });
+        log.info("clientSessionId={}, sid={}, account={} 发送角色列表:{}", clientSessionId, sid, account, resLogin);
     }
 
     public void addExp(Player player, long exp, Object... args) {

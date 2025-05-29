@@ -68,12 +68,8 @@ public abstract class MessageEncode extends ChannelOutboundHandlerAdapter {
                     return;
                 }
                 byte[] bytes = SerializerUtil.encode(pojoBase);
-                ByteBuf byteBuf = build(msgId, bytes);
-                if (session.isWebSocket()) {
-                    super.write(ctx, new BinaryWebSocketFrame(byteBuf), promise);
-                } else {
-                    super.write(ctx, byteBuf, promise);
-                }
+                Object build = build(session, msgId, bytes);
+                super.write(ctx, build, promise);
                 if (log.isDebugEnabled()) {
                     log.debug("发送消息：{} msgId={}, {}", session, msgId, pojoBase);
                 }
@@ -81,7 +77,11 @@ public abstract class MessageEncode extends ChannelOutboundHandlerAdapter {
             case byte[] bytes -> {
                 ByteBuf byteBuf = ByteBufUtil.pooledByteBuf(bytes.length);
                 byteBuf.writeBytes(bytes);
-                super.write(ctx, byteBuf, promise);
+                if (session.isWebSocket()) {
+                    super.write(ctx, new BinaryWebSocketFrame(byteBuf), promise);
+                } else {
+                    super.write(ctx, byteBuf, promise);
+                }
             }
             case ByteBuf byteBuf -> {
                 if (session.isWebSocket()) {
@@ -95,11 +95,14 @@ public abstract class MessageEncode extends ChannelOutboundHandlerAdapter {
         writeUpdate.incrementAndGet();
     }
 
-    public static ByteBuf build(int messageId, byte[] bytes) {
+    public static Object build(SocketSession session, int messageId, byte[] bytes) {
         ByteBuf byteBuf = ByteBufUtil.pooledByteBuf(bytes.length + 10);
         byteBuf.writeInt(bytes.length + 4);
         byteBuf.writeInt(messageId);
         byteBuf.writeBytes(bytes);
+        if (session.isWebSocket()) {
+            return new BinaryWebSocketFrame(byteBuf);
+        }
         return byteBuf;
     }
 

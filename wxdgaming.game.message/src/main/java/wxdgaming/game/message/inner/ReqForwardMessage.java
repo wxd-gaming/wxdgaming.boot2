@@ -1,4 +1,4 @@
-package wxdgaming.game.message.inner;
+package  wxdgaming.game.message.inner;
 
 import io.protostuff.Tag;
 import java.util.ArrayList;
@@ -20,6 +20,17 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 @Comment("请求转发消息")
 public class ReqForwardMessage extends PojoBase {
 
+    /** 消息ID */
+    public static int _msgId() {
+        return 54323214;
+    }
+
+    /** 消息ID */
+    public int msgId() {
+        return _msgId();
+    }
+
+
     /** 转发的sessionId列表 我需要把消息转发给哪些sessionId */
     @Tag(1) private List<Long> sessionIds = new ArrayList<>();
     /** 转发的gameId列表 我需要把消息转发给哪些gameId */
@@ -32,5 +43,8 @@ public class ReqForwardMessage extends PojoBase {
     @Tag(5) private byte[] messages;
     /** 转发的rid列表 我需要把消息转发给哪些rid */
     @Tag(6) private List<Long> rids = new ArrayList<>();
+    /** kv关系绑定 */
+    @Tag(8) private Map<String, String> kvBeansMap = new LinkedHashMap<>();
+
 
 }

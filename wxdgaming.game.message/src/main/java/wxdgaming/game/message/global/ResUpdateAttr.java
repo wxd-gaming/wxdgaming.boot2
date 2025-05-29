@@ -1,4 +1,4 @@
-package wxdgaming.game.message.global;
+package  wxdgaming.game.message.global;
 
 import io.protostuff.Tag;
 import java.util.ArrayList;
@@ -20,9 +20,21 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 @Comment("更新属性")
 public class ResUpdateAttr extends PojoBase {
 
+    /** 消息ID */
+    public static int _msgId() {
+        return 50695681;
+    }
+
+    /** 消息ID */
+    public int msgId() {
+        return _msgId();
+    }
+
+
     /** 变更的场景对象id */
     @Tag(1) private long uid;
     /** 属性列表 */
     @Tag(2) private List<AttrBean> attrs = new ArrayList<>();
+
 
 }

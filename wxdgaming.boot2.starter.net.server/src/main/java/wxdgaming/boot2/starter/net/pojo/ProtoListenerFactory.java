@@ -7,7 +7,6 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 
 import java.util.List;
@@ -26,6 +25,7 @@ public class ProtoListenerFactory {
     /** 相当于用 read and copy write方式作为线程安全性 */
     ProtoListenerContent protoListenerContent = null;
     IWebSocketStringListener iWebSocketStringListener = null;
+    ProtoUnknownMessageEvent protoUnknownMessageEvent = null;
     List<ProtoFilter> protoFilters;
 
     @Init
@@ -33,6 +33,7 @@ public class ProtoListenerFactory {
     public void init(RunApplication runApplication) {
         protoListenerContent = new ProtoListenerContent(runApplication);
         iWebSocketStringListener = runApplication.classWithSuper(IWebSocketStringListener.class).findFirst().orElse(null);
+        protoUnknownMessageEvent = runApplication.classWithSuper(ProtoUnknownMessageEvent.class).findFirst().orElse(null);
         protoFilters = runApplication.classWithSuper(ProtoFilter.class).toList();
     }
 
@@ -48,7 +49,14 @@ public class ProtoListenerFactory {
     public void dispatch(SocketSession socketSession, int messageId, byte[] data) {
         ProtoMapping mapping = protoListenerContent.getMappingMap().get(messageId);
         if (mapping == null) {
-            throw new RuntimeException("未找到消息id: %s".formatted(messageId));
+            if (protoUnknownMessageEvent != null) {
+                protoUnknownMessageEvent.onUnknownMessageEvent(socketSession, messageId, data);
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("收到消息：{} msgId={} - 未找到映射", socketSession, messageId);
+                }
+            }
+            return;
         }
         /*根据映射解析生成触发事件*/
         ProtoListenerTrigger protoListenerTrigger = new ProtoListenerTrigger(mapping, protoListenerContent.getRunApplication(), socketSession, messageId, data);

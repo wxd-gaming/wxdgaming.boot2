@@ -11,6 +11,8 @@ import wxdgaming.boot2.core.util.JwtUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.role.ReqLogin;
+import wxdgaming.game.server.bean.ClientSessionMapping;
+import wxdgaming.game.server.module.data.ClientSessionService;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.role.PlayerService;
 import wxdgaming.game.server.script.tips.TipsService;
@@ -24,12 +26,14 @@ import wxdgaming.game.server.script.tips.TipsService;
 public class ReqLoginHandler extends HoldRunApplication {
 
     private final DataCenterService dataCenterService;
+    private final ClientSessionService clientSessionService;
     private final PlayerService playerService;
     private final TipsService tipsService;
 
     @Inject
-    public ReqLoginHandler(DataCenterService dataCenterService, PlayerService playerService, TipsService tipsService) {
+    public ReqLoginHandler(DataCenterService dataCenterService, ClientSessionService clientSessionService, PlayerService playerService, TipsService tipsService) {
         this.dataCenterService = dataCenterService;
+        this.clientSessionService = clientSessionService;
         this.playerService = playerService;
         this.tipsService = tipsService;
     }
@@ -47,17 +51,19 @@ public class ReqLoginHandler extends HoldRunApplication {
             String platform = claimsJws.getPayload().get("platform", String.class);
             String channel = claimsJws.getPayload().get("channel", String.class);
 
-            socketSession
-                    .bindData("sid", sid)
-                    .bindData("account", account)
-                    .bindData("platform", platform);
+            ClientSessionMapping clientSessionMapping = clientSessionService.getAccountMappingMap().computeIfAbsent(account, k -> new ClientSessionMapping());
 
-            playerService.sendPlayerList(socketSession, sid, account);
+            clientSessionMapping.setSid(sid);
+            clientSessionMapping.setAccount(account);
+            clientSessionMapping.setSession(socketSession);
+            clientSessionMapping.setClientSessionId(clientSessionId);
 
-            log.info("登录完成:{}", account);
+            playerService.sendPlayerList(socketSession, clientSessionId, sid, account);
+
+            log.info("登录完成:{}", clientSessionMapping);
         } catch (Exception e) {
             log.error("登录失败 {}", req, e);
-            tipsService.tips(socketSession, "服务器异常");
+            tipsService.tips(socketSession, clientSessionId, "服务器异常");
         }
     }
 

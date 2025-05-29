@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.server.bean.StatusConst;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnLogout;
+import wxdgaming.game.server.module.data.DataCenterService;
 
 /**
  * 角色创建事件
@@ -17,16 +18,20 @@ import wxdgaming.game.server.event.OnLogout;
 @Singleton
 public class PlayerLogoutHandler {
 
+    private final DataCenterService dataCenterService;
+
     @Inject
-    public PlayerLogoutHandler() {
+    public PlayerLogoutHandler(DataCenterService dataCenterService) {
+        this.dataCenterService = dataCenterService;
     }
 
     /** 创建角色之后赠送初始化道具 */
     @OnLogout
     public void onLogout(Player player) {
-        log.info("玩家下线: {}", player.getSocketSession());
-        player.setSocketSession(null);
+        log.info("玩家下线: {}", player);
         player.getStatus().addFlags(StatusConst.Offline);
+        player.setClientSessionMapping(null);
+        dataCenterService.getOnlinePlayerGroup().remove(player.getUid());
     }
 
 }

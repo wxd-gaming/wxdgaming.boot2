@@ -3,7 +3,6 @@ package wxdgaming.game.server.script.chat.impl;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.message.chat.ChatType;
 import wxdgaming.game.message.chat.ReqChatMessage;
 import wxdgaming.game.message.chat.ResChatMessage;
@@ -33,14 +32,14 @@ public class PrivateChatHandler extends ChatHandler {
         return ChatType.Chat_TYPE_Private;
     }
 
-    public void chat(SocketSession socketSession, Player player, ReqChatMessage req) {
+    public void chat(Player player, ReqChatMessage req) {
         Player targetPlayer = dataCenterService.player(req.getTargetId());
         if (targetPlayer == null) {
-            tipsService.tips(socketSession, "目标玩家不存在");
+            tipsService.tips(player, "目标玩家不存在");
             return;
         }
         if (!targetPlayer.checkOnline()) {
-            tipsService.tips(socketSession, "目标玩家不在线");
+            tipsService.tips(player, "目标玩家不在线");
             return;
         }
         ResChatMessage res = new ResChatMessage();
@@ -49,6 +48,7 @@ public class PrivateChatHandler extends ChatHandler {
         res.setParams(req.getParams());
         res.setSenderId(player.getUid());
         res.setSenderName(player.getName());
+        player.write(res);
         targetPlayer.write(res);
     }
 

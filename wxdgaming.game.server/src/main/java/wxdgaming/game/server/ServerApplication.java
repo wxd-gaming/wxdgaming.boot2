@@ -47,9 +47,9 @@ public class ServerApplication {
 
             ExecutorFactory.getExecutorServiceBasic().schedule(
                     () -> {
-                        RpcService rpcService = runApplication.getInstance(RpcService.class);
-                        SocketClient client = runApplication.getInstance(SocketClient.class);
-                        SocketSession socketSession = client.idleNullException();
+                        // RpcService rpcService = runApplication.getInstance(RpcService.class);
+                        // SocketClient client = runApplication.getInstance(SocketClient.class);
+                        // SocketSession socketSession = client.idleNullException();
                         // for (int k = 0; k < 5; k++) {
                         //     DiffTime diffTime = new DiffTime();
                         //     int rcount = 10_0000;

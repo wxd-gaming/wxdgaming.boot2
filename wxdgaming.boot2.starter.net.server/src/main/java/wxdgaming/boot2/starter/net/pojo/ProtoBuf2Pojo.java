@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Comment;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.collection.MapOf;
@@ -45,11 +46,9 @@ public class ProtoBuf2Pojo {
                 .walkFiles(readPath, ".proto")
                 .forEach(filePath -> {
 
-                    AtomicBoolean multiple_files = new AtomicBoolean(true);
-
                     AtomicBoolean clean_files = new AtomicBoolean(false);
 
-                    AtomicReference<BeanInfo> comment = new AtomicReference<>(new BeanInfo(multiple_files.get()));
+                    AtomicReference<BeanInfo> comment = new AtomicReference<>(new BeanInfo(""));
                     AtomicBoolean start = new AtomicBoolean();
                     AtomicReference<String> packageName = new AtomicReference<>("");
 
@@ -66,9 +65,6 @@ public class ProtoBuf2Pojo {
                     imports.add(LinkedHashMap.class.getName());
                     imports.add(MapOf.class.getName());
 
-
-                    StringBuilder stringBuilder = new StringBuilder();
-
                     FileReadUtil.readLine(filePath, StandardCharsets.UTF_8, line -> {
                         line = line.trim();
                         if (StringUtils.isBlank(line)) return;
@@ -82,6 +78,12 @@ public class ProtoBuf2Pojo {
                             int i1 = line.indexOf(";");
                             String trim = line.substring(i + 1, i1).trim().replace("\"", "");
                             packageName.set(trim);
+                            comment.get().packageName = trim;
+                        } else if (line.contains("import")) {
+                            int i1 = line.indexOf(";");
+                            String trim = line.substring(7, i1).trim().replace("\"", "");
+                            trim = trim.replace(".proto", "");
+                            imports.add(packageName.get() + "." + trim + ".*");
                         } else if (line.startsWith("//")) {
                             comment.get().comment = line.substring(2);
                         } else if (line.startsWith("message") || line.startsWith("enum")) {
@@ -93,30 +95,27 @@ public class ProtoBuf2Pojo {
 
                             start.set(true);
                         } else if (line.contains("}")) {
-                            String string = comment.get().string();
-                            if (multiple_files.get()) {
-                                String p1 = filePath.getFileName().toString().replace(".proto", "").replace("Message", "");
-                                p1 = wxdgaming.boot2.core.chatset.StringUtils.lowerFirst(p1);
-                                String to = "package %s.%s;".formatted(packageName.get(), p1);
-                                to += "\n";
-                                for (String anImport : imports) {
-                                    to += "\nimport %s;".formatted(anImport);
-                                }
-                                to += "\n\n\n";
-                                to += string;
-                                String javaFileName = "%s/%s/%s/%s.java".formatted(outPath, packageName.get().replace(".", "/"), p1, comment.get().getClassName());
-                                File javaFile = new File(javaFileName);
-                                if (clean_files.compareAndSet(false, true)) {
-                                    FileUtil.del(javaFile.getParent());
-                                }
-                                System.out.println(to);
-                                FileWriteUtil.writeString(
-                                        javaFile,
-                                        to
-                                );
+                            String p1 = filePath.getFileName().toString().replace(".proto", "").replace("Message", "");
+                            p1 = wxdgaming.boot2.core.chatset.StringUtils.lowerFirst(p1);
+                            comment.get().packageName = " %s.%s".formatted(packageName.get(), p1);
+                            String to = "package %s;".formatted(comment.get().packageName);
+                            to += "\n";
+                            for (String anImport : imports) {
+                                to += "\nimport %s;".formatted(anImport);
                             }
-                            stringBuilder.append(string);
-                            comment.set(new BeanInfo(multiple_files.get()));
+                            to += "\n\n\n";
+                            to += comment.get().string();
+                            String javaFileName = "%s/%s/%s/%s.java".formatted(outPath, packageName.get().replace(".", "/"), p1, comment.get().getClassName());
+                            File javaFile = new File(javaFileName);
+                            if (clean_files.compareAndSet(false, true)) {
+                                FileUtil.del(javaFile.getParent());
+                            }
+                            System.out.println(to);
+                            FileWriteUtil.writeString(
+                                    javaFile,
+                                    to
+                            );
+                            comment.set(new BeanInfo(packageName.get()));
                             start.set(false);
                         } else {
                             if (start.get()) {
@@ -124,31 +123,6 @@ public class ProtoBuf2Pojo {
                             }
                         }
                     });
-
-                    if (!multiple_files.get()) {
-
-                        String to = "package " + packageName + ";";
-                        to += "\n";
-                        for (String anImport : imports) {
-                            to += "\nimport " + anImport + ";";
-                        }
-                        to += "\n";
-                        to += "\n";
-                        to += "\n";
-                        to += "/**\n" +
-                              " * rpc.proto\n" +
-                              " *\n" +
-                              " * @author: wxd-gaming(無心道, 15388152619)\n" +
-                              " * @version: v1.1\n" +
-                              " */";
-                        String className = filePath.getFileName().toString().replace(".proto", "");
-                        to += "\npublic class " + className + " {";
-                        to += stringBuilder.toString();
-                        to += "\n}";
-                        System.out.println(to);
-                        FileWriteUtil.writeString(outPath + "/" + packageName.get().replace(".", "/") + "/" + className + ".java", to);
-
-                    }
                 });
 
     }
@@ -156,14 +130,14 @@ public class ProtoBuf2Pojo {
     @Getter
     public static class BeanInfo {
 
-        private boolean multiple_files = false;
+        private String packageName;
         private String classType;
         private String className;
         private String comment;
         private final List<FiledInfo> filedInfos = new ArrayList<>();
 
-        public BeanInfo(boolean multiple_files) {
-            this.multiple_files = multiple_files;
+        public BeanInfo(String packageName) {
+            this.packageName = packageName;
         }
 
         public void addField(String line) {
@@ -195,116 +169,73 @@ public class ProtoBuf2Pojo {
         public String classString() {
             String f = "\n";
             for (FiledInfo filedInfo : filedInfos) {
-                if (multiple_files) {
-                    f += """
-                                /** %s */
-                                @Tag(%s) private %s;
-                            """.formatted(filedInfo.comment, filedInfo.tag, filedInfo.field);
-                } else {
-                    f += """
-                                    /** %s */
-                                    @Tag(%s) private %s;
-                            """.formatted(filedInfo.comment, filedInfo.tag, filedInfo.field);
-                }
-            }
-            if (multiple_files) {
-                return """                        
-                        /** %s */
-                        @Getter
-                        @Setter
-                        @Accessors(chain = true)
-                        @Comment("%s")
-                        public class %s extends PojoBase {
-                        %s
-                        }
-                        """.formatted(comment, comment, className, f);
-            } else {
-                return """
-                        
+                f += """
                             /** %s */
-                            @Getter
-                            @Setter
-                            @Accessors(chain = true)
-                            @Comment("%s")
-                            public static class %s extends PojoBase {
-                            %s
-                            }
-                        """.formatted(comment, comment, className, f);
+                            @Tag(%s) private %s;
+                        """.formatted(filedInfo.comment, filedInfo.tag, filedInfo.field);
             }
+            String formatted = "%s.%s".formatted(packageName, className).trim();
+            int hashcode = StringUtils.hashcode(formatted);
+            System.out.println(formatted + " = " + hashcode);
+            return """                        
+                    /** %s */
+                    @Getter
+                    @Setter
+                    @Accessors(chain = true)
+                    @Comment("%s")
+                    public class %s extends PojoBase {                        
+                    
+                        /** 消息ID */
+                        public static int _msgId() {
+                            return %s;
+                        }
+                    
+                        /** 消息ID */
+                        public int msgId() {
+                            return _msgId();
+                        }
+                    
+                    %s
+                    
+                    }
+                    """.formatted(comment, comment, className, hashcode, f);
+
         }
 
         public String enumString() {
             String f = "\n";
             for (FiledInfo filedInfo : filedInfos) {
-                if (multiple_files) {
-                    f += """
-                                /** %s */
-                                @Tag(%s)
-                                %s(%s, "%s"),
-                            """.formatted(filedInfo.comment, filedInfo.tag, filedInfo.field.trim(), filedInfo.tag, filedInfo.comment);
-                } else {
-                    f += """
-                                    /** %s */
-                                    @Tag(%s)
-                                    %s(%s, "%s"),
-                            """.formatted(filedInfo.comment, filedInfo.tag, filedInfo.field.trim(), filedInfo.tag, filedInfo.comment);
-                }
-            }
-            if (multiple_files) {
-                return """
-                        /** %s */
-                        @Getter
-                        @Comment("%s")
-                        public enum %s {
-                        %s
-                            ;
-                        
-                            private static final Map<Integer, %s> static_map = MapOf.ofMap(%s::getCode, %s.values());
-                        
-                            public static %s valueOf(int code) {
-                                return static_map.get(code);
-                            }
-                        
-                            /** code */
-                            private final int code;
-                            /** 备注 */
-                            private final String command;
-                        
-                            %s(int code, String command) {
-                                this.code = code;
-                                this.command = command;
-                            }
-                        }
-                        """.formatted(comment, comment, className, f, className, className, className, className, className);
-            } else {
-                return """
-                        
-                        
+                f += """
                             /** %s */
-                            @Getter
-                            @Comment("%s")
-                            public enum %s {
-                            %s
-                                ;
-                        
-                                private static final Map<Integer, %s> static_map = MapOf.ofMap(%s::getCode, %s.values());
-                        
-                                public static %s valueOf(int code) {
-                                    return static_map.get(code);
-                                }
-                        
-                                /** code */
-                                private final int code;
-                                /** 备注 */
-                                private final String command;
-                        
-                                %s(int code, String command) {
-                                    this.code = code;
-                                    this.command = command;
-                                }
-                            }
-                        """.formatted(comment, comment, className, f, className, className, className, className, className);
+                            @Tag(%s)
+                            %s(%s, "%s"),
+                        """.formatted(filedInfo.comment, filedInfo.tag, filedInfo.field.trim(), filedInfo.tag, filedInfo.comment);
             }
+            return """
+                    /** %s */
+                    @Getter
+                    @Comment("%s")
+                    public enum %s {
+                    %s
+                        ;
+                    
+                        private static final Map<Integer, %s> static_map = MapOf.ofMap(%s::getCode, %s.values());
+                    
+                        public static %s valueOf(int code) {
+                            return static_map.get(code);
+                        }
+                    
+                        /** code */
+                        private final int code;
+                        /** 备注 */
+                        private final String command;
+                    
+                        %s(int code, String command) {
+                            this.code = code;
+                            this.command = command;
+                        }
+                    }
+                    """.formatted(comment, comment, className, f, className, className, className, className, className);
         }
 
     }
@@ -328,11 +259,13 @@ public class ProtoBuf2Pojo {
             if (split.length > 1) {
                 comment = split[1].replace("//", "");
             }
-            List<String> split1 = List.of(split[0].split(" "));
             ArrayList<String> tmp = new ArrayList<>();
             if ("enum".equals(classType)) {
                 tmp.add("enum");
             }
+
+            List<String> split1 = List.of(split[0].split(" "));
+
             for (String string : split1) {
                 if (StringUtils.isBlank(string)) continue;
                 tmp.add(string.trim());
@@ -383,9 +316,10 @@ public class ProtoBuf2Pojo {
                 }
                 break;
                 default: {
-                    if (string.startsWith("map<") && string.endsWith(">")) {
-                        field = String.class.getSimpleName();
-                        field = wxdgaming.boot2.core.chatset.StringUtils.upperFirst(field);
+                    if (split[0].contains("map<") && split[0].contains(">")) {
+                        int start = split[0].indexOf("<");
+                        int end = split[0].indexOf(">");
+                        field = "Map<" + split[0].substring(start + 1, end) + ">";
                         field = field
                                 .replace("bool", Boolean.class.getSimpleName())
                                 .replace("int32", Integer.class.getSimpleName())
@@ -393,6 +327,8 @@ public class ProtoBuf2Pojo {
                                 .replace("bytes", byte[].class.getSimpleName())
                                 .replace("string", String.class.getSimpleName())
                         ;
+                        tmp.set(1, tmp.get(2));
+                        tmp.set(3, tmp.get(4));
                     } else {
                         if (repeated) {
                             field = "List<" + string + ">";
@@ -406,10 +342,14 @@ public class ProtoBuf2Pojo {
             field += " " + tmp.get(1);
             if (repeated) {
                 field += " = new ArrayList<>()";
-            } else if (field.contains("Map<")) {
+            } else if (field.contains("Map")) {
                 field += " = new LinkedHashMap<>()";
             }
-            tag = Integer.parseInt(tmp.get(3));
+            try {
+                tag = Integer.parseInt(tmp.get(3));
+            } catch (NumberFormatException e) {
+                throw Throw.of(line, e);
+            }
         }
 
     }

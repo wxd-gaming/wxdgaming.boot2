@@ -7,6 +7,7 @@ import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.AnnUtil;
+import wxdgaming.boot2.core.reflect.MethodUtil;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 
 import java.lang.reflect.Method;
@@ -65,7 +66,17 @@ public class ProtoListenerContent {
     }
 
     public int register(Class<? extends PojoBase> pojoClass) {
-        int hashcode = StringUtils.hashcode(pojoClass.getName());
+        Method method = MethodUtil.findMethod(true, pojoClass, "_msgId");
+        int hashcode;
+        if (method == null) {
+            hashcode = StringUtils.hashcode(pojoClass.getName());
+        } else {
+            try {
+                hashcode = (int) method.invoke(null);
+            } catch (Exception e) {
+                hashcode = StringUtils.hashcode(pojoClass.getName());
+            }
+        }
         message2MappingMap.put(pojoClass, hashcode);
         Class<? extends PojoBase> old = messageId2MappingMap.putIfAbsent(hashcode, pojoClass);
         if (old != null && !Objects.equals(old.getName(), pojoClass.getName())) {

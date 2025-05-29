@@ -4,9 +4,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
+import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.chat.ReqChatMessage;
+import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.bean.global.GlobalDataType;
 import wxdgaming.game.server.bean.global.impl.YunyingData;
 import wxdgaming.game.server.bean.role.Player;
@@ -44,8 +46,8 @@ public class ReqChatMessageHandler {
     /** 请求聊天 */
     @ProtoRequest
     public void reqChatMessage(SocketSession socketSession, ReqChatMessage req) {
-
-        Player player = socketSession.bindData("player");
+        ClientSessionMapping clientSessionMapping = ThreadContext.context("clientSessionMapping");
+        Player player = clientSessionMapping.getPlayer();
         String content = req.getContent();
         log.info("{} 聊天消息 {}", player, req);
         if (content.startsWith("@gm")) {
@@ -58,11 +60,11 @@ public class ReqChatMessageHandler {
             }
         }
         if (content.length() > 120) {
-            tipsService.tips(socketSession, "消息长度不能超过100");
+            tipsService.tips(player, "消息长度不能超过100");
             return;
         }
         if (player.getLevel() < 10) {
-            tipsService.tips(socketSession, "等级不足10级");
+            tipsService.tips(player, "等级不足10级");
             return;
         }
 
@@ -70,7 +72,7 @@ public class ReqChatMessageHandler {
         String replace = dataCenterService.getKeywordsMapping().replace(content, '*');
         req.setContent(replace);
 
-        chatService.chatHandler(req.getType()).chat(socketSession, player, req);
+        chatService.chatHandler(req.getType()).chat(player, req);
     }
 
 }

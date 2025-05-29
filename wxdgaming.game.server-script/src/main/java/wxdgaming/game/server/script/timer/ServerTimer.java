@@ -1,16 +1,8 @@
 package wxdgaming.game.server.script.timer;
 
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.HoldRunApplication;
-import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
-import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
-import wxdgaming.game.message.inner.ReqRegisterServer;
-import wxdgaming.game.message.inner.ServiceType;
-
-import java.util.Collection;
 
 /**
  * 服务器定时器
@@ -22,24 +14,5 @@ import java.util.Collection;
 @Singleton
 public class ServerTimer extends HoldRunApplication {
 
-    private final ProtoListenerFactory protoListenerFactory;
-
-    @Inject
-    public ServerTimer(ProtoListenerFactory protoListenerFactory) {
-        this.protoListenerFactory = protoListenerFactory;
-    }
-
-
-    @Scheduled("*/20")
-    public void reportGateWay() {
-        ReqRegisterServer registerServer = new ReqRegisterServer();
-        registerServer.setServiceType(ServiceType.GAME);
-        registerServer.setGameId(BootConfig.getIns().gid());
-        registerServer.setMainSid(BootConfig.getIns().sid());
-        registerServer.getServerIds().add(BootConfig.getIns().sid());
-        Collection<Integer> values = protoListenerFactory.getProtoListenerContent().getMessage2MappingMap().values();
-        registerServer.getMessageIds().addAll(values);
-        log.info("{}", registerServer);
-    }
 
 }

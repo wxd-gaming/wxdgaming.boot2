@@ -1,4 +1,4 @@
-package wxdgaming.game.message.role;
+package  wxdgaming.game.message.role;
 
 import io.protostuff.Tag;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.ann.Comment;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
+import wxdgaming.game.message.global.*;
 
 
 /** 登录响应 */
@@ -20,7 +21,19 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 @Comment("登录响应")
 public class ResLogin extends PojoBase {
 
+    /** 消息ID */
+    public static int _msgId() {
+        return 42848768;
+    }
+
+    /** 消息ID */
+    public int msgId() {
+        return _msgId();
+    }
+
+
     /**  */
     @Tag(1) private List<RoleBean> roles = new ArrayList<>();
+
 
 }

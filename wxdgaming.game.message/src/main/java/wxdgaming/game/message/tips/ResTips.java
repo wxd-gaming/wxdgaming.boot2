@@ -1,4 +1,4 @@
-package wxdgaming.game.message.tips;
+package  wxdgaming.game.message.tips;
 
 import io.protostuff.Tag;
 import java.util.ArrayList;
@@ -20,6 +20,17 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 @Comment("提示内容")
 public class ResTips extends PojoBase {
 
+    /** 消息ID */
+    public static int _msgId() {
+        return 42002782;
+    }
+
+    /** 消息ID */
+    public int msgId() {
+        return _msgId();
+    }
+
+
     /**  */
     @Tag(1) private TipsType type;
     /**  */
@@ -28,5 +39,6 @@ public class ResTips extends PojoBase {
     @Tag(3) private List<String> params = new ArrayList<>();
     /** 提示消息id，如果客户端在监听这个id */
     @Tag(4) private int resMessageId;
+
 
 }

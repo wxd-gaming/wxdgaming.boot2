@@ -3,7 +3,6 @@ package wxdgaming.game.server.script.chat;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.message.chat.ChatType;
 import wxdgaming.game.message.chat.ReqChatMessage;
 import wxdgaming.game.server.bean.role.Player;
@@ -17,7 +16,7 @@ import wxdgaming.game.server.script.tips.TipsService;
  **/
 @Slf4j
 @Singleton
-public class ChatHandler {
+public abstract class ChatHandler {
 
     protected TipsService tipsService;
 
@@ -30,8 +29,6 @@ public class ChatHandler {
         return ChatType.Chat_TYPE_NONE;
     }
 
-    public void chat(SocketSession socketSession, Player player, ReqChatMessage req) {
-        tipsService.tips(socketSession, "暂未实现");
-    }
+    public abstract void chat(Player player, ReqChatMessage req);
 
 }

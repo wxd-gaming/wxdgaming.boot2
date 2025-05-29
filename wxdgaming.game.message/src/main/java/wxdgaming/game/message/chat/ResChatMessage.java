@@ -1,4 +1,4 @@
-package wxdgaming.game.message.chat;
+package  wxdgaming.game.message.chat;
 
 import io.protostuff.Tag;
 import java.util.ArrayList;
@@ -20,6 +20,17 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 @Comment("聊天响应")
 public class ResChatMessage extends PojoBase {
 
+    /** 消息ID */
+    public static int _msgId() {
+        return 49186680;
+    }
+
+    /** 消息ID */
+    public int msgId() {
+        return _msgId();
+    }
+
+
     /**  */
     @Tag(1) private ChatType type;
     /**  */
@@ -32,5 +43,6 @@ public class ResChatMessage extends PojoBase {
     @Tag(5) private long senderId;
     /** 发送者名字 */
     @Tag(6) private String senderName;
+
 
 }

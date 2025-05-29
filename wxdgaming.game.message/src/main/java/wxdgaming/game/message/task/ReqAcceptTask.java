@@ -1,4 +1,4 @@
-package wxdgaming.game.message.task;
+package  wxdgaming.game.message.task;
 
 import io.protostuff.Tag;
 import java.util.ArrayList;
@@ -20,9 +20,21 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 @Comment("接受任务")
 public class ReqAcceptTask extends PojoBase {
 
+    /** 消息ID */
+    public static int _msgId() {
+        return 48269354;
+    }
+
+    /** 消息ID */
+    public int msgId() {
+        return _msgId();
+    }
+
+
     /**  */
     @Tag(1) private TaskType taskType;
     /**  */
     @Tag(2) private int taskId;
+
 
 }

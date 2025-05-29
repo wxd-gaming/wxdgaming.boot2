@@ -32,7 +32,7 @@ public class PlayerLoginHandler extends HoldRunApplication {
     @Order(1)
     @OnLoginBefore
     public void onLoginBefore(Player player) {
-        log.info("玩家上线:{}, {}", player, player.getSocketSession());
+        log.info("玩家上线:{}", player);
         player.setStatus(new BitFlag());
         player.getStatus().addFlags(StatusConst.Online);
         player.getOnlineInfo().setLastLoginTime(MyClock.millis());
@@ -49,7 +49,7 @@ public class PlayerLoginHandler extends HoldRunApplication {
     @Order(1)
     @OnLogin
     public void onLogin(Player player) {
-        log.info("玩家上线:{}, {}", player, player.getSocketSession());
+        log.info("玩家上线:{}", player);
 
     }
 

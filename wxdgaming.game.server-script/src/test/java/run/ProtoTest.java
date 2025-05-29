@@ -28,7 +28,7 @@ public class ProtoTest {
                 "src/main/java",
                 "wxdgaming.game.server.script",
                 "Req",
-                "wxdgaming.game.message.inner",
+                "wxdgaming.game.message",
                 null
         );
     }

@@ -81,6 +81,24 @@ public class ChannelUtil implements Serializable {
         return null;
     }
 
+    /** 返回 ip:port */
+    static public int remotePort(Channel session) {
+        try {
+            InetSocketAddress insocket = (InetSocketAddress) session.remoteAddress();
+            return insocket.getPort();
+        } catch (Throwable ignore) {}
+        return 0;
+    }
+
+    /** 返回 ip:port */
+    static public int localPort(Channel session) {
+        try {
+            InetSocketAddress insocket = (InetSocketAddress) session.localAddress();
+            return insocket.getPort();
+        } catch (Throwable ignore) {}
+        return 0;
+    }
+
     /**
      * 获取链接信息设置的参数
      *

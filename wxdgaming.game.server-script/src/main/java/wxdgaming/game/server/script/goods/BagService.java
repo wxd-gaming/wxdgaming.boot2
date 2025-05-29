@@ -151,7 +151,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
     public boolean gainItems4CfgNotice(Player player, long serialNumber, List<ItemCfg> itemCfgs, Object... args) {
         boolean gained = gainItems4Cfg(player, serialNumber, itemCfgs, args);
         if (!gained) {
-            tipsService.tips(player.getSocketSession(), "背包已满");
+            tipsService.tips(player, "背包已满");
         }
         return gained;
     }

@@ -33,6 +33,10 @@ public abstract class ObjectBase implements Serializable, Cloneable {
         return FastJsonUtil.toJSONString(this);
     }
 
+    public String toJSONStringAsFmt() {
+        return FastJsonUtil.toJSONStringAsFmt(this);
+    }
+
     public String toJSONStringAsWriteType() {
         return FastJsonUtil.toJSONStringAsWriteType(this);
     }

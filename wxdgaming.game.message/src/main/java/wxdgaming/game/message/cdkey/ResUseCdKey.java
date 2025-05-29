@@ -1,4 +1,4 @@
-package wxdgaming.game.message.cdkey;
+package  wxdgaming.game.message.cdkey;
 
 import io.protostuff.Tag;
 import java.util.ArrayList;
@@ -20,7 +20,19 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 @Comment("响应使用cdkey")
 public class ResUseCdKey extends PojoBase {
 
+    /** 消息ID */
+    public static int _msgId() {
+        return 46805964;
+    }
+
+    /** 消息ID */
+    public int msgId() {
+        return _msgId();
+    }
+
+
     /**  */
     @Tag(1) private String cdKey;
+
 
 }

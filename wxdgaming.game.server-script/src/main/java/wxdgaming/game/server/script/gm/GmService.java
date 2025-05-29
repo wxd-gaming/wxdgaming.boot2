@@ -48,15 +48,15 @@ public class GmService extends HoldRunApplication {
         String cmd = args[0].toLowerCase();
         GuiceReflectContext.MethodContent methodContent = gmMap.get(cmd);
         if (methodContent == null) {
-            tipsService.tips(player.getSocketSession(), "不存在的gm命令: " + cmd);
+            tipsService.tips(player, "不存在的gm命令: " + cmd);
             return;
         }
         Method method = methodContent.getMethod();
         try {
             method.invoke(methodContent.getIns(), player, args);
         } catch (Exception e) {
-            log.error("执行gm命令失败: " + cmd, e);
-            tipsService.tips(player.getSocketSession(), "执行gm命令失败: " + cmd);
+            log.error("执行gm命令失败: {}", cmd, e);
+            tipsService.tips(player, "执行gm命令失败: " + cmd);
         }
     }
 

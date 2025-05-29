@@ -1,4 +1,4 @@
-package wxdgaming.game.message.role;
+package  wxdgaming.game.message.role;
 
 import io.protostuff.Tag;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.ann.Comment;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
+import wxdgaming.game.message.global.*;
 
 
 /** 登录请求 */
@@ -20,6 +21,17 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 @Comment("登录请求")
 public class ReqLogin extends PojoBase {
 
+    /** 消息ID */
+    public static int _msgId() {
+        return 42828529;
+    }
+
+    /** 消息ID */
+    public int msgId() {
+        return _msgId();
+    }
+
+
     /**  */
     @Tag(1) private String account;
     /** 用于验证的令牌 */
@@ -28,5 +40,6 @@ public class ReqLogin extends PojoBase {
     @Tag(3) private int sid;
     /** 客户端特殊列表 */
     @Tag(4) private List<MapBean> clientParams = new ArrayList<>();
+
 
 }
