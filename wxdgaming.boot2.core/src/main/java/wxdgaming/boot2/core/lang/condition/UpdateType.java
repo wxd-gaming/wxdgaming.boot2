@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.lang.condition;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -20,7 +21,9 @@ public abstract class UpdateType implements Serializable {
     private static final Map<Integer, UpdateType> static_map = new HashMap<>();
 
     public static UpdateType of(int value) {
-        return static_map.get(value);
+        UpdateType updateType = static_map.get(value);
+        AssertUtil.assertTrue(updateType != null, "进度变更方式不存在 value=%d", value);
+        return updateType;
     }
 
 
@@ -59,7 +62,8 @@ public abstract class UpdateType implements Serializable {
     public UpdateType(int code, String comment) {
         this.code = code;
         this.comment = comment;
-        static_map.put(code, this);
+        UpdateType old = static_map.put(code, this);
+        AssertUtil.assertTrue(old == null, "重复定义进度变更方式 code=%d", code);
     }
 
     @Override public boolean equals(Object o) {

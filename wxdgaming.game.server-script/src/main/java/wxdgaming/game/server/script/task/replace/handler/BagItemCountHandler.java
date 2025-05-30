@@ -25,7 +25,7 @@ public class BagItemCountHandler implements ConditionReplaceValueHandler {
     }
 
     @Override public Condition condition() {
-        return new Condition("bagitem", "0", "0", UpdateType.Replace);
+        return new Condition("bagitem", UpdateType.Replace);
     }
 
     @Override public long replaceValue(Player player, Condition condition) {
