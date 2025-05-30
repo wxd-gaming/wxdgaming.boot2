@@ -1,11 +1,8 @@
 package wxdgaming.boot2.core.util;
 
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * 断言辅助
@@ -43,38 +40,18 @@ public class AssertUtil {
     }
 
     /** 条件如果是false 抛出异常 */
-    public static void assertTrue(boolean success, String message) {
-        if (!success) throw assertException(message);
-    }
-
-    /** 条件如果是false 抛出异常 */
-    public static void assertTrues(boolean success, Object... args) {
-        if (!success) {
-            String collect = Arrays.stream(args).map(v -> {
-                        if (v instanceof String || v instanceof Boolean || v instanceof Number) {
-                            return String.valueOf(v);
-                        } else {
-                            return FastJsonUtil.toJSONString(v);
-                        }
-                    })
-                    .collect(Collectors.joining(" "));
-            throw assertException(collect);
-        }
-    }
-
-    /** 条件如果是false 抛出异常 */
-    public static void assertTrueFmt(boolean success, String format, Object... args) {
+    public static void assertTrue(boolean success, String format, Object... args) {
         if (!success) throw assertException(format, args);
     }
 
-    /** 条件如果是false 抛出异常 */
+    /** 如果{@code !Objects.equals(o1, o2)} 抛出异常 */
     public static void assertEquals(Object o1, Object o2, String message) {
-        if (Objects.equals(o1, o2)) throw assertException(message);
+        if (!Objects.equals(o1, o2)) throw assertException(message);
     }
 
-    /** 条件如果是false 抛出异常 */
+    /** 如果{@code Objects.equals(o1, o2)} 抛出异常 */
     public static void assertNotEquals(Object o1, Object o2, String message) {
-        if (!Objects.equals(o1, o2)) throw assertException(message);
+        if (Objects.equals(o1, o2)) throw assertException(message);
     }
 
     /** 参数是 null 抛出异常 */
