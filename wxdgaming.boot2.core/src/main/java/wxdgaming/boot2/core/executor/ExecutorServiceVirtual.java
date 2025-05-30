@@ -1,6 +1,9 @@
 package wxdgaming.boot2.core.executor;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
@@ -13,7 +16,8 @@ import java.util.concurrent.locks.ReentrantLock;
  **/
 public class ExecutorServiceVirtual extends ExecutorService {
 
-    private final BlockingQueue<ExecutorJobVirtual> queue;
+    private final ArrayBlockingQueue<ExecutorJobVirtual> queue;
+    private final QueuePolicy queuePolicy;
     private final ConcurrentMap<String, ExecutorQueue> queueMap = new ConcurrentHashMap<>();
     private final ReentrantLock reentrantLock = new ReentrantLock();
     private final AtomicInteger threadSize = new AtomicInteger();
@@ -24,10 +28,11 @@ public class ExecutorServiceVirtual extends ExecutorService {
     private final int queueSize;
 
     /** 如果队列已经达到上限默认是拒绝添加任务的 */
-    ExecutorServiceVirtual(String namePrefix, int core, int queueSize) {
+    ExecutorServiceVirtual(String namePrefix, int core, int queueSize, QueuePolicy queuePolicy) {
         this.ofVirtual = Thread.ofVirtual().name("Virtual-" + namePrefix + "-", 0);
         this.core = core;
         this.queueSize = queueSize;
+        this.queuePolicy = queuePolicy;
         this.queue = new ArrayBlockingQueue<>(queueSize);
     }
 
@@ -55,7 +60,7 @@ public class ExecutorServiceVirtual extends ExecutorService {
             if (executorJob instanceof IExecutorQueue iExecutorQueue) {
                 if (Utils.isNotBlank(iExecutorQueue.queueName())) {
                     queueMap
-                            .computeIfAbsent(iExecutorQueue.queueName(), k -> new ExecutorQueue(this, this.queueSize))
+                            .computeIfAbsent(iExecutorQueue.queueName(), k -> new ExecutorQueue(this, this.queueSize, this.queuePolicy))
                             .execute(executorJob);
                     return;
                 }
@@ -100,10 +105,7 @@ public class ExecutorServiceVirtual extends ExecutorService {
                     this.ofVirtual.start(task);
                 }
             } else {
-                if (this.queue.size() >= this.queueSize) {
-                    throw new RejectedExecutionException("队列已满");
-                }
-                this.queue.add(executorJobVirtual);
+                this.queuePolicy.execute(queue, executorJobVirtual);
             }
         } finally {
             reentrantLock.unlock();

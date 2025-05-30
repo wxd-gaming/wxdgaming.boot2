@@ -3,6 +3,7 @@ package code.rank;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
+import wxdgaming.boot2.core.executor.QueuePolicyConst;
 import wxdgaming.boot2.core.lang.DiffTime;
 import wxdgaming.boot2.core.rank.RankMapBySet;
 import wxdgaming.boot2.core.rank.RankScore;
@@ -22,7 +23,7 @@ public class Rank2Test {
 
     public static void main(String[] args) {
         RankMapBySet rankMap = new RankMapBySet();
-        ExecutorServicePlatform executorService = ExecutorFactory.create("map", 3, 5000);
+        ExecutorServicePlatform executorService = ExecutorFactory.create("map", 3);
         for (int k = 0; k < 10; k++) {
             executorService.execute(() -> {
                 StringBuilder stringBuilder = new StringBuilder();

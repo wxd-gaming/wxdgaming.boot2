@@ -36,31 +36,51 @@ public class ExecutorFactory {
         EXECUTOR_MONITOR = new ExecutorMonitor();
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         BootConfig bootConfig = BootConfig.getIns();
-        EXECUTOR_SERVICE_BASIC = create("basic", bootConfig.basicConfig().getCoreSize(), bootConfig.basicConfig().getMaxQueueSize());
-        EXECUTOR_SERVICE_LOGIC = create("logic", bootConfig.logicConfig().getCoreSize(), bootConfig.logicConfig().getMaxQueueSize());
-        EXECUTOR_SERVICE_VIRTUAL = createVirtual("virtual", bootConfig.virtualConfig().getCoreSize(), bootConfig.virtualConfig().getMaxQueueSize());
+        EXECUTOR_SERVICE_BASIC = create("basic", bootConfig.basicConfig());
+        EXECUTOR_SERVICE_LOGIC = create("logic", bootConfig.logicConfig());
+        EXECUTOR_SERVICE_VIRTUAL = createVirtual("virtual", bootConfig.virtualConfig());
     }
 
     public static ExecutorService getExecutor(String name) {
         return getExecutorMap().get(name);
     }
 
-    public static ExecutorServicePlatform create(String name, int corePoolSize) {
-        return create(name, corePoolSize, Integer.MAX_VALUE);
+    public static ExecutorServicePlatform create(String name, ExecutorConfig executorConfig) {
+        return create(name, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getQueuePolicy());
     }
 
-    public static ExecutorServicePlatform create(String name, int corePoolSize, int queueSize) {
-        ExecutorServicePlatform executorServicePlatform = new ExecutorServicePlatform(name, corePoolSize, queueSize);
+    /**
+     * 创建一个平台线程池，默认队列长度是5000，默认拒绝策略是AbortPolicy
+     *
+     * @param name         名
+     * @param corePoolSize 核心线程数
+     */
+    public static ExecutorServicePlatform create(String name, int corePoolSize) {
+        return create(name, corePoolSize, 5000, QueuePolicyConst.AbortPolicy);
+    }
+
+    public static ExecutorServicePlatform create(String name, int corePoolSize, int queueSize, QueuePolicy queuePolicy) {
+        ExecutorServicePlatform executorServicePlatform = new ExecutorServicePlatform(name, corePoolSize, queueSize, queuePolicy);
         getExecutorMap().put(name, executorServicePlatform);
         return executorServicePlatform;
     }
 
-    public static ExecutorServiceVirtual createVirtual(String name, int corePoolSize) {
-        return createVirtual(name, corePoolSize, Integer.MAX_VALUE);
+    public static ExecutorServiceVirtual createVirtual(String name, ExecutorConfig executorConfig) {
+        return createVirtual(name, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getQueuePolicy());
     }
 
-    public static ExecutorServiceVirtual createVirtual(String name, int corePoolSize, int queueSize) {
-        ExecutorServiceVirtual executorServiceVirtual = new ExecutorServiceVirtual(name, corePoolSize, queueSize);
+    /**
+     * 创建一个虚拟线程池，默认队列长度是5000，默认拒绝策略是AbortPolicy
+     *
+     * @param name         名
+     * @param corePoolSize 核心线程数
+     */
+    public static ExecutorServiceVirtual createVirtual(String name, int corePoolSize) {
+        return createVirtual(name, corePoolSize, 5000, QueuePolicyConst.AbortPolicy);
+    }
+
+    public static ExecutorServiceVirtual createVirtual(String name, int corePoolSize, int queueSize, QueuePolicy queuePolicy) {
+        ExecutorServiceVirtual executorServiceVirtual = new ExecutorServiceVirtual(name, corePoolSize, queueSize, queuePolicy);
         getExecutorMap().put(name, executorServiceVirtual);
         return executorServiceVirtual;
     }

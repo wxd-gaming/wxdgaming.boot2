@@ -3,9 +3,7 @@ package wxdgaming.boot2.core.executor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -16,25 +14,22 @@ import java.util.concurrent.locks.ReentrantLock;
  * @version: 2025-05-15 10:09
  **/
 @Slf4j
-public class ExecutorQueue extends ExecutorJob implements Executor {
+public class ExecutorQueue extends ExecutorJob {
 
     private final Executor executor;
     private final ReentrantLock reentrantLock = new ReentrantLock();
     private final AtomicBoolean running = new AtomicBoolean(false);
-    private final BlockingQueue<ExecutorJob> queue;
-    private final int queueSize;
+    private final ArrayBlockingQueue<ExecutorJob> queue;
+    private final QueuePolicy queuePolicy;
 
-    public ExecutorQueue(Executor executor, int queueSize) {
+    public ExecutorQueue(Executor executor, int queueSize, QueuePolicy queuePolicy) {
         super(null);
         this.executor = executor;
-        queue = new ArrayBlockingQueue<>(queueSize);
-        this.queueSize = queueSize;
+        this.queue = new ArrayBlockingQueue<>(queueSize);
+        this.queuePolicy = queuePolicy;
     }
 
-    @Override public void execute(Runnable command) {
-        if (queue.size() > queueSize) {
-            throw new RejectedExecutionException("Queue is full");
-        }
+    private ExecutorJob convert(Runnable command) {
         ExecutorJob executorJob;
         if (!(command instanceof ExecutorJob)) {
             executorJob = new ExecutorJob(command);
@@ -45,7 +40,16 @@ public class ExecutorQueue extends ExecutorJob implements Executor {
             /*TODO 任务添加线程上下文*/
             executorJob.threadContext = new ThreadContext(ThreadContext.context());
         }
-        queue.add(executorJob);
+        return executorJob;
+    }
+
+    /**
+     * 如果队列已满会直接拒绝抛出异常
+     *
+     * @throws IllegalStateException if this queue is full
+     */
+    public void execute(Runnable command) {
+        queuePolicy.execute(queue, convert(command));
         checkExecute(false);
     }
 

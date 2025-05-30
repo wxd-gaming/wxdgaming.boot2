@@ -22,7 +22,7 @@ public class RankLazyTest {
 
     public static void main(String[] args) {
         RankListLazySort rankMap = new RankListLazySort(10000);
-        ExecutorServicePlatform executorService = ExecutorFactory.create("map", 2, 5000);
+        ExecutorServicePlatform executorService = ExecutorFactory.create("map", 2);
         for (int k = 0; k < 10; k++) {
             executorService.execute(() -> {
                 StringBuilder stringBuilder = new StringBuilder();

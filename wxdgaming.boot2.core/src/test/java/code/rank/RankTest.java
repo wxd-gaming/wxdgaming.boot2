@@ -22,7 +22,7 @@ public class RankTest {
 
     public static void main(String[] args) {
         RankGroupMap rankGroupMap = new RankGroupMap();
-        ExecutorServicePlatform executorService = ExecutorFactory.create("map", 3, 5000);
+        ExecutorServicePlatform executorService = ExecutorFactory.create("map", 3);
         for (int k = 0; k < 10; k++) {
             executorService.execute(() -> {
                 StringBuilder stringBuilder = new StringBuilder();

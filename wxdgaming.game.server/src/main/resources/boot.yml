@@ -13,7 +13,7 @@ executor:
     maxQueueSize: 1500000              #队列超过就会打印异常
   scheduled:
     coreSize: 1
-    maxQueueSize: 50000
+    maxQueueSize: 500
 http:
   client:
     routeMaxSize: 20                    #连接池的核心连接数

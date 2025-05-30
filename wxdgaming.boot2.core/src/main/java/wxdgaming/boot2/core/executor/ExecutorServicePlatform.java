@@ -14,17 +14,20 @@ import java.util.concurrent.*;
 public class ExecutorServicePlatform extends ExecutorService {
 
     private final int queueSize;
+    private final QueuePolicy queuePolicy;
     protected ThreadPoolExecutor threadPoolExecutor;
     protected ConcurrentMap<String, ExecutorQueue> queueMap = new ConcurrentHashMap<>();
 
     /** 如果队列已经达到上限默认是拒绝添加任务的 */
-    ExecutorServicePlatform(String namePrefix, int threadSize, int queueSize) {
+    ExecutorServicePlatform(String namePrefix, int threadSize, int queueSize, QueuePolicy queuePolicy) {
         this.queueSize = queueSize;
+        this.queuePolicy = queuePolicy;
         threadPoolExecutor = new ThreadPoolExecutor(
                 threadSize, threadSize,
                 0L, TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<>(queueSize),
-                new NameThreadFactory(namePrefix)
+                new NameThreadFactory(namePrefix),
+                queuePolicy.getRejectedExecutionHandler()
         );
     }
 
@@ -45,7 +48,7 @@ public class ExecutorServicePlatform extends ExecutorService {
             if (executorJob instanceof IExecutorQueue iExecutorQueue) {
                 if (Utils.isNotBlank(iExecutorQueue.queueName())) {
                     queueMap
-                            .computeIfAbsent(iExecutorQueue.queueName(), k -> new ExecutorQueue(this, this.queueSize))
+                            .computeIfAbsent(iExecutorQueue.queueName(), k -> new ExecutorQueue(this, this.queueSize, this.queuePolicy))
                             .execute(executorJob);
                     return;
                 }
