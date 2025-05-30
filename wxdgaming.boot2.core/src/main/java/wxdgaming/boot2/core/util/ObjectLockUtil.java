@@ -3,6 +3,7 @@ package wxdgaming.boot2.core.util;
 import wxdgaming.boot2.core.cache2.CacheLock;
 import wxdgaming.boot2.core.cache2.LRUCache;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -22,8 +23,8 @@ public class ObjectLockUtil {
     static {
         cache = LRUCache.<Object, LockObject>builder()
                 .area(1)
-                .heartTimeMs(3000)
-                .expireAfterReadMs(3000)
+                .heartTimeMs(TimeUnit.MINUTES.toMillis(5))
+                .expireAfterReadMs(TimeUnit.MINUTES.toMillis(5))
                 .loader(k -> new LockObject())
                 .removalListener((o, lockObject) -> lockObject.count <= 0)
                 .build();
@@ -32,7 +33,7 @@ public class ObjectLockUtil {
         writeLock = cacheLock.getWriteLock();
     }
 
-    public static void lock(Object key) {
+    private static LockObject getLockObject(Object key) {
         LockObject lockObject;
         writeLock.lock();
         try {
@@ -41,7 +42,19 @@ public class ObjectLockUtil {
         } finally {
             writeLock.unlock();
         }
-        lockObject.reentrantLock.lock();
+        return lockObject;
+    }
+
+    public static void lock(Object key) {
+        getLockObject(key).reentrantLock.lock();
+    }
+
+    public static boolean tryLock(Object key) {
+        return getLockObject(key).reentrantLock.tryLock();
+    }
+
+    public static boolean tryLock(Object key, long timeout, TimeUnit unit) throws InterruptedException {
+        return getLockObject(key).reentrantLock.tryLock(timeout, unit);
     }
 
     public static void unlock(Object key) {
@@ -59,7 +72,7 @@ public class ObjectLockUtil {
     private static class LockObject {
 
         int count = 0;
-        ReentrantLock reentrantLock = new ReentrantLock();
+        final ReentrantLock reentrantLock = new ReentrantLock();
 
     }
 
