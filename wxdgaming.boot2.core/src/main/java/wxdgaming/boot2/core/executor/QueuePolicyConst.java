@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.executor;
 
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.Throw;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
@@ -36,8 +37,8 @@ public enum QueuePolicyConst implements QueuePolicy {
         @Override public void execute(ArrayBlockingQueue queue, Runnable task) {
             /*队列已满添加是直接忽略*/
             boolean offer = queue.offer(task);
-            if (!offer && log.isDebugEnabled()) {
-                log.debug("队列已满，任务被丢弃");
+            if (!offer) {
+                log.info("队列已满，任务被丢弃 {}, {}", task, Throw.ofString(new RejectedExecutionException("队列已满拒绝提醒"), false));
             }
         }
     },
