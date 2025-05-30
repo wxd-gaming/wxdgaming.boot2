@@ -372,12 +372,12 @@ public class TableMapping {
                 if (String.class.isAssignableFrom(tType)) {
                     return new AtomicReference<>(object);
                 }
-                object = FastJsonUtil.parse(object.toString(), tType);
+                object = FastJsonUtil.parseSupportAutoType(object.toString(), tType);
             }
 
             switch (getColumnType()) {
                 case Blob -> {
-                    return FastJsonUtil.parse((byte[]) object, getJsonType());
+                    return FastJsonUtil.parseSupportAutoType((byte[]) object, getJsonType());
                 }
                 case Bool -> {
                     if (AtomicBoolean.class.isAssignableFrom(getFileType())) {
@@ -448,7 +448,7 @@ public class TableMapping {
                 case null, default -> {
                     if (BitSet.class.isAssignableFrom(getFileType())) {
                         if (object instanceof String json) {
-                            long[] parse = FastJsonUtil.parse(json, long[].class);
+                            long[] parse = FastJsonUtil.parseSupportAutoType(json, long[].class);
                             return BitSet.valueOf(parse);
                         }
                     } else if (Enum.class.isAssignableFrom(getFileType())) {
@@ -456,7 +456,7 @@ public class TableMapping {
                     } else if (ConfigString.class.isAssignableFrom(getFileType())) {
                         return new ConfigString(object.toString());
                     }
-                    return FastJsonUtil.parse(object.toString(), getJsonType());
+                    return FastJsonUtil.parseSupportAutoType(object.toString(), getJsonType());
                 }
             }
         }

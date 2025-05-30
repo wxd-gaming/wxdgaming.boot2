@@ -80,10 +80,7 @@ public class FastJsonUtil {
                 SerializerFeature.MapSortField                      /*排序*/
         };
 
-        Reader_Features = new Feature[]{
-                Feature.OrderedField,
-                Feature.SupportAutoType
-        };
+        Reader_Features = new Feature[]{Feature.IgnoreAutoType};
 
         Writer_Features_Fmt = Objects.merge(Writer_Features, SerializerFeature.PrettyFormat);
 
@@ -103,7 +100,7 @@ public class FastJsonUtil {
         Writer_Features_Fmt_Key_String = Objects.merge(Writer_Features_Key_String, SerializerFeature.PrettyFormat);/*所有的 key 都用引号*/
         Writer_Features_Fmt_K_V_String = Objects.merge(Writer_Features_K_V_String, SerializerFeature.PrettyFormat);/*所有的 value 都用引号*/
 
-        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
+        ParserConfig.getGlobalInstance().setAutoTypeSupport(false);
 
         SerializeConfig.getGlobalInstance().put(BitSet.class, BitSetSerializerFastJson.default_instance);
         ParserConfig.getGlobalInstance().putDeserializer(BitSet.class, BitSetSerializerFastJson.default_instance);
@@ -211,6 +208,16 @@ public class FastJsonUtil {
         return JSON.parseObject(bytes, clazz, Reader_Features);
     }
 
+    /** 自带类型推断 */
+    public static <T> T parseSupportAutoType(byte[] bytes, Class<T> clazz) {
+        return JSON.parseObject(bytes, clazz, Feature.SupportAutoType);
+    }
+
+    /** 自带类型推断 */
+    public static <T> T parseSupportAutoType(byte[] bytes, Type clazz) {
+        return JSON.parseObject(bytes, clazz, Feature.SupportAutoType);
+    }
+
     public static <T, F> T parse(String str, SLFunction1<F, ?> function) {
         Type type = ParameterizedTypeImpl.genericFieldTypes(function);
         return JSON.parseObject(str, type, Reader_Features);
@@ -230,6 +237,18 @@ public class FastJsonUtil {
 
     public static <T> T parse(String str, TypeReference<T> tTypeReference) {
         return JSON.parseObject(str, tTypeReference, Reader_Features);
+    }
+
+    public static <T> T parseSupportAutoType(String str, Class<T> clazz) {
+        return JSON.parseObject(str, clazz, Feature.SupportAutoType);
+    }
+
+    public static <T> T parseSupportAutoType(String str, Type clazz) {
+        return JSON.parseObject(str, clazz, Feature.SupportAutoType);
+    }
+
+    public static <T> T parseSupportAutoType(String str, TypeReference<T> tTypeReference) {
+        return JSON.parseObject(str, tTypeReference, Feature.SupportAutoType);
     }
 
     /**
@@ -280,6 +299,7 @@ public class FastJsonUtil {
                 );
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T parseObject(Object object, Type type, Object defaultValue) {
         if (object == null) {
             if (defaultValue == null) return null;
