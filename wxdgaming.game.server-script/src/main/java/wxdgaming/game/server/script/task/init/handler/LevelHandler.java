@@ -2,7 +2,7 @@ package wxdgaming.game.server.script.task.init.handler;
 
 import com.google.inject.Singleton;
 import wxdgaming.boot2.core.lang.condition.Condition;
-import wxdgaming.boot2.core.lang.condition.UpdateType;
+import wxdgaming.boot2.core.lang.condition.ConditionUpdatePolicyConst;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.task.init.ConditionInitValueHandler;
 
@@ -16,7 +16,7 @@ import wxdgaming.game.server.script.task.init.ConditionInitValueHandler;
 public class LevelHandler implements ConditionInitValueHandler {
 
     @Override public Condition condition() {
-        return new Condition("level", "0", "0", UpdateType.Replace);
+        return new Condition("level", ConditionUpdatePolicyConst.Replace, 0);
     }
 
     @Override public long initValue(Player player, Condition condition) {

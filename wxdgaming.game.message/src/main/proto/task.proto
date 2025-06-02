@@ -10,6 +10,22 @@ enum TaskType {
   Main = 1;
 }
 
+//任务列表
+message ReqTaskList {
+  TaskType taskType           = 1;
+}
+
+//任务列表
+message ResTaskList {
+  TaskType taskType           = 1;
+  repeated TaskBean tasks     = 2;
+}
+
+message TaskBean {
+  int32 taskId                = 2;
+  repeated int64 progresses   = 3;
+}
+
 //接受任务
 message ReqAcceptTask  {
   TaskType taskType           = 1;

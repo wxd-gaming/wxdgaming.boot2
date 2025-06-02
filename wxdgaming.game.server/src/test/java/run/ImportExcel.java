@@ -17,10 +17,10 @@ public class ImportExcel {
     @Test
     public void s1() {
         ExcelRepository excelReader = ExcelRepository.getIns();
-        excelReader.readExcel(Paths.get("src/cfg/道具.xlsx"), "");
+        excelReader.readExcel(Paths.get("src/cfg/任务成就.xlsx"), "");
         excelReader.outJsonFile("../cfg_json");
         excelReader.getTableInfoMap().values().forEach(tableInfo -> {
-            CreateJavaCode.getIns().createCode(tableInfo, "src/main/java", "wxdgaming.game.test.cfg", "");
+            CreateJavaCode.getIns().createCode(tableInfo, "src/main/java", "wxdgaming.game.server.cfg", "");
         });
     }
 

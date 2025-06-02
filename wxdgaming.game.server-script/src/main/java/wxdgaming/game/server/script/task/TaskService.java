@@ -6,7 +6,6 @@ import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.condition.Condition;
-import wxdgaming.boot2.core.lang.condition.UpdateType;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.task.TaskInfo;
@@ -59,10 +58,6 @@ public class TaskService extends HoldRunApplication {
         taskScriptImplHashMap = tmpTaskScriptImplHashMap;
     }
 
-    public Condition getCondition(int id) {
-        return new Condition(1, 1, 1, UpdateType.Add);
-    }
-
     public ITaskScript getTaskScript(int taskType) {
         ITaskScript taskScript = taskScriptImplHashMap.get(taskType);
         AssertUtil.assertNull(taskScript, "任务类型不存在：" + taskType);
@@ -71,24 +66,15 @@ public class TaskService extends HoldRunApplication {
 
     /** 初始化任务的时候调用变量初始化，比如接取任务的初始化当前等级 */
     public void initTask(Player player, TaskInfo taskInfo, Map<Integer, Long> conditions) {
-        for (Map.Entry<Integer, Long> entry : conditions.entrySet()) {
-            Integer conditionId = entry.getKey();
-            Condition condition = getCondition(conditionId);
-            ConditionInitValueHandler conditionInitValueHandler = conditionInitValueHandlerMap.get(condition);
-            if (conditionInitValueHandler != null) {
-                long initValue = conditionInitValueHandler.initValue(player, condition);
-                taskInfo.getProgresses().put(conditionId, initValue);
-            }
-        }
+
     }
 
     @OnTask
-    public void update(Player player, TaskEvent taskEvent) {
+    public void update(Player player, Condition condition) {
         TaskPack taskPack = player.getTaskPack();
-        replace(player, taskEvent);
         List<TaskInfo> changes = new ArrayList<>();
         for (ITaskScript taskScript : taskScriptImplHashMap.values()) {
-            taskScript.update(player, taskPack, changes, taskEvent);
+            taskScript.update(player, taskPack, changes, condition);
         }
         /* TODO发送变更列表 */
         for (TaskInfo taskInfo : changes) {

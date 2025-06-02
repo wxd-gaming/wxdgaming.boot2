@@ -35,12 +35,14 @@ public class DataRepository {
     private DataRepository() {
     }
 
+    @SuppressWarnings("unchecked")
     public <D extends DataKey, T extends DataTable<D>> T dataTable(Class<T> dataTableClass) {
-        return (T) dataTableMap.computeIfAbsent(dataTableClass, k -> buildDataTable(k));
+        return (T) dataTableMap.computeIfAbsent(dataTableClass, this::buildDataTable);
     }
 
+    @SuppressWarnings("unchecked")
     public <E extends DataKey, T extends DataTable<E>> E dataTable(Class<T> dataTableClass, Object key) {
-        return (E) (dataTableMap.computeIfAbsent(dataTableClass, k -> buildDataTable(k)).get(key));
+        return (E) (dataTableMap.computeIfAbsent(dataTableClass, this::buildDataTable).get(key));
     }
 
     @Start

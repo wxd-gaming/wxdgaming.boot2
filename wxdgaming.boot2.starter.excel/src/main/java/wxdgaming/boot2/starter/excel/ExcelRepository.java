@@ -634,9 +634,9 @@ public class ExcelRepository {
                     Class<?> aClass = this.getClass().getClassLoader().loadClass(fieldTypeName);
                     entityField.setFieldType(aClass);
                 } catch (ClassNotFoundException e) {
-                    if (fieldTypeName.contains("List<")) {
+                    if (fieldTypeName.toLowerCase().contains("list<")) {
                         entityField.setFieldType(List.class);
-                    } else if (fieldTypeName.contains("Map<")) {
+                    } else if (fieldTypeName.toLowerCase().contains("map<")) {
                         entityField.setFieldType(Map.class);
                     } else {
                         log.error("{} - {} - {} - {}", fileName, sheetName, entityField.getFieldName(), fieldTypeName, e);

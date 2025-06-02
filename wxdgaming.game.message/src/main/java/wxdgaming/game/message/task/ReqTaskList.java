@@ -8,16 +8,16 @@ import wxdgaming.boot2.core.ann.Comment;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 
 
-/** 提交任务 */
+/** 任务列表 */
 @Getter
 @Setter
 @Accessors(chain = true)
-@Comment("提交任务")
-public class ResSubmitTask extends PojoBase {
+@Comment("任务列表")
+public class ReqTaskList extends PojoBase {
 
     /** 消息ID */
     public static int _msgId() {
-        return 48657328;
+        return 46251239;
     }
 
     /** 消息ID */
@@ -28,8 +28,6 @@ public class ResSubmitTask extends PojoBase {
 
     /**  */
     @Tag(1) private TaskType taskType;
-    /**  */
-    @Tag(2) private int taskId;
 
 
 }

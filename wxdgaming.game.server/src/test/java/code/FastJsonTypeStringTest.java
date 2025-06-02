@@ -1,6 +1,7 @@
 package code;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -15,11 +16,20 @@ import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
 import wxdgaming.game.server.bean.task.TaskInfo;
 import wxdgaming.game.server.bean.task.TaskPack;
+import wxdgaming.game.server.bean.task.TaskType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class FastJsonTypeStringTest {
+
+    @Test
+    public void e1(){
+        System.out.println(FastJsonUtil.toJSONString(TaskType.Main));
+        System.out.println(TaskType.valueOf(TaskType.Main.name()));
+        TaskType taskType = JSON.parseObject(String.valueOf("Main"), TaskType.class, Feature.SupportAutoType,Feature.ErrorOnEnumNotMatch);
+        System.out.println(taskType);
+    }
 
     @Test
     public void t1() {

@@ -3,7 +3,7 @@ package wxdgaming.game.server.script.task.replace.handler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import wxdgaming.boot2.core.lang.condition.Condition;
-import wxdgaming.boot2.core.lang.condition.UpdateType;
+import wxdgaming.boot2.core.lang.condition.ConditionUpdatePolicyConst;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.goods.BagService;
 import wxdgaming.game.server.script.task.replace.ConditionReplaceValueHandler;
@@ -25,7 +25,7 @@ public class BagItemCountHandler implements ConditionReplaceValueHandler {
     }
 
     @Override public Condition condition() {
-        return new Condition("bagitem", UpdateType.Replace);
+        return new Condition("bagitem", ConditionUpdatePolicyConst.Replace, 0);
     }
 
     @Override public long replaceValue(Player player, Condition condition) {

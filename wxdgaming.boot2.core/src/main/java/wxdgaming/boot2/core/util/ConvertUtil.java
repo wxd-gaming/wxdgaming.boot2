@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.util;
 
 
+import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 
@@ -170,7 +171,15 @@ public class ConvertUtil {
             case String:
                 return String.valueOf(obj);
             default: {
-                return FastJsonUtil.parse(String.valueOf(obj), clazz);
+                if (clazz.isEnum()) {
+                    String valueOf = String.valueOf(obj);
+                    try {
+                        return Enum.valueOf(clazz.asSubclass(Enum.class), valueOf);
+                    } catch (Exception e) {
+                        throw Throw.of(valueOf + " - " + clazz, e);
+                    }
+                } else
+                    return FastJsonUtil.parse(String.valueOf(obj), clazz);
             }
         }
     }

@@ -12,7 +12,7 @@ public class ConditionTest {
     @Test
     public void t1() {
         String a = """
-                {"k1":1001}""";
+                {"k1":1001,"update":"Replace"}""";
         log.info(a);
         Condition parse = FastJsonUtil.parse(a, Condition.class);
         log.info(parse.toString());

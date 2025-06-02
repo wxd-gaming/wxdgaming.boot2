@@ -4,8 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.lang.ObjectBase;
+import wxdgaming.boot2.core.lang.condition.Condition;
+import wxdgaming.boot2.starter.excel.store.DataRepository;
+import wxdgaming.game.server.cfg.QTaskTable;
+import wxdgaming.game.server.cfg.bean.QTask;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * 任务
@@ -19,12 +24,47 @@ import java.util.HashMap;
 public class TaskInfo extends ObjectBase {
 
     private int cfgId;
-
+    /** 接取任务的时间 */
     private long acceptTime;
+    /** 是否完成 */
     private boolean complete = false;
     /** 是否领取奖励 */
     private boolean rewards = false;
-    /** key:完成条件, value:当前进度 */
+    /** 当前进度 */
     private HashMap<Integer, Long> progresses = new HashMap<>();
+
+    public boolean update(Condition condition) {
+        boolean updateing = false;
+        QTask qTask = qTask();
+        List<Condition> qTaskConditionList = qTask.getConditionList();
+
+        for (int i = 0; i < qTaskConditionList.size(); i++) {
+            Condition qCondition = qTaskConditionList.get(i);
+            if (qCondition.equals(condition)) {
+                long old = progresses.getOrDefault(i, 0L);
+                long progress = condition.getUpdate().update(old, condition.getTarget());
+                progresses.put(i, progress);
+                updateing |= progress != old;
+            }
+        }
+
+        if (updateing) {
+            boolean checkComplete = true;
+            for (int i = 0; i < qTaskConditionList.size(); i++) {
+                Condition qCondition = qTaskConditionList.get(i);
+                long progress = progresses.getOrDefault(i, 0L);
+                if (qCondition.getTarget() > progress) {
+                    checkComplete = false;
+                    break;
+                }
+            }
+            complete = checkComplete;
+        }
+        return updateing;
+    }
+
+    public QTask qTask() {
+        return DataRepository.getIns().dataTable(QTaskTable.class, cfgId);
+    }
 
 }

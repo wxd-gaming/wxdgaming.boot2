@@ -7,17 +7,20 @@ import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.ann.Comment;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 
+import java.util.ArrayList;
+import java.util.List;
 
-/** 提交任务 */
+
+/** null */
 @Getter
 @Setter
 @Accessors(chain = true)
-@Comment("提交任务")
-public class ResSubmitTask extends PojoBase {
+@Comment("null")
+public class TaskBean extends PojoBase {
 
     /** 消息ID */
     public static int _msgId() {
-        return 48657328;
+        return 42597836;
     }
 
     /** 消息ID */
@@ -27,9 +30,9 @@ public class ResSubmitTask extends PojoBase {
 
 
     /**  */
-    @Tag(1) private TaskType taskType;
-    /**  */
     @Tag(2) private int taskId;
+    /**  */
+    @Tag(3) private List<Long> progresses = new ArrayList<>();
 
 
 }

@@ -29,23 +29,16 @@ public class Condition extends ObjectBase implements Serializable {
     /** 条件3 */
     private final Serializable k3;
     /** 当前完成条件变更方案 */
-    private final UpdateType updateType;
+    private final ConditionUpdatePolicy update;
+    /** 目标完成条件 */
+    private final long target;
 
-    public Condition(Serializable k1) {
-        this(k1, "0", "0", UpdateType.Add);
+    public Condition(Serializable k1, long target) {
+        this(k1, "0", "0", ConditionUpdatePolicyConst.Add, target);
     }
 
-    public Condition(Serializable k1, UpdateType updateType) {
-        this(k1, "0", "0", updateType);
-    }
-
-    public Condition(Serializable k1, Serializable k2, Serializable k3, UpdateType updateType) {
-        AssertUtil.assertTrue(k1 != null, "条件1不能为空");
-        AssertUtil.assertTrue(updateType != null, "更新策略不能null");
-        this.k1 = k1;
-        this.k2 = k2 == null ? "0" : k2;
-        this.k3 = k3 == null ? "0" : k3;
-        this.updateType = updateType;
+    public Condition(Serializable k1, ConditionUpdatePolicy update, long target) {
+        this(k1, "0", "0", update, target);
     }
 
     /** fastjson */
@@ -53,8 +46,22 @@ public class Condition extends ObjectBase implements Serializable {
     public Condition(@JSONField(name = "k1") Serializable k1,
                      @JSONField(name = "k2") Serializable k2,
                      @JSONField(name = "k3") Serializable k3,
-                     @JSONField(name = "updateType") int updateType) {
-        this(k1, k2, k3, UpdateType.of(updateType == 0 ? 1 : updateType));
+                     @JSONField(name = "update") ConditionUpdatePolicyConst update,
+                     @JSONField(name = "target") long target) {
+        this(k1, k2, k3, (ConditionUpdatePolicy) update, target);
+    }
+
+    public Condition(Serializable k1,
+                     Serializable k2,
+                     Serializable k3,
+                     ConditionUpdatePolicy update,
+                     long target) {
+        AssertUtil.assertTrue(k1 != null, "条件1不能为空");
+        this.k1 = k1;
+        this.k2 = k2 == null ? "0" : k2;
+        this.k3 = k3 == null ? "0" : k3;
+        this.update = update == null ? ConditionUpdatePolicyConst.Add : update;
+        this.target = target;
     }
 
     public boolean equals(Serializable k1, Serializable k2, Serializable k3) {
@@ -74,12 +81,15 @@ public class Condition extends ObjectBase implements Serializable {
         int result = Objects.hashCode(getK1());
         result = 31 * result + Objects.hashCode(getK2());
         result = 31 * result + Objects.hashCode(getK3());
-        result = 31 * result + Objects.hashCode(getUpdateType());
         return result;
     }
 
     public Condition copy() {
-        return new Condition(this.k1, this.k2, this.k3, this.updateType);
+        return new Condition(this.k1, this.k2, this.k3, this.update, this.target);
+    }
+
+    public Condition copy(long target) {
+        return new Condition(this.k1, this.k2, this.k3, this.update, target);
     }
 
 }
