@@ -151,7 +151,7 @@ public abstract class SocketClient {
     public void start(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
         init(protoListenerFactory, httpListenerFactory);
         for (int i = 0; i < config.getMaxConnectionCount(); i++) {
-            connect();
+            ChannelFuture future = connect();
         }
     }
 
@@ -164,15 +164,20 @@ public abstract class SocketClient {
         log.info("shutdown tcp client：{}:{}", config.getHost(), config.getPort());
     }
 
-    public final void connect() {
+    public void check(Consumer<SocketSession> consumer) {
         if (sessionGroup.size() >= config.getMaxConnectionCount()) {
-            log.error("{} 连接数已经达到最大连接数：{}", this.getClass().getSimpleName(), config.getMaxConnectionCount());
+            if (log.isDebugEnabled()) {
+                log.debug("{} 连接数已经达到最大连接数：{}", this.getClass().getSimpleName(), config.getMaxConnectionCount());
+            }
             return;
         }
-        try {
-            ChannelFuture connect = connect(null);
-            connect.sync();
-        } catch (Exception ignored) {}
+        for (int i = sessionGroup.size(); i < config.getMaxConnectionCount(); i++) {
+            ChannelFuture future = connect(consumer);
+        }
+    }
+
+    public final ChannelFuture connect() {
+        return connect(null);
     }
 
     public ChannelFuture connect(Consumer<SocketSession> consumer) {
@@ -180,49 +185,49 @@ public abstract class SocketClient {
     }
 
     public ChannelFuture connect(String inetHost, int inetPort, Consumer<SocketSession> consumer) {
-        return bootstrap.connect(inetHost, inetPort)
-                .addListener((ChannelFutureListener) future -> {
-                    Throwable cause = future.cause();
-                    if (cause != null) {
-                        log.error("{} connect error {}", this.getClass().getSimpleName(), cause.toString());
-                        if (reconnection(consumer)) {
-                            log.info("{} reconnection", this.getClass().getSimpleName());
-                        }
-                        return;
-                    }
-                    Channel channel = future.channel();
-                    SocketSession socketSession = new SocketSession(SocketSession.Type.client, channel, false, config.isEnabledScheduledFlush());
-                    if (config.getMaxFrameBytes() > 0) {
-                        socketSession.setMaxFrameBytes(BytesUnit.Kb.toBytes(getConfig().getMaxFrameBytes()));
-                    }
+        ChannelFuture channelFuture = bootstrap.connect(inetHost, inetPort);
+        return channelFuture.addListener((ChannelFutureListener) future -> {
+            Throwable cause = future.cause();
+            if (cause != null) {
+                log.error("{} connect error {}", this.getClass().getSimpleName(), cause.toString());
+                if (reconnection(consumer)) {
+                    log.info("{} reconnection", this.getClass().getSimpleName());
+                }
+                return;
+            }
+            Channel channel = future.channel();
+            SocketSession socketSession = new SocketSession(SocketSession.Type.client, channel, false, config.isEnabledScheduledFlush());
+            if (config.getMaxFrameBytes() > 0) {
+                socketSession.setMaxFrameBytes(BytesUnit.Kb.toBytes(getConfig().getMaxFrameBytes()));
+            }
 
-                    socketSession.setMaxFrameLength(getConfig().getMaxFrameLength());
-                    socketSession.setSsl(config.isEnabledSSL());
+            socketSession.setMaxFrameLength(getConfig().getMaxFrameLength());
+            socketSession.setSsl(config.isEnabledSSL());
 
-                    if (config.isEnabledWebSocket()) {
-                        socketSession.setWebSocket(true);
-                    }
+            if (config.isEnabledWebSocket()) {
+                socketSession.setWebSocket(true);
+            }
 
-                    log.debug("{} connect success {}", this.getClass().getSimpleName(), channel);
+            log.debug("{} connect success {}", this.getClass().getSimpleName(), channel);
 
-                    sessionGroup.add(socketSession);
-                    /*添加事件，如果链接关闭了触发*/
-                    socketSession.getChannel().closeFuture().addListener(closeFuture -> {
-                        sessionGroup.remove(socketSession);
-                        reconnection(consumer);
-                    });
+            sessionGroup.add(socketSession);
+            /*添加事件，如果链接关闭了触发*/
+            socketSession.getChannel().closeFuture().addListener(closeFuture -> {
+                sessionGroup.remove(socketSession);
+                reconnection(consumer);
+            });
 
-                    if (consumer != null) {
-                        consumer.accept(socketSession);
-                    }
-                });
+            if (consumer != null) {
+                consumer.accept(socketSession);
+            }
+        });
     }
 
     AtomicLong atomicLong = new AtomicLong();
 
     protected boolean reconnection(Consumer<SocketSession> consumer) {
 
-        if (closed || !config.isEnabledReconnection())
+        if (closed || !config.isEnabledReconnection() || 1 == 1)
             return false;
 
         long l = atomicLong.get();

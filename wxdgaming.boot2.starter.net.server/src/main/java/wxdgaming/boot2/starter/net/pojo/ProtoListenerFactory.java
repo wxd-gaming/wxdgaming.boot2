@@ -10,6 +10,7 @@ import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * 派发器
@@ -47,6 +48,10 @@ public class ProtoListenerFactory {
 
     /** 这里是由netty的work线程触发 */
     public void dispatch(SocketSession socketSession, int messageId, byte[] data) {
+        dispatch(socketSession, messageId, data, null);
+    }
+
+    public void dispatch(SocketSession socketSession, int messageId, byte[] data, Supplier<String> queueSupplier) {
         ProtoMapping mapping = protoListenerContent.getMappingMap().get(messageId);
         if (mapping == null) {
             if (protoUnknownMessageEvent != null) {
@@ -69,8 +74,14 @@ public class ProtoListenerFactory {
         }
         if (!mapping.protoRequest().ignoreQueue()) {
             if (StringUtils.isBlank(protoListenerTrigger.queueName())) {
-                /*这里相当于绑定每个session的队列*/
-                protoListenerTrigger.setQueueName("session-" + String.valueOf(socketSession.getChannel().id().asShortText().hashCode() % 16));
+                String queueName;
+                if (queueSupplier != null) {
+                    queueName = queueSupplier.get();
+                } else {
+                    // 这里可以根据hashCode 来进行分组，16个队列
+                    queueName = "session-drive-" + socketSession.getUid() % 16;
+                }
+                protoListenerTrigger.setQueueName(queueName);
             }
         }
         if (log.isDebugEnabled()) {
