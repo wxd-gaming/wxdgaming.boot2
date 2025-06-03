@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
+import wxdgaming.game.core.Reason;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.goods.ItemBag;
 import wxdgaming.game.server.bean.goods.ItemCfg;
@@ -65,7 +66,7 @@ public class GainScript extends HoldRunApplication {
     }
 
     /** 将道具添加进入背包 */
-    public boolean gain(Player player, ItemBag itemBag, long serialNumber, Item newItem, Object... args) {
+    public boolean gain(Player player, ItemBag itemBag, long serialNumber, Reason reason, Item newItem, Object... args) {
         long count = newItem.getCount();
         for (Item value : itemBag.getItems()) {
             /* TODO 叠加 */

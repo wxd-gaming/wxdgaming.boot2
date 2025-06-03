@@ -69,7 +69,7 @@ public class FastJsonTypeStringTest {
     @Test
     public void t4() {
         TaskPack taskPack = new TaskPack();
-        taskPack.getTaskFinishList().put(1, Lists.newArrayList(1, 2, 3));
+        taskPack.getTaskFinishList().put(TaskType.Main, Lists.newArrayList(1, 2, 3));
         taskPack.getTasks().put(TaskType.Main, 1, new TaskInfo().setCfgId(1));
         System.out.println(JSON.toJSONString(taskPack));
         System.out.println(FastJsonUtil.toJSONString(taskPack, new SerializerFeature[0]));

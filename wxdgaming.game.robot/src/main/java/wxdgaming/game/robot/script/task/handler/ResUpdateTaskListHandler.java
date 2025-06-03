@@ -4,34 +4,32 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
-import wxdgaming.game.message.task.ResSubmitTask;
+import wxdgaming.game.message.task.ResUpdateTaskList;
 import wxdgaming.game.message.task.TaskBean;
 import wxdgaming.game.robot.bean.Robot;
 
+import java.util.List;
+
 /**
- * 提交任务
+ * 更新任务列表
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: v1.1
  **/
 @Slf4j
 @Singleton
-public class ResSubmitTaskHandler {
+public class ResUpdateTaskListHandler {
 
-    /** 提交任务 */
+    /** 更新任务列表 */
     @ProtoRequest
-    public void resSubmitTask(SocketSession socketSession, ResSubmitTask req) {
+    public void resUpdateTaskList(SocketSession socketSession, ResUpdateTaskList req) {
         Robot robot = socketSession.bindData("robot");
         if (log.isDebugEnabled()) {
-            log.debug("{} 完成任务 {}", robot, req);
+            log.debug("{} 任务变更列表 {}", robot, req);
         }
-        TaskBean taskBean = robot.getTasks().get(req.getTaskId());
-        if (taskBean == null) {
-            return;
-        }
-        taskBean.setReward(true);
-        if (req.isRemove()) {
-            robot.getTasks().remove(req.getTaskId());
+        List<TaskBean> tasks = req.getTasks();
+        for (TaskBean task : tasks) {
+            robot.getTasks().put(task.getTaskId(), task);
         }
     }
 

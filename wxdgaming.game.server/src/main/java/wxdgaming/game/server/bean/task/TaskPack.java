@@ -22,7 +22,7 @@ public class TaskPack extends ObjectBase {
 
     /** 任务完成ID key:任务类型, value: 完成的id集合 */
     @JSONField(ordinal = 11)
-    private HashMap<Integer, ArrayList<Integer>> taskFinishList = new HashMap<>();
+    private HashMap<TaskType, ArrayList<Integer>> taskFinishList = new HashMap<>();
     /** key:任务类型, value: 任务列表 */
     @JSONField(ordinal = 12)
     private Table<TaskType, Integer, TaskInfo> tasks = new Table<>();

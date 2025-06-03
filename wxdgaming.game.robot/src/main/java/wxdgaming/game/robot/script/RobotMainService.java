@@ -16,6 +16,10 @@ import wxdgaming.game.message.chat.ChatType;
 import wxdgaming.game.message.chat.ReqChatMessage;
 import wxdgaming.game.message.role.ReqHeartbeat;
 import wxdgaming.game.message.role.ReqLogin;
+import wxdgaming.game.message.task.ReqAcceptTask;
+import wxdgaming.game.message.task.ReqSubmitTask;
+import wxdgaming.game.message.task.TaskBean;
+import wxdgaming.game.message.task.TaskType;
 import wxdgaming.game.robot.bean.Robot;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,6 +88,9 @@ public class RobotMainService {
     public void timer30() {
         for (Robot robot : robotMap.values()) {
             if (robot.isLoginEnd()) {
+                if (!RandomUtils.randomBoolean()) {
+                    continue;
+                }
                 ReqChatMessage reqChatMessage = new ReqChatMessage();
                 reqChatMessage.setType(ChatType.Chat_TYPE_World);
                 reqChatMessage.setContent("你好");
@@ -93,10 +100,43 @@ public class RobotMainService {
     }
 
     /** 1秒一次主循环 */
+    @Scheduled("*/5")
+    public void timerTask() {
+        for (Robot robot : robotMap.values()) {
+            if (robot.isLoginEnd()) {
+                if (!RandomUtils.randomBoolean()) {
+                    continue;
+                }
+                for (TaskBean taskBean : robot.getTasks().values()) {
+                    if (!taskBean.isAccept()) {
+                        ReqAcceptTask reqAcceptTask = new ReqAcceptTask();
+                        reqAcceptTask.setTaskType(TaskType.Main);
+                        reqAcceptTask.setTaskId(taskBean.getTaskId());
+                        robot.getSocketSession().write(reqAcceptTask);
+                    } else if (!taskBean.isCompleted()) {
+                        ReqChatMessage reqChatMessage = new ReqChatMessage();
+                        reqChatMessage.setType(ChatType.Chat_TYPE_World);
+                        reqChatMessage.setContent("@gm completeTask " + taskBean.getTaskId());
+                        robot.getSocketSession().write(reqChatMessage);
+                    } else if (!taskBean.isReward()) {
+                        ReqSubmitTask reqSubmitTask = new ReqSubmitTask();
+                        reqSubmitTask.setTaskType(TaskType.Main);
+                        reqSubmitTask.setTaskId(taskBean.getTaskId());
+                        robot.getSocketSession().write(reqSubmitTask);
+                    }
+                }
+            }
+        }
+    }
+
+    /** 1秒一次主循环 */
     @Scheduled(value = "*/5", async = true)
     public void timer60() {
         for (Robot robot : robotMap.values()) {
             if (robot.isLoginEnd()) {
+                if (!RandomUtils.randomBoolean()) {
+                    continue;
+                }
                 ReqChatMessage reqChatMessage = new ReqChatMessage();
                 reqChatMessage.setType(ChatType.Chat_TYPE_World);
                 reqChatMessage.setContent("@gm addexp " + RandomUtils.random(20, 100));

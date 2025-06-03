@@ -3,6 +3,7 @@ package wxdgaming.game.server.script.role.event;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.game.core.Reason;
 import wxdgaming.game.server.bean.goods.ItemCfg;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnCreateRole;
@@ -40,7 +41,7 @@ public class PlayerCreateHandler {
         rewards.add(builder.cfgId(4).num(10000).build());
         rewards.add(builder.cfgId(5).num(1).build());
         long serialNumber = System.nanoTime();
-        bagService.gainItems4Cfg(player, serialNumber, rewards, "创角赠送道具:", 1001);
+        bagService.gainItems4Cfg(player, serialNumber, Reason.CreateRole, rewards);
     }
 
 }

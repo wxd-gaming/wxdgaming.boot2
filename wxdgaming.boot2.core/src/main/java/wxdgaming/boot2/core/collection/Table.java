@@ -5,7 +5,6 @@ import com.alibaba.fastjson.annotation.JSONType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.format.data.Data2Json;
 
 import java.io.Serializable;
@@ -24,8 +23,6 @@ import java.util.function.Predicate;
 @Setter
 @JSONType(seeAlso = {HashMap.class})
 public class Table<K1, K2, V> implements Serializable, Data2Json {
-
-    private static final Map EMPTY_MAP = Map.of();
 
     private HashMap<K1, HashMap<K2, V>> nodes;
 
@@ -59,7 +56,7 @@ public class Table<K1, K2, V> implements Serializable, Data2Json {
     }
 
     /** 行 */
-    public Map<K2, V> row(K1 k1) {
+    public HashMap<K2, V> row(K1 k1) {
         return nodes.computeIfAbsent(k1, k -> new HashMap<>());
     }
 
@@ -112,7 +109,7 @@ public class Table<K1, K2, V> implements Serializable, Data2Json {
         return null;
     }
 
-    public Optional<Map<K2, V>> opt(K1 k) {
+    public Optional<HashMap<K2, V>> opt(K1 k) {
         return Optional.ofNullable(nodes.get(k));
     }
 
@@ -120,15 +117,15 @@ public class Table<K1, K2, V> implements Serializable, Data2Json {
         return opt(k1).map(v -> v.get(k2));
     }
 
-    public Map<K2, V> get(K1 key) {
-        return opt(key).orElse(EMPTY_MAP);
+    public HashMap<K2, V> get(K1 key) {
+        return nodes.get(key);
     }
 
     public V get(K1 k1, K2 k2) {
         return opt(k1, k2).orElse(null);
     }
 
-    public Map<K2, V> remove(K1 k1) {
+    public HashMap<K2, V> remove(K1 k1) {
         return nodes.remove(k1);
     }
 

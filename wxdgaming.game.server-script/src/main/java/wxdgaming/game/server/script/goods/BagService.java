@@ -12,6 +12,7 @@ import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
+import wxdgaming.game.core.Reason;
 import wxdgaming.game.server.bean.goods.*;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.cfg.QItemTable;
@@ -133,7 +134,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
     }
 
     /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
-    public boolean gainItems4Cfg(Player player, long serialNumber, List<ItemCfg> itemCfgs, Object... args) {
+    public boolean gainItems4Cfg(Player player, long serialNumber, Reason reason, List<ItemCfg> itemCfgs, Object... args) {
         List<Item> items = newItems(itemCfgs);
         BagPack bagPack = player.getBagPack();
         ItemBag itemBag = itemBag(bagPack, 1);
@@ -143,13 +144,13 @@ public class BagService extends HoldRunApplication implements InitPrint {
             }
             return false;/* TODO 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
         }
-        gainItems(player, itemBag, serialNumber, items, args);
+        gainItems(player, itemBag, serialNumber, reason, items, args);
         return true;
     }
 
     /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
-    public boolean gainItems4CfgNotice(Player player, long serialNumber, List<ItemCfg> itemCfgs, Object... args) {
-        boolean gained = gainItems4Cfg(player, serialNumber, itemCfgs, args);
+    public boolean gainItems4CfgNotice(Player player, long serialNumber, Reason reason, List<ItemCfg> itemCfgs, Object... args) {
+        boolean gained = gainItems4Cfg(player, serialNumber, reason, itemCfgs, args);
         if (!gained) {
             tipsService.tips(player, "背包已满");
         }
@@ -157,16 +158,16 @@ public class BagService extends HoldRunApplication implements InitPrint {
     }
 
     /** 默认是往背包添加 */
-    public void gainItems(Player player, long serialNumber, List<Item> items, Object... args) {
+    public void gainItems(Player player, long serialNumber, Reason reason, List<Item> items, Object... args) {
         BagPack bagPack = player.getBagPack();
         ItemBag itemBag = itemBag(bagPack, 1);
-        gainItems(player, itemBag, serialNumber, items, args);
+        gainItems(player, itemBag, serialNumber, reason, items, args);
     }
 
-    private void gainItems(Player player, ItemBag itemBag, long serialNumber, List<Item> items, Object... args) {
+    private void gainItems(Player player, ItemBag itemBag, long serialNumber, Reason reason, List<Item> items, Object... args) {
         Iterator<Item> iterator = items.iterator();
 
-        String collect = Objects.toString(args);
+        String collect = reason.name() + ", " + Objects.toString(args);
 
         while (iterator.hasNext()) {
             Item newItem = iterator.next();
@@ -182,7 +183,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
             long oldCount = gainScript.gainCount(player, itemBag, newItem.getCfgId());
             long change = newItem.getCount();
 
-            boolean gain = gainScript.gain(player, itemBag, serialNumber, newItem, args);
+            boolean gain = gainScript.gain(player, itemBag, serialNumber, reason, newItem, args);
 
             if (gain || newItem.getCount() != change) {
                 long newCount = gainScript.gainCount(player, itemBag, newItem.getCfgId());

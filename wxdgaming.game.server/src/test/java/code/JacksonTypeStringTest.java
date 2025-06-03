@@ -45,7 +45,7 @@ public class JacksonTypeStringTest {
     @Test
     public void t4() throws Exception {
         TaskPack taskPack = new TaskPack();
-        taskPack.getTaskFinishList().put(1, Lists.newArrayList(1, 2, 3));
+        taskPack.getTaskFinishList().put(TaskType.Main, Lists.newArrayList(1, 2, 3));
         TaskInfo taskInfo = new TaskInfo().setCfgId(1);
         taskInfo.getProgresses().put(0,1L);
         taskPack.getTasks().put(TaskType.Main, 1, taskInfo);

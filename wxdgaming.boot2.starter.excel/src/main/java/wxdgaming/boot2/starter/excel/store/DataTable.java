@@ -96,6 +96,7 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
         /*不可变的列表*/
         this.dataList = Collections.unmodifiableList(modelList);
         this.dataMap = Collections.unmodifiableMap(modeMap);
+        this.initDb();
         return this;
     }
 

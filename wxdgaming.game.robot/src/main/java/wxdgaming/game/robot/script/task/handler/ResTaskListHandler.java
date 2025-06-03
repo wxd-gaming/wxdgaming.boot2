@@ -5,7 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.task.ResTaskList;
+import wxdgaming.game.message.task.TaskBean;
 import wxdgaming.game.robot.bean.Robot;
+
+import java.util.List;
 
 /**
  * 任务列表
@@ -23,6 +26,10 @@ public class ResTaskListHandler {
         Robot robot = socketSession.bindData("robot");
         if (log.isDebugEnabled()) {
             log.debug("{} 任务列表 {}", robot, req);
+        }
+        List<TaskBean> tasks = req.getTasks();
+        for (TaskBean task : tasks) {
+            robot.getTasks().put(task.getTaskId(), task);
         }
     }
 

@@ -13,16 +13,16 @@ import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 
 
-/** 接受任务 */
+/** 更新任务列表 */
 @Getter
 @Setter
 @Accessors(chain = true)
-@Comment("接受任务")
-public class ResAcceptTask extends PojoBase {
+@Comment("更新任务列表")
+public class ResUpdateTaskList extends PojoBase {
 
     /** 消息ID */
     public static int _msgId() {
-        return 48289835;
+        return 53081705;
     }
 
     /** 消息ID */
@@ -32,11 +32,7 @@ public class ResAcceptTask extends PojoBase {
 
 
     /**  */
-    @Tag(1) private TaskType taskType;
-    /**  */
-    @Tag(2) private int taskId;
-    /**  */
-    @Tag(3) private TaskBean task;
+    @Tag(2) private List<TaskBean> tasks = new ArrayList<>();
 
 
 }

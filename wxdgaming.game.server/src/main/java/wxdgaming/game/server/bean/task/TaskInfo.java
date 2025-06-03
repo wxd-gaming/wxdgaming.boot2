@@ -6,11 +6,14 @@ import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
+import wxdgaming.game.message.task.TaskBean;
 import wxdgaming.game.server.cfg.QTaskTable;
 import wxdgaming.game.server.cfg.bean.QTask;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 任务
@@ -65,6 +68,23 @@ public class TaskInfo extends ObjectBase {
 
     public QTask qTask() {
         return DataRepository.getIns().dataTable(QTaskTable.class, cfgId);
+    }
+
+    public TaskBean buildTaskBean() {
+        TaskBean taskBean = new TaskBean();
+        taskBean.setTaskId(this.getCfgId());
+        taskBean.setAccept(this.getAcceptTime() > 0);
+        taskBean.setCompleted(this.isComplete());
+        if (!this.isComplete()) {
+            HashMap<Integer, Long> progresses = this.getProgresses();
+            progresses.entrySet()
+                    .stream()
+                    .sorted(Comparator.comparingInt(Map.Entry::getKey))
+                    .map(Map.Entry::getValue)
+                    .forEach(taskBean.getProgresses()::add);
+        }
+        taskBean.setReward(this.isRewards());
+        return taskBean;
     }
 
 }

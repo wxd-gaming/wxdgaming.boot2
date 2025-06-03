@@ -17,13 +17,21 @@ message ReqTaskList {
 
 //任务列表
 message ResTaskList {
-  TaskType taskType           = 1;
+  TaskType taskType           = 1;//可能是空
+  repeated TaskBean tasks     = 2;
+}
+
+//更新任务列表
+message ResUpdateTaskList {
   repeated TaskBean tasks     = 2;
 }
 
 message TaskBean {
-  int32 taskId                = 2;
-  repeated int64 progresses   = 3;
+  int32 taskId                = 2;//任务id
+  bool accept                 = 3;//是否接受
+  bool completed              = 4;//是否完成
+  bool reward                 = 5;//是否领取奖励
+  repeated int64 progresses   = 6;//进度,当任务completed = true,此参数空
 }
 
 //接受任务
@@ -36,6 +44,7 @@ message ReqAcceptTask  {
 message ResAcceptTask  {
   TaskType taskType           = 1;
   int32 taskId                = 2;
+  TaskBean task               = 3;
 }
 
 //提交任务
@@ -48,5 +57,6 @@ message ReqSubmitTask  {
 message ResSubmitTask  {
   TaskType taskType           = 1;
   int32 taskId                = 2;
+  bool remove                 = 3;//是否移除
 }
 

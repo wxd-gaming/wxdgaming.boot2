@@ -7,10 +7,14 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.util.AssertUtil;
+import wxdgaming.game.message.task.ResTaskList;
+import wxdgaming.game.message.task.ResUpdateTaskList;
+import wxdgaming.game.message.task.TaskBean;
 import wxdgaming.game.message.task.TaskType;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.task.TaskInfo;
 import wxdgaming.game.server.bean.task.TaskPack;
+import wxdgaming.game.server.event.OnLogin;
 import wxdgaming.game.server.event.OnTask;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.task.init.ConditionInitValueHandler;
@@ -18,7 +22,6 @@ import wxdgaming.game.server.script.task.init.ConditionInitValueHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 任务模块
@@ -52,7 +55,7 @@ public class TaskService extends HoldRunApplication {
         HashMap<TaskType, ITaskScript> tmpTaskScriptImplHashMap = new HashMap<>();
         runApplication.classWithSuper(ITaskScript.class)
                 .forEach(taskScript -> {
-                    if (taskScriptImplHashMap.put(taskScript.type(), taskScript) != null) {
+                    if (tmpTaskScriptImplHashMap.put(taskScript.type(), taskScript) != null) {
                         throw new RuntimeException("任务类型处理重复：" + taskScript.type());
                     }
                 });
@@ -66,8 +69,29 @@ public class TaskService extends HoldRunApplication {
     }
 
     /** 初始化任务的时候调用变量初始化，比如接取任务的初始化当前等级 */
-    public void initTask(Player player, TaskInfo taskInfo, Map<Integer, Long> conditions) {
+    public void initTask(Player player, TaskInfo taskInfo, List<Condition> conditionList) {
+        for (int i = 0; i < conditionList.size(); i++) {
+            Condition condition = conditionList.get(i);
+            ConditionInitValueHandler conditionInitValueHandler = conditionInitValueHandlerMap.get(condition);
+            if (conditionInitValueHandler != null) {
+                long initValue = conditionInitValueHandler.initValue(player, condition);
+                /*设置初始化变量*/
+                taskInfo.getProgresses().put(i, initValue);
+            }
+        }
+    }
 
+    /** 登录的时候检查任务 */
+    @OnLogin
+    public void onLogin(Player player) {
+        TaskPack taskPack = player.getTaskPack();
+        /*推送数据的*/
+        ResTaskList resTaskList = new ResTaskList();
+        taskPack.getTasks().forEach(taskInfo -> {
+            TaskBean taskBean = taskInfo.buildTaskBean();
+            resTaskList.getTasks().add(taskBean);
+        });
+        player.write(resTaskList);
     }
 
     @OnTask
@@ -77,13 +101,16 @@ public class TaskService extends HoldRunApplication {
         for (ITaskScript taskScript : taskScriptImplHashMap.values()) {
             taskScript.update(player, taskPack, changes, condition);
         }
+        if (changes.isEmpty()) {
+            return;
+        }
+        ResUpdateTaskList resUpdateTaskList = new ResUpdateTaskList();
         /* TODO发送变更列表 */
         for (TaskInfo taskInfo : changes) {
-
+            TaskBean taskBean = taskInfo.buildTaskBean();
+            resUpdateTaskList.getTasks().add(taskBean);
         }
-    }
-
-    void replace(Player player, Condition condition) {
+        player.write(resUpdateTaskList);
     }
 
 }

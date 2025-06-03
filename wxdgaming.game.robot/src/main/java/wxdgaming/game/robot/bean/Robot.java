@@ -4,6 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wxdgaming.boot2.starter.net.SocketSession;
+import wxdgaming.game.message.task.TaskBean;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 机器人
@@ -26,6 +30,8 @@ public class Robot {
     private SocketSession socketSession;
     private boolean sendLogin;
     private boolean loginEnd;
+
+    private Map<Integer, TaskBean> tasks = new HashMap<>();
 
     @Override public String toString() {
         return "Robot{rid=%d, account='%s', name='%s', lv=%s}".formatted(rid, account, name, level);
