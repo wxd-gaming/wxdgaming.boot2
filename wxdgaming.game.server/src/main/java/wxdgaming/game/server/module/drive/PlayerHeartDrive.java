@@ -4,7 +4,9 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.HoldRunApplication;
+import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.timer.MyClock;
@@ -25,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  **/
 @Slf4j
 @Singleton
-public class PlayerDrive extends HoldRunApplication {
+public class PlayerHeartDrive extends HoldRunApplication {
 
     private final HashMap<Integer, PlayerDriveContent> playerDriveContentMap = new HashMap<>();
 
@@ -33,10 +35,16 @@ public class PlayerDrive extends HoldRunApplication {
     public void start() {
         int maxSize = BootConfig.getIns().logicConfig().getCoreSize();
         for (int i = 0; i < maxSize; i++) {
-            PlayerDriveContent driveContent = new PlayerDriveContent("drive-" + i);
+            PlayerDriveContent driveContent = new PlayerDriveContent("player-drive-" + i);
             playerDriveContentMap.put(i, driveContent);
             driveContent.timerJob = ExecutorFactory.getExecutorServiceLogic().scheduleAtFixedRate(driveContent, 33, 33, TimeUnit.MILLISECONDS);
         }
+    }
+
+    @Order(1)
+    @shutdown()
+    public void shutdown() {
+        playerDriveContentMap.values().forEach(v -> v.timerJob.cancel(true));
     }
 
     @OnLogin

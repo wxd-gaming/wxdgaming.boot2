@@ -3,6 +3,7 @@ package wxdgaming.game.server.script.cdkey.handler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
@@ -31,8 +32,8 @@ public class ReqUseCdKeyHandler {
     /** 请求使用cdkey */
     @ProtoRequest
     @ExecutorWith(queueName = "use-cdKey")
-    public void reqUseCdKey(SocketSession socketSession, ReqUseCdKey req) {
-        Player player = socketSession.bindData("player");
+    public void reqUseCdKey(SocketSession socketSession, ReqUseCdKey req,
+                            @ThreadParam(path = "player") Player player) {
         cdKeyService.use(player, req.getCdKey());
     }
 

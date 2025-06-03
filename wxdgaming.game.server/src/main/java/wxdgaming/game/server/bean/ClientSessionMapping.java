@@ -3,6 +3,7 @@ package wxdgaming.game.server.bean;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
@@ -17,6 +18,7 @@ import java.util.function.Consumer;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-05-28 20:41
  **/
+@Slf4j
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -41,6 +43,9 @@ public class ClientSessionMapping extends ObjectBase {
         msg.setMessages(message.encode());
         if (callback != null) {
             callback.accept(msg);
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("发送消息：clientSessionId={},player={}, msgId={}, {}", clientSessionId, player, message.msgId(), message);
         }
         session.write(msg);
     }

@@ -4,6 +4,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
+import wxdgaming.game.message.task.TaskType;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.task.TaskInfo;
 import wxdgaming.game.server.bean.task.TaskPack;
@@ -24,8 +25,8 @@ import java.util.Map;
 @Singleton
 public class TaskMainScript extends ITaskScript {
 
-    @Override public int type() {
-        return 1;
+    @Override public TaskType type() {
+        return TaskType.Main;
     }
 
     /** 初始化 */

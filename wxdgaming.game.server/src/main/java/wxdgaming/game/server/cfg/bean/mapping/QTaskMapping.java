@@ -23,7 +23,7 @@ public abstract class QTaskMapping extends ObjectBase implements Serializable, D
     /** 主键id */
     protected int id;
     /** 任务类型 */
-    protected wxdgaming.game.server.bean.task.TaskType taskType;
+    protected wxdgaming.game.message.task.TaskType taskType;
     /** 上一个任务ID */
     protected int before;
     /** 下一个任务ID */

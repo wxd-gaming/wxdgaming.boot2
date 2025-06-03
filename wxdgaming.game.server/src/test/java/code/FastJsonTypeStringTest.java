@@ -10,13 +10,13 @@ import lombok.Setter;
 import org.junit.Test;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.ObjectBase;
+import wxdgaming.game.message.task.TaskType;
 import wxdgaming.game.server.bean.global.GlobalDataEntity;
 import wxdgaming.game.server.bean.global.impl.YunyingData;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
 import wxdgaming.game.server.bean.task.TaskInfo;
 import wxdgaming.game.server.bean.task.TaskPack;
-import wxdgaming.game.server.bean.task.TaskType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,7 +70,7 @@ public class FastJsonTypeStringTest {
     public void t4() {
         TaskPack taskPack = new TaskPack();
         taskPack.getTaskFinishList().put(1, Lists.newArrayList(1, 2, 3));
-        taskPack.getTasks().put(1, 1, new TaskInfo().setCfgId(1));
+        taskPack.getTasks().put(TaskType.Main, 1, new TaskInfo().setCfgId(1));
         System.out.println(JSON.toJSONString(taskPack));
         System.out.println(FastJsonUtil.toJSONString(taskPack, new SerializerFeature[0]));
         System.out.println(taskPack.toString());

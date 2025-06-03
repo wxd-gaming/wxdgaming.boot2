@@ -5,11 +5,11 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.*;
 import wxdgaming.game.server.script.fight.FightService;
-import wxdgaming.game.server.script.task.TaskEvent;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -61,7 +61,7 @@ public class PlayerHeartHandler extends HoldRunApplication {
             player.getOnlineInfo().setOnlineMills(player.getOnlineInfo().getOnlineMills() + diff);
             player.getOnlineInfo().setOnlineTotalMills(player.getOnlineInfo().getOnlineTotalMills() + diff);
             player.getOnlineInfo().setLastUpdateOnlineTime(millis);
-            runApplication.executeMethodWithAnnotatedException(OnTask.class, player, TaskEvent.builder().k1("onlineTime").targetValue(diff).build());
+            runApplication.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("onlineTime", diff));
         }
 
     }

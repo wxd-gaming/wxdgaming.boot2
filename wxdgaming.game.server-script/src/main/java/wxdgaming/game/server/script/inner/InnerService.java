@@ -12,7 +12,6 @@ import wxdgaming.game.message.inner.ServiceType;
 import wxdgaming.game.server.module.data.DataCenterService;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -50,6 +49,9 @@ public class InnerService extends HoldRunApplication {
         req.getSessionIds().add(clientSessionId);
         if (callback != null) {
             callback.accept(req);
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("发送消息：clientSessionId={}, msgId={}, {}", clientSessionId, message.msgId(), message);
         }
         socketSession.write(req);
     }

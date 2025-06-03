@@ -40,7 +40,7 @@ public class RobotMainService {
 
     @Start
     public void start() {
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 1; i++) {
             String account = "test" + (i + 1);
             robotMap.put(account, new Robot().setAccount(account).setName(account));
         }

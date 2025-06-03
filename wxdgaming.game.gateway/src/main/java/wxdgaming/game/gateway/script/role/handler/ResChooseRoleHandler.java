@@ -35,7 +35,8 @@ public class ResChooseRoleHandler {
 
     /** 选择角色响应 */
     @ProtoRequest
-    public void resChooseRole(SocketSession socketSession, ResChooseRole req, @ThreadParam(path = "forwardMessage") ReqForwardMessage forwardMessage) {
+    public void resChooseRole(SocketSession socketSession, ResChooseRole req,
+                              @ThreadParam(path = "forwardMessage") ReqForwardMessage forwardMessage) {
         List<Long> sessionIds = forwardMessage.getSessionIds();
         Long sessionId = sessionIds.getFirst();
         SocketSession clientSession = dataCenterService.getClientSession(sessionId);

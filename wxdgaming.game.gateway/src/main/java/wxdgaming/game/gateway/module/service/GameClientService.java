@@ -10,7 +10,6 @@ import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.SocketClientConfig;
-import wxdgaming.boot2.starter.net.client.SocketClientImpl;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
@@ -28,7 +27,7 @@ import wxdgaming.game.message.inner.ServiceType;
 @Singleton
 public class GameClientService extends HoldRunApplication {
 
-    final ConcurrentTable<String, Integer, SocketClientImpl> sessions = new ConcurrentTable<>();
+    final ConcurrentTable<String, Integer, Gateway2GameSocketClientImpl> sessions = new ConcurrentTable<>();
 
     private final ProtoListenerFactory protoListenerFactory;
     private final HttpListenerFactory httpListenerFactory;
@@ -44,7 +43,7 @@ public class GameClientService extends HoldRunApplication {
         checkGatewaySession();
     }
 
-    @Scheduled("*/20")
+    @Scheduled("*/10")
     public void checkGatewaySession() {
 
         ReqRegisterServer registerServer = new ReqRegisterServer();
@@ -56,17 +55,19 @@ public class GameClientService extends HoldRunApplication {
 
     /** 网关主动连游戏服 */
     public void checkGatewaySession(final String inetHost, final int inetPort, ReqRegisterServer registerServer) {
-        SocketClientImpl gatewaySocketClient = getSessions().computeIfAbsent(inetHost, inetPort, l -> {
+        Gateway2GameSocketClientImpl gatewaySocketClient = getSessions().computeIfAbsent(inetHost, inetPort, l -> {
             SocketClientConfig socketClientConfig = BootConfig.getIns().getNestedValue("socket.client-forward", SocketClientConfig.class);
             socketClientConfig = (SocketClientConfig) socketClientConfig.clone();
             socketClientConfig.setHost(inetHost);
             socketClientConfig.setPort(inetPort);
             socketClientConfig.setMaxConnectionCount(1);
-            socketClientConfig.setEnabledReconnection(true);
-            SocketClientImpl socketClient = new SocketClientImpl(socketClientConfig);
-            socketClient.start(protoListenerFactory, httpListenerFactory);
+            socketClientConfig.setEnabledReconnection(false);
+            Gateway2GameSocketClientImpl socketClient = new Gateway2GameSocketClientImpl(socketClientConfig);
+            socketClient.init(protoListenerFactory, httpListenerFactory);
             return socketClient;
         });
+
+        gatewaySocketClient.check(null);
 
         SocketSession socketSession = gatewaySocketClient.idle();
         if (socketSession != null) {

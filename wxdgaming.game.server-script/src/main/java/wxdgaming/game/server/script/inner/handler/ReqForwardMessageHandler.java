@@ -55,6 +55,7 @@ public class ReqForwardMessageHandler extends HoldRunApplication {
         if (account != null) {
             ClientSessionMapping clientSessionMapping = clientSessionService.getAccountMappingMap().get(account);
             ThreadContext.putContent("clientSessionMapping", clientSessionMapping);
+            ThreadContext.putContent("player", clientSessionMapping.getPlayer());
         }
         protoListenerFactory.dispatch(socketSession, messageId, messages);
     }

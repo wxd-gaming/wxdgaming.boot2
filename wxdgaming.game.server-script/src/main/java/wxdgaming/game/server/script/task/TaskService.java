@@ -7,6 +7,7 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.util.AssertUtil;
+import wxdgaming.game.message.task.TaskType;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.task.TaskInfo;
 import wxdgaming.game.server.bean.task.TaskPack;
@@ -29,7 +30,7 @@ import java.util.Map;
 public class TaskService extends HoldRunApplication {
 
     private final DataCenterService dataCenterService;
-    private HashMap<Integer, ITaskScript> taskScriptImplHashMap = new HashMap<>();
+    private HashMap<TaskType, ITaskScript> taskScriptImplHashMap = new HashMap<>();
     private HashMap<Condition, ConditionInitValueHandler> conditionInitValueHandlerMap = new HashMap<>();
 
     @Inject
@@ -48,7 +49,7 @@ public class TaskService extends HoldRunApplication {
                 });
         conditionInitValueHandlerMap = tmpConditionInitValueHandlerMap;
 
-        HashMap<Integer, ITaskScript> tmpTaskScriptImplHashMap = new HashMap<>();
+        HashMap<TaskType, ITaskScript> tmpTaskScriptImplHashMap = new HashMap<>();
         runApplication.classWithSuper(ITaskScript.class)
                 .forEach(taskScript -> {
                     if (taskScriptImplHashMap.put(taskScript.type(), taskScript) != null) {
@@ -58,7 +59,7 @@ public class TaskService extends HoldRunApplication {
         taskScriptImplHashMap = tmpTaskScriptImplHashMap;
     }
 
-    public ITaskScript getTaskScript(int taskType) {
+    public ITaskScript getTaskScript(TaskType taskType) {
         ITaskScript taskScript = taskScriptImplHashMap.get(taskType);
         AssertUtil.assertNull(taskScript, "任务类型不存在：" + taskType);
         return taskScript;
@@ -82,7 +83,7 @@ public class TaskService extends HoldRunApplication {
         }
     }
 
-    void replace(Player player, TaskEvent taskEvent) {
+    void replace(Player player, Condition condition) {
     }
 
 }

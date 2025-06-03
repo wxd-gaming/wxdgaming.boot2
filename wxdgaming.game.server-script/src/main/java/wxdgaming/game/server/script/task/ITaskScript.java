@@ -3,6 +3,9 @@ package wxdgaming.game.server.script.task;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.condition.Condition;
+import wxdgaming.game.message.task.ResTaskList;
+import wxdgaming.game.message.task.TaskBean;
+import wxdgaming.game.message.task.TaskType;
 import wxdgaming.game.server.bean.goods.ItemCfg;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.task.TaskInfo;
@@ -11,9 +14,7 @@ import wxdgaming.game.server.event.OnLogin;
 import wxdgaming.game.server.event.OnLoginBefore;
 import wxdgaming.game.server.script.goods.BagService;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public abstract class ITaskScript extends HoldRunApplication {
 
@@ -26,7 +27,7 @@ public abstract class ITaskScript extends HoldRunApplication {
         this.bagService = bagService;
     }
 
-    public abstract int type();
+    public abstract TaskType type();
 
     /** 登录的时候检查任务 */
     @OnLoginBefore
@@ -40,6 +41,22 @@ public abstract class ITaskScript extends HoldRunApplication {
     public void onLogin(Player player) {
         TaskPack taskPack = player.getTaskPack();
         /*推送数据的*/
+        ResTaskList resTaskList = new ResTaskList();
+        resTaskList.setTaskType(type());
+        Map<Integer, TaskInfo> integerTaskInfoMap = taskPack.getTasks().get(type());
+        if (integerTaskInfoMap != null) {
+            for (TaskInfo value : integerTaskInfoMap.values()) {
+                TaskBean taskBean = new TaskBean();
+                taskBean.setTaskId(value.getCfgId());
+                HashMap<Integer, Long> progresses = value.getProgresses();
+                progresses.entrySet()
+                        .stream()
+                        .sorted(Comparator.comparingInt(Map.Entry::getKey))
+                        .map(Map.Entry::getValue)
+                        .forEach(taskBean.getProgresses()::add);
+            }
+        }
+        player.write(resTaskList);
     }
 
     /** 初始化 */

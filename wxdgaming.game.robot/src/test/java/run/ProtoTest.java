@@ -28,7 +28,7 @@ public class ProtoTest {
                 "src/main/java",
                 "wxdgaming.game.robot.script",
                 "Res",
-                "wxdgaming.game.robot.script",
+                "wxdgaming.game.message",
                 null,
                 null,
                 null

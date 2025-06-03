@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import org.junit.Test;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.chatset.json.JacksonUtil;
+import wxdgaming.game.message.task.TaskType;
 import wxdgaming.game.server.bean.global.GlobalDataEntity;
 import wxdgaming.game.server.bean.global.impl.YunyingData;
 import wxdgaming.game.server.bean.task.TaskInfo;
@@ -45,8 +46,10 @@ public class JacksonTypeStringTest {
     public void t4() throws Exception {
         TaskPack taskPack = new TaskPack();
         taskPack.getTaskFinishList().put(1, Lists.newArrayList(1, 2, 3));
-        taskPack.getTasks().put(1, 1, new TaskInfo().setCfgId(1));
-        String jsonString = JacksonUtil.toJSONString(taskPack);
+        TaskInfo taskInfo = new TaskInfo().setCfgId(1);
+        taskInfo.getProgresses().put(0,1L);
+        taskPack.getTasks().put(TaskType.Main, 1, taskInfo);
+        String jsonString = JacksonUtil.toJSONStringFmt(taskPack);
         System.out.println(jsonString);
         TaskPack parse = JacksonUtil.parse(jsonString, TaskPack.class);
         System.out.println(FastJsonUtil.toJsonFmtWriteType(parse));

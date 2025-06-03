@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.io.Objects;
+import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.message.role.ResLogin;
 import wxdgaming.game.message.role.ResUpdateExp;
@@ -15,7 +16,6 @@ import wxdgaming.game.server.event.OnLevelUp;
 import wxdgaming.game.server.event.OnTask;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.inner.InnerService;
-import wxdgaming.game.server.script.task.TaskEvent;
 
 import java.util.HashSet;
 
@@ -76,9 +76,9 @@ public class PlayerService extends HoldRunApplication {
         /*触发升级, 比如功能开放监听需要*/
         runApplication.executeMethodWithAnnotatedException(OnLevelUp.class, player, lv);
         /*触发当前等级*/
-        runApplication.executeMethodWithAnnotatedException(OnTask.class, player, TaskEvent.builder().k1("level").targetValue(player.getLevel()).build());
+        runApplication.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("level", player.getLevel()));
         /*触发提升等级*/
-        runApplication.executeMethodWithAnnotatedException(OnTask.class, player, TaskEvent.builder().k1("levelup").targetValue(lv).build());
+        runApplication.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("levelup", lv));
     }
 
 }

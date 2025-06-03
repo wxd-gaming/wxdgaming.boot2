@@ -6,13 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.lang.bit.BitFlag;
+import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.game.server.bean.StatusConst;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnLogin;
 import wxdgaming.game.server.event.OnLoginBefore;
 import wxdgaming.game.server.event.OnTask;
-import wxdgaming.game.server.script.task.TaskEvent;
 
 /**
  * 角色创建事件
@@ -34,14 +34,12 @@ public class PlayerLoginHandler extends HoldRunApplication {
     public void onLoginBefore(Player player) {
         log.info("玩家上线:{}", player);
         player.setStatus(new BitFlag());
-        player.getStatus().addFlags(StatusConst.Online);
-        player.getOnlineInfo().setLastLoginTime(MyClock.millis());
         /*触发任务登录次数*/
-        runApplication.executeMethodWithAnnotatedException(OnTask.class, player, TaskEvent.builder().k1("login").targetValue(1).build());
+        runApplication.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("login", 1));
         if (!MyClock.isSameDay(player.getOnlineInfo().getLastLoginDayTime())) {
             player.getOnlineInfo().setLastLoginDayTime(MyClock.millis());
             /*触发任务登录天数*/
-            runApplication.executeMethodWithAnnotatedException(OnTask.class, player, TaskEvent.builder().k1("loginDay").targetValue(1).build());
+            runApplication.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("loginDay", 1));
         }
     }
 
@@ -50,7 +48,8 @@ public class PlayerLoginHandler extends HoldRunApplication {
     @OnLogin
     public void onLogin(Player player) {
         log.info("玩家上线:{}", player);
-
+        player.getStatus().addFlags(StatusConst.Online);
+        player.getOnlineInfo().setLastLoginTime(MyClock.millis());
     }
 
 

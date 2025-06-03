@@ -1,0 +1,103 @@
+{
+  "@type": "wxdgaming.game.server.bean.role.Player",
+  "account": "test2",
+  "bagPack": {
+    "items": {
+      1: {
+        "buyGrid": 0,
+        "currencyMap": {
+          1: 100L,
+          2: 100L,
+          3: 10000L,
+          4: 10000L
+        },
+        "googsGrid": 0,
+        "initGrid": 100,
+        "items": []
+      },
+      2: {
+        "buyGrid": 0,
+        "currencyMap": {},
+        "googsGrid": 0,
+        "initGrid": 100,
+        "items": []
+      }
+    }
+  },
+  "buffs": [],
+  "cfgId": 0,
+  "clientData": {},
+  "createTime": 0L,
+  "del": false,
+  "direction": 0,
+  "exp": 1L,
+  "fightValue": 2142400L,
+  "finalAttrInfo": {
+    "MAXHP": 10106L,
+    "体力": 101L,
+    "攻击": 101L,
+    "防御": 101L
+  },
+  "gmAttrInfo": {},
+  "gmAttrProInfo": {},
+  "hp": 900L,
+  "job": 1,
+  "lastDirection": 0,
+  "lastMapKey": null,
+  "lastPosition": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "level": 1,
+  "mailPack": {
+    "mailInfoList": []
+  },
+  "mapKey": null,
+  "mapObjectType": "Player",
+  "mp": 100L,
+  "name": "test2",
+  "onlineInfo": {
+    "lastLoginDayTime": 1748918302186,
+    "lastLoginTime": 1748918637446,
+    "lastLogoutTime": 0L,
+    "onlineTotalMills": 1748919456021
+  },
+  "physical": 0,
+  "position": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "sex": 1,
+  "sid": 1,
+  "status": [
+    1
+  ],
+  "taskPack": {
+    "taskFinishList": {},
+    "tasks": {
+      "nodes": {
+        "Main": {
+          1: {
+            "@type": "wxdgaming.game.server.bean.task.TaskInfo",
+            "acceptTime": 1748918302189,
+            "cfgId": 1,
+            "complete": false,
+            "progresses": {},
+            "rewards": false
+          }
+        }
+      }
+    }
+  },
+  "uid": 597624731205633,
+  "useCDKeyMap": {},
+  "vipInfo": {
+    "activatedTime": 0L,
+    "buyRewardIdList": [],
+    "exp": 0L,
+    "lv": 0,
+    "rewardIdList": []
+  }
+}
