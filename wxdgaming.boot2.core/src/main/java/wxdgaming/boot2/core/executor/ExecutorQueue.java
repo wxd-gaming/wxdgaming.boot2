@@ -79,6 +79,7 @@ public class ExecutorQueue extends ExecutorJob {
             if (task != null) {
                 stack = task.getStack();
                 ExecutorMonitor.put(task);
+                ThreadContext.putContent("queue", this);
                 task.run();
             }
         } catch (Throwable throwable) {

@@ -42,6 +42,7 @@ public abstract class ExecutorEvent extends ExecutorJob implements IExecutorQueu
             if (this.getThreadContext() != null) {
                 ThreadContext.context().putAll(this.getThreadContext());
             }
+            ThreadContext.putContent("queueName", queueName());
             onEvent();
         } catch (Throwable throwable) {
             log.error("{}", getStack(), throwable);

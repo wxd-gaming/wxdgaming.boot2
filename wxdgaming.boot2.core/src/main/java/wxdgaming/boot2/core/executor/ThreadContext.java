@@ -1,6 +1,5 @@
 package wxdgaming.boot2.core.executor;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Throw;
@@ -9,6 +8,7 @@ import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,10 +19,11 @@ import java.util.Map;
  **/
 @Slf4j
 @Getter
-public class ThreadContext extends JSONObject {
+public class ThreadContext extends HashMap<String, Object> {
 
     private static final ThreadLocal<ThreadContext> local = new ThreadLocal<>();
 
+    @SuppressWarnings("unchecked")
     public static <R> R context(ThreadParam threadParam, Type type) {
         String name = threadParam.path();
         if (StringUtils.isBlank(name)) {
@@ -31,11 +32,7 @@ public class ThreadContext extends JSONObject {
         R r;
         try {
             ThreadContext context = ThreadContext.context();
-            if (threadParam.nestedPath()) {
-                r = FastJsonUtil.getNestedValue(context, name, type);
-            } else {
-                r = context.getObject(name, type);
-            }
+            r = (R) context.get(name);
             if (r == null && StringUtils.isNotBlank(threadParam.defaultValue())) {
                 r = FastJsonUtil.parse(threadParam.defaultValue(), type);
             }
@@ -49,12 +46,14 @@ public class ThreadContext extends JSONObject {
     }
 
     /** 获取参数 */
+    @SuppressWarnings("unchecked")
     public static <T> T context(final Class<T> clazz) {
         return (T) context().get(clazz.getName());
     }
 
     /** 获取参数 */
-    public static <T> T context(final Object name) {
+    @SuppressWarnings("unchecked")
+    public static <T> T context(final String name) {
         return (T) context().get(name);
     }
 
@@ -139,7 +138,39 @@ public class ThreadContext extends JSONObject {
 
     /** 获取当然任务队列名 */
     public String queueName() {
-        return getString("queueName");
+        return (String) get("queueName");
+    }
+
+    public int getIntValue(String key) {
+        Object value = get(key);
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        return 0;
+    }
+
+    public Integer getInteger(String key) {
+        Object value = get(key);
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        return null;
+    }
+
+    public Long getLong(String key) {
+        Object value = get(key);
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        return null;
+    }
+
+    public long getLongValue(String key) {
+        Object value = get(key);
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        return 0;
     }
 
 }

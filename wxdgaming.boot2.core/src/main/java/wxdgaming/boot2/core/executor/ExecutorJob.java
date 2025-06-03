@@ -32,8 +32,8 @@ class ExecutorJob implements Runnable {
         } finally {
             this.threadContext = null;
             ThreadContext.cleanup();
-            runAfter();
             ExecutorMonitor.release();
+            runAfter();
         }
     }
 
