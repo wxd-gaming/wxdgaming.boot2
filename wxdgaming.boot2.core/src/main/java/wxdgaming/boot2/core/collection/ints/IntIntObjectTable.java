@@ -27,7 +27,7 @@ public class IntIntObjectTable<T> extends ObjectBase {
         return row(row).put(col, value);
     }
 
-    public IntIntObjectTable fluentPut(int row, int col, T value) {
+    public IntIntObjectTable<T> fluentPut(int row, int col, T value) {
         row(row).put(col, value);
         return this;
     }

@@ -1,8 +1,8 @@
 package wxdgaming.boot2.core.collection.concurrent;
 
+import com.alibaba.fastjson.annotation.JSONType;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.format.data.Data2Json;
 
 import java.io.Serializable;
@@ -13,19 +13,19 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * 切记，json序列化 请使用type类型
+ * 切记，json序列化 请使用type类型, 如果是枚举类型，会泛型丢失导致异常
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2022-04-19 16:08
  **/
 @Getter
 @Setter
-@Accessors(chain = true)
+@JSONType(seeAlso = {HashMap.class})
 public class ConcurrentTable<K1, K2, V> implements Serializable, Data2Json {
 
     private static final Map EMPTY_MAP = Map.of();
 
-    private final ConcurrentHashMap<K1, ConcurrentHashMap<K2, V>> nodes;
+    private ConcurrentHashMap<K1, ConcurrentHashMap<K2, V>> nodes;
 
     public ConcurrentTable() {
         this(16);

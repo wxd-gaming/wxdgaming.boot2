@@ -22,6 +22,7 @@ public class JacksonUtil {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // 启用缩进输出（默认使用 2 个空格缩进）
         mapperFmt.enable(SerializationFeature.INDENT_OUTPUT);
+        mapperFmt.enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         mapperFmt.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 

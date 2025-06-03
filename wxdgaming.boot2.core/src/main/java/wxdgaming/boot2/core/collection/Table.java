@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.collection;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.annotation.JSONType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,19 +15,19 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * 切记，json序列化 请使用type类型
+ * 切记，json序列化 请使用type类型, 如果是枚举类型，会泛型丢失导致异常
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2022-04-19 16:08
  **/
 @Getter
 @Setter
-@Accessors(chain = true)
+@JSONType(seeAlso = {HashMap.class})
 public class Table<K1, K2, V> implements Serializable, Data2Json {
 
     private static final Map EMPTY_MAP = Map.of();
 
-    private final HashMap<K1, HashMap<K2, V>> nodes;
+    private HashMap<K1, HashMap<K2, V>> nodes;
 
     public Table() {
         this(16);
