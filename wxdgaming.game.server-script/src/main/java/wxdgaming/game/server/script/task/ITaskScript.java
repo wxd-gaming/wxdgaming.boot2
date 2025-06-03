@@ -54,6 +54,7 @@ public abstract class ITaskScript extends HoldRunApplication {
                         .sorted(Comparator.comparingInt(Map.Entry::getKey))
                         .map(Map.Entry::getValue)
                         .forEach(taskBean.getProgresses()::add);
+                resTaskList.getTasks().add(taskBean);
             }
         }
         player.write(resTaskList);
