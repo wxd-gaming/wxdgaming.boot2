@@ -16,7 +16,7 @@ import wxdgaming.game.server.script.task.init.ConditionInitValueHandler;
 public class LevelHandler implements ConditionInitValueHandler {
 
     @Override public Condition condition() {
-        return new Condition("level", ConditionUpdatePolicyConst.Replace, 0);
+        return new Condition("Lv", ConditionUpdatePolicyConst.Replace, 0);
     }
 
     @Override public long initValue(Player player, Condition condition) {

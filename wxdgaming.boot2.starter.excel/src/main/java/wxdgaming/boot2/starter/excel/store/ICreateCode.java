@@ -74,14 +74,18 @@ public abstract class ICreateCode {
 
         {
             File file = new File(tmpPath + "bean/" + tableData.getCodeClassName() + ".java");
-            templatePack.ftl2File("bean.ftl", parse, file.getPath());
-            log.info("生成 bean 文件：{}, {}, {}", tableData.getTableComment(), tableData.getTableName(), FileUtil.getCanonicalPath(file));
+            if (!file.exists()) {
+                templatePack.ftl2File("bean.ftl", parse, file.getPath());
+                log.info("生成 bean 文件：{}, {}, {}", tableData.getTableComment(), tableData.getTableName(), FileUtil.getCanonicalPath(file));
+            }
         }
 
         {
             File file = new File(tmpPath + "/" + tableData.getCodeClassName() + "Table.java");
-            templatePack.ftl2File("table.ftl", parse, file.getPath());
-            log.info("生成 table 文件：{}, {}, {}", tableData.getTableComment(), tableData.getTableName(), FileUtil.getCanonicalPath(file));
+            if (!file.exists()) {
+                templatePack.ftl2File("table.ftl", parse, file.getPath());
+                log.info("生成 table 文件：{}, {}, {}", tableData.getTableComment(), tableData.getTableName(), FileUtil.getCanonicalPath(file));
+            }
         }
     }
 
