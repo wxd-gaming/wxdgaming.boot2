@@ -8,7 +8,7 @@ import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
-import wxdgaming.game.message.inner.ReqForwardMessage;
+import wxdgaming.game.message.inner.InnerForwardMessage;
 import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.module.data.ClientSessionService;
 import wxdgaming.game.server.module.data.DataCenterService;
@@ -24,7 +24,7 @@ import java.util.List;
  **/
 @Slf4j
 @Singleton
-public class ReqForwardMessageHandler extends HoldRunApplication {
+public class InnerForwardMessageHandler extends HoldRunApplication {
 
     private final InnerService innerService;
     private final ClientSessionService clientSessionService;
@@ -32,7 +32,10 @@ public class ReqForwardMessageHandler extends HoldRunApplication {
     private final DataCenterService dataCenterService;
 
     @Inject
-    public ReqForwardMessageHandler(InnerService innerService, ClientSessionService clientSessionService, ProtoListenerFactory protoListenerFactory, DataCenterService dataCenterService) {
+    public InnerForwardMessageHandler(InnerService innerService,
+                                      ClientSessionService clientSessionService,
+                                      ProtoListenerFactory protoListenerFactory,
+                                      DataCenterService dataCenterService) {
         this.innerService = innerService;
         this.clientSessionService = clientSessionService;
         this.protoListenerFactory = protoListenerFactory;
@@ -41,7 +44,7 @@ public class ReqForwardMessageHandler extends HoldRunApplication {
 
     /** 请求转发消息 */
     @ProtoRequest
-    public void reqForwardMessage(SocketSession socketSession, ReqForwardMessage req) {
+    public void innerForwardMessage(SocketSession socketSession, InnerForwardMessage req) {
         List<Long> sessionIds = req.getSessionIds();
         int messageId = req.getMessageId();
         byte[] messages = req.getMessages();

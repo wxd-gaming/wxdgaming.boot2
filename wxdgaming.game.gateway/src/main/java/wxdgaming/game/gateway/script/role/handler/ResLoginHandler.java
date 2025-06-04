@@ -9,7 +9,8 @@ import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.game.gateway.bean.UserMapping;
 import wxdgaming.game.gateway.module.data.DataCenterService;
-import wxdgaming.game.message.inner.ReqForwardMessage;
+import wxdgaming.game.message.inner.InnerForwardMessage;
+import wxdgaming.game.message.inner.InnerUserOffline;
 import wxdgaming.game.message.role.ResLogin;
 
 import java.util.List;
@@ -38,18 +39,33 @@ public class ResLoginHandler {
     /** 登录响应 */
     @ProtoRequest
     public void resLogin(SocketSession socketSession, ResLogin req) {
-        ReqForwardMessage forwardMessage = ThreadContext.context("forwardMessage");
+        InnerForwardMessage forwardMessage = ThreadContext.context("forwardMessage");
         List<Long> sessionIds = forwardMessage.getSessionIds();
-        Long sessionId = sessionIds.getFirst();
+        final Long sessionId = sessionIds.getFirst();
+        final String account = req.getAccount();
         SocketSession clientSession = dataCenterService.getClientSession(sessionId);
-        String account = req.getAccount();
         clientSession.bindData("account", account);
         clientSession.write(req);
-        UserMapping userMapping = dataCenterService.getUserMappings().computeIfAbsent(account, k -> new UserMapping());
-        if (userMapping.getSocketSession() != null && !Objects.equals(userMapping.getSocketSession(), clientSession)) {
-            userMapping.getSocketSession().close("被顶号登录");
+
+        UserMapping userMapping = dataCenterService.getUserMapping(account);
+        userMapping.setChooseServerSession(socketSession);
+
+        if (userMapping.getClientSocketSession() != null && !Objects.equals(userMapping.getClientSocketSession(), clientSession)) {
+            userMapping.getClientSocketSession().close("被顶号登录");
         }
-        userMapping.setSocketSession(clientSession);
+        if (userMapping.getClientSocketSession() == null || !Objects.equals(userMapping.getClientSocketSession(), clientSession)) {
+            clientSession.getChannel().closeFuture().addListener(future -> {
+                if (!Objects.equals(userMapping.getClientSocketSession(), clientSession)) {
+                    return;
+                }
+                InnerUserOffline userOffline = new InnerUserOffline();
+                userOffline.setAccount(account);
+                userOffline.setClientSessionId(sessionId);
+                userMapping.getChooseServerSession().write(userOffline);
+                log.info("玩家离线：{}, {}", account, sessionId);
+            });
+        }
+        userMapping.setClientSocketSession(clientSession);
     }
 
 }

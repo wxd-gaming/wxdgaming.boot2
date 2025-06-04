@@ -12,6 +12,7 @@ import io.netty.util.AttributeKey;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.pojo.IWebSocketStringListener;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
@@ -142,6 +143,12 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
             // 读取消息长度
             byteBuf.markReaderIndex();
             int len = byteBuf.readInt();
+            if (len > BytesUnit.Mb.toBytes(64)) {
+                log.error("消息包超大，关闭连接 {} {}", ctx, len);
+                ctx.disconnect();
+                ctx.close();
+                return;
+            }
             if (len > 0 && byteBuf.readableBytes() >= len) {
                 /*读取消息ID*/
                 int messageId = byteBuf.readInt();

@@ -4,8 +4,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.starter.net.SocketSession;
-import wxdgaming.boot2.starter.net.ann.ProtoRequest;
-import wxdgaming.game.message.inner.ReqForwardMessage;
+import wxdgaming.game.message.inner.InnerForwardMessage;
 import wxdgaming.game.message.role.ResCreateRole;
 
 /**
@@ -19,7 +18,7 @@ import wxdgaming.game.message.role.ResCreateRole;
 public class ResCreateRoleHandler {
 
     /** 创建角色响应 */
-    public void resCreateRole(SocketSession socketSession, ResCreateRole req, @ThreadParam(path = "forwardMessage") ReqForwardMessage forwardMessage) {
+    public void resCreateRole(SocketSession socketSession, ResCreateRole req, @ThreadParam(path = "forwardMessage") InnerForwardMessage forwardMessage) {
         
     }
 

@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
-import wxdgaming.game.message.inner.ReqForwardMessage;
+import wxdgaming.game.message.inner.InnerForwardMessage;
 import wxdgaming.game.message.role.ResHeartbeat;
 
 /**
@@ -19,7 +19,7 @@ import wxdgaming.game.message.role.ResHeartbeat;
 public class ResHeartbeatHandler {
 
     /** 心跳包响应 */
-    public void resHeartbeat(SocketSession socketSession, ResHeartbeat req, @ThreadParam(path = "forwardMessage") ReqForwardMessage forwardMessage) {
+    public void resHeartbeat(SocketSession socketSession, ResHeartbeat req, @ThreadParam(path = "forwardMessage") InnerForwardMessage forwardMessage) {
 
     }
 

@@ -13,7 +13,7 @@ import wxdgaming.boot2.starter.net.client.SocketClientConfig;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
-import wxdgaming.game.message.inner.ReqRegisterServer;
+import wxdgaming.game.message.inner.InnerRegisterServer;
 import wxdgaming.game.message.inner.ServiceType;
 
 /**
@@ -46,7 +46,7 @@ public class GameClientService extends HoldRunApplication {
     @Scheduled("*/10")
     public void checkGatewaySession() {
 
-        ReqRegisterServer registerServer = new ReqRegisterServer();
+        InnerRegisterServer registerServer = new InnerRegisterServer();
         registerServer.setServiceType(ServiceType.GATEWAY);
         log.info("{}", registerServer);
 
@@ -54,7 +54,7 @@ public class GameClientService extends HoldRunApplication {
     }
 
     /** 网关主动连游戏服 */
-    public void checkGatewaySession(final String inetHost, final int inetPort, ReqRegisterServer registerServer) {
+    public void checkGatewaySession(final String inetHost, final int inetPort, InnerRegisterServer registerServer) {
         Gateway2GameSocketClientImpl gatewaySocketClient = getSessions().computeIfAbsent(inetHost, inetPort, l -> {
             SocketClientConfig socketClientConfig = BootConfig.getIns().getNestedValue("socket.client-forward", SocketClientConfig.class);
             socketClientConfig = (SocketClientConfig) socketClientConfig.clone();

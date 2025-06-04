@@ -22,6 +22,7 @@ public class UserMapping extends ObjectBase {
     private String userId;
     private String token;
     private long chooseRoleId;
-    private SocketSession socketSession;
+    private SocketSession chooseServerSession;
+    private SocketSession clientSocketSession;
 
 }

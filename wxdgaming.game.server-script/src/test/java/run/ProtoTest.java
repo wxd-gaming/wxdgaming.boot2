@@ -37,4 +37,20 @@ public class ProtoTest {
         );
     }
 
+    @Test
+    @Order(2)
+    public void buildGameInnerProtoHandler() {
+        ProtoBuf2Pojo.createMapping(
+                "src/main/java",
+                "wxdgaming.game.server.script",
+                "Inner",
+                "wxdgaming.game.message",
+                null,
+                () -> """
+                        @ThreadParam(path = "clientSessionMapping") ClientSessionMapping clientSessionMapping""",
+                () -> """
+                        """
+        );
+    }
+
 }

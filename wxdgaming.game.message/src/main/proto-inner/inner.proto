@@ -15,7 +15,7 @@ enum ServiceType {
 }
 
 //请求转发消息
-message ReqForwardMessage {
+message InnerForwardMessage {
   repeated int64 sessionIds             = 1;//转发的sessionId列表 我需要把消息转发给哪些sessionId
   repeated int32 gameIds                = 2;//转发的gameId列表 我需要把消息转发给哪些gameId
   repeated int32 serverIds              = 3;//转发的serverId列表 我需要把消息转发给哪些serverId
@@ -25,15 +25,17 @@ message ReqForwardMessage {
   map<string, string> kvBeansMap        = 8;//kv关系绑定
 }
 
-//请求转发消息
-message ResForwardMessage {
-
-}
-
-message ReqRegisterServer {
+//注册服务
+message InnerRegisterServer {
   int32 gameId                          = 1;//游戏id
   int32 mainSid                         = 2;//主服务器id
   repeated int32 serverIds              = 3;//服务器id,因为合服可能会导致多个服务器id
   repeated int32 messageIds             = 4;//监听的消息id列表
   ServiceType serviceType               = 5;//服务类型
+}
+
+//玩家离线
+message InnerUserOffline {
+  int64 clientSessionId                 = 1;//客户端sessionId
+  string account                        = 2;//账号
 }

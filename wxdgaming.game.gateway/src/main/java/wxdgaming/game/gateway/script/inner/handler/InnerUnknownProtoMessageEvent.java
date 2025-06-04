@@ -18,14 +18,14 @@ import wxdgaming.game.message.inner.ServiceType;
  **/
 @Slf4j
 @Singleton
-public class ReqProtoUnknownMessageEvent implements ProtoUnknownMessageEvent {
+public class InnerUnknownProtoMessageEvent implements ProtoUnknownMessageEvent {
 
     private final DataCenterService dataCenterService;
     private final ProtoListenerFactory listenerFactory;
 
 
     @Inject
-    public ReqProtoUnknownMessageEvent(DataCenterService dataCenterService, ProtoListenerFactory listenerFactory) {
+    public InnerUnknownProtoMessageEvent(DataCenterService dataCenterService, ProtoListenerFactory listenerFactory) {
         this.dataCenterService = dataCenterService;
         this.listenerFactory = listenerFactory;
     }

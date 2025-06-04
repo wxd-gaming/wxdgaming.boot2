@@ -7,7 +7,7 @@ import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
-import wxdgaming.game.message.inner.ReqForwardMessage;
+import wxdgaming.game.message.inner.InnerForwardMessage;
 import wxdgaming.game.message.inner.ServiceType;
 import wxdgaming.game.server.module.data.DataCenterService;
 
@@ -34,18 +34,18 @@ public class InnerService extends HoldRunApplication {
         this.dataCenterService = dataCenterService;
     }
 
-    ReqForwardMessage buildForwardMessage(PojoBase message) {
+    InnerForwardMessage buildForwardMessage(PojoBase message) {
         int messageId = message.msgId();
         byte[] messageBytes = message.encode();
-        ReqForwardMessage req = new ReqForwardMessage();
+        InnerForwardMessage req = new InnerForwardMessage();
         req.setMessageId(messageId);
         req.setMessages(messageBytes);
         return req;
     }
 
 
-    public void forwardMessage(SocketSession socketSession, long clientSessionId, PojoBase message, Consumer<ReqForwardMessage> callback) {
-        ReqForwardMessage req = buildForwardMessage(message);
+    public void forwardMessage(SocketSession socketSession, long clientSessionId, PojoBase message, Consumer<InnerForwardMessage> callback) {
+        InnerForwardMessage req = buildForwardMessage(message);
         req.getSessionIds().add(clientSessionId);
         if (callback != null) {
             callback.accept(req);
@@ -57,7 +57,7 @@ public class InnerService extends HoldRunApplication {
     }
 
     public void forwardMessage(ServiceType serviceType, Collection<Long> playerIds, PojoBase message) {
-        ReqForwardMessage req = buildForwardMessage(message);
+        InnerForwardMessage req = buildForwardMessage(message);
         req.getRids().addAll(playerIds);
         Map<Long, SocketSession> longSocketSessionMap = dataCenterService.getServiceSocketSessionMapping().get(serviceType);
         if (longSocketSessionMap == null) {

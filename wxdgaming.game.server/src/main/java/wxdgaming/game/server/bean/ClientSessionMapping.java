@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
-import wxdgaming.game.message.inner.ReqForwardMessage;
+import wxdgaming.game.message.inner.InnerForwardMessage;
 import wxdgaming.game.server.bean.role.Player;
 
 import java.util.function.Consumer;
@@ -36,8 +36,8 @@ public class ClientSessionMapping extends ObjectBase {
         forwardMessage(message, null);
     }
 
-    public void forwardMessage(PojoBase message, Consumer<ReqForwardMessage> callback) {
-        ReqForwardMessage msg = new ReqForwardMessage();
+    public void forwardMessage(PojoBase message, Consumer<InnerForwardMessage> callback) {
+        InnerForwardMessage msg = new InnerForwardMessage();
         msg.getSessionIds().add(clientSessionId);
         msg.setMessageId(message.msgId());
         msg.setMessages(message.encode());

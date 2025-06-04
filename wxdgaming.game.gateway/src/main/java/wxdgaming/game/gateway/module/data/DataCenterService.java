@@ -10,7 +10,7 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.server.SocketServerImpl;
 import wxdgaming.game.gateway.bean.ServerMapping;
 import wxdgaming.game.gateway.bean.UserMapping;
-import wxdgaming.game.message.inner.ReqRegisterServer;
+import wxdgaming.game.message.inner.InnerRegisterServer;
 import wxdgaming.game.message.inner.ServiceType;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public class DataCenterService extends HoldRunApplication {
         this.socketServer = socketServer;
     }
 
-    public void registerServerMapping(SocketSession socketSession, ReqRegisterServer reqRegisterServer) {
+    public void registerServerMapping(SocketSession socketSession, InnerRegisterServer reqRegisterServer) {
         ServiceType serviceType = reqRegisterServer.getServiceType();
 
         Map<Integer, ServerMapping> serverMappingMap = serviceMappings.row(serviceType);

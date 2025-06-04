@@ -13,16 +13,16 @@ import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 
 
-/** null */
+/** 玩家离线 */
 @Getter
 @Setter
 @Accessors(chain = true)
-@Comment("null")
-public class ReqRegisterServer extends PojoBase {
+@Comment("玩家离线")
+public class InnerUserOffline extends PojoBase {
 
     /** 消息ID */
     public static int _msgId() {
-        return 54664956;
+        return 53197558;
     }
 
     /** 消息ID */
@@ -31,16 +31,10 @@ public class ReqRegisterServer extends PojoBase {
     }
 
 
-    /** 游戏id */
-    @Tag(1) private int gameId;
-    /** 主服务器id */
-    @Tag(2) private int mainSid;
-    /** 服务器id,因为合服可能会导致多个服务器id */
-    @Tag(3) private List<Integer> serverIds = new ArrayList<>();
-    /** 监听的消息id列表 */
-    @Tag(4) private List<Integer> messageIds = new ArrayList<>();
-    /** 服务类型 */
-    @Tag(5) private ServiceType serviceType;
+    /** 客户端sessionId */
+    @Tag(1) private long clientSessionId;
+    /** 账号 */
+    @Tag(2) private String account;
 
 
 }

@@ -18,11 +18,11 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 @Setter
 @Accessors(chain = true)
 @Comment("请求转发消息")
-public class ReqForwardMessage extends PojoBase {
+public class InnerForwardMessage extends PojoBase {
 
     /** 消息ID */
     public static int _msgId() {
-        return 54323214;
+        return 56706558;
     }
 
     /** 消息ID */

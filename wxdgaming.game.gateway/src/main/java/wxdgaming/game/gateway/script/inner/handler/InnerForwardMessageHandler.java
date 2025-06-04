@@ -12,7 +12,7 @@ import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.pojo.ProtoMapping;
 import wxdgaming.game.gateway.module.data.DataCenterService;
-import wxdgaming.game.message.inner.ReqForwardMessage;
+import wxdgaming.game.message.inner.InnerForwardMessage;
 
 import java.util.List;
 
@@ -24,20 +24,20 @@ import java.util.List;
  **/
 @Slf4j
 @Singleton
-public class ReqForwardMessageHandler {
+public class InnerForwardMessageHandler {
 
     private final DataCenterService dataCenterService;
     private final ProtoListenerFactory protoListenerFactory;
 
     @Inject
-    public ReqForwardMessageHandler(DataCenterService dataCenterService, ProtoListenerFactory protoListenerFactory) {
+    public InnerForwardMessageHandler(DataCenterService dataCenterService, ProtoListenerFactory protoListenerFactory) {
         this.dataCenterService = dataCenterService;
         this.protoListenerFactory = protoListenerFactory;
     }
 
     /** 请求转发消息 */
     @ProtoRequest
-    public void reqForwardMessage(SocketSession socketSession, ReqForwardMessage req) {
+    public void reqForwardMessage(SocketSession socketSession, InnerForwardMessage req) {
         int messageId = req.getMessageId();
         byte[] messages = req.getMessages();
         ProtoMapping protoMapping = protoListenerFactory.getProtoListenerContent().getMappingMap().get(messageId);

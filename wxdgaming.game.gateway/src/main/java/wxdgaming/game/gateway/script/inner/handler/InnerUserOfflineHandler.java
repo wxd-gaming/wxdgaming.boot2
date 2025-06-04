@@ -1,24 +1,24 @@
-package wxdgaming.game.robot.script.inner.handler;
+package wxdgaming.game.gateway.script.inner.handler;
 
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
-import wxdgaming.game.message.inner.ResForwardMessage;
+import wxdgaming.game.message.inner.InnerUserOffline;
 
 /**
- * 请求转发消息
+ * 玩家离线
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: v1.1
  **/
 @Slf4j
 @Singleton
-public class ResForwardMessageHandler {
+public class InnerUserOfflineHandler {
 
-    /** 请求转发消息 */
+    /** 玩家离线 */
     @ProtoRequest
-    public void resForwardMessage(SocketSession socketSession, ResForwardMessage req) {
+    public void innerUserOffline(SocketSession socketSession, InnerUserOffline req) {
         
     }
 

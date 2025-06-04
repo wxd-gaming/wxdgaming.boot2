@@ -32,7 +32,7 @@ socket:
     enabledTcp: true                                         #是否启用tcp
     enabledScheduledFlush: true                             # 开启定时器flush
     scheduledFlushMs: 10                                    #定时调用flush的频率单位是ms
-    enabledWebSocket: true                                  #是否启用websocket
+    enabledWebSocket: false                                  #是否启用websocket
     webSocketPrefix: "/ws"                                   #websocket前缀
     maxAggregatorLength: 64                                  #聚合器最大长度
     maxFrameBytes: -1                                        #单个消息最大长度

@@ -52,6 +52,9 @@ public class PlayerHeartDrive extends HoldRunApplication {
         int driveId = (int) (player.getUid() % playerDriveContentMap.size());
         PlayerDriveContent playerDriveContent = playerDriveContentMap.get(driveId);
         playerDriveContent.playerMap.put(player.getUid(), player);
+        if (log.isDebugEnabled()) {
+            log.debug("PlayerHeartDrive add player {}", player);
+        }
     }
 
     @OnLogout
@@ -59,6 +62,9 @@ public class PlayerHeartDrive extends HoldRunApplication {
         int driveId = (int) (player.getUid() % playerDriveContentMap.size());
         PlayerDriveContent playerDriveContent = playerDriveContentMap.get(driveId);
         playerDriveContent.playerMap.remove(player.getUid());
+        if (log.isDebugEnabled()) {
+            log.debug("PlayerHeartDrive add remove {}", player);
+        }
     }
 
     public class PlayerDriveContent extends ExecutorEvent {
