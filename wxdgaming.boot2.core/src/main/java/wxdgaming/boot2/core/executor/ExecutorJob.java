@@ -24,7 +24,7 @@ class ExecutorJob implements Runnable {
         try {
             ExecutorMonitor.put(this);
             if (this.getThreadContext() != null) {
-                ThreadContext.context().putAll(this.getThreadContext());
+                ThreadContext.context().putAllIfAbsent(this.getThreadContext());
             }
             runnable.run();
         } catch (Throwable throwable) {

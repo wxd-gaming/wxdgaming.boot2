@@ -3,6 +3,7 @@ package wxdgaming.game.server.script.role.event;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.bean.StatusConst;
 import wxdgaming.game.server.bean.role.Player;
@@ -29,7 +30,7 @@ public class PlayerLogoutHandler {
     /** 创建角色之后赠送初始化道具 */
     @OnLogout
     public void onLogout(Player player) {
-        log.info("玩家下线: {}", player);
+        log.info("玩家下线: {} {}", ThreadContext.context().queueName(), player);
         player.getStatus().addFlags(StatusConst.Offline);
         ClientSessionMapping clientSessionMapping = player.getClientSessionMapping();
         clientSessionMapping.setRid(0);

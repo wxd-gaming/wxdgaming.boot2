@@ -43,12 +43,14 @@ public class ExecutorServicePlatform extends ExecutorService {
             if (!(command instanceof ExecutorJobScheduled.ScheduledExecutorJob) && executorJob.threadContext == null) {
                 /*TODO 任务添加线程上下文*/
                 executorJob.threadContext = new ThreadContext(ThreadContext.context());
+                executorJob.threadContext.remove("queue");
+                executorJob.threadContext.remove("queueName");
             }
 
             if (executorJob instanceof IExecutorQueue iExecutorQueue) {
                 if (Utils.isNotBlank(iExecutorQueue.queueName())) {
                     queueMap
-                            .computeIfAbsent(iExecutorQueue.queueName(), k -> new ExecutorQueue(this, this.queueSize, this.queuePolicy))
+                            .computeIfAbsent(iExecutorQueue.queueName(), k -> new ExecutorQueue(k, this, this.queueSize, this.queuePolicy))
                             .execute(executorJob);
                     return;
                 }

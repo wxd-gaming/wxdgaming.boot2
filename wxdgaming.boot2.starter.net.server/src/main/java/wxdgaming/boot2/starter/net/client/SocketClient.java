@@ -176,6 +176,21 @@ public abstract class SocketClient {
         }
     }
 
+    public void checkSync(Consumer<SocketSession> consumer) {
+        if (sessionGroup.size() >= config.getMaxConnectionCount()) {
+            if (log.isDebugEnabled()) {
+                log.debug("{} 连接数已经达到最大连接数：{}", this.getClass().getSimpleName(), config.getMaxConnectionCount());
+            }
+            return;
+        }
+        for (int i = sessionGroup.size(); i < config.getMaxConnectionCount(); i++) {
+            ChannelFuture future = connect(consumer);
+            try {
+                future.sync();
+            } catch (Exception ignored) {}
+        }
+    }
+
     public final ChannelFuture connect() {
         return connect(null);
     }

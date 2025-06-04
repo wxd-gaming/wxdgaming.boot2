@@ -12,6 +12,7 @@ import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnLogout;
 import wxdgaming.game.server.module.data.ClientSessionService;
 import wxdgaming.game.server.module.data.DataCenterService;
+import wxdgaming.game.server.module.drive.PlayerDriveService;
 
 /**
  * 玩家离线
@@ -24,11 +25,13 @@ import wxdgaming.game.server.module.data.DataCenterService;
 public class InnerUserOfflineHandler extends HoldRunApplication {
 
     private final DataCenterService dataCenterService;
+    private final PlayerDriveService playerDriveService;
     private final ClientSessionService clientSessionService;
 
     @Inject
-    public InnerUserOfflineHandler(DataCenterService dataCenterService, ClientSessionService clientSessionService) {
+    public InnerUserOfflineHandler(DataCenterService dataCenterService, PlayerDriveService playerDriveService, ClientSessionService clientSessionService) {
         this.dataCenterService = dataCenterService;
+        this.playerDriveService = playerDriveService;
         this.clientSessionService = clientSessionService;
     }
 
@@ -38,18 +41,25 @@ public class InnerUserOfflineHandler extends HoldRunApplication {
         long clientSessionId = req.getClientSessionId();
         String account = req.getAccount();
         log.info("网关转发玩家离线 {}", req);
-        ClientSessionMapping remove = clientSessionService.getAccountMappingMap().get(account);
-        if (remove != null) {
-            Player player = remove.getPlayer();
+        ClientSessionMapping clientSessionMapping = clientSessionService.getAccountMappingMap().get(account);
+        if (clientSessionMapping != null) {
+            Player player = clientSessionMapping.getPlayer();
+            Runnable afterRunnable = () -> {
+                clientSessionMapping.setSession(null);
+                clientSessionMapping.setRid(0);
+                clientSessionMapping.setSid(0);
+                clientSessionMapping.setPlayer(null);
+                clientSessionMapping.setClientSessionId(0);
+            };
             if (player != null) {
-                runApplication.executeMethodWithAnnotatedException(OnLogout.class, player);
-                player.setClientSessionMapping(null);
+                playerDriveService.executor(player, () -> {
+                    runApplication.executeMethodWithAnnotatedException(OnLogout.class, player);
+                    player.setClientSessionMapping(null);
+                    afterRunnable.run();
+                });
+            } else {
+                afterRunnable.run();
             }
-            remove.setSession(null);
-            remove.setRid(0);
-            remove.setSid(0);
-            remove.setPlayer(null);
-            remove.setClientSessionId(0);
         }
     }
 

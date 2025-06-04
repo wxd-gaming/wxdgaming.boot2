@@ -27,14 +27,15 @@ import java.util.concurrent.TimeUnit;
  **/
 @Slf4j
 @Singleton
-public class PlayerHeartDrive extends HoldRunApplication {
+public class PlayerDriveService extends HoldRunApplication {
 
     private final ConcurrentHashMap<Integer, PlayerDriveContent> playerDriveContentMap = new ConcurrentHashMap<>();
+    private int logicCoreSize = 0;
 
     @Start
     public void start() {
-        int maxSize = BootConfig.getIns().logicConfig().getCoreSize();
-        for (int i = 0; i < maxSize; i++) {
+        logicCoreSize = BootConfig.getIns().logicConfig().getCoreSize();
+        for (int i = 0; i < logicCoreSize; i++) {
             PlayerDriveContent driveContent = new PlayerDriveContent("player-drive-" + i);
             playerDriveContentMap.put(i, driveContent);
             driveContent.timerJob = ExecutorFactory.getExecutorServiceLogic().scheduleAtFixedRate(driveContent, 33, 33, TimeUnit.MILLISECONDS);
@@ -47,9 +48,36 @@ public class PlayerHeartDrive extends HoldRunApplication {
         playerDriveContentMap.values().forEach(v -> v.timerJob.cancel(true));
     }
 
+    public int getPlayerDriveId(long uid) {
+        return (int) (uid % logicCoreSize);
+    }
+
+    public String getPlayerDriveName(long uid) {
+        return getPlayerDriveName(getPlayerDriveId(uid));
+    }
+
+    public String getPlayerDriveName(int driveId) {
+        return "player-drive-" + driveId;
+    }
+
+    /** 提交到玩家队列处理任务 */
+    public void executor(Player player, Runnable runnable) {
+        String playerDriveName = getPlayerDriveName(player.getUid());
+
+        ExecutorEvent executorEvent = new ExecutorEvent() {
+
+            @Override public void onEvent() throws Exception {
+                runnable.run();
+            }
+
+        };
+        executorEvent.setQueueName(playerDriveName);
+        ExecutorFactory.getExecutorServiceLogic().execute(executorEvent);
+    }
+
     @OnLogin
     public void addPlayer(Player player) {
-        int driveId = (int) (player.getUid() % playerDriveContentMap.size());
+        int driveId = getPlayerDriveId(player.getUid());
         PlayerDriveContent playerDriveContent = playerDriveContentMap.get(driveId);
         playerDriveContent.playerMap.put(player.getUid(), player);
         if (log.isDebugEnabled()) {
@@ -59,7 +87,7 @@ public class PlayerHeartDrive extends HoldRunApplication {
 
     @OnLogout
     public void removePlayer(Player player) {
-        int driveId = (int) (player.getUid() % playerDriveContentMap.size());
+        int driveId = getPlayerDriveId(player.getUid());
         PlayerDriveContent playerDriveContent = playerDriveContentMap.get(driveId);
         playerDriveContent.playerMap.remove(player.getUid());
         if (log.isDebugEnabled()) {

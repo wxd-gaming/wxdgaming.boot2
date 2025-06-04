@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.executor;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -14,16 +15,19 @@ import java.util.concurrent.locks.ReentrantLock;
  * @version: 2025-05-15 10:09
  **/
 @Slf4j
+@Getter
 public class ExecutorQueue extends ExecutorJob {
 
+    private final String queueName;
     private final Executor executor;
     private final ReentrantLock reentrantLock = new ReentrantLock();
     private final AtomicBoolean running = new AtomicBoolean(false);
     private final ArrayBlockingQueue<ExecutorJob> queue;
     private final QueuePolicy queuePolicy;
 
-    public ExecutorQueue(Executor executor, int queueSize, QueuePolicy queuePolicy) {
+    public ExecutorQueue(String queueName, Executor executor, int queueSize, QueuePolicy queuePolicy) {
         super(null);
+        this.queueName = queueName;
         this.executor = executor;
         this.queue = new ArrayBlockingQueue<>(queueSize);
         this.queuePolicy = queuePolicy;
@@ -80,6 +84,7 @@ public class ExecutorQueue extends ExecutorJob {
                 stack = task.getStack();
                 ExecutorMonitor.put(task);
                 ThreadContext.putContent("queue", this);
+                ThreadContext.putContent("queueName", getQueueName());
                 task.run();
             }
         } catch (Throwable throwable) {

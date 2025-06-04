@@ -32,7 +32,7 @@ class ExecutorJobFuture<T> extends ExecutorJob implements Runnable, IExecutorQue
         try {
             ExecutorMonitor.put(this);
             if (this.getThreadContext() != null) {
-                ThreadContext.context().putAll(this.getThreadContext());
+                ThreadContext.context().putAllIfAbsent(this.getThreadContext());
             }
             future.complete(this.supplier.get());
         } catch (Throwable throwable) {

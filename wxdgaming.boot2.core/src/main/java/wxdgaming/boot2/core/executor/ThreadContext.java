@@ -131,6 +131,16 @@ public class ThreadContext extends HashMap<String, Object> {
         putAll(m);
     }
 
+    public void putAllIfAbsent(Map<? extends String, ?> m) {
+        for (Entry<? extends String, ?> entry : m.entrySet()) {
+            putIfAbsent(entry.getKey(), entry.getValue());
+        }
+    }
+
+    @Override public void putAll(Map<? extends String, ?> m) {
+        super.putAll(m);
+    }
+
     /** 获取当前任务所在队列 */
     public ExecutorQueue queue() {
         return (ExecutorQueue) get("queue");

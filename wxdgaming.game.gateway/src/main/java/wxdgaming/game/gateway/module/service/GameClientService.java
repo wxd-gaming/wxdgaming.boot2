@@ -43,13 +43,12 @@ public class GameClientService extends HoldRunApplication {
         checkGatewaySession();
     }
 
-    @Scheduled("*/10")
+    @Scheduled(value = "*/5", async = true)
     public void checkGatewaySession() {
 
         InnerRegisterServer registerServer = new InnerRegisterServer();
         registerServer.setServiceType(ServiceType.GATEWAY);
         registerServer.setMainSid(BootConfig.getIns().sid());
-        log.info("{}", registerServer);
 
         checkGatewaySession("127.0.0.1", 8000, registerServer);
     }
@@ -68,11 +67,12 @@ public class GameClientService extends HoldRunApplication {
             return socketClient;
         });
 
-        gatewaySocketClient.check(null);
+        gatewaySocketClient.checkSync(null);
 
         SocketSession socketSession = gatewaySocketClient.idle();
         if (socketSession != null) {
             if (socketSession.isOpen()) {
+                log.info("{}", registerServer);
                 socketSession.write(registerServer);
             }
         }

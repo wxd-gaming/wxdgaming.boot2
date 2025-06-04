@@ -15,6 +15,7 @@ import wxdgaming.game.server.event.OnLogin;
 import wxdgaming.game.server.event.OnLoginBefore;
 import wxdgaming.game.server.event.OnLogout;
 import wxdgaming.game.server.module.data.DataCenterService;
+import wxdgaming.game.server.module.drive.PlayerDriveService;
 
 import java.util.HashSet;
 
@@ -29,10 +30,12 @@ import java.util.HashSet;
 public class ReqChooseRoleHandler extends HoldRunApplication {
 
     private final DataCenterService dataCenterService;
+    final PlayerDriveService playerDriveService;
 
     @Inject
-    public ReqChooseRoleHandler(DataCenterService dataCenterService) {
+    public ReqChooseRoleHandler(DataCenterService dataCenterService, PlayerDriveService playerDriveService) {
         this.dataCenterService = dataCenterService;
+        this.playerDriveService = playerDriveService;
     }
 
     /** 选择角色 */
@@ -50,29 +53,29 @@ public class ReqChooseRoleHandler extends HoldRunApplication {
         }
 
         Player player = dataCenterService.player(rid);
+        playerDriveService.executor(player, () -> {
+            if (clientSessionMapping.getRid() > 0 && clientSessionMapping.getRid() != player.getUid()) {
+                /*角色切换*/
+                log.info("sid={}, account={} 角色切换 rid={} -> {}", sid, account, clientSessionMapping.getRid(), player.getUid());
+                runApplication.executeMethodWithAnnotatedException(OnLogout.class, clientSessionMapping.getPlayer());
+            }
 
-        if (clientSessionMapping.getRid() > 0 && clientSessionMapping.getRid() != player.getUid()) {
-            /*角色切换*/
-            log.info("sid={}, account={} 角色切换 rid={} -> {}", sid, account, clientSessionMapping.getRid(), player.getUid());
-            runApplication.executeMethodWithAnnotatedException(OnLogout.class, clientSessionMapping.getPlayer());
-        }
+            player.setClientSessionMapping(clientSessionMapping);
+            clientSessionMapping.setRid(player.getUid());
+            clientSessionMapping.setPlayer(player);
 
-        player.setClientSessionMapping(clientSessionMapping);
-        clientSessionMapping.setRid(player.getUid());
-        clientSessionMapping.setPlayer(player);
+            dataCenterService.getOnlinePlayerGroup().put(player.getUid(), clientSessionMapping.getClientSessionId());
 
-        dataCenterService.getOnlinePlayerGroup().put(player.getUid(), clientSessionMapping.getClientSessionId());
-
-        /*绑定*/
-        log.info("sid={}, {} 触发登录之前校验事件", sid, player);
-        runApplication.executeMethodWithAnnotatedException(OnLoginBefore.class, player);
-        ResChooseRole resChooseRole = new ResChooseRole();
-        resChooseRole.setRid(rid);
-        clientSessionMapping.forwardMessage(resChooseRole);
-        log.info("sid={}, {} 触发登录事件", sid, player);
-        runApplication.executeMethodWithAnnotatedException(OnLogin.class, player, 1, 1);
-        log.info("sid={}, {} 选择角色成功", sid, player);
-
+            /*绑定*/
+            log.info("sid={}, {} 触发登录之前校验事件", sid, player);
+            runApplication.executeMethodWithAnnotatedException(OnLoginBefore.class, player);
+            ResChooseRole resChooseRole = new ResChooseRole();
+            resChooseRole.setRid(rid);
+            clientSessionMapping.forwardMessage(resChooseRole);
+            log.info("sid={}, {} 触发登录事件", sid, player);
+            runApplication.executeMethodWithAnnotatedException(OnLogin.class, player, 1, 1);
+            log.info("sid={}, {} 选择角色成功", sid, player);
+        });
     }
 
 }

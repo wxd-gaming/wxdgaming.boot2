@@ -40,9 +40,8 @@ public abstract class ExecutorEvent extends ExecutorJob implements IExecutorQueu
         try {
             ExecutorMonitor.put(this);
             if (this.getThreadContext() != null) {
-                ThreadContext.context().putAll(this.getThreadContext());
+                ThreadContext.context().putAllIfAbsent(this.getThreadContext());
             }
-            ThreadContext.putContent("queueName", queueName());
             onEvent();
         } catch (Throwable throwable) {
             log.error("{}", getStack(), throwable);
