@@ -51,3 +51,8 @@ socket:
     readTimeout: 0
     recvByteBufM: 12                                           #接收缓冲区大小 单位MB
     writeByteBufM: 12                                          #发送缓冲区大小 单位MB
+
+data:
+  json:
+    path: "cfg_json"
+    scan: "wxdgaming.game.server.cfg"

@@ -6,6 +6,7 @@ import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.core.Reason;
+import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.task.ResAcceptTask;
 import wxdgaming.game.message.task.ResSubmitTask;
 import wxdgaming.game.message.task.TaskType;
@@ -73,6 +74,7 @@ public abstract class ITaskScript extends HoldRunApplication {
             boolean update = taskInfo.update(condition);
             if (update) {
                 changes.add(taskInfo);
+                log.info("{} 更新任务 {}, {}", player, taskInfo.qTask().getInnerTaskDetail(), taskInfo);
             }
         }
     }
@@ -88,7 +90,7 @@ public abstract class ITaskScript extends HoldRunApplication {
             taskPack.getTasks().put(type(), taskInfo.getCfgId(), taskInfo);
         }
         taskInfo.setAcceptTime(System.currentTimeMillis());
-        log.info("{} 接取 {} 任务：{}({}), {}", player, type(), qTask.getId(), qTask.getName(), taskInfo.toJSONString());
+        log.info("{} 接取 {} 任务：{}, {}", player, type(), qTask.getInnerTaskDetail(), taskInfo.toJSONString());
         ResAcceptTask resAcceptTask = new ResAcceptTask();
         resAcceptTask.setTaskType(type());
         resAcceptTask.setTaskId(taskId);
@@ -114,11 +116,11 @@ public abstract class ITaskScript extends HoldRunApplication {
 
         taskInfo.setRewards(true);
 
-        long serialNumber = System.nanoTime();
+        ReasonArgs reasonArgs = new ReasonArgs(Reason.TASK_SUBMIT, "taskCfg=" + taskId);
 
-        log.info("{} 完成任务 {}({}), 流水号：{}, rewards={}", player, qTask.getId(), qTask.getName(), serialNumber, rewards);
+        log.info("{} 提交任务 {}, {}, rewards={}", player, qTask.getInnerTaskDetail(), reasonArgs, rewards);
 
-        bagService.gainItems4Cfg(player, serialNumber, Reason.TASK_SUBMIT, rewards, "taskCfg=", taskId);
+        bagService.gainItems4Cfg(player, rewards, reasonArgs);
 
         taskPack.getTaskFinishList().computeIfAbsent(type(), k -> new ArrayList<>()).add(taskId);
         ResSubmitTask resSubmitTask = new ResSubmitTask();

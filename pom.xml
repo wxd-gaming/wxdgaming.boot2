@@ -22,11 +22,12 @@
         <module>wxdgaming.boot2.starter.net.httpclient</module>
         <module>wxdgaming.boot2.starter.net.server</module>
         <module>wxdgaming.boot2.starter.scheduled</module>
+        <module>wxdgaming.game.cfg</module>
+        <module>wxdgaming.game.gateway</module>
         <module>wxdgaming.game.message</module>
         <module>wxdgaming.game.robot</module>
         <module>wxdgaming.game.server</module>
         <module>wxdgaming.game.server-script</module>
-        <module>wxdgaming.game.gateway</module>
     </modules>
 
     <properties>

@@ -9,10 +9,9 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.collection.Table;
-import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
-import wxdgaming.game.core.Reason;
+import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.server.bean.goods.*;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.cfg.QItemTable;
@@ -134,23 +133,23 @@ public class BagService extends HoldRunApplication implements InitPrint {
     }
 
     /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
-    public boolean gainItems4Cfg(Player player, long serialNumber, Reason reason, List<ItemCfg> itemCfgs, Object... args) {
+    public boolean gainItems4Cfg(Player player, List<ItemCfg> itemCfgs, ReasonArgs reasonArgs) {
         List<Item> items = newItems(itemCfgs);
         BagPack bagPack = player.getBagPack();
         ItemBag itemBag = itemBag(bagPack, 1);
         if (itemBag.freeGrid() < items.size()) {
             if (log.isDebugEnabled()) {
-                log.debug("添加道具背包空间不足 {} 业务流水号：{} 背包空间：{} 需要格子数：{}", player, serialNumber, itemBag.freeGrid(), items.size());
+                log.debug("添加道具背包空间不足 {} 背包空间：{} 需要格子数：{}, {}", player, itemBag.freeGrid(), items.size(), reasonArgs);
             }
             return false;/* TODO 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
         }
-        gainItems(player, itemBag, serialNumber, reason, items, args);
+        gainItems(player, itemBag, items, reasonArgs);
         return true;
     }
 
     /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
-    public boolean gainItems4CfgNotice(Player player, long serialNumber, Reason reason, List<ItemCfg> itemCfgs, Object... args) {
-        boolean gained = gainItems4Cfg(player, serialNumber, reason, itemCfgs, args);
+    public boolean gainItems4CfgNotice(Player player, List<ItemCfg> itemCfgs, ReasonArgs reasonArgs) {
+        boolean gained = gainItems4Cfg(player, itemCfgs, reasonArgs);
         if (!gained) {
             tipsService.tips(player, "背包已满");
         }
@@ -158,16 +157,14 @@ public class BagService extends HoldRunApplication implements InitPrint {
     }
 
     /** 默认是往背包添加 */
-    public void gainItems(Player player, long serialNumber, Reason reason, List<Item> items, Object... args) {
+    public void gainItems(Player player, List<Item> items, ReasonArgs reasonArgs) {
         BagPack bagPack = player.getBagPack();
         ItemBag itemBag = itemBag(bagPack, 1);
-        gainItems(player, itemBag, serialNumber, reason, items, args);
+        gainItems(player, itemBag, items, reasonArgs);
     }
 
-    private void gainItems(Player player, ItemBag itemBag, long serialNumber, Reason reason, List<Item> items, Object... args) {
+    private void gainItems(Player player, ItemBag itemBag, List<Item> items, ReasonArgs reasonArgs) {
         Iterator<Item> iterator = items.iterator();
-
-        String collect = reason.name() + ", " + Objects.toString(args);
 
         while (iterator.hasNext()) {
             Item newItem = iterator.next();
@@ -183,11 +180,11 @@ public class BagService extends HoldRunApplication implements InitPrint {
             long oldCount = gainScript.gainCount(player, itemBag, newItem.getCfgId());
             long change = newItem.getCount();
 
-            boolean gain = gainScript.gain(player, itemBag, serialNumber, reason, newItem, args);
+            boolean gain = gainScript.gain(player, itemBag, newItem, reasonArgs);
 
             if (gain || newItem.getCount() != change) {
                 long newCount = gainScript.gainCount(player, itemBag, newItem.getCfgId());
-                log.info("{} 业务流水号：{} 获得道具：{}({}-{}}) {} + {} = {}, 变更原因：{}", player, serialNumber, newItem.getUid(), qItem.getId(), qItem.getName(), oldCount, change, newCount, collect);
+                log.info("获得道具：{}, {}({}-{}}) {} + {} = {}, 变更原因：{}", player, newItem.getUid(), qItem.getId(), qItem.getName(), oldCount, change, newCount, reasonArgs);
             }
 
             if (gain) {

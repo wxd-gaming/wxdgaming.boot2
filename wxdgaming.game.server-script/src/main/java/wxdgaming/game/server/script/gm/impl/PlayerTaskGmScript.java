@@ -61,6 +61,7 @@ public class PlayerTaskGmScript {
                 return;
             }
             task.setComplete(true);
+            log.info("{} gm 命令强制完成任务 {}", player, task);
             resUpdateTaskList.getTasks().add(task.buildTaskBean());
         });
         player.write(resUpdateTaskList);

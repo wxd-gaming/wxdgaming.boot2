@@ -2,7 +2,7 @@ package wxdgaming.game.server.script.goods.gain.impl;
 
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.game.core.Reason;
+import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.goods.ItemBag;
 import wxdgaming.game.server.bean.goods.ItemCfg;
@@ -37,7 +37,7 @@ public class CurrencyGainScript extends GainScript {
         return itemBag.getCurrencyMap().getOrDefault(cfgId, 0L);
     }
 
-    @Override public boolean gain(Player player, ItemBag itemBag, long serialNumber, Reason reason, Item newItem, Object... args) {
+    @Override public boolean gain(Player player, ItemBag itemBag, Item newItem, ReasonArgs reasonArgs) {
         int cfgId = newItem.getCfgId();
         long count = newItem.getCount();
         itemBag.getCurrencyMap().merge(cfgId, count, Math::addExact);

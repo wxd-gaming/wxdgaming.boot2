@@ -12,6 +12,7 @@ import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.httpclient.HttpBuilder;
 import wxdgaming.boot2.starter.net.httpclient.PostText;
 import wxdgaming.game.core.Reason;
+import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.cdkey.ResUseCdKey;
 import wxdgaming.game.server.bean.BackendConfig;
 import wxdgaming.game.server.bean.goods.ItemCfg;
@@ -86,9 +87,9 @@ public class CDKeyService {
             rewards.add(itemCfg);
         }
 
-        long nanoTime = System.nanoTime();
+        ReasonArgs reasonArgs = new ReasonArgs(Reason.USE_CDKEY, "cdkey", cdKey, runResult.getIntValue("cid"), runResult.getString("comment"));
 
-        if (!bagService.gainItems4Cfg(player, nanoTime, Reason.USE_CDKEY,rewards, "use cdkey", cdKey, runResult.getIntValue("cid"), runResult.getString("comment"))) {
+        if (!bagService.gainItems4Cfg(player, rewards, reasonArgs)) {
             return;
         }
 

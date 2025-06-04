@@ -142,6 +142,17 @@ public class SocketSession {
         return true;
     }
 
+    @Override public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SocketSession that = (SocketSession) o;
+        return getUid() == that.getUid();
+    }
+
+    @Override public int hashCode() {
+        return Long.hashCode(getUid());
+    }
+
     @Override public String toString() {
         return """
                 【%s - %s%s%s%s】""".formatted(

@@ -13,6 +13,7 @@ import wxdgaming.game.message.inner.ReqForwardMessage;
 import wxdgaming.game.message.role.ResLogin;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 登录响应
@@ -45,7 +46,7 @@ public class ResLoginHandler {
         clientSession.bindData("account", account);
         clientSession.write(req);
         UserMapping userMapping = dataCenterService.getUserMappings().computeIfAbsent(account, k -> new UserMapping());
-        if (userMapping.getSocketSession() != null) {
+        if (userMapping.getSocketSession() != null && !Objects.equals(userMapping.getSocketSession(), clientSession)) {
             userMapping.getSocketSession().close("被顶号登录");
         }
         userMapping.setSocketSession(clientSession);
