@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
+import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.game.message.global.AttrBean;
 import wxdgaming.game.message.global.ResUpdateAttr;
@@ -57,6 +58,11 @@ public class Player extends MapNpc {
 
     public Player() {
         this.setMapObjectType(MapObjectType.Player);
+    }
+
+    public void executor(Runnable task) {
+        boolean add = eventList.add(task);
+        AssertUtil.assertTrue(add, "事件队列已满，添加失败");
     }
 
     public boolean checkOnline() {
