@@ -43,8 +43,6 @@ public class DataCenterService {
     /** key:{@link Player#getUid()}, value:clientSessionId */
     final ConcurrentHashMap<Long, Long> onlinePlayerGroup = new ConcurrentHashMap<>();
     final KeywordsMapping keywordsMapping = new KeywordsMapping();
-    /** 服务映射 */
-    final ConcurrentTable<ServiceType, Long, SocketSession> serviceSocketSessionMapping = new ConcurrentTable<>();
 
     @Inject
     public DataCenterService(PgsqlService pgsqlService) {

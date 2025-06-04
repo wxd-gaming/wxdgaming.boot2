@@ -26,6 +26,7 @@ public class ClientSessionMapping extends ObjectBase {
 
     /** 客户端session */
     private SocketSession session;
+    private int gatewayId;
     private long clientSessionId;
     private int sid;
     private String account;

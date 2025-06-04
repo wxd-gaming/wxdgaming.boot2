@@ -6,9 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
-import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.game.message.inner.InnerForwardMessage;
 import wxdgaming.game.message.inner.ServiceType;
+import wxdgaming.game.server.module.data.ClientSessionService;
 import wxdgaming.game.server.module.data.DataCenterService;
 
 import java.util.Collection;
@@ -25,13 +25,13 @@ import java.util.function.Consumer;
 @Singleton
 public class InnerService extends HoldRunApplication {
 
-    private final ProtoListenerFactory protoListenerFactory;
     private final DataCenterService dataCenterService;
+    private final ClientSessionService clientSessionService;
 
     @Inject
-    public InnerService(ProtoListenerFactory protoListenerFactory, DataCenterService dataCenterService) {
-        this.protoListenerFactory = protoListenerFactory;
+    public InnerService(DataCenterService dataCenterService, ClientSessionService clientSessionService) {
         this.dataCenterService = dataCenterService;
+        this.clientSessionService = clientSessionService;
     }
 
     InnerForwardMessage buildForwardMessage(PojoBase message) {
@@ -59,7 +59,7 @@ public class InnerService extends HoldRunApplication {
     public void forwardMessage(ServiceType serviceType, Collection<Long> playerIds, PojoBase message) {
         InnerForwardMessage req = buildForwardMessage(message);
         req.getRids().addAll(playerIds);
-        Map<Long, SocketSession> longSocketSessionMap = dataCenterService.getServiceSocketSessionMapping().get(serviceType);
+        Map<Integer, SocketSession> longSocketSessionMap = clientSessionService.getServiceSocketSessionMapping().get(serviceType);
         if (longSocketSessionMap == null) {
             log.error("转发消息失败{} {}", serviceType, message);
             return;

@@ -48,8 +48,8 @@ public class ResLoginHandler {
         clientSession.write(req);
 
         UserMapping userMapping = dataCenterService.getUserMapping(account);
+        userMapping.setChooseServerId(req.getSid());
         userMapping.setChooseServerSession(socketSession);
-
         if (userMapping.getClientSocketSession() != null && !Objects.equals(userMapping.getClientSocketSession(), clientSession)) {
             userMapping.getClientSocketSession().close("被顶号登录");
         }

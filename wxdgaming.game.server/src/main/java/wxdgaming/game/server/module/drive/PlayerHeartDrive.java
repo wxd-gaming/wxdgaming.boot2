@@ -14,7 +14,7 @@ import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.*;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class PlayerHeartDrive extends HoldRunApplication {
 
-    private final HashMap<Integer, PlayerDriveContent> playerDriveContentMap = new HashMap<>();
+    private final ConcurrentHashMap<Integer, PlayerDriveContent> playerDriveContentMap = new ConcurrentHashMap<>();
 
     @Start
     public void start() {

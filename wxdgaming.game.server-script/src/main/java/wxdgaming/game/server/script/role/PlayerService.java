@@ -47,6 +47,7 @@ public class PlayerService extends HoldRunApplication {
                 resLogin.getRoles().add(roleBean);
             }
         }
+        resLogin.setSid(sid);
         resLogin.setAccount(account);
         resLogin.setUserId(account);
         innerService.forwardMessage(socketSession, clientSessionId, resLogin, reqForwardMessage -> {

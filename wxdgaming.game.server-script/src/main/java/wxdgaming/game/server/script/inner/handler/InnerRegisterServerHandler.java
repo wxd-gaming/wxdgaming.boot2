@@ -9,8 +9,10 @@ import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.game.message.inner.InnerRegisterServer;
 import wxdgaming.game.message.inner.ServiceType;
+import wxdgaming.game.server.module.data.ClientSessionService;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * 注册服务
@@ -23,10 +25,12 @@ import java.util.Collection;
 public class InnerRegisterServerHandler {
 
     private final ProtoListenerFactory protoListenerFactory;
+    private final ClientSessionService clientSessionService;
 
     @Inject
-    public InnerRegisterServerHandler(ProtoListenerFactory protoListenerFactory) {
+    public InnerRegisterServerHandler(ProtoListenerFactory protoListenerFactory, ClientSessionService clientSessionService) {
         this.protoListenerFactory = protoListenerFactory;
+        this.clientSessionService = clientSessionService;
     }
 
     /** 注册服务 */
@@ -35,6 +39,15 @@ public class InnerRegisterServerHandler {
         ServiceType serviceType = req.getServiceType();
         /*网关过来，告诉游戏服务器，我是网关*/
         if (serviceType == ServiceType.GATEWAY) {
+            int mainSid = req.getMainSid();
+            SocketSession oldSession = clientSessionService.getServiceSocketSessionMapping().put(serviceType, mainSid, socketSession);
+            if (oldSession != null && !Objects.equals(oldSession, socketSession)) {
+                /* TODO 网关重连 ??? */
+            }
+
+            socketSession.bindData("serviceType", serviceType);
+            socketSession.bindData("serviceId", mainSid);
+
             /*反向注册，告诉网关我是游戏服，并且告诉网关的基本信息*/
             InnerRegisterServer registerServer = new InnerRegisterServer();
             registerServer.setServiceType(ServiceType.GAME);

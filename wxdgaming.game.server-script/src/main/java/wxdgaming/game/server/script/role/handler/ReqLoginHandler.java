@@ -51,11 +51,14 @@ public class ReqLoginHandler extends HoldRunApplication {
             String platform = claimsJws.getPayload().get("platform", String.class);
             String channel = claimsJws.getPayload().get("channel", String.class);
 
+            int gatewayId = socketSession.bindData("serviceId");
+
             ClientSessionMapping clientSessionMapping = clientSessionService.getAccountMappingMap().computeIfAbsent(account, k -> new ClientSessionMapping());
 
             clientSessionMapping.setSid(sid);
             clientSessionMapping.setAccount(account);
             clientSessionMapping.setSession(socketSession);
+            clientSessionMapping.setGatewayId(gatewayId);
             clientSessionMapping.setClientSessionId(clientSessionId);
 
             playerService.sendPlayerList(socketSession, clientSessionId, sid, account);

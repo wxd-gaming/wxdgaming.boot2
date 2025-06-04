@@ -17,7 +17,8 @@ message ReqLogin {
 message ResLogin {
   string userId                        = 1;//用户id
   string account                       = 2;//账号
-  repeated RoleBean roles              = 3;
+  int32 sid                            = 3;//当前选择的区服id
+  repeated RoleBean roles              = 4;//角色列表
 }
 
 //角色信息

@@ -48,6 +48,7 @@ public class GameClientService extends HoldRunApplication {
 
         InnerRegisterServer registerServer = new InnerRegisterServer();
         registerServer.setServiceType(ServiceType.GATEWAY);
+        registerServer.setMainSid(BootConfig.getIns().sid());
         log.info("{}", registerServer);
 
         checkGatewaySession("127.0.0.1", 8000, registerServer);

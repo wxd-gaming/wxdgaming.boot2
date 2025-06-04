@@ -3,6 +3,9 @@ package wxdgaming.game.server.module.data;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
+import wxdgaming.boot2.starter.net.SocketSession;
+import wxdgaming.game.message.inner.ServiceType;
 import wxdgaming.game.server.bean.ClientSessionMapping;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,6 +20,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 @Singleton
 public class ClientSessionService {
+
+    /** 服务映射,R:服务类型, C:服务id（网关id）, V:session */
+    final ConcurrentTable<ServiceType, Integer, SocketSession> serviceSocketSessionMapping = new ConcurrentTable<>();
 
     /** key:account, value:mapping */
     private final ConcurrentHashMap<String, ClientSessionMapping> accountMappingMap = new ConcurrentHashMap<>();
