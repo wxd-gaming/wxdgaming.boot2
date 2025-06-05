@@ -16,8 +16,8 @@ import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.boot2.starter.net.SocketScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
-import wxdgaming.game.server.cfg.QPlayerTable;
-import wxdgaming.game.server.cfg.bean.QPlayer;
+import wxdgaming.game.cfg.QPlayerTable;
+import wxdgaming.game.cfg.bean.QPlayer;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;

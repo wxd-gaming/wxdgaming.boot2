@@ -1,0 +1,8 @@
+[
+	{"id":1001,"crossType":1,"type":1,"name":"新手村","min_lv":1,"max_lv":10,"buffIds":[1,2]},
+	{"id":1002,"crossType":1,"type":1,"name":"城镇中心","min_lv":11,"max_lv":20,"buffIds":[1,2]},
+	{"id":1003,"crossType":1,"type":1,"name":"魔幻森林","min_lv":21,"max_lv":30,"buffIds":[1,2]},
+	{"id":1004,"crossType":1,"type":1,"name":"宠物天堂","min_lv":31,"max_lv":40,"buffIds":[1,2]},
+	{"id":1005,"crossType":1,"type":1,"name":"永恒大陆","min_lv":41,"max_lv":50,"buffIds":[1,2]},
+	{"id":1006,"crossType":1,"type":1,"name":"暗之神殿","min_lv":51,"max_lv":60,"buffIds":[1,2]}
+]

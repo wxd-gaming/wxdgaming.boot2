@@ -8,8 +8,8 @@ import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.server.bean.MapMonster;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.MapObject;
-import wxdgaming.game.server.bean.attr.AttrInfo;
-import wxdgaming.game.server.bean.attr.AttrType;
+import wxdgaming.game.bean.attr.AttrInfo;
+import wxdgaming.game.bean.attr.AttrType;
 
 import java.util.HashMap;
 import java.util.Map;

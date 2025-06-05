@@ -7,7 +7,7 @@ import wxdgaming.game.message.task.TaskType;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.task.TaskInfo;
 import wxdgaming.game.server.bean.task.TaskPack;
-import wxdgaming.game.server.cfg.bean.QTask;
+import wxdgaming.game.cfg.bean.QTask;
 import wxdgaming.game.server.script.task.ITaskScript;
 
 import java.util.List;

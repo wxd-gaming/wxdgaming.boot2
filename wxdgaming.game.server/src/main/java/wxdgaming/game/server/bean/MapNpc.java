@@ -4,8 +4,8 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.game.server.bean.attr.AttrInfo;
-import wxdgaming.game.server.bean.attr.AttrType;
+import wxdgaming.game.bean.attr.AttrInfo;
+import wxdgaming.game.bean.attr.AttrType;
 import wxdgaming.game.server.bean.buff.Buff;
 
 import java.util.ArrayList;

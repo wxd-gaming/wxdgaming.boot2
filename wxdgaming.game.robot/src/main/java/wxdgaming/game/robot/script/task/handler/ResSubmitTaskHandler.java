@@ -8,7 +8,7 @@ import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.task.ResSubmitTask;
 import wxdgaming.game.message.task.TaskBean;
 import wxdgaming.game.robot.bean.Robot;
-import wxdgaming.game.server.cfg.QTaskTable;
+import wxdgaming.game.cfg.QTaskTable;
 
 /**
  * 提交任务

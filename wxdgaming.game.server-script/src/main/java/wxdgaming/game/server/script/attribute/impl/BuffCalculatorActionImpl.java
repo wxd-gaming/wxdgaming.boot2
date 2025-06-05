@@ -4,7 +4,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.MapObject;
-import wxdgaming.game.server.bean.attr.AttrInfo;
+import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.server.bean.buff.Buff;
 import wxdgaming.game.server.script.attribute.CalculatorAction;
 import wxdgaming.game.server.script.attribute.CalculatorType;

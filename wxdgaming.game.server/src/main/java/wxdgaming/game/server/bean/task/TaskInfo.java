@@ -7,8 +7,8 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.message.task.TaskBean;
-import wxdgaming.game.server.cfg.QTaskTable;
-import wxdgaming.game.server.cfg.bean.QTask;
+import wxdgaming.game.cfg.QTaskTable;
+import wxdgaming.game.cfg.bean.QTask;
 
 import java.util.Comparator;
 import java.util.HashMap;

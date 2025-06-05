@@ -6,7 +6,7 @@ import lombok.Setter;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.excel.store.DataKey;
 import wxdgaming.boot2.starter.excel.store.DataMapping;
-import wxdgaming.game.server.bean.attr.AttrInfo;
+import wxdgaming.game.bean.attr.AttrInfo;
 
 import java.io.Serializable;
 

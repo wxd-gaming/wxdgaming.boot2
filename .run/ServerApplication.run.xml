@@ -4,7 +4,7 @@
     <module name="wxdgaming.game.server" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="wxdgaming.game.server.bean.goods.*" />
+        <option name="PATTERN" value="wxdgaming.game.bean.goods.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
