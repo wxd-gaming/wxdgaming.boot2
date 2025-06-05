@@ -1,0 +1,40 @@
+syntax = "proto3";
+//把文件拆分
+option java_multiple_files = true;
+//导出包名
+option java_package = "wxdgaming.game.message";
+
+enum BagType {
+  Bag = 0;
+  Store = 1;
+}
+
+//请求背包信息
+message ReqBagInfo {
+    BagType bagType = 1;
+}
+
+//响应背包信息
+message ResBagInfo {
+  BagType bagType                   = 1;
+  map<int32, int64> currencyMap     = 2;//所有的货币
+  repeated ItemBean items           = 3;//所有的物品
+}
+
+//响应背包信息
+message ResUpdateBagInfo {
+  BagType bagType                   = 1;
+  map<int32, int64> currencyMap     = 2;//所有的货币
+  repeated ItemBean items           = 3;//所有的物品
+  string reason                     = 4;//更新原因
+  string other                      = 7;//其他信息-与客户端协商
+}
+
+message ItemBean {
+  int64 uid           = 1;
+  int32 itemId        = 2;
+  int64 count         = 3;
+  bool bind           = 4;
+  int64 expireTime    = 5;
+
+}

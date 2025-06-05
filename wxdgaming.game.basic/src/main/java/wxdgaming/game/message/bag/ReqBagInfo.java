@@ -1,4 +1,4 @@
-package  wxdgaming.game.message.role;
+package  wxdgaming.game.message.bag;
 
 import io.protostuff.Tag;
 import java.util.ArrayList;
@@ -11,19 +11,18 @@ import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.ann.Comment;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
-import wxdgaming.game.message.global.*;
 
 
-/** 更新经验 */
+/** 请求背包信息 */
 @Getter
 @Setter
 @Accessors(chain = true)
-@Comment("更新经验")
-public class ResUpdateExp extends PojoBase {
+@Comment("请求背包信息")
+public class ReqBagInfo extends PojoBase {
 
     /** 消息ID */
     public static int _msgId() {
-        return 47342601;
+        return 43123174;
     }
 
     /** 消息ID */
@@ -32,10 +31,8 @@ public class ResUpdateExp extends PojoBase {
     }
 
 
-    /** 当前经验 */
-    @Tag(1) private long exp;
-    /** 原因 */
-    @Tag(2) private String reason;
+    /**  */
+    @Tag(1) private BagType bagType;
 
 
 }

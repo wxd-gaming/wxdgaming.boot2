@@ -1,9 +1,9 @@
-package wxdgaming.game.server.script.goods.use.impl;
+package wxdgaming.game.server.script.bag.use.impl;
 
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.script.goods.use.UseItemAction;
+import wxdgaming.game.server.script.bag.use.UseItemAction;
 
 /**
  * 默认使用

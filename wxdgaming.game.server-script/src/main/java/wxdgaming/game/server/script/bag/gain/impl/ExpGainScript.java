@@ -1,11 +1,13 @@
-package wxdgaming.game.server.script.goods.gain.impl;
+package wxdgaming.game.server.script.bag.gain.impl;
 
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.core.ReasonArgs;
+import wxdgaming.game.message.bag.BagType;
+import wxdgaming.game.message.bag.ResUpdateBagInfo;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.goods.ItemBag;
-import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.server.bean.role.Player;
 
 /**
@@ -26,7 +28,9 @@ public class ExpGainScript extends CurrencyGainScript {
         return player.getExp();
     }
 
-    @Override public boolean gain(Player player, ItemBag itemBag, Item newItem, ReasonArgs reasonArgs) {
+    @Override public boolean gain(Player player, ResUpdateBagInfo resUpdateBagInfo,
+                                  BagType bagType, ItemBag itemBag,
+                                  Item newItem, ReasonArgs reasonArgs) {
         long count = newItem.getCount();
         playerService.addExp(player, count, reasonArgs);
         return true;

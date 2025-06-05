@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
-import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.net.SocketSession;
+import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.role.ResLogin;
 import wxdgaming.game.message.role.ResUpdateExp;
 import wxdgaming.game.message.role.ResUpdateLevel;
@@ -56,23 +56,30 @@ public class PlayerService extends HoldRunApplication {
         log.info("clientSessionId={}, sid={}, account={} 发送角色列表:{}", clientSessionId, sid, account, resLogin);
     }
 
-    public void addExp(Player player, long exp, Object... args) {
-        log.info("{} 当前经验：{} 增加经验:{}, 来源：{}", player, player.getExp(), exp, Objects.toString(args));
+    public void addExp(Player player, long exp, ReasonArgs reasonArgs) {
+        log.info("{} 当前经验：{} 增加经验:{}, {}", player, player.getExp(), exp, reasonArgs);
         long tmp = player.getExp() + exp;
         while (tmp >= 100L * player.getLevel()) {
             /*假设升级需要100*/
             tmp -= 100L * player.getLevel();
-            addLevel(player, 1, args, "经验升级");
+            addLevel(player, 1, reasonArgs.copyFrom("经验升级"));
         }
         player.setExp(tmp);
-        ResUpdateExp resUpdateLevel = new ResUpdateExp().setExp(player.getExp());
+        ResUpdateExp resUpdateLevel = new ResUpdateExp()
+                .setExp(player.getExp())
+                .setReason(reasonArgs.getReason().name());
         player.write(resUpdateLevel);
     }
 
-    public void addLevel(Player player, int lv, Object... args) {
-        log.info("{} 当前等级:{} 增加等级:{}, 来源：{}", player, player.getLevel(), lv, Objects.toString(args));
+    public void addLevel(Player player, int lv, ReasonArgs reasonArgs) {
+        int oldLevel = player.getLevel();
         player.setLevel(player.getLevel() + lv);
-        ResUpdateLevel resUpdateLevel = new ResUpdateLevel().setLevel(player.getLevel());
+        log.info("{} 等级变更: oldLv={} change={} newLv={}, {}", player, oldLevel, lv, player.getLevel(), reasonArgs);
+
+        ResUpdateLevel resUpdateLevel = new ResUpdateLevel()
+                .setLevel(player.getLevel())
+                .setReason(reasonArgs.getReason().name());
+
         player.write(resUpdateLevel);
         /*触发升级, 比如功能开放监听需要*/
         runApplication.executeMethodWithAnnotatedException(OnLevelUp.class, player, lv);

@@ -4,8 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.lang.condition.ConditionUpdatePolicyConst;
+import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.script.goods.BagService;
+import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.task.init.ConditionInitValueHandler;
 
 /**
@@ -30,7 +31,7 @@ public class BagItemCountHandler implements ConditionInitValueHandler {
 
     @Override public long initValue(Player player, Condition condition) {
         int itemCfg = Integer.parseInt(condition.getK2().toString());
-        return bagService.itemCount(player, 1, itemCfg);
+        return bagService.itemCount(player, BagType.Bag, itemCfg);
     }
 
 }

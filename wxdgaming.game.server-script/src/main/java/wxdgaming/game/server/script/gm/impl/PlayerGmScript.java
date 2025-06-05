@@ -3,6 +3,8 @@ package wxdgaming.game.server.script.gm.impl;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.game.core.Reason;
+import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.gm.ann.GM;
 import wxdgaming.game.server.script.role.PlayerService;
@@ -35,7 +37,7 @@ public class PlayerGmScript {
     @GM
     public Object addExp(Player player, String[] args) {
         long exp = Long.parseLong(args[1]);
-        this.playerService.addExp(player, exp, "gm命令", System.currentTimeMillis());
+        this.playerService.addExp(player, exp, ReasonArgs.of(Reason.GM));
         return null;
     }
 

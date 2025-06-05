@@ -39,7 +39,7 @@ public class ProtoTest {
 
     @Test
     @Order(2)
-    public void buildGameInnerProtoHandler() {
+    public void buildInnerProtoHandler() {
         ProtoBuf2Pojo.createMapping(
                 "src/main/java",
                 "wxdgaming.game.server.script",

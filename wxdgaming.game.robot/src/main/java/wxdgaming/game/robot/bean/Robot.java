@@ -4,10 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wxdgaming.boot2.starter.net.SocketSession;
+import wxdgaming.game.message.bag.ItemBean;
 import wxdgaming.game.message.task.TaskBean;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 机器人
@@ -30,7 +30,10 @@ public class Robot {
     private SocketSession socketSession;
     private boolean sendLogin;
     private boolean loginEnd;
-
+    /** 所有的货币 */
+    private Map<Integer, Long> currencyMap = new LinkedHashMap<>();
+    /** 所有的物品 */
+    private List<ItemBean> items = new ArrayList<>();
     private Map<Integer, TaskBean> tasks = new HashMap<>();
 
     @Override public String toString() {

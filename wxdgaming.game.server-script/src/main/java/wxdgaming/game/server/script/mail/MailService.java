@@ -4,15 +4,21 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
+import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.server.bean.global.GlobalDataType;
 import wxdgaming.game.server.bean.global.impl.ServerMailData;
+import wxdgaming.game.server.bean.goods.Item;
+import wxdgaming.game.server.bean.mail.MailInfo;
 import wxdgaming.game.server.bean.mail.MailPack;
 import wxdgaming.game.server.bean.mail.ServerMailInfo;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnHeartMinute;
+import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.module.data.GlobalDataService;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 邮件
@@ -25,10 +31,12 @@ import java.util.ArrayList;
 public class MailService extends HoldRunApplication {
 
     final GlobalDataService globalDataService;
+    final DataCenterService dataCenterService;
 
     @Inject
-    public MailService(GlobalDataService globalDataService) {
+    public MailService(GlobalDataService globalDataService, DataCenterService dataCenterService) {
         this.globalDataService = globalDataService;
+        this.dataCenterService = dataCenterService;
     }
 
     @OnHeartMinute
@@ -57,6 +65,24 @@ public class MailService extends HoldRunApplication {
             mailPack.getMailInfoList().add(mailInfo);
             log.info("{} 领取邮件 {}", player, mailInfo);
         }
+    }
+
+    public void sendBagFullMail(Player player, List<Item> items, ReasonArgs reasonArgs) {
+        sendMail(player, "系统", "背包已满", "背包已满，无法获得物品", List.of(), items, reasonArgs.toString());
+    }
+
+    public void sendMail(Player player, String sender, String title, String content, List<String> contentArgs, List<Item> items, String logMsg) {
+        MailInfo mailInfo = new MailInfo();
+        mailInfo.setUid(dataCenterService.getMailHexid().newId());
+        mailInfo.setSender(sender);
+        mailInfo.setSendTime(MyClock.millis());
+        mailInfo.setTitle(title);
+        mailInfo.setContent(content);
+        mailInfo.getContentParams().addAll(contentArgs);
+        mailInfo.setItems(items);
+        mailInfo.setSourceLog(logMsg);
+        player.getMailPack().getMailInfoList().add(mailInfo);
+        log.info("获得邮件：{}, {}", player, mailInfo);
     }
 
 }

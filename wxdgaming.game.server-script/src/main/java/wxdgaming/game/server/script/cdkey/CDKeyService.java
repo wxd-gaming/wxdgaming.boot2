@@ -11,15 +11,16 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.httpclient.HttpBuilder;
 import wxdgaming.boot2.starter.net.httpclient.PostText;
+import wxdgaming.game.bean.goods.ItemCfg;
 import wxdgaming.game.core.Reason;
 import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.cdkey.ResUseCdKey;
 import wxdgaming.game.server.bean.BackendConfig;
-import wxdgaming.game.bean.goods.ItemCfg;
+import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
+import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.cdkey.bean.CDKeyReward;
-import wxdgaming.game.server.script.goods.BagService;
 import wxdgaming.game.server.script.tips.TipsService;
 
 import java.util.ArrayList;
@@ -87,11 +88,14 @@ public class CDKeyService {
             rewards.add(itemCfg);
         }
 
-        ReasonArgs reasonArgs = new ReasonArgs(Reason.USE_CDKEY, "cdkey", cdKey, runResult.getIntValue("cid"), runResult.getString("comment"));
+        ReasonArgs reasonArgs = ReasonArgs.of(
+                Reason.USE_CDKEY,
+                "cdkey=", cdKey, "cid=%d(%s)".formatted(runResult.getIntValue("cid"), runResult.getString("comment"))
+        );
 
-        if (!bagService.gainItems4Cfg(player, rewards, reasonArgs)) {
-            return;
-        }
+        List<Item> itemList = bagService.newItems(rewards);
+
+        bagService.gainItems(player, itemList, reasonArgs);
 
         ResUseCdKey resUseCdKey = new ResUseCdKey();
         resUseCdKey.setCdKey(cdKey);

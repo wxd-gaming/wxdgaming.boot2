@@ -8,7 +8,7 @@ import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.bean.goods.ItemCfg;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnCreateRole;
-import wxdgaming.game.server.script.goods.BagService;
+import wxdgaming.game.server.script.bag.BagService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ public class PlayerCreateHandler {
         rewards.add(builder.cfgId(3).num(10000).build());
         rewards.add(builder.cfgId(4).num(10000).build());
         rewards.add(builder.cfgId(5).num(1).build());
-        ReasonArgs reasonArgs = new ReasonArgs(Reason.CreateRole);
+        ReasonArgs reasonArgs = ReasonArgs.of(Reason.CreateRole);
         bagService.gainItems4Cfg(player, rewards, reasonArgs);
     }
 

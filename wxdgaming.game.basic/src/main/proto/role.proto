@@ -68,11 +68,13 @@ message ResHeartbeat {
 //更新经验
 message ResUpdateExp {
   int64 exp                           = 1;//当前经验
+  string reason                       = 2;//原因
 }
 
 //更新等级
 message ResUpdateLevel {
   int32 level                         = 1;//当前等级
+  string reason                       = 2;//原因
 }
 
 //更新战斗力

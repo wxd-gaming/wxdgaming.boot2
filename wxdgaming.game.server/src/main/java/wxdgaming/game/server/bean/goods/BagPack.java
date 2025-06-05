@@ -5,8 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.lang.ObjectBase;
-import wxdgaming.boot2.starter.batis.ColumnType;
-import wxdgaming.boot2.starter.batis.ann.DbColumn;
+import wxdgaming.game.message.bag.BagType;
 
 import java.util.HashMap;
 
@@ -21,18 +20,18 @@ import java.util.HashMap;
 public class BagPack extends ObjectBase {
 
     /** key:背包类型, value:{key:道具id, value:道具} */
-    @DbColumn(length = Integer.MAX_VALUE, columnType = ColumnType.String)
-    private HashMap<Integer, ItemBag> items = new HashMap<>();
+    private HashMap<BagType, ItemBag> items = new HashMap<>();
 
     @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
-    public boolean isFull() {
-        ItemBag itemBag = items.get(1);
+    public boolean bagFull() {
+        ItemBag itemBag = items.get(BagType.Bag);
         return itemBag.checkFull();
     }
 
-    public int freeGrid() {
-        ItemBag itemBag = items.get(1);
+    /** 空闲的格子数 */
+    public int bagFreeGrid() {
+        ItemBag itemBag = items.get(BagType.Bag);
         return itemBag.freeGrid();
     }
 

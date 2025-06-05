@@ -1,4 +1,4 @@
-package wxdgaming.game.server.script.goods.use;
+package wxdgaming.game.server.script.bag.use;
 
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.bean.goods.ItemTypeConst;

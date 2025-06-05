@@ -10,6 +10,7 @@ public enum Reason {
     /** 未知 */
     UNKNOWN,
     CreateRole,
+    GM,
     USE_CDKEY,
     /** 任务完成 */
     TASK_SUBMIT,

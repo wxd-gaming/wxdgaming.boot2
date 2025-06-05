@@ -17,7 +17,7 @@ import wxdgaming.game.server.bean.task.TaskPack;
 import wxdgaming.game.cfg.QTaskTable;
 import wxdgaming.game.cfg.bean.QTask;
 import wxdgaming.game.server.event.OnLoginBefore;
-import wxdgaming.game.server.script.goods.BagService;
+import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.inner.InnerService;
 import wxdgaming.game.server.script.tips.TipsService;
 
@@ -116,7 +116,7 @@ public abstract class ITaskScript extends HoldRunApplication {
 
         taskInfo.setRewards(true);
 
-        ReasonArgs reasonArgs = new ReasonArgs(Reason.TASK_SUBMIT, "taskCfg=" + taskId);
+        ReasonArgs reasonArgs = ReasonArgs.of(Reason.TASK_SUBMIT, "taskCfg=" + taskId);
 
         log.info("{} 提交任务 {}, {}, rewards={}", player, qTask.getInnerTaskDetail(), reasonArgs, rewards);
 

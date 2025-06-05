@@ -34,6 +34,8 @@ public class ResUpdateLevel extends PojoBase {
 
     /** 当前等级 */
     @Tag(1) private int level;
+    /** 原因 */
+    @Tag(2) private String reason;
 
 
 }

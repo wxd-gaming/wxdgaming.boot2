@@ -16,15 +16,15 @@ public abstract class ItemTypeConst {
     /** 货币 */
     public static final ItemTypeConst CurrencyType = new ItemTypeConst(1, 0, 0) {};
     /** 钻石 */
-    public static final ItemTypeConst Gold = new ItemTypeConst(1, 0, 1) {};
+    public static final ItemTypeConst Gold = new ItemTypeConst(1, 1, 0) {};
     /** 绑定钻石 */
-    public static final ItemTypeConst BindGold = new ItemTypeConst(1, 0, 2) {};
+    public static final ItemTypeConst BindGold = new ItemTypeConst(1, 2, 0) {};
     /** 金币 */
-    public static final ItemTypeConst Money = new ItemTypeConst(1, 0, 3) {};
+    public static final ItemTypeConst Money = new ItemTypeConst(1, 3, 0) {};
     /** 绑定金币 */
-    public static final ItemTypeConst BindMoney = new ItemTypeConst(1, 0, 4) {};
+    public static final ItemTypeConst BindMoney = new ItemTypeConst(1, 4, 0) {};
     /** 经验值 */
-    public static final ItemTypeConst EXP = new ItemTypeConst(1, 1, 5) {};
+    public static final ItemTypeConst EXP = new ItemTypeConst(1, 5, 0) {};
     /** 公会货币 */
     public static final ItemTypeConst GuildCurrencyType = new ItemTypeConst(1, 2, 0) {};
 

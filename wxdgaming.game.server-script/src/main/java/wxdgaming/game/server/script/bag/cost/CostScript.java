@@ -1,4 +1,4 @@
-package wxdgaming.game.server.script.goods.cost;
+package wxdgaming.game.server.script.bag.cost;
 
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.role.Player;
