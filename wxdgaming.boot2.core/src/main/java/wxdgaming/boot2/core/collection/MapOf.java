@@ -16,13 +16,6 @@ import java.util.function.Function;
  **/
 public class MapOf implements Serializable {
 
-    /** 不可变的空map */
-    @SuppressWarnings("unchecked")
-    public static <K, V> Map<K, V> emptyMap() {
-        return (Map<K, V>) EmptyMap.EMPTY_MAP;
-    }
-
-
     public static <K, V> Map<K, V> of() {
         return Map.of();
     }

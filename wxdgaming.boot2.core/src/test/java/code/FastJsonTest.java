@@ -4,6 +4,7 @@ import org.junit.Test;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.collection.ListOf;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ public class FastJsonTest {
 
     @Test
     public void t0() {
-        List<Object> objects = ListOf.emptyList();
+        List<Object> objects = Collections.emptyList();
         String jsonString = FastJsonUtil.toJSONStringAsWriteType(objects);
         List parse = FastJsonUtil.parse(jsonString, List.class);
         System.out.println(parse);
