@@ -1,8 +1,7 @@
 package wxdgaming.boot2.core.collection;
 
 
-import lombok.Getter;
-import lombok.Setter;
+import com.alibaba.fastjson.annotation.JSONType;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 
 import java.util.HashMap;
@@ -12,8 +11,7 @@ import java.util.function.IntBinaryOperator;
 import java.util.function.IntUnaryOperator;
 
 /** 非线程安全的 */
-@Getter
-@Setter
+@JSONType(seeAlso = {HashMap.class})
 public class ObjIntMap<K> extends HashMap<K, Integer> implements Map<K, Integer> {
 
     public int getCount(K key) {

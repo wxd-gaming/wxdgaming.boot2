@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.collection;
 
+import com.alibaba.fastjson.annotation.JSONType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -20,11 +21,12 @@ import java.util.function.Predicate;
 @Getter
 @Setter
 @Accessors(chain = true)
+@JSONType(seeAlso = {HashMap.class})
 public class LinkedTable<K1, K2, V> implements Serializable, Data2Json {
 
     private static final Map EMPTY_MAP = Map.of();
 
-    private final LinkedHashMap<K1, LinkedHashMap<K2, V>> nodes;
+    private LinkedHashMap<K1, LinkedHashMap<K2, V>> nodes;
 
     public LinkedTable() {
         this(16);

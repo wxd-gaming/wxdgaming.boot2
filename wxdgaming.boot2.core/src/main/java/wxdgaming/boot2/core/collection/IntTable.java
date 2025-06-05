@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.collection;
 
+import com.alibaba.fastjson.annotation.JSONType;
 import io.netty.util.collection.IntObjectHashMap;
 
 import java.util.*;
@@ -13,9 +14,10 @@ import java.util.function.Function;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2023-10-09 10:08
  */
+@JSONType(seeAlso = {HashMap.class})
 public class IntTable<V> {
 
-    private final IntObjectHashMap<IntObjectHashMap<V>> maps = new IntObjectHashMap<>();
+    private IntObjectHashMap<IntObjectHashMap<V>> maps = new IntObjectHashMap<>();
 
     public boolean containsKey(int r) {
         return maps.containsKey(r);

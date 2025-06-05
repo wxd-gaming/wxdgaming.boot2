@@ -16,6 +16,12 @@ import java.util.function.Predicate;
  **/
 public class ListOf implements Serializable {
 
+    /** 空list */
+    @SuppressWarnings("unchecked")
+    public static <T> List<T> emptyList() {
+        return (List<T>) EmptyList.EMPTY_LIST;
+    }
+
     public static String asString(CharSequence delimiter, Collection list) {
         StringBuilder streamWriter = new StringBuilder();
         for (Object o : list) {

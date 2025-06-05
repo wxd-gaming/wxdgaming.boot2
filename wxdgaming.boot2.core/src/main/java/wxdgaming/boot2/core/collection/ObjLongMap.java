@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.collection;
 
 
+import com.alibaba.fastjson.annotation.JSONType;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.function.LongBinaryOperator;
 import java.util.function.LongUnaryOperator;
 
 /** 非线程安全的 */
+@JSONType(seeAlso = {HashMap.class})
 public class ObjLongMap<K> extends HashMap<K, Long> implements Map<K, Long> {
 
 

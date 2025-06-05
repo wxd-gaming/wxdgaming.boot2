@@ -8,6 +8,8 @@ import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import wxdgaming.boot2.core.collection.EmptyList;
+import wxdgaming.boot2.core.collection.EmptyMap;
 import wxdgaming.boot2.core.function.SLFunction1;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.ConfigString;

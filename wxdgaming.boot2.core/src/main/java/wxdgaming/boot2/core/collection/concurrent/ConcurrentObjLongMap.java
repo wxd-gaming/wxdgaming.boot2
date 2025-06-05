@@ -1,8 +1,10 @@
 package wxdgaming.boot2.core.collection.concurrent;
 
 
+import com.alibaba.fastjson.annotation.JSONType;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -10,6 +12,7 @@ import java.util.function.LongBinaryOperator;
 import java.util.function.LongUnaryOperator;
 
 /** 线程安全的 */
+@JSONType(seeAlso = {ConcurrentHashMap.class})
 public class ConcurrentObjLongMap<K> extends ConcurrentHashMap<K, Long> implements Map<K, Long> {
 
 

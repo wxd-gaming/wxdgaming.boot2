@@ -1,10 +1,12 @@
 package wxdgaming.boot2.core.collection.concurrent;
 
 
+import com.alibaba.fastjson.annotation.JSONType;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,6 +16,7 @@ import java.util.function.IntUnaryOperator;
 /** 线程安全的 */
 @Getter
 @Setter
+@JSONType(seeAlso = {ConcurrentHashMap.class})
 public class ConcurrentObjIntMap<K> extends ConcurrentHashMap<K, Integer> implements Map<K, Integer> {
 
     public int getCount(K key) {

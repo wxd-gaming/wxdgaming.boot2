@@ -1,7 +1,6 @@
 package wxdgaming.boot2.core.collection.concurrent;
 
 
-
 import wxdgaming.boot2.core.format.data.Data2Json;
 
 import java.util.*;

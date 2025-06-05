@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.collection.ints;
 
+import com.alibaba.fastjson.annotation.JSONType;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.lang.ObjectBase;
@@ -15,9 +16,10 @@ import java.util.Optional;
  **/
 @Getter
 @Setter
+@JSONType(seeAlso = {HashMap.class})
 public class IntLongLongTable extends ObjectBase {
 
-    private final HashMap<Integer, HashMap<Long, Long>> nodes = new HashMap<>();
+    private HashMap<Integer, HashMap<Long, Long>> nodes = new HashMap<>();
 
     public HashMap<Long, Long> row(int row) {
         return nodes.computeIfAbsent(row, k -> new HashMap<>());
