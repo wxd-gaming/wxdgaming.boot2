@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Value;
@@ -37,23 +38,25 @@ public class DataRepository {
 
     @SuppressWarnings("unchecked")
     public <D extends DataKey, T extends DataTable<D>> T dataTable(Class<T> dataTableClass) {
-        return (T) dataTableMap.computeIfAbsent(dataTableClass, this::buildDataTable);
+        return (T) dataTableMap.get(dataTableClass);
     }
 
-    @SuppressWarnings("unchecked")
     public <E extends DataKey, T extends DataTable<E>> E dataTable(Class<T> dataTableClass, Object key) {
-        return (E) (dataTableMap.computeIfAbsent(dataTableClass, this::buildDataTable).get(key));
+        return dataTable(dataTableClass).get(key);
     }
 
     @Start
     @Order(1)
-    public void load(@Value(path = "data.json.path", nestedPath = true, required = false) String jsonPath,
-                     @Value(path = "data.json.scan", nestedPath = true, required = false) String scanPackageName) {
+    public void start(@Value(path = "data.json.path", nestedPath = true, required = false) String jsonPath,
+                      @Value(path = "data.json.scan", nestedPath = true, required = false) String scanPackageName) {
         this.jsonPath = jsonPath;
         this.scanPackageName = scanPackageName;
+        loadAll();
+    }
 
+    public void loadAll() {
         if (StringUtils.isBlank(jsonPath) || StringUtils.isBlank(scanPackageName)) {
-            log.warn("扫描器异常：{}, {}", jsonPath, scanPackageName);
+            log.error("扫描器异常：{}, {}", jsonPath, scanPackageName);
             return;
         }
         Map<Class<?>, DataTable<?>> tmpDataTableMap = new ConcurrentHashMap<>();
@@ -67,17 +70,26 @@ public class DataRepository {
                     tmpDataTableMap.put(dataTableClass, dataTable);
                 });
         for (DataTable<?> dataTable : tmpDataTableMap.values()) {
+            for (DataKey row : dataTable.getDataList()) {
+                if (row instanceof DataChecked dataChecked) {
+                    try {
+                        dataChecked.initAndCheck(tmpDataTableMap);
+                    } catch (Exception e) {
+                        throw Throw.of(row.toString(), e);
+                    }
+                }
+            }
+        }
+        for (DataTable<?> dataTable : tmpDataTableMap.values()) {
             dataTable.checkData(tmpDataTableMap);
+        }
+        if (tmpDataTableMap.isEmpty()) {
+            log.error("扫描器异常：{}, {}, 没有任何类", jsonPath, scanPackageName);
         }
         dataTableMap = tmpDataTableMap;
     }
 
-    public void reload(Class<?> dataTableClass) {
-        DataTable<?> dataTable = buildDataTable(dataTableClass);
-        dataTableMap.put(dataTableClass, dataTable);
-    }
-
-    DataTable<?> buildDataTable(Class<?> dataTableClass) {
+    private DataTable<?> buildDataTable(Class<?> dataTableClass) {
         DataTable<?> dataTable = null;
         try {
             dataTable = (DataTable<?>) dataTableClass.getDeclaredConstructor().newInstance();

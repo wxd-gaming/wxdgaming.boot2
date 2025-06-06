@@ -3,9 +3,11 @@ package ${packageName}.bean;
 
 import lombok.Getter;
 import wxdgaming.boot2.starter.excel.store.DataChecked;
+import wxdgaming.boot2.starter.excel.store.DataTable;
 import ${packageName}.bean.mapping.${codeClassName}Mapping;
 
 import java.io.Serializable;
+import java.util.Map;
 
 
 /**
@@ -17,7 +19,7 @@ import java.io.Serializable;
 @Getter
 public class ${codeClassName} extends ${codeClassName}Mapping implements Serializable, DataChecked {
 
-    @Override public void initAndCheck() throws Exception {
+    @Override public void initAndCheck(Map<Class<?>, DataTable<?>> store) throws Exception {
         /*todo 实现数据检测和初始化*/
 
     }

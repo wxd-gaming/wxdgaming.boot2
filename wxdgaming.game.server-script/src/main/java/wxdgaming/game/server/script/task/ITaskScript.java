@@ -3,19 +3,18 @@ package wxdgaming.game.server.script.task;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
+import wxdgaming.boot2.core.collection.ListOf;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
+import wxdgaming.game.bean.goods.ItemCfg;
+import wxdgaming.game.cfg.QTaskTable;
+import wxdgaming.game.cfg.bean.QTask;
 import wxdgaming.game.core.Reason;
 import wxdgaming.game.core.ReasonArgs;
-import wxdgaming.game.message.task.ResAcceptTask;
-import wxdgaming.game.message.task.ResSubmitTask;
-import wxdgaming.game.message.task.TaskType;
-import wxdgaming.game.bean.goods.ItemCfg;
+import wxdgaming.game.message.task.*;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.task.TaskInfo;
 import wxdgaming.game.server.bean.task.TaskPack;
-import wxdgaming.game.cfg.QTaskTable;
-import wxdgaming.game.cfg.bean.QTask;
 import wxdgaming.game.server.event.OnLoginBefore;
 import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.inner.InnerService;
@@ -46,13 +45,6 @@ public abstract class ITaskScript extends HoldRunApplication {
         initTask(player, taskPack);
     }
 
-    protected TaskInfo buildTaskInfo(Player player, QTask qTask) {
-        TaskInfo taskInfo = new TaskInfo();
-        taskInfo.setCfgId(qTask.getId());
-        taskService.initTask(player, taskInfo, qTask.getConditionList()/*TODO读取配置表*/);
-        return taskInfo;
-    }
-
     /** 初始化 */
     public void initTask(Player player, TaskPack taskPack) {
         Map<Integer, TaskInfo> integerTaskInfoMap = taskPack.getTasks().row(type());
@@ -60,8 +52,24 @@ public abstract class ITaskScript extends HoldRunApplication {
             QTaskTable qTaskTable = DataRepository.getIns().dataTable(QTaskTable.class);
             TreeMap<Integer, QTask> integerQTaskTreeMap = qTaskTable.getTaskGroupMap().get(type());
             QTask qTask = integerQTaskTreeMap.firstEntry().getValue();
-            acceptTask(player, taskPack, qTask.getId());
+            initTaskInfo(player, taskPack, qTask, false);
         }
+    }
+
+    protected TaskInfo initTaskInfo(Player player, TaskPack taskPack, QTask qTask, boolean noticeClient) {
+        TaskInfo taskInfo = new TaskInfo();
+        taskInfo.setCfgId(qTask.getId());
+        taskService.initTask(player, taskInfo, qTask.getConditionList()/*TODO读取配置表*/);
+        taskPack.getTasks().put(type(), taskInfo.getCfgId(), taskInfo);
+        log.info("{} 初始化任务 {}, {}, {}", player, type(), qTask.getInnerTaskDetail(), taskInfo);
+        /* TODO发送变更列表 */
+        if (noticeClient) {
+            ResUpdateTaskList resUpdateTaskList = new ResUpdateTaskList();
+            TaskBean taskBean = taskInfo.buildTaskBean();
+            resUpdateTaskList.getTasks().add(taskBean);
+            player.write(resUpdateTaskList);
+        }
+        return taskInfo;
     }
 
     /** 更新 */
@@ -74,7 +82,7 @@ public abstract class ITaskScript extends HoldRunApplication {
             boolean update = taskInfo.update(condition);
             if (update) {
                 changes.add(taskInfo);
-                log.info("{} 更新任务 {}, {}", player, taskInfo.qTask().getInnerTaskDetail(), taskInfo);
+                log.info("{} 更新任务 {}, {}, {}", player, type(), taskInfo.qTask().getInnerTaskDetail(), taskInfo);
             }
         }
     }
@@ -86,11 +94,22 @@ public abstract class ITaskScript extends HoldRunApplication {
         QTask qTask = integerQTaskTreeMap.get(taskId);
         TaskInfo taskInfo = taskPack.getTasks().get(type(), taskId);
         if (taskInfo == null) {
-            taskInfo = buildTaskInfo(player, qTask);
-            taskPack.getTasks().put(type(), taskInfo.getCfgId(), taskInfo);
+            taskInfo = initTaskInfo(player, taskPack, qTask, false);
+        }
+        if (taskInfo.getAcceptTime() > 0) {
+            log.debug("{} 任务 {} 已经接取", player, qTask.getInnerTaskDetail());
+            tipsService.tips(player, "已经接取");
+            return;
+        }
+        if (!ListOf.checkEmpty(qTask.getAcceptCost())) {
+            if (!bagService.checkCostNotice(player, qTask.getAcceptCost())) {
+                return;
+            }
+            ReasonArgs reasonArgs = ReasonArgs.of(Reason.TASK_ACCEPT, "taskCfg=" + taskId);
+            bagService.cost(player, qTask.getAcceptCost(), reasonArgs);
         }
         taskInfo.setAcceptTime(System.currentTimeMillis());
-        log.info("{} 接取 {} 任务：{}, {}", player, type(), qTask.getInnerTaskDetail(), taskInfo.toJSONString());
+        log.info("{} 接取任务：{}, {}, {}", player, type(), qTask.getInnerTaskDetail(), taskInfo.toJSONString());
         ResAcceptTask resAcceptTask = new ResAcceptTask();
         resAcceptTask.setTaskType(type());
         resAcceptTask.setTaskId(taskId);
@@ -104,21 +123,32 @@ public abstract class ITaskScript extends HoldRunApplication {
         TaskInfo taskInfo = taskInfoMap.get(taskId);
 
         if (!taskInfo.isComplete()) {
-            log.error("{} 任务 {} 没有完成", player, taskId);
+            log.debug("{} 任务 {} 没有完成", player, taskId);
             tipsService.tips(player, "任务尚未完成");
             return;
         }
 
-        QTaskTable qTaskTable = DataRepository.getIns().dataTable(QTaskTable.class);
-        TreeMap<Integer, QTask> integerQTaskTreeMap = qTaskTable.getTaskGroupMap().get(type());
-        QTask qTask = integerQTaskTreeMap.get(taskInfo.getCfgId());
+        if (taskInfo.isRewards()) {
+            log.debug("{} 任务 {} 已经领取奖励", player, taskId);
+            tipsService.tips(player, "已经领取奖励");
+            return;
+        }
+
+        QTask qTask = taskInfo.qTask();
+        ReasonArgs reasonArgs = ReasonArgs.of(Reason.TASK_SUBMIT, "taskCfg=" + taskId);
+
+        if (!ListOf.checkEmpty(qTask.getSubmitCost())) {
+            if (!bagService.checkCostNotice(player, qTask.getSubmitCost())) {
+                return;
+            }
+            bagService.cost(player, qTask.getSubmitCost(), reasonArgs);
+        }
+
         List<ItemCfg> rewards = qTask.getRewards();
 
         taskInfo.setRewards(true);
 
-        ReasonArgs reasonArgs = ReasonArgs.of(Reason.TASK_SUBMIT, "taskCfg=" + taskId);
-
-        log.info("{} 提交任务 {}, {}, rewards={}", player, qTask.getInnerTaskDetail(), reasonArgs, rewards);
+        log.info("{} 提交任务 {}, {}, {}, rewards={}", player, type(), qTask.getInnerTaskDetail(), reasonArgs, rewards);
 
         bagService.gainItems4Cfg(player, rewards, reasonArgs);
 
@@ -126,7 +156,7 @@ public abstract class ITaskScript extends HoldRunApplication {
         ResSubmitTask resSubmitTask = new ResSubmitTask();
         resSubmitTask.setTaskType(type());
         resSubmitTask.setTaskId(taskId);
-        QTask nextQTask = integerQTaskTreeMap.get(qTask.getAfter());
+        QTask nextQTask = qTask.getQTaskAfter();
         if (nextQTask != null) {
             resSubmitTask.setRemove(true);
             taskInfoMap.remove(taskId);
@@ -134,7 +164,7 @@ public abstract class ITaskScript extends HoldRunApplication {
         player.write(resSubmitTask);
 
         if (nextQTask != null) {
-            acceptTask(player, taskPack, nextQTask.getId());
+            initTaskInfo(player, taskPack, nextQTask, true);
         }
     }
 

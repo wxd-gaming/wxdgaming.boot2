@@ -1,5 +1,7 @@
 package wxdgaming.boot2.starter.excel.store;
 
+import java.util.Map;
+
 /**
  * 用于配置的检测和初始化
  *
@@ -9,6 +11,6 @@ package wxdgaming.boot2.starter.excel.store;
 public interface DataChecked {
 
     /** 用于配置的检测和初始化 */
-    default void initAndCheck() throws Exception {}
+    default void initAndCheck(Map<Class<?>, DataTable<?>> store) throws Exception {}
 
 }

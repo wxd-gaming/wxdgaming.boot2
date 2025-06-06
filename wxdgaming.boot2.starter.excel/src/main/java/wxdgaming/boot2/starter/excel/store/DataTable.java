@@ -44,7 +44,7 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
         dataMapping = AnnUtil.ann(tClass, DataMapping.class, true);
     }
 
-    public DataTable<E> loadJson(String jsonPath) {
+    public void loadJson(String jsonPath) {
         if (!jsonPath.endsWith("/")) {
             jsonPath += "/";
         }
@@ -53,14 +53,14 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
         if (StringUtils.isBlank(json)) {
             throw new RuntimeException("加载配置表：" + this.getClass().getSimpleName() + " 查询文件失败：" + jsonPath);
         }
-        return setModelList(FastJsonUtil.parseArray(json, tClass));
+        setModelList(FastJsonUtil.parseArray(json, tClass));
     }
 
-    public DataTable<E> setModelList(List<E> modelList) {
+    public void setModelList(List<E> modelList) {
         if (modelList == null || modelList.isEmpty()) {
             dataList = List.of();
             dataMap = Map.of();
-            return this;
+            return;
         }
         /*不可变列表*/
         final Map<Object, E> modeMap = new LinkedHashMap<>();
@@ -69,9 +69,6 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
                 Object keyValue = dbModel.key();
                 if (modeMap.put(keyValue, dbModel) != null) {
                     throw new RuntimeException("数据 主键 【" + keyValue + "】 重复");
-                }
-                if (dbModel instanceof DataChecked dataChecked) {
-                    dataChecked.initAndCheck();
                 }
                 Keys keys = AnnUtil.ann(DataTable.this.getClass(), Keys.class);
                 if (keys != null) {
@@ -97,7 +94,6 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
         this.dataList = Collections.unmodifiableList(modelList);
         this.dataMap = Collections.unmodifiableMap(modeMap);
         this.initDb();
-        return this;
     }
 
     /**

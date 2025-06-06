@@ -6,9 +6,12 @@ import lombok.Getter;
 import org.apache.logging.log4j.message.ParameterizedMessage;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.excel.store.DataChecked;
+import wxdgaming.boot2.starter.excel.store.DataTable;
+import wxdgaming.game.cfg.QTaskTable;
 import wxdgaming.game.cfg.bean.mapping.QTaskMapping;
 
 import java.io.Serializable;
+import java.util.Map;
 
 
 /**
@@ -20,6 +23,8 @@ import java.io.Serializable;
 @Getter
 public class QTask extends QTaskMapping implements Serializable, DataChecked {
 
+    private transient QTask qTaskBefore;
+    private transient QTask qTaskAfter;
     /** 详情 */
     @JSONField(serialize = false)
     private transient String innerTaskDetail;
@@ -30,7 +35,7 @@ public class QTask extends QTaskMapping implements Serializable, DataChecked {
     @JSONField(serialize = false)
     private transient String innerTaskDescription;
 
-    @Override public void initAndCheck() throws Exception {
+    @Override public void initAndCheck(Map<Class<?>, DataTable<?>> store) throws Exception {
         /*todo 实现数据检测和初始化*/
         Object[] objects = new Object[conditionList.size()];
         for (int i = 0; i < conditionList.size(); i++) {
@@ -40,6 +45,10 @@ public class QTask extends QTaskMapping implements Serializable, DataChecked {
         innerTaskDescription = new ParameterizedMessage(getDescription(), objects).getFormattedMessage();
         innerTaskName = String.format("%s(%s)", getId(), getName());
         innerTaskDetail = innerTaskName + "{" + innerTaskDescription + "}";
+
+        DataTable<?> dataTable = store.get(QTaskTable.class);
+        qTaskBefore = (QTask) dataTable.get(getBefore());
+        qTaskAfter = (QTask) dataTable.get(getAfter());
 
     }
 

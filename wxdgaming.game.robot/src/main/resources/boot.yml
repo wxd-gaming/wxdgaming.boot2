@@ -55,4 +55,4 @@ socket:
 data:
   json:
     path: "cfg_json"
-    scan: "wxdgaming.game.server.cfg"
+    scan: "wxdgaming.game.cfg"

@@ -13,7 +13,7 @@ import java.util.Map;
  * excel 构建 怪物表, src/main/cfg/怪物信息.xlsx, q_monster,
  *
  * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-05 10:08:09
+ * @version: 2025-06-06 14:05:07
  **/
 @Getter
 public class QMonsterTable extends DataTable<QMonster> implements Serializable {

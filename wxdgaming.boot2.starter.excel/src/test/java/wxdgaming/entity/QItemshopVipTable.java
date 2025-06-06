@@ -13,7 +13,7 @@ import java.util.Map;
  * excel 构建 vip礼包, src/main/resources/范例.xlsx, q_itemshop_vip,
  *
  * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-03-06 21:12:35
+ * @version: 2025-06-06 14:04:24
  **/
 @Getter
 public class QItemshopVipTable extends DataTable<QItemshopVip> implements Serializable {

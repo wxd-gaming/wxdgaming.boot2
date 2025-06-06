@@ -87,4 +87,14 @@ public class TaskInfo extends ObjectBase {
         return taskBean;
     }
 
+    @Override public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TaskInfo taskInfo = (TaskInfo) o;
+        return getCfgId() == taskInfo.getCfgId();
+    }
+
+    @Override public int hashCode() {
+        return getCfgId();
+    }
 }

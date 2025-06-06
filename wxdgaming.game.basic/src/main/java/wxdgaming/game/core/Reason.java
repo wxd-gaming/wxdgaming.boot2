@@ -12,6 +12,8 @@ public enum Reason {
     CreateRole,
     GM,
     USE_CDKEY,
+    /** 任务接受 */
+    TASK_ACCEPT,
     /** 任务完成 */
     TASK_SUBMIT,
     /** 任务完成 */

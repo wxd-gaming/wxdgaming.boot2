@@ -93,4 +93,8 @@ public class ListOf implements Serializable {
         return list;
     }
 
+    public static <T> boolean checkEmpty(Collection<T> collection) {
+        return collection == null || collection.isEmpty();
+    }
+
 }

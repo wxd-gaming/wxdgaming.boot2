@@ -38,8 +38,12 @@ public abstract class QTaskMapping extends ObjectBase implements Serializable, D
     protected int max_lv;
     /** 任务条件 */
     protected final List<wxdgaming.boot2.core.lang.condition.Condition> conditionList = new ArrayList<>();
+    /** 任务接取的时候需要扣除的道具 */
+    protected final List<wxdgaming.game.bean.goods.ItemCfg> acceptCost = new ArrayList<>();
     /** 任务奖励 */
     protected final List<wxdgaming.game.bean.goods.ItemCfg> rewards = new ArrayList<>();
+    /** 任务提交的时候需要扣除的道具 */
+    protected final List<wxdgaming.game.bean.goods.ItemCfg> submitCost = new ArrayList<>();
 
     public Object key() {
         return id;

@@ -1,15 +1,12 @@
 package code;
 
 import org.junit.Test;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.util.JvmUtil;
 import wxdgaming.boot2.starter.excel.ExcelRepository;
 import wxdgaming.boot2.starter.excel.store.CreateJavaCode;
-import wxdgaming.entity.bean.QItemshopVip;
 
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * 读取测试
@@ -31,8 +28,8 @@ public class ReadTest {
 
             String x = tableInfo.data2Json();
             System.out.println(x);
-            List<QItemshopVip> qItemshopVipMappings = FastJsonUtil.parseArray(x, QItemshopVip.class);
-            System.out.println(qItemshopVipMappings);
+            // List<QItemshopVip> qItemshopVipMappings = FastJsonUtil.parseArray(x, QItemshopVip.class);
+            // System.out.println(qItemshopVipMappings);
 
         });
     }

@@ -262,15 +262,32 @@ public class BagService extends HoldRunApplication implements InitPrint {
 
     }
 
-    /** 在执行 cost 之前切记用这个 */
-    public boolean checkCost(Player player, List<ItemCfg> costList, ReasonArgs reasonArgs) {
+    public boolean checkCostNotice(Player player, List<ItemCfg> costList) {
         BagPack bagPack = player.getBagPack();
         ItemBag itemBag = bagPack.getItems().get(BagType.Bag);
-        return checkCost(player, BagType.Bag, itemBag, costList, reasonArgs);
+        return checkCostNotice(player, BagType.Bag, itemBag, costList);
     }
 
     /** 在执行 cost 之前切记用这个 */
-    public boolean checkCost(Player player, BagType bagType, ItemBag itemBag, List<ItemCfg> costList, ReasonArgs reasonArgs) {
+    public boolean checkCostNotice(Player player, BagType bagType, ItemBag itemBag, List<ItemCfg> costList) {
+        Integer cfgId = checkCost(player, bagType, itemBag, costList);
+        if (cfgId == null) {
+            return true;
+        }
+        QItem qItem = dataRepository.dataTable(QItemTable.class, cfgId);
+        tipsService.tips(player, qItem.getToName() + "道具不足");
+        return false;
+    }
+
+    /** 在执行 cost 之前切记用这个 */
+    public Integer checkCost(Player player, List<ItemCfg> costList) {
+        BagPack bagPack = player.getBagPack();
+        ItemBag itemBag = bagPack.getItems().get(BagType.Bag);
+        return checkCost(player, BagType.Bag, itemBag, costList);
+    }
+
+    /** 在执行 cost 之前切记用这个 */
+    public Integer checkCost(Player player, BagType bagType, ItemBag itemBag, List<ItemCfg> costList) {
         HashMap<Integer, Long> costMap = new HashMap<>();
         for (ItemCfg itemCfg : costList) {
             int cfgId = itemCfg.getCfgId();
@@ -286,20 +303,20 @@ public class BagService extends HoldRunApplication implements InitPrint {
             GainScript gainScript = getGainScript(type, subtype);
             long oldCount = gainScript.getCount(player, itemBag, cfgId);
             if (oldCount < change) {
-                return false;
+                return cfgId;
             }
         }
-        return true;
+        return null;
     }
 
-    /** 调用之前请使用 {@link BagService#checkCost(Player, List, ReasonArgs)} 函数 是否够消耗 */
+    /** 调用之前请使用 {@link BagService#checkCost(Player, List)} 函数 是否够消耗 */
     public void cost(Player player, List<ItemCfg> costList, ReasonArgs reasonArgs) {
         BagPack bagPack = player.getBagPack();
         ItemBag itemBag = bagPack.getItems().get(BagType.Bag);
         cost(player, BagType.Bag, itemBag, costList, reasonArgs);
     }
 
-    /** 调用之前请使用 {@link BagService#checkCost(Player, BagType, ItemBag, List, ReasonArgs)} 函数 是否够消耗 */
+    /** 调用之前请使用 {@link BagService#checkCost(Player, BagType, ItemBag, List)} 函数 是否够消耗 */
     public void cost(Player player, BagType bagType, ItemBag itemBag, List<ItemCfg> costList, ReasonArgs reasonArgs) {
 
         BagChanges bagChanges = new BagChanges(player, bagType, itemBag, reasonArgs);
@@ -319,7 +336,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
             costScript.cost(player, bagChanges, qItem, change, reasonArgs);
             long newCount = gainScript.getCount(player, itemBag, cfgId);
 
-            log.info("消耗道具：{}, {}, {} {} + {} = {}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, reasonArgs);
+            log.info("消耗道具：{}, {}, {} {} - {} = {}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, reasonArgs);
         }
 
         player.write(bagChanges.build());

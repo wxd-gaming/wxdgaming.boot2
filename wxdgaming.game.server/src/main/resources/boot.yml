@@ -52,7 +52,7 @@ socket:
 data:
   json:
     path: "cfg_json"
-    scan: "wxdgaming.game.server.cfg"
+    scan: "wxdgaming.game.cfg"
 db:
   pgsql:
     debug: false                                                 #调试模式将会显示sql语句
