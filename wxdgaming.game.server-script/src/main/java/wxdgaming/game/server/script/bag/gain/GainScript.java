@@ -11,15 +11,14 @@ import wxdgaming.game.cfg.QItemTable;
 import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.bag.BagType;
-import wxdgaming.game.message.bag.ResUpdateBagInfo;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.goods.ItemBag;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
+import wxdgaming.game.server.script.bag.BagChanges;
 import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.role.PlayerService;
 
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -41,11 +40,16 @@ public class GainScript extends HoldRunApplication {
         return ItemTypeConst.NONE;
     }
 
+    @SuppressWarnings("unchecked")
+    protected <T extends Item> T newItem() {
+        return (T) new Item();
+    }
+
     /** 创建道具 */
     public void newItem(List<Item> items, ItemCfg itemCfg) {
         long count = itemCfg.getNum();
         do {
-            Item item = new Item();
+            Item item = newItem();
             item.setUid(dataCenterService.getItemHexid().newId());
             item.setCfgId(itemCfg.getCfgId());
             QItem qItem = DataRepository.getIns().dataTable(QItemTable.class, itemCfg.getCfgId());
@@ -63,8 +67,10 @@ public class GainScript extends HoldRunApplication {
         } while (count > 0);
     }
 
+    protected void initItem(Item item) {}
+
     /** 查询指定道具背包数量 */
-    public long gainCount(Player player, ItemBag itemBag, int cfgId) {
+    public long getCount(Player player, ItemBag itemBag, int cfgId) {
         return itemBag
                 .getItems()
                 .stream()
@@ -73,33 +79,41 @@ public class GainScript extends HoldRunApplication {
                 .sum();
     }
 
-    /** 将道具添加进入背包 */
-    public boolean gain(Player player, ResUpdateBagInfo resUpdateBagInfo, BagType bagType, ItemBag itemBag, Item newItem, ReasonArgs reasonArgs) {
+    /**
+     * 将道具添加进入背包
+     *
+     * @return
+     */
+    public boolean gain(BagChanges bagChanges, Item newItem) {
+        Player player = bagChanges.getPlayer();
+        BagType bagType = bagChanges.getBagType();
+        ItemBag itemBag = bagChanges.getItemBag();
+        ReasonArgs reasonArgs = bagChanges.getReasonArgs();
         long count = newItem.getCount();
-        HashSet<Item> changeItems = new HashSet<>();
-        for (Item value : itemBag.getItems()) {
-            /* TODO 叠加 */
-            QItem qItem = DataRepository.getIns().dataTable(QItemTable.class, value.getCfgId());
-            int maxCount = qItem.getMaxCount();
-            if (value.getCfgId() != newItem.getCfgId()) continue;
-            if (value.isBind() != newItem.isBind()) continue;/* TODO 绑定状态一致 */
-            if (value.getExpireTime() == newItem.getExpireTime()/* TODO 过期时间一致 */) continue;
-            if (value.getCount() < maxCount || maxCount == 0/*表示无限叠加*/) {
-                if (maxCount > 0 && value.getCount() + count > maxCount) {
-                    count = maxCount - value.getCount();
-                    value.setCount(maxCount);
-                } else {
-                    count = 0;
-                    value.setCount(value.getCount() + count);
+        /* TODO 叠加 */
+        QItem qItem = DataRepository.getIns().dataTable(QItemTable.class, newItem.getCfgId());
+        int maxCount = qItem.getMaxCount();
+        if (count != maxCount/*TODO入股相等说明最大值，不去执行叠加操作直接入包*/) {
+            for (Item value : itemBag.getItems()) {
+                if (value.getCfgId() != newItem.getCfgId()) continue;
+                if (value.isBind() != newItem.isBind()) continue;/* TODO 绑定状态一致 */
+                if (value.getExpireTime() != newItem.getExpireTime()/* TODO 过期时间一致 */) continue;
+                long oldCount = value.getCount();
+                if (oldCount < maxCount || maxCount == 0/*表示无限叠加*/) {
+                    if (maxCount > 0 && oldCount + count > maxCount) {
+                        long addChange = maxCount - oldCount;
+                        count -= addChange;
+                        value.setCount(maxCount);
+                        log.info("道具入包：{}, {}, 道具叠加, {}, {}+{}={}, {}", player, bagType, value.toName(), oldCount, addChange, value.getCount(), reasonArgs);
+                    } else {
+                        value.setCount(oldCount + count);
+                        log.info("道具入包：{}, {}, 道具叠加, {}, {}+{}={}, {}", player, bagType, value.toName(), oldCount, count, value.getCount(), reasonArgs);
+                        count = 0;
+                    }
+                    bagChanges.addChange(value);
                 }
-                changeItems.add(value);
-            }
-            if (count < 1)
-                break;
-        }
-        if (!changeItems.isEmpty()) {
-            for (Item changeItem : changeItems) {
-                resUpdateBagInfo.getItems().add(changeItem.toItemBean());
+                if (count < 1)
+                    break;
             }
         }
         /* TODO 叠加过后剩余的 */
@@ -109,8 +123,9 @@ public class GainScript extends HoldRunApplication {
                 /* TODO 背包已满 */
                 return false;
             }
+            log.info("道具入包：{}, {}, 道具新增, {}, count={}, {}", player, bagType, newItem.toName(), newItem.getCount(), reasonArgs);
             itemBag.getItems().add(newItem);
-            resUpdateBagInfo.getItems().add(newItem.toItemBean());
+            bagChanges.addChange(newItem);
         }
         return true;
     }

@@ -26,7 +26,8 @@ message ResUpdateBagInfo {
   BagType bagType                   = 1;
   map<int32, int64> currencyMap     = 2;//所有的货币
   repeated ItemBean items           = 3;//所有的物品
-  string reason                     = 4;//更新原因
+  repeated int64 delItemIds         = 4;//删除的物品id
+  string reason                     = 5;//更新原因
   string other                      = 7;//其他信息-与客户端协商
 }
 

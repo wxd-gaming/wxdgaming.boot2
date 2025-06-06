@@ -27,6 +27,10 @@ public abstract class ItemTypeConst {
     public static final ItemTypeConst EXP = new ItemTypeConst(1, 5, 0) {};
     /** 公会货币 */
     public static final ItemTypeConst GuildCurrencyType = new ItemTypeConst(1, 2, 0) {};
+    /** 装备类型 */
+    public static final ItemTypeConst EquipType = new ItemTypeConst(2, 0, 0) {};
+    /** 消耗类型 */
+    public static final ItemTypeConst ConsumeType = new ItemTypeConst(10, 0, 0) {};
 
     private final int type;
     private final int subType;

@@ -18,7 +18,6 @@ import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.message.bag.ResBagInfo;
-import wxdgaming.game.message.bag.ResUpdateBagInfo;
 import wxdgaming.game.server.bean.goods.BagPack;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.goods.ItemBag;
@@ -27,15 +26,13 @@ import wxdgaming.game.server.event.OnCreateRole;
 import wxdgaming.game.server.event.OnLogin;
 import wxdgaming.game.server.event.OnLoginBefore;
 import wxdgaming.game.server.module.data.DataCenterService;
+import wxdgaming.game.server.script.bag.cost.CostScript;
 import wxdgaming.game.server.script.bag.gain.GainScript;
 import wxdgaming.game.server.script.bag.use.UseItemAction;
 import wxdgaming.game.server.script.mail.MailService;
 import wxdgaming.game.server.script.tips.TipsService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * 背包逻辑脚本
@@ -48,6 +45,7 @@ import java.util.List;
 public class BagService extends HoldRunApplication implements InitPrint {
 
     Table<Integer, Integer, GainScript> gainImplTable = new Table<>();
+    Table<Integer, Integer, CostScript> costImplTable = new Table<>();
     Table<Integer, Integer, UseItemAction> useItemImplTable = new Table<>();
 
     final DataCenterService dataCenterService;
@@ -74,6 +72,17 @@ public class BagService extends HoldRunApplication implements InitPrint {
                         AssertUtil.assertTrue(old == null, "重复注册类型：" + itemTypeConst);
                     });
             this.gainImplTable = tmpGainScriptTable;
+        }
+
+        {
+            Table<Integer, Integer, CostScript> tmpCostScriptTable = new Table<>();
+            runApplication.classWithSuper(CostScript.class)
+                    .forEach(costScript -> {
+                        ItemTypeConst itemTypeConst = costScript.type();
+                        CostScript old = tmpCostScriptTable.put(itemTypeConst.getType(), itemTypeConst.getSubType(), costScript);
+                        AssertUtil.assertTrue(old == null, "重复注册类型：" + itemTypeConst);
+                    });
+            this.costImplTable = tmpCostScriptTable;
         }
 
         {
@@ -135,6 +144,17 @@ public class BagService extends HoldRunApplication implements InitPrint {
         return gainScript;
     }
 
+    public CostScript getCostScript(int type, int subtype) {
+        CostScript costScript = costImplTable.get(type, subtype);
+        if (costScript == null) {
+            costScript = costImplTable.get(type, 0);
+        }
+        if (costScript == null) {
+            costScript = costImplTable.get(0, 0);
+        }
+        return costScript;
+    }
+
     public List<Item> newItems(ItemCfg itemCfg) {
         return newItems(List.of(itemCfg));
     }
@@ -162,7 +182,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
         QItem qItem = dataRepository.dataTable(QItemTable.class, itemCfgId);
         int type = qItem.getItemType();
         int subtype = qItem.getItemSubType();
-        return getGainScript(type, subtype).gainCount(player, itemBag, itemCfgId);
+        return getGainScript(type, subtype).getCount(player, itemBag, itemCfgId);
     }
 
     /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
@@ -199,9 +219,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
     /** 最终入口 */
     private void gainItems(Player player, BagType bagType, ItemBag itemBag, List<Item> items, ReasonArgs reasonArgs) {
         Iterator<Item> iterator = items.iterator();
-        ResUpdateBagInfo resUpdateBagInfo = new ResUpdateBagInfo();
-        resUpdateBagInfo.setBagType(bagType);
-
+        BagChanges bagChanges = new BagChanges(player, bagType, itemBag, reasonArgs);
         while (iterator.hasNext()) {
             Item newItem = iterator.next();
 
@@ -213,14 +231,18 @@ public class BagService extends HoldRunApplication implements InitPrint {
 
             GainScript gainScript = getGainScript(type, subtype);
 
-            long oldCount = gainScript.gainCount(player, itemBag, newItem.getCfgId());
+            long oldCount = gainScript.getCount(player, itemBag, newItem.getCfgId());
             long change = newItem.getCount();
 
-            boolean gain = gainScript.gain(player, resUpdateBagInfo, bagType, itemBag, newItem, reasonArgs);
+            boolean gain = gainScript.gain(bagChanges, newItem);
 
             if (gain || newItem.getCount() != change) {
-                long newCount = gainScript.gainCount(player, itemBag, newItem.getCfgId());
-                log.info("获得道具：{}, {} {} + {} = {}, {}", player, newItem.toName(), oldCount, change, newCount, reasonArgs);
+                long newCount = gainScript.getCount(player, itemBag, newItem.getCfgId());
+                if (!gain) {
+                    /*表示叠加之后，剩余的东西没办法入包，需要发邮件*/
+                    change -= newItem.getCount();
+                }
+                log.info("获得道具：{}, {}, {} {} + {} = {}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, reasonArgs);
             }
 
             if (gain) {
@@ -230,13 +252,77 @@ public class BagService extends HoldRunApplication implements InitPrint {
                 break;
             }
         }
-        resUpdateBagInfo.setReason(reasonArgs.getReason().name());
-        player.write(resUpdateBagInfo);
+
+        player.write(bagChanges.build());
 
         /* TODO 发送邮件 */
         if (!items.isEmpty()) {
             mailService.sendMail(player, "系统", "背包已满", "背包已满", List.of(), items, reasonArgs.toString());
         }
+
+    }
+
+    /** 在执行 cost 之前切记用这个 */
+    public boolean checkCost(Player player, List<ItemCfg> costList, ReasonArgs reasonArgs) {
+        BagPack bagPack = player.getBagPack();
+        ItemBag itemBag = bagPack.getItems().get(BagType.Bag);
+        return checkCost(player, BagType.Bag, itemBag, costList, reasonArgs);
+    }
+
+    /** 在执行 cost 之前切记用这个 */
+    public boolean checkCost(Player player, BagType bagType, ItemBag itemBag, List<ItemCfg> costList, ReasonArgs reasonArgs) {
+        HashMap<Integer, Long> costMap = new HashMap<>();
+        for (ItemCfg itemCfg : costList) {
+            int cfgId = itemCfg.getCfgId();
+            long change = itemCfg.getNum();
+            costMap.merge(cfgId, change, Math::addExact);
+        }
+        for (Map.Entry<Integer, Long> entry : costMap.entrySet()) {
+            int cfgId = entry.getKey();
+            long change = entry.getValue();
+            QItem qItem = dataRepository.dataTable(QItemTable.class, cfgId);
+            int type = qItem.getItemType();
+            int subtype = qItem.getItemSubType();
+            GainScript gainScript = getGainScript(type, subtype);
+            long oldCount = gainScript.getCount(player, itemBag, cfgId);
+            if (oldCount < change) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** 调用之前请使用 {@link BagService#checkCost(Player, List, ReasonArgs)} 函数 是否够消耗 */
+    public void cost(Player player, List<ItemCfg> costList, ReasonArgs reasonArgs) {
+        BagPack bagPack = player.getBagPack();
+        ItemBag itemBag = bagPack.getItems().get(BagType.Bag);
+        cost(player, BagType.Bag, itemBag, costList, reasonArgs);
+    }
+
+    /** 调用之前请使用 {@link BagService#checkCost(Player, BagType, ItemBag, List, ReasonArgs)} 函数 是否够消耗 */
+    public void cost(Player player, BagType bagType, ItemBag itemBag, List<ItemCfg> costList, ReasonArgs reasonArgs) {
+
+        BagChanges bagChanges = new BagChanges(player, bagType, itemBag, reasonArgs);
+
+        for (ItemCfg itemCfg : costList) {
+            int cfgId = itemCfg.getCfgId();
+            long change = itemCfg.getNum();
+
+            QItem qItem = dataRepository.dataTable(QItemTable.class, cfgId);
+            int type = qItem.getItemType();
+            int subtype = qItem.getItemSubType();
+            GainScript gainScript = getGainScript(type, subtype);
+
+            long oldCount = gainScript.getCount(player, itemBag, cfgId);
+            CostScript costScript = getCostScript(type, subtype);
+
+            costScript.cost(player, bagChanges, qItem, change, reasonArgs);
+            long newCount = gainScript.getCount(player, itemBag, cfgId);
+
+            log.info("消耗道具：{}, {}, {} {} + {} = {}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, reasonArgs);
+        }
+
+        player.write(bagChanges.build());
 
     }
 

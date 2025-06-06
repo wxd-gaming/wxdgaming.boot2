@@ -38,13 +38,16 @@ public class Item extends ObjectLong {
         return itemBean;
     }
 
-    public QItem toCfg() {
+    public QItem qItem() {
         return DataRepository.getIns().dataTable(QItemTable.class, getCfgId());
     }
 
     public String toName() {
-        QItem qItem = toCfg();
+        QItem qItem = qItem();
         return "%s(%s, %s)".formatted(getUid(), qItem.getId(), qItem.getName());
     }
 
+    @Override public String toString() {
+        return toName();
+    }
 }

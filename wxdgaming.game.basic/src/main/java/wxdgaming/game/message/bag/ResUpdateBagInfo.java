@@ -37,8 +37,10 @@ public class ResUpdateBagInfo extends PojoBase {
     @Tag(2) private Map<Integer, Long> currencyMap = new LinkedHashMap<>();
     /** 所有的物品 */
     @Tag(3) private List<ItemBean> items = new ArrayList<>();
+    /** 删除的物品id */
+    @Tag(4) private List<Long> delItemIds = new ArrayList<>();
     /** 更新原因 */
-    @Tag(4) private String reason;
+    @Tag(5) private String reason;
     /** 其他信息-与客户端协商 */
     @Tag(7) private String other;
 

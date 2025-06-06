@@ -17,9 +17,11 @@ import java.io.Serializable;
 @Getter
 public class QItem extends QItemMapping implements Serializable, DataChecked {
 
+    private String toName;
+
     @Override public void initAndCheck() throws Exception {
         /*todo 实现数据检测和初始化*/
-
+        toName = "%s(%s)".formatted(this.getId(), this.getName());
     }
 
 }

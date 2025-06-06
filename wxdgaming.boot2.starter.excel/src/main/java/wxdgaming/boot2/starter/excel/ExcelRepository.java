@@ -130,7 +130,7 @@ public class ExcelRepository {
                 TreeMap<Integer, CellInfo> cellInfoMap = new TreeMap<>();
 
                 short lastCellNum = fieldNameRow.getLastCellNum();
-                for (int cellIndex = 0; cellIndex < lastCellNum; cellIndex++) {
+                for (int cellIndex = 0; cellIndex <= lastCellNum; cellIndex++) {
                     String fieldBelongCell = readCellString(fieldBelongRow.getCell(cellIndex), false);/*字段归属*/
                     String fieldNameCell = readCellString(fieldNameRow.getCell(cellIndex), true);/*字段名字*/
                     String fieldTypeCell = readCellString(fieldTypeRow.getCell(cellIndex), false);/*字段类型*/
@@ -163,7 +163,7 @@ public class ExcelRepository {
 
                 final Map<Object, RowData> rows = new LinkedHashMap<>();
                 int lastRowNum = sheet.getLastRowNum();
-                for (int rowIndex = 5; rowIndex < lastRowNum; rowIndex++) {
+                for (int rowIndex = 5; rowIndex <= lastRowNum; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
                     RowData rowData = new RowData(true);
                     for (int cellIndex = 0; cellIndex < lastCellNum; cellIndex++) {

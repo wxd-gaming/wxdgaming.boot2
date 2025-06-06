@@ -3,12 +3,10 @@ package wxdgaming.game.server.script.bag.gain.impl;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.bean.goods.ItemTypeConst;
-import wxdgaming.game.core.ReasonArgs;
-import wxdgaming.game.message.bag.BagType;
-import wxdgaming.game.message.bag.ResUpdateBagInfo;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.goods.ItemBag;
 import wxdgaming.game.server.bean.role.Player;
+import wxdgaming.game.server.script.bag.BagChanges;
 
 /**
  * 货币的获得
@@ -24,15 +22,13 @@ public class ExpGainScript extends CurrencyGainScript {
         return ItemTypeConst.EXP;
     }
 
-    @Override public long gainCount(Player player, ItemBag itemBag, int cfgId) {
+    @Override public long getCount(Player player, ItemBag itemBag, int cfgId) {
         return player.getExp();
     }
 
-    @Override public boolean gain(Player player, ResUpdateBagInfo resUpdateBagInfo,
-                                  BagType bagType, ItemBag itemBag,
-                                  Item newItem, ReasonArgs reasonArgs) {
+    @Override public boolean gain(BagChanges bagChanges, Item newItem) {
         long count = newItem.getCount();
-        playerService.addExp(player, count, reasonArgs);
+        playerService.addExp(bagChanges.getPlayer(), count, bagChanges.getReasonArgs());
         return true;
     }
 

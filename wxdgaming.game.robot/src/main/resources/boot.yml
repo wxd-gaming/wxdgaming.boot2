@@ -31,7 +31,7 @@ socket:
   client:
     debug: false
     host: 127.0.0.1
-    port: 8800
+    port: 18800
     connectTimeout: 500                                       #创建链接的超时时间
     enabledScheduledFlush: true                             # 开启定时器flush
     scheduledFlushMs: 10                                    #定时调用flush的频率单位是ms

@@ -16,5 +16,6 @@
 	{"id":15,"type":2,"name":"杀怪","description":"击杀 {} 只怪物","min_lv":1,"max_lv":100,"condition":{"k1":"KillMonster","k2":"0","k3":"0","target":1700,"update":"Add"},"rewards":[{"num":10,"cfgId":1},{"num":10,"cfgId":3},{"num":24,"cfgId":5}]},
 	{"id":16,"type":2,"name":"杀怪","description":"击杀 {} 只怪物","min_lv":1,"max_lv":100,"condition":{"k1":"KillMonster","k2":"0","k3":"0","target":2000,"update":"Add"},"rewards":[{"num":10,"cfgId":1},{"num":10,"cfgId":3},{"num":25,"cfgId":5}]},
 	{"id":17,"type":2,"name":"杀怪","description":"击杀 {} 只怪物","min_lv":1,"max_lv":100,"condition":{"k1":"KillMonster","k2":"0","k3":"0","target":2300,"update":"Add"},"rewards":[{"num":10,"cfgId":1},{"num":10,"cfgId":3},{"num":26,"cfgId":5}]},
-	{"id":18,"type":2,"name":"杀怪","description":"击杀 {} 只怪物","min_lv":1,"max_lv":100,"condition":{"k1":"KillMonster","k2":"0","k3":"0","target":2600,"update":"Add"},"rewards":[{"num":10,"cfgId":1},{"num":10,"cfgId":3},{"num":27,"cfgId":5}]}
+	{"id":18,"type":2,"name":"杀怪","description":"击杀 {} 只怪物","min_lv":1,"max_lv":100,"condition":{"k1":"KillMonster","k2":"0","k3":"0","target":2600,"update":"Add"},"rewards":[{"num":10,"cfgId":1},{"num":10,"cfgId":3},{"num":27,"cfgId":5}]},
+	{"id":19,"type":2,"name":"杀怪","description":"击杀 {} 只怪物","min_lv":1,"max_lv":100,"condition":{"k1":"KillMonster","k2":"0","k3":"0","target":2900,"update":"Add"},"rewards":[{"num":10,"cfgId":1},{"num":10,"cfgId":3},{"num":28,"cfgId":5}]}
 ]
