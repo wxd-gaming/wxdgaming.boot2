@@ -8,7 +8,7 @@ import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
-import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlService;
+import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.game.server.bean.BackendConfig;
 import wxdgaming.game.server.bean.global.DataBase;
 import wxdgaming.game.server.bean.global.GlobalDataEntity;
@@ -28,17 +28,17 @@ import java.util.List;
 public class GlobalDataService extends HoldRunApplication {
 
     private int sid;
-    private PgsqlService pgsqlService;
+    private SqlDataHelper<?> sqlDataHelper;
     /** key: sid, key: type, value: 数据 */
     private final ConcurrentTable<Integer, GlobalDataType, GlobalDataEntity> globalDataTable = new ConcurrentTable<>();
     @Value(path = "backends")
     private BackendConfig backendConfig;
 
     @Start
-    public void start(@Value(path = "sid") int sid, PgsqlService pgsqlService) {
+    public void start(@Value(path = "sid") int sid, SqlDataHelper<?> sqlDataHelper) {
         this.sid = sid;
-        this.pgsqlService = pgsqlService;
-        List<GlobalDataEntity> list = this.pgsqlService.findListByWhere(GlobalDataEntity.class, "merge = ?", false);
+        this.sqlDataHelper = sqlDataHelper;
+        List<GlobalDataEntity> list = this.sqlDataHelper.findListByWhere(GlobalDataEntity.class, "merge = ?", false);
         for (GlobalDataEntity entity : list) {
             GlobalDataType globalDataType = GlobalDataType.ofOrException(entity.getId());
             globalDataTable.put(entity.getSid(), globalDataType, entity);
@@ -48,7 +48,7 @@ public class GlobalDataService extends HoldRunApplication {
     @shutdown
     public void shutdown() {
         globalDataTable.forEach(globalDataEntity -> {
-            pgsqlService.dataBatch().save(globalDataEntity);
+            sqlDataHelper.dataBatch().save(globalDataEntity);
         });
     }
 
@@ -70,7 +70,7 @@ public class GlobalDataService extends HoldRunApplication {
     }
 
     public void save(GlobalDataEntity globalDataEntity) {
-        pgsqlService.save(globalDataEntity);
+        sqlDataHelper.save(globalDataEntity);
     }
 
 }

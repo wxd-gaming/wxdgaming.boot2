@@ -48,7 +48,6 @@ public class MysqlDataHelper extends SqlDataHelper<MySqlDDLBuilder> {
                 tableName
         );
 
-        StringBuilder sb = new StringBuilder();
         LinkedHashMap<String, TableMapping.FieldMapping> columnMap = tableMapping.getColumns();
         for (TableMapping.FieldMapping fieldMapping : columnMap.values()) {
             if (fieldMapping.isIndex()) {
@@ -57,11 +56,10 @@ public class MysqlDataHelper extends SqlDataHelper<MySqlDDLBuilder> {
                 keyName = keyName.toLowerCase();
                 if (!indexList.contains(keyName)) {
                     String alterColumn = ddlBuilder.buildAlterColumnIndex(tableName, fieldMapping);
-                    sb.append(alterColumn).append("\n");
+                    executeUpdate(alterColumn);
                 }
             }
         }
-        executeUpdate(sb.toString());
     }
 
     @Override protected void createTable(TableMapping tableMapping, String tableName, String comment) {

@@ -112,7 +112,7 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
      */
     public String buildAlterColumnIndex(String tableName, TableMapping.FieldMapping fieldMapping) {
         String columnName = fieldMapping.getColumnName();
-        return "ALTER TABLE `%s` ADD INDEX %s_%s (`%s`);".formatted(tableName, tableName, columnName, columnName);
+        return "ALTER TABLE `%s` ADD INDEX `%s_%s` (`%s`);".formatted(tableName, tableName, columnName, columnName);
     }
 
     /** ? 占位符 */

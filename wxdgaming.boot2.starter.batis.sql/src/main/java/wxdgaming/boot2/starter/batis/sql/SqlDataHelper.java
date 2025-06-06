@@ -12,6 +12,7 @@ import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.batis.DataHelper;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
@@ -266,6 +267,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
      * @version: 2025-02-21 13:35
      */
     public int executeUpdate(String sql, Object... params) {
+        AssertUtil.assertTrue(StringUtils.isNotBlank(sql), "sql 语句不能为空");
         try (Connection connection = connection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             if (params != null) {
                 for (int i = 0; i < params.length; i++) {

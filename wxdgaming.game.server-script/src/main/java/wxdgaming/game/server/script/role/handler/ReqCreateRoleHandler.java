@@ -99,7 +99,7 @@ public class ReqCreateRoleHandler extends HoldRunApplication {
             player.setSex(sex);
             player.setJob(job);
             log.info("sid={}, account={}, 创建角色：{}", sid, account, player);
-            dataCenterService.getPgsqlService().getCacheService()
+            dataCenterService.getSqlDataHelper().getCacheService()
                     .cache(RoleEntity.class)
                     .put(player.getUid(), new RoleEntity().setUid(player.getUid()).setPlayer(player));
             dataCenterService.getAccount2RidsMap().computeIfAbsent(sid, account, l -> new HashSet<>()).add(player.getUid());

@@ -10,10 +10,8 @@ import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
 import wxdgaming.boot2.core.format.HexId;
 import wxdgaming.boot2.core.keywords.KeywordsMapping;
+import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryResult;
-import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlService;
-import wxdgaming.boot2.starter.net.SocketSession;
-import wxdgaming.game.message.inner.ServiceType;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
 
@@ -31,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Singleton
 public class DataCenterService {
 
-    final PgsqlService pgsqlService;
+    final SqlDataHelper<?> sqlDataHelper;
     HexId hexid;
     HexId itemHexid;
     HexId mailHexid;
@@ -46,8 +44,8 @@ public class DataCenterService {
     final KeywordsMapping keywordsMapping = new KeywordsMapping();
 
     @Inject
-    public DataCenterService(PgsqlService pgsqlService) {
-        this.pgsqlService = pgsqlService;
+    public DataCenterService(SqlDataHelper sqlDataHelper) {
+        this.sqlDataHelper = sqlDataHelper;
     }
 
     @Start
@@ -56,7 +54,7 @@ public class DataCenterService {
         itemHexid = new HexId(sid);
         mailHexid = new HexId(sid);
         String sql = "SELECT uid,sid,name,account FROM role where del=?";
-        try (SqlQueryResult sqlQueryResult = pgsqlService.queryResultSet(sql, false)) {
+        try (SqlQueryResult sqlQueryResult = sqlDataHelper.queryResultSet(sql, false)) {
             while (sqlQueryResult.hasNext()) {
                 JSONObject row = sqlQueryResult.row();
                 String account = row.getString("account");
@@ -71,7 +69,7 @@ public class DataCenterService {
     }
 
     public Player player(long uid) {
-        RoleEntity roleEntity = pgsqlService.getCacheService().cacheIfPresent(RoleEntity.class, uid);
+        RoleEntity roleEntity = sqlDataHelper.getCacheService().cacheIfPresent(RoleEntity.class, uid);
         return roleEntity == null ? null : roleEntity.getPlayer();
     }
 

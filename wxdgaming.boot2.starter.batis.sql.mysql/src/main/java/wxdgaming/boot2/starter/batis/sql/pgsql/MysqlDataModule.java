@@ -4,6 +4,7 @@ import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ServiceModule;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
+import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 
 /**
  * pgsql 模块
@@ -23,7 +24,8 @@ public class MysqlDataModule extends ServiceModule {
             SqlConfig sqlConfig = BootConfig.getIns().getNestedValue("db.mysql", SqlConfig.class);
             if (sqlConfig != null) {
                 MysqlService dataHelper = new MysqlService(sqlConfig);
-                bindInstance(dataHelper);
+                bindInstance(MysqlService.class, dataHelper);
+                bindInstance(SqlDataHelper.class, dataHelper);
             }
         }
         {

@@ -4,6 +4,7 @@ import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ServiceModule;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
+import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 
 /**
  * pgsql 模块
@@ -24,6 +25,7 @@ public class PgsqlDataModule extends ServiceModule {
             if (sqlConfig != null) {
                 PgsqlService dataHelper = new PgsqlService(sqlConfig);
                 bindInstance(PgsqlService.class, dataHelper);
+                bindInstance(SqlDataHelper.class, dataHelper);
             }
         }
         {
