@@ -1,5 +1,6 @@
 package wxdgaming.game.server.script.gm.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -27,16 +28,16 @@ public class PlayerGmScript {
     }
 
     @GM
-    public Object lv(Player player, String[] args) {
+    public Object lv(Player player, JSONArray args) {
         int oldLv = player.getLevel();
-        player.setLevel(Integer.parseInt(args[1]));
+        player.setLevel(args.getInteger(1));
         log.info("{} 当前等级:{} 设置等级为：{}", player, oldLv, player.getLevel());
         return null;
     }
 
     @GM
-    public Object addExp(Player player, String[] args) {
-        long exp = Long.parseLong(args[1]);
+    public Object addExp(Player player, JSONArray args) {
+        long exp = args.getLongValue(1);
         this.playerService.addExp(player, exp, ReasonArgs.of(Reason.GM));
         return null;
     }

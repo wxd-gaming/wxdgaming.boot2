@@ -1,5 +1,6 @@
 package wxdgaming.game.server.script.bag;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.bag.BagType;
@@ -17,16 +18,16 @@ import java.util.HashSet;
  * @version: 2025-06-05 19:20
  **/
 @Getter
-public class BagChanges {
+public class BagChangesEvent {
 
     final Player player;
     final BagType bagType;
     final ItemBag itemBag;
     final ReasonArgs reasonArgs;
-    final ResUpdateBagInfo resUpdateBagInfo;
+    @Getter(AccessLevel.PRIVATE) final ResUpdateBagInfo resUpdateBagInfo;
     final HashSet<Item> changeItems = new HashSet<>();
 
-    public BagChanges(Player player, BagType bagType, ItemBag itemBag, ReasonArgs reasonArgs) {
+    public BagChangesEvent(Player player, BagType bagType, ItemBag itemBag, ReasonArgs reasonArgs) {
         this.player = player;
         this.bagType = bagType;
         this.itemBag = itemBag;
@@ -57,7 +58,7 @@ public class BagChanges {
         changeItems.add(item);
     }
 
-    public ResUpdateBagInfo build() {
+    public ResUpdateBagInfo toResUpdateBagInfo() {
         for (Item changeItem : changeItems) {
             resUpdateBagInfo.getItems().add(changeItem.toItemBean());
         }

@@ -6,7 +6,7 @@ import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.goods.ItemBag;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.script.bag.BagChanges;
+import wxdgaming.game.server.script.bag.BagChangesEvent;
 
 /**
  * 公会货币的获得
@@ -26,7 +26,7 @@ public class GuildCurrencyGainScript extends CurrencyGainScript {
         return super.getCount(player, itemBag, cfgId);
     }
 
-    @Override public boolean gain(BagChanges bagChanges, Item newItem) {
-        return super.gain(bagChanges, newItem);
+    @Override public boolean gain(BagChangesEvent bagChangesEvent, Item newItem) {
+        return super.gain(bagChangesEvent, newItem);
     }
 }

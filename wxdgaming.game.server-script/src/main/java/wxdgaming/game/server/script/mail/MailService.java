@@ -67,10 +67,6 @@ public class MailService extends HoldRunApplication {
         }
     }
 
-    public void sendBagFullMail(Player player, List<Item> items, ReasonArgs reasonArgs) {
-        sendMail(player, "系统", "背包已满", "背包已满，无法获得物品", List.of(), items, reasonArgs.toString());
-    }
-
     public void sendMail(Player player, String sender, String title, String content, List<String> contentArgs, List<Item> items, String logMsg) {
         MailInfo mailInfo = new MailInfo();
         mailInfo.setUid(dataCenterService.getMailHexid().newId());

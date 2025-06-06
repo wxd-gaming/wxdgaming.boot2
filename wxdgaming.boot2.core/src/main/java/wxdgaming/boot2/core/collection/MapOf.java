@@ -20,7 +20,7 @@ public class MapOf implements Serializable {
         return Map.of();
     }
 
-    public static boolean isEmpty(final Map map) {
+    public static <K, V> boolean isEmpty(final Map<K, V> map) {
         return map == null || map.isEmpty();
     }
 

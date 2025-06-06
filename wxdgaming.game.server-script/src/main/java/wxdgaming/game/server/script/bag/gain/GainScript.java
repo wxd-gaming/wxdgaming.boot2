@@ -15,7 +15,7 @@ import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.goods.ItemBag;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
-import wxdgaming.game.server.script.bag.BagChanges;
+import wxdgaming.game.server.script.bag.BagChangesEvent;
 import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.role.PlayerService;
 
@@ -84,11 +84,11 @@ public class GainScript extends HoldRunApplication {
      *
      * @return
      */
-    public boolean gain(BagChanges bagChanges, Item newItem) {
-        Player player = bagChanges.getPlayer();
-        BagType bagType = bagChanges.getBagType();
-        ItemBag itemBag = bagChanges.getItemBag();
-        ReasonArgs reasonArgs = bagChanges.getReasonArgs();
+    public boolean gain(BagChangesEvent bagChangesEvent, Item newItem) {
+        Player player = bagChangesEvent.getPlayer();
+        BagType bagType = bagChangesEvent.getBagType();
+        ItemBag itemBag = bagChangesEvent.getItemBag();
+        ReasonArgs reasonArgs = bagChangesEvent.getReasonArgs();
         long count = newItem.getCount();
         /* TODO 叠加 */
         QItem qItem = DataRepository.getIns().dataTable(QItemTable.class, newItem.getCfgId());
@@ -110,7 +110,7 @@ public class GainScript extends HoldRunApplication {
                         log.info("道具入包：{}, {}, 道具叠加, {}, {}+{}={}, {}", player, bagType, value.toName(), oldCount, count, value.getCount(), reasonArgs);
                         count = 0;
                     }
-                    bagChanges.addChange(value);
+                    bagChangesEvent.addChange(value);
                 }
                 if (count < 1)
                     break;
@@ -125,7 +125,7 @@ public class GainScript extends HoldRunApplication {
             }
             log.info("道具入包：{}, {}, 道具新增, {}, count={}, {}", player, bagType, newItem.toName(), newItem.getCount(), reasonArgs);
             itemBag.getItems().add(newItem);
-            bagChanges.addChange(newItem);
+            bagChangesEvent.addChange(newItem);
         }
         return true;
     }

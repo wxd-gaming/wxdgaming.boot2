@@ -1,5 +1,6 @@
 package wxdgaming.game.server.script.gm;
 
+import com.alibaba.fastjson.JSONArray;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import wxdgaming.game.server.script.tips.TipsService;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * gm服务, 运营接口
@@ -45,7 +47,8 @@ public class GmService extends HoldRunApplication {
     }
 
     public void doGm(Player player, String[] args) {
-        String cmd = args[0].toLowerCase();
+        JSONArray jsonArray = new JSONArray(List.of(args));
+        String cmd = jsonArray.getString(0).toLowerCase();
         GuiceReflectContext.MethodContent methodContent = gmMap.get(cmd);
         if (methodContent == null) {
             tipsService.tips(player, "不存在的gm命令: " + cmd);
@@ -53,7 +56,7 @@ public class GmService extends HoldRunApplication {
         }
         Method method = methodContent.getMethod();
         try {
-            method.invoke(methodContent.getIns(), player, args);
+            method.invoke(methodContent.getIns(), player, jsonArray);
         } catch (Exception e) {
             log.error("执行gm命令失败: {}", cmd, e);
             tipsService.tips(player, "执行gm命令失败: " + cmd);

@@ -1,5 +1,6 @@
 package wxdgaming.game.server.script.gm.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,7 @@ public class PlayerTaskGmScript {
     }
 
     @GM
-    public void acceptTask(Player player, String[] args) {
+    public void acceptTask(Player player, JSONArray args) {
         ITaskScript taskScript = taskService.getTaskScript(TaskType.Main);
         TaskPack taskPack = player.getTaskPack();
         HashMap<Integer, TaskInfo> integerTaskInfoMap = taskPack.getTasks().get(TaskType.Main);
@@ -45,8 +46,8 @@ public class PlayerTaskGmScript {
     }
 
     @GM
-    public void completeTask(Player player, String[] args) {
-        int taskId = Integer.parseInt(args[1]);
+    public void completeTask(Player player, JSONArray args) {
+        int taskId = args.getIntValue(1);
         TaskPack taskPack = player.getTaskPack();
         /*通知客户端*/
         ResUpdateTaskList resUpdateTaskList = new ResUpdateTaskList();
@@ -68,7 +69,7 @@ public class PlayerTaskGmScript {
     }
 
     @GM
-    public void submitTask(Player player, String[] args) {
+    public void submitTask(Player player, JSONArray args) {
         ITaskScript taskScript = taskService.getTaskScript(TaskType.Main);
         TaskPack taskPack = player.getTaskPack();
         HashMap<Integer, TaskInfo> integerTaskInfoMap = taskPack.getTasks().get(TaskType.Main);

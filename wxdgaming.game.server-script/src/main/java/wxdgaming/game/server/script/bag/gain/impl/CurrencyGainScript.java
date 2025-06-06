@@ -7,7 +7,7 @@ import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.goods.ItemBag;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.script.bag.BagChanges;
+import wxdgaming.game.server.script.bag.BagChangesEvent;
 import wxdgaming.game.server.script.bag.gain.GainScript;
 
 import java.util.List;
@@ -37,10 +37,10 @@ public class CurrencyGainScript extends GainScript {
         return itemBag.getCurrencyMap().getOrDefault(cfgId, 0L);
     }
 
-    @Override public boolean gain(BagChanges bagChanges, Item newItem) {
+    @Override public boolean gain(BagChangesEvent bagChangesEvent, Item newItem) {
         int cfgId = newItem.getCfgId();
         long count = newItem.getCount();
-        bagChanges.addCurrency(cfgId, count);
+        bagChangesEvent.addCurrency(cfgId, count);
         return true;
     }
 

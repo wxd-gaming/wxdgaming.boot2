@@ -10,7 +10,7 @@ import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.goods.ItemBag;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.script.bag.BagChanges;
+import wxdgaming.game.server.script.bag.BagChangesEvent;
 
 import java.util.List;
 
@@ -28,9 +28,9 @@ public class CostScript {
         return ItemTypeConst.NONE;
     }
 
-    public void cost(Player player, BagChanges bagChanges, QItem qItem, long count, ReasonArgs reasonArgs) {
-        BagType bagType = bagChanges.getBagType();
-        ItemBag itemBag = bagChanges.getItemBag();
+    public void cost(Player player, BagChangesEvent bagChangesEvent, QItem qItem, long count, ReasonArgs reasonArgs) {
+        BagType bagType = bagChangesEvent.getBagType();
+        ItemBag itemBag = bagChangesEvent.getItemBag();
         List<Item> list = itemBag.getItems().stream()
                 .filter(v -> v.getCfgId() == qItem.getId())
                 .sorted((o1, o2) -> {
@@ -55,12 +55,12 @@ public class CostScript {
                 long hasNum = item.getCount();
                 if (hasNum <= count) {
                     log.info("扣除道具：{}, {}, {}, 从背包移除, {}", player, bagType, item.toName(), reasonArgs);
-                    bagChanges.addDel(item);
+                    bagChangesEvent.addDel(item);
                     count -= hasNum;
                 } else {
                     /*正常扣除*/
                     item.setCount(hasNum - count);
-                    bagChanges.addChange(item);
+                    bagChangesEvent.addChange(item);
                     log.info("扣除道具：{}, {}, {}, 变更 {} - {} = {}, {}", player, bagType, item.toName(), hasNum, count, item.getCount(), reasonArgs);
                     count = 0;
                 }
@@ -72,16 +72,16 @@ public class CostScript {
         AssertUtil.assertTrue(count <= 0, "扣除道具：%s, %s, %s, 数量不足", player, bagType, qItem.getToName());
     }
 
-    public void cost(Player player, BagChanges bagChanges, Item item, long count, ReasonArgs reasonArgs) {
+    public void cost(Player player, BagChangesEvent bagChangesEvent, Item item, long count, ReasonArgs reasonArgs) {
         long hasNum = item.getCount();
         if (hasNum <= count) {
-            log.info("扣除道具：{}, {}, {}, 从背包移除, {}", player, bagChanges.getBagType(), item.toName(), reasonArgs);
-            bagChanges.addDel(item);
+            log.info("扣除道具：{}, {}, {}, 从背包移除, {}", player, bagChangesEvent.getBagType(), item.toName(), reasonArgs);
+            bagChangesEvent.addDel(item);
         } else {
             /*正常扣除*/
             item.setCount(hasNum - count);
-            bagChanges.addChange(item);
-            log.info("扣除道具：{}, {}, {}, 变更 {} - {} = {}, {}", player, bagChanges.getBagType(), item.toName(), hasNum, count, item.getCount(), reasonArgs);
+            bagChangesEvent.addChange(item);
+            log.info("扣除道具：{}, {}, {}, 变更 {} - {} = {}, {}", player, bagChangesEvent.getBagType(), item.toName(), hasNum, count, item.getCount(), reasonArgs);
         }
     }
 

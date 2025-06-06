@@ -2,10 +2,7 @@ package wxdgaming.boot2.core.collection;
 
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -16,7 +13,19 @@ import java.util.function.Predicate;
  **/
 public class ListOf implements Serializable {
 
-    public static String asString(CharSequence delimiter, Collection list) {
+    public static <T> boolean isEmpty(Collection<T> collection) {
+        return collection == null || collection.isEmpty();
+    }
+
+    public static <T> ArrayList<T> newArrayList() {
+        return new ArrayList<>();
+    }
+
+    public static <T> LinkedList<T> newLinkedList() {
+        return new LinkedList<>();
+    }
+
+    public static <T> String asString(CharSequence delimiter, Collection<T> list) {
         StringBuilder streamWriter = new StringBuilder();
         for (Object o : list) {
             if (!streamWriter.isEmpty()) streamWriter.append(delimiter.toString());
@@ -25,37 +34,37 @@ public class ListOf implements Serializable {
         return streamWriter.toString();
     }
 
-    public static List<Integer> asList(int[] args) {
+    public static List<Integer> ofList(int[] args) {
         List<Integer> list = new ArrayList<>(args.length + 1);
-        return asList(list, args);
+        return ofList(list, args);
     }
 
-    public static List<Integer> asList(List<Integer> list, int[] args) {
+    public static List<Integer> ofList(List<Integer> list, int[] args) {
         for (int t : args) {
             list.add(t);
         }
         return list;
     }
 
-    public static List<Long> asList(long[] args) {
+    public static List<Long> ofList(long[] args) {
         List<Long> list = new ArrayList<>(args.length + 1);
-        return asList(list, args);
+        return ofList(list, args);
     }
 
-    public static List<Long> asList(List<Long> list, long[] args) {
+    public static List<Long> ofList(List<Long> list, long[] args) {
         for (long t : args) {
             list.add(t);
         }
         return list;
     }
 
-    @SafeVarargs public static <T> List<T> asList(T... args) {
+    @SafeVarargs public static <T> List<T> ofList(T... args) {
         List<T> list = new ArrayList<>(args.length + 1);
-        return asList(list, args);
+        return ofList(list, args);
     }
 
     /** 投建list */
-    @SafeVarargs public static <T> List<T> asList(List<T> list, T... args) {
+    @SafeVarargs public static <T> List<T> ofList(List<T> list, T... args) {
         list.addAll(Arrays.asList(args));
         return list;
     }
@@ -64,7 +73,7 @@ public class ListOf implements Serializable {
     @SafeVarargs public static <T> List<List<T>> asLists(T[]... args) {
         List<List<T>> list = new ArrayList<>(args.length + 1);
         for (T[] ts : args) {
-            final List<T> row = asList(ts);
+            final List<T> row = ofList(ts);
             list.add(row);
         }
         return list;
@@ -93,8 +102,5 @@ public class ListOf implements Serializable {
         return list;
     }
 
-    public static <T> boolean checkEmpty(Collection<T> collection) {
-        return collection == null || collection.isEmpty();
-    }
 
 }

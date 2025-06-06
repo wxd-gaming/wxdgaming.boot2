@@ -6,7 +6,7 @@ import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.goods.ItemBag;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.script.bag.BagChanges;
+import wxdgaming.game.server.script.bag.BagChangesEvent;
 
 /**
  * 货币的获得
@@ -26,9 +26,9 @@ public class ExpGainScript extends CurrencyGainScript {
         return player.getExp();
     }
 
-    @Override public boolean gain(BagChanges bagChanges, Item newItem) {
+    @Override public boolean gain(BagChangesEvent bagChangesEvent, Item newItem) {
         long count = newItem.getCount();
-        playerService.addExp(bagChanges.getPlayer(), count, bagChanges.getReasonArgs());
+        playerService.addExp(bagChangesEvent.getPlayer(), count, bagChangesEvent.getReasonArgs());
         return true;
     }
 

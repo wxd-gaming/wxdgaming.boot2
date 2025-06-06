@@ -7,7 +7,7 @@ import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.script.bag.BagChanges;
+import wxdgaming.game.server.script.bag.BagChangesEvent;
 import wxdgaming.game.server.script.bag.cost.CostScript;
 
 /**
@@ -24,7 +24,7 @@ public class ExpCostScript extends CostScript {
         return ItemTypeConst.EXP;
     }
 
-    @Override public void cost(Player player, BagChanges bagChanges,
+    @Override public void cost(Player player, BagChangesEvent bagChangesEvent,
                                QItem qItem, long count, ReasonArgs reasonArgs) {
         long hasExp = player.getExp();
         if (hasExp < count) {
@@ -34,8 +34,8 @@ public class ExpCostScript extends CostScript {
         log.info("扣除道具：{}, {}, 变更 {} - {} = {}, {}", player, qItem.getToName(), hasExp, count, player.getExp(), reasonArgs);
     }
 
-    @Override public void cost(Player player, BagChanges bagChanges, Item item, long count, ReasonArgs reasonArgs) {
-        cost(player, bagChanges, item.qItem(), count, reasonArgs);
+    @Override public void cost(Player player, BagChangesEvent bagChangesEvent, Item item, long count, ReasonArgs reasonArgs) {
+        cost(player, bagChangesEvent, item.qItem(), count, reasonArgs);
     }
 
 }

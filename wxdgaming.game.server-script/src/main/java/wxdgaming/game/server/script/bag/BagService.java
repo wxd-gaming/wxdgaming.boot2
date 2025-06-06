@@ -219,7 +219,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
     /** 最终入口 */
     private void gainItems(Player player, BagType bagType, ItemBag itemBag, List<Item> items, ReasonArgs reasonArgs) {
         Iterator<Item> iterator = items.iterator();
-        BagChanges bagChanges = new BagChanges(player, bagType, itemBag, reasonArgs);
+        BagChangesEvent bagChangesEvent = new BagChangesEvent(player, bagType, itemBag, reasonArgs);
         while (iterator.hasNext()) {
             Item newItem = iterator.next();
 
@@ -234,7 +234,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
             long oldCount = gainScript.getCount(player, itemBag, newItem.getCfgId());
             long change = newItem.getCount();
 
-            boolean gain = gainScript.gain(bagChanges, newItem);
+            boolean gain = gainScript.gain(bagChangesEvent, newItem);
 
             if (gain || newItem.getCount() != change) {
                 long newCount = gainScript.getCount(player, itemBag, newItem.getCfgId());
@@ -253,7 +253,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
             }
         }
 
-        player.write(bagChanges.build());
+        player.write(bagChangesEvent.toResUpdateBagInfo());
 
         /* TODO 发送邮件 */
         if (!items.isEmpty()) {
@@ -319,7 +319,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
     /** 调用之前请使用 {@link BagService#checkCost(Player, BagType, ItemBag, List)} 函数 是否够消耗 */
     public void cost(Player player, BagType bagType, ItemBag itemBag, List<ItemCfg> costList, ReasonArgs reasonArgs) {
 
-        BagChanges bagChanges = new BagChanges(player, bagType, itemBag, reasonArgs);
+        BagChangesEvent bagChangesEvent = new BagChangesEvent(player, bagType, itemBag, reasonArgs);
 
         for (ItemCfg itemCfg : costList) {
             int cfgId = itemCfg.getCfgId();
@@ -333,13 +333,12 @@ public class BagService extends HoldRunApplication implements InitPrint {
             long oldCount = gainScript.getCount(player, itemBag, cfgId);
             CostScript costScript = getCostScript(type, subtype);
 
-            costScript.cost(player, bagChanges, qItem, change, reasonArgs);
+            costScript.cost(player, bagChangesEvent, qItem, change, reasonArgs);
             long newCount = gainScript.getCount(player, itemBag, cfgId);
 
             log.info("消耗道具：{}, {}, {} {} - {} = {}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, reasonArgs);
         }
-
-        player.write(bagChanges.build());
+        player.write(bagChangesEvent.toResUpdateBagInfo());
 
     }
 

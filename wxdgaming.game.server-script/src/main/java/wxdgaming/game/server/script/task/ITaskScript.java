@@ -101,7 +101,7 @@ public abstract class ITaskScript extends HoldRunApplication {
             tipsService.tips(player, "已经接取");
             return;
         }
-        if (!ListOf.checkEmpty(qTask.getAcceptCost())) {
+        if (!ListOf.isEmpty(qTask.getAcceptCost())) {
             if (!bagService.checkCostNotice(player, qTask.getAcceptCost())) {
                 return;
             }
@@ -137,7 +137,7 @@ public abstract class ITaskScript extends HoldRunApplication {
         QTask qTask = taskInfo.qTask();
         ReasonArgs reasonArgs = ReasonArgs.of(Reason.TASK_SUBMIT, "taskCfg=" + taskId);
 
-        if (!ListOf.checkEmpty(qTask.getSubmitCost())) {
+        if (!ListOf.isEmpty(qTask.getSubmitCost())) {
             if (!bagService.checkCostNotice(player, qTask.getSubmitCost())) {
                 return;
             }
