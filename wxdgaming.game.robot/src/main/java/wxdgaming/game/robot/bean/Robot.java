@@ -33,7 +33,7 @@ public class Robot {
     /** 所有的货币 */
     private Map<Integer, Long> currencyMap = new LinkedHashMap<>();
     /** 所有的物品 */
-    private List<ItemBean> items = new ArrayList<>();
+    private Map<Integer, ItemBean> items = new HashMap<>();
     private Map<Integer, TaskBean> tasks = new HashMap<>();
 
     @Override public String toString() {

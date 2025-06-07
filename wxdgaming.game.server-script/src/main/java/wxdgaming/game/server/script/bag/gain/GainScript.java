@@ -11,11 +11,12 @@ import wxdgaming.game.cfg.QItemTable;
 import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.bag.BagType;
-import wxdgaming.game.server.bean.goods.Item;
-import wxdgaming.game.server.bean.goods.ItemBag;
+import wxdgaming.game.server.bean.bag.BagChangesEvent;
+import wxdgaming.game.server.bean.bag.ItemBag;
+import wxdgaming.game.server.bean.bag.ItemGrid;
+import wxdgaming.game.server.bean.bag.goods.Item;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
-import wxdgaming.game.server.script.bag.BagChangesEvent;
 import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.role.PlayerService;
 
@@ -71,19 +72,10 @@ public class GainScript extends HoldRunApplication {
 
     /** 查询指定道具背包数量 */
     public long getCount(Player player, ItemBag itemBag, int cfgId) {
-        return itemBag
-                .getItems()
-                .stream()
-                .filter(item -> item.getCfgId() == cfgId)
-                .mapToLong(Item::getCount)
-                .sum();
+        return itemBag.itemCountByCfgId(cfgId);
     }
 
-    /**
-     * 将道具添加进入背包
-     *
-     * @return
-     */
+    /** 将道具添加进入背包 */
     public boolean gain(BagChangesEvent bagChangesEvent, Item newItem) {
         Player player = bagChangesEvent.getPlayer();
         BagType bagType = bagChangesEvent.getBagType();
@@ -94,7 +86,10 @@ public class GainScript extends HoldRunApplication {
         QItem qItem = DataRepository.getIns().dataTable(QItemTable.class, newItem.getCfgId());
         int maxCount = qItem.getMaxCount();
         if (count != maxCount/*TODO入股相等说明最大值，不去执行叠加操作直接入包*/) {
-            for (Item value : itemBag.getItems()) {
+            Item[] itemGrids = itemBag.getItemGrids();
+            for (int i = 0; i < itemGrids.length; i++) {
+                Item value = itemGrids[i];
+                if (value == null) continue;
                 if (value.getCfgId() != newItem.getCfgId()) continue;
                 if (value.isBind() != newItem.isBind()) continue;/* TODO 绑定状态一致 */
                 if (value.getExpireTime() != newItem.getExpireTime()/* TODO 过期时间一致 */) continue;
@@ -104,13 +99,19 @@ public class GainScript extends HoldRunApplication {
                         long addChange = maxCount - oldCount;
                         count -= addChange;
                         value.setCount(maxCount);
-                        log.info("道具入包：{}, {}, 道具叠加, {}, {}+{}={}, {}", player, bagType, value.toName(), oldCount, addChange, value.getCount(), reasonArgs);
+                        log.info(
+                                "背包变更：{}, {}, 道具叠加, 格子：{}, {}, {}+{}={}, {}",
+                                player, bagType, i, value.toName(), oldCount, addChange, value.getCount(), reasonArgs
+                        );
                     } else {
                         value.setCount(oldCount + count);
-                        log.info("道具入包：{}, {}, 道具叠加, {}, {}+{}={}, {}", player, bagType, value.toName(), oldCount, count, value.getCount(), reasonArgs);
+                        log.info(
+                                "背包变更：{}, {}, 道具叠加, 格子：{}, {}, {}+{}={}, {}",
+                                player, bagType, i, value.toName(), oldCount, count, value.getCount(), reasonArgs
+                        );
                         count = 0;
                     }
-                    bagChangesEvent.addChange(value);
+                    bagChangesEvent.addChange(new ItemGrid(i, value));
                 }
                 if (count < 1)
                     break;
@@ -123,9 +124,12 @@ public class GainScript extends HoldRunApplication {
                 /* TODO 背包已满 */
                 return false;
             }
-            log.info("道具入包：{}, {}, 道具新增, {}, count={}, {}", player, bagType, newItem.toName(), newItem.getCount(), reasonArgs);
-            itemBag.getItems().add(newItem);
-            bagChangesEvent.addChange(newItem);
+            ItemGrid itemGrid = itemBag.add(newItem);
+            log.info(
+                    "背包变更：{}, {}, 道具新增, 格子：{}, {}, count={}, {}",
+                    player, bagType, itemGrid.getGrid(), newItem.toName(), newItem.getCount(), reasonArgs
+            );
+            bagChangesEvent.addChange(itemGrid);
         }
         return true;
     }

@@ -5,7 +5,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.lang.ObjectLong;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.game.server.bean.goods.Item;
+import wxdgaming.game.server.bean.bag.goods.Item;
 
 import java.util.ArrayList;
 import java.util.List;

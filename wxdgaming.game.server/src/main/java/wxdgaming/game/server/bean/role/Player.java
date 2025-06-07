@@ -11,7 +11,7 @@ import wxdgaming.game.message.global.AttrBean;
 import wxdgaming.game.message.global.ResUpdateAttr;
 import wxdgaming.game.server.bean.*;
 import wxdgaming.game.bean.attr.AttrType;
-import wxdgaming.game.server.bean.goods.BagPack;
+import wxdgaming.game.server.bean.bag.BagPack;
 import wxdgaming.game.server.bean.mail.MailPack;
 import wxdgaming.game.server.bean.task.TaskPack;
 import wxdgaming.game.server.bean.vip.VipInfo;

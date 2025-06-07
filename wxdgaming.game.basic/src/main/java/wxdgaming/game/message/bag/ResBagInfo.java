@@ -36,7 +36,7 @@ public class ResBagInfo extends PojoBase {
     /** 所有的货币 */
     @Tag(2) private Map<Integer, Long> currencyMap = new LinkedHashMap<>();
     /** 所有的物品 */
-    @Tag(3) private List<ItemBean> items = new ArrayList<>();
+    @Tag(3) private Map<Integer, ItemBean> items = new LinkedHashMap<>();
 
 
 }

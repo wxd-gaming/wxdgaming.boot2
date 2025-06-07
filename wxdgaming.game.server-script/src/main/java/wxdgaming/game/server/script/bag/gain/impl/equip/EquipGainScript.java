@@ -1,15 +1,15 @@
-package wxdgaming.game.server.script.bag.gain.impl;
+package wxdgaming.game.server.script.bag.gain.impl.equip;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.bean.goods.ItemTypeConst;
-import wxdgaming.game.server.bean.goods.Equipment;
-import wxdgaming.game.server.bean.goods.Item;
-import wxdgaming.game.server.bean.goods.ItemBag;
+import wxdgaming.game.server.bean.bag.goods.Equipment;
+import wxdgaming.game.server.bean.bag.goods.Item;
+import wxdgaming.game.server.bean.bag.ItemBag;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
-import wxdgaming.game.server.script.bag.BagChangesEvent;
+import wxdgaming.game.server.bean.bag.BagChangesEvent;
 import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.bag.gain.GainScript;
 import wxdgaming.game.server.script.role.PlayerService;

@@ -16,19 +16,19 @@ message ReqBagInfo {
 
 //响应背包信息
 message ResBagInfo {
-  BagType bagType                   = 1;
-  map<int32, int64> currencyMap     = 2;//所有的货币
-  repeated ItemBean items           = 3;//所有的物品
+  BagType bagType                         = 1;
+  map<int32, int64> currencyMap           = 2;//所有的货币
+  map<int32, ItemBean> items              = 3;//所有的物品
 }
 
-//响应背包信息
+//背包更新
 message ResUpdateBagInfo {
-  BagType bagType                   = 1;
-  map<int32, int64> currencyMap     = 2;//所有的货币
-  repeated ItemBean items           = 3;//所有的物品
-  repeated int64 delItemIds         = 4;//删除的物品id
-  string reason                     = 5;//更新原因
-  string other                      = 7;//其他信息-与客户端协商
+  BagType bagType                         = 1;
+  map<int32, int64> currencyMap           = 2;//所有的货币
+  map<int32, ItemBean> changeItems        = 3;//所有的物品
+  repeated int32 delItemIds               = 4;//删除的物品对应的格子
+  string reason                           = 5;//更新原因
+  string other                            = 7;//其他信息-与客户端协商
 }
 
 message ItemBean {

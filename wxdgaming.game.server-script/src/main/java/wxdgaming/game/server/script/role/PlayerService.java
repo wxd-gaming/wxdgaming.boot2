@@ -64,12 +64,17 @@ public class PlayerService extends HoldRunApplication {
             tmp -= 100L * player.getLevel();
             addLevel(player, 1, reasonArgs.copyFrom("经验升级"));
         }
-        player.setExp(tmp);
+        setExp(player, tmp, reasonArgs);
+    }
+
+    public void setExp(Player player, long exp, ReasonArgs reasonArgs) {
+        player.setExp(exp);
         ResUpdateExp resUpdateLevel = new ResUpdateExp()
                 .setExp(player.getExp())
                 .setReason(reasonArgs.getReason().name());
         player.write(resUpdateLevel);
     }
+
 
     public void addLevel(Player player, int lv, ReasonArgs reasonArgs) {
         int oldLevel = player.getLevel();

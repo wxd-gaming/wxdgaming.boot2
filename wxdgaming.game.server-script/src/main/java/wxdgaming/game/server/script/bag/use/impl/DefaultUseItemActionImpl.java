@@ -1,6 +1,6 @@
 package wxdgaming.game.server.script.bag.use.impl;
 
-import wxdgaming.game.server.bean.goods.Item;
+import wxdgaming.game.server.bean.bag.goods.Item;
 import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.bag.use.UseItemAction;

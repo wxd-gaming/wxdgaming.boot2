@@ -1,4 +1,4 @@
-package wxdgaming.game.server.bean.goods;
+package wxdgaming.game.server.bean.bag;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,19 +20,21 @@ import java.util.HashMap;
 public class BagPack extends ObjectBase {
 
     /** key:背包类型, value:{key:道具id, value:道具} */
-    private HashMap<BagType, ItemBag> items = new HashMap<>();
+    private HashMap<BagType, ItemBag> bagMap = new HashMap<>();
+
+    public ItemBag itemBag(BagType type) {
+        return bagMap.get(type);
+    }
 
     @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public boolean bagFull() {
-        ItemBag itemBag = items.get(BagType.Bag);
-        return itemBag.checkFull();
+        return itemBag(BagType.Bag).checkFull();
     }
 
     /** 空闲的格子数 */
     public int bagFreeGrid() {
-        ItemBag itemBag = items.get(BagType.Bag);
-        return itemBag.freeGrid();
+        return itemBag(BagType.Bag).freeGrid();
     }
 
 }

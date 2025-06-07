@@ -1,12 +1,11 @@
-package wxdgaming.game.server.script.bag;
+package wxdgaming.game.server.bean.bag;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.message.bag.ResUpdateBagInfo;
-import wxdgaming.game.server.bean.goods.Item;
-import wxdgaming.game.server.bean.goods.ItemBag;
 import wxdgaming.game.server.bean.role.Player;
 
 import java.util.HashSet;
@@ -24,8 +23,9 @@ public class BagChangesEvent {
     final BagType bagType;
     final ItemBag itemBag;
     final ReasonArgs reasonArgs;
-    @Getter(AccessLevel.PRIVATE) final ResUpdateBagInfo resUpdateBagInfo;
-    final HashSet<Item> changeItems = new HashSet<>();
+    @Getter(AccessLevel.PRIVATE)
+    final ResUpdateBagInfo resUpdateBagInfo;
+    final HashSet<ItemGrid> changeItems = new HashSet<>();
 
     public BagChangesEvent(Player player, BagType bagType, ItemBag itemBag, ReasonArgs reasonArgs) {
         this.player = player;
@@ -49,18 +49,19 @@ public class BagChangesEvent {
         resUpdateBagInfo.getCurrencyMap().put(cfgId, merged);
     }
 
-    public void addDel(Item item) {
-        changeItems.remove(item);
-        resUpdateBagInfo.getDelItemIds().add(item.getUid());
+    public void addDel(ItemGrid itemGrid) {
+        changeItems.remove(itemGrid);
+        resUpdateBagInfo.getDelItemIds().add(itemGrid.getGrid());
     }
 
-    public void addChange(Item item) {
+    public void addChange(ItemGrid item) {
+        AssertUtil.assertNull(item, "null");
         changeItems.add(item);
     }
 
     public ResUpdateBagInfo toResUpdateBagInfo() {
-        for (Item changeItem : changeItems) {
-            resUpdateBagInfo.getItems().add(changeItem.toItemBean());
+        for (ItemGrid changeItem : changeItems) {
+            resUpdateBagInfo.getChangeItems().put(changeItem.getGrid(), changeItem.getItem().toItemBean());
         }
         return resUpdateBagInfo;
     }
