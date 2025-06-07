@@ -39,7 +39,6 @@ public class LocalSdkLoginApi extends SdkLoginApi {
         UserData userData = loginService.userData(account);
         if (userData == null) {
             userData = new UserData();
-            userData.setUid(loginService.getUserHexId().newId());
             userData.setAccount(account);
             userData.setToken(token);
             userData.setPlatformUserId(account);
