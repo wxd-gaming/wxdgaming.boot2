@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.excel;
 
-import wxdgaming.boot2.core.ServiceModule;
+import wxdgaming.boot2.core.ServiceGuiceModule;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 
@@ -10,9 +10,9 @@ import wxdgaming.boot2.starter.excel.store.DataRepository;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-05-09 14:00
  **/
-public class DataServiceModule extends ServiceModule {
+public class DataServiceGuiceModule extends ServiceGuiceModule {
 
-    public DataServiceModule(ReflectContext reflectContext) {
+    public DataServiceGuiceModule(ReflectContext reflectContext) {
         super(reflectContext);
     }
 

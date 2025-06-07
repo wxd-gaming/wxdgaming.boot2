@@ -44,12 +44,12 @@ public class ReqLoginHandler extends HoldRunApplication {
         log.info("登录请求:{}, clientSessionId={}", req, clientSessionId);
         try {
             int sid = req.getSid();
-            String account = req.getAccount();
             String token = req.getToken();
             Jws<Claims> claimsJws = JwtUtils.parseJWT(token);
-            String tokenAccount = claimsJws.getPayload().get("account", String.class);
+            String account = claimsJws.getPayload().get("account", String.class);
             String platform = claimsJws.getPayload().get("platform", String.class);
-            String channel = claimsJws.getPayload().get("channel", String.class);
+            /*平台返回的userid*/
+            String platformUserId = claimsJws.getPayload().get("platformUserId", String.class);
 
             int gatewayId = socketSession.bindData("serviceId");
 
@@ -57,6 +57,8 @@ public class ReqLoginHandler extends HoldRunApplication {
 
             clientSessionMapping.setSid(sid);
             clientSessionMapping.setAccount(account);
+            clientSessionMapping.setPlatform(platform);
+            clientSessionMapping.setPlatformUserId(platformUserId);
             clientSessionMapping.setSession(socketSession);
             clientSessionMapping.setGatewayId(gatewayId);
             clientSessionMapping.setClientSessionId(clientSessionId);

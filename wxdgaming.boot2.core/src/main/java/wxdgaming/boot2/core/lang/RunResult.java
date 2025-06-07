@@ -25,11 +25,11 @@ public class RunResult extends JSONObject {
         return new RunResult().fluentPut("code", 1).fluentPut("msg", "ok");
     }
 
-    public static RunResult error(String message) {
-        return error(99, message);
+    public static RunResult fail(String message) {
+        return fail(99, message);
     }
 
-    public static RunResult error(int code, String message) {
+    public static RunResult fail(int code, String message) {
         return new RunResult().fluentPut("code", code).fluentPut("msg", message);
     }
 

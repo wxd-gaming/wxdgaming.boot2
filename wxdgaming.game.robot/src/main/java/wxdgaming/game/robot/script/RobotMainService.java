@@ -1,17 +1,22 @@
 package wxdgaming.game.robot.script;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.jsonwebtoken.JwtBuilder;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.util.JwtUtils;
+import wxdgaming.boot2.core.collection.MapOf;
+import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.RandomUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.SocketClientImpl;
+import wxdgaming.boot2.starter.net.httpclient.HttpBuilder;
+import wxdgaming.boot2.starter.net.httpclient.PostText;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
+import wxdgaming.game.login.LoginConfig;
 import wxdgaming.game.message.chat.ChatType;
 import wxdgaming.game.message.chat.ReqChatMessage;
 import wxdgaming.game.message.role.ReqHeartbeat;
@@ -30,15 +35,18 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-04-27 13:20
  **/
+@Slf4j
 @Getter
 @Singleton
 public class RobotMainService {
 
-    SocketClientImpl socketClient;
-    ConcurrentHashMap<String, Robot> robotMap = new ConcurrentHashMap<>();
+    final LoginConfig loginConfig;
+    final SocketClientImpl socketClient;
+    final ConcurrentHashMap<String, Robot> robotMap = new ConcurrentHashMap<>();
 
     @Inject
-    public RobotMainService(SocketClientImpl socketClient) {
+    public RobotMainService(LoginConfig loginConfig, SocketClientImpl socketClient) {
+        this.loginConfig = loginConfig;
         this.socketClient = socketClient;
     }
 
@@ -59,10 +67,6 @@ public class RobotMainService {
                 socketClient.connect(connect -> {
                     robot.setSendLogin(true);
 
-                    JwtBuilder jwtBuilder = JwtUtils.createJwtBuilder();
-                    jwtBuilder.claim("account", robot.getAccount());
-                    String token = jwtBuilder.compact();
-
                     robot.setSocketSession(connect);
                     connect.getChannel().closeFuture().addListener(new ChannelFutureListener() {
                         @Override public void operationComplete(ChannelFuture future) throws Exception {
@@ -73,7 +77,25 @@ public class RobotMainService {
                     });
                     connect.bindData("robot", robot);
 
-                    connect.write(new ReqLogin().setAccount(robot.getAccount()).setSid(1).setToken(token));
+                    JSONObject jsonObject = MapOf.newJSONObject();
+                    jsonObject.put("platform", 1);
+                    jsonObject.put("account", robot.getAccount());
+                    jsonObject.put("token", robot.getAccount());
+
+                    String uriPath = getLoginConfig().getUrl() + "/login/check";
+                    PostText postText = HttpBuilder.postJson(uriPath, jsonObject.toJSONString());
+                    RunResult runResult = postText.request().bodyRunResult();
+                    if (runResult.isError()) {
+                        log.error("登录失败：{}", runResult.msg());
+                        return;
+                    }
+
+                    connect.write(
+                            new ReqLogin()
+                                    .setAccount(robot.getAccount())
+                                    .setSid(1)
+                                    .setToken(runResult.getString("token"))
+                    );
 
                 });
             } else {

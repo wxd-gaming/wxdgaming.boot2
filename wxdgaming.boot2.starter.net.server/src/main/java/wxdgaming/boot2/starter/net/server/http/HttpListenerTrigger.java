@@ -52,7 +52,7 @@ public class HttpListenerTrigger extends ExecutorEvent {
             /*请求格式处理，比如必须是get请求，或者必须是post请求*/
             if (!httpMapping.httpRequest().method().equalsIgnoreCase(httpContext.getRequest().httpMethod().name())) {
                 httpContext.getResponse().setStatus(HttpResponseStatus.METHOD_NOT_ALLOWED);
-                httpContext.getResponse().response(RunResult.error("method not allowed"));
+                httpContext.getResponse().response(RunResult.fail("method not allowed"));
                 return;
             }
         }
@@ -72,7 +72,7 @@ public class HttpListenerTrigger extends ExecutorEvent {
             GlobalUtil.exception(stringBuilder.toString(), e);
             stringBuilder.setLength(0);
             httpContext.getResponse().setStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
-            httpContext.getResponse().response(RunResult.error("server error " + e.getMessage()));
+            httpContext.getResponse().response(RunResult.fail("server error " + e.getMessage()));
         } finally {
             httpContext.close();
         }

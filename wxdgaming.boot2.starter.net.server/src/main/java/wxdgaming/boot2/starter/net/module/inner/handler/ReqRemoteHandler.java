@@ -52,7 +52,7 @@ public class ReqRemoteHandler {
             RpcMapping rpcMapping = rpcListenerContent.getRpcMappingMap().get(lowerCase);
             if (rpcMapping == null) {
                 if (rpcId > 0) {
-                    rpcService.response(socketSession, rpcId, RunResult.error(9, "not cmd path"));
+                    rpcService.response(socketSession, rpcId, RunResult.fail(9, "not cmd path"));
                 }
                 return;
             }
@@ -80,7 +80,7 @@ public class ReqRemoteHandler {
             }
             log.error("dispatch error rpcId: {}, cmd: {}, paramData: {}", rpcId, cmd, params, e);
             if (rpcId > 0) {
-                rpcService.response(socketSession, rpcId, RunResult.error(500, "server error"));
+                rpcService.response(socketSession, rpcId, RunResult.fail(500, "server error"));
             }
         }
 

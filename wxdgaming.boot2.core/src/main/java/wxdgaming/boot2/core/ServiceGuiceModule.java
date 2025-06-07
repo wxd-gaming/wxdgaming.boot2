@@ -10,9 +10,9 @@ import java.lang.annotation.Annotation;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-13 16:14
  **/
-public abstract class ServiceModule extends BaseModule {
+public abstract class ServiceGuiceModule extends GuiceModuleBase {
 
-    public ServiceModule(ReflectContext reflectContext) {
+    public ServiceGuiceModule(ReflectContext reflectContext) {
         super(reflectContext);
     }
 

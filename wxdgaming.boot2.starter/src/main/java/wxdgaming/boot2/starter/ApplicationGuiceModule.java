@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter;
 
-import wxdgaming.boot2.core.BaseModule;
+import wxdgaming.boot2.core.GuiceModuleBase;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 
@@ -11,9 +11,9 @@ import wxdgaming.boot2.core.reflect.ReflectContext;
  * @version: 2025-02-14 16:57
  **/
 @Order(1)
-class ApplicationModule extends BaseModule {
+class ApplicationGuiceModule extends GuiceModuleBase {
 
-    public ApplicationModule(ReflectContext reflectContext) {
+    public ApplicationGuiceModule(ReflectContext reflectContext) {
         super(reflectContext);
     }
 

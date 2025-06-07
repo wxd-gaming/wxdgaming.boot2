@@ -86,3 +86,7 @@ backends:
   gameId: 1
   appToken: "123456"
   logToken: "123456"
+
+login:
+  url: http://127.0.0.1:19800
+  token: 1234567890

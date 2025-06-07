@@ -5,6 +5,7 @@ import wxdgaming.boot2.starter.RunApplicationMain;
 import wxdgaming.boot2.starter.WxdApplication;
 import wxdgaming.boot2.starter.net.SocketScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
+import wxdgaming.game.login.LoginServiceGuiceModule;
 
 /**
  * @author: wxd-gaming(無心道, 15388152619)
@@ -17,6 +18,7 @@ public class GatewayApplication {
                 CoreScan.class,
                 SocketScan.class,
                 ScheduledScan.class,
+                LoginServiceGuiceModule.class,
                 GatewayApplication.class
         );
 

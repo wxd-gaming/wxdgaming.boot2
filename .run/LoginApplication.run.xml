@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="GatewayApplication" type="Application" factoryName="Application" nameIsGenerated="true">
-    <option name="MAIN_CLASS_NAME" value="wxdgaming.game.gateway.GatewayApplication" />
-    <module name="wxdgaming.game.gateway" />
+  <configuration default="false" name="LoginApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="wxdgaming.game.login.LoginApplication" />
+    <module name="wxdgaming.game.login" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="wxdgaming.game.login.*" />

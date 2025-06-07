@@ -17,11 +17,11 @@ import java.lang.annotation.Annotation;
  **/
 @Slf4j
 @Getter
-public abstract class BaseModule extends AbstractModule {
+public abstract class GuiceModuleBase extends AbstractModule {
 
     final ReflectContext reflectContext;
 
-    public BaseModule(ReflectContext reflectContext) {
+    public GuiceModuleBase(ReflectContext reflectContext) {
         this.reflectContext = reflectContext;
     }
 

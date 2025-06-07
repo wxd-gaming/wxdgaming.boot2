@@ -8,9 +8,10 @@ import wxdgaming.boot2.core.reflect.ReflectContext;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-13 16:14
  **/
-public abstract class UserModule extends BaseModule {
+public abstract class UserGuiceModule extends GuiceModuleBase {
 
-    public UserModule(ReflectContext reflectContext) {
+    public UserGuiceModule(ReflectContext reflectContext) {
         super(reflectContext);
     }
+
 }

@@ -28,6 +28,7 @@
         <module>wxdgaming.game.robot</module>
         <module>wxdgaming.game.server</module>
         <module>wxdgaming.game.server-script</module>
+        <module>wxdgaming.game.login</module>
     </modules>
 
     <properties>

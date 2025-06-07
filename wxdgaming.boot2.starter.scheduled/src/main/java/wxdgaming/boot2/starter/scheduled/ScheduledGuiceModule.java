@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.scheduled;
 
 import wxdgaming.boot2.core.BootConfig;
-import wxdgaming.boot2.core.ServiceModule;
+import wxdgaming.boot2.core.ServiceGuiceModule;
 import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.executor.QueuePolicyConst;
 import wxdgaming.boot2.core.reflect.ReflectContext;
@@ -12,11 +12,11 @@ import wxdgaming.boot2.core.reflect.ReflectContext;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-18 09:30
  **/
-public class ScheduledModule extends ServiceModule {
+public class ScheduledGuiceModule extends ServiceGuiceModule {
 
     public static final ExecutorConfig DEFAULT_INSTANCE = new ExecutorConfig(1, 1000, QueuePolicyConst.AbortPolicy);
 
-    public ScheduledModule(ReflectContext reflectContext) {
+    public ScheduledGuiceModule(ReflectContext reflectContext) {
         super(reflectContext);
     }
 

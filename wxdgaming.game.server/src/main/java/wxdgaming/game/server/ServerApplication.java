@@ -18,6 +18,7 @@ import wxdgaming.boot2.starter.net.SocketScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 import wxdgaming.game.cfg.QPlayerTable;
 import wxdgaming.game.cfg.bean.QPlayer;
+import wxdgaming.game.login.LoginServiceGuiceModule;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +35,7 @@ public class ServerApplication {
                     SocketScan.class,
                     PgsqlScan.class,
                     MysqlScan.class,
+                    LoginServiceGuiceModule.class,
                     ServerApplication.class
             );
             loadScript();

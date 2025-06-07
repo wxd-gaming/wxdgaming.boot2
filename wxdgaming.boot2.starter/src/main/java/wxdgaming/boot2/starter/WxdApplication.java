@@ -51,16 +51,16 @@ public class WxdApplication {
 
             ReflectContext reflectContext = ReflectContext.Builder.of(finalPackages).build();
 
-            Stream<Class<? extends BaseModule>> moduleStream = Stream.empty();
+            Stream<Class<? extends GuiceModuleBase>> moduleStream = Stream.empty();
 
-            moduleStream = Stream.concat(moduleStream, reflectContext.classWithSuper(ServiceModule.class));
-            moduleStream = Stream.concat(moduleStream, reflectContext.classWithSuper(UserModule.class));
+            moduleStream = Stream.concat(moduleStream, reflectContext.classWithSuper(ServiceGuiceModule.class));
+            moduleStream = Stream.concat(moduleStream, reflectContext.classWithSuper(UserGuiceModule.class));
 
-            List<BaseModule> collect = moduleStream
+            List<GuiceModuleBase> collect = moduleStream
                     .map(cls -> ReflectContext.newInstance(cls, reflectContext))
                     .collect(Collectors.toList());
-            collect.addFirst(new ApplicationModule(reflectContext));
-            collect.add(new SingletonModule(reflectContext));
+            collect.addFirst(new ApplicationGuiceModule(reflectContext));
+            collect.add(new SingletonGuiceModule(reflectContext));
 
             Injector injector = Guice.createInjector(Stage.PRODUCTION, collect);
             runApplicationMain = injector.getInstance(RunApplicationMain.class);
@@ -82,11 +82,11 @@ public class WxdApplication {
     }
 
     public static RunApplicationSub createRunApplicationSub(ReflectContext reflectContext) {
-        List<BaseModule> collect = reflectContext.classWithSuper(UserModule.class)
+        List<GuiceModuleBase> collect = reflectContext.classWithSuper(UserGuiceModule.class)
                 .map(cls -> ReflectContext.newInstance(cls, reflectContext))
                 .collect(Collectors.toList());
         /* TODO 这里把子容器注入进去 */
-        collect.add(new SingletonModule(reflectContext, RunApplicationSub.class));
+        collect.add(new SingletonGuiceModule(reflectContext, RunApplicationSub.class));
 
         Injector injector = runApplicationMain.getInjector().createChildInjector(collect);
         RunApplicationSub runApplicationSub = injector.getInstance(RunApplicationSub.class);

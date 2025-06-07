@@ -169,18 +169,22 @@ public class HttpContext implements AutoCloseable {
             }
 
             String http = ssl() ? "https" : "http";
-            this.uriPath = uriPathString;
             this.domainName = http + "://" + host;
             this.completeUri = this.domainName + uriPathString;
+            this.uriPath = uriPathString;
+            int indexOf = uriPathString.indexOf("?");
+            if (indexOf > -1) {
+                this.uriPath = uriPathString.substring(0, indexOf);
+            }
             actionPostData();
             actionGetData();
         }
 
         protected void actionGetData() throws Exception {
-            if (StringUtils.isNotBlank(this.uriPath)) {
-                int index = this.uriPath.indexOf("?");
+            if (StringUtils.isNotBlank(this.completeUri)) {
+                int index = this.completeUri.indexOf("?");
                 if (index > -1) {
-                    this.queryString = this.uriPath.substring(index + 1);
+                    this.queryString = this.completeUri.substring(index + 1);
                     if (StringUtils.isNotBlank(queryString)) {
                         HttpDataAction.httpDataDecoder(getReqParams(), queryString);
                     }

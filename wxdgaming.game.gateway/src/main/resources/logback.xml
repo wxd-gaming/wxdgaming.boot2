@@ -59,6 +59,7 @@
     </appender>
 
     <logger name="io.netty" level="info" additivity="false"/>
+    <logger name="org.apache.hc" level="info" additivity="false"/>
     <logger name="com.zaxxer.hikari" level="info" additivity="false"/>
     <logger name="org.mongodb.driver" level="info" additivity="false"/>
 

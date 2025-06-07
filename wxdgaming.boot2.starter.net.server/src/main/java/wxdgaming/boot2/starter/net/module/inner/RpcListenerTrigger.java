@@ -81,7 +81,7 @@ public class RpcListenerTrigger extends ExecutorEvent {
             }
             log.error("dispatch error rpcId: {}, cmd: {}, paramData: {}", rpcId, rpcMapping.path(), paramObject, e);
             if (rpcId > 0) {
-                rpcService.response(socketSession, rpcId, RunResult.error(500, "server error"));
+                rpcService.response(socketSession, rpcId, RunResult.fail(500, "server error"));
             }
         }
     }

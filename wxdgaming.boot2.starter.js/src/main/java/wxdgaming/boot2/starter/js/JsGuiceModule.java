@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.js;
 
-import wxdgaming.boot2.core.ServiceModule;
+import wxdgaming.boot2.core.ServiceGuiceModule;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 
 /**
@@ -9,10 +9,10 @@ import wxdgaming.boot2.core.reflect.ReflectContext;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-15 12:42
  **/
-public class JsModule extends ServiceModule {
+public class JsGuiceModule extends ServiceGuiceModule {
 
 
-    public JsModule(ReflectContext reflectContext) {
+    public JsGuiceModule(ReflectContext reflectContext) {
         super(reflectContext);
     }
 

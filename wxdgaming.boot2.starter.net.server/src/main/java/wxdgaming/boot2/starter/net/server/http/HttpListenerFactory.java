@@ -81,7 +81,7 @@ public class HttpListenerFactory {
             }
         } catch (Throwable e) {
             log.error("dispatch error", e);
-            RunResult serverError = RunResult.error("server error");
+            RunResult serverError = RunResult.fail("server error");
             ByteBuf byteBuf = Unpooled.wrappedBuffer(serverError.toJSONString().getBytes(StandardCharsets.UTF_8));
             DefaultFullHttpResponse response = new DefaultFullHttpResponse(fullHttpRequest.protocolVersion(), HttpResponseStatus.INTERNAL_SERVER_ERROR, byteBuf);
             response.headers().set(HttpHeaderNames.CONTENT_TYPE, HttpHeadValueType.Json);

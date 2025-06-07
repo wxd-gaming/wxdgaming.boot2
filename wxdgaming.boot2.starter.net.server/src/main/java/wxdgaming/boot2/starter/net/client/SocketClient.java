@@ -233,7 +233,11 @@ public abstract class SocketClient {
             });
 
             if (consumer != null) {
-                consumer.accept(socketSession);
+                try {
+                    consumer.accept(socketSession);
+                } catch (Throwable throwable) {
+                    log.error("{} consumer error", this.getClass().getSimpleName(), throwable);
+                }
             }
         });
     }

@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.batis.sql.pgsql;
 
 import wxdgaming.boot2.core.BootConfig;
-import wxdgaming.boot2.core.ServiceModule;
+import wxdgaming.boot2.core.ServiceGuiceModule;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
@@ -12,10 +12,10 @@ import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-15 12:42
  **/
-public class PgsqlDataModule extends ServiceModule {
+public class PgsqlDataGuiceModule extends ServiceGuiceModule {
 
 
-    public PgsqlDataModule(ReflectContext reflectContext) {
+    public PgsqlDataGuiceModule(ReflectContext reflectContext) {
         super(reflectContext);
     }
 

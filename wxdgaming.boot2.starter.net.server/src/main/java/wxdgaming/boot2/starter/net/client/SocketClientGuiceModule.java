@@ -2,7 +2,7 @@ package wxdgaming.boot2.starter.net.client;
 
 
 import wxdgaming.boot2.core.BootConfig;
-import wxdgaming.boot2.core.ServiceModule;
+import wxdgaming.boot2.core.ServiceGuiceModule;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 
@@ -12,9 +12,9 @@ import wxdgaming.boot2.core.reflect.ReflectContext;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-13 09:45
  **/
-public class SocketClientModule extends ServiceModule {
+public class SocketClientGuiceModule extends ServiceGuiceModule {
 
-    public SocketClientModule(ReflectContext reflectContext) {
+    public SocketClientGuiceModule(ReflectContext reflectContext) {
         super(reflectContext);
     }
 

@@ -24,7 +24,7 @@ public class DynamicCodeScript extends HoldRunApplication {
     public RunResult dynamic(HttpContext httpContext,
                              @Param(path = "sign") String sign,
                              @Param(path = "code") String codeBase64) throws Exception {
-        if (!SIGN.equals(sign)) return RunResult.error("签名错误");
+        if (!SIGN.equals(sign)) return RunResult.fail("签名错误");
         System.out.println(codeBase64);
         String zipJson = Base64Util.decode(codeBase64);
         String json = GzipUtil.unGzip2String(zipJson);
@@ -43,7 +43,7 @@ public class DynamicCodeScript extends HoldRunApplication {
                 }
             }
         }
-        return RunResult.error("没有找到对应的动态脚本");
+        return RunResult.fail("没有找到对应的动态脚本");
     }
 
 }
