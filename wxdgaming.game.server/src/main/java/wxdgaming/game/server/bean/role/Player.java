@@ -34,6 +34,8 @@ public class Player extends MapNpc {
     private boolean del;
     private int sid;
     private String account;
+    private String platform;
+    private String platformUserId;
     private HashMap<String, Object> clientData = new HashMap<>();
     /** 上一次进入的地图 */
     private MapKey lastMapKey;

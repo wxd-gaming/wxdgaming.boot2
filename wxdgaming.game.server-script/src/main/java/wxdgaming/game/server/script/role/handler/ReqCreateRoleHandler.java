@@ -91,6 +91,8 @@ public class ReqCreateRoleHandler extends HoldRunApplication {
             player = new Player();
             player.setUid(dataCenterService.getHexid().newId());
             player.setAccount(account);
+            player.setPlatform(clientSessionMapping.getPlatform());
+            player.setPlatformUserId(clientSessionMapping.getPlatformUserId());
             player.setSid(sid);
             player.setName(name);
             player.setLevel(1);
