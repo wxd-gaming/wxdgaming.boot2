@@ -68,6 +68,7 @@ public class CostScript {
                             "背包变更：{}, {}, 道具扣除, 格子：{}, {}, {}, 从背包移除, {}",
                             player, bagType, itemGrid.getGrid(), item.toName(), item.getCount(), reasonArgs
                     );
+                    itemBag.remove(itemGrid);
                     bagChangesEvent.addDel(itemGrid);
                     count -= hasNum;
                 } else {
@@ -89,6 +90,7 @@ public class CostScript {
     }
 
     public void cost(Player player, BagChangesEvent bagChangesEvent, ItemGrid itemGrid, long count, ReasonArgs reasonArgs) {
+        ItemBag itemBag = bagChangesEvent.getItemBag();
         Item item = itemGrid.getItem();
         long hasNum = item.getCount();
         if (hasNum <= count) {
@@ -96,6 +98,7 @@ public class CostScript {
                     "背包变更：{}, {}, 道具扣除, 格子：{}, {}, {}, 从背包移除, {}",
                     player, bagChangesEvent.getBagType(), itemGrid.getGrid(), item.toName(), item.getCount(), reasonArgs
             );
+            itemBag.remove(itemGrid);
             bagChangesEvent.addDel(itemGrid);
         } else {
             /*正常扣除*/

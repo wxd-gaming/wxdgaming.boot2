@@ -100,6 +100,11 @@ public class ItemBag {
     }
 
     /** 删除 */
+    public void remove(ItemGrid itemGrid) {
+        itemGrids[itemGrid.getGrid()] = null;
+    }
+
+    /** 删除 */
     public ItemGrid remove(Item item) {
         for (int i = 0; i < itemGrids.length; i++) {
             if (Objects.equals(itemGrids[i], item)) {
