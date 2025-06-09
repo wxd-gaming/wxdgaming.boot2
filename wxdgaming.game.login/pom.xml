@@ -47,6 +47,11 @@
             <artifactId>wxdgaming.boot2.starter.batis.sql.mysql</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>wxdgaming.boot2</groupId>
+            <artifactId>wxdgaming.game.basic</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

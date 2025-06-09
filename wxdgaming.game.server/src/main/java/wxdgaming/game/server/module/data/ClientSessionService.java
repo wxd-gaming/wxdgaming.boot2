@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClientSessionService {
 
     /** 服务映射,R:服务类型, C:服务id（网关id）, V:session */
-    final ConcurrentTable<ServiceType, Integer, SocketSession> serviceSocketSessionMapping = new ConcurrentTable<>();
+    private final ConcurrentTable<ServiceType, Integer, SocketSession> serviceSocketSessionMapping = new ConcurrentTable<>();
 
     /** key:account, value:mapping */
     private final ConcurrentHashMap<String, ClientSessionMapping> accountMappingMap = new ConcurrentHashMap<>();

@@ -1,3 +1,5 @@
+package wxdgaming.game.chart;
+
 import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.starter.RunApplicationMain;
 import wxdgaming.boot2.starter.WxdApplication;

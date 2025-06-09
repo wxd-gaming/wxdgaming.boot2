@@ -66,7 +66,6 @@ public class RpcService {
     }
 
     public Mono<JSONObject> request(SocketSession socketSession, String cmd, String params, boolean immediate) {
-        CompletableFuture<JSONObject> completableFuture = new CompletableFuture<>();
         ReqRemote reqRemote = new ReqRemote();
         reqRemote
                 .setUid(hexId.newId())
@@ -77,6 +76,7 @@ public class RpcService {
             reqRemote.setGzip(1);
             reqRemote.setParams(GzipUtil.gzip2String(reqRemote.getParams()));
         }
+        CompletableFuture<JSONObject> completableFuture = new CompletableFuture<>();
         Mono<JSONObject> jsonObjectMono = Mono.fromCompletionStage(completableFuture);
         rpcCache.put(reqRemote.getUid(), completableFuture);
         if (immediate)

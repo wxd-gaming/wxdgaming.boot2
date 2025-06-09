@@ -10,6 +10,7 @@ import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.util.JwtUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.game.login.LoginConfig;
 import wxdgaming.game.message.role.ReqLogin;
 import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.module.data.ClientSessionService;
@@ -29,13 +30,19 @@ public class ReqLoginHandler extends HoldRunApplication {
     private final ClientSessionService clientSessionService;
     private final PlayerService playerService;
     private final TipsService tipsService;
+    private final LoginConfig loginConfig;
 
     @Inject
-    public ReqLoginHandler(DataCenterService dataCenterService, ClientSessionService clientSessionService, PlayerService playerService, TipsService tipsService) {
+    public ReqLoginHandler(DataCenterService dataCenterService,
+                           ClientSessionService clientSessionService,
+                           PlayerService playerService,
+                           TipsService tipsService,
+                           LoginConfig loginConfig) {
         this.dataCenterService = dataCenterService;
         this.clientSessionService = clientSessionService;
         this.playerService = playerService;
         this.tipsService = tipsService;
+        this.loginConfig = loginConfig;
     }
 
     @ProtoRequest
@@ -45,7 +52,7 @@ public class ReqLoginHandler extends HoldRunApplication {
         try {
             int sid = req.getSid();
             String token = req.getToken();
-            Jws<Claims> claimsJws = JwtUtils.parseJWT(token);
+            Jws<Claims> claimsJws = JwtUtils.parseJWT(loginConfig.getJwtKey(), token);
             String account = claimsJws.getPayload().get("account", String.class);
             String platform = claimsJws.getPayload().get("platform", String.class);
             /*平台返回的userid*/

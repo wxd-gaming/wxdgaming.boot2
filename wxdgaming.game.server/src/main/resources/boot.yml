@@ -89,4 +89,8 @@ backends:
 
 login:
   url: http://127.0.0.1:19800
-  token: 1234567890
+  jwtKey: "1234567890"
+
+chat:
+  host: 127.0.0.1
+  port: 19800

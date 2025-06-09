@@ -17,6 +17,7 @@ public class LoginApplication {
                 CoreScan.class,
                 SocketScan.class,
                 ScheduledScan.class,
+                LoginServiceGuiceModule.class,
                 LoginApplication.class
         );
 

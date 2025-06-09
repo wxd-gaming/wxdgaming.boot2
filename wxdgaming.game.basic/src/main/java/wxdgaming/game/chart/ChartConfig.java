@@ -1,4 +1,4 @@
-package wxdgaming.game.login;
+package wxdgaming.game.chart;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +12,7 @@ import wxdgaming.boot2.core.lang.ObjectBase;
  **/
 @Getter
 @Setter
-public class LoginConfig extends ObjectBase {
+public class ChartConfig extends ObjectBase {
 
     private String url;
     private String jwtKey;

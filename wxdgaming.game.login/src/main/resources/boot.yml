@@ -62,3 +62,6 @@ db:
     maxPoolSize: 20                                           #最大连接数
     batchSubmitSize: 500                                      #批量提交数量
     batchThreadSize: 1                                        #批量提交线程数
+
+login:
+  jwtKey: "1234567890"

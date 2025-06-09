@@ -6,6 +6,7 @@ import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.JwtUtils;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
+import wxdgaming.game.login.LoginConfig;
 import wxdgaming.game.login.bean.UserData;
 import wxdgaming.game.login.service.LoginService;
 
@@ -22,6 +23,7 @@ public abstract class SdkLoginApi {
     @Inject protected LoginService loginService;
     @SuppressWarnings("rawtypes")
     @Inject protected SqlDataHelper sqlDataHelper;
+    @Inject protected LoginConfig loginConfig;
 
     /** 平台 */
     public abstract int platform();
@@ -29,7 +31,7 @@ public abstract class SdkLoginApi {
     public abstract RunResult login(HttpContext context);
 
     public RunResult buildResult(UserData userData) {
-        JwtBuilder jwtBuilder = JwtUtils.createJwtBuilder(TimeUnit.MINUTES.toMillis(5));
+        JwtBuilder jwtBuilder = JwtUtils.createJwtBuilder(loginConfig.getJwtKey(), TimeUnit.MINUTES.toMillis(5));
         jwtBuilder.claim("platform", userData.getPlatform());
         jwtBuilder.claim("account", userData.getAccount());
         jwtBuilder.claim("platformUserId", userData.getPlatformUserId());
