@@ -62,12 +62,8 @@ public abstract class MessageEncode extends ChannelOutboundHandlerAdapter {
                 super.write(ctx, textWebSocketFrame, promise);
             }
             case PojoBase pojoBase -> {
-                int msgId = protoListenerFactory.messageId(pojoBase.getClass());
-                if (msgId == 0) {
-                    log.warn("{} 消息 {} 未注册", session, pojoBase.getClass().getName(), new RuntimeException("无法编码"));
-                    return;
-                }
-                byte[] bytes = SerializerUtil.encode(pojoBase);
+                int msgId = pojoBase.msgId();
+                byte[] bytes = pojoBase.encode();
                 Object build = build(session, msgId, bytes);
                 super.write(ctx, build, promise);
                 if (log.isDebugEnabled()) {
