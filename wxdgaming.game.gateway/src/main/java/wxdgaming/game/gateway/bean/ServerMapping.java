@@ -3,6 +3,7 @@ package wxdgaming.game.gateway.bean;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.message.inner.InnerForwardMessage;
@@ -18,6 +19,7 @@ import java.util.function.Consumer;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-05-28 10:24
  **/
+@Slf4j
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -43,6 +45,10 @@ public class ServerMapping extends ObjectBase {
         innerForwardMessage.getKvBeansMap().put("clientSessionId", String.valueOf(clientSessionId));
         if (callback != null) {
             callback.accept(innerForwardMessage);
+        }
+        if (session == null || !session.isOpen()) {
+            log.debug("发送消息 连接不可用：clientSessionId={}, msgId={}, {}", clientSessionId, messageId, innerForwardMessage);
+            return;
         }
         session.writeAndFlush(innerForwardMessage);
     }

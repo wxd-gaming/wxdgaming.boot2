@@ -8,7 +8,6 @@ import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.game.gateway.bean.ServerMapping;
 import wxdgaming.game.gateway.module.data.DataCenterService;
-import wxdgaming.game.message.inner.ServiceType;
 import wxdgaming.game.message.role.ReqLogin;
 
 /**
@@ -35,7 +34,7 @@ public class ReqLoginHandler {
     @ProtoRequest
     public void reqLogin(SocketSession socketSession, ReqLogin req) {
         int sid = req.getSid();
-        ServerMapping serverMapping = dataCenterService.getServiceMappings().get(ServiceType.GAME, sid);
+        ServerMapping serverMapping = dataCenterService.getGameServiceMappings().get(sid);
         if (serverMapping == null) {
             log.error("sid:{} 不存在", sid);
             socketSession.close("异常消息");
