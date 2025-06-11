@@ -43,7 +43,7 @@ public class PostText extends HttpBase<PostText> {
             ByteArrayEntity requestEntity = new ByteArrayEntity(bytes, contentType);
             httpRequest.setEntity(requestEntity);
             if (log.isDebugEnabled()) {
-                log.debug("send url={}\n{}", url(), params);
+                log.debug("send url={}, params={}", url(), params);
             }
         }
         CloseableHttpClient closeableHttpClient = httpClientPool.getCloseableHttpClient();
