@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="GatewayApplication-2" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="wxdgaming.game.gateway.GatewayApplication" />
+    <module name="wxdgaming.game.gateway" />
+    <option name="VM_PARAMETERS" value="-ea -Dboot.config=boot2.yml" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="wxdgaming.game.login.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
