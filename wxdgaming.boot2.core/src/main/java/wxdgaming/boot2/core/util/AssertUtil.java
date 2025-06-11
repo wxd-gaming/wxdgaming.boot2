@@ -1,5 +1,7 @@
 package wxdgaming.boot2.core.util;
 
+import wxdgaming.boot2.core.lang.AssertException;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
@@ -11,14 +13,6 @@ import java.util.Objects;
  * @version: 2024-07-31 09:34
  */
 public class AssertUtil {
-
-    public static class AssertException extends RuntimeException {
-
-        public AssertException(String message, StackTraceElement[] stackTrace) {
-            super(message);
-            setStackTrace(stackTrace);
-        }
-    }
 
     public static AssertException assertException(String message) {
         return assertException(4, message);

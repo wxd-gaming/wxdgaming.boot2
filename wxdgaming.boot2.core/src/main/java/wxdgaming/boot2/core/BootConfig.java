@@ -3,6 +3,7 @@ package wxdgaming.boot2.core;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.io.FileUtil;
@@ -41,6 +42,7 @@ public class BootConfig {
 
     private JSONObject config = new JSONObject(true);
 
+    @SuppressWarnings("unchecked")
     public <R> R value(Value value, Type type) {
         /*实现注入*/
         String path = value.path();
@@ -54,7 +56,10 @@ public class BootConfig {
             if (type instanceof Class<?> clazz && clazz.isInstance(r)) {
                 return (R) clazz.cast(r);
             }
-            if (r == null && !value.defaultValue().isBlank()) {
+            if (r == null && StringUtils.isNotBlank(value.defaultValue())) {
+                if (type.equals(String.class)) {
+                    return (R) value.defaultValue();
+                }
                 r = FastJsonUtil.parse(value.defaultValue(), type);
             }
         } catch (Exception e) {

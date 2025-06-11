@@ -61,6 +61,8 @@ public abstract class ExecutorEvent extends ExecutorJob implements IExecutorQueu
             String threadName = executorWith.threadName();
             if (Utils.isNotBlank(threadName)) {
                 executorService = ExecutorFactory.getExecutor(threadName);
+            }else if(executorWith.useVirtualThread()){
+                executorService = ExecutorFactory.getExecutorServiceVirtual();
             }
         }
         executorService.execute(this);
