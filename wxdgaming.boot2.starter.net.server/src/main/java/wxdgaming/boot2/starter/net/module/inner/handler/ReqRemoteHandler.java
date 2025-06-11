@@ -5,8 +5,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
-import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
@@ -14,6 +14,7 @@ import wxdgaming.boot2.starter.net.module.inner.*;
 import wxdgaming.boot2.starter.net.module.inner.message.ReqRemote;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 
 /**
  * @author: wxd-gaming(無心道, 15388152619)
@@ -37,6 +38,10 @@ public class ReqRemoteHandler {
         long rpcId = req.getUid();
         String cmd = req.getCmd();
         String token = req.getToken();
+        if (!Objects.equals(rpcService.sign(rpcId), token)) {
+            log.error("rpc ({}-{}) 调用异常 token 无效 ", rpcId, cmd);
+            return;
+        }
         int gzip = req.getGzip();
         String params = req.getParams();
         if (gzip == 1) {

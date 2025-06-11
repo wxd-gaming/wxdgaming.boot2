@@ -11,6 +11,7 @@ import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.module.inner.RpcService;
 import wxdgaming.boot2.starter.net.module.inner.message.ResRemote;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -32,6 +33,12 @@ public class ResRemoteHandler {
     public void resRemote(SocketSession socketSession, ResRemote req) {
         long rpcId = req.getUid();
         String token = req.getToken();
+
+        if (!Objects.equals(rpcService.sign(rpcId), token)) {
+            log.error("rpc ({}) 调用异常 token 无效 ", rpcId);
+            return;
+        }
+
         String params = req.getParams();
         if (req.getGzip() == 1) {
             params = GzipUtil.unGzip2String(params);
