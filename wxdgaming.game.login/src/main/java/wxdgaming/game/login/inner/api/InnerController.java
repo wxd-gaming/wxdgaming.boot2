@@ -45,6 +45,8 @@ public class InnerController extends HoldRunApplication {
         for (Integer sid : sidList) {
             InnerServerInfoBean clone = serverBean.clone();
             clone.setServerId(sid);
+            clone.setHost(context.getIp());
+            clone.setLastSyncTime(MyClock.millis());
             innerService.getInnerGameServerInfoMap().put(sid, clone);
             innerService.getSqlDataHelper().getDataBatch().save(clone);
         }

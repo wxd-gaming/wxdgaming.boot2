@@ -55,6 +55,7 @@ public class GameTimerService {
         InnerServerInfoBean serverInfoBean = new InnerServerInfoBean();
         serverInfoBean.setServerId(BootConfig.getIns().sid());
         serverInfoBean.setMainId(BootConfig.getIns().sid());
+        serverInfoBean.setGid(BootConfig.getIns().gid());
         serverInfoBean.setName(BootConfig.getIns().sname());
         serverInfoBean.setPort(socketServer.getConfig().getPort());
         serverInfoBean.setHttpPort(socketServer.getConfig().getPort());
