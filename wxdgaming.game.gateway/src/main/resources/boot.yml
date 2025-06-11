@@ -1,4 +1,5 @@
 debug: true
+gid: 1
 sid: 1
 executor:
   basic:
@@ -74,4 +75,4 @@ socket:
 
 login:
   url: http://127.0.0.1:19800
-  token: 1234567890
+  jwtKey: "123456789012345678901234567890123456789012345678901234567890"

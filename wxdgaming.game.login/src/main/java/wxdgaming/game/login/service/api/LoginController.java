@@ -10,7 +10,7 @@ import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
-import wxdgaming.game.login.sdk.SdkLoginApi;
+import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,16 +27,16 @@ import java.util.Map;
 @RequestMapping(path = "/login")
 public class LoginController extends HoldRunApplication {
 
-    Map<Integer, SdkLoginApi> sdkMap = new HashMap<>();
+    Map<Integer, AbstractSdkLoginApi> sdkMap = new HashMap<>();
 
     @Init
     public void init() {
 
-        HashMap<Integer, SdkLoginApi> map = new HashMap<>();
+        HashMap<Integer, AbstractSdkLoginApi> map = new HashMap<>();
 
-        runApplication.classWithSuper(SdkLoginApi.class)
+        runApplication.classWithSuper(AbstractSdkLoginApi.class)
                 .forEach(sdkLoginApi -> {
-                    SdkLoginApi oldPut = map.put(sdkLoginApi.platform(), sdkLoginApi);
+                    AbstractSdkLoginApi oldPut = map.put(sdkLoginApi.platform(), sdkLoginApi);
                     AssertUtil.assertTrue(oldPut == null, "重复注册类型：" + sdkLoginApi.platform());
                     log.info("register sdk login api: {}", sdkLoginApi.platform());
                 });
@@ -46,7 +46,7 @@ public class LoginController extends HoldRunApplication {
 
     @HttpRequest
     public RunResult check(HttpContext context, @Param(path = "platform") int platform) {
-        SdkLoginApi sdkLoginApi = sdkMap.get(platform);
+        AbstractSdkLoginApi sdkLoginApi = sdkMap.get(platform);
         if (sdkLoginApi == null) {
             return RunResult.fail("not support platform: " + platform);
         }

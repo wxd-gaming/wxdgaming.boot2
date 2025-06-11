@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-06-07 18:22
  **/
-public abstract class SdkLoginApi {
+public abstract class AbstractSdkLoginApi {
 
     @Inject protected LoginService loginService;
     @SuppressWarnings("rawtypes")

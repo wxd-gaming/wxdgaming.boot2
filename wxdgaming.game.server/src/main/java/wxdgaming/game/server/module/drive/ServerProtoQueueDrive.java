@@ -4,7 +4,7 @@ import com.google.inject.Singleton;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.executor.ThreadContext;
-import wxdgaming.boot2.starter.net.pojo.ProtoFilter;
+import wxdgaming.boot2.starter.net.pojo.ServerProtoFilter;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerTrigger;
 import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.bean.MapKey;
@@ -17,7 +17,7 @@ import wxdgaming.game.server.bean.role.Player;
  * @version: 2025-05-08 10:34
  **/
 @Singleton
-public class ProtoQueueDrive implements ProtoFilter {
+public class ServerProtoQueueDrive implements ServerProtoFilter {
 
 
     @Override

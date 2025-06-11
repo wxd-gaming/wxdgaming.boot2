@@ -19,6 +19,21 @@
         </dependency>
         <dependency>
             <groupId>wxdgaming.boot2</groupId>
+            <artifactId>wxdgaming.boot2.starter.batis.sql</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>wxdgaming.boot2</groupId>
+            <artifactId>wxdgaming.boot2.starter.batis.sql.mysql</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>wxdgaming.boot2</groupId>
+            <artifactId>wxdgaming.boot2.starter.batis.sql.pgsql</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>wxdgaming.boot2</groupId>
             <artifactId>wxdgaming.boot2.starter.net.server</artifactId>
             <version>${project.version}</version>
         </dependency>

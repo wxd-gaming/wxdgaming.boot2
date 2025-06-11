@@ -6,7 +6,7 @@ import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
 import wxdgaming.game.login.bean.UserData;
-import wxdgaming.game.login.sdk.SdkLoginApi;
+import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
 
 /**
  * 本地服
@@ -16,7 +16,7 @@ import wxdgaming.game.login.sdk.SdkLoginApi;
  **/
 @Slf4j
 @Singleton
-public class LocalSdkLoginApi extends SdkLoginApi {
+public class LocalSdkLoginApi extends AbstractSdkLoginApi {
 
 
     @Override public int platform() {
