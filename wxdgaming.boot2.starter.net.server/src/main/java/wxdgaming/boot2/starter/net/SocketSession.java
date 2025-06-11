@@ -10,7 +10,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.lang.TickCount;
-import wxdgaming.boot2.starter.net.pojo.PojoBase;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -36,7 +35,9 @@ public class SocketSession {
     private final long uid;
     private final Type type;
     private final Channel channel;
-    private final int port;
+    /** 请求端口 */
+    private final int localPort;
+    /** 通信用的远程端口 */
     private final int remotePort;
     private boolean webSocket;
     /** websocket 握手完成 */
@@ -56,7 +57,7 @@ public class SocketSession {
         this.channel = channel;
         this.webSocket = Boolean.TRUE.equals(webSocket);
         this.enabledScheduledFlush = enabledScheduledFlush;
-        this.port = ChannelUtil.localPort(channel);
+        this.localPort = ChannelUtil.localPort(channel);
         this.remotePort = ChannelUtil.remotePort(channel);
         ChannelUtil.attr(this.channel, ChannelUtil.SOCKET_SESSION_KEY, this);
     }

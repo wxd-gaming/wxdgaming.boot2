@@ -161,6 +161,7 @@ public abstract class SocketClient {
     @shutdown
     public void shutdown() {
         closed = true;
+        sessionGroup.getChannelGroup().disconnect();
         log.info("shutdown tcp client：{}:{}", config.getHost(), config.getPort());
     }
 

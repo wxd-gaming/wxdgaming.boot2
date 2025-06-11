@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.net.SocketSession;
-import wxdgaming.boot2.starter.net.pojo.ProtoFilter;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerTrigger;
+import wxdgaming.boot2.starter.net.pojo.ServerProtoFilter;
 import wxdgaming.game.gateway.module.data.DataCenterService;
 
 /**
@@ -17,14 +17,14 @@ import wxdgaming.game.gateway.module.data.DataCenterService;
  **/
 @Slf4j
 @Singleton
-public class ProtoClientFilterImpl implements ProtoFilter {
+public class ServerProtoFilterImpl implements ServerProtoFilter {
 
     private final DataCenterService dataCenterService;
     private final ProtoListenerFactory listenerFactory;
 
 
     @Inject
-    public ProtoClientFilterImpl(DataCenterService dataCenterService, ProtoListenerFactory listenerFactory) {
+    public ServerProtoFilterImpl(DataCenterService dataCenterService, ProtoListenerFactory listenerFactory) {
         this.dataCenterService = dataCenterService;
         this.listenerFactory = listenerFactory;
     }
@@ -32,10 +32,7 @@ public class ProtoClientFilterImpl implements ProtoFilter {
 
     @Override public boolean doFilter(ProtoListenerTrigger protoListenerTrigger) {
         SocketSession socketSession = protoListenerTrigger.getSocketSession();
-        if (socketSession.getType() == SocketSession.Type.client) {
-            /*表示对内的session, 比如游戏服发过来的消息*/
-            return true;
-        } else if (socketSession.getType() == SocketSession.Type.server) {
+        if (socketSession.getType() == SocketSession.Type.server) {
             /*表示对外的session*/
             return true;
         }

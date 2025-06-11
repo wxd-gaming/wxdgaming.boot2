@@ -27,7 +27,8 @@ public class ProtoListenerFactory {
     ProtoListenerContent protoListenerContent = null;
     IWebSocketStringListener iWebSocketStringListener = null;
     ProtoUnknownMessageEvent protoUnknownMessageEvent = null;
-    List<ProtoFilter> protoFilters;
+    List<ServerProtoFilter> serverProtoFilters;
+    List<ClientProtoFilter> clientProtoFilters;
 
     @Init
     @Order(6)
@@ -35,7 +36,8 @@ public class ProtoListenerFactory {
         protoListenerContent = new ProtoListenerContent(runApplication);
         iWebSocketStringListener = runApplication.classWithSuper(IWebSocketStringListener.class).findFirst().orElse(null);
         protoUnknownMessageEvent = runApplication.classWithSuper(ProtoUnknownMessageEvent.class).findFirst().orElse(null);
-        protoFilters = runApplication.classWithSuper(ProtoFilter.class).toList();
+        serverProtoFilters = runApplication.classWithSuper(ServerProtoFilter.class).toList();
+        clientProtoFilters = runApplication.classWithSuper(ClientProtoFilter.class).toList();
     }
 
     public RunApplication getRunApplication() {
@@ -65,7 +67,16 @@ public class ProtoListenerFactory {
         }
         /*根据映射解析生成触发事件*/
         ProtoListenerTrigger protoListenerTrigger = new ProtoListenerTrigger(mapping, protoListenerContent.getRunApplication(), socketSession, messageId, data);
-        boolean allMatch = protoFilters.stream().allMatch(filter -> filter.doFilter(protoListenerTrigger));
+        boolean allMatch;
+        if (socketSession.getType() == SocketSession.Type.server) {
+            allMatch = serverProtoFilters.stream()
+                    .filter(filter -> filter.localPort() == 0 || filter.localPort() == socketSession.getLocalPort())
+                    .allMatch(filter -> filter.doFilter(protoListenerTrigger));
+        } else {
+            allMatch = clientProtoFilters.stream()
+                    .filter(filter -> filter.localPort() == 0 || filter.localPort() == socketSession.getLocalPort())
+                    .allMatch(filter -> filter.doFilter(protoListenerTrigger));
+        }
         if (!allMatch) {
             if (log.isDebugEnabled()) {
                 log.debug("收到消息：{} msgId={}, {} - 被过滤器剔除无需执行", socketSession, messageId, protoListenerTrigger.getPojoBase());
