@@ -229,7 +229,7 @@ public class Objects {
     }
 
     /** 返回非null的那个参数，优先第一个 */
-    public static <R> R returnNonNull(R... args) {
+    @SafeVarargs public static <R> R returnNonNull(R... args) {
         for (int i = 0; i < args.length; i++) {
             R arg = args[i];
             if (arg != null) {

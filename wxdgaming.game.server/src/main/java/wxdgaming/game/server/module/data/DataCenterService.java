@@ -44,6 +44,7 @@ public class DataCenterService {
     final KeywordsMapping keywordsMapping = new KeywordsMapping();
 
     @Inject
+    @SuppressWarnings("rawtypes")
     public DataCenterService(SqlDataHelper sqlDataHelper) {
         this.sqlDataHelper = sqlDataHelper;
     }
@@ -68,8 +69,12 @@ public class DataCenterService {
         }
     }
 
+    public RoleEntity roleEntity(long uid) {
+        return sqlDataHelper.getCacheService().cacheIfPresent(RoleEntity.class, uid);
+    }
+
     public Player player(long uid) {
-        RoleEntity roleEntity = sqlDataHelper.getCacheService().cacheIfPresent(RoleEntity.class, uid);
+        RoleEntity roleEntity = roleEntity(uid);
         return roleEntity == null ? null : roleEntity.getPlayer();
     }
 

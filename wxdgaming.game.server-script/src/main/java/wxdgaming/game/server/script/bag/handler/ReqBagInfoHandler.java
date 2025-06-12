@@ -8,6 +8,7 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.bag.ReqBagInfo;
 import wxdgaming.game.server.bean.ClientSessionMapping;
+import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.bag.BagService;
 
 /**
@@ -29,9 +30,8 @@ public class ReqBagInfoHandler {
 
     /** 请求背包信息 */
     @ProtoRequest
-    public void reqBagInfo(SocketSession socketSession, ReqBagInfo req,
-                           @ThreadParam(path = "clientSessionMapping") ClientSessionMapping clientSessionMapping) {
-        bagService.sendBagInfo(clientSessionMapping.getPlayer(), req.getBagType());
+    public void reqBagInfo(SocketSession socketSession, ReqBagInfo req, @ThreadParam(path = "player") Player player) {
+        bagService.sendBagInfo(player, req.getBagType());
     }
 
 }

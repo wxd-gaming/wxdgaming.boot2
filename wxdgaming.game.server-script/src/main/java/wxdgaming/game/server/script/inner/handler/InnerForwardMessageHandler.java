@@ -10,6 +10,7 @@ import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.game.message.inner.InnerForwardMessage;
 import wxdgaming.game.server.bean.ClientSessionMapping;
+import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.ClientSessionService;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.inner.InnerService;
@@ -58,7 +59,9 @@ public class InnerForwardMessageHandler extends HoldRunApplication {
         if (account != null) {
             ClientSessionMapping clientSessionMapping = clientSessionService.getAccountMappingMap().get(account);
             ThreadContext.putContent("clientSessionMapping", clientSessionMapping);
-            ThreadContext.putContent("player", clientSessionMapping.getPlayer());
+            long rid = clientSessionMapping.getRid();
+            Player player = dataCenterService.player(rid);
+            ThreadContext.putContent("player", player);
         }
         protoListenerFactory.dispatch(socketSession, messageId, messages);
     }

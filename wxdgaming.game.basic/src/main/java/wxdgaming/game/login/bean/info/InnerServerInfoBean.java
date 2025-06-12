@@ -1,9 +1,7 @@
-package wxdgaming.game.bean.info;
+package wxdgaming.game.login.bean.info;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
@@ -29,6 +27,12 @@ public class InnerServerInfoBean extends Entity implements Cloneable {
     private int httpPort;
     private long lastSyncTime;
     private int status;
+    private int maxOnlineSize = 1000;
+    private int onlineSize = 0;
+
+    public int free() {
+        return maxOnlineSize - onlineSize;
+    }
 
     @Override public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

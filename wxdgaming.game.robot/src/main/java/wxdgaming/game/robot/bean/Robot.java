@@ -7,7 +7,9 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.message.bag.ItemBean;
 import wxdgaming.game.message.task.TaskBean;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 机器人
@@ -22,6 +24,7 @@ public class Robot {
 
     private long rid;
     private String account;
+    private String platformUserId;
     private int sid;
     private String name;
     private int level;
@@ -36,7 +39,9 @@ public class Robot {
     private Map<Integer, ItemBean> items = new HashMap<>();
     private Map<Integer, TaskBean> tasks = new HashMap<>();
 
+
     @Override public String toString() {
-        return "Robot{rid=%d, account='%s', name='%s', lv=%s}".formatted(rid, account, name, level);
+        return "Robot{rid=%d, account='%s', platformUserId='%s', sid=%d, name='%s', level=%d}"
+                .formatted(rid, account, platformUserId, sid, name, level);
     }
 }

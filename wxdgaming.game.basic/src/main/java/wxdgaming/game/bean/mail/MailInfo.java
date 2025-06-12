@@ -1,11 +1,11 @@
-package wxdgaming.game.server.bean.mail;
+package wxdgaming.game.bean.mail;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.lang.ObjectLong;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.game.server.bean.bag.goods.Item;
+import wxdgaming.game.bean.goods.Item;
 
 import java.util.ArrayList;
 import java.util.List;

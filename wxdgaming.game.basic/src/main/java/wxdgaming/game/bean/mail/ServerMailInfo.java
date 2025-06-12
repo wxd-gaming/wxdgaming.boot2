@@ -1,4 +1,4 @@
-package wxdgaming.game.server.bean.mail;
+package wxdgaming.game.bean.mail;
 
 import lombok.Getter;
 import lombok.Setter;

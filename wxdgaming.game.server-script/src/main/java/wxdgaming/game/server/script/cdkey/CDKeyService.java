@@ -16,7 +16,7 @@ import wxdgaming.game.core.Reason;
 import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.cdkey.ResUseCdKey;
 import wxdgaming.game.server.bean.BackendConfig;
-import wxdgaming.game.server.bean.bag.goods.Item;
+import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.bag.BagService;
@@ -70,7 +70,7 @@ public class CDKeyService {
         PostText postText = HttpBuilder.postJson(url, FastJsonUtil.toJSONString(params));
         RunResult runResult = postText.request().bodyRunResult();
 
-        if (runResult.isError()) {
+        if (runResult.isFail()) {
             tipsService.tips(player, runResult.msg());
             return;
         }

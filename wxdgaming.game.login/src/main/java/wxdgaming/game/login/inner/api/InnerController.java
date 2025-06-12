@@ -13,7 +13,7 @@ import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
-import wxdgaming.game.bean.info.InnerServerInfoBean;
+import wxdgaming.game.login.bean.info.InnerServerInfoBean;
 import wxdgaming.game.login.inner.InnerService;
 
 import java.util.ArrayList;

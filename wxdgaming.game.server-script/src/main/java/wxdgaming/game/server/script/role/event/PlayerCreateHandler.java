@@ -36,10 +36,10 @@ public class PlayerCreateHandler {
         log.info("角色创建:{}", player);
         ItemCfg.ItemCfgBuilder builder = ItemCfg.builder();
         List<ItemCfg> rewards = new ArrayList<>();
-        rewards.add(builder.cfgId(1).num(100).build());
-        rewards.add(builder.cfgId(2).num(100).build());
-        rewards.add(builder.cfgId(3).num(10000).build());
-        rewards.add(builder.cfgId(4).num(10000).build());
+        rewards.add(builder.cfgId(1).num(10000).build());
+        rewards.add(builder.cfgId(2).num(10000).build());
+        rewards.add(builder.cfgId(3).num(100000).build());
+        rewards.add(builder.cfgId(4).num(100000).build());
         rewards.add(builder.cfgId(5).num(1).build());
         ReasonArgs reasonArgs = ReasonArgs.of(Reason.CreateRole);
         bagService.gainItems4Cfg(player, rewards, reasonArgs);

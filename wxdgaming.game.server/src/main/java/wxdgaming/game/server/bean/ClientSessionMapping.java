@@ -33,13 +33,12 @@ public class ClientSessionMapping extends ObjectBase {
     private String platform;
     private String platformUserId;
     private long rid;
-    private Player player;
 
-    public void forwardMessage(PojoBase message) {
-        forwardMessage(message, null);
+    public void forwardMessage(Player player, PojoBase message) {
+        forwardMessage(player, message, null);
     }
 
-    public void forwardMessage(PojoBase message, Consumer<InnerForwardMessage> callback) {
+    public void forwardMessage(Player player, PojoBase message, Consumer<InnerForwardMessage> callback) {
         InnerForwardMessage msg = new InnerForwardMessage();
         msg.getSessionIds().add(clientSessionId);
         msg.setMessageId(message.msgId());

@@ -162,13 +162,14 @@ public class Throw extends RuntimeException implements Serializable {
         return throwableName;
     }
 
-    public Throw(String message) {
-        super(message);
-    }
 
     public Throw(String message, Throwable throwable) {
         super(message, throwable.getCause(), false, true);
         this.setStackTrace(throwable.getStackTrace());
+    }
+
+    @Override public synchronized Throwable fillInStackTrace() {
+        return this;
     }
 
     @Override public String toString() {

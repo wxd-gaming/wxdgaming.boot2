@@ -4,7 +4,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.bean.goods.ItemCfg;
 import wxdgaming.game.bean.goods.ItemTypeConst;
-import wxdgaming.game.server.bean.bag.goods.Item;
+import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.server.bean.bag.ItemBag;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.bag.BagChangesEvent;

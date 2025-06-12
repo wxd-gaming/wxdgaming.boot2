@@ -11,7 +11,7 @@ import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.server.bean.bag.BagChangesEvent;
 import wxdgaming.game.server.bean.bag.ItemBag;
 import wxdgaming.game.server.bean.bag.ItemGrid;
-import wxdgaming.game.server.bean.bag.goods.Item;
+import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.bag.BagService;

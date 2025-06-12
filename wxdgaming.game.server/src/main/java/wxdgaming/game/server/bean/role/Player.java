@@ -7,14 +7,17 @@ import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
+import wxdgaming.game.bean.Vector3D;
+import wxdgaming.game.bean.mail.MailPack;
+import wxdgaming.game.global.bean.role.OnlineInfo;
+import wxdgaming.game.global.bean.role.PlayerSnap;
+import wxdgaming.game.bean.vip.VipInfo;
 import wxdgaming.game.message.global.AttrBean;
 import wxdgaming.game.message.global.ResUpdateAttr;
 import wxdgaming.game.server.bean.*;
 import wxdgaming.game.bean.attr.AttrType;
 import wxdgaming.game.server.bean.bag.BagPack;
-import wxdgaming.game.server.bean.mail.MailPack;
 import wxdgaming.game.server.bean.task.TaskPack;
-import wxdgaming.game.server.bean.vip.VipInfo;
 
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -62,6 +65,31 @@ public class Player extends MapNpc {
         this.setMapObjectType(MapObjectType.Player);
     }
 
+    public PlayerSnap toPlayerSnap() {
+        PlayerSnap playerSnap = new PlayerSnap();
+        buildPlayerSnap(playerSnap);
+        return playerSnap;
+    }
+
+    public void buildPlayerSnap(PlayerSnap playerSnap) {
+
+        playerSnap.setUid(getUid());
+        playerSnap.setSid(getSid());
+        playerSnap.setAccount(getAccount());
+        playerSnap.setName(getName());
+        playerSnap.setLevel(getLevel());
+        if (getMapKey() != null) {
+            playerSnap.setMapId(getMapKey().getMapId());
+            playerSnap.setMapCfgId(getMapKey().getMapCfgId());
+            playerSnap.setMapLine(getMapKey().getLine());
+        }
+        playerSnap.setVector3D(getPosition());
+        playerSnap.setLastDirection(getLastDirection());
+        playerSnap.setSex(getSex());
+        playerSnap.setJob(getJob());
+
+    }
+
     public void executor(Runnable task) {
         boolean add = eventList.add(task);
         AssertUtil.assertTrue(add, "事件队列已满，添加失败");
@@ -97,14 +125,6 @@ public class Player extends MapNpc {
         if (!checkOnline()) {
             return;
         }
-        getClientSessionMapping().forwardMessage(pojoBase);
+        getClientSessionMapping().forwardMessage(this, pojoBase);
     }
-
-    public void writeAndFlush(PojoBase pojoBase) {
-        if (!checkOnline()) {
-            return;
-        }
-        getClientSessionMapping().forwardMessage(pojoBase);
-    }
-
 }

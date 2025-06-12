@@ -3,6 +3,7 @@ package wxdgaming.game.server.bean;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.lang.bit.BitFlag;
+import wxdgaming.game.bean.Vector3D;
 
 /**
  * 场景对象
@@ -21,7 +22,7 @@ public class MapObject extends GameBase {
         Item,
     }
 
-    private MapKey mapKey;
+    private MapKey mapKey = new MapKey(0, 0, 0);
 
     private Vector3D position = new Vector3D();
     /** 朝向 */

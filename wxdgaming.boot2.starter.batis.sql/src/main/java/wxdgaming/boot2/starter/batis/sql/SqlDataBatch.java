@@ -11,6 +11,7 @@ import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.lang.DiffTime;
 import wxdgaming.boot2.core.lang.Tick;
+import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.starter.batis.DataBatch;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -43,7 +45,7 @@ public abstract class SqlDataBatch extends DataBatch {
         int batchThreadSize = sqlDataHelper.getSqlConfig().getBatchThreadSize();
         log.info("{} 数据库: {} 创建 {} 个 sql 批量线程", sqlDataHelper.getClass().getSimpleName(), sqlDataHelper.getDbName(), batchThreadSize);
         for (int i = 1; i <= batchThreadSize; i++) {
-            batchThreads.add(new BatchThread(i, sqlDataHelper.getDbName() + "-" + i, sqlDataHelper.getSqlConfig().getBatchSubmitSize()));
+            batchThreads.add(new BatchThread(i, "Sql-Batch-" + sqlDataHelper.getDbName() + "-" + i, sqlDataHelper.getSqlConfig().getBatchSubmitSize()));
         }
     }
 
@@ -153,7 +155,9 @@ public abstract class SqlDataBatch extends DataBatch {
 
             while (true) {
                 try {
-                    Thread.sleep(200);
+                    if (!closed.get() && !GlobalUtil.Exiting.get()) {
+                        LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(200));
+                    }
                     insertBach();
                     updateBach();
                     if (closed.get()) {
@@ -162,12 +166,10 @@ public abstract class SqlDataBatch extends DataBatch {
                         log.info("停服等待数据落地 sql batch {}", Thread.currentThread());
                     }
                 } catch (Throwable throwable) {
-                    if (!(throwable instanceof InterruptedException)) {
-                        log.error("sqlDataBatch error", throwable);
-                    }
+                    log.error("sqlDataBatch error", throwable);
                 }
             }
-            log.info("线程 sql batch {} 退出", Thread.currentThread());
+            log.info("线程 {} 退出", Thread.currentThread());
         }
 
         protected void insertBach() {
@@ -182,7 +184,7 @@ public abstract class SqlDataBatch extends DataBatch {
             } finally {
                 lock.unlock();
             }
-            executeBach(tmp);
+            executeBach("insertBach", tmp);
         }
 
         protected void updateBach() {
@@ -197,34 +199,35 @@ public abstract class SqlDataBatch extends DataBatch {
             } finally {
                 lock.unlock();
             }
-            executeBach(tmp);
+            executeBach("updateBach", tmp);
         }
 
-        protected void executeBach(Table<String, String, ConvertCollection<BatchParam>> tmp) {
-            int executeCount = 0;
+        protected void executeBach(String sqlType, Table<String, String, ConvertCollection<BatchParam>> tmp) {
             for (HashMap<String, ConvertCollection<BatchParam>> map : tmp.values()) {
                 for (Map.Entry<String, ConvertCollection<BatchParam>> entry : map.entrySet()) {
-                    String insertSql = entry.getKey();
+                    String sql = entry.getKey();
                     ConvertCollection<BatchParam> values = entry.getValue();
                     SplitCollection<BatchParam> splitCollection = new SplitCollection<>(batchSubmitSize, values.getNodes());
                     while (!splitCollection.isEmpty()) {
                         List<BatchParam> batchParams = splitCollection.removeFirst();
                         diffTime.reset();
-                        executeCount += executeUpdate(insertSql, batchParams);
+                        int executeCount = executeUpdate(sql, batchParams);
                         long diff = diffTime.diffNs() / 10000;
                         executeDiffTime += diff;
                         this.executeCount += executeCount;
-                        if (sqlDataHelper.getSqlConfig().isDebug() || ticket.need() || closed.get()) {
+                        log.info("GlobalUtil.Exiting={}", GlobalUtil.Exiting.get());
+                        if (sqlDataHelper.getSqlConfig().isDebug() || ticket.need() || closed.get() || GlobalUtil.Exiting.get()) {
                             log.info(
                                     """
                                             
-                                            %s 数据库: %s, 单次批量提交数量限制: %s, 当前待提交剩余: %s 条
+                                            %s 数据库: %s, %s(%s) , 单次批量提交数量限制: %s, 当前待提交剩余: %s 条
                                             本次 count: %s 条 耗时: %s ms 性能：%s 条/s
                                             累计 count: %s 条 耗时: %s ms 性能：%s 条/s
                                             """
                                             .formatted(
                                                     sqlDataHelper.getClass().getSimpleName(),
                                                     sqlDataHelper.getDbName(),
+                                                    sqlType, sql,
                                                     batchSubmitSize, splitCollection.size(),
                                                     StringUtils.padLeft(executeCount, 19, ' '),
                                                     StringUtils.padLeft(diff / 100f, 19, ' '),

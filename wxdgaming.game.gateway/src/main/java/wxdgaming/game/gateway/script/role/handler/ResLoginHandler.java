@@ -41,16 +41,19 @@ public class ResLoginHandler {
     public void resLogin(SocketSession socketSession, ResLogin req) {
         InnerForwardMessage forwardMessage = ThreadContext.context("forwardMessage");
         List<Long> sessionIds = forwardMessage.getSessionIds();
-        final Long sessionId = sessionIds.getFirst();
+        final Long clientSessionId = sessionIds.getFirst();
         final String account = req.getAccount();
-        SocketSession clientSession = dataCenterService.getClientSession(sessionId);
+        SocketSession clientSession = dataCenterService.getClientSession(clientSessionId);
         clientSession.bindData("account", account);
-        clientSession.write(req);
 
         UserMapping userMapping = dataCenterService.getUserMapping(account);
         userMapping.setChooseServerId(req.getSid());
         userMapping.setChooseServerSession(socketSession);
+
+        clientSession.bindData("userMapping", userMapping);
+
         if (userMapping.getClientSocketSession() != null && !Objects.equals(userMapping.getClientSocketSession(), clientSession)) {
+            log.info("玩家被顶号登录：{}, {}, {}", account, clientSessionId, userMapping);
             userMapping.getClientSocketSession().close("被顶号登录");
         }
         if (userMapping.getClientSocketSession() == null || !Objects.equals(userMapping.getClientSocketSession(), clientSession)) {
@@ -60,12 +63,18 @@ public class ResLoginHandler {
                 }
                 InnerUserOffline userOffline = new InnerUserOffline();
                 userOffline.setAccount(account);
-                userOffline.setClientSessionId(sessionId);
+                userOffline.setClientSessionId(clientSessionId);
                 userMapping.getChooseServerSession().write(userOffline);
-                log.info("玩家离线：{}, {}", account, sessionId);
+                log.info("玩家离线：{}, {}, {}", account, clientSessionId, userMapping);
+                userMapping.setChooseRoleId(0);
+                userMapping.setClientSocketSession(null);
+                userMapping.setChooseServerId(0);
+                userMapping.setChooseServerSession(null);
             });
         }
+
         userMapping.setClientSocketSession(clientSession);
+        userMapping.send2Client(req);
     }
 
 }

@@ -1,9 +1,12 @@
 package wxdgaming.boot2.core.loader;
 
+import lombok.Getter;
+
 /**
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2021-11-01 16:16
  **/
+@Getter
 public enum JDKVersion {
 
     Jdk_1_8(8, "1.8"),
@@ -13,11 +16,13 @@ public enum JDKVersion {
     Jdk_19(19, "19"),
     Jdk_21(21, "21"),
     Jdk_23(23, "23"),
+    Jdk_24(24, "24"),
     ;
 
     private static JDKVersion runTimeJDKVersion;
     private final int version;
     private final String versionString;
+    /** 获取参数{@code  System.getProperty("java.version");} */
     private String curVersionString;
 
     JDKVersion(int version, String versionString) {
@@ -25,26 +30,7 @@ public enum JDKVersion {
         this.versionString = versionString;
     }
 
-    public int getVersion() {
-        return version;
-    }
-
-    /**
-     * System.getProperty("java.version");
-     */
-    public String getCurVersionString() {
-        return curVersionString;
-    }
-
-    public String getVersionString() {
-        return versionString;
-    }
-
-    /**
-     * 获取当前运行的默认版本
-     *
-     * @return
-     */
+    /** 获取当前运行的默认版本 */
     public static JDKVersion runTimeJDKVersion() {
         if (runTimeJDKVersion == null) {
             final String jdk_version = jdk_version();

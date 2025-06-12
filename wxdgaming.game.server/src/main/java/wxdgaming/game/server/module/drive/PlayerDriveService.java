@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 角色驱动
@@ -31,6 +32,7 @@ public class PlayerDriveService extends HoldRunApplication {
 
     private final ConcurrentHashMap<Integer, PlayerDriveContent> playerDriveContentMap = new ConcurrentHashMap<>();
     private int logicCoreSize = 0;
+    private final AtomicInteger onlineSize = new AtomicInteger();
 
     @Start
     public void start() {
@@ -46,6 +48,10 @@ public class PlayerDriveService extends HoldRunApplication {
     @shutdown()
     public void shutdown() {
         playerDriveContentMap.values().forEach(v -> v.timerJob.cancel(true));
+    }
+
+    public int onlineSize() {
+        return onlineSize.get();
     }
 
     public int getPlayerDriveId(long uid) {
@@ -80,6 +86,7 @@ public class PlayerDriveService extends HoldRunApplication {
         int driveId = getPlayerDriveId(player.getUid());
         PlayerDriveContent playerDriveContent = playerDriveContentMap.get(driveId);
         playerDriveContent.playerMap.put(player.getUid(), player);
+        onlineSize.incrementAndGet();
         if (log.isDebugEnabled()) {
             log.debug("PlayerHeartDrive add player {}", player);
         }
@@ -89,7 +96,10 @@ public class PlayerDriveService extends HoldRunApplication {
     public void removePlayer(Player player) {
         int driveId = getPlayerDriveId(player.getUid());
         PlayerDriveContent playerDriveContent = playerDriveContentMap.get(driveId);
-        playerDriveContent.playerMap.remove(player.getUid());
+        Player remove = playerDriveContent.playerMap.remove(player.getUid());
+        if (remove != null) {
+            onlineSize.decrementAndGet();
+        }
         if (log.isDebugEnabled()) {
             log.debug("PlayerHeartDrive add remove {}", player);
         }

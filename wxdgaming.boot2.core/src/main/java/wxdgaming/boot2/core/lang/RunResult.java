@@ -45,7 +45,7 @@ public class RunResult extends JSONObject {
         return code() == 1;
     }
 
-    public boolean isError() {
+    public boolean isFail() {
         return code() != 1;
     }
 

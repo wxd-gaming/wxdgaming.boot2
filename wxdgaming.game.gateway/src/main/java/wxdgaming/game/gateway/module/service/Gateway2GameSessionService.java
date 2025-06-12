@@ -23,7 +23,7 @@ import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.SocketServerImpl;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
-import wxdgaming.game.bean.info.InnerServerInfoBean;
+import wxdgaming.game.login.bean.info.InnerServerInfoBean;
 import wxdgaming.game.login.LoginConfig;
 import wxdgaming.game.message.inner.InnerRegisterServer;
 import wxdgaming.game.message.inner.ServiceType;
@@ -78,6 +78,9 @@ public class Gateway2GameSessionService extends HoldRunApplication {
         serverInfoBean.setPort(socketServer.getConfig().getPort());
         serverInfoBean.setHttpPort(socketServer.getConfig().getPort());
 
+        serverInfoBean.setMaxOnlineSize(loginConfig.getMaxOnlineSize());
+        serverInfoBean.setOnlineSize(socketServer.getSessionGroup().size());
+
         JSONObject jsonObject = MapOf.newJSONObject();
         jsonObject.put("sid", BootConfig.getIns().sid());
         jsonObject.put("serverBean", serverInfoBean.toJSONString());
@@ -86,8 +89,9 @@ public class Gateway2GameSessionService extends HoldRunApplication {
         String md5DigestEncode = Md5Util.md5DigestEncode0("#", json, loginConfig.getJwtKey());
         jsonObject.put("sign", md5DigestEncode);
 
-        Response<PostText> request = HttpBuilder.postJson(loginConfig.getUrl() + "/inner/registerGateway", jsonObject.toString()).request();
-        log.info("向登陆服务器注册: {}", request.bodyString());
+        String string = jsonObject.toString();
+        Response<PostText> request = HttpBuilder.postJson(loginConfig.getUrl() + "/inner/registerGateway", string).request();
+        log.info("登录服务器注册完成返回信息: {}", request.bodyString());
         RunResult runResult = request.bodyRunResult();
         if (runResult.code() == 1) {
 

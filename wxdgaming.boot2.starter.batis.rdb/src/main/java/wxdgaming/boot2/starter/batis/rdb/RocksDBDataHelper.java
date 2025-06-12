@@ -2,7 +2,7 @@ package wxdgaming.boot2.starter.batis.rdb;
 
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.*;
-import wxdgaming.boot2.core.util.ObjectLockUtil;
+import wxdgaming.boot2.core.util.SingletonLockUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -110,7 +110,7 @@ public class RocksDBDataHelper {
      * @return true 表示写入成功，false 表示 key 已存在
      */
     public boolean putIfAbsent(String key, String value) throws RocksDBException {
-        ObjectLockUtil.lock(key);
+        SingletonLockUtil.lock(key);
         try {
             byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
             if (db.get(keyBytes) == null) {
@@ -119,12 +119,12 @@ public class RocksDBDataHelper {
             }
             return false;
         } finally {
-            ObjectLockUtil.unlock(key);
+            SingletonLockUtil.unlock(key);
         }
     }
 
     public boolean delIfAbsent(String key) {
-        ObjectLockUtil.lock(key);
+        SingletonLockUtil.lock(key);
         try {
             byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
             if (db.get(keyBytes) != null) {
@@ -135,7 +135,7 @@ public class RocksDBDataHelper {
         } catch (RocksDBException e) {
             throw new RuntimeException(e);
         } finally {
-            ObjectLockUtil.unlock(key);
+            SingletonLockUtil.unlock(key);
         }
     }
 }

@@ -33,7 +33,6 @@ public class ServerApplication {
                     DataExcelScan.class,
                     ScheduledScan.class,
                     SocketScan.class,
-                    PgsqlScan.class,
                     MysqlScan.class,
                     LoginServiceGuiceModule.class,
                     ServerApplication.class

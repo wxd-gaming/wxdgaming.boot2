@@ -10,6 +10,7 @@ import wxdgaming.boot2.core.collection.SetOf;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.reflect.ReflectContext;
 import wxdgaming.boot2.core.util.DumpUtil;
+import wxdgaming.boot2.core.util.GlobalUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,11 +41,12 @@ public class WxdApplication {
             log.info("boot2-starter starting");
             isRunning.set(true);
             BootConfig.getIns().loadConfig();
+            GlobalUtil.DEBUG.set(BootConfig.getIns().isDebug());
 
             String[] packages = Arrays.stream(classes).map(Class::getPackageName).toArray(String[]::new);
 
             /*组合把必要的启动器加入*/
-            Set<String> packageSet = SetOf.asSet(WxdApplication.class.getPackageName(), CoreScan.class.getPackageName());
+            Set<String> packageSet = SetOf.asSet(CoreScan.class.getPackageName());
             packageSet.addAll(Arrays.asList(packages));
 
             final String[] finalPackages = packageSet.toArray(new String[0]);

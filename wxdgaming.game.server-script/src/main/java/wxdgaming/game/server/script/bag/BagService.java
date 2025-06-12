@@ -21,7 +21,7 @@ import wxdgaming.game.message.bag.ResBagInfo;
 import wxdgaming.game.server.bean.bag.BagChangesEvent;
 import wxdgaming.game.server.bean.bag.BagPack;
 import wxdgaming.game.server.bean.bag.ItemBag;
-import wxdgaming.game.server.bean.bag.goods.Item;
+import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnCreateRole;
 import wxdgaming.game.server.event.OnLogin;

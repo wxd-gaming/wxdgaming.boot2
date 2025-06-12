@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.executor.ThreadContext;
-import wxdgaming.boot2.core.util.ObjectLockUtil;
+import wxdgaming.boot2.core.util.SingletonLockUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.role.ReqCreateRole;
@@ -75,7 +75,7 @@ public class ReqCreateRoleHandler extends HoldRunApplication {
             this.tipsService.tips(socketSession, clientSessionId, "角色名不合符规范");
             return;
         }
-        ObjectLockUtil.lock("role_" + name);
+        SingletonLockUtil.lock("role_" + name);
         try {
 
             boolean containsKey = dataCenterService.getName2RidMap().containsKey(name);
@@ -108,7 +108,7 @@ public class ReqCreateRoleHandler extends HoldRunApplication {
             dataCenterService.getName2RidMap().put(name, player.getUid());
             dataCenterService.getRid2NameMap().put(player.getUid(), name);
         } finally {
-            ObjectLockUtil.unlock("role_" + name);
+            SingletonLockUtil.unlock("role_" + name);
         }
         runApplication.executeMethodWithAnnotatedException(OnCreateRole.class, player);
         playerService.sendPlayerList(socketSession, clientSessionId, sid, account);

@@ -73,10 +73,17 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
     }
 
     @shutdown
-    @Order(Integer.MAX_VALUE/*最后关闭*/)
-    public void shutdown() {
+    @Order(Integer.MAX_VALUE / 2/*最后关闭*/)
+    public void shutdownCache() {
+        log.info("关闭数据库缓存：{}", this.getSqlConfig().getUrl());
         if (this.cacheService != null)
             this.cacheService.shutdown();
+    }
+
+    @shutdown
+    @Order(Integer.MAX_VALUE/*最后关闭*/)
+    public void shutdown() {
+        log.info("准备关闭数据库服务：{}", this.getSqlConfig().getUrl());
         if (this.dataBatch != null)
             this.dataBatch.shutdown();
         this.hikariDataSource.close();

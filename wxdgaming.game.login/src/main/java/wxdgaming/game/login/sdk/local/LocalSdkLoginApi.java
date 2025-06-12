@@ -4,6 +4,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
 import wxdgaming.game.login.bean.UserData;
 import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
@@ -23,8 +24,11 @@ public class LocalSdkLoginApi extends AbstractSdkLoginApi {
         return 1;
     }
 
-
     @Override public RunResult login(HttpContext context) {
+
+        if (!GlobalUtil.DEBUG.get()) {
+            return RunResult.fail("not debug ban login");
+        }
 
         String account = context.getRequest().getReqParams().getString("account");
         String token = context.getRequest().getReqParams().getString("token");
@@ -36,15 +40,12 @@ public class LocalSdkLoginApi extends AbstractSdkLoginApi {
             return RunResult.fail("account is null");
         }
 
+        account = "local-" + account;
+
         UserData userData = loginService.userData(account);
         if (userData == null) {
-            userData = new UserData();
-            userData.setAccount(account);
+            userData = createUserData(account, "local", account);
             userData.setToken(token);
-            userData.setPlatformUserId(account);
-            userData.setPlatform("local");
-            userData.setCreateTime(System.currentTimeMillis());
-            sqlDataHelper.getCacheService().cache(UserData.class).put(account, userData);
         } else {
             if (!token.equals(userData.getToken())) {
                 return RunResult.fail("token error");

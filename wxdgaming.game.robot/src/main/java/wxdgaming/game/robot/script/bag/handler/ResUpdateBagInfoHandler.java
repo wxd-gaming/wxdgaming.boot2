@@ -21,7 +21,7 @@ public class ResUpdateBagInfoHandler {
     @ProtoRequest
     public void resUpdateBagInfo(SocketSession socketSession, ResUpdateBagInfo req) {
         Robot robot = socketSession.bindData("robot");
-        log.info("{} 背包更新响应：\n{}", robot, req.toJSONStringAsFmt());
+        log.info("{} 背包更新响应：\n{}", robot, req.toJSONString());
         robot.getItems().entrySet().removeIf(v -> req.getDelItemIds().contains(v.getKey()));
         robot.getItems().putAll(req.getChangeItems());
         robot.getCurrencyMap().putAll(req.getCurrencyMap());

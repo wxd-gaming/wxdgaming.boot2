@@ -5,10 +5,13 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
-import wxdgaming.game.bean.info.InnerServerInfoBean;
+import wxdgaming.game.login.bean.info.InnerServerInfoBean;
 
+import java.util.Comparator;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 内网服务
@@ -38,6 +41,21 @@ public class InnerService {
             log.info("InnerService: {}", bean);
             innerGameServerInfoMap.put(bean.getServerId(), bean);
         });
+    }
+
+    public InnerServerInfoBean idleGateway() {
+        return innerGatewayServerInfoMap.values()
+                .stream()
+                .filter(bean -> MyClock.millis() - bean.getLastSyncTime() < TimeUnit.SECONDS.toMillis(15))
+                .min((o1, o2) -> {
+                    int free1 = o1.free();
+                    int free2 = o2.free();
+                    if (free1 != free2) {
+                        return Integer.compare(free2, free1);
+                    }
+                    return Integer.compare(o1.getServerId(), o2.getServerId());
+                })
+                .orElse(null);
     }
 
 }

@@ -8,6 +8,8 @@ import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
 import wxdgaming.game.login.LoginConfig;
 import wxdgaming.game.login.bean.UserData;
+import wxdgaming.game.login.bean.info.InnerServerInfoBean;
+import wxdgaming.game.login.inner.InnerService;
 import wxdgaming.game.login.service.LoginService;
 
 import java.util.concurrent.TimeUnit;
@@ -24,11 +26,22 @@ public abstract class AbstractSdkLoginApi {
     @SuppressWarnings("rawtypes")
     @Inject protected SqlDataHelper sqlDataHelper;
     @Inject protected LoginConfig loginConfig;
+    @Inject protected InnerService innerService;
 
     /** 平台 */
     public abstract int platform();
 
     public abstract RunResult login(HttpContext context);
+
+    public UserData createUserData(String account, String platform, String platformUserId) {
+        UserData userData = new UserData();
+        userData.setAccount(account);
+        userData.setPlatform(platform);
+        userData.setPlatformUserId(platformUserId);
+        userData.setCreateTime(System.currentTimeMillis());
+        sqlDataHelper.getCacheService().cache(UserData.class).put(userData.getAccount(), userData);
+        return userData;
+    }
 
     public RunResult buildResult(UserData userData) {
         JwtBuilder jwtBuilder = JwtUtils.createJwtBuilder(loginConfig.getJwtKey(), TimeUnit.MINUTES.toMillis(5));
@@ -36,9 +49,15 @@ public abstract class AbstractSdkLoginApi {
         jwtBuilder.claim("account", userData.getAccount());
         jwtBuilder.claim("platformUserId", userData.getPlatformUserId());
         String token = jwtBuilder.compact();
+        InnerServerInfoBean gateway = innerService.idleGateway();
+        if (gateway != null) {
+            gateway.setOnlineSize(gateway.getOnlineSize() + 1);
+        }
         return RunResult.ok()
                 .fluentPut("userId", userData.getPlatformUserId())
-                .fluentPut("token", token);
+                .fluentPut("token", token)
+                .fluentPut("host", gateway == null ? "" : gateway.getHost())
+                .fluentPut("port", gateway == null ? 0 : gateway.getPort());
     }
 
 }

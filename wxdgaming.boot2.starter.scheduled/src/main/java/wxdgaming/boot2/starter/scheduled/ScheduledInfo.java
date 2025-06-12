@@ -55,9 +55,9 @@ public class ScheduledInfo extends ExecutorEvent implements Runnable, IExecutorQ
         scheduledProxy = JavassistProxy.of(instance, method);
 
         if (StringUtils.isNotBlank(scheduled.name())) {
-            this.name = "[scheduled-job]" + scheduled.name();
+            this.name = "[scheduled-job] " + scheduled.name();
         } else {
-            this.name = "[scheduled-job]" + instance.getClass().getName() + "." + method.getName();
+            this.name = "[scheduled-job] " + instance.getClass().getName() + "." + method.getName();
         }
 
         final Order orderAnn = AnnUtil.ann(method, Order.class);
@@ -89,7 +89,7 @@ public class ScheduledInfo extends ExecutorEvent implements Runnable, IExecutorQ
         this.instance = null;
         this.method = null;
         this.scheduledTask = scheduledTask;
-        this.name = "[timer-job]" + scheduledTask.getClass() + "-" + scheduledName;
+        this.name = "[timer-job] " + scheduledTask.getClass() + "-" + scheduledName;
 
         this.index = 999999;
         this.scheduleAtFixedRate = scheduleAtFixedRate;

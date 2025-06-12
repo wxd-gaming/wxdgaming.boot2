@@ -6,7 +6,7 @@ import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.task.ReqTaskList;
-import wxdgaming.game.server.bean.ClientSessionMapping;
+import wxdgaming.game.server.bean.role.Player;
 
 /**
  * 任务列表
@@ -20,9 +20,8 @@ public class ReqTaskListHandler {
 
     /** 任务列表 */
     @ProtoRequest
-    public void reqTaskList(SocketSession socketSession, ReqTaskList req,
-                            @ThreadParam(path = "clientSessionMapping") ClientSessionMapping clientSessionMapping) {
-
+    public void reqTaskList(SocketSession socketSession, ReqTaskList req, @ThreadParam(path = "player") Player player) {
+        
     }
 
 }

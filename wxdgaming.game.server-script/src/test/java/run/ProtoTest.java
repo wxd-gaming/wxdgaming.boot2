@@ -4,7 +4,9 @@ import org.junit.Test;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.TestMethodOrder;
+import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.starter.net.pojo.ProtoBuf2Pojo;
+import wxdgaming.game.server.bean.role.Player;
 
 /**
  * protobuf篡改
@@ -32,6 +34,21 @@ public class ProtoTest {
                 null,
                 () -> """
                         @ThreadParam(path = "clientSessionMapping") ClientSessionMapping clientSessionMapping""",
+                () -> """
+                        """
+        );
+    }
+    @Test
+    @Order(2)
+    public void buildGamePlayerProtoHandler() {
+        ProtoBuf2Pojo.createMapping(
+                "src/main/java",
+                "wxdgaming.game.server.script",
+                "Req",
+                "wxdgaming.game.message",
+                null,
+                () -> """
+                        @ThreadParam(path = "player") Player player""",
                 () -> """
                         """
         );

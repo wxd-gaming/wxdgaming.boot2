@@ -16,6 +16,7 @@ public class GlobalUtil {
 
     /** 当前服务器的debug状态 */
     public static final AtomicBoolean DEBUG = new AtomicBoolean();
+    public static final AtomicBoolean Exiting = new AtomicBoolean();
 
     public static Consumer2<Object, Throwable> exceptionCall = null;
 

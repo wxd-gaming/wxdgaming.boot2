@@ -1,4 +1,4 @@
-package wxdgaming.game.server.bean;
+package wxdgaming.game.bean;
 
 import lombok.Getter;
 import lombok.Setter;

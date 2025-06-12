@@ -17,7 +17,7 @@ import wxdgaming.game.server.bean.global.GlobalDataType;
 import java.util.List;
 
 /**
- * 全局数据服务
+ * 本服的全局数据服务
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-04-30 11:05

@@ -18,6 +18,7 @@ class ApplicationGuiceModule extends GuiceModuleBase {
     }
 
     @Override protected void bind() throws Throwable {
+        bind(RunApplicationMain.class);
     }
 
 }

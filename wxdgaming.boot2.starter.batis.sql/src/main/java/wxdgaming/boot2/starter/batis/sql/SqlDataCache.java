@@ -1,6 +1,7 @@
 package wxdgaming.boot2.starter.batis.sql;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.cache2.Cache;
 import wxdgaming.boot2.core.cache2.LRUCache;
 import wxdgaming.boot2.core.reflect.ReflectContext;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-17 11:28
  **/
+@Slf4j
 @Getter
 public class SqlDataCache<E extends Entity, Key> {
 
@@ -88,7 +90,8 @@ public class SqlDataCache<E extends Entity, Key> {
     }
 
     protected boolean removed(Key key, E e) {
-        sqlDataHelper.update(e);
+        log.info("缓存移除：{}, {}, {}", cls, key, e);
+        sqlDataHelper.getDataBatch().update(e);
         return true;
     }
 

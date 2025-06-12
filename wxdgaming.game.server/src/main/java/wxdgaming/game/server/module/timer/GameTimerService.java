@@ -1,7 +1,6 @@
 package wxdgaming.game.server.module.timer;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -9,23 +8,17 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.executor.ExecutorWith;
-import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.Md5Util;
-import wxdgaming.boot2.starter.net.client.SocketClientConfig;
 import wxdgaming.boot2.starter.net.httpclient.HttpBuilder;
 import wxdgaming.boot2.starter.net.httpclient.PostText;
 import wxdgaming.boot2.starter.net.httpclient.Response;
 import wxdgaming.boot2.starter.net.server.SocketServerImpl;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
-import wxdgaming.game.bean.info.InnerServerInfoBean;
+import wxdgaming.game.login.bean.info.InnerServerInfoBean;
 import wxdgaming.game.login.LoginConfig;
-import wxdgaming.game.message.inner.InnerRegisterServer;
-import wxdgaming.game.message.inner.ServiceType;
+import wxdgaming.game.server.module.drive.PlayerDriveService;
 
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 游戏进程的定时器服务
@@ -39,11 +32,13 @@ public class GameTimerService {
 
     final SocketServerImpl socketServer;
     final LoginConfig loginConfig;
+    final PlayerDriveService playerDriveService;
 
     @Inject
-    public GameTimerService(SocketServerImpl socketServer, LoginConfig loginConfig) {
+    public GameTimerService(SocketServerImpl socketServer, LoginConfig loginConfig, PlayerDriveService playerDriveService) {
         this.socketServer = socketServer;
         this.loginConfig = loginConfig;
+        this.playerDriveService = playerDriveService;
     }
 
 
@@ -59,6 +54,10 @@ public class GameTimerService {
         serverInfoBean.setName(BootConfig.getIns().sname());
         serverInfoBean.setPort(socketServer.getConfig().getPort());
         serverInfoBean.setHttpPort(socketServer.getConfig().getPort());
+
+        serverInfoBean.setMaxOnlineSize(loginConfig.getMaxOnlineSize());
+        serverInfoBean.setOnlineSize(playerDriveService.onlineSize());
+
 
         JSONObject jsonObject = MapOf.newJSONObject();
         jsonObject.put("sidList", List.of(BootConfig.getIns().sid()));

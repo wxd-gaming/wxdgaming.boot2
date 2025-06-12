@@ -21,7 +21,7 @@ public class ResBagInfoHandler {
     @ProtoRequest
     public void resBagInfo(SocketSession socketSession, ResBagInfo req) {
         Robot robot = socketSession.bindData("robot");
-        log.info("{} 背包响应：\n{}", robot, req.toJSONStringAsFmt());
+        log.info("{} 背包响应：\n{}", robot, req.toJSONString());
         robot.setItems(req.getItems());
         robot.setCurrencyMap(req.getCurrencyMap());
     }

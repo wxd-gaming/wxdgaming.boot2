@@ -11,6 +11,7 @@ import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.shutdown;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.FileReadUtil;
+import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.core.util.JvmUtil;
 
 /**
@@ -20,7 +21,6 @@ import wxdgaming.boot2.core.util.JvmUtil;
  * @version: 2025-02-14 16:55
  **/
 @Slf4j
-@Singleton
 public final class RunApplicationMain extends RunApplication {
 
     @Inject
@@ -40,6 +40,7 @@ public final class RunApplicationMain extends RunApplication {
 
             JvmUtil.addShutdownHook(() -> {
                 System.out.println("--------------------------shutdown---------------------------");
+                GlobalUtil.Exiting.set(true);
                 executeMethodWithAnnotatedException(shutdown.class);
             });
 

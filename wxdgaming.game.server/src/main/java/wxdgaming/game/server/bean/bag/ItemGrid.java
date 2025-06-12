@@ -1,7 +1,7 @@
 package wxdgaming.game.server.bean.bag;
 
 import lombok.Getter;
-import wxdgaming.game.server.bean.bag.goods.Item;
+import wxdgaming.game.bean.goods.Item;
 
 import java.util.Objects;
 

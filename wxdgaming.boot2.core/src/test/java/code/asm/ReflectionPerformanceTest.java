@@ -34,7 +34,7 @@ public class ReflectionPerformanceTest {
         }
         long endTime = System.nanoTime();
         long proxyTime = endTime - startTime;
-        System.out.printf("直接调用 调用耗时: %d 纳秒, %s ms%n", proxyTime, proxyTime / 10000 / 100f);
+        System.out.printf("直接调用 调用耗时: %d 纳秒, %s ms%n", proxyTime, proxyTime / 100 / 10000f);
     }
 
     @Test
@@ -49,7 +49,7 @@ public class ReflectionPerformanceTest {
         }
         long endTime = System.nanoTime();
         long proxyTime = endTime - startTime;
-        System.out.printf("reflect 调用耗时: %d 纳秒, %s ms%n", proxyTime, proxyTime / 10000 / 100f);
+        System.out.printf("reflect 调用耗时: %d 纳秒, %s ms%n", proxyTime, proxyTime / 100 / 10000f);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class ReflectionPerformanceTest {
         }
         long endTime = System.nanoTime();
         long proxyTime = endTime - startTime;
-        System.out.printf("asm 调用耗时: %d 纳秒, %s ms%n", proxyTime, proxyTime / 10000 / 100f);
+        System.out.printf("asm 调用耗时: %d 纳秒, %s ms%n", proxyTime, proxyTime / 100 / 10000f);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class ReflectionPerformanceTest {
         }
         long endTime = System.nanoTime();
         long proxyTime = endTime - startTime;
-        System.out.printf("compiler 调用耗时: %d 纳秒, %s ms%n", proxyTime, proxyTime / 10000 / 100f);
+        System.out.printf("compiler 调用耗时: %d 纳秒, %s ms%n", proxyTime, proxyTime / 100 / 10000f);
     }
 
     @Test
@@ -102,7 +102,7 @@ public class ReflectionPerformanceTest {
         }
         long endTime = System.nanoTime();
         long proxyTime = endTime - startTime;
-        System.out.printf("compiler 调用耗时: %d 纳秒, %s ms%n", proxyTime, proxyTime / 10000 / 100f);
+        System.out.printf("compiler 调用耗时: %d 纳秒, %s ms%n", proxyTime, proxyTime / 100 / 10000f);
     }
 
 

@@ -1,4 +1,4 @@
-package wxdgaming.game.server.bean.vip;
+package wxdgaming.game.bean.vip;
 
 import lombok.Getter;
 import lombok.Setter;

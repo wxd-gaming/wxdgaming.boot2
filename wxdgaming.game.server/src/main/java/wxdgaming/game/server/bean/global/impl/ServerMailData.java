@@ -3,7 +3,7 @@ package wxdgaming.game.server.bean.global.impl;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.game.server.bean.global.DataBase;
-import wxdgaming.game.server.bean.mail.ServerMailInfo;
+import wxdgaming.game.bean.mail.ServerMailInfo;
 
 import java.util.ArrayList;
 

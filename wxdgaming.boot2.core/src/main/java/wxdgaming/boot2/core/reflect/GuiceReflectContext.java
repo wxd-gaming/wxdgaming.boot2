@@ -191,7 +191,7 @@ public class GuiceReflectContext {
             {
                 HoldParam param = parameter.getAnnotation(HoldParam.class);
                 if (param != null) {
-                    params[i] = holderArgument.get();
+                    params[i] = holderArgument.next();
                     continue;
                 }
             }
@@ -200,7 +200,7 @@ public class GuiceReflectContext {
             } catch (Exception e) {
                 Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
                 if (qualifier == null) {
-                    params[i] = holderArgument.get();
+                    params[i] = holderArgument.next();
                     continue;
                 } else if (qualifier.required()) {
                     throw new RuntimeException("bean:" + parameterType.getName() + " is not bind");
@@ -219,7 +219,7 @@ public class GuiceReflectContext {
             this.arguments = arguments;
         }
 
-        public <R> R get() {
+        public <R> R next() {
             return (R) arguments[argumentIndex++];
         }
 

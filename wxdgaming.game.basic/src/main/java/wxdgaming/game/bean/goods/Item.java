@@ -1,4 +1,4 @@
-package wxdgaming.game.server.bean.bag.goods;
+package wxdgaming.game.bean.goods;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;

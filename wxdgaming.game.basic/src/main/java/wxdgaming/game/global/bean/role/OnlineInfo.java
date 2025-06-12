@@ -1,4 +1,4 @@
-package wxdgaming.game.server.bean.role;
+package wxdgaming.game.global.bean.role;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;

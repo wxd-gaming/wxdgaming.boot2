@@ -16,5 +16,6 @@ public class LoginConfig extends ObjectBase {
 
     private String url;
     private String jwtKey;
+    private int maxOnlineSize = 1000;
 
 }

@@ -3,7 +3,9 @@ package wxdgaming.game.robot;
 import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.starter.RunApplicationMain;
 import wxdgaming.boot2.starter.WxdApplication;
+import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.net.SocketScan;
+import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 import wxdgaming.game.login.LoginServiceGuiceModule;
 
 /**
@@ -19,6 +21,8 @@ public class RobotApplication {
         RunApplicationMain runApplication = WxdApplication.run(
                 CoreScan.class,
                 SocketScan.class,
+                DataExcelScan.class,
+                ScheduledScan.class,
                 LoginServiceGuiceModule.class,
                 RobotApplication.class
         );

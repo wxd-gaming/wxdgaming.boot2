@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2024-12-15 20:54
  **/
-public class ObjectLockUtil {
+public class SingletonLockUtil {
 
     /** 缓存锁 */
     static final LRUCache<Object, LockObject> cache;

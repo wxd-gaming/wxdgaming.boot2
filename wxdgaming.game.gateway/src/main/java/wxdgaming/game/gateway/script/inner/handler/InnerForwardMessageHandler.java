@@ -11,6 +11,7 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.pojo.ProtoMapping;
+import wxdgaming.game.gateway.bean.UserMapping;
 import wxdgaming.game.gateway.module.data.DataCenterService;
 import wxdgaming.game.message.inner.InnerForwardMessage;
 
@@ -47,16 +48,16 @@ public class InnerForwardMessageHandler {
         for (Long sessionId : sessionIds) {
             SocketSession clientSession = dataCenterService.getClientSession(sessionId);
             if (clientSession != null) {
+                UserMapping userMapping = clientSession.bindData("userMapping");
                 /*TODO重构队列，1是为了效率把消息分散队列，2是为了绝对的保证消息的顺序*/
                 String queueName = "session-drive-" + clientSession.getUid() % 16;
                 if (protoMapping != null) {
                     ThreadContext.putContent("forwardMessage", req);
+                    ThreadContext.putContent("clientSession", clientSession);
+                    ThreadContext.putContent("userMapping", userMapping);
                     protoListenerFactory.dispatch(socketSession, messageId, messages, () -> queueName);
                 } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug("请求转发消息:{}", req);
-                    }
-                    ReqForwardMessageRunnable command = new ReqForwardMessageRunnable(clientSession, messageId, messages);
+                    ReqForwardMessageRunnable command = new ReqForwardMessageRunnable(userMapping, messageId, messages);
                     command.setQueueName(queueName);
                     ExecutorFactory.getExecutorServiceLogic().execute(command);
                 }
@@ -66,12 +67,12 @@ public class InnerForwardMessageHandler {
 
     public static class ReqForwardMessageRunnable extends ExecutorEvent {
 
-        final SocketSession clientSession;
+        final UserMapping userMapping;
         final int messageId;
         final byte[] bytes;
 
-        public ReqForwardMessageRunnable(SocketSession clientSession, int messageId, byte[] bytes) {
-            this.clientSession = clientSession;
+        public ReqForwardMessageRunnable(UserMapping userMapping, int messageId, byte[] bytes) {
+            this.userMapping = userMapping;
             this.messageId = messageId;
             this.bytes = bytes;
         }
@@ -81,8 +82,10 @@ public class InnerForwardMessageHandler {
         }
 
         @Override public void onEvent() throws Exception {
-            Object build = MessageEncode.build(clientSession, messageId, bytes);
-            clientSession.write(build);
+            if (log.isDebugEnabled()) {
+                log.debug("请求转发消息到客户端:{}, msgId={}", userMapping, messageId);
+            }
+            userMapping.send2Client(messageId, bytes);
         }
 
     }
