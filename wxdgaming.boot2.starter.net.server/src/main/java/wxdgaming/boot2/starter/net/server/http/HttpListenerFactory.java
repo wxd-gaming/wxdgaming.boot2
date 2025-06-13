@@ -43,7 +43,7 @@ public class HttpListenerFactory {
                      @Value(path = "socket.server.http", nestedPath = true, required = false) HttpServerConfig httpServerConfig) {
         this.httpServerConfig = httpServerConfig;
         this.runApplication = runApplication;
-        this.httpListenerContent = new HttpListenerContent(httpServerConfig, runApplication);
+        this.httpListenerContent = new HttpListenerContent(runApplication);
     }
 
     public void dispatch(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) {
@@ -51,15 +51,13 @@ public class HttpListenerFactory {
             ThreadContext.cleanup();
 
             HttpContext httpContext = new HttpContext(this.httpServerConfig, ctx, fullHttpRequest);
-
-            String uriPath = httpContext.getRequest().getUriPath();
-            String lowerCase = uriPath.toLowerCase();
-            HttpMapping httpMapping = this.httpListenerContent.getHttpMappingMap().get(lowerCase);
+            HttpMapping topHttpMapping = this.httpListenerContent.getTopHttpMapping();
+            HttpMapping httpMapping = this.httpListenerContent.getHttpMapping(httpContext);
             HttpRequest httpRequest = httpMapping == null ? null : httpMapping.httpRequest();
             Method method = httpMapping == null ? null : httpMapping.javassistProxy().getMethod();
 
             Object filterMatch = this.httpListenerContent.getHttpFilterList().stream()
-                    .map(httpFilter -> httpFilter.doFilter(httpRequest, method, uriPath, httpContext))
+                    .map(httpFilter -> httpFilter.doFilter(httpRequest, method, httpContext))
                     .filter(Objects::nonNull)
                     .findFirst()
                     .orElse(null);
@@ -69,15 +67,9 @@ public class HttpListenerFactory {
                 return;
             }
             if (httpMapping == null) {
-                HttpListenerTriggerFile httpListenerTriggerFile = new HttpListenerTriggerFile(httpContext);
-                ExecutorFactory.getExecutorServiceVirtual().execute(httpListenerTriggerFile);
+                HttpListenerTriggerFile.execute(this, topHttpMapping, httpContext);
             } else {
-                if (this.httpServerConfig.isShowRequest()) {
-                    StringBuilder showLog = httpContext.showLog();
-                    log.info("{}", showLog);
-                }
-                HttpListenerTrigger httpListenerTrigger = new HttpListenerTrigger(httpMapping, runApplication, httpContext);
-                httpListenerTrigger.submit();
+                HttpListenerTrigger.execute(runApplication, httpMapping, httpContext, this.httpServerConfig.isShowRequest());
             }
         } catch (Throwable e) {
             log.error("dispatch error", e);

@@ -7,6 +7,7 @@ import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.cache2.CASCache;
 import wxdgaming.boot2.core.cache2.Cache;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.lang.Tuple2;
 import wxdgaming.boot2.core.timer.MyClock;
@@ -44,10 +45,19 @@ public class HttpListenerTriggerFile extends ExecutorEvent {
         cache.start();
     }
 
+    public static void execute(HttpListenerFactory factory, HttpMapping topHttpMapping, HttpContext httpContext) {
+        HttpListenerTriggerFile httpListenerTriggerFile = new HttpListenerTriggerFile(factory, topHttpMapping, httpContext);
+        ExecutorFactory.getExecutorServiceVirtual().execute(httpListenerTriggerFile);
+    }
+
+    private final HttpListenerFactory factory;
+    private final HttpMapping topHttpMapping;
     private final HttpContext httpContext;
 
-    public HttpListenerTriggerFile(HttpContext httpContext) {
+    public HttpListenerTriggerFile(HttpListenerFactory factory, HttpMapping topHttpMapping, HttpContext httpContext) {
         super();
+        this.factory = factory;
+        this.topHttpMapping = topHttpMapping;
         this.httpContext = httpContext;
     }
 
@@ -79,10 +89,13 @@ public class HttpListenerTriggerFile extends ExecutorEvent {
                     stringBuilder.setLength(0);
                 }
                 httpContext.getResponse().response(inputStream);
-                return;
+            } else if (topHttpMapping != null) {
+                /*顶级监听*/
+                HttpListenerTrigger.execute(factory.runApplication, topHttpMapping, httpContext, factory.getHttpServerConfig().isShowResponse());
+            } else {
+                httpContext.getResponse().setStatus(HttpResponseStatus.NOT_FOUND);
+                httpContext.getResponse().response("not found url " + httpContext.getRequest().getUriPath());
             }
-            httpContext.getResponse().setStatus(HttpResponseStatus.NOT_FOUND);
-            httpContext.getResponse().response("not found url " + httpContext.getRequest().getUriPath());
         } catch (Exception e) {
             final String ofString = Throw.ofString(e);
             StringBuilder stringBuilder = httpContext.showLog();

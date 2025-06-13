@@ -12,6 +12,6 @@ import java.lang.reflect.Method;
  **/
 public abstract class HttpFilter {
 
-    public abstract Object doFilter(HttpRequest httpRequest, Method method, String url, HttpContext httpContext);
+    public abstract Object doFilter(HttpRequest httpRequest, Method method, HttpContext httpContext);
 
 }

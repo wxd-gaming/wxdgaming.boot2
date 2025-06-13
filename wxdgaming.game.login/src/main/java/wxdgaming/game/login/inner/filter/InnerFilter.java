@@ -33,8 +33,8 @@ public class InnerFilter extends HttpFilter {
     }
 
 
-    @Override public Object doFilter(HttpRequest httpRequest, Method method, String url, HttpContext httpContext) {
-        if (url.startsWith("/inner")) {
+    @Override public Object doFilter(HttpRequest httpRequest, Method method, HttpContext httpContext) {
+        if (httpContext.getRequest().getUriPath().startsWith("/inner")) {
             JSONObject reqParams = httpContext.getRequest().getReqParams();
             Object sign = reqParams.remove("sign");
             String json = reqParams.toString(SerializerFeature.MapSortField, SerializerFeature.SortField);

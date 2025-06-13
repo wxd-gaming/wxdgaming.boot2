@@ -11,9 +11,12 @@ import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
+import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.core.util.GlobalUtil;
+import wxdgaming.boot2.starter.net.ann.HttpPath;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
@@ -27,6 +30,14 @@ import java.lang.reflect.Type;
  **/
 @Slf4j
 public class HttpListenerTrigger extends ExecutorEvent {
+
+    public static void execute(RunApplication runApplication, HttpMapping httpMapping, HttpContext httpContext, boolean showLog) {
+        if (showLog) {
+            StringBuilder stringBuilder = httpContext.showLog();
+            log.info("{}", stringBuilder);
+        }
+        new HttpListenerTrigger(httpMapping, runApplication, httpContext).submit();
+    }
 
     private final HttpMapping httpMapping;
     private final RunApplication runApplication;
@@ -121,6 +132,18 @@ public class HttpListenerTrigger extends ExecutorEvent {
                 }
             }
             {
+                HttpPath httpPath = parameter.getAnnotation(HttpPath.class);
+                if (httpPath != null) {
+                    String string = httpContext.getRequest().getPathMatcherMap().get(httpPath.value());
+                    AssertUtil.assertTrue(StringUtils.isNotBlank(string), "path param:" + httpPath.value() + " is null");
+                    if (String.class.equals(parameterizedType))
+                        params[i] = string;
+                    else
+                        params[i] = FastJsonUtil.parse(string, parameterizedType);
+                    continue;
+                }
+            }
+            {
                 Param param = parameter.getAnnotation(Param.class);
                 if (param != null) {
                     String name = param.path();
@@ -133,7 +156,10 @@ public class HttpListenerTrigger extends ExecutorEvent {
                             o = httpContext.getRequest().getReqParams().getObject(name, parameterizedType);
                         }
                         if (o == null && StringUtils.isNotBlank(param.defaultValue())) {
-                            o = FastJsonUtil.parse(param.defaultValue(), parameterizedType);
+                            if (String.class.equals(parameterizedType))
+                                o = param.defaultValue();
+                            else
+                                o = FastJsonUtil.parse(param.defaultValue(), parameterizedType);
                         }
                     } catch (Exception e) {
                         throw Throw.of("参数：" + name, e);

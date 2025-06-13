@@ -7,6 +7,7 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Param;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.AssertUtil;
+import wxdgaming.boot2.starter.net.ann.HttpPath;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
@@ -51,6 +52,11 @@ public class LoginController extends HoldRunApplication {
             return RunResult.fail("not support platform: " + platform);
         }
         return sdkLoginApi.login(context);
+    }
+
+    @HttpRequest(path = "test/{id}/sdk")
+    public RunResult checkSdk(HttpContext context, @Param(path = "platform") int platform, @HttpPath("id") int id) {
+        return RunResult.fail(String.valueOf(id));
     }
 
 }

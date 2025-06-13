@@ -124,6 +124,7 @@ public class HttpContext implements AutoCloseable {
         private String uriPath;
         /** 完整的url */
         private String completeUri;
+        protected Map<String, String> pathMatcherMap = MapOf.of();
 
         public Request(FullHttpRequest fullHttpRequest) throws Exception {
             this.fullHttpRequest = fullHttpRequest;
@@ -176,6 +177,7 @@ public class HttpContext implements AutoCloseable {
             if (indexOf > -1) {
                 this.uriPath = uriPathString.substring(0, indexOf);
             }
+            this.uriPath = this.uriPath.toLowerCase();
             actionPostData();
             actionGetData();
         }

@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 public class GMFilter extends HttpFilter {
 
 
-    @Override public Object doFilter(HttpRequest httpRequest, Method method, String url, HttpContext httpContext) {
+    @Override public Object doFilter(HttpRequest httpRequest, Method method, HttpContext httpContext) {
         // if (url.startsWith("/gm")) {
         //     if (!BootConfig.getIns().isDebug())
         //         return RunResult.error("功能未开启");

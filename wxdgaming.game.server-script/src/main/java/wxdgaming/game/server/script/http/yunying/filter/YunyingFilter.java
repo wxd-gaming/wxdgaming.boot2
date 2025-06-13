@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 public class YunyingFilter extends HttpFilter {
 
 
-    @Override public Object doFilter(HttpRequest httpRequest, Method method, String url, HttpContext httpContext) {
+    @Override public Object doFilter(HttpRequest httpRequest, Method method, HttpContext httpContext) {
         if (url.startsWith("/yunying")) {
             // 这里可以添加运营权限验证逻辑
             return null;

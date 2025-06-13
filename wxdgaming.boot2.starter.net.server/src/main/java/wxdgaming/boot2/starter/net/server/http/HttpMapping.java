@@ -5,17 +5,17 @@ import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 
+import java.util.List;
+
 /**
  * 映射关系绑定
  *
- * @param httpRequest      请求信息
- * @param path             请求路径
- * @param javassistProxy 代理对象
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-18 08:50
  */
 @Slf4j
-public record HttpMapping(HttpRequest httpRequest, String path, JavassistProxy javassistProxy) {
+public record HttpMapping(HttpRequest httpRequest, String path, JavassistProxy javassistProxy,
+        List<String> pathMatcherList) {
 
     public String comment() {
         if (StringUtils.isBlank(httpRequest.comment())) {
