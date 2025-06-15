@@ -7,6 +7,8 @@ import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.game.core.Reason;
+import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.*;
 import wxdgaming.game.server.script.fight.FightService;
@@ -46,12 +48,13 @@ public class PlayerHeartHandler extends HoldRunApplication {
         }
     }
 
+    final ReasonArgs reasonArgs = ReasonArgs.of(Reason.Heart, "心跳回血");
+
     @OnHeartSecond
     public void onHeartSecond(Player player, int second) {
-        // log.info("onHeartSecond: {} {} {}", second, player, ThreadContext.context().queueName());
         if (second % 10 == 0) {
             if (player.getHp() < player.maxHp()) {
-                fightService.changeHp(player, 10, "心跳回血");
+                fightService.changeHp(player, 10, reasonArgs);
             }
         }
         long millis = MyClock.millis();

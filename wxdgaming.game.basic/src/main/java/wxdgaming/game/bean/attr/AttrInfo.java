@@ -1,6 +1,8 @@
 package wxdgaming.game.bean.attr;
 
 
+import com.alibaba.fastjson.annotation.JSONType;
+
 import java.util.HashMap;
 
 /**
@@ -9,6 +11,7 @@ import java.util.HashMap;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2024-03-23 20:39
  **/
+@JSONType(seeAlso = {HashMap.class})
 public class AttrInfo extends HashMap<AttrType, Long> {
 
     public AttrInfo() {

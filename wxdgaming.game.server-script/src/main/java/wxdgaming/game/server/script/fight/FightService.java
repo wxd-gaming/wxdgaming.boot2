@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.util.AssertUtil;
+import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.server.bean.MapNpc;
-import wxdgaming.game.server.bean.role.Player;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,24 +34,36 @@ public class FightService extends HoldRunApplication {
         actionImplMap = map;
     }
 
-    public void changeHp(Player player, long change, String msg) {
-        long oldHp = player.getHp();
-        player.setHp(oldHp + change);
-        if (player.getHp() > player.maxHp()) {
-            player.setHp(player.maxHp());
+    public void changeHp(MapNpc mapNpc, long change, ReasonArgs reasonArgs) {
+        long oldHp = mapNpc.getHp();
+        long maxHp = mapNpc.maxHp();
+        if (oldHp >= maxHp) {
+            return;
         }
-        log.info("{} 改变血量 {} -> {} -> {}, 原因: {}", player, oldHp, change, player.getHp(), msg);
-        player.sendHp();
+        mapNpc.setHp(oldHp + change);
+        if (mapNpc.getHp() > maxHp) {
+            mapNpc.setHp(maxHp);
+        }
+        if (mapNpc.getHp() < 0) {
+            mapNpc.setHp(0);
+        }
+        log.info("{} 改变血量 {} -> {} -> {}, maxMp={}, {}", mapNpc, oldHp, change, mapNpc.getHp(), maxHp, reasonArgs);
     }
 
-    public void changeMp(Player player, long change, String msg) {
+    public void changeMp(MapNpc player, long change, ReasonArgs reasonArgs) {
         long oldMp = player.getMp();
-        player.setMp(oldMp + change);
-        if (player.getMp() > player.maxMp()) {
-            player.setMp(player.maxMp());
+        long maxMp = player.maxMp();
+        if (oldMp >= maxMp) {
+            return;
         }
-        log.info("{} 改变魔量 {} -> {} -> {}, 原因: {}", player, oldMp, change, player.getMp(), msg);
-        player.sendHp();
+        player.setMp(oldMp + change);
+        if (player.getMp() > maxMp) {
+            player.setMp(maxMp);
+        }
+        if (player.getMp() < 0) {
+            player.setMp(0);
+        }
+        log.info("{} 改变魔量 {} -> {} -> {}, maxMp={}, {}", player, oldMp, change, player.getMp(), maxMp, reasonArgs);
     }
 
     public List<MapNpc> selectAttack(MapNpc player) {

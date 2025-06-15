@@ -21,7 +21,7 @@ import java.util.*;
 public abstract class QBuffMapping extends ObjectBase implements Serializable, DataKey {
 
     /** 主键id 唯一id */
-    protected int id;
+    protected String id;
     /** buff的id */
     protected int group;
     /** 等级 */

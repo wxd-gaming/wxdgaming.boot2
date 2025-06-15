@@ -1,8 +1,8 @@
-package wxdgaming.game.bean;
+package wxdgaming.game.bean.buff;
 
 import lombok.Getter;
 import wxdgaming.boot2.core.collection.MapOf;
-import wxdgaming.game.bean.buff.BuffType;
+import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.util.Map;
 
@@ -16,9 +16,8 @@ import java.util.Map;
 public enum BuffTypeConst implements BuffType {
 
     None(0, "默认值"),
-    AddHp(1, "增加生命值"),
-    AddMp(2, "增加魔法值"),
-    ChangeAttr(3, "修改属性值"),
+    ChangeHpMp(1, "增加生命值"),
+    ChangeAttr(2, "修改属性值"),
 
     ;
 
@@ -30,7 +29,7 @@ public enum BuffTypeConst implements BuffType {
 
     public static BuffTypeConst ofOrException(int value) {
         BuffTypeConst tmp = static_map.get(value);
-        if (tmp == null) throw new RuntimeException("查找失败 " + value);
+        AssertUtil.assertNull(tmp, "查找失败 " + value);
         return tmp;
     }
 

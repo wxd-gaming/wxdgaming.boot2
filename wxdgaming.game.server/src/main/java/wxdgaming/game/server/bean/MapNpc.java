@@ -4,8 +4,11 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.bean.attr.AttrType;
+import wxdgaming.game.message.global.AttrBean;
+import wxdgaming.game.message.global.ResUpdateAttr;
 import wxdgaming.game.server.bean.buff.Buff;
 
 import java.util.ArrayList;
@@ -64,5 +67,24 @@ public class MapNpc extends MapObject {
     public long maxMp() {
         return this.getFinalAttrInfo().get(AttrType.MAXMP);
     }
+
+    /** 推送生命变化 */
+    public void sendHp() {
+        ResUpdateAttr resUpdateAttr = new ResUpdateAttr();
+        resUpdateAttr.setUid(this.getUid());
+        resUpdateAttr.getAttrs().add(new AttrBean().setAttrId(AttrType.HP.getCode()).setValue(getHp()));
+        resUpdateAttr.getAttrs().add(new AttrBean().setAttrId(AttrType.MAXHP.getCode()).setValue(maxHp()));
+        write(resUpdateAttr);
+    }
+
+    /** 推送魔法变化 */
+    public void sendMp() {
+        ResUpdateAttr resUpdateAttr = new ResUpdateAttr();
+        resUpdateAttr.setUid(this.getUid());
+        resUpdateAttr.getAttrs().add(new AttrBean().setAttrId(AttrType.MP.getCode()).setValue(getMp()));
+        resUpdateAttr.getAttrs().add(new AttrBean().setAttrId(AttrType.MAXMP.getCode()).setValue(maxMp()));
+        write(resUpdateAttr);
+    }
+
 
 }

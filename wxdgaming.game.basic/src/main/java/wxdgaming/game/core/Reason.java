@@ -11,6 +11,8 @@ public enum Reason {
     UNKNOWN,
     CreateRole,
     GM,
+    Heart,
+    Buff,
     USE_CDKEY,
     /** 任务接受 */
     TASK_ACCEPT,

@@ -8,14 +8,17 @@ import lombok.Setter;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.game.bean.Vector3D;
+import wxdgaming.game.bean.attr.AttrType;
 import wxdgaming.game.bean.mail.MailPack;
+import wxdgaming.game.bean.vip.VipInfo;
 import wxdgaming.game.global.bean.role.OnlineInfo;
 import wxdgaming.game.global.bean.role.PlayerSnap;
-import wxdgaming.game.bean.vip.VipInfo;
 import wxdgaming.game.message.global.AttrBean;
 import wxdgaming.game.message.global.ResUpdateAttr;
-import wxdgaming.game.server.bean.*;
-import wxdgaming.game.bean.attr.AttrType;
+import wxdgaming.game.server.bean.ClientSessionMapping;
+import wxdgaming.game.server.bean.MapKey;
+import wxdgaming.game.server.bean.MapNpc;
+import wxdgaming.game.server.bean.StatusConst;
 import wxdgaming.game.server.bean.bag.BagPack;
 import wxdgaming.game.server.bean.task.TaskPack;
 
@@ -97,28 +100,6 @@ public class Player extends MapNpc {
 
     public boolean checkOnline() {
         return getClientSessionMapping() != null && getStatus().hasFlag(StatusConst.Online);
-    }
-
-    /** 推送生命变化 */
-    public void sendHp() {
-        if (!checkOnline()) {
-            return;
-        }
-        ResUpdateAttr resUpdateAttr = new ResUpdateAttr();
-        resUpdateAttr.getAttrs().add(new AttrBean().setAttrId(AttrType.HP.getCode()).setValue(getHp()));
-        resUpdateAttr.getAttrs().add(new AttrBean().setAttrId(AttrType.MAXHP.getCode()).setValue(maxHp()));
-        write(resUpdateAttr);
-    }
-
-    /** 推送魔法变化 */
-    public void sendMp() {
-        if (!checkOnline()) {
-            return;
-        }
-        ResUpdateAttr resUpdateAttr = new ResUpdateAttr();
-        resUpdateAttr.getAttrs().add(new AttrBean().setAttrId(AttrType.MP.getCode()).setValue(getMp()));
-        resUpdateAttr.getAttrs().add(new AttrBean().setAttrId(AttrType.MAXMP.getCode()).setValue(maxMp()));
-        write(resUpdateAttr);
     }
 
     public void write(PojoBase pojoBase) {

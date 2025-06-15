@@ -11,8 +11,11 @@ import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.cfg.QBuffTable;
 import wxdgaming.game.cfg.bean.QBuff;
+import wxdgaming.game.server.bean.MapNpc;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 
 /**
  * 场景对象身上的buff
@@ -25,6 +28,12 @@ import java.util.ArrayList;
 @Accessors(chain = true)
 public class Buff extends ObjectLong {
 
+    /** 是谁给我加在身上的 */
+    private long sendUid;
+    /** 是谁给我加在身上的 */
+    @JsonIgnore
+    @JSONField(serialize = false, deserialize = false)
+    private transient MapNpc sender;
     /** 配置id */
     private int buffCfgId;
     /** 等级 */
@@ -32,21 +41,36 @@ public class Buff extends ObjectLong {
     /** 叠加层级 */
     private ArrayList<Tuple2<Long, Long>> timeList = new ArrayList<>();
     private long lastExecuteTime;
-    /** 执行间隔时间 */
-    private int interval;
     /** 执行次数 */
     private int executeCount;
 
     @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public boolean checkStart() {
-        return MyClock.millis() > timeList.getFirst().getLeft();
+        Tuple2<Long, Long> longLongTuple2 = timeList.stream().min(Comparator.comparing(Tuple2::getLeft)).get();
+        return MyClock.millis() > longLongTuple2.getLeft();
     }
 
     @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public boolean checkEnd() {
-        return MyClock.millis() > getTimeList().getFirst().getRight();
+        Tuple2<Long, Long> longLongTuple2 = timeList.stream().max(Comparator.comparing(Tuple2::getLeft)).get();
+        return MyClock.millis() > longLongTuple2.getRight();
+    }
+
+    @JsonIgnore
+    @JSONField(serialize = false, deserialize = false)
+    public boolean checkTime(long millis) {
+        boolean result = false;
+        Iterator<Tuple2<Long, Long>> iterator = timeList.iterator();
+        while (iterator.hasNext()) {
+            Tuple2<Long, Long> next = iterator.next();
+            if (millis > next.getRight()) {
+                iterator.remove();
+                result = true;
+            }
+        }
+        return result;
     }
 
     public QBuff qBuff() {

@@ -3,18 +3,27 @@ package wxdgaming.game.server.script.buff;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.HoldRunApplication;
+import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.Tuple2;
 import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
+import wxdgaming.game.bean.buff.BuffType;
 import wxdgaming.game.cfg.QBuffTable;
 import wxdgaming.game.cfg.bean.QBuff;
+import wxdgaming.game.core.Reason;
 import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.buff.Buff;
 import wxdgaming.game.server.event.OnHeart;
+import wxdgaming.game.server.event.OnHeartMinute;
 import wxdgaming.game.server.module.data.DataCenterService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.stream.Stream;
 
 /**
  * buff管理
@@ -24,91 +33,130 @@ import java.util.ArrayList;
  **/
 @Slf4j
 @Singleton
-public class BuffService {
+public class BuffService extends HoldRunApplication {
 
     final DataCenterService dataCenterService;
+    HashMap<BuffType, AbstractBuffAction> actionMap = new HashMap<>();
 
     @Inject
     public BuffService(DataCenterService dataCenterService) {
         this.dataCenterService = dataCenterService;
     }
 
+    @Init
+    public void init() {
+        HashMap<BuffType, AbstractBuffAction> map = new HashMap<>();
+        Stream<AbstractBuffAction> abstractBuffActionStream = runApplication.classWithSuper(AbstractBuffAction.class);
+        abstractBuffActionStream.forEach(impl -> {
+            AbstractBuffAction old = map.put(impl.buffType(), impl);
+            AssertUtil.assertTrue(old == null, "重复的buff类型" + impl.buffType());
+        });
+        actionMap = map;
+    }
+
+    @OnHeartMinute
+    public void onHeartMinuteBuffActionTest(MapNpc mapNpc, long mill) {
+
+        addBuff(mapNpc, mapNpc, 2, 1, ReasonArgs.of(Reason.GM));
+        addBuff(mapNpc, mapNpc, 3, 1, ReasonArgs.of(Reason.GM));
+
+    }
+
     @OnHeart
     public void onHeartBuffAction(MapNpc mapNpc, long mill) {
         QBuffTable qBuffTable = DataRepository.getIns().dataTable(QBuffTable.class);
         ArrayList<Buff> buffs = mapNpc.getBuffs();
-        for (Buff buff : buffs) {
-
+        Iterator<Buff> iterator = buffs.iterator();
+        while (iterator.hasNext()) {
+            Buff buff = iterator.next();
             QBuff qBuff = qBuffTable.getGroupLvTable().get(buff.getBuffCfgId(), buff.getLv());
-
+            if (qBuff == null) {
+                log.warn("buff不存在 {}, {} {}", mapNpc, buff.getBuffCfgId(), buff.getLv());
+                continue;
+            }
+            if (buff.getLastExecuteTime() + qBuff.getInterval() > mill) {
+                continue;
+            }
+            executeBuff(mapNpc, buff, qBuff, mill);
+            if (buff.checkTime(mill) && buff.getTimeList().isEmpty()) {
+                log.debug("buff {}, 结束, {}", mapNpc, buff);
+                iterator.remove();
+            }
         }
     }
 
-    public void executeBuff(MapNpc mapNpc, Buff buff) {
-
+    public void executeBuff(MapNpc mapNpc, Buff buff, QBuff qBuff, long mill) {
+        BuffType buffType = qBuff.getBuffType();
+        AbstractBuffAction abstractBuffAction = actionMap.get(buffType);
+        AssertUtil.assertNull(abstractBuffAction, "没有对应的buff处理类" + buffType);
+        abstractBuffAction.doAction(mapNpc, buff, qBuff);
+        buff.setLastExecuteTime(MyClock.millis());
+        buff.setExecuteCount(buff.getExecuteCount() + 1);
     }
 
-    public void addBuff(MapNpc mapNpc, int buffCfgId, int lv, ReasonArgs reasonArgs) {
+    public void addBuff(MapNpc sender, MapNpc targetMapNpc, int buffCfgId, int lv, ReasonArgs reasonArgs) {
         QBuffTable qBuffTable = DataRepository.getIns().dataTable(QBuffTable.class);
         QBuff qBuff = qBuffTable.getGroupLvTable().get(buffCfgId, lv);
-        addBuff(mapNpc, qBuff, reasonArgs);
+        addBuff(sender, targetMapNpc, qBuff, reasonArgs);
     }
 
-    public void addBuff(MapNpc mapNpc, int buffId, ReasonArgs reasonArgs) {
+    public void addBuff(MapNpc sender, MapNpc targetMapNpc, int buffId, ReasonArgs reasonArgs) {
         QBuff qBuff = DataRepository.getIns().dataTable(QBuffTable.class, buffId);
-        addBuff(mapNpc, qBuff, reasonArgs);
+        addBuff(sender, targetMapNpc, qBuff, reasonArgs);
     }
 
 
-    public void addBuff(MapNpc mapNpc, QBuff qbuff, ReasonArgs reasonArgs) {
-        ArrayList<Buff> buffs = mapNpc.getBuffs();
+    public void addBuff(MapNpc sender, MapNpc targetMapNpc, QBuff qbuff, ReasonArgs reasonArgs) {
+        ArrayList<Buff> buffs = targetMapNpc.getBuffs();
         Buff oldBuff = null;
         for (Buff buff : buffs) {
-            if (buff.getBuffCfgId() == qbuff.getId()) {
+            if (buff.getBuffCfgId() == qbuff.getGroup()) {
                 oldBuff = buff;
                 break;
             }
         }
         int addType = qbuff.getAddType();
         if (addType == 1 && oldBuff != null) {
-            log.debug("添加buff {}, 已有相同的buff {} 忽略 {}", mapNpc, oldBuff, reasonArgs);
+            log.debug("添加buff {}, 已有相同的buff {} 忽略 {}", targetMapNpc, oldBuff, reasonArgs);
             return;
         }
 
         if (addType == 2 && oldBuff != null) {
             Tuple2<Long, Long> tuple2 = new Tuple2<>(MyClock.millis(), MyClock.millis() + qbuff.getDuration());
             oldBuff.getTimeList().add(tuple2);
-            log.debug("添加buff {}, 已有相同的buff {} 叠加 {}, {}", mapNpc, oldBuff, tuple2, reasonArgs);
+            log.debug("添加buff {}, 已有相同的buff {} 叠加 {}, {}", targetMapNpc, oldBuff, tuple2, reasonArgs);
             return;
         }
 
         if (oldBuff != null) {
             buffs.remove(oldBuff);
-            log.debug("添加buff {}, 已有相同的buff {} 移除 {}", mapNpc, oldBuff, reasonArgs);
+            log.debug("添加buff {}, 已有相同的buff {} 移除 {}", targetMapNpc, oldBuff, reasonArgs);
         }
 
         Buff newBuff = new Buff();
         newBuff.setUid(dataCenterService.getBuffHexid().newId());
+        newBuff.setSendUid(sender.getUid());
+        newBuff.setSender(sender);
         newBuff.setBuffCfgId(qbuff.getGroup());
         newBuff.setLv(qbuff.getLv());
         Tuple2<Long, Long> tuple2 = new Tuple2<>(MyClock.millis(), MyClock.millis() + qbuff.getDuration());
         newBuff.getTimeList().add(tuple2);
         newBuff.setLastExecuteTime(tuple2.getLeft());
-        newBuff.setInterval(qbuff.getInterval());
         newBuff.setExecuteCount(0);
 
         if (qbuff.isAddExecutor()) {
-            executeBuff(mapNpc, newBuff);
+            /*获得buff理解执行*/
+            executeBuff(targetMapNpc, newBuff, qbuff, newBuff.getLastExecuteTime());
         }
 
         if (qbuff.getDuration() < 100) {
-            log.debug("添加buff {}, {}, buff持续时间过小，视为一次性buff ,{}", mapNpc, newBuff, reasonArgs);
+            log.debug("添加buff {}, {}, buff持续时间过小，视为一次性buff ,{}", targetMapNpc, newBuff, reasonArgs);
             return;
         }
 
         buffs.add(newBuff);
 
-        log.debug("添加buff {}, {}, {}", mapNpc, newBuff, reasonArgs);
+        log.debug("添加buff {}, {}, {}", targetMapNpc, newBuff, reasonArgs);
     }
 
     public void removeBuff(MapNpc mapNpc, int buffCfgId) {

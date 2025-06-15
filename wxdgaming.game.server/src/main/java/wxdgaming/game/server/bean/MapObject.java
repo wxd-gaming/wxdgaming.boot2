@@ -3,6 +3,7 @@ package wxdgaming.game.server.bean;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.lang.bit.BitFlag;
+import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.game.bean.Vector3D;
 
 /**
@@ -32,6 +33,9 @@ public class MapObject extends GameBase {
     private String name;
     private MapObjectType mapObjectType;
     private BitFlag status = new BitFlag();
+
+    public void write(PojoBase pojoBase) {
+    }
 
     @Override public String toString() {
         return "%s{uid=%s, name='%s'}".formatted(this.getClass().getSimpleName(), getUid(), name);
