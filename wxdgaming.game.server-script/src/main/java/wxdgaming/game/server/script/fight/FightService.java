@@ -21,14 +21,14 @@ import java.util.List;
 @Singleton
 public class FightService extends HoldRunApplication {
 
-    HashMap<Integer, FightAction> actionImplMap = new HashMap<>();
+    HashMap<Integer, AbstractFightAction> actionImplMap = new HashMap<>();
 
     @Init
     public void init() {
-        HashMap<Integer, FightAction> map = new HashMap<>();
-        runApplication.classWithSuper(FightAction.class)
+        HashMap<Integer, AbstractFightAction> map = new HashMap<>();
+        runApplication.classWithSuper(AbstractFightAction.class)
                 .forEach(impl -> {
-                    FightAction old = map.put(impl.type(), impl);
+                    AbstractFightAction old = map.put(impl.type(), impl);
                     AssertUtil.assertTrue(old == null, "重复的战斗动作类型" + impl.type());
                 });
         actionImplMap = map;

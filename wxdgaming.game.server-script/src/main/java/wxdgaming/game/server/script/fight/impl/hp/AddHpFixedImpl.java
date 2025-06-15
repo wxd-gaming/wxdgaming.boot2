@@ -3,7 +3,7 @@ package wxdgaming.game.server.script.fight.impl.hp;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.server.bean.MapNpc;
-import wxdgaming.game.server.script.fight.FightAction;
+import wxdgaming.game.server.script.fight.AbstractFightAction;
 
 /**
  * 固定值加血
@@ -13,7 +13,7 @@ import wxdgaming.game.server.script.fight.FightAction;
  **/
 @Slf4j
 @Singleton
-public class AddHpFixedImpl extends FightAction {
+public class AddHpFixedImpl extends AbstractFightAction {
 
     @Override public int type() {
         return 100;
