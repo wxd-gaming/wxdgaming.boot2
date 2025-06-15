@@ -1,9 +1,11 @@
 package wxdgaming.boot2.core.chatset.json;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.DefaultJSONParser;
 import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
 import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.ObjectSerializer;
+import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.lang.ConfigString;
 
 import java.io.IOException;
@@ -23,14 +25,22 @@ public class ConfigStringSerializerFastJson implements ObjectSerializer, ObjectD
                       Object fieldName,
                       Type fieldType,
                       int features) throws IOException {
-        ConfigString bitSet = (ConfigString) object;
-        serializer.write(bitSet.getValue());
+        ConfigString configString = (ConfigString) object;
+        serializer.write(configString.getValue());
     }
 
     /** 由于集合序列化后为子类,再进行反序列化时,无法还原原对象,需要修改反序列化方法,手动修改反序列化逻辑 */
     @Override
     public Object deserialze(DefaultJSONParser parser, Type type, Object fieldName) {
         Object parse = parser.parse();
+        if (parse instanceof ConfigString configString) return configString;
+        if (parse instanceof JSONObject jsonObject) {
+            String value = jsonObject.getString("value");
+            if (StringUtils.isNotBlank(value)) {
+                return new ConfigString(value);
+            }
+        }
+
         return new ConfigString(parse.toString());
     }
 
