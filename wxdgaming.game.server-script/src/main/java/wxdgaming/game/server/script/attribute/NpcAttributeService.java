@@ -5,11 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.game.server.bean.MapMonster;
-import wxdgaming.game.server.bean.MapNpc;
-import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.bean.attr.AttrType;
+import wxdgaming.game.core.ReasonArgs;
+import wxdgaming.game.server.bean.MapNpc;
+import wxdgaming.game.server.bean.MapObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,23 +45,30 @@ public class NpcAttributeService extends HoldRunApplication {
     }
 
 
-    public void calculatorAll(MapMonster mapMonster) {
+    public void calculatorAll(MapNpc mapNpc) {
         HashMap<Integer, AttrInfo> attrMap = new HashMap<>();
         HashMap<Integer, AttrInfo> attrProMap = new HashMap<>();
         for (AbstractCalculatorAction calculatorAction : calculatorImplMap.values()) {
-            AttrInfo calculate = calculatorAction.calculate(mapMonster);
+            AttrInfo calculate = calculatorAction.calculate(mapNpc);
             attrMap.put(calculatorAction.calculatorType().getCode(), calculate);
-            AttrInfo calculatePro = calculatorAction.calculatePro(mapMonster);
+            AttrInfo calculatePro = calculatorAction.calculatePro(mapNpc);
             attrProMap.put(calculatorAction.calculatorType().getCode(), calculatePro);
         }
 
-        mapMonster.setAttrMap(attrMap);
-        mapMonster.setAttrProMap(attrProMap);
+        mapNpc.setAttrMap(attrMap);
+        mapNpc.setAttrProMap(attrProMap);
 
-        finalCalculator(mapMonster);
+        finalCalculator(mapNpc);
     }
 
-    public void calculator(MapNpc mapNpc, CalculatorType calculatorType) {
+    public void onNpcAttributeCalculator(MapNpc mapNpc, CalculatorType[] calculatorTypes, ReasonArgs msg) {
+        for (CalculatorType calculatorType : calculatorTypes) {
+            calculator(mapNpc, calculatorType, msg);
+        }
+        finalCalculator(mapNpc);
+    }
+
+    public void calculator(MapNpc mapNpc, CalculatorType calculatorType, ReasonArgs msg) {
 
         AbstractCalculatorAction calculatorAction = calculatorImplMap.get(calculatorType.getCode());
 
@@ -72,17 +79,17 @@ public class NpcAttributeService extends HoldRunApplication {
 
     }
 
-    public void finalCalculator(MapMonster mapMonster) {
+    public void finalCalculator(MapNpc mapNpc) {
 
         /*累计基础属性*/
         AttrInfo finalAttrInfo = new AttrInfo();
-        for (AttrInfo attrInfo : mapMonster.getAttrMap().values()) {
+        for (AttrInfo attrInfo : mapNpc.getAttrMap().values()) {
             finalAttrInfo.append(attrInfo);
         }
 
         /*累计百分比属性*/
         AttrInfo finalAttrInfoPro = new AttrInfo();
-        for (AttrInfo attrInfo : mapMonster.getAttrProMap().values()) {
+        for (AttrInfo attrInfo : mapNpc.getAttrProMap().values()) {
             finalAttrInfoPro.append(attrInfo);
         }
         for (Map.Entry<AttrType, Long> entry : finalAttrInfoPro.entrySet()) {
@@ -95,8 +102,8 @@ public class NpcAttributeService extends HoldRunApplication {
         }
 
         /*历史战斗力*/
-        long oldFightValue = mapMonster.getFightValue();
-        AttrInfo oldFinalAttrInfo = mapMonster.getFinalAttrInfo();
+        long oldFightValue = mapNpc.getFightValue();
+        AttrInfo oldFinalAttrInfo = mapNpc.getFinalAttrInfo();
 
         long fightValue = 0;
         for (Map.Entry<AttrType, Long> entry : finalAttrInfo.entrySet()) {
@@ -105,8 +112,8 @@ public class NpcAttributeService extends HoldRunApplication {
             fightValue += attrType.getCode() * value * 100;
         }
 
-        mapMonster.setFightValue(fightValue);
-        mapMonster.setFinalAttrInfo(finalAttrInfo);
+        mapNpc.setFightValue(fightValue);
+        mapNpc.setFinalAttrInfo(finalAttrInfo);
 
     }
 }

@@ -5,10 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.game.message.role.ResUpdateFightValue;
-import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.bean.attr.AttrType;
+import wxdgaming.game.core.Reason;
+import wxdgaming.game.core.ReasonArgs;
+import wxdgaming.game.message.role.ResUpdateFightValue;
+import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnLevelUp;
 import wxdgaming.game.server.event.OnLoginBefore;
@@ -65,7 +67,7 @@ public class PlayerAttributeService extends HoldRunApplication {
         player.setAttrMap(attrMap);
         player.setAttrProMap(attrProMap);
 
-        finalCalculator(player, true, "上线");
+        finalCalculator(player, true, ReasonArgs.of(Reason.Level));
     }
 
     public void calculator(Player player, CalculatorType calculatorType) {
@@ -79,7 +81,7 @@ public class PlayerAttributeService extends HoldRunApplication {
 
     }
 
-    public void finalCalculator(Player player, boolean isLogin, String msg) {
+    public void finalCalculator(Player player, boolean isLogin, ReasonArgs msg) {
 
         /*累计基础属性*/
         AttrInfo finalAttrInfo = new AttrInfo();
@@ -146,11 +148,11 @@ public class PlayerAttributeService extends HoldRunApplication {
     @OnLevelUp
     public void onLevel(Player player) {
         calculator(player, CalculatorType.BASE);
-        finalCalculator(player, false, "等级提升");
+        finalCalculator(player, false, ReasonArgs.of(Reason.Level));
     }
 
     @OnPlayerAttributeCalculator
-    public void onPlayerAttributeCalculator(Player player, CalculatorType[] calculatorTypes, String msg) {
+    public void onPlayerAttributeCalculator(Player player, CalculatorType[] calculatorTypes, ReasonArgs msg) {
         for (CalculatorType calculatorType : calculatorTypes) {
             calculator(player, calculatorType);
         }

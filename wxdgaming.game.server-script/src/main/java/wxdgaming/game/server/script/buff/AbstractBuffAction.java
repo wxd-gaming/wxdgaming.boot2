@@ -6,6 +6,8 @@ import wxdgaming.game.cfg.bean.QBuff;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.buff.Buff;
 import wxdgaming.game.server.module.data.DataCenterService;
+import wxdgaming.game.server.script.attribute.NpcAttributeService;
+import wxdgaming.game.server.script.attribute.PlayerAttributeService;
 import wxdgaming.game.server.script.fight.FightService;
 import wxdgaming.game.server.script.role.PlayerService;
 
@@ -21,6 +23,8 @@ public abstract class AbstractBuffAction {
     @Inject protected DataCenterService dataCenterService;
     @Inject protected FightService fightService;
     @Inject protected PlayerService playerService;
+    @Inject protected PlayerAttributeService playerAttributeService;
+    @Inject protected NpcAttributeService npcAttributeService;
 
     public abstract BuffType buffType();
 

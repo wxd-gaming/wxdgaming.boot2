@@ -13,6 +13,8 @@ public enum Reason {
     GM,
     Heart,
     Buff,
+    Login,
+    Level,
     USE_CDKEY,
     /** 任务接受 */
     TASK_ACCEPT,

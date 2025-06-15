@@ -5,8 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.bean.buff.BuffType;
 import wxdgaming.game.bean.buff.BuffTypeConst;
 import wxdgaming.game.cfg.bean.QBuff;
+import wxdgaming.game.core.Reason;
+import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.buff.Buff;
+import wxdgaming.game.server.bean.role.Player;
+import wxdgaming.game.server.script.attribute.CalculatorType;
 import wxdgaming.game.server.script.buff.AbstractBuffAction;
 
 /**
@@ -24,7 +28,13 @@ public class ChangeAttrBuffAction extends AbstractBuffAction {
     }
 
     @Override public void doAction(MapNpc mapNpc, Buff buff, QBuff qBuff) {
-
+        CalculatorType[] calculatorTypes = {CalculatorType.BUFF};
+        ReasonArgs reasonArgs = ReasonArgs.of(Reason.Buff, "buff", qBuff.getId(), "sendUid", buff.getSendUid());
+        if (mapNpc instanceof Player player) {
+            playerAttributeService.onPlayerAttributeCalculator(player, calculatorTypes, reasonArgs);
+        } else {
+            npcAttributeService.onNpcAttributeCalculator(mapNpc, calculatorTypes, reasonArgs);
+        }
     }
 
 }
