@@ -1,11 +1,13 @@
 package wxdgaming.boot2.core.lang;
 
+import com.alibaba.fastjson.annotation.JSONCreator;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.format.string.*;
 
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * 配置字符串
@@ -39,8 +41,10 @@ public class ConfigString {
     private transient List<long[]> longArrayList = null;
     private transient List<float[]> floatArrayList = null;
     private transient List<String[]> stringArrayList = null;
+    private transient Object object = null;
 
-    public ConfigString(String value) {
+    @JSONCreator()
+    public ConfigString(@JSONField(name = "value") String value) {
         this.value = value;
     }
 
@@ -195,6 +199,24 @@ public class ConfigString {
             stringArrayList = String2StringArrayList.parse(value);
         }
         return stringArrayList;
+    }
+
+    public <T> void initObjectByFunction(Function<String, T> function) {
+        object = function.apply(value);
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public <T> T getObject() {
+        return (T) object;
+    }
+
+    /** 自定义转化，避免每次都转化 */
+    public <T> T getObjectByFunction(Function<String, T> function) {
+        if (StringUtils.isBlank(value)) return null;
+        if (object == null) {
+            object = function.apply(value);
+        }
+        return getObject();
     }
 
     @Override public String toString() {
