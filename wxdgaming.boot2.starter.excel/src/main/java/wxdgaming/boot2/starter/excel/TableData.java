@@ -274,12 +274,7 @@ public class TableData {
     }
 
     @Override public String toString() {
-        return "TableInfo{" +
-               "tableComment='" + tableComment + '\'' +
-               ", tableName='" + tableName + '\'' +
-               ", sheetName='" + sheetName + '\'' +
-               ", fileName='" + fileName + '\'' +
-               ", filePath='" + filePath + '\'' +
-               '}';
+        return "TableInfo{tableComment='%s', tableName='%s', sheetName='%s', fileName='%s', filePath='%s'}"
+                .formatted(tableComment, tableName, sheetName, fileName, filePath);
     }
 }
