@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.bean.attr.AttrInfo;
-import wxdgaming.game.server.script.attribute.CalculatorAction;
+import wxdgaming.game.server.script.attribute.AbstractCalculatorAction;
 import wxdgaming.game.server.script.attribute.CalculatorType;
 
 /**
@@ -16,7 +16,7 @@ import wxdgaming.game.server.script.attribute.CalculatorType;
  **/
 @Slf4j
 @Singleton
-public class GMCalculatorActionImpl extends CalculatorAction {
+public class GMCalculatorActionImpl extends AbstractCalculatorAction {
 
     @Override public MapObject.MapObjectType mapObjectType() {
         return MapObject.MapObjectType.Monster;

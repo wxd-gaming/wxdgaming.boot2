@@ -6,7 +6,7 @@ import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.server.bean.buff.Buff;
-import wxdgaming.game.server.script.attribute.CalculatorAction;
+import wxdgaming.game.server.script.attribute.AbstractCalculatorAction;
 import wxdgaming.game.server.script.attribute.CalculatorType;
 
 /**
@@ -17,7 +17,7 @@ import wxdgaming.game.server.script.attribute.CalculatorType;
  **/
 @Slf4j
 @Singleton
-public class BuffCalculatorActionImpl extends CalculatorAction {
+public class BuffCalculatorActionImpl extends AbstractCalculatorAction {
 
     @Override public MapObject.MapObjectType mapObjectType() {
         return null;

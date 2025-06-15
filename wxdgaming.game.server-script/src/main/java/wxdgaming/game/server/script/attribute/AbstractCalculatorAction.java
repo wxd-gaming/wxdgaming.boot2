@@ -14,7 +14,7 @@ import wxdgaming.game.bean.attr.AttrInfo;
  * @version: 2025-05-09 19:29
  **/
 @Slf4j
-public abstract class CalculatorAction {
+public abstract class AbstractCalculatorAction {
 
     @Inject protected DataRepository dataRepository;
 

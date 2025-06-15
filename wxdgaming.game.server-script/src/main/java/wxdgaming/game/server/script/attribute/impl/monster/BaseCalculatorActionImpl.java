@@ -7,7 +7,7 @@ import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.cfg.QPlayerTable;
 import wxdgaming.game.cfg.bean.QPlayer;
-import wxdgaming.game.server.script.attribute.CalculatorAction;
+import wxdgaming.game.server.script.attribute.AbstractCalculatorAction;
 import wxdgaming.game.server.script.attribute.CalculatorType;
 
 /**
@@ -18,7 +18,7 @@ import wxdgaming.game.server.script.attribute.CalculatorType;
  **/
 @Slf4j
 @Singleton
-public class BaseCalculatorActionImpl extends CalculatorAction {
+public class BaseCalculatorActionImpl extends AbstractCalculatorAction {
 
     @Override public MapObject.MapObjectType mapObjectType() {
         return MapObject.MapObjectType.Monster;

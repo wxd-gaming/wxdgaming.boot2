@@ -26,19 +26,19 @@ import java.util.TreeMap;
 public class NpcAttributeService extends HoldRunApplication {
 
     /** 属性计算器 */
-    TreeMap<Integer, CalculatorAction> calculatorImplMap = new TreeMap<>();
+    TreeMap<Integer, AbstractCalculatorAction> calculatorImplMap = new TreeMap<>();
 
     @Init
     public void init() {
 
-        TreeMap<Integer, CalculatorAction> tmp = new TreeMap<>();
-        runApplication.classWithSuper(CalculatorAction.class)
+        TreeMap<Integer, AbstractCalculatorAction> tmp = new TreeMap<>();
+        runApplication.classWithSuper(AbstractCalculatorAction.class)
                 .forEach(calculatorAction -> {
                     MapObject.MapObjectType mapObjectType = calculatorAction.mapObjectType();
                     if (mapObjectType == MapObject.MapObjectType.Player) {
                         return;
                     }
-                    CalculatorAction old = tmp.put(calculatorAction.calculatorType().getCode(), calculatorAction);
+                    AbstractCalculatorAction old = tmp.put(calculatorAction.calculatorType().getCode(), calculatorAction);
                     AssertUtil.assertTrue(old == null, "重复的属性计算器类型 " + calculatorAction.calculatorType().getCode() + " " + old + ", " + calculatorAction);
                 });
         calculatorImplMap = tmp;
@@ -48,7 +48,7 @@ public class NpcAttributeService extends HoldRunApplication {
     public void calculatorAll(MapMonster mapMonster) {
         HashMap<Integer, AttrInfo> attrMap = new HashMap<>();
         HashMap<Integer, AttrInfo> attrProMap = new HashMap<>();
-        for (CalculatorAction calculatorAction : calculatorImplMap.values()) {
+        for (AbstractCalculatorAction calculatorAction : calculatorImplMap.values()) {
             AttrInfo calculate = calculatorAction.calculate(mapMonster);
             attrMap.put(calculatorAction.calculatorType().getCode(), calculate);
             AttrInfo calculatePro = calculatorAction.calculatePro(mapMonster);
@@ -63,7 +63,7 @@ public class NpcAttributeService extends HoldRunApplication {
 
     public void calculator(MapNpc mapNpc, CalculatorType calculatorType) {
 
-        CalculatorAction calculatorAction = calculatorImplMap.get(calculatorType.getCode());
+        AbstractCalculatorAction calculatorAction = calculatorImplMap.get(calculatorType.getCode());
 
         AttrInfo calculate = calculatorAction.calculate(mapNpc);
         mapNpc.getAttrMap().put(calculatorAction.calculatorType().getCode(), calculate);
