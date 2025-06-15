@@ -33,6 +33,7 @@ public class DataCenterService {
     HexId hexid;
     HexId itemHexid;
     HexId mailHexid;
+    HexId buffHexid;
     /** key:serverID, key:account, value: 角色id列表 */
     final ConcurrentTable<Integer, String, HashSet<Long>> account2RidsMap = new ConcurrentTable<>();
     /** 角色名字和id的映射 key:name, value:roleId */
@@ -54,6 +55,7 @@ public class DataCenterService {
         hexid = new HexId(sid);
         itemHexid = new HexId(sid);
         mailHexid = new HexId(sid);
+        buffHexid = new HexId(sid);
         String sql = "SELECT uid,sid,name,account FROM role where del=?";
         try (SqlQueryResult sqlQueryResult = sqlDataHelper.queryResultSet(sql, false)) {
             while (sqlQueryResult.hasNext()) {
