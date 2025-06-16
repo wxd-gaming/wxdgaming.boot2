@@ -20,17 +20,17 @@ import java.util.Map;
 @Getter
 public class QBuffTable extends DataTable<QBuff> implements Serializable {
 
-    /** R:{@link QBuff#getGroup()}, C:{@link QBuff#getLv()}, value: {@link QBuff}} */
-    Table<Integer, Integer, QBuff> groupLvTable;
+    /** R:{@link QBuff#getBuffId()} ()}, C:{@link QBuff#getLv()}, value: {@link QBuff}} */
+    Table<Integer, Integer, QBuff> idLvTable;
 
     @Override public void initDb() {
         /*todo 实现一些数据分组*/
         Table<Integer, Integer, QBuff> tmpTable = new Table<>();
         List<QBuff> dataList = getDataList();
         for (QBuff qBuff : dataList) {
-            tmpTable.put(qBuff.getGroup(), qBuff.getLv(), qBuff);
+            tmpTable.put(qBuff.getBuffId(), qBuff.getLv(), qBuff);
         }
-        this.groupLvTable = tmpTable;
+        this.idLvTable = tmpTable;
     }
 
     @Override public void checkData(Map<Class<?>, DataTable<?>> store) {

@@ -6,19 +6,25 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.Tuple2;
+import wxdgaming.boot2.core.lang.bit.BitFlagGroup;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.bean.buff.BuffType;
+import wxdgaming.game.bean.buff.BuffTypeConst;
 import wxdgaming.game.cfg.QBuffTable;
 import wxdgaming.game.cfg.bean.QBuff;
 import wxdgaming.game.core.Reason;
 import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.buff.Buff;
+import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnHeart;
 import wxdgaming.game.server.event.OnHeartMinute;
 import wxdgaming.game.server.module.data.DataCenterService;
+import wxdgaming.game.server.script.attribute.CalculatorType;
+import wxdgaming.game.server.script.attribute.NpcAttributeService;
+import wxdgaming.game.server.script.attribute.PlayerAttributeService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,11 +42,16 @@ import java.util.stream.Stream;
 public class BuffService extends HoldRunApplication {
 
     final DataCenterService dataCenterService;
+    final PlayerAttributeService playerAttributeService;
+    final NpcAttributeService npcAttributeService;
     HashMap<BuffType, AbstractBuffAction> actionMap = new HashMap<>();
 
+
     @Inject
-    public BuffService(DataCenterService dataCenterService) {
+    public BuffService(DataCenterService dataCenterService, PlayerAttributeService playerAttributeService, NpcAttributeService npcAttributeService) {
         this.dataCenterService = dataCenterService;
+        this.playerAttributeService = playerAttributeService;
+        this.npcAttributeService = npcAttributeService;
     }
 
     @Init
@@ -59,7 +70,6 @@ public class BuffService extends HoldRunApplication {
 
         addBuff(mapNpc, mapNpc, 2, 1, ReasonArgs.of(Reason.GM));
         addBuff(mapNpc, mapNpc, 3, 1, ReasonArgs.of(Reason.GM));
-
     }
 
     @OnHeart
@@ -67,9 +77,10 @@ public class BuffService extends HoldRunApplication {
         QBuffTable qBuffTable = DataRepository.getIns().dataTable(QBuffTable.class);
         ArrayList<Buff> buffs = mapNpc.getBuffs();
         Iterator<Buff> iterator = buffs.iterator();
+        boolean needExecuteAttrCalculator = false;
         while (iterator.hasNext()) {
             Buff buff = iterator.next();
-            QBuff qBuff = qBuffTable.getGroupLvTable().get(buff.getBuffCfgId(), buff.getLv());
+            QBuff qBuff = qBuffTable.getIdLvTable().get(buff.getBuffCfgId(), buff.getLv());
             if (qBuff == null) {
                 log.warn("buff不存在 {}, {} {}", mapNpc, buff.getBuffCfgId(), buff.getLv());
                 continue;
@@ -78,25 +89,66 @@ public class BuffService extends HoldRunApplication {
                 continue;
             }
             executeBuff(mapNpc, buff, qBuff, mill);
-            if (buff.checkTime(mill) && buff.getTimeList().isEmpty()) {
+            if (buff.clearTime(mill) && buff.getTimeList().isEmpty()) {
                 log.debug("buff {}, 结束, {}", mapNpc, buff);
                 iterator.remove();
+                onRemoveBuff(mapNpc, buff);
+                if (qBuff.getBuffType() == BuffTypeConst.ChangeAttr) {
+                    needExecuteAttrCalculator = true;
+                }
             }
+        }
+        if (needExecuteAttrCalculator) {
+            /*删除了属性buff*/
+            executeAttrCalculator(mapNpc);
         }
     }
 
+    /** 执行buff，比如掉血 */
     public void executeBuff(MapNpc mapNpc, Buff buff, QBuff qBuff, long mill) {
         BuffType buffType = qBuff.getBuffType();
         AbstractBuffAction abstractBuffAction = actionMap.get(buffType);
-        AssertUtil.assertNull(abstractBuffAction, "没有对应的buff处理类" + buffType);
+        if (abstractBuffAction == null) {
+            abstractBuffAction = actionMap.get(BuffTypeConst.None);
+        }
+        AssertUtil.assertNull(abstractBuffAction, "没有对应的buff处理类%s", buffType);
         abstractBuffAction.doAction(mapNpc, buff, qBuff);
         buff.setLastExecuteTime(MyClock.millis());
         buff.setExecuteCount(buff.getExecuteCount() + 1);
     }
 
+    /** 触发属性计算 */
+    public void executeAttrCalculator(MapNpc mapNpc) {
+        CalculatorType[] calculatorTypes = {CalculatorType.BUFF};
+        ReasonArgs reasonArgs = ReasonArgs.of(Reason.Buff);
+        if (mapNpc instanceof Player player) {
+            playerAttributeService.onPlayerAttributeCalculator(player, calculatorTypes, reasonArgs);
+        } else {
+            npcAttributeService.onNpcAttributeCalculator(mapNpc, calculatorTypes, reasonArgs);
+        }
+    }
+
+    /** 处理状态问题 比如眩晕，狂暴，冰冻 */
+    public void executeAddStatus(MapNpc mapNpc, QBuff qBuff) {
+        ArrayList<Integer> addStatusList = qBuff.getAddStatusList();
+        for (Integer status : addStatusList) {
+            BitFlagGroup bitFlagGroup = BitFlagGroup.of(status);
+            mapNpc.getStatus().addFlags(bitFlagGroup);
+        }
+    }
+
+    /** 处理状态问题 比如眩晕，狂暴，冰冻 */
+    public void executeRemoveStatus(MapNpc mapNpc, QBuff qBuff) {
+        ArrayList<Integer> addStatusList = qBuff.getAddStatusList();
+        for (Integer status : addStatusList) {
+            BitFlagGroup bitFlagGroup = BitFlagGroup.of(status);
+            mapNpc.getStatus().removeFlags(bitFlagGroup);
+        }
+    }
+
     public void addBuff(MapNpc sender, MapNpc targetMapNpc, int buffCfgId, int lv, ReasonArgs reasonArgs) {
         QBuffTable qBuffTable = DataRepository.getIns().dataTable(QBuffTable.class);
-        QBuff qBuff = qBuffTable.getGroupLvTable().get(buffCfgId, lv);
+        QBuff qBuff = qBuffTable.getIdLvTable().get(buffCfgId, lv);
         addBuff(sender, targetMapNpc, qBuff, reasonArgs);
     }
 
@@ -110,7 +162,7 @@ public class BuffService extends HoldRunApplication {
         ArrayList<Buff> buffs = targetMapNpc.getBuffs();
         Buff oldBuff = null;
         for (Buff buff : buffs) {
-            if (buff.getBuffCfgId() == qbuff.getGroup()) {
+            if (buff.getBuffCfgId() == qbuff.getBuffId()) {
                 oldBuff = buff;
                 break;
             }
@@ -130,14 +182,45 @@ public class BuffService extends HoldRunApplication {
 
         if (oldBuff != null) {
             buffs.remove(oldBuff);
-            log.debug("添加buff {}, 已有相同的buff {} 移除 {}", targetMapNpc, oldBuff, reasonArgs);
+            onRemoveBuff(targetMapNpc, oldBuff);
+            log.debug("添加buff {}, 已有相同的buff {} -> {} 移除 {}", targetMapNpc, qbuff.getId(), oldBuff, reasonArgs);
+        }
+
+        if (qbuff.getClearBuffIdList() != null) {
+            /*清除指定buff，比如掉血，眩晕buff*/
+            for (Integer clearBuffId : qbuff.getClearBuffIdList()) {
+                Iterator<Buff> iterator = buffs.iterator();
+                while (iterator.hasNext()) {
+                    Buff buff = iterator.next();
+                    if (buff.getBuffCfgId() == clearBuffId) {
+                        iterator.remove();
+                        onRemoveBuff(targetMapNpc, buff);
+                        log.debug("添加buff {}, 移除已有的buffId {} -> {} 添加 {}", targetMapNpc, qbuff.getId(), buff, reasonArgs);
+                    }
+                }
+            }
+        }
+
+        if (qbuff.getClearGroupList() != null) {
+            /*删除分组的buff，比如删除减益buff*/
+            for (Integer clearGroup : qbuff.getClearGroupList()) {
+                Iterator<Buff> iterator = buffs.iterator();
+                while (iterator.hasNext()) {
+                    Buff buff = iterator.next();
+                    if (buff.qBuff().getBuffGroup() == clearGroup) {
+                        iterator.remove();
+                        onRemoveBuff(targetMapNpc, buff);
+                        log.debug("添加buff {}, 移除已有的buffGroup {} -> {} 添加 {}", targetMapNpc, qbuff.getId(), buff, reasonArgs);
+                    }
+                }
+            }
         }
 
         Buff newBuff = new Buff();
         newBuff.setUid(dataCenterService.getBuffHexid().newId());
         newBuff.setSendUid(sender.getUid());
         newBuff.setSender(sender);
-        newBuff.setBuffCfgId(qbuff.getGroup());
+        newBuff.setBuffCfgId(qbuff.getBuffId());
         newBuff.setLv(qbuff.getLv());
         Tuple2<Long, Long> tuple2 = new Tuple2<>(MyClock.millis(), MyClock.millis() + qbuff.getDuration());
         newBuff.getTimeList().add(tuple2);
@@ -155,15 +238,19 @@ public class BuffService extends HoldRunApplication {
         }
 
         buffs.add(newBuff);
-
+        onAddBuff(targetMapNpc, newBuff);
+        if (qbuff.getBuffType() == BuffTypeConst.ChangeAttr) {
+            executeAttrCalculator(targetMapNpc);
+        }
         log.debug("添加buff {}, {}, {}", targetMapNpc, newBuff, reasonArgs);
     }
 
-    public void removeBuff(MapNpc mapNpc, int buffCfgId) {
-
+    public void onAddBuff(MapNpc mapNpc, Buff buff) {
+        executeAddStatus(mapNpc, buff.qBuff());
     }
 
-    public void removeBuff(MapNpc mapNpc, Buff buff) {
-        mapNpc.getBuffs().remove(buff);
+    public void onRemoveBuff(MapNpc mapNpc, Buff buff) {
+        executeRemoveStatus(mapNpc, buff.qBuff());
     }
+
 }

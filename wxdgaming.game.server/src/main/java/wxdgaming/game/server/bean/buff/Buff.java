@@ -60,8 +60,8 @@ public class Buff extends ObjectLong {
 
     @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
-    public boolean checkTime(long millis) {
-        boolean result = false;
+    public boolean clearTime(long millis) {
+        boolean result = timeList.isEmpty();
         Iterator<Tuple2<Long, Long>> iterator = timeList.iterator();
         while (iterator.hasNext()) {
             Tuple2<Long, Long> next = iterator.next();
@@ -75,7 +75,7 @@ public class Buff extends ObjectLong {
 
     public QBuff qBuff() {
         QBuffTable qBuffTable = DataRepository.getIns().dataTable(QBuffTable.class);
-        return qBuffTable.getGroupLvTable().get(buffCfgId, lv);
+        return qBuffTable.getIdLvTable().get(buffCfgId, lv);
     }
 
 }

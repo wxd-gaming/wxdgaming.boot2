@@ -22,8 +22,10 @@ public abstract class QBuffMapping extends ObjectBase implements Serializable, D
 
     /** 主键id 唯一id */
     protected String id;
+    /** buff分组 */
+    protected int buffGroup;
     /** buff的id */
-    protected int group;
+    protected int buffId;
     /** 等级 */
     protected int lv;
     /** 类型 */
@@ -32,12 +34,16 @@ public abstract class QBuffMapping extends ObjectBase implements Serializable, D
     protected int addType;
     /** 是否在添加buff立即执行一次 */
     protected boolean addExecutor;
+    /** 获得buff添加的状态 */
+    protected ArrayList<Integer> addStatusList;
     /** buff的清理机制，死亡删除，切换地图删除，下线删除 */
     protected int clearType;
     /** 添加buff的时候检查是部分保护其他buff */
     protected ArrayList<Integer> checkGroup;
     /** 添加buff 的时候删除的其他的buff */
-    protected ArrayList<Integer> clearGroup;
+    protected ArrayList<Integer> clearBuffIdList;
+    /** 添加buff 的时候删除的其他的buff */
+    protected ArrayList<Integer> clearGroupList;
     /** 持续时间 */
     protected int duration;
     /** 间隔时间 */

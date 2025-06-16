@@ -1,7 +1,10 @@
 package wxdgaming.game.server.script.buff;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.bean.buff.BuffType;
+import wxdgaming.game.bean.buff.BuffTypeConst;
 import wxdgaming.game.cfg.bean.QBuff;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.buff.Buff;
@@ -17,7 +20,9 @@ import wxdgaming.game.server.script.role.PlayerService;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-06-15 13:24
  **/
-public abstract class AbstractBuffAction {
+@Slf4j
+@Singleton
+public class AbstractBuffAction {
 
     @Inject protected BuffService buffService;
     @Inject protected DataCenterService dataCenterService;
@@ -26,8 +31,10 @@ public abstract class AbstractBuffAction {
     @Inject protected PlayerAttributeService playerAttributeService;
     @Inject protected NpcAttributeService npcAttributeService;
 
-    public abstract BuffType buffType();
+    public BuffType buffType() {
+        return BuffTypeConst.None;
+    }
 
-    public abstract void doAction(MapNpc mapNpc, Buff buff, QBuff qBuff);
+    public void doAction(MapNpc mapNpc, Buff buff, QBuff qBuff) {}
 
 }
