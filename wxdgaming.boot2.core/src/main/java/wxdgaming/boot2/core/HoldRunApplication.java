@@ -16,7 +16,7 @@ public abstract class HoldRunApplication {
     protected RunApplication runApplication;
 
     @Init
-    @Order(1)
+    @Order(Integer.MIN_VALUE)
     public void initHold(RunApplication runApplication) {
         this.runApplication = runApplication;
     }

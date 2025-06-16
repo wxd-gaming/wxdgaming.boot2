@@ -28,7 +28,7 @@ public class OutConfigTest {
         config.put("sid", 1);
         config.put("executor",
                 MapOf.newJSONObject()
-                        .fluentPut("default", ExecutorConfig.DEFAULT_INSTANCE.toJSONObject())
+                        .fluentPut("default", ExecutorConfig.BASIC_INSTANCE.toJSONObject())
                         .fluentPut("logic", ExecutorConfig.LOGIC_INSTANCE.toJSONObject())
                         .fluentPut("virtual", ExecutorConfig.VIRTUAL_INSTANCE.toJSONObject())
                         .fluentPut("scheduled", ExecutorConfig.VIRTUAL_INSTANCE.toJSONObject())

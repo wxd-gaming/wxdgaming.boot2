@@ -8,6 +8,7 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.lang.Tuple2;
+import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.core.util.JvmUtil;
 import wxdgaming.boot2.core.util.YamlUtil;
 
@@ -25,7 +26,13 @@ import java.nio.file.Path;
 @Getter
 public class BootConfig {
 
-    @Getter private static final BootConfig ins = new BootConfig();
+    private static final class Holder {
+        private static final BootConfig ins = new BootConfig();
+    }
+
+    public static BootConfig getIns() {
+        return Holder.ins;
+    }
 
     private BootConfig() {}
 
@@ -57,7 +64,7 @@ public class BootConfig {
                 return (R) clazz.cast(r);
             }
             if (r == null && StringUtils.isNotBlank(value.defaultValue())) {
-                if (type.equals(String.class)) {
+                if (String.class.equals(type)) {
                     return (R) value.defaultValue();
                 }
                 r = FastJsonUtil.parse(value.defaultValue(), type);
@@ -77,17 +84,13 @@ public class BootConfig {
 
     public int gid() {
         Integer sid = config.getInteger("gid");
-        if (sid == null) {
-            throw new RuntimeException("gid is null");
-        }
+        AssertUtil.assertNull(sid, "gid is null");
         return sid;
     }
 
     public int sid() {
         Integer sid = config.getInteger("sid");
-        if (sid == null) {
-            throw new RuntimeException("sid is null");
-        }
+        AssertUtil.assertNull(sid, "sid is null");
         return sid;
     }
 
@@ -100,7 +103,7 @@ public class BootConfig {
     }
 
     public ExecutorConfig basicConfig() {
-        return getNestedValue("executor.basic", ExecutorConfig.class, ExecutorConfig.DEFAULT_INSTANCE);
+        return getNestedValue("executor.basic", ExecutorConfig.class, ExecutorConfig.BASIC_INSTANCE);
     }
 
     public ExecutorConfig logicConfig() {

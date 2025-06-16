@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter;
 
+import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.GuiceModuleBase;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.reflect.ReflectContext;
@@ -19,6 +20,7 @@ class ApplicationGuiceModule extends GuiceModuleBase {
 
     @Override protected void bind() throws Throwable {
         bind(RunApplicationMain.class);
+        bindInstance(BootConfig.getIns());
     }
 
 }

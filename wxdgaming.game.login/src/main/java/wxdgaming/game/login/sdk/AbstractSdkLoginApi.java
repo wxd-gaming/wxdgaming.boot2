@@ -44,9 +44,9 @@ public abstract class AbstractSdkLoginApi {
 
     public RunResult buildResult(UserData userData) {
         JsonTokenBuilder jwtBuilder = JsonTokenBuilder.of(loginConfig.getJwtKey(), TimeUnit.MINUTES, 5);
-        jwtBuilder.putData("platform", userData.getPlatform());
-        jwtBuilder.putData("account", userData.getAccount());
-        jwtBuilder.putData("platformUserId", userData.getPlatformUserId());
+        jwtBuilder.put("platform", userData.getPlatform());
+        jwtBuilder.put("account", userData.getAccount());
+        jwtBuilder.put("platformUserId", userData.getPlatformUserId());
         String token = jwtBuilder.compact();
         InnerServerInfoBean gateway = innerService.idleGateway();
         if (gateway != null) {

@@ -14,7 +14,7 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 @Getter
 public class ExecutorConfig extends ObjectBase {
 
-    public static final ExecutorConfig DEFAULT_INSTANCE = new ExecutorConfig(2, 5000, QueuePolicyConst.AbortPolicy);
+    public static final ExecutorConfig BASIC_INSTANCE = new ExecutorConfig(2, 5000, QueuePolicyConst.AbortPolicy);
     public static final ExecutorConfig LOGIC_INSTANCE = new ExecutorConfig(8, 5000, QueuePolicyConst.AbortPolicy);
     public static final ExecutorConfig VIRTUAL_INSTANCE = new ExecutorConfig(100, 5000, QueuePolicyConst.AbortPolicy);
 
