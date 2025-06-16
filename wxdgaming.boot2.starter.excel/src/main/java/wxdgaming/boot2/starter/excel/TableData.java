@@ -2,7 +2,6 @@ package wxdgaming.boot2.starter.excel;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.chatset.StringUtils;
@@ -52,7 +51,6 @@ public class TableData {
     }
 
     /** 生成代码文件的名字 */
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public String getCodeClassName() {
 
@@ -66,7 +64,6 @@ public class TableData {
         return StringUtils.upperFirst(codeName);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public String getString(Object key, String field) {
         RowData rowData = rows.get(key);
@@ -76,7 +73,6 @@ public class TableData {
         return rowData.getString(field);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public boolean getBooleanValue(Object key, String field) {
         RowData rowData = rows.get(key);
@@ -86,7 +82,6 @@ public class TableData {
         return rowData.getBooleanValue(field);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public Boolean getBoolean(Object key, String field) {
         RowData rowData = rows.get(key);
@@ -96,7 +91,6 @@ public class TableData {
         return rowData.getBoolean(field);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public int getIntValue(Object key, String field) {
         RowData rowData = rows.get(key);
@@ -106,7 +100,6 @@ public class TableData {
         return rowData.getIntValue(field);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public Integer getInteger(Object key, String field) {
         RowData rowData = rows.get(key);
@@ -116,7 +109,6 @@ public class TableData {
         return rowData.getInteger(field);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public long getLongValue(Object key, String field) {
         RowData jsonObject = rows.get(key);
@@ -126,7 +118,6 @@ public class TableData {
         return jsonObject.getLongValue(field);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public Long getLong(Object key, String field) {
         RowData jsonObject = rows.get(key);
@@ -136,7 +127,6 @@ public class TableData {
         return jsonObject.getLong(field);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public float getFloatValue(Object key, String field) {
         RowData jsonObject = rows.get(key);
@@ -146,7 +136,6 @@ public class TableData {
         return jsonObject.getFloatValue(field);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public Float getFloat(Object key, String field) {
         RowData jsonObject = rows.get(key);
@@ -156,7 +145,6 @@ public class TableData {
         return jsonObject.getFloat(field);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public ConfigString getConfigString(Object key, String field) {
         RowData jsonObject = rows.get(key);
@@ -166,31 +154,26 @@ public class TableData {
         return (ConfigString) jsonObject.get(field);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public int[] getIntArray(Object key, String field) {
         return getT(key, field, int[].class);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public int[][] getInt2Array(Object key, String field) {
         return getT(key, field, int[][].class);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public long[] getLongArray(Object key, String field) {
         return getT(key, field, long[].class);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public long[][] getLong2Array(Object key, String field) {
         return getT(key, field, long[][].class);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public <R> R getT(Object key, String field, Class<R> clazz) {
         RowData jsonObject = rows.get(key);
@@ -200,7 +183,6 @@ public class TableData {
         return jsonObject.getObject(field, clazz);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public Object getObject(Object key, String field) {
         RowData jsonObject = rows.get(key);

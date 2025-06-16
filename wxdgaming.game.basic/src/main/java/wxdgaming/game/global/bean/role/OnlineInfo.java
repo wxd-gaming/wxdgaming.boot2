@@ -1,7 +1,6 @@
 package wxdgaming.game.global.bean.role;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,7 +21,6 @@ public class OnlineInfo {
     /** 总计在线秒数 */
     private long onlineTotalMills = 0;
     /** 最后一次刷新总计在线秒数时间 */
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient long lastUpdateOnlineTime = 0;
 }

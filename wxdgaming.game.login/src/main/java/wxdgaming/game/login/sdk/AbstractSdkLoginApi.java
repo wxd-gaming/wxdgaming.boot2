@@ -1,9 +1,8 @@
 package wxdgaming.game.login.sdk;
 
 import com.google.inject.Inject;
-import io.jsonwebtoken.JwtBuilder;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.core.util.JwtUtils;
+import wxdgaming.boot2.core.token.JsonTokenBuilder;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
 import wxdgaming.game.login.LoginConfig;
@@ -44,10 +43,10 @@ public abstract class AbstractSdkLoginApi {
     }
 
     public RunResult buildResult(UserData userData) {
-        JwtBuilder jwtBuilder = JwtUtils.createJwtBuilder(loginConfig.getJwtKey(), TimeUnit.MINUTES.toMillis(5));
-        jwtBuilder.claim("platform", userData.getPlatform());
-        jwtBuilder.claim("account", userData.getAccount());
-        jwtBuilder.claim("platformUserId", userData.getPlatformUserId());
+        JsonTokenBuilder jwtBuilder = JsonTokenBuilder.of(loginConfig.getJwtKey(), TimeUnit.MINUTES, 5);
+        jwtBuilder.putData("platform", userData.getPlatform());
+        jwtBuilder.putData("account", userData.getAccount());
+        jwtBuilder.putData("platformUserId", userData.getPlatformUserId());
         String token = jwtBuilder.compact();
         InnerServerInfoBean gateway = innerService.idleGateway();
         if (gateway != null) {

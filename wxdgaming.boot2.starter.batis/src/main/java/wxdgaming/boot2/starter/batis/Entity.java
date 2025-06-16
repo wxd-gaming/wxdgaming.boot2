@@ -2,7 +2,6 @@ package wxdgaming.boot2.starter.batis;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.chatset.StringUtils;
@@ -21,11 +20,9 @@ import wxdgaming.boot2.starter.batis.ann.DbColumn;
 public abstract class Entity extends ObjectBase {
 
     /** null 未知， true 表示不存在数据库 false 表示在数据库 */
-    @JsonIgnore
     @DbColumn(ignore = true)
     @JSONField(serialize = false, deserialize = false)
     private transient Boolean newEntity = null;
-    @JsonIgnore
     @DbColumn(ignore = true)
     @JSONField(serialize = false, deserialize = false)
     private transient int oldHashCode = -1;

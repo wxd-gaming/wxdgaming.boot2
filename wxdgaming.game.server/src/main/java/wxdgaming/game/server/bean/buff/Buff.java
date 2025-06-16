@@ -1,7 +1,6 @@
 package wxdgaming.game.server.bean.buff;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -31,7 +30,6 @@ public class Buff extends ObjectLong {
     /** 是谁给我加在身上的 */
     private long sendUid;
     /** 是谁给我加在身上的 */
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient MapNpc sender;
     /** 配置id */
@@ -44,21 +42,18 @@ public class Buff extends ObjectLong {
     /** 执行次数 */
     private int executeCount;
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public boolean checkStart() {
         Tuple2<Long, Long> longLongTuple2 = timeList.stream().min(Comparator.comparing(Tuple2::getLeft)).get();
         return MyClock.millis() > longLongTuple2.getLeft();
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public boolean checkEnd() {
         Tuple2<Long, Long> longLongTuple2 = timeList.stream().max(Comparator.comparing(Tuple2::getLeft)).get();
         return MyClock.millis() > longLongTuple2.getRight();
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public boolean clearTime(long millis) {
         boolean result = timeList.isEmpty();

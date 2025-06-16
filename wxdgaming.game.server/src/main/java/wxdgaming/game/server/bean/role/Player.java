@@ -1,20 +1,16 @@
 package wxdgaming.game.server.bean.role;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.game.bean.Vector3D;
-import wxdgaming.game.bean.attr.AttrType;
 import wxdgaming.game.bean.mail.MailPack;
 import wxdgaming.game.bean.vip.VipInfo;
 import wxdgaming.game.global.bean.role.OnlineInfo;
 import wxdgaming.game.global.bean.role.PlayerSnap;
-import wxdgaming.game.message.global.AttrBean;
-import wxdgaming.game.message.global.ResUpdateAttr;
 import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.bean.MapKey;
 import wxdgaming.game.server.bean.MapNpc;
@@ -57,10 +53,8 @@ public class Player extends MapNpc {
     private BagPack bagPack = new BagPack();
     private TaskPack taskPack = new TaskPack();
     private MailPack mailPack = new MailPack();
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient BlockingQueue<Runnable> eventList = new ArrayBlockingQueue<>(1024);
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient ClientSessionMapping clientSessionMapping;
 

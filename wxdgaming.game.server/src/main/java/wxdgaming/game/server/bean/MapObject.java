@@ -1,7 +1,6 @@
 package wxdgaming.game.server.bean;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.lang.bit.BitFlag;
@@ -35,7 +34,6 @@ public class MapObject extends GameBase {
     private String name;
     private MapObjectType mapObjectType;
     /** 状态 */
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private BitFlag status = new BitFlag();
 

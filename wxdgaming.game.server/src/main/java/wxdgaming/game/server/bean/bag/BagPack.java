@@ -1,7 +1,6 @@
 package wxdgaming.game.server.bean.bag;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.lang.ObjectBase;
@@ -26,7 +25,6 @@ public class BagPack extends ObjectBase {
         return bagMap.get(type);
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public boolean bagFull() {
         return itemBag(BagType.Bag).checkFull();

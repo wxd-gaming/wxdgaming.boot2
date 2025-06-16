@@ -27,4 +27,8 @@ public class ClientSessionService {
     /** key:account, value:mapping */
     private final ConcurrentHashMap<String, ClientSessionMapping> accountMappingMap = new ConcurrentHashMap<>();
 
+    public ClientSessionMapping getMapping(String account) {
+        return accountMappingMap.computeIfAbsent(account, l -> new ClientSessionMapping().setAccount(account));
+    }
+
 }

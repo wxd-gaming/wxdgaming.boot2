@@ -2,12 +2,11 @@ package wxdgaming.game.server.script.role.handler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.executor.ThreadContext;
-import wxdgaming.boot2.core.util.JwtUtils;
+import wxdgaming.boot2.core.token.JsonToken;
+import wxdgaming.boot2.core.token.JsonTokenParse;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.login.LoginConfig;
@@ -52,15 +51,15 @@ public class ReqLoginHandler extends HoldRunApplication {
         try {
             int sid = req.getSid();
             String token = req.getToken();
-            Jws<Claims> claimsJws = JwtUtils.parseJWT(loginConfig.getJwtKey(), token);
-            String account = claimsJws.getPayload().get("account", String.class);
-            String platform = claimsJws.getPayload().get("platform", String.class);
+            JsonToken jsonToken = JsonTokenParse.parse(loginConfig.getJwtKey(), token);
+            String account = jsonToken.getString("account");
+            String platform = jsonToken.getString("platform");
             /*平台返回的userid*/
-            String platformUserId = claimsJws.getPayload().get("platformUserId", String.class);
+            String platformUserId = jsonToken.getString("platformUserId");
 
             int gatewayId = socketSession.bindData("serviceId");
 
-            ClientSessionMapping clientSessionMapping = clientSessionService.getAccountMappingMap().computeIfAbsent(account, k -> new ClientSessionMapping());
+            ClientSessionMapping clientSessionMapping = clientSessionService.getMapping(account);
 
             clientSessionMapping.setSid(sid);
             clientSessionMapping.setAccount(account);

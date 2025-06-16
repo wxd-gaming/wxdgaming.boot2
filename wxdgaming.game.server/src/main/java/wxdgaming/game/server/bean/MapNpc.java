@@ -1,10 +1,8 @@
 package wxdgaming.game.server.bean;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.bean.attr.AttrType;
 import wxdgaming.game.message.global.AttrBean;
@@ -40,19 +38,15 @@ public class MapNpc extends MapObject {
     /** gm的百分比提升属性 */
     private AttrInfo gmAttrProInfo = new AttrInfo();
     /** 临时属性 */
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient AttrInfo tmpAttrInfo = new AttrInfo();
     /** 临时百分比提升属性 */
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient AttrInfo tmpAttrProInfo = new AttrInfo();
     /** 分组属性 */
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient HashMap<Integer, AttrInfo> attrMap = new HashMap<>();
     /** 分组百分比属性 */
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     private transient HashMap<Integer, AttrInfo> attrProMap = new HashMap<>();
 

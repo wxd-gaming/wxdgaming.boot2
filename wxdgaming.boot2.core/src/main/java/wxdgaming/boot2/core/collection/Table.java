@@ -2,7 +2,6 @@ package wxdgaming.boot2.core.collection;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.annotation.JSONType;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.format.data.Data2Json;
@@ -141,7 +140,6 @@ public class Table<K1, K2, V> implements Serializable, Data2Json {
         return remove;
     }
 
-    @JsonIgnore
     @JSONField(serialize = false, deserialize = false)
     public boolean isEmpty() {
         return nodes.isEmpty();
