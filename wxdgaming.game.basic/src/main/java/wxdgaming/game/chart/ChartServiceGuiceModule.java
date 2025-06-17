@@ -2,7 +2,7 @@ package wxdgaming.game.chart;
 
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ServiceGuiceModule;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 /**
  * 驱动配置
@@ -12,8 +12,8 @@ import wxdgaming.boot2.core.reflect.ReflectContext;
  **/
 public class ChartServiceGuiceModule extends ServiceGuiceModule {
 
-    public ChartServiceGuiceModule(ReflectContext reflectContext) {
-        super(reflectContext);
+    public ChartServiceGuiceModule(ReflectProvider reflectProvider) {
+        super(reflectProvider);
     }
 
     @Override protected void bind() throws Throwable {

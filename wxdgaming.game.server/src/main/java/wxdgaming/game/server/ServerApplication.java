@@ -6,12 +6,11 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.starter.RunApplicationMain;
 import wxdgaming.boot2.starter.RunApplicationSub;
 import wxdgaming.boot2.starter.WxdApplication;
 import wxdgaming.boot2.starter.batis.sql.pgsql.MysqlScan;
-import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
 import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.boot2.starter.net.SocketScan;
@@ -123,8 +122,8 @@ public class ServerApplication {
             }
         }
 
-        ReflectContext reflectContext = ReflectContext.Builder.of(classDirLoader, "wxdgaming.game.server.script").build();
-        RunApplicationSub runApplicationSub = WxdApplication.createRunApplicationSub(reflectContext);
+        ReflectProvider reflectProvider = ReflectProvider.Builder.of(classDirLoader, "wxdgaming.game.server.script").build();
+        RunApplicationSub runApplicationSub = WxdApplication.createRunApplicationSub(reflectProvider);
         runApplicationSub.executeMethodWithAnnotated(Init.class);
         log.info("加载脚本模块完成");
     }

@@ -14,18 +14,18 @@ import java.lang.reflect.Method;
  */
 @Slf4j
 @Getter
-public class ReflectFieldContext {
+public class ReflectFieldProvider {
 
-    private final ReflectClassContext reflectClassContext;
+    private final ReflectClassProvider reflectClassProvider;
     private final Field field;
     private final Method setMethod;
     private final Method getMethod;
 
-    public ReflectFieldContext(ReflectClassContext reflectClassContext, Field field) {
-        this.reflectClassContext = reflectClassContext;
+    public ReflectFieldProvider(ReflectClassProvider reflectClassProvider, Field field) {
+        this.reflectClassProvider = reflectClassProvider;
         this.field = field;
-        this.setMethod = findSetMethod(reflectClassContext.getClazz(), field);
-        this.getMethod = findGetMethod(reflectClassContext.getClazz(), field);
+        this.setMethod = findSetMethod(reflectClassProvider.getClazz(), field);
+        this.getMethod = findGetMethod(reflectClassProvider.getClazz(), field);
     }
 
     @Override public String toString() {
@@ -58,7 +58,7 @@ public class ReflectFieldContext {
     }
 
     private Method findMethod(Class<?> clazz, Field field, String prefix, String fieldName, int parameterCount) {
-        for (Method method : reflectClassContext.getMethodMap().values()) {
+        for (Method method : reflectClassProvider.getMethodMap().values()) {
             String methodName = method.getName();// 获取每一个方法名
             if (methodName.equalsIgnoreCase(prefix + fieldName)) {
                 if (method.getParameterCount() != parameterCount) {

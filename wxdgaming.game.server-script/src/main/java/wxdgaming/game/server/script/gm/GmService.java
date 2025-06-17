@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.reflect.GuiceReflectContext;
+import wxdgaming.boot2.core.reflect.GuiceBeanProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.gm.ann.GM;
@@ -26,7 +26,7 @@ import java.util.List;
 @Singleton
 public class GmService extends HoldRunApplication {
 
-    HashMap<String, GuiceReflectContext.MethodContent> gmMap = new HashMap<>();
+    HashMap<String, GuiceBeanProvider.ProviderMethod> gmMap = new HashMap<>();
     private final TipsService tipsService;
 
     @Inject
@@ -36,11 +36,11 @@ public class GmService extends HoldRunApplication {
 
     @Init
     public void init() {
-        HashMap<String, GuiceReflectContext.MethodContent> tmp = new HashMap<>();
+        HashMap<String, GuiceBeanProvider.ProviderMethod> tmp = new HashMap<>();
         runApplication.withMethodAnnotated(GM.class)
                 .forEach(content -> {
                     Method method = content.getMethod();
-                    GuiceReflectContext.MethodContent old = tmp.put(method.getName().toLowerCase(), content);
+                    GuiceBeanProvider.ProviderMethod old = tmp.put(method.getName().toLowerCase(), content);
                     AssertUtil.assertTrue(old == null, "重复的gm命令: " + method.getName());
                 });
         gmMap = tmp;
@@ -49,14 +49,14 @@ public class GmService extends HoldRunApplication {
     public void doGm(Player player, String[] args) {
         JSONArray jsonArray = new JSONArray(List.of(args));
         String cmd = jsonArray.getString(0).toLowerCase();
-        GuiceReflectContext.MethodContent methodContent = gmMap.get(cmd);
-        if (methodContent == null) {
+        GuiceBeanProvider.ProviderMethod providerMethod = gmMap.get(cmd);
+        if (providerMethod == null) {
             tipsService.tips(player, "不存在的gm命令: " + cmd);
             return;
         }
-        Method method = methodContent.getMethod();
+        Method method = providerMethod.getMethod();
         try {
-            method.invoke(methodContent.getIns(), player, jsonArray);
+            method.invoke(providerMethod.getBean(), player, jsonArray);
         } catch (Exception e) {
             log.error("执行gm命令失败: {}", cmd, e);
             tipsService.tips(player, "执行gm命令失败: " + cmd);

@@ -11,9 +11,8 @@ import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ThreadContext;
-import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.core.reflect.GuiceReflectContext;
+import wxdgaming.boot2.core.reflect.GuiceBeanProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.starter.net.ann.HttpPath;
@@ -96,8 +95,8 @@ public class HttpListenerTrigger extends ExecutorEvent {
             Parameter parameter = parameters[i];
             Class<?> parameterType = parameter.getType();
             Type parameterizedType = parameter.getParameterizedType();
-            if (GuiceReflectContext.class.isAssignableFrom(parameterType)) {
-                params[i] = parameterType.cast(runApplication.getGuiceReflectContext());
+            if (GuiceBeanProvider.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(runApplication.getGuiceBeanProvider());
                 continue;
             } else if (RunApplication.class.isAssignableFrom(parameterType)) {
                 params[i] = parameterType.cast(runApplication);

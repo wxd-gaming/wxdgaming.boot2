@@ -10,10 +10,7 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.chatset.json.ParameterizedTypeImpl;
 import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.boot2.core.lang.TimeValue;
-import wxdgaming.boot2.core.reflect.AnnUtil;
-import wxdgaming.boot2.core.reflect.FieldUtil;
-import wxdgaming.boot2.core.reflect.MethodUtil;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.*;
 import wxdgaming.boot2.starter.batis.ann.Convert;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
@@ -92,15 +89,16 @@ public class TableMapping {
         /*表名全小写*/
         this.tableName = tableName(cls);
         this.tableComment = tableComment(cls);
-
-        Map<String, Field> fields = FieldUtil.getFields(false, cls);
-        for (Map.Entry<String, Field> entry : fields.entrySet()) {
+        ReflectClassProvider reflectClassProvider = new ReflectClassProvider(cls);
+        Map<String, Field> fieldMap = reflectClassProvider.getFieldMap();
+        for (Map.Entry<String, Field> entry : fieldMap.entrySet()) {
             Field field = entry.getValue();
+            ReflectFieldProvider fieldContext = reflectClassProvider.getFieldContext(field);
             DbColumn dbColumn = AnnUtil.ann(field, DbColumn.class);
             if (dbColumn != null && dbColumn.ignore()) {
                 continue;
             }
-            FieldMapping fieldMapping = new FieldMapping(cls, field);
+            FieldMapping fieldMapping = new FieldMapping(fieldContext);
             if (dbColumn != null) {
                 fieldMapping.key = dbColumn.key();
                 fieldMapping.index = dbColumn.index();
@@ -139,7 +137,7 @@ public class TableMapping {
     public void buildColumnType(FieldMapping fieldMapping) {
         Class<?> type = fieldMapping.getField().getType();
         if (AtomicReference.class.isAssignableFrom(type)) {
-            type = ReflectContext.getTType(fieldMapping.getField().getGenericType(), 0);
+            type = ReflectProvider.getTType(fieldMapping.getField().getGenericType(), 0);
         }
         if (boolean.class.isAssignableFrom(type) || Boolean.class.isAssignableFrom(type)) {
             fieldMapping.columnType = ColumnType.Bool;
@@ -171,6 +169,7 @@ public class TableMapping {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public <R> R newInstance() {
         try {
             Constructor<?> constructor = cls.getConstructor();
@@ -198,13 +197,13 @@ public class TableMapping {
         private String comment;
         private String defaultValue;
 
-        public FieldMapping(Class<?> cls, Field field) {
-            this.field = field;
+        public FieldMapping(ReflectFieldProvider fieldContext) {
+            this.field = fieldContext.getField();
             this.field.setAccessible(true);
             this.fileType = this.field.getType();
             this.jsonType = ParameterizedTypeImpl.genericFieldTypes(field);
-            this.setMethod = MethodUtil.findSetMethod(cls, field);
-            this.getMethod = MethodUtil.findGetMethod(cls, field);
+            this.setMethod = fieldContext.getSetMethod();
+            this.getMethod = fieldContext.getGetMethod();
         }
 
         /** 获取字段的值 */
@@ -368,7 +367,7 @@ public class TableMapping {
             }
 
             if (AtomicReference.class.isAssignableFrom(getFileType())) {
-                Class<?> tType = ReflectContext.getTType(getField().getGenericType(), 0);
+                Class<?> tType = ReflectProvider.getTType(getField().getGenericType(), 0);
                 if (String.class.isAssignableFrom(tType)) {
                     return new AtomicReference<>(object);
                 }

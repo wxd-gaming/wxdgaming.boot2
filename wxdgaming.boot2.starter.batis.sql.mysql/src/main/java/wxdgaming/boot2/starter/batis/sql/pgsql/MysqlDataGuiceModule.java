@@ -2,7 +2,7 @@ package wxdgaming.boot2.starter.batis.sql.pgsql;
 
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ServiceGuiceModule;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 
@@ -15,8 +15,8 @@ import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 public class MysqlDataGuiceModule extends ServiceGuiceModule {
 
 
-    public MysqlDataGuiceModule(ReflectContext reflectContext) {
-        super(reflectContext);
+    public MysqlDataGuiceModule(ReflectProvider reflectProvider) {
+        super(reflectProvider);
     }
 
     @Override protected void bind() throws Throwable {

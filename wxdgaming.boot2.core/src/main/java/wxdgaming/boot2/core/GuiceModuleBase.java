@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import com.google.inject.matcher.Matchers;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 import java.lang.annotation.Annotation;
 
@@ -19,16 +19,16 @@ import java.lang.annotation.Annotation;
 @Getter
 public abstract class GuiceModuleBase extends AbstractModule {
 
-    final ReflectContext reflectContext;
+    final ReflectProvider reflectProvider;
 
-    public GuiceModuleBase(ReflectContext reflectContext) {
-        this.reflectContext = reflectContext;
+    public GuiceModuleBase(ReflectProvider reflectProvider) {
+        this.reflectProvider = reflectProvider;
     }
 
     /** 绑定指定注解 */
     public void bindClassWithAnnotated(Class<? extends Annotation> annotation) {
-        reflectContext.classWithAnnotated(annotation)
-                .sorted(ReflectContext.ComparatorClassBySort)
+        reflectProvider.classWithAnnotated(annotation)
+                .sorted(ReflectProvider.ComparatorClassBySort)
                 .forEach(this::bindSingleton);
     }
 

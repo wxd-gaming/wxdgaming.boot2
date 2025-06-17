@@ -4,7 +4,7 @@ import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ServiceGuiceModule;
 import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.executor.QueuePolicyConst;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 /**
  * 模块
@@ -16,8 +16,8 @@ public class ScheduledGuiceModule extends ServiceGuiceModule {
 
     public static final ExecutorConfig DEFAULT_INSTANCE = new ExecutorConfig(1, 1000, QueuePolicyConst.AbortPolicy);
 
-    public ScheduledGuiceModule(ReflectContext reflectContext) {
-        super(reflectContext);
+    public ScheduledGuiceModule(ReflectProvider reflectProvider) {
+        super(reflectProvider);
     }
 
     @Override protected void bind() throws Throwable {

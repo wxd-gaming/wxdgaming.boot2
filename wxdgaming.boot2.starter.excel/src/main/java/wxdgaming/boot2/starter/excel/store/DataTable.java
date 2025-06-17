@@ -11,7 +11,7 @@ import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.FieldUtil;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.core.util.ConvertUtil;
 
@@ -40,7 +40,7 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
     private Map<Object, E> dataMap;
 
     public DataTable() {
-        tClass = ReflectContext.getTClass(this.getClass());
+        tClass = ReflectProvider.getTClass(this.getClass());
         fieldMap = FieldUtil.getFields(false, tClass);
         dataMapping = AnnUtil.ann(tClass, DataMapping.class, true);
     }

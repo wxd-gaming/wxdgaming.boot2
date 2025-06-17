@@ -6,7 +6,7 @@ import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.shutdown;
+import wxdgaming.boot2.core.ann.Shutdown;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.timer.MyClock;
@@ -45,7 +45,7 @@ public class PlayerDriveService extends HoldRunApplication {
     }
 
     @Order(1)
-    @shutdown()
+    @Shutdown()
     public void shutdown() {
         playerDriveContentMap.values().forEach(v -> v.timerJob.cancel(true));
     }

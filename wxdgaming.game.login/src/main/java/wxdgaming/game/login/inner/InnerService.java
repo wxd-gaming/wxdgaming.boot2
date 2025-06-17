@@ -4,12 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.ann.Shutdown;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.game.login.bean.info.InnerServerInfoBean;
 
-import java.util.Comparator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -40,6 +41,14 @@ public class InnerService {
         sqlDataHelper.findList(InnerServerInfoBean.class).forEach(bean -> {
             log.info("InnerService: {}", bean);
             innerGameServerInfoMap.put(bean.getServerId(), bean);
+        });
+    }
+
+    @Order(10)
+    @Shutdown
+    public void shutdown() {
+        innerGameServerInfoMap.values().forEach(bean -> {
+            sqlDataHelper.getDataBatch().save(bean);
         });
     }
 

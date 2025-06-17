@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.batis.sql;
 
 import lombok.Getter;
-import wxdgaming.boot2.core.ann.shutdown;
+import wxdgaming.boot2.core.ann.Shutdown;
 import wxdgaming.boot2.starter.batis.Entity;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,7 +22,7 @@ public class SqlDataCacheService {
         this.sqlDataHelper = sqlDataHelper;
     }
 
-    @shutdown
+    @Shutdown
     public void shutdown() {
         jdbcCacheMap.values().forEach(SqlDataCache::shutdown);
     }

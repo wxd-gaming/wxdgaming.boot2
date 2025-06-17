@@ -33,10 +33,10 @@ public class ProtoListenerContent {
 
     public ProtoListenerContent(RunApplication runApplication) {
         this.runApplication = runApplication;
-        runApplication.getGuiceReflectContext()
+        runApplication.getGuiceBeanProvider()
                 .withMethodAnnotated(ProtoRequest.class)
                 .forEach(contentMethod -> {
-                    Object ins = contentMethod.getIns();
+                    Object ins = contentMethod.getBean();
                     Method method = contentMethod.getMethod();
 
                     ProtoRequest methodRequestMapping = AnnUtil.ann(method, ProtoRequest.class);

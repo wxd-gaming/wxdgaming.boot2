@@ -15,7 +15,7 @@ import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.core.reflect.AnnUtil;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 
@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * pojo生成
@@ -365,17 +366,19 @@ public class ProtoBuf2Pojo {
      * @author: wxd-gaming(無心道, 15388152619)
      * @version: 2025-01-15 14:58
      */
-    public static void createMapping(String outPath, String packageName, String spi, String readPackageName, Predicate<Class<?>> filter, Supplier<String> methodParamsSupplier, Supplier<String> methodContentSupplier) {
-        ReflectContext reflectContext = ReflectContext.Builder.of(readPackageName).build();
-        reflectContext
-                .withSuper(PojoBase.class)
-                .forEach(pojoBase -> {
-                    Class<?> cls = pojoBase.getCls();
-                    if (filter != null && !filter.test(cls)) {
-                        return;
-                    }
-                    createMapping0(outPath, packageName, spi, cls, methodParamsSupplier, methodContentSupplier);
-                });
+    public static void createMapping(String outPath, String packageName, String spi,
+                                     String readPackageName,
+                                     Predicate<Class<PojoBase>> filter,
+                                     Supplier<String> methodParamsSupplier,
+                                     Supplier<String> methodContentSupplier) {
+        ReflectProvider reflectProvider = ReflectProvider.Builder.of(readPackageName).build();
+        Stream<Class<PojoBase>> classStream = reflectProvider.classWithSuper(PojoBase.class);
+        if (filter != null) {
+            classStream = classStream.filter(filter);
+        }
+        classStream.forEach(cls -> {
+            createMapping0(outPath, packageName, spi, cls, methodParamsSupplier, methodContentSupplier);
+        });
     }
 
     public static void createMapping0(String outPath, String packageName, String spi, Class<?> cls, Supplier<String> methodParamsSupplier, Supplier<String> methodContentSupplier) {

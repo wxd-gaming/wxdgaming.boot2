@@ -2,7 +2,7 @@ package wxdgaming.boot2.starter;
 
 import com.google.inject.Singleton;
 import wxdgaming.boot2.core.GuiceModuleBase;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 /**
  * 构建Singleton
@@ -14,8 +14,8 @@ public class SingletonGuiceModule extends GuiceModuleBase {
 
     private final Class<?>[] classes;
 
-    public SingletonGuiceModule(ReflectContext reflectContext, Class<?>... classes) {
-        super(reflectContext);
+    public SingletonGuiceModule(ReflectProvider reflectProvider, Class<?>... classes) {
+        super(reflectProvider);
         this.classes = classes;
     }
 

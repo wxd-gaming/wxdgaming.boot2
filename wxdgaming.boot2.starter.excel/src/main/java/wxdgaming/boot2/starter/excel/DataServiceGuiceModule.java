@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.excel;
 
 import wxdgaming.boot2.core.ServiceGuiceModule;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 
 /**
@@ -12,8 +12,8 @@ import wxdgaming.boot2.starter.excel.store.DataRepository;
  **/
 public class DataServiceGuiceModule extends ServiceGuiceModule {
 
-    public DataServiceGuiceModule(ReflectContext reflectContext) {
-        super(reflectContext);
+    public DataServiceGuiceModule(ReflectProvider reflectProvider) {
+        super(reflectProvider);
     }
 
     @Override protected void bind() throws Throwable {

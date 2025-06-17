@@ -4,7 +4,7 @@ package wxdgaming.boot2.starter.net.server;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ServiceGuiceModule;
 import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 /**
  * socket 模块
@@ -14,8 +14,8 @@ import wxdgaming.boot2.core.reflect.ReflectContext;
  **/
 public class SocketServerGuiceModule extends ServiceGuiceModule {
 
-    public SocketServerGuiceModule(ReflectContext reflectContext) {
-        super(reflectContext);
+    public SocketServerGuiceModule(ReflectProvider reflectProvider) {
+        super(reflectProvider);
     }
 
     @Override protected void bind() throws Throwable {

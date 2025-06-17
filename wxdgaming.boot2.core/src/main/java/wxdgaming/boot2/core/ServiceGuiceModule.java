@@ -1,6 +1,6 @@
 package wxdgaming.boot2.core;
 
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 import java.lang.annotation.Annotation;
 
@@ -12,8 +12,8 @@ import java.lang.annotation.Annotation;
  **/
 public abstract class ServiceGuiceModule extends GuiceModuleBase {
 
-    public ServiceGuiceModule(ReflectContext reflectContext) {
-        super(reflectContext);
+    public ServiceGuiceModule(ReflectProvider reflectProvider) {
+        super(reflectProvider);
     }
 
     @Override public void bindClassWithAnnotated(Class<? extends Annotation> annotation) {

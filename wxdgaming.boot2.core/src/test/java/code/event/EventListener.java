@@ -1,7 +1,7 @@
 package code.event;
 
 import lombok.Getter;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 
 /**
@@ -20,7 +20,7 @@ public abstract class EventListener<E extends EventObject> {
     public EventListener() {
         Class tmp = Object.class;
         try {
-            tmp = ReflectContext.getTClass(this.getClass());
+            tmp = ReflectProvider.getTClass(this.getClass());
         } catch (Exception ignored) {
         }
         this.eventClass = tmp;

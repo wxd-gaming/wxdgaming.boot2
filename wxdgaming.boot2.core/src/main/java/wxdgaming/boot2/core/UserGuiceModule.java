@@ -1,6 +1,6 @@
 package wxdgaming.boot2.core;
 
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 /**
  * 服务使用
@@ -10,8 +10,8 @@ import wxdgaming.boot2.core.reflect.ReflectContext;
  **/
 public abstract class UserGuiceModule extends GuiceModuleBase {
 
-    public UserGuiceModule(ReflectContext reflectContext) {
-        super(reflectContext);
+    public UserGuiceModule(ReflectProvider reflectProvider) {
+        super(reflectProvider);
     }
 
 }

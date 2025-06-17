@@ -8,10 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.shutdown;
+import wxdgaming.boot2.core.ann.Shutdown;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.batis.DataHelper;
 import wxdgaming.boot2.starter.batis.Entity;
@@ -60,7 +60,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
     public void start() {
         if (StringUtils.isNotBlank(sqlConfig.getScanPackage())) {
             Map<String, LinkedHashMap<String, JSONObject>> tableStructMap = findTableStructMap();
-            ReflectContext.Builder.of(sqlConfig.getScanPackage()).build()
+            ReflectProvider.Builder.of(sqlConfig.getScanPackage()).build()
                     .classWithAnnotated(DbTable.class)
                     .forEach(cls -> {
                         if (!Entity.class.isAssignableFrom(cls)) {
@@ -72,7 +72,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
         }
     }
 
-    @shutdown
+    @Shutdown
     @Order(Integer.MAX_VALUE / 2/*最后关闭*/)
     public void shutdownCache() {
         log.info("关闭数据库缓存：{}", this.getSqlConfig().getUrl());
@@ -80,7 +80,7 @@ public abstract class SqlDataHelper<DDL extends SqlDDLBuilder> extends DataHelpe
             this.cacheService.shutdown();
     }
 
-    @shutdown
+    @Shutdown
     @Order(Integer.MAX_VALUE/*最后关闭*/)
     public void shutdown() {
         log.info("准备关闭数据库服务：{}", this.getSqlConfig().getUrl());

@@ -3,7 +3,7 @@ package wxdgaming.boot2.core.assist;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicLong;
@@ -85,7 +85,7 @@ public class Javassist2Proxy {
                     .compilerCode(javaCoder)
                     .classLoader()
                     .loadClass(className);
-            Javassist2Proxy javassist2Proxy = (Javassist2Proxy) ReflectContext.newInstance(javassistProxy);
+            Javassist2Proxy javassist2Proxy = (Javassist2Proxy) ReflectProvider.newInstance(javassistProxy);
             javassist2Proxy.init(invokeInstance, method);
             return javassist2Proxy;
         } catch (ClassNotFoundException e) {

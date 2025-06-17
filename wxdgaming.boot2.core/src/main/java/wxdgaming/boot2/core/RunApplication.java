@@ -5,7 +5,7 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import lombok.Getter;
 import wxdgaming.boot2.core.ann.Value;
-import wxdgaming.boot2.core.reflect.GuiceReflectContext;
+import wxdgaming.boot2.core.reflect.GuiceBeanProvider;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 public abstract class RunApplication {
 
     private final Injector injector;
-    private GuiceReflectContext guiceReflectContext;
+    private GuiceBeanProvider guiceBeanProvider;
 
     public RunApplication(Injector injector) {
         this.injector = injector;
@@ -45,18 +45,18 @@ public abstract class RunApplication {
             throw Throw.of(e);
         }
 
-        guiceReflectContext = new GuiceReflectContext(this, hashMap.values());
-        guiceReflectContext.stream().forEach(content -> {
-            content.fieldWithAnnotated(Value.class).forEach(field -> {
-                Object valued = BootConfig.getIns().value(field.getAnnotation(Value.class), field.getType());
-                try {
-                    if (valued != null) {
-                        field.set(content.getInstance(), valued);
-                    }
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
+        guiceBeanProvider = new GuiceBeanProvider(this, hashMap.values());
+        guiceBeanProvider.withFieldAnnotated(Value.class).forEach(fieldProvider -> {
+            Value annotation = fieldProvider.getField().getAnnotation(Value.class);
+            if (annotation == null) return;
+            Object valued = BootConfig.getIns().value(annotation, fieldProvider.getField().getType());
+            try {
+                if (valued != null) {
+                    fieldProvider.invoke(valued);
                 }
-            });
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
@@ -83,43 +83,30 @@ public abstract class RunApplication {
         return injector.getInstance(clazz);
     }
 
-    /**
-     * 通过接口或者父类查找 实现类
-     *
-     * @param clazz 查找的实例类
-     * @param <T>   实例对象
-     * @return 实例对象
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-02-19 11:02
-     */
+    /** 通过接口或者父类查找 实现类 */
     public <T> Stream<T> classWithSuper(Class<T> clazz) {
-        return guiceReflectContext.classWithSuper(clazz);
+        return guiceBeanProvider.classWithSuper(clazz);
     }
 
-    /**
-     * 查找添加了某个注解的类
-     *
-     * @param annotation 注解
-     * @return 类流
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-02-19 11:04
-     */
+    /** 查找添加了某个注解的类 */
     public Stream<Object> classWithAnnotated(Class<? extends Annotation> annotation) {
-        return guiceReflectContext.classWithAnnotated(annotation);
+        return guiceBeanProvider.classWithAnnotated(annotation);
+    }
+
+    /** 所有bean里面的方法，添加了注解的 */
+    public Collection<GuiceBeanProvider.ProviderMethod> withMethodAnnotated(Class<? extends Annotation> annotation) {
+        return guiceBeanProvider.withMethodAnnotated(annotation);
     }
 
     /** 执行循环过程中某一个函数执行失败中断执行 */
     public void executeMethodWithAnnotated(Class<? extends Annotation> annotation, Object... args) {
-        guiceReflectContext.executeMethodWithAnnotated(annotation, args);
+        guiceBeanProvider.executeMethodWithAnnotated(annotation, args);
     }
 
     /** 执行循环过程中某一个函数执行失败会继续执行其它函数 */
     public void executeMethodWithAnnotatedException(Class<? extends Annotation> annotation, Object... args) {
-        guiceReflectContext.executeMethodWithAnnotatedException(annotation, args);
+        guiceBeanProvider.executeMethodWithAnnotatedException(annotation, args);
     }
 
-    /** 所有bean里面的方法，添加了注解的 */
-    public Collection<GuiceReflectContext.MethodContent> withMethodAnnotated(Class<? extends Annotation> annotation) {
-        return guiceReflectContext.withMethodAnnotated(annotation);
-    }
+
 }

@@ -3,7 +3,7 @@ package wxdgaming.boot2.starter;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.GuiceModuleBase;
 import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 /**
  * 线程模块
@@ -14,8 +14,8 @@ import wxdgaming.boot2.core.reflect.ReflectContext;
 @Order(1)
 class ApplicationGuiceModule extends GuiceModuleBase {
 
-    public ApplicationGuiceModule(ReflectContext reflectContext) {
-        super(reflectContext);
+    public ApplicationGuiceModule(ReflectProvider reflectProvider) {
+        super(reflectProvider);
     }
 
     @Override protected void bind() throws Throwable {

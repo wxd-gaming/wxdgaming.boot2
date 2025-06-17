@@ -3,10 +3,12 @@ package wxdgaming.boot2.core.reflect;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * 反射类信息
@@ -16,19 +18,24 @@ import java.util.Map;
  **/
 @Slf4j
 @Getter
-public class ReflectClassContext {
+public class ReflectClassProvider {
 
-    private final String className;
-    private final String simpleName;
     private final Class<?> clazz;
     private Map<String, Field> fieldMap;
-    private final Map<String, ReflectFieldContext> fieldContextMap = new HashMap<>();
+    private final Map<Field, ReflectFieldProvider> fieldProviderMap = new HashMap<>();
     private Map<String, Method> methodMap;
 
-    public ReflectClassContext(Class<?> clazz) {
-        this.className = clazz.getName();
-        this.simpleName = clazz.getSimpleName();
+    public ReflectClassProvider(Class<?> clazz) {
         this.clazz = clazz;
+    }
+
+    public boolean isAssignableFrom(Class<?> cls) {
+        return clazz.isAssignableFrom(cls);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T cast(Object obj) {
+        return (T) clazz.cast(obj);
     }
 
     public Map<String, Field> getFieldMap() {
@@ -45,6 +52,14 @@ public class ReflectClassContext {
         return methodMap;
     }
 
+    public Stream<Method> methodStream() {
+        return getMethodMap().values().stream();
+    }
+
+    public Stream<Method> methodStreamWithAnnotation(Class<? extends Annotation> annotation) {
+        return getMethodMap().values().stream().filter(method -> method.isAnnotationPresent(annotation));
+    }
+
     public Method findMethod(String methodName, Class<?>... parameters) {
         StringBuilder fullName = new StringBuilder(methodName);
         for (int i = 0; i < parameters.length; i++) {
@@ -54,11 +69,13 @@ public class ReflectClassContext {
         return getMethodMap().get(fullName.toString());
     }
 
-    public ReflectFieldContext getFieldContext(String fieldName) {
-        return fieldContextMap.computeIfAbsent(fieldName, l -> {
-            Field field = getFieldMap().get(fieldName);
-            return new ReflectFieldContext(this, field);
-        });
+    public ReflectFieldProvider getFieldContext(String fieldName) {
+        Field field = getFieldMap().get(fieldName);
+        return getFieldContext(field);
+    }
+
+    public ReflectFieldProvider getFieldContext(Field field) {
+        return fieldProviderMap.computeIfAbsent(field, l -> new ReflectFieldProvider(this, field));
     }
 
 }

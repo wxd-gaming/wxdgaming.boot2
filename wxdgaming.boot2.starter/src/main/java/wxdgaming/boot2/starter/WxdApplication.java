@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.*;
 import wxdgaming.boot2.core.collection.SetOf;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.util.DumpUtil;
 import wxdgaming.boot2.core.util.GlobalUtil;
 
@@ -51,18 +51,18 @@ public class WxdApplication {
 
             final String[] finalPackages = packageSet.toArray(new String[0]);
 
-            ReflectContext reflectContext = ReflectContext.Builder.of(finalPackages).build();
+            ReflectProvider reflectProvider = ReflectProvider.Builder.of(finalPackages).build();
 
             Stream<Class<? extends GuiceModuleBase>> moduleStream = Stream.empty();
 
-            moduleStream = Stream.concat(moduleStream, reflectContext.classWithSuper(ServiceGuiceModule.class));
-            moduleStream = Stream.concat(moduleStream, reflectContext.classWithSuper(UserGuiceModule.class));
+            moduleStream = Stream.concat(moduleStream, reflectProvider.classWithSuper(ServiceGuiceModule.class));
+            moduleStream = Stream.concat(moduleStream, reflectProvider.classWithSuper(UserGuiceModule.class));
 
             List<GuiceModuleBase> collect = moduleStream
-                    .map(cls -> ReflectContext.newInstance(cls, reflectContext))
+                    .map(cls -> ReflectProvider.newInstance(cls, reflectProvider))
                     .collect(Collectors.toList());
-            collect.addFirst(new ApplicationGuiceModule(reflectContext));
-            collect.add(new SingletonGuiceModule(reflectContext));
+            collect.addFirst(new ApplicationGuiceModule(reflectProvider));
+            collect.add(new SingletonGuiceModule(reflectProvider));
 
             Injector injector = Guice.createInjector(Stage.PRODUCTION, collect);
             runApplicationMain = injector.getInstance(RunApplicationMain.class);
@@ -83,12 +83,12 @@ public class WxdApplication {
         return null;
     }
 
-    public static RunApplicationSub createRunApplicationSub(ReflectContext reflectContext) {
-        List<GuiceModuleBase> collect = reflectContext.classWithSuper(UserGuiceModule.class)
-                .map(cls -> ReflectContext.newInstance(cls, reflectContext))
+    public static RunApplicationSub createRunApplicationSub(ReflectProvider reflectProvider) {
+        List<GuiceModuleBase> collect = reflectProvider.classWithSuper(UserGuiceModule.class)
+                .map(cls -> ReflectProvider.newInstance(cls, reflectProvider))
                 .collect(Collectors.toList());
         /* TODO 这里把子容器注入进去 */
-        collect.add(new SingletonGuiceModule(reflectContext, RunApplicationSub.class));
+        collect.add(new SingletonGuiceModule(reflectProvider, RunApplicationSub.class));
 
         Injector injector = runApplicationMain.getInjector().createChildInjector(collect);
         RunApplicationSub runApplicationSub = injector.getInstance(RunApplicationSub.class);

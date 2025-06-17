@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.lang.Tuple2;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.util.JvmUtil;
 import wxdgaming.boot2.core.zip.ZipReadFile;
 
@@ -103,7 +103,7 @@ public class FileUtil implements Serializable {
     /** graalvm 打包需要 resources.json */
     public static List<String> getResources() {
         if (resources == null) {
-            InputStream resourceAsStream = ReflectContext.class.getResourceAsStream("resources.json");
+            InputStream resourceAsStream = ReflectProvider.class.getResourceAsStream("resources.json");
             if (resourceAsStream != null) {
                 byte[] bytes = FileReadUtil.readBytes(resourceAsStream);
                 String string = new String(bytes, StandardCharsets.UTF_8);

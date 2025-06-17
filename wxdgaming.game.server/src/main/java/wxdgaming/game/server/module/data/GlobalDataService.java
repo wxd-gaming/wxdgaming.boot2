@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Value;
-import wxdgaming.boot2.core.ann.shutdown;
+import wxdgaming.boot2.core.ann.Shutdown;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.game.server.bean.BackendConfig;
@@ -45,7 +45,7 @@ public class GlobalDataService extends HoldRunApplication {
         }
     }
 
-    @shutdown
+    @Shutdown
     public void shutdown() {
         globalDataTable.forEach(globalDataEntity -> {
             sqlDataHelper.dataBatch().save(globalDataEntity);

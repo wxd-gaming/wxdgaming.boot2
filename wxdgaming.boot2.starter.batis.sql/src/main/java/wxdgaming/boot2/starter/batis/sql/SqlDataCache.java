@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.cache2.Cache;
 import wxdgaming.boot2.core.cache2.LRUCache;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
 
@@ -34,7 +34,7 @@ public class SqlDataCache<E extends Entity, Key> {
      * @param expireAfterAccessM 过期时间，单位分钟
      */
     public SqlDataCache(SqlDataHelper<?> sqlDataHelper, int hashArea, int expireAfterAccessM) {
-        this.init(ReflectContext.getTClass(this.getClass()), sqlDataHelper, hashArea, expireAfterAccessM);
+        this.init(ReflectProvider.getTClass(this.getClass()), sqlDataHelper, hashArea, expireAfterAccessM);
     }
 
     /**

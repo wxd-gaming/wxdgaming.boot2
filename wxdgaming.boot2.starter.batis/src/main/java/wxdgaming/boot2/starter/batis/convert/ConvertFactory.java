@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.batis.convert;
 
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,7 +15,7 @@ public class ConvertFactory {
     public static final ConcurrentHashMap<Class<? extends Converter>, Converter<?, ?>> converterMap = new ConcurrentHashMap<>();
 
     public static Converter getConverter(Class<? extends Converter> cls) {
-        return converterMap.computeIfAbsent(cls, l -> ReflectContext.newInstance(cls));
+        return converterMap.computeIfAbsent(cls, l -> ReflectProvider.newInstance(cls));
     }
 
 }

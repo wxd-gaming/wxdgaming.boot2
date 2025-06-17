@@ -6,7 +6,7 @@ import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.shutdown;
+import wxdgaming.boot2.core.ann.Shutdown;
 import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
@@ -46,10 +46,10 @@ public class ScheduledService {
     public void init(RunApplication runApplication) {
         log.debug("------------------------------初始化定时任务调度器------------------------------");
         List<ScheduledInfo> tmpJobList = new ArrayList<>();
-        runApplication.getGuiceReflectContext().withMethodAnnotated(Scheduled.class)
+        runApplication.getGuiceBeanProvider().withMethodAnnotated(Scheduled.class)
                 .forEach(methodContent -> {
                     ScheduledInfo scheduledInfo = new ScheduledInfo(
-                            methodContent.getIns(),
+                            methodContent.getBean(),
                             methodContent.getMethod(),
                             methodContent.getMethod().getAnnotation(Scheduled.class)
                     );
@@ -72,7 +72,7 @@ public class ScheduledService {
         );
     }
 
-    @shutdown
+    @Shutdown
     @Order(1000)
     public void shutdown() {
         log.info("线程 Scheduled 调度器 退出");

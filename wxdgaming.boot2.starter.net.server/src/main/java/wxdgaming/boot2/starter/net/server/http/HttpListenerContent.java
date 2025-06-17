@@ -42,11 +42,11 @@ public class HttpListenerContent {
 
         this.httpFilterList = runApplication.classWithSuper(HttpFilter.class).toList();
 
-        runApplication.getGuiceReflectContext()
+        runApplication.getGuiceBeanProvider()
                 .withMethodAnnotated(HttpRequest.class)
-                .forEach(contentMethod -> {
-                    Object ins = contentMethod.getIns();
-                    Method method = contentMethod.getMethod();
+                .forEach(provider -> {
+                    Object ins = provider.getBean();
+                    Method method = provider.getMethod();
 
                     RequestMapping insRequestMapping = AnnUtil.ann(ins.getClass(), RequestMapping.class);
                     HttpRequest methodRequestMapping = AnnUtil.ann(method, HttpRequest.class);

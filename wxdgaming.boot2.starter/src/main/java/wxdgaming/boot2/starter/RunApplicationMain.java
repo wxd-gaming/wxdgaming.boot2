@@ -2,13 +2,12 @@ package wxdgaming.boot2.starter;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.shutdown;
+import wxdgaming.boot2.core.ann.Shutdown;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.util.GlobalUtil;
@@ -41,7 +40,7 @@ public final class RunApplicationMain extends RunApplication {
             JvmUtil.addShutdownHook(() -> {
                 System.out.println("--------------------------shutdown---------------------------");
                 GlobalUtil.Exiting.set(true);
-                executeMethodWithAnnotatedException(shutdown.class);
+                executeMethodWithAnnotatedException(Shutdown.class);
             });
 
             StringBuilder stringAppend = new StringBuilder(1024);
@@ -57,7 +56,8 @@ public final class RunApplicationMain extends RunApplication {
                     .append("    -[ " + StringUtils.padRight(BootConfig.getIns().sid() + " | " + BootConfig.getIns().sname(), len, ' ') + " ]-\n")
                     .append("    -[ " + StringUtils.padRight(JvmUtil.timeZone(), len, ' ') + " ]-\n");
             stringAppend.append("\n");
-            log.warn(stringAppend.toString());
+            log.info("=== start end ===");
+            //            log.warn(stringAppend.toString());
         } catch (Throwable e) {
             log.error("start error", e);
             System.exit(1);

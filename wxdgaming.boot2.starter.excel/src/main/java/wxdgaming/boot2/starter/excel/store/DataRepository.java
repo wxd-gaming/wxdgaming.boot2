@@ -9,7 +9,7 @@ import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Value;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,8 +63,8 @@ public class DataRepository {
         if (classLoader == null) {
             classLoader = Thread.currentThread().getContextClassLoader();
         }
-        ReflectContext reflectContext = ReflectContext.Builder.of(classLoader, scanPackageName).build();
-        reflectContext.classWithSuper(DataTable.class, null)
+        ReflectProvider reflectProvider = ReflectProvider.Builder.of(classLoader, scanPackageName).build();
+        reflectProvider.classWithSuper(DataTable.class)
                 .forEach(dataTableClass -> {
                     DataTable<?> dataTable = buildDataTable(dataTableClass);
                     tmpDataTableMap.put(dataTableClass, dataTable);

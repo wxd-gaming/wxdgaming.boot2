@@ -30,11 +30,11 @@ public class RpcListenerContent {
 
     public RpcListenerContent(RunApplication runApplication) {
         this.runApplication = runApplication;
-        this.rpcFilterList = runApplication.getGuiceReflectContext().classWithSuper(RpcFilter.class).toList();
-        this.runApplication.getGuiceReflectContext()
+        this.rpcFilterList = runApplication.classWithSuper(RpcFilter.class).toList();
+        this.runApplication.getGuiceBeanProvider()
                 .withMethodAnnotated(RpcRequest.class)
                 .forEach(contentMethod -> {
-                    Object ins = contentMethod.getIns();
+                    Object ins = contentMethod.getBean();
                     Method method = contentMethod.getMethod();
 
                     RequestMapping insRequestMapping = AnnUtil.ann(ins.getClass(), RequestMapping.class);

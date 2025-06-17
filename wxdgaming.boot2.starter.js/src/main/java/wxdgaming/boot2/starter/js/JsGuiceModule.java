@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.js;
 
 import wxdgaming.boot2.core.ServiceGuiceModule;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 /**
  * pgsql 模块
@@ -12,8 +12,8 @@ import wxdgaming.boot2.core.reflect.ReflectContext;
 public class JsGuiceModule extends ServiceGuiceModule {
 
 
-    public JsGuiceModule(ReflectContext reflectContext) {
-        super(reflectContext);
+    public JsGuiceModule(ReflectProvider reflectProvider) {
+        super(reflectProvider);
     }
 
     @Override protected void bind() throws Throwable {

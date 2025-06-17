@@ -10,8 +10,8 @@ import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ThreadContext;
-import wxdgaming.boot2.core.reflect.GuiceReflectContext;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.GuiceBeanProvider;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.starter.net.SocketSession;
 
 import java.lang.reflect.Parameter;
@@ -61,8 +61,8 @@ public class ProtoListenerTrigger extends ExecutorEvent {
             Parameter parameter = parameters[i];
             Class<?> parameterType = parameter.getType();
             Type parameterizedType = parameter.getParameterizedType();
-            if (GuiceReflectContext.class.isAssignableFrom(parameterType)) {
-                params[i] = parameterType.cast(runApplication.getGuiceReflectContext());
+            if (GuiceBeanProvider.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(runApplication.getGuiceBeanProvider());
                 continue;
             } else if (RunApplication.class.isAssignableFrom(parameterType)) {
                 params[i] = parameterType.cast(runApplication);
@@ -108,7 +108,7 @@ public class ProtoListenerTrigger extends ExecutorEvent {
 
     public PojoBase getPojoBase() {
         if (pojoBase == null) {
-            pojoBase = ReflectContext.newInstance(protoMapping.pojoClass());
+            pojoBase = ReflectProvider.newInstance(protoMapping.pojoClass());
             pojoBase.decode(bytes);
         }
         return pojoBase;

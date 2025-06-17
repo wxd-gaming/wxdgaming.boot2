@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.batis.convert;
 
 import lombok.Getter;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 import java.lang.reflect.Type;
 
@@ -18,8 +18,8 @@ public abstract class Converter<X, Y> {
     private final Class<Y> clazzY;
 
     public Converter() {
-        this.clazzX = ReflectContext.getTClass(this.getClass(), 0);
-        this.clazzY = ReflectContext.getTClass(this.getClass(), 1);
+        this.clazzX = ReflectProvider.getTClass(this.getClass(), 0);
+        this.clazzY = ReflectProvider.getTClass(this.getClass(), 1);
     }
 
     /** 转换成数据库 */

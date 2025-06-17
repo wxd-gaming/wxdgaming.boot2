@@ -14,7 +14,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.shutdown;
+import wxdgaming.boot2.core.ann.Shutdown;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.ChannelUtil;
@@ -158,7 +158,7 @@ public abstract class SocketClient {
     protected void addChanelHandler(SocketChannel socketChannel, ChannelPipeline pipeline) {}
 
     @Order(100)
-    @shutdown
+    @Shutdown
     public void shutdown() {
         closed = true;
         sessionGroup.getChannelGroup().disconnect();

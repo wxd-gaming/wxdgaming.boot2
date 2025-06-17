@@ -8,7 +8,7 @@ import wxdgaming.boot2.core.assist.Javassist2Proxy;
 import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
-import wxdgaming.boot2.core.reflect.ReflectContext;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 import java.lang.reflect.Method;
 
@@ -91,7 +91,7 @@ public class ReflectionPerformanceTest {
     public void compilerCode2Class() throws Exception {
         ClassDirLoader classDirLoader = new ClassDirLoader("target/test-classes");
         Class<?> aClass = classDirLoader.findClass("code.asm.SimpleClass");
-        Object object = ReflectContext.newInstance(aClass);
+        Object object = ReflectProvider.newInstance(aClass);
         // 反射方法调用
         Method method = aClass.getMethod("simpleMethod");
         // 代理方法调用
