@@ -4,6 +4,7 @@ import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
+import wxdgaming.boot2.core.Const;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.*;
@@ -15,7 +16,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -30,124 +30,84 @@ public class GuiceReflectContext {
 
     private final RunApplication runApplication;
     /** 所有的类 */
-    private final List<Content<Object>> classList;
+    private final List<Content<Object>> beanList;
     /** 实现了某个注解的类 */
     private final ConcurrentHashMap<Class<? extends Annotation>, List<Content<Object>>> annotationCacheMap = new ConcurrentHashMap<>();
+    /** 实现了某个注解的类 */
+    private final ConcurrentHashMap<Class<? extends Annotation>, List<MethodContent>> annotationMethodContentCacheMap = new ConcurrentHashMap<>();
     /** 继承某个类接口或者实现某个接口 */
     private final ConcurrentHashMap<Class<?>, List<Content<Object>>> superCacheMap = new ConcurrentHashMap<>();
 
-    public GuiceReflectContext(RunApplication runApplication, Collection<Object> classList) {
+    public GuiceReflectContext(RunApplication runApplication, Collection<Object> beanList) {
         this.runApplication = runApplication;
-        this.classList = classList.stream().sorted(ReflectContext.ComparatorBeanBySort)
-                .map(Content::of)
+        this.beanList = beanList.stream()
+                .sorted(ReflectContext.ComparatorBeanBySort)
+                .map(Content::new)
                 .toList();
     }
 
     /** 所有的类 */
     public Stream<Content<Object>> stream() {
-        return classList.stream();
+        return beanList.stream();
     }
 
     /** 继承某个类接口或者实现某个接口 */
-    Stream<Content<Object>> classWithSuperStream(Class<?> cls) {
+    Collection<Content<Object>> classWithSuperStream(Class<?> cls) {
         return superCacheMap.computeIfAbsent(cls, k ->
-                        classList.stream()
-                                .filter(content -> content.withSuper(cls))
-                                .toList()
-                )
-                .stream();
+                beanList.stream()
+                        .filter(content -> content.withSuper(cls))
+                        .toList()
+        );
     }
 
     /** 实现了某个注解的类 */
-    Stream<Content<Object>> classWithAnnotatedStream(Class<? extends Annotation> annotation) {
+    Collection<Content<Object>> classWithAnnotatedStream(Class<? extends Annotation> annotation) {
         return annotationCacheMap.computeIfAbsent(annotation, k ->
-                        classList.stream()
-                                .filter(content -> content.withAnnotated(annotation))
-                                .toList()
-                )
-                .stream();
+                beanList.stream()
+                        .filter(content -> content.withAnnotated(annotation))
+                        .toList()
+        );
     }
 
     /** 父类或者接口 */
     public <U> Stream<U> classWithSuper(Class<U> cls) {
-        return classWithSuper(cls, null);
-    }
-
-    /** 父类或者接口 */
-    public <U> Stream<U> classWithSuper(Class<U> cls, Predicate<U> predicate) {
-        Stream<U> tmp = classWithSuperStream(cls).map(content -> cls.cast(content.instance));
-        if (predicate != null) tmp = tmp.filter(predicate);
-        return tmp;
+        return classWithSuperStream(cls).stream().map(content -> cls.cast(content.instance));
     }
 
     /** 所有添加了这个注解的类 */
     public Stream<Object> classWithAnnotated(Class<? extends Annotation> annotation) {
-        return classWithAnnotated(annotation, null);
-    }
-
-    /** 所有添加了这个注解的类 */
-    public Stream<Object> classWithAnnotated(Class<? extends Annotation> annotation, Predicate<Object> predicate) {
-        Stream<Object> tmp = classWithAnnotatedStream(annotation).map(Content::getInstance);
-        if (predicate != null) tmp = tmp.filter(predicate);
-        return tmp;
+        return classWithAnnotatedStream(annotation).stream().map(Content::getInstance);
     }
 
     /** 父类或者接口 */
+    @SuppressWarnings("unchecked")
     public <U> Stream<Content<U>> withSuper(Class<U> cls) {
-        return withSuper(cls, null);
-    }
-
-    /** 父类或者接口 */
-    public <U> Stream<Content<U>> withSuper(Class<U> cls, Predicate<U> predicate) {
-        Stream<Content<U>> tmp = classWithSuperStream(cls).map(content -> (Content<U>) content);
-        if (predicate != null) tmp = tmp.filter(content -> predicate.test(content.getInstance()));
-        return tmp;
+        return classWithSuperStream(cls).stream().map(content -> (Content<U>) content);
     }
 
     /** 所有添加了这个注解的类 */
-    public Stream<Content<Object>> withAnnotated(Class<? extends Annotation> annotation) {
-        return withAnnotated(annotation, null);
-    }
-
-    /** 所有添加了这个注解的类 */
-    public Stream<Content<Object>> withAnnotated(Class<? extends Annotation> annotation, Predicate<Object> predicate) {
-        Stream<Content<Object>> tmp = classWithAnnotatedStream(annotation);
-        if (predicate != null) tmp = tmp.filter(content -> predicate.test(content.instance));
-        return tmp;
+    public Collection<Content<Object>> withAnnotated(Class<? extends Annotation> annotation) {
+        return classWithAnnotatedStream(annotation);
     }
 
     /** 所有bean里面的方法，添加了注解的 */
-    public Stream<MethodContent> withMethodAnnotated(Class<? extends Annotation> annotation) {
-        return withMethodAnnotated(annotation, null);
-    }
-
-    /** 所有添加了这个注解的类 */
-    public Stream<MethodContent> withMethodAnnotated(Class<? extends Annotation> annotation, Predicate<MethodContent> predicate) {
-        Stream<MethodContent> methodStream = stream()
-                .flatMap(content ->
-                        content.methodsWithAnnotated(annotation)
-                                .map(m -> new MethodContent(content.instance, m))
-                )
-                .sorted(MethodContent::compareTo);
-
-        if (predicate != null) {
-            methodStream = methodStream.filter(predicate);
-        }
-        return methodStream;
+    public Collection<MethodContent> withMethodAnnotated(Class<? extends Annotation> annotation) {
+        return annotationMethodContentCacheMap.computeIfAbsent(annotation, k -> stream()
+                .flatMap(content -> content.methodsWithAnnotated(annotation))
+                .sorted(MethodContent::compareTo)
+                .toList());
     }
 
     /** 执行循环过程中某一个函数执行失败中断执行 */
     public void executeMethodWithAnnotated(Class<? extends Annotation> annotation, Object... args) {
-        Stream<MethodContent> methodContentStream = withMethodAnnotated(annotation);
-        List<MethodContent> list = methodContentStream.toList();
-        list.forEach(methodContent -> methodContent.invoke(args));
+        Collection<MethodContent> methodContentStream = withMethodAnnotated(annotation);
+        methodContentStream.forEach(methodContent -> methodContent.invoke(args));
     }
 
     /** 执行循环过程中某一个函数执行失败会继续执行其它函数 */
     public void executeMethodWithAnnotatedException(Class<? extends Annotation> annotation, Object... args) {
-        Stream<MethodContent> methodContentStream = withMethodAnnotated(annotation);
-        List<MethodContent> list = methodContentStream.toList();
-        list.forEach(methodContent -> {
+        Collection<MethodContent> methodContentStream = withMethodAnnotated(annotation);
+        methodContentStream.forEach(methodContent -> {
             try {
                 methodContent.invoke(args);
             } catch (Exception e) {
@@ -219,6 +179,7 @@ public class GuiceReflectContext {
             this.arguments = arguments;
         }
 
+        @SuppressWarnings("unchecked")
         public <R> R next() {
             return (R) arguments[argumentIndex++];
         }
@@ -226,22 +187,18 @@ public class GuiceReflectContext {
     }
 
     @Getter
-    public static class Content<T> {
+    public class Content<T> {
 
         private final T instance;
         /** 所有的字段 */
         private final Collection<Field> fields;
         /** 所有的方法 */
-        private final Collection<Method> methods;
-
-        public static <U> Content<U> of(U cls) {
-            return new Content<>(cls);
-        }
+        private final Collection<MethodContent> methods;
 
         Content(T instance) {
             this.instance = instance;
             this.fields = Collections.unmodifiableCollection(FieldUtil.getFields(false, instance.getClass()).values());
-            this.methods = Collections.unmodifiableCollection(MethodUtil.readAllMethod(false, instance.getClass()).values());
+            this.methods = MethodUtil.readAllMethod(false, instance.getClass()).values().stream().map(m -> new MethodContent(instance, m)).toList();
         }
 
         /** 是否添加了注解 */
@@ -254,14 +211,9 @@ public class GuiceReflectContext {
             return cls.isAssignableFrom(instance.getClass());
         }
 
-        /** 所有的方法 */
-        public Stream<Method> methodStream() {
-            return getMethods().stream();
-        }
-
         /** 所有添加了这个注解的方法 */
-        public Stream<Method> methodsWithAnnotated(Class<? extends Annotation> annotation) {
-            return methodStream().filter(m -> AnnUtil.ann(m, annotation) != null);
+        public Stream<MethodContent> methodsWithAnnotated(Class<? extends Annotation> annotation) {
+            return methods.stream().filter(mc -> AnnUtil.ann(mc.getMethod(), annotation) != null);
         }
 
         /** 所有的字段 */
@@ -309,12 +261,12 @@ public class GuiceReflectContext {
             int o1Sort = AnnUtil.annOpt(method, Order.class)
                     .or(() -> AnnUtil.annOpt(ins.getClass(), Order.class))
                     .map(Order::value)
-                    .orElse(999999);
+                    .orElse(Const.SORT_DEFAULT);
 
             int o2Sort = AnnUtil.annOpt(o.method, Order.class)
                     .or(() -> AnnUtil.annOpt(o.ins.getClass(), Order.class))
                     .map(Order::value)
-                    .orElse(999999);
+                    .orElse(Const.SORT_DEFAULT);
 
             if (o1Sort == o2Sort) {
                 /*如果排序值相同，采用名字排序*/

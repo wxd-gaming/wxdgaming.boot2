@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.Const;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.chatset.StringUtils;
@@ -61,7 +62,7 @@ public class ScheduledInfo extends ExecutorEvent implements Runnable, IExecutorQ
         }
 
         final Order orderAnn = AnnUtil.ann(method, Order.class);
-        this.index = orderAnn == null ? 999999 : orderAnn.value();
+        this.index = orderAnn == null ? Const.SORT_DEFAULT : orderAnn.value();
         this.scheduleAtFixedRate = scheduled.scheduleAtFixedRate();
         this.cronExpress = new CronExpress(scheduled.value(), TimeUnit.SECONDS, 0);
     }
@@ -91,7 +92,7 @@ public class ScheduledInfo extends ExecutorEvent implements Runnable, IExecutorQ
         this.scheduledTask = scheduledTask;
         this.name = "[timer-job] " + scheduledTask.getClass() + "-" + scheduledName;
 
-        this.index = 999999;
+        this.index = Const.SORT_DEFAULT;
         this.scheduleAtFixedRate = scheduleAtFixedRate;
         this.cronExpress = new CronExpress(scheduled, TimeUnit.SECONDS, 0);
     }

@@ -8,6 +8,7 @@ import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.reflect.GuiceReflectContext;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -118,7 +119,7 @@ public abstract class RunApplication {
     }
 
     /** 所有bean里面的方法，添加了注解的 */
-    public Stream<GuiceReflectContext.MethodContent> withMethodAnnotated(Class<? extends Annotation> annotation) {
-        return guiceReflectContext.withMethodAnnotated(annotation, null);
+    public Collection<GuiceReflectContext.MethodContent> withMethodAnnotated(Class<? extends Annotation> annotation) {
+        return guiceReflectContext.withMethodAnnotated(annotation);
     }
 }
