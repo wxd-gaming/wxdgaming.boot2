@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.assist;
 
 import javassist.*;
 import lombok.Getter;
+import wxdgaming.boot2.core.Throw;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -68,7 +69,8 @@ public class JavassistBox {
             try {
                 return classPool.get(name);
             } catch (NotFoundException e) {
-                throw new RuntimeException(e);
+
+                throw Throw.of(e);
             }
         }
 
@@ -84,10 +86,10 @@ public class JavassistBox {
             }
         }
 
-        CtClass[] convert(Class[] methodParams) {
+        CtClass[] convert(Class<?>[] methodParams) {
             CtClass[] ctClasses = new CtClass[methodParams.length];
             for (int i = 0; i < methodParams.length; i++) {
-                Class methodParam = methodParams[i];
+                Class<?> methodParam = methodParams[i];
                 CtClass ctClass1 = ctClass(methodParam.getName());
                 ctClasses[i] = ctClass1;
             }
@@ -95,14 +97,14 @@ public class JavassistBox {
         }
 
         /** 查询已有的方法 */
-        public JavaAssist declaredMethod(String methodName, Class[] methodParams, Call<CtMethod> call) {
+        public JavaAssist declaredMethod(String methodName, Class<?>[] methodParams, Call<CtMethod> call) {
             CtClass[] convert = convert(methodParams);
             try {
                 CtMethod ctMethod = ctClass.getDeclaredMethod(methodName, convert);
                 call.accept(ctMethod);
                 return this;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw Throw.of(e);
             }
         }
 
@@ -116,7 +118,7 @@ public class JavassistBox {
          * @param call         回调
          */
         public JavaAssist createMethod(int modifier, CtClass returnType,
-                                       String methodName, Class[] methodParams,
+                                       String methodName, Class<?>[] methodParams,
                                        Call<CtMethod> call) {
             try {
                 CtClass[] convert = convert(methodParams);
@@ -126,7 +128,7 @@ public class JavassistBox {
                 ctClass.addMethod(ctMethod);
                 return this;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw Throw.of(e);
             }
         }
 
@@ -137,7 +139,8 @@ public class JavassistBox {
                 ctClass.addMethod(method);
                 return this;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+
+                throw Throw.of(e);
             }
         }
 
@@ -146,7 +149,7 @@ public class JavassistBox {
                 getCtClass().writeFile(directoryName);
                 return this;
             } catch (CannotCompileException | IOException e) {
-                throw new RuntimeException(e);
+                throw Throw.of(e);
             }
         }
 
@@ -154,7 +157,7 @@ public class JavassistBox {
             try {
                 return getCtClass().toBytecode();
             } catch (CannotCompileException | IOException e) {
-                throw new RuntimeException(e);
+                throw Throw.of(e);
             }
         }
 
@@ -165,16 +168,16 @@ public class JavassistBox {
                 call.accept(aClass);
                 return this;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw Throw.of(e);
             }
         }
 
         /** 通过 classloader 加载类 */
         public Class<?> loadClass() {
             try {
-                return loadClass(ctClass.getName());
+                return findClass(ctClass.getName());
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw Throw.of(e);
             }
         }
 
@@ -184,15 +187,16 @@ public class JavassistBox {
                 byte[] b = ctClass.toBytecode();
                 return defineClass(name, b, 0, b.length);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw Throw.of(e);
             }
         }
 
+        @SuppressWarnings("unchecked")
         public <R> R toInstance() {
             try {
                 return (R) loadClass().getDeclaredConstructor().newInstance();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw Throw.of(e);
             }
         }
     }
@@ -217,7 +221,7 @@ public class JavassistBox {
             CtClass tmp = classPool.get(clazzName);
             return new JavaAssist(classPool, tmp, classLoader);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw Throw.of(e);
         }
     }
 
@@ -234,7 +238,7 @@ public class JavassistBox {
             tmp.setSuperclass(classPool.get(superclass.getName()));
             return new JavaAssist(classPool, tmp, classLoader);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw Throw.of(e);
         }
     }
 
@@ -253,7 +257,7 @@ public class JavassistBox {
             }
             return new JavaAssist(classPool, tmp, classLoader);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw Throw.of(e);
         }
     }
 
@@ -269,7 +273,7 @@ public class JavassistBox {
             CtClass tmp = classPool.makeClass(className + "Impl" + ATOMIC_INTEGER.incrementAndGet());
             return new JavaAssist(classPool, tmp, classLoader);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw Throw.of(e);
         }
     }
 

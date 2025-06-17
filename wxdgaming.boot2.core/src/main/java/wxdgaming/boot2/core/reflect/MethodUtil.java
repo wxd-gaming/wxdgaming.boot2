@@ -4,10 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Throw;
 
 import java.lang.reflect.*;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /***
  * 读取方法
@@ -50,21 +47,43 @@ public class MethodUtil {
     }
 
     public static Method findMethod(Class<?> cls, String methodName) {
-        return findMethod(false, cls, methodName);
+        return findMethod(false, cls, methodName, null);
     }
 
     /** 如果有重载的方法，只会随机返回一个 */
     public static Method findMethod(boolean readStatic, Class<?> cls, String methodName) {
+        return findMethod(readStatic, cls, methodName, null);
+    }
+
+    public static Method findMethod(boolean readStatic, Class<?> cls, String methodName, Class<?>[] parameters) {
         Map<String, Method> stringMethodTreeMap = readAllMethods0(cls);
-        return stringMethodTreeMap
-                .values()
-                .stream()
+        String fullName = methodName;
+        if (parameters != null) {
+            for (Class<?> parameter : parameters) {
+                fullName += "_" + parameter.getSimpleName();
+            }
+            if (stringMethodTreeMap.containsKey(fullName)) {
+                return stringMethodTreeMap.get(fullName);
+            }
+        }
+        return stringMethodTreeMap.values().stream()
                 .filter(method -> {
                     if (!readStatic && Modifier.isStatic(method.getModifiers())) {
                         /*非静态*/
                         return false;
                     }
-                    return method.getName().equals(methodName);
+                    if (!method.getName().equals(methodName)) return false;
+                    if (parameters == null) {
+                        return true;
+                    }
+                    Class<?>[] parameterTypes = method.getParameterTypes();
+                    if (parameterTypes.length != parameters.length) return false;
+                    for (int i = 0; i < parameterTypes.length; i++) {
+                        if (!parameterTypes[i].isAssignableFrom(parameters[i])) {
+                            return false;
+                        }
+                    }
+                    return true;
                 })
                 .findAny()
                 .orElse(null);
@@ -157,7 +176,7 @@ public class MethodUtil {
     private static Map<String, Method> readAllMethods0(Class<?> cls) {
         Map<String, Method> methodList = new LinkedHashMap<>();
         readAllMethods0(cls, methodList);
-        return methodList;
+        return Collections.unmodifiableMap(methodList);
     }
 
     private static void readAllMethods0(Class<?> cls, Map<String, Method> methodList) {
