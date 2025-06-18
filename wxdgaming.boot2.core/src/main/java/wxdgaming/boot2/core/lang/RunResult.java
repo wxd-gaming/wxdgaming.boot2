@@ -5,6 +5,8 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * 执行
@@ -80,8 +82,8 @@ public class RunResult extends JSONObject {
         return this;
     }
 
-    public <T> T getObject(String key, Class<T> clazz, Object defaultValue) {
-        return FastJsonUtil.getObject(this, key, clazz, defaultValue);
+    public <T> T getObject(String key, Class<T> clazz, Supplier<Object> supplier) {
+        return FastJsonUtil.getObject(this, key, clazz, supplier);
     }
 
     /** 泛型方法：通过路由获取嵌套的 JSON 数据并转换为指定类型 */
@@ -90,8 +92,8 @@ public class RunResult extends JSONObject {
     }
 
     /** 泛型方法：通过路由获取嵌套的 JSON 数据并转换为指定类型 */
-    public <T> T getNestedValue(String path, Class<T> clazz, Object defaultValue) {
-        return FastJsonUtil.getNestedValue(this, path, clazz, defaultValue);
+    public <T> T getNestedValue(String path, Class<T> clazz, Supplier<Object> supplier) {
+        return FastJsonUtil.getNestedValue(this, path, clazz, supplier);
     }
 
     @Override public RunResult fluentPut(String key, Object value) {

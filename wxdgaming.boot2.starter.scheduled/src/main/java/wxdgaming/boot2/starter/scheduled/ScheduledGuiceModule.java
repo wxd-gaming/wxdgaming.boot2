@@ -6,6 +6,8 @@ import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.executor.QueuePolicyConst;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 
+import java.util.function.Supplier;
+
 /**
  * 模块
  *
@@ -14,7 +16,7 @@ import wxdgaming.boot2.core.reflect.ReflectProvider;
  **/
 public class ScheduledGuiceModule extends ServiceGuiceModule {
 
-    public static final ExecutorConfig DEFAULT_INSTANCE = new ExecutorConfig(1, 1000, QueuePolicyConst.AbortPolicy);
+    public static Supplier<Object> DEFAULT_INSTANCE = () -> new ExecutorConfig(1, 1000, QueuePolicyConst.AbortPolicy);
 
     public ScheduledGuiceModule(ReflectProvider reflectProvider) {
         super(reflectProvider);

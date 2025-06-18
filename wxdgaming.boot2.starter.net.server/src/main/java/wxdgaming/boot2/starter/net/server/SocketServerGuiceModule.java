@@ -6,6 +6,8 @@ import wxdgaming.boot2.core.ServiceGuiceModule;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 
+import java.util.function.Supplier;
+
 /**
  * socket 模块
  *
@@ -14,13 +16,15 @@ import wxdgaming.boot2.core.reflect.ReflectProvider;
  **/
 public class SocketServerGuiceModule extends ServiceGuiceModule {
 
+    public static Supplier<Object> DEFAULT_INSTANCE = SocketServerConfig::new;
+
     public SocketServerGuiceModule(ReflectProvider reflectProvider) {
         super(reflectProvider);
     }
 
     @Override protected void bind() throws Throwable {
         {
-            SocketServerConfig serverConfig = BootConfig.getIns().getNestedValue("socket.server", SocketServerConfig.class);
+            SocketServerConfig serverConfig = BootConfig.getIns().getNestedValue("socket.server", SocketServerConfig.class, DEFAULT_INSTANCE);
             if (serverConfig != null && serverConfig.getPort() > 0) {
                 if (serverConfig.isEnabledWebSocket() && StringUtils.isBlank(serverConfig.getWebSocketPrefix())) {
                     throw new RuntimeException("WebSocket 模块配置错误，WebSocket 模块需要配置 WebSocket 前缀");

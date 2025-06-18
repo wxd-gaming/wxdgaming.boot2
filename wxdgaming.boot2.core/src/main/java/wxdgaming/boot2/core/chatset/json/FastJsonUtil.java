@@ -16,6 +16,7 @@ import wxdgaming.boot2.core.lang.bit.BitFlag;
 
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * @author: wxd-gaming(無心道, 15388152619)
@@ -300,9 +301,10 @@ public class FastJsonUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T parseObject(Object object, Type type, Object defaultValue) {
+    public static <T> T parseObject(Object object, Type type, Supplier<Object> supplier) {
         if (object == null) {
-            if (defaultValue == null) return null;
+            if (supplier == null) return null;
+            Object defaultValue = supplier.get();
             if (type instanceof Class<?> clazz && clazz.isInstance(defaultValue)) {
                 return (T) clazz.cast(defaultValue);
             }
@@ -314,9 +316,9 @@ public class FastJsonUtil {
         return (T) FastJsonUtil.parse(String.valueOf(object), type);
     }
 
-    public static <T> T getObject(JSONObject source, String key, Type type, Object defaultValue) {
+    public static <T> T getObject(JSONObject source, String key, Type type, Supplier<Object> supplier) {
         T object = source.getObject(key, type);
-        return parseObject(object, type, defaultValue);
+        return parseObject(object, type, supplier);
     }
 
     public static <T> T getNestedValue(JSONObject source, String path, Type clazz) {
@@ -324,9 +326,9 @@ public class FastJsonUtil {
     }
 
     /** 泛型方法：通过路由获取嵌套的 JSON 数据并转换为指定类型 */
-    public static <T> T getNestedValue(JSONObject source, String path, Type type, Object defaultValue) {
+    public static <T> T getNestedValue(JSONObject source, String path, Type type, Supplier<Object> supplier) {
         Object value = getNestedValue(source, path);
-        return parseObject(value, type, defaultValue);
+        return parseObject(value, type, supplier);
     }
 
     /** 新增方法：通过路由获取嵌套的 JSON 数据 */

@@ -25,7 +25,7 @@ public class SocketServerConfig extends ObjectBase {
     @JSONField(ordinal = 1)
     private boolean debug = false;
     @JSONField(ordinal = 2)
-    private int port = 8080;
+    private int port = 8800;
     @JSONField(ordinal = 3)
     private boolean enabledTcp = false;
     @JSONField(ordinal = 4)

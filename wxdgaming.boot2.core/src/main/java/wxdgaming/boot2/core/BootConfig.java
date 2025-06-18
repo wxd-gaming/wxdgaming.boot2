@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.function.Supplier;
 
 /**
  * 启动配置
@@ -138,8 +139,8 @@ public class BootConfig {
         return config.getObject(key, clazz);
     }
 
-    public <T> T getObject(String key, Type clazz, Object defaultValue) {
-        return FastJsonUtil.getObject(config, key, clazz, defaultValue);
+    public <T> T getObject(String key, Type clazz, Supplier<Object> supplier) {
+        return FastJsonUtil.getObject(config, key, clazz, supplier);
     }
 
     public <T> T getNestedValue(String path, Type clazz) {
@@ -147,8 +148,8 @@ public class BootConfig {
     }
 
     /** 泛型方法：通过路由获取嵌套的 JSON 数据并转换为指定类型 */
-    public <T> T getNestedValue(String path, Type clazz, Object defaultValue) {
-        return FastJsonUtil.getNestedValue(config, path, clazz, defaultValue);
+    public <T> T getNestedValue(String path, Type clazz, Supplier<Object> supplier) {
+        return FastJsonUtil.getNestedValue(config, path, clazz, supplier);
     }
 
 

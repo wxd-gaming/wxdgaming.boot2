@@ -6,6 +6,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.mysql.cj.jdbc.Driver;
 import org.junit.Test;
 import wxdgaming.boot2.core.BootConfig;
+import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.util.YamlUtil;
@@ -28,14 +29,14 @@ public class OutConfigTest {
         config.put("sid", 1);
         config.put("executor",
                 MapOf.newJSONObject()
-                        .fluentPut("default", ExecutorConfig.BASIC_INSTANCE.toJSONObject())
-                        .fluentPut("logic", ExecutorConfig.LOGIC_INSTANCE.toJSONObject())
-                        .fluentPut("virtual", ExecutorConfig.VIRTUAL_INSTANCE.toJSONObject())
-                        .fluentPut("scheduled", ExecutorConfig.VIRTUAL_INSTANCE.toJSONObject())
+                        .fluentPut("default", FastJsonUtil.toJSONString(ExecutorConfig.BASIC_INSTANCE.get()))
+                        .fluentPut("logic", FastJsonUtil.toJSONString(ExecutorConfig.LOGIC_INSTANCE.get()))
+                        .fluentPut("virtual", FastJsonUtil.toJSONString(ExecutorConfig.VIRTUAL_INSTANCE.get()))
+                        .fluentPut("scheduled", FastJsonUtil.toJSONString(ExecutorConfig.VIRTUAL_INSTANCE.get()))
         );
         config.put("http",
                 MapOf.newJSONObject()
-                        .fluentPut("client", HttpClientConfig.DEFAULT.toJSONObject())
+                        .fluentPut("client", ((HttpClientConfig) HttpClientConfig.DEFAULT.get()).toJSONObject())
 
         );
         config.put(

@@ -5,6 +5,8 @@ import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import wxdgaming.boot2.core.lang.ObjectBase;
 
+import java.util.function.Supplier;
+
 /**
  * 配置
  *
@@ -14,7 +16,7 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 @Getter
 public class HttpClientConfig extends ObjectBase {
 
-    public static final HttpClientConfig DEFAULT = new HttpClientConfig(
+    public static Supplier<Object> DEFAULT = () -> new HttpClientConfig(
             500, 5000,
             30,
             3000, 3000, 3000, 30000,

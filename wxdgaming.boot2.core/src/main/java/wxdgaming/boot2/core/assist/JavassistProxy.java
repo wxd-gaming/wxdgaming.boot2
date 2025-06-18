@@ -56,7 +56,7 @@ public class JavassistProxy {
         stringBuilder.append("    ").append("return result;").append("\n");
         stringBuilder.append("}");
         String methodBody = stringBuilder.toString();
-        boolean nestedValue = BootConfig.getIns().getNestedValue("javassist.proxy.debug", Boolean.class, false);
+        boolean nestedValue = BootConfig.getIns().getNestedValue("javassist.proxy.debug", Boolean.class, () -> false);
         if (nestedValue) {
             log.info("\n{}", methodBody);
         }

@@ -5,6 +5,8 @@ import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import wxdgaming.boot2.core.lang.ObjectBase;
 
+import java.util.function.Supplier;
+
 /**
  * 线程池配置
  *
@@ -14,9 +16,9 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 @Getter
 public class ExecutorConfig extends ObjectBase {
 
-    public static final ExecutorConfig BASIC_INSTANCE = new ExecutorConfig(2, 5000, QueuePolicyConst.AbortPolicy);
-    public static final ExecutorConfig LOGIC_INSTANCE = new ExecutorConfig(8, 5000, QueuePolicyConst.AbortPolicy);
-    public static final ExecutorConfig VIRTUAL_INSTANCE = new ExecutorConfig(100, 5000, QueuePolicyConst.AbortPolicy);
+    public static Supplier<Object> BASIC_INSTANCE = () -> new ExecutorConfig(2, 5000, QueuePolicyConst.AbortPolicy);
+    public static Supplier<Object> LOGIC_INSTANCE = () -> new ExecutorConfig(8, 5000, QueuePolicyConst.AbortPolicy);
+    public static Supplier<Object> VIRTUAL_INSTANCE = () -> new ExecutorConfig(100, 5000, QueuePolicyConst.AbortPolicy);
 
     @JSONField(ordinal = 1)
     private final int coreSize;
