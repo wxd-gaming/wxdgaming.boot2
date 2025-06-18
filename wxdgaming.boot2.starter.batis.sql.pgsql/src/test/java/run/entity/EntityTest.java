@@ -2,6 +2,7 @@ package run.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.EntityLongUID;
 import wxdgaming.boot2.starter.batis.ann.Convert;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
@@ -31,6 +32,7 @@ public class EntityTest extends EntityLongUID {
     private String remark;
     @DbColumn(length = 32800)
     private String remark2;
+    @DbColumn(length = 32800, columnType = ColumnType.String)
     @Convert(Object2JsonStringConverter.class)
     private final List<String> list = new ArrayList<>();
 

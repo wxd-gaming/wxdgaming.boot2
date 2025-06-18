@@ -2,6 +2,7 @@ package run;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
+import org.junit.jupiter.api.RepeatedTest;
 import run.entity.EntityTest;
 import run.entity.Table2;
 import wxdgaming.boot2.core.timer.MyClock;
@@ -33,6 +34,7 @@ public class PgsqlTest {
         sqlConfig.setPassword("test");
         sqlConfig.setScanPackage(EntityTest.class.getPackageName());
         dataHelper = new PgsqlDataHelper(sqlConfig);
+        dataHelper.start();
         TableMapping tableMapping = dataHelper.tableMapping(EntityTest.class);
         /*TODO 处理分区表 */
         LocalDateTime localDate = LocalDateTime.now();
@@ -46,8 +48,9 @@ public class PgsqlTest {
     }
 
     @Test
+    @RepeatedTest(10)
     public void t1() {
-        long uid = System.currentTimeMillis();
+        long uid = System.nanoTime();
         int yyyyMMdd = Integer.parseInt(MyClock.formatDate("yyyyMMdd"));
         EntityTest entityTest = new EntityTest();
         entityTest.setUid(uid);
@@ -63,8 +66,9 @@ public class PgsqlTest {
     }
 
     @Test
+    @RepeatedTest(10)
     public void t2() {
-        long uid = System.currentTimeMillis();
+        long uid = System.nanoTime();
         Table2 table2 = new Table2();
         table2.setUid(uid);
         table2.setName("测试" + uid);
@@ -76,6 +80,7 @@ public class PgsqlTest {
     }
 
     @Test
+    @RepeatedTest(10)
     public void selectAll() {
         List<EntityTest> all = dataHelper.findList(EntityTest.class);
         for (EntityTest entityTest : all) {
