@@ -36,10 +36,7 @@ public class PgSqlDDLBuilder extends SqlDDLBuilder {
             case Bool -> {
                 columnDefinition = "bool";
             }
-            case Byte -> {
-                columnDefinition = "int2";
-            }
-            case Short -> {
+            case Byte, Short -> {
                 columnDefinition = "int2";
             }
             case Int -> {
@@ -83,10 +80,11 @@ public class PgSqlDDLBuilder extends SqlDDLBuilder {
 
     /** pgsql 如果字段是json的 ? => ?::json */
     @Override public String build$$(TableMapping.FieldMapping fieldMapping) {
-        if (fieldMapping.getColumnType() == ColumnType.Json) {
-            return "?::json";
-        }
-        return super.build$$(fieldMapping);
+        return switch (fieldMapping.getColumnType()) {
+            case Json -> "?::json";
+            case Byte, Short -> "?::int2";
+            case null, default -> super.build$$(fieldMapping);
+        };
     }
 
     /** sql语句中替换`为" */
