@@ -23,7 +23,7 @@ public class SqlDataCache<E extends Entity, Key> {
 
     protected Class<E> cls;
     protected TableMapping tableMapping;
-    protected SqlDataHelper<?> sqlDataHelper;
+    protected SqlDataHelper sqlDataHelper;
     protected Cache<Key, E> cache;
 
     /**
@@ -33,7 +33,7 @@ public class SqlDataCache<E extends Entity, Key> {
      * @param hashArea           分区数量
      * @param expireAfterAccessM 过期时间，单位分钟
      */
-    public SqlDataCache(SqlDataHelper<?> sqlDataHelper, int hashArea, int expireAfterAccessM) {
+    public SqlDataCache(SqlDataHelper sqlDataHelper, int hashArea, int expireAfterAccessM) {
         this.init(ReflectProvider.getTClass(this.getClass()), sqlDataHelper, hashArea, expireAfterAccessM);
     }
 
@@ -45,11 +45,11 @@ public class SqlDataCache<E extends Entity, Key> {
      * @param hashArea           分区数量
      * @param expireAfterAccessM 过期时间，单位分钟
      */
-    public SqlDataCache(Class<E> cls, SqlDataHelper<?> sqlDataHelper, int hashArea, int expireAfterAccessM) {
+    public SqlDataCache(Class<E> cls, SqlDataHelper sqlDataHelper, int hashArea, int expireAfterAccessM) {
         this.init(cls, sqlDataHelper, hashArea, expireAfterAccessM);
     }
 
-    protected void init(Class<E> cls, SqlDataHelper<?> sqlDataHelper, int hashArea, int expireAfterAccessM) {
+    protected void init(Class<E> cls, SqlDataHelper sqlDataHelper, int hashArea, int expireAfterAccessM) {
         this.cls = cls;
         this.sqlDataHelper = sqlDataHelper;
         this.tableMapping = this.sqlDataHelper.tableMapping(cls);

@@ -22,7 +22,7 @@ import java.util.Map;
 @Slf4j
 @Getter
 @Setter
-public class MysqlDataHelper extends SqlDataHelper<MySqlDDLBuilder> {
+public class MysqlDataHelper extends SqlDataHelper {
 
     public MysqlDataHelper(SqlConfig sqlConfig) {
         super(sqlConfig, new MySqlDDLBuilder());
@@ -55,7 +55,7 @@ public class MysqlDataHelper extends SqlDataHelper<MySqlDDLBuilder> {
                 /*pgsql 默认全小写*/
                 keyName = keyName.toLowerCase();
                 if (!indexList.contains(keyName)) {
-                    String alterColumn = ddlBuilder.buildAlterColumnIndex(tableName, fieldMapping);
+                    String alterColumn = ddlBuilder().buildAlterColumnIndex(tableName, fieldMapping);
                     executeUpdate(alterColumn);
                 }
             }

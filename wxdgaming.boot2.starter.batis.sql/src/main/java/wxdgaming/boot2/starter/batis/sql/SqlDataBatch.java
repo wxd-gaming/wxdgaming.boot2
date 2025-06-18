@@ -37,10 +37,10 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 public abstract class SqlDataBatch extends DataBatch {
 
-    protected final SqlDataHelper<?> sqlDataHelper;
+    protected final SqlDataHelper sqlDataHelper;
     protected final List<BatchThread> batchThreads = new ArrayList<>();
 
-    public SqlDataBatch(SqlDataHelper<?> sqlDataHelper) {
+    public SqlDataBatch(SqlDataHelper sqlDataHelper) {
         this.sqlDataHelper = sqlDataHelper;
         int batchThreadSize = sqlDataHelper.getSqlConfig().getBatchThreadSize();
         log.info("{} 数据库: {} 创建 {} 个 sql 批量线程", sqlDataHelper.getClass().getSimpleName(), sqlDataHelper.getDbName(), batchThreadSize);
@@ -62,7 +62,7 @@ public abstract class SqlDataBatch extends DataBatch {
         }
     }
 
-    public <SDH extends SqlDataHelper<?>> SDH dataHelper() {
+    public <SDH extends SqlDataHelper> SDH dataHelper() {
         return (SDH) sqlDataHelper;
     }
 
@@ -119,10 +119,10 @@ public abstract class SqlDataBatch extends DataBatch {
         public void insert(Entity entity) {
             String tableName = TableMapping.beanTableName(entity);
             TableMapping tableMapping = sqlDataHelper.tableMapping(entity.getClass());
-            String insertSql = sqlDataHelper.getDdlBuilder().buildInsertSql(tableMapping, tableName);
+            String insertSql = sqlDataHelper.ddlBuilder().buildInsertSql(tableMapping, tableName);
 
-            Object[] keyParams = sqlDataHelper.getDdlBuilder().buildKeyParams(tableMapping, entity);
-            Object[] insertParams = sqlDataHelper.getDdlBuilder().buildInsertParams(tableMapping, entity);
+            Object[] keyParams = sqlDataHelper.ddlBuilder().buildKeyParams(tableMapping, entity);
+            Object[] insertParams = sqlDataHelper.ddlBuilder().buildInsertParams(tableMapping, entity);
             BatchParam batchParam = new BatchParam(entity, keyParams, insertParams);
             lock.lock();
             try {
@@ -137,10 +137,10 @@ public abstract class SqlDataBatch extends DataBatch {
         public void update(Entity entity) {
             String tableName = TableMapping.beanTableName(entity);
             TableMapping tableMapping = sqlDataHelper.tableMapping(entity.getClass());
-            String updateSql = sqlDataHelper.getDdlBuilder().buildUpdateSql(tableMapping, tableName);
+            String updateSql = sqlDataHelper.ddlBuilder().buildUpdateSql(tableMapping, tableName);
 
-            Object[] keyParams = sqlDataHelper.getDdlBuilder().buildKeyParams(tableMapping, entity);
-            Object[] updateParams = sqlDataHelper.getDdlBuilder().builderUpdateParams(tableMapping, entity);
+            Object[] keyParams = sqlDataHelper.ddlBuilder().buildKeyParams(tableMapping, entity);
+            Object[] updateParams = sqlDataHelper.ddlBuilder().builderUpdateParams(tableMapping, entity);
             BatchParam batchParam = new BatchParam(entity, keyParams, updateParams);
             lock.lock();
             try {

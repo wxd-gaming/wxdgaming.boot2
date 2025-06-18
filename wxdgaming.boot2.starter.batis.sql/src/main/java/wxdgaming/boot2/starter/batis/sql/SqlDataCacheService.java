@@ -15,10 +15,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class SqlDataCacheService {
 
-    protected SqlDataHelper<?> sqlDataHelper;
+    protected SqlDataHelper sqlDataHelper;
     protected final ConcurrentHashMap<Class<?>, SqlDataCache<?, ?>> jdbcCacheMap = new ConcurrentHashMap<>();
 
-    public SqlDataCacheService(SqlDataHelper<?> sqlDataHelper) {
+    public SqlDataCacheService(SqlDataHelper sqlDataHelper) {
         this.sqlDataHelper = sqlDataHelper;
     }
 

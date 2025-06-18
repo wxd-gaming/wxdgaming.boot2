@@ -21,7 +21,7 @@ import java.util.List;
 @Accessors(chain = true)
 public abstract class SqlQueryBuilder {
 
-    private final SqlDataHelper<?> sqlDataHelper;
+    private final SqlDataHelper sqlDataHelper;
 
     /** 查询的字段 */
     private String selectField = "*";
@@ -34,7 +34,7 @@ public abstract class SqlQueryBuilder {
 
     private Object[] parameters = new Object[0];
 
-    public SqlQueryBuilder(SqlDataHelper<?> sqlDataHelper) {
+    public SqlQueryBuilder(SqlDataHelper sqlDataHelper) {
         this.sqlDataHelper = sqlDataHelper;
     }
 

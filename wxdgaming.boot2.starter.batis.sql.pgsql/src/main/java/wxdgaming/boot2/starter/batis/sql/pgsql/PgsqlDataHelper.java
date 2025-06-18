@@ -26,7 +26,7 @@ import java.util.Map;
 @Slf4j
 @Getter
 @Setter
-public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
+public class PgsqlDataHelper extends SqlDataHelper {
 
     public PgsqlDataHelper(SqlConfig sqlConfig) {
         super(sqlConfig, new PgSqlDDLBuilder());
@@ -113,7 +113,7 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
                 /*pgsql 默认全小写*/
                 keyName = keyName.toLowerCase();
                 if (!indexList.contains(keyName)) {
-                    String alterColumn = ddlBuilder.buildAlterColumnIndex(tableName, fieldMapping);
+                    String alterColumn = ddlBuilder().buildAlterColumnIndex(tableName, fieldMapping);
                     sb.append(alterColumn).append("\n");
                 }
             }
@@ -132,9 +132,9 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
     }
 
     @Override protected void createTable(TableMapping tableMapping, String tableName, String comment) {
-        StringBuilder stringBuilder = ddlBuilder.buildTableSqlString(tableMapping, tableName);
+        StringBuilder stringBuilder = ddlBuilder().buildTableSqlString(tableMapping, tableName);
         String creteTableSql = stringBuilder.toString();
-        creteTableSql = ddlBuilder.buildSql$$(creteTableSql);
+        creteTableSql = ddlBuilder().buildSql$$(creteTableSql);
         this.executeUpdate(creteTableSql);
         /*创建表备注*/
         this.executeUpdate("COMMENT ON TABLE \"%s\" IS '%s';".formatted(tableName, comment));
@@ -184,14 +184,14 @@ public class PgsqlDataHelper extends SqlDataHelper<PgSqlDDLBuilder> {
                 .formatted(
                         tableName,
                         fieldMapping.getColumnName(),
-                        ddlBuilder.buildColumnDefinition(fieldMapping)
+                        ddlBuilder().buildColumnDefinition(fieldMapping)
                 );
         executeUpdate(sql);
         updateColumnComment(tableName, fieldMapping);
     }
 
     @Override protected void updateColumn(String tableName, JSONObject dbColumnMapping, TableMapping.FieldMapping fieldMapping) {
-        String columnDefinition = ddlBuilder.buildColumnDefinition(fieldMapping);
+        String columnDefinition = ddlBuilder().buildColumnDefinition(fieldMapping);
         String[] split = columnDefinition.split(" ");
         String columnType = split[0].toLowerCase();
         if (columnType.equalsIgnoreCase(dbColumnMapping.getString("column_type"))) {

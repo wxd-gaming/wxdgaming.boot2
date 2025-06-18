@@ -24,25 +24,26 @@ public class PgsqlDataGuiceModule extends ServiceGuiceModule {
         {
             SqlConfig sqlConfig = BootConfig.getIns().getNestedValue("db.pgsql", SqlConfig.class);
             if (sqlConfig != null) {
-                PgsqlService dataHelper = new PgsqlService(sqlConfig);
-                bindInstance(PgsqlService.class, dataHelper);
+                PgsqlDataHelper dataHelper = new PgsqlDataHelper(sqlConfig);
+                bindInstance(PgsqlDataHelper.class, dataHelper);
                 bindInstance(SqlDataHelper.class, dataHelper);
+                bindInstance(PgsqlDataHelper.class, "db.pgsql", dataHelper);
                 bindInstance(SqlDataHelper.class, "db.pgsql", dataHelper);
             }
         }
         {
             SqlConfig sqlConfig = BootConfig.getIns().getNestedValue("db.pgsql-second", SqlConfig.class);
             if (sqlConfig != null) {
-                PgsqlService2 dataHelper = new PgsqlService2(sqlConfig);
-                bindInstance(PgsqlService2.class, dataHelper);
+                PgsqlDataHelper dataHelper = new PgsqlDataHelper(sqlConfig);
+                bindInstance(PgsqlDataHelper.class, "db.pgsql-second", dataHelper);
                 bindInstance(SqlDataHelper.class, "db.pgsql-second", dataHelper);
             }
         }
         {
             SqlConfig sqlConfig = BootConfig.getIns().getNestedValue("db.pgsql-third", SqlConfig.class);
             if (sqlConfig != null) {
-                PgsqlService3 dataHelper = new PgsqlService3(sqlConfig);
-                bindInstance(PgsqlService3.class, dataHelper);
+                PgsqlDataHelper dataHelper = new PgsqlDataHelper(sqlConfig);
+                bindInstance(PgsqlDataHelper.class, "db.pgsql-third", dataHelper);
                 bindInstance(SqlDataHelper.class, "db.pgsql-third", dataHelper);
             }
         }

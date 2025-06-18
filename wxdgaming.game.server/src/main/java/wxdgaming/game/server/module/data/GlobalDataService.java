@@ -28,14 +28,14 @@ import java.util.List;
 public class GlobalDataService extends HoldRunApplication {
 
     private int sid;
-    private SqlDataHelper<?> sqlDataHelper;
+    private SqlDataHelper sqlDataHelper;
     /** key: sid, key: type, value: 数据 */
     private final ConcurrentTable<Integer, GlobalDataType, GlobalDataEntity> globalDataTable = new ConcurrentTable<>();
     @Value(path = "backends")
     private BackendConfig backendConfig;
 
     @Start
-    public void start(@Value(path = "sid") int sid, SqlDataHelper<?> sqlDataHelper) {
+    public void start(@Value(path = "sid") int sid, SqlDataHelper sqlDataHelper) {
         this.sid = sid;
         this.sqlDataHelper = sqlDataHelper;
         List<GlobalDataEntity> list = this.sqlDataHelper.findListByWhere(GlobalDataEntity.class, "merge = ?", false);

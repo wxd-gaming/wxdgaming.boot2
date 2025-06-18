@@ -9,7 +9,6 @@ import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
-import wxdgaming.boot2.starter.batis.sql.pgsql.MysqlService2;
 import wxdgaming.game.global.bean.role.PlayerSnap;
 import wxdgaming.game.server.bean.role.Player;
 
@@ -24,11 +23,11 @@ import wxdgaming.game.server.bean.role.Player;
 @Singleton
 public class GlobalDbDataCenterService {
 
-    final SqlDataHelper<?> globalDbHelper;
+    final SqlDataHelper globalDbHelper;
     final DataCenterService dataCenterService;
 
     @Inject
-    public GlobalDbDataCenterService(@Named("SqlDataHelper2") SqlDataHelper globalDbHelper, DataCenterService dataCenterService) {
+    public GlobalDbDataCenterService(@Named("db.mysql-second") SqlDataHelper globalDbHelper, DataCenterService dataCenterService) {
         this.globalDbHelper = globalDbHelper;
         this.dataCenterService = dataCenterService;
     }

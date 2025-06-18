@@ -16,12 +16,17 @@ import java.util.List;
  **/
 @Getter
 @Setter
-public abstract class DataHelper<DDL extends DDLBuilder> {
+public abstract class DataHelper {
 
-    protected DDL ddlBuilder;
+    protected DDLBuilder ddlBuilder;
 
-    public DataHelper(DDL ddlBuilder) {
+    public DataHelper(DDLBuilder ddlBuilder) {
         this.ddlBuilder = ddlBuilder;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <DDL extends DDLBuilder> DDL ddlBuilder() {
+        return (DDL) ddlBuilder;
     }
 
     @Shutdown

@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Singleton
 public class DataCenterService {
 
-    final SqlDataHelper<?> sqlDataHelper;
+    final SqlDataHelper sqlDataHelper;
     HexId hexid;
     HexId itemHexid;
     HexId mailHexid;

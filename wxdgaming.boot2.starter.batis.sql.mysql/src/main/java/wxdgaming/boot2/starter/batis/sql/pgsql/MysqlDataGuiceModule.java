@@ -25,25 +25,26 @@ public class MysqlDataGuiceModule extends ServiceGuiceModule {
         {
             SqlConfig sqlConfig = BootConfig.getIns().getNestedValue("db.mysql", SqlConfig.class);
             if (sqlConfig != null) {
-                MysqlService dataHelper = new MysqlService(sqlConfig);
-                bindInstance(MysqlService.class, dataHelper);
+                MysqlDataHelper dataHelper = new MysqlDataHelper(sqlConfig);
+                bindInstance(MysqlDataHelper.class, dataHelper);
                 bindInstance(SqlDataHelper.class, dataHelper);
+                bindInstance(MysqlDataHelper.class, "db.mysql", dataHelper);
                 bindInstance(SqlDataHelper.class, "db.mysql", dataHelper);
             }
         }
         {
             SqlConfig sqlConfig = BootConfig.getIns().getNestedValue("db.mysql-second", SqlConfig.class);
             if (sqlConfig != null) {
-                MysqlService2 dataHelper = new MysqlService2(sqlConfig);
-                bindInstance(dataHelper);
+                MysqlDataHelper dataHelper = new MysqlDataHelper(sqlConfig);
+                bindInstance(MysqlDataHelper.class, "db.mysql-second", dataHelper);
                 bindInstance(SqlDataHelper.class, "db.mysql-second", dataHelper);
             }
         }
         {
             SqlConfig sqlConfig = BootConfig.getIns().getNestedValue("db.mysql-third", SqlConfig.class);
             if (sqlConfig != null) {
-                MysqlService3 dataHelper = new MysqlService3(sqlConfig);
-                bindInstance(dataHelper);
+                MysqlDataHelper dataHelper = new MysqlDataHelper(sqlConfig);
+                bindInstance(MysqlDataHelper.class, "db.mysql-third", dataHelper);
                 bindInstance(SqlDataHelper.class, "db.mysql-third", dataHelper);
             }
         }

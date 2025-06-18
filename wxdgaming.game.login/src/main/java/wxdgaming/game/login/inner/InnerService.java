@@ -25,12 +25,11 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class InnerService {
 
-    final SqlDataHelper<?> sqlDataHelper;
+    final SqlDataHelper sqlDataHelper;
     final ConcurrentHashMap<Integer, InnerServerInfoBean> innerGameServerInfoMap = new ConcurrentHashMap<>();
     final ConcurrentHashMap<Integer, InnerServerInfoBean> innerGatewayServerInfoMap = new ConcurrentHashMap<>();
 
     @Inject
-    @SuppressWarnings({"rawtypes"})
     public InnerService(SqlDataHelper sqlDataHelper) {
         this.sqlDataHelper = sqlDataHelper;
         this.sqlDataHelper.checkTable(InnerServerInfoBean.class);
