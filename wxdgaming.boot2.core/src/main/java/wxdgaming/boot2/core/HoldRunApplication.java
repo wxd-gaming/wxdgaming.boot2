@@ -11,7 +11,7 @@ import wxdgaming.boot2.core.ann.Order;
  * @version: 2025-04-23 17:38
  **/
 @Getter
-public abstract class HoldRunApplication {
+public abstract class HoldRunApplication implements InitPrint{
 
     protected RunApplication runApplication;
 

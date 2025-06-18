@@ -33,12 +33,12 @@ public abstract class GuiceModuleBase extends AbstractModule {
     }
 
     public void bindSingleton(Class<?> clazz) {
-        log.debug("bind clazz {} {} clazz={}", this.getClass().getName(), this.hashCode(), clazz);
+//        log.debug("bind clazz {} {} clazz={}", this.getClass().getName(), this.hashCode(), clazz);
         bind(clazz).in(Singleton.class);
     }
 
     public <R> void bindSingleton(Class<R> father, Class<? extends R> son) {
-        log.debug("bind clazz father to son {} {} father={} son={}", this.getClass().getName(), this.hashCode(), father, son);
+//        log.debug("bind clazz father to son {} {} father={} son={}", this.getClass().getName(), this.hashCode(), father, son);
         bind(father).to(son).in(Singleton.class);
     }
 
@@ -48,7 +48,7 @@ public abstract class GuiceModuleBase extends AbstractModule {
     }
 
     public void bindInstance(Class clazz, Object instance) {
-        log.debug("bind instance {} {} clazz={} instance={}", this.getClass().getName(), this.hashCode(), clazz, instance.getClass());
+//        log.debug("bind instance {} {} clazz={} instance={}", this.getClass().getName(), this.hashCode(), clazz, instance.getClass());
         bind(clazz).toInstance(instance);
     }
 
