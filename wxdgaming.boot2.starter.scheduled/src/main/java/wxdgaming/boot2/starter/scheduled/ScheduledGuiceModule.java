@@ -1,5 +1,7 @@
 package wxdgaming.boot2.starter.scheduled;
 
+import com.google.inject.name.Names;
+import jakarta.inject.Named;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ServiceGuiceModule;
 import wxdgaming.boot2.core.executor.ExecutorConfig;
@@ -26,5 +28,6 @@ public class ScheduledGuiceModule extends ServiceGuiceModule {
         ExecutorConfig nestedValue = BootConfig.getIns().getNestedValue("executor.scheduled", ExecutorConfig.class, DEFAULT_INSTANCE);
         ScheduledService scheduledService = new ScheduledService(nestedValue);
         bindInstance(scheduledService);
+        bindInstance(ExecutorConfig.class, "executor.scheduled", nestedValue);
     }
 }

@@ -2,6 +2,7 @@ package wxdgaming.game.server.module.data;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Start;
@@ -27,8 +28,8 @@ public class GlobalDbDataCenterService {
     final DataCenterService dataCenterService;
 
     @Inject
-    public GlobalDbDataCenterService(MysqlService2 mysqlService2, DataCenterService dataCenterService) {
-        this.globalDbHelper = mysqlService2;
+    public GlobalDbDataCenterService(@Named("SqlDataHelper2") SqlDataHelper globalDbHelper, DataCenterService dataCenterService) {
+        this.globalDbHelper = globalDbHelper;
         this.dataCenterService = dataCenterService;
     }
 

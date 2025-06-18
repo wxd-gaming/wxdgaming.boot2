@@ -2,6 +2,7 @@ package wxdgaming.boot2.starter.batis.sql.pgsql;
 
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ServiceGuiceModule;
+import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
@@ -26,6 +27,7 @@ public class PgsqlDataGuiceModule extends ServiceGuiceModule {
                 PgsqlService dataHelper = new PgsqlService(sqlConfig);
                 bindInstance(PgsqlService.class, dataHelper);
                 bindInstance(SqlDataHelper.class, dataHelper);
+                bindInstance(SqlDataHelper.class, "db.pgsql", dataHelper);
             }
         }
         {
@@ -33,6 +35,7 @@ public class PgsqlDataGuiceModule extends ServiceGuiceModule {
             if (sqlConfig != null) {
                 PgsqlService2 dataHelper = new PgsqlService2(sqlConfig);
                 bindInstance(PgsqlService2.class, dataHelper);
+                bindInstance(SqlDataHelper.class, "db.pgsql-second", dataHelper);
             }
         }
         {
@@ -40,6 +43,7 @@ public class PgsqlDataGuiceModule extends ServiceGuiceModule {
             if (sqlConfig != null) {
                 PgsqlService3 dataHelper = new PgsqlService3(sqlConfig);
                 bindInstance(PgsqlService3.class, dataHelper);
+                bindInstance(SqlDataHelper.class, "db.pgsql-third", dataHelper);
             }
         }
     }

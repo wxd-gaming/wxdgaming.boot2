@@ -3,6 +3,7 @@ package wxdgaming.boot2.core;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.matcher.Matchers;
+import com.google.inject.name.Names;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
@@ -33,12 +34,12 @@ public abstract class GuiceModuleBase extends AbstractModule {
     }
 
     public void bindSingleton(Class<?> clazz) {
-//        log.debug("bind clazz {} {} clazz={}", this.getClass().getName(), this.hashCode(), clazz);
+        //        log.debug("bind clazz {} {} clazz={}", this.getClass().getName(), this.hashCode(), clazz);
         bind(clazz).in(Singleton.class);
     }
 
     public <R> void bindSingleton(Class<R> father, Class<? extends R> son) {
-//        log.debug("bind clazz father to son {} {} father={} son={}", this.getClass().getName(), this.hashCode(), father, son);
+        //        log.debug("bind clazz father to son {} {} father={} son={}", this.getClass().getName(), this.hashCode(), father, son);
         bind(father).to(son).in(Singleton.class);
     }
 
@@ -47,9 +48,14 @@ public abstract class GuiceModuleBase extends AbstractModule {
         bindInstance(aClass, instance);
     }
 
+    @SuppressWarnings({"unchecked", "rawtype"})
     public void bindInstance(Class clazz, Object instance) {
-//        log.debug("bind instance {} {} clazz={} instance={}", this.getClass().getName(), this.hashCode(), clazz, instance.getClass());
         bind(clazz).toInstance(instance);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtype"})
+    public <T> void bindInstance(Class clazz, String name, T instance) {
+        bind(clazz).annotatedWith(Names.named(name)).toInstance(instance);
     }
 
     @Override

@@ -4,6 +4,7 @@ package wxdgaming.boot2.starter.net.server;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ServiceGuiceModule;
 import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 import java.util.function.Supplier;
@@ -31,6 +32,8 @@ public class SocketServerGuiceModule extends ServiceGuiceModule {
                 }
                 SocketServerImpl server = new SocketServerImpl(serverConfig);
                 bindInstance(server);
+                bindInstance(SocketServer.class, server);
+                bindInstance(SocketServer.class, "socket.server", server);
             }
         }
         {
@@ -41,6 +44,7 @@ public class SocketServerGuiceModule extends ServiceGuiceModule {
                 }
                 SocketServerImpl2 server = new SocketServerImpl2(serverConfig);
                 bindInstance(server);
+                bindInstance(SocketServer.class, "socket.server-second", server);
             }
         }
     }

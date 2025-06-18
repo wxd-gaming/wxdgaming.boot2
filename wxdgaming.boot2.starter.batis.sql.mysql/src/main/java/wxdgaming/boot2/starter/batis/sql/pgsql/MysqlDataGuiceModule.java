@@ -2,6 +2,8 @@ package wxdgaming.boot2.starter.batis.sql.pgsql;
 
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ServiceGuiceModule;
+import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
@@ -26,6 +28,7 @@ public class MysqlDataGuiceModule extends ServiceGuiceModule {
                 MysqlService dataHelper = new MysqlService(sqlConfig);
                 bindInstance(MysqlService.class, dataHelper);
                 bindInstance(SqlDataHelper.class, dataHelper);
+                bindInstance(SqlDataHelper.class, "db.mysql", dataHelper);
             }
         }
         {
@@ -33,6 +36,7 @@ public class MysqlDataGuiceModule extends ServiceGuiceModule {
             if (sqlConfig != null) {
                 MysqlService2 dataHelper = new MysqlService2(sqlConfig);
                 bindInstance(dataHelper);
+                bindInstance(SqlDataHelper.class, "db.mysql-second", dataHelper);
             }
         }
         {
@@ -40,6 +44,7 @@ public class MysqlDataGuiceModule extends ServiceGuiceModule {
             if (sqlConfig != null) {
                 MysqlService3 dataHelper = new MysqlService3(sqlConfig);
                 bindInstance(dataHelper);
+                bindInstance(SqlDataHelper.class, "db.mysql-third", dataHelper);
             }
         }
     }
