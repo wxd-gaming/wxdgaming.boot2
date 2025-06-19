@@ -29,7 +29,7 @@ public class GetPlayerByRpc implements IGetPlayer {
         this.globalDbDataCenterService = globalDbDataCenterService;
     }
 
-    SocketSession socketSession(long rid){
+    SocketSession socketSession(long rid) {
         PlayerSnap playerSnap = globalDbDataCenterService.playerSnap(rid);
         int sid = playerSnap.getSid();
         return clientSessionService.getCrossServerSocketSessionMapping().get(sid);
