@@ -10,7 +10,6 @@ import wxdgaming.boot2.starter.net.pojo.ProtoUnknownMessageEvent;
 import wxdgaming.game.gateway.bean.ServerMapping;
 import wxdgaming.game.gateway.bean.UserMapping;
 import wxdgaming.game.gateway.module.data.DataCenterService;
-import wxdgaming.game.message.inner.ServiceType;
 
 /**
  * 前端发送消息网关无监听，转发到游戏或者社交进程
@@ -49,21 +48,20 @@ public class ClientUnknownProtoMessageEvent implements ProtoUnknownMessageEvent 
     }
 
     void forwardGameServer(UserMapping userMapping, int messageId, byte[] messages, Class<? extends PojoBase> messageType) {
-        ServerMapping serverMapping = dataCenterService.getGameServiceMappings().get(userMapping.getChooseServerId());
+        ServerMapping serverMapping = dataCenterService.getGameServiceMappings().get(userMapping.gameServerId());
         if (serverMapping == null) {
             /* 找不到服务监听 */
-            log.warn("转发消息找不到游戏服务器：{}, msg={}({})", userMapping, messageId, messageType);
+            log.warn("转发消息找不到游戏服务器：{}, cross={} msg={}({})", userMapping, userMapping.isCrossing(), messageId, messageType);
             return;
         }
         if (!serverMapping.getMessageIds().contains(messageId)) {
             /* 找不到服务监听 */
-            if (log.isDebugEnabled()) {
-                log.debug("转发消息游戏服：{}, msg={}({}) 不接受此消息监听", userMapping, messageId, messageType);
-            }
+            if (log.isDebugEnabled())
+                log.debug("转发消息游戏服：{}, cross={} msg={}({}) 不接受此消息监听", userMapping, userMapping.isCrossing(), messageId, messageType);
             return;
         }
         if (log.isDebugEnabled()) {
-            log.debug("转发消息游戏服: {}, {}({})", userMapping, messageId, messageType);
+            log.debug("转发消息游戏服: {}, cross={} msg={}({})", userMapping, userMapping.isCrossing(), messageId, messageType);
         }
         serverMapping.forwardMessage(userMapping.clientSessionId(), messageId, messages, req -> {
             req.getKvBeansMap().put("account", userMapping.getAccount());

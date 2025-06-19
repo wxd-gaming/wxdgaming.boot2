@@ -21,6 +21,8 @@ class ApplicationGuiceModule extends GuiceModuleBase {
     @Override protected void bind() throws Throwable {
         bind(RunApplicationMain.class);
         bindInstance(BootConfig.getIns());
+        bindInstance(int.class, "sid", BootConfig.getIns().sid());
+        bindInstance(boolean.class, "debug", BootConfig.getIns().isDebug());
     }
 
 }

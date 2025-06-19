@@ -33,7 +33,7 @@ public class PrivateChatHandler extends ChatHandler {
     }
 
     public void chat(Player player, ReqChatMessage req) {
-        Player targetPlayer = dataCenterService.player(req.getTargetId());
+        Player targetPlayer = dataCenterService.getPlayer(req.getTargetId());
         if (targetPlayer == null) {
             tipsService.tips(player, "目标玩家不存在");
             return;

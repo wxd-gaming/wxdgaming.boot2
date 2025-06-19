@@ -22,8 +22,8 @@ public class UserMapping extends ObjectBase {
 
     private String account;
     private long chooseRoleId;
-    private int chooseServerId;
-    private SocketSession chooseServerSession;
+    private int crossServerId;
+    private int gameServerId;
     private SocketSession clientSocketSession;
 
     public ChannelFuture send2Client(PojoBase pojoBase) {
@@ -35,13 +35,15 @@ public class UserMapping extends ObjectBase {
         return getClientSocketSession().write(build);
     }
 
-    public ChannelFuture send2Game(PojoBase pojoBase) {
-        return getClientSocketSession().write(pojoBase);
+    public boolean isCrossing() {
+        return crossServerId > 0;
     }
 
-    public ChannelFuture send2Game(int messageId, byte[] messages) {
-        Object build = MessageEncode.build(getChooseServerSession(), messageId, messages);
-        return getChooseServerSession().write(build);
+    public int gameServerId() {
+        if (crossServerId > 0) {
+            return crossServerId;
+        }
+        return gameServerId;
     }
 
     public long clientSessionId() {
@@ -51,6 +53,6 @@ public class UserMapping extends ObjectBase {
 
     @Override public String toString() {
         return "UserMapping{account='%s', chooseRoleId=%d, chooseServerId=%d, clientSessionId=%d}"
-                .formatted(account, chooseRoleId, chooseServerId, clientSessionId());
+                .formatted(account, chooseRoleId, gameServerId, clientSessionId());
     }
 }

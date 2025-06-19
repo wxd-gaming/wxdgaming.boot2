@@ -3,8 +3,10 @@ package wxdgaming.game.server.module.data;
 import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
@@ -12,6 +14,11 @@ import wxdgaming.boot2.core.format.HexId;
 import wxdgaming.boot2.core.keywords.KeywordsMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryResult;
+import wxdgaming.boot2.starter.net.module.inner.RpcService;
+import wxdgaming.game.server.api.role.GetPlayerProxy;
+import wxdgaming.game.server.api.role.IGetPlayer;
+import wxdgaming.game.server.api.role.impl.GetPlayerByDatabase;
+import wxdgaming.game.server.api.role.impl.GetPlayerByRpc;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
 
@@ -27,9 +34,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Getter
 @Singleton
-public class DataCenterService {
+public class DataCenterService extends HoldRunApplication implements IGetPlayer {
 
-    final SqlDataHelper sqlDataHelper;
     HexId hexid;
     HexId itemHexid;
     HexId mailHexid;
@@ -44,40 +50,55 @@ public class DataCenterService {
     final ConcurrentHashMap<Long, Long> onlinePlayerGroup = new ConcurrentHashMap<>();
     final KeywordsMapping keywordsMapping = new KeywordsMapping();
 
+    GetPlayerProxy getPlayerProxy;
+
     @Inject
-    @SuppressWarnings("rawtypes")
-    public DataCenterService(SqlDataHelper sqlDataHelper) {
-        this.sqlDataHelper = sqlDataHelper;
+    public DataCenterService() {
     }
 
     @Start
-    public void start(@Value(path = "sid") int sid) {
+    public void start(@Value(path = "sid") int sid, @Named("serverType") int serverType) {
         hexid = new HexId(sid);
         itemHexid = new HexId(sid);
         mailHexid = new HexId(sid);
         buffHexid = new HexId(sid);
-        String sql = "SELECT uid,sid,name,account FROM role where del=?";
-        try (SqlQueryResult sqlQueryResult = sqlDataHelper.queryResultSet(sql, false)) {
-            while (sqlQueryResult.hasNext()) {
-                JSONObject row = sqlQueryResult.row();
-                String account = row.getString("account");
-                int roleSid = row.getIntValue("sid");
-                long roleId = row.getLongValue("uid");
-                String name = row.getString("name");
-                account2RidsMap.computeIfAbsent(roleSid, account, k -> new HashSet<>()).add(roleId);
-                name2RidMap.put(name, roleId);
-                rid2NameMap.put(roleId, name);
+        if (serverType <= 1) {
+            SqlDataHelper sqlDataHelper = runApplication.getInstance(SqlDataHelper.class);
+            getPlayerProxy = new GetPlayerProxy(new GetPlayerByDatabase(sqlDataHelper));
+            String sql = "SELECT uid,sid,name,account FROM role where del=?";
+            try (SqlQueryResult sqlQueryResult = sqlDataHelper.queryResultSet(sql, false)) {
+                while (sqlQueryResult.hasNext()) {
+                    JSONObject row = sqlQueryResult.row();
+                    String account = row.getString("account");
+                    int roleSid = row.getIntValue("sid");
+                    long roleId = row.getLongValue("uid");
+                    String name = row.getString("name");
+                    account2RidsMap.computeIfAbsent(roleSid, account, k -> new HashSet<>()).add(roleId);
+                    name2RidMap.put(name, roleId);
+                    rid2NameMap.put(roleId, name);
+                }
             }
+        } else {
+            RpcService rpcService = runApplication.getInstance(RpcService.class);
+            ClientSessionService clientSessionService = runApplication.getInstance(ClientSessionService.class);
+            GlobalDbDataCenterService globalDbDataCenterService = runApplication.getInstance(GlobalDbDataCenterService.class);
+            getPlayerProxy = new GetPlayerProxy(new GetPlayerByRpc(rpcService, clientSessionService, globalDbDataCenterService));
         }
     }
 
-    public RoleEntity roleEntity(long uid) {
-        return sqlDataHelper.getCacheService().cacheIfPresent(RoleEntity.class, uid);
+    @Override public RoleEntity roleEntity(long rid) {
+        return getPlayerProxy.roleEntity(rid);
     }
 
-    public Player player(long uid) {
-        RoleEntity roleEntity = roleEntity(uid);
-        return roleEntity == null ? null : roleEntity.getPlayer();
+    @Override public Player getPlayer(long rid) {
+        return getPlayerProxy.getPlayer(rid);
     }
 
+    @Override public void putCache(RoleEntity roleEntity) {
+        getPlayerProxy.putCache(roleEntity);
+    }
+
+    @Override public void save(RoleEntity roleEntity) {
+        getPlayerProxy.putCache(roleEntity);
+    }
 }

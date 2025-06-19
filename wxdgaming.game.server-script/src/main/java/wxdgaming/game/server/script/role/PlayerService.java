@@ -42,7 +42,7 @@ public class PlayerService extends HoldRunApplication {
         ResLogin resLogin = new ResLogin();
         if (longs != null) {
             for (Long rid : longs) {
-                Player player = dataCenterService.player(rid);
+                Player player = dataCenterService.getPlayer(rid);
                 RoleBean roleBean = new RoleBean().setRid(rid).setName(player.getName()).setLevel(player.getLevel());
                 resLogin.getRoles().add(roleBean);
             }

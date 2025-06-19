@@ -56,7 +56,7 @@ public class ReqChooseRoleHandler extends HoldRunApplication {
             return;
         }
 
-        Player player = dataCenterService.player(rid);
+        Player player = dataCenterService.getPlayer(rid);
         playerDriveService.executor(player, () -> {
             if (clientSessionMapping.getRid() > 0 && clientSessionMapping.getRid() != player.getUid()) {
                 /*角色切换*/

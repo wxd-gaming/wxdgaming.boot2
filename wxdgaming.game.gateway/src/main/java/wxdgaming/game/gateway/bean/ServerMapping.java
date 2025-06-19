@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.net.SocketSession;
+import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.game.message.inner.InnerForwardMessage;
 
 import java.util.HashSet;
@@ -50,7 +51,11 @@ public class ServerMapping extends ObjectBase {
             log.debug("发送消息 连接不可用：clientSessionId={}, msgId={}, {}", clientSessionId, messageId, innerForwardMessage);
             return;
         }
-        session.writeAndFlush(innerForwardMessage);
+        writeAndFlush(innerForwardMessage);
+    }
+
+    public void writeAndFlush(PojoBase pojoBase) {
+        session.writeAndFlush(pojoBase);
     }
 
     @Override public String toString() {

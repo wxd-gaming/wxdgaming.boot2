@@ -23,7 +23,8 @@ public class ClientSessionService {
 
     /** 服务映射,R:服务类型, C:服务id（网关id）, V:session */
     private final ConcurrentTable<ServiceType, Integer, SocketSession> serviceSocketSessionMapping = new ConcurrentTable<>();
-
+    /** 如果是本服，，就是本服连到跨服的session，如果是跨服就是，所有连到跨服的游戏服 */
+    private final ConcurrentHashMap<Integer, SocketSession> crossServerSocketSessionMapping = new ConcurrentHashMap<>();
     /** key:account, value:mapping */
     private final ConcurrentHashMap<String, ClientSessionMapping> accountMappingMap = new ConcurrentHashMap<>();
 

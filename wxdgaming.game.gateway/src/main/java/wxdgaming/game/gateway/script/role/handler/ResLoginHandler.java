@@ -7,6 +7,7 @@ import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
+import wxdgaming.game.gateway.bean.ServerMapping;
 import wxdgaming.game.gateway.bean.UserMapping;
 import wxdgaming.game.gateway.module.data.DataCenterService;
 import wxdgaming.game.message.inner.InnerForwardMessage;
@@ -47,8 +48,7 @@ public class ResLoginHandler {
         clientSession.bindData("account", account);
 
         UserMapping userMapping = dataCenterService.getUserMapping(account);
-        userMapping.setChooseServerId(req.getSid());
-        userMapping.setChooseServerSession(socketSession);
+        userMapping.setGameServerId(req.getSid());
 
         clientSession.bindData("userMapping", userMapping);
 
@@ -61,15 +61,20 @@ public class ResLoginHandler {
                 if (!Objects.equals(userMapping.getClientSocketSession(), clientSession)) {
                     return;
                 }
-                InnerUserOffline userOffline = new InnerUserOffline();
-                userOffline.setAccount(account);
-                userOffline.setClientSessionId(clientSessionId);
-                userMapping.getChooseServerSession().write(userOffline);
+
+                ServerMapping gameServerMapping = dataCenterService.getGameServerMapping(userMapping.getGameServerId());
+                if (gameServerMapping != null) {
+                    InnerUserOffline userOffline = new InnerUserOffline();
+                    userOffline.setAccount(account);
+                    userOffline.setClientSessionId(userMapping.getClientSocketSession().getUid());
+                    gameServerMapping.writeAndFlush(userOffline);
+                }
+
                 log.info("玩家离线：{}, {}, {}", account, clientSessionId, userMapping);
                 userMapping.setChooseRoleId(0);
+                userMapping.setGameServerId(0);
+                userMapping.setCrossServerId(0);
                 userMapping.setClientSocketSession(null);
-                userMapping.setChooseServerId(0);
-                userMapping.setChooseServerSession(null);
             });
         }
 

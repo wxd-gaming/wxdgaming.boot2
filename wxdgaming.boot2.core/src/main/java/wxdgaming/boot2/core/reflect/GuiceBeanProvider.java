@@ -1,6 +1,8 @@
 package wxdgaming.boot2.core.reflect;
 
 import com.google.inject.Injector;
+import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
@@ -163,24 +165,12 @@ public class GuiceBeanProvider {
                     continue;
                 }
             }
-            {
-                HoldParam param = parameter.getAnnotation(HoldParam.class);
-                if (param != null) {
-                    params[i] = holderArgument.next();
-                    continue;
-                }
+            Object parameterBean = runApplication.getInstanceByParameter(parameter);
+            if (parameterBean != null) {
+                params[i] = parameterBean;
+                continue;
             }
-            try {
-                params[i] = runApplication.getInstance(parameterType);
-            } catch (Exception e) {
-                Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
-                if (qualifier == null) {
-                    params[i] = holderArgument.next();
-                    continue;
-                } else if (qualifier.required()) {
-                    throw new RuntimeException("bean:" + parameterType.getName() + " is not bind");
-                }
-            }
+            params[i] = holderArgument.next();
         }
         return params;
     }
@@ -315,7 +305,7 @@ public class GuiceBeanProvider {
                 if (throwable instanceof InvocationTargetException) {
                     throwable = throwable.getCause();
                 }
-                throw Throw.of(throwable);
+                throw Throw.of(bean.getClass().getName() + "#" + method.getName(), throwable);
             }
         }
 

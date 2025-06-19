@@ -60,7 +60,7 @@ public class InnerForwardMessageHandler extends HoldRunApplication {
             ClientSessionMapping clientSessionMapping = clientSessionService.getAccountMappingMap().get(account);
             ThreadContext.putContent("clientSessionMapping", clientSessionMapping);
             long rid = clientSessionMapping.getRid();
-            Player player = dataCenterService.player(rid);
+            Player player = dataCenterService.getPlayer(rid);
             ThreadContext.putContent("player", player);
         }
         protoListenerFactory.dispatch(socketSession, messageId, messages);

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.bean.StatusConst;
 import wxdgaming.game.server.bean.role.Player;
@@ -41,7 +42,7 @@ public class PlayerLogoutHandler {
         player.setClientSessionMapping(null);
         dataCenterService.getOnlinePlayerGroup().remove(player.getUid());
         RoleEntity roleEntity = dataCenterService.roleEntity(player.getUid());
-        dataCenterService.getSqlDataHelper().getDataBatch().save(roleEntity);
+        dataCenterService.save(roleEntity);
     }
 
 }

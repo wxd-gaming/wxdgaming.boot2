@@ -36,7 +36,7 @@ public class ReqHeartbeatHandler {
         ClientSessionMapping clientSessionMapping = ThreadContext.context("clientSessionMapping");
         ResHeartbeat resHeartbeat = new ResHeartbeat();
         resHeartbeat.setTimestamp(MyClock.millis());
-        Player player = dataCenterService.player(clientSessionMapping.getRid());
+        Player player = dataCenterService.getPlayer(clientSessionMapping.getRid());
         clientSessionMapping.forwardMessage(player, resHeartbeat);
     }
 

@@ -287,7 +287,7 @@ public class CronExpress extends ObjectBase {
      * @param change 每一次变更的时间差查找上一次就是 -1000
      * @return
      */
-    public long[] findValidateTime(long time, long change) {
+    private long[] findValidateTime(long time, long change) {
         long seconds = TimeUnit.DAYS.toSeconds(30);
         for (int i = 0; i < seconds; i++) {
             int second = MyClock.getSecond(time);

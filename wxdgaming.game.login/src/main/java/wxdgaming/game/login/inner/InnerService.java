@@ -33,15 +33,14 @@ public class InnerService {
     public InnerService(SqlDataHelper sqlDataHelper) {
         this.sqlDataHelper = sqlDataHelper;
         this.sqlDataHelper.checkTable(InnerServerInfoBean.class);
-    }
 
-    @Start
-    public void start() {
         sqlDataHelper.findList(InnerServerInfoBean.class).forEach(bean -> {
             log.info("InnerService: {}", bean);
             innerGameServerInfoMap.put(bean.getServerId(), bean);
         });
+
     }
+
 
     @Order(10)
     @Shutdown

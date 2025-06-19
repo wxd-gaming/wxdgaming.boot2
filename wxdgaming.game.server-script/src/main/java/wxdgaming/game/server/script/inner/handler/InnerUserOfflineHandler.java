@@ -43,7 +43,7 @@ public class InnerUserOfflineHandler extends HoldRunApplication {
         log.info("网关转发玩家离线 {}", req);
         ClientSessionMapping clientSessionMapping = clientSessionService.getAccountMappingMap().get(account);
         if (clientSessionMapping != null) {
-            Player player = dataCenterService.player(clientSessionMapping.getRid());
+            Player player = dataCenterService.getPlayer(clientSessionMapping.getRid());
             Runnable afterRunnable = () -> {
                 clientSessionMapping.setClientSessionId(0);
                 clientSessionMapping.setGatewayId(0);

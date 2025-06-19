@@ -1,6 +1,7 @@
 package wxdgaming.boot2.starter.net.pojo;
 
 import com.google.inject.Injector;
+import com.google.inject.name.Named;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
@@ -94,14 +95,7 @@ public class ProtoListenerTrigger extends ExecutorEvent {
                     continue;
                 }
             }
-            try {
-                params[i] = runApplication.getInstance(parameterType);
-            } catch (Exception e) {
-                Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
-                if (qualifier == null || qualifier.required()) {
-                    throw new RuntimeException("bean:" + parameterType.getName() + " is not bind");
-                }
-            }
+            params[i] = runApplication.getInstanceByParameter(parameter);
         }
         return params;
     }

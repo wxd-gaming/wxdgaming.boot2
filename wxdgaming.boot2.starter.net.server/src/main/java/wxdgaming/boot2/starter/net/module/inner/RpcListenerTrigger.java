@@ -167,15 +167,7 @@ public class RpcListenerTrigger extends ExecutorEvent {
                     continue;
                 }
             }
-
-            try {
-                params[i] = runApplication.getInstance(parameterType);
-            } catch (Exception e) {
-                Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
-                if (qualifier == null || qualifier.required()) {
-                    throw new RuntimeException("bean:" + parameterType.getName() + " is not bind");
-                }
-            }
+            params[i] = runApplication.getInstanceByParameter(parameter);
         }
         return params;
     }

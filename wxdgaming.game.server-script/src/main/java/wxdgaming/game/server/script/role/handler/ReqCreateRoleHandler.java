@@ -7,6 +7,7 @@ import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
+import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.role.ReqCreateRole;
@@ -101,9 +102,9 @@ public class ReqCreateRoleHandler extends HoldRunApplication {
             player.setSex(sex);
             player.setJob(job);
             log.info("sid={}, account={}, 创建角色：{}", sid, account, player);
-            dataCenterService.getSqlDataHelper().getCacheService()
-                    .cache(RoleEntity.class)
-                    .put(player.getUid(), new RoleEntity().setUid(player.getUid()).setPlayer(player));
+            RoleEntity roleEntity = new RoleEntity().setUid(player.getUid()).setPlayer(player);
+            roleEntity.setNewEntity(true);
+            dataCenterService.putCache(roleEntity);
             dataCenterService.getAccount2RidsMap().computeIfAbsent(sid, account, l -> new HashSet<>()).add(player.getUid());
             dataCenterService.getName2RidMap().put(name, player.getUid());
             dataCenterService.getRid2NameMap().put(player.getUid(), name);

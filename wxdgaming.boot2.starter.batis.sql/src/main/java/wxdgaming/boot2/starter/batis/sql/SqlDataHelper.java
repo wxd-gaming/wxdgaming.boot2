@@ -7,13 +7,12 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Shutdown;
+import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.boot2.starter.batis.DDLBuilder;
 import wxdgaming.boot2.starter.batis.DataHelper;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
@@ -62,7 +61,7 @@ public abstract class SqlDataHelper extends DataHelper {
     }
 
     @Start()
-    @Order(100)
+    @Order(-1)
     public void start() {
         if (StringUtils.isNotBlank(sqlConfig.getScanPackage())) {
             Map<String, LinkedHashMap<String, JSONObject>> tableStructMap = findTableStructMap();
@@ -79,7 +78,7 @@ public abstract class SqlDataHelper extends DataHelper {
     }
 
     @Shutdown
-    @Order(Integer.MAX_VALUE / 2/*最后关闭*/)
+    @Order(100/*优先清空缓存*/)
     public void shutdownCache() {
         log.info("关闭数据库缓存：{}", this.getSqlConfig().getUrl());
         if (this.cacheService != null)
@@ -99,6 +98,7 @@ public abstract class SqlDataHelper extends DataHelper {
 
     public abstract SqlQueryBuilder queryBuilder();
 
+    @SuppressWarnings("unchecked")
     public <SDB extends SqlDataBatch> SDB dataBatch() {
         return (SDB) dataBatch;
     }
