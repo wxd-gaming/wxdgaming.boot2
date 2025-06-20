@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.module.inner.RpcService;
 import wxdgaming.game.global.bean.role.PlayerSnap;
-import wxdgaming.game.server.api.role.IGetPlayer;
+import wxdgaming.game.server.api.role.GetPlayerStrategy;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
 import wxdgaming.game.server.module.data.ClientSessionService;
@@ -17,13 +17,13 @@ import wxdgaming.game.server.module.data.GlobalDbDataCenterService;
  * @version: 2025-06-18 20:39
  **/
 @Slf4j
-public class GetPlayerByRpc implements IGetPlayer {
+public class RpcGetPlayerStrategy implements GetPlayerStrategy {
 
     final RpcService rpcService;
     final ClientSessionService clientSessionService;
     final GlobalDbDataCenterService globalDbDataCenterService;
 
-    public GetPlayerByRpc(RpcService rpcService, ClientSessionService clientSessionService, GlobalDbDataCenterService globalDbDataCenterService) {
+    public RpcGetPlayerStrategy(RpcService rpcService, ClientSessionService clientSessionService, GlobalDbDataCenterService globalDbDataCenterService) {
         this.rpcService = rpcService;
         this.clientSessionService = clientSessionService;
         this.globalDbDataCenterService = globalDbDataCenterService;

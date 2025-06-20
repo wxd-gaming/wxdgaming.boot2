@@ -1,6 +1,5 @@
 package wxdgaming.game.server.api.role;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
@@ -12,11 +11,11 @@ import wxdgaming.game.server.bean.role.RoleEntity;
  * @version: 2025-06-18 19:42
  **/
 @Slf4j
-public class GetPlayerProxy implements IGetPlayer {
+public class GetPlayerStrategyFactory implements GetPlayerStrategy {
 
-    private final IGetPlayer playerProxy;
+    private final GetPlayerStrategy playerProxy;
 
-    public GetPlayerProxy(IGetPlayer getPlayer) {
+    public GetPlayerStrategyFactory(GetPlayerStrategy getPlayer) {
         this.playerProxy = getPlayer;
     }
 

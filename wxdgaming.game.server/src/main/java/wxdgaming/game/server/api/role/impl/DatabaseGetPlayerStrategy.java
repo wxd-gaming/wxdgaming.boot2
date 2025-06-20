@@ -1,9 +1,8 @@
 package wxdgaming.game.server.api.role.impl;
 
-import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
-import wxdgaming.game.server.api.role.IGetPlayer;
+import wxdgaming.game.server.api.role.GetPlayerStrategy;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
 
@@ -14,12 +13,11 @@ import wxdgaming.game.server.bean.role.RoleEntity;
  * @version: 2025-06-18 20:39
  **/
 @Slf4j
-public class GetPlayerByDatabase implements IGetPlayer {
+public class DatabaseGetPlayerStrategy implements GetPlayerStrategy {
 
     private final SqlDataHelper sqlDataHelper;
 
-    @Inject
-    public GetPlayerByDatabase(SqlDataHelper sqlDataHelper) {
+    public DatabaseGetPlayerStrategy(SqlDataHelper sqlDataHelper) {
         this.sqlDataHelper = sqlDataHelper;
     }
 

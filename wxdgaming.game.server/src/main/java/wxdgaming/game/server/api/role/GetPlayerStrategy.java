@@ -9,7 +9,7 @@ import wxdgaming.game.server.bean.role.RoleEntity;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-06-18 19:42
  **/
-public interface IGetPlayer {
+public interface GetPlayerStrategy {
 
     RoleEntity roleEntity(long rid);
 

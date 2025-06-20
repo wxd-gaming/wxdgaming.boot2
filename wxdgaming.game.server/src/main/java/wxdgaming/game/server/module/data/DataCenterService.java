@@ -8,17 +8,16 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
 import wxdgaming.boot2.core.format.HexId;
 import wxdgaming.boot2.core.keywords.KeywordsMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryResult;
 import wxdgaming.boot2.starter.net.module.inner.RpcService;
-import wxdgaming.game.server.api.role.GetPlayerProxy;
-import wxdgaming.game.server.api.role.IGetPlayer;
-import wxdgaming.game.server.api.role.impl.GetPlayerByDatabase;
-import wxdgaming.game.server.api.role.impl.GetPlayerByRpc;
+import wxdgaming.game.server.api.role.GetPlayerStrategyFactory;
+import wxdgaming.game.server.api.role.GetPlayerStrategy;
+import wxdgaming.game.server.api.role.impl.DatabaseGetPlayerStrategy;
+import wxdgaming.game.server.api.role.impl.RpcGetPlayerStrategy;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
 
@@ -34,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Getter
 @Singleton
-public class DataCenterService extends HoldRunApplication implements IGetPlayer {
+public class DataCenterService extends HoldRunApplication implements GetPlayerStrategy {
 
     HexId hexid;
     HexId itemHexid;
@@ -50,21 +49,21 @@ public class DataCenterService extends HoldRunApplication implements IGetPlayer 
     final ConcurrentHashMap<Long, Long> onlinePlayerGroup = new ConcurrentHashMap<>();
     final KeywordsMapping keywordsMapping = new KeywordsMapping();
 
-    GetPlayerProxy getPlayerProxy;
+    GetPlayerStrategyFactory getPlayerStrategyFactory;
 
     @Inject
     public DataCenterService() {
     }
 
     @Start
-    public void start(@Value(path = "sid") int sid, @Named("serverType") int serverType) {
+    public void start(@Named("sid") int sid, @Named("serverType") int serverType) {
         hexid = new HexId(sid);
         itemHexid = new HexId(sid);
         mailHexid = new HexId(sid);
         buffHexid = new HexId(sid);
         if (serverType <= 1) {
             SqlDataHelper sqlDataHelper = runApplication.getInstance(SqlDataHelper.class);
-            getPlayerProxy = new GetPlayerProxy(new GetPlayerByDatabase(sqlDataHelper));
+            getPlayerStrategyFactory = new GetPlayerStrategyFactory(new DatabaseGetPlayerStrategy(sqlDataHelper));
             String sql = "SELECT uid,sid,name,account FROM role where del=?";
             try (SqlQueryResult sqlQueryResult = sqlDataHelper.queryResultSet(sql, false)) {
                 while (sqlQueryResult.hasNext()) {
@@ -82,23 +81,23 @@ public class DataCenterService extends HoldRunApplication implements IGetPlayer 
             RpcService rpcService = runApplication.getInstance(RpcService.class);
             ClientSessionService clientSessionService = runApplication.getInstance(ClientSessionService.class);
             GlobalDbDataCenterService globalDbDataCenterService = runApplication.getInstance(GlobalDbDataCenterService.class);
-            getPlayerProxy = new GetPlayerProxy(new GetPlayerByRpc(rpcService, clientSessionService, globalDbDataCenterService));
+            getPlayerStrategyFactory = new GetPlayerStrategyFactory(new RpcGetPlayerStrategy(rpcService, clientSessionService, globalDbDataCenterService));
         }
     }
 
     @Override public RoleEntity roleEntity(long rid) {
-        return getPlayerProxy.roleEntity(rid);
+        return getPlayerStrategyFactory.roleEntity(rid);
     }
 
     @Override public Player getPlayer(long rid) {
-        return getPlayerProxy.getPlayer(rid);
+        return getPlayerStrategyFactory.getPlayer(rid);
     }
 
     @Override public void putCache(RoleEntity roleEntity) {
-        getPlayerProxy.putCache(roleEntity);
+        getPlayerStrategyFactory.putCache(roleEntity);
     }
 
     @Override public void save(RoleEntity roleEntity) {
-        getPlayerProxy.putCache(roleEntity);
+        getPlayerStrategyFactory.putCache(roleEntity);
     }
 }

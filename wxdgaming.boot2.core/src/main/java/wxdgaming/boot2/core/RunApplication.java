@@ -51,7 +51,8 @@ public abstract class RunApplication {
             throw Throw.of(e);
         }
 
-        guiceBeanProvider = new GuiceBeanProvider(this, new HashSet<>(hashMap.values()));
+        HashSet<Object> beanList = new HashSet<>(hashMap.values());
+        guiceBeanProvider = new GuiceBeanProvider(this, beanList);
         guiceBeanProvider.withFieldAnnotated(Value.class).forEach(fieldProvider -> {
             Value annotation = fieldProvider.getField().getAnnotation(Value.class);
             if (annotation == null) return;
