@@ -2,6 +2,7 @@ package wxdgaming.boot2.starter.batis.rdb;
 
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.*;
+import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
 
 import java.nio.charset.StandardCharsets;
@@ -60,9 +61,17 @@ public class RocksDBDataHelper {
         return db.newIterator();
     }
 
+    public void put2Json(String key, Object value) {
+        try {
+            db.put(key.getBytes(StandardCharsets.UTF_8), FastJsonUtil.toJSONString(value).getBytes(StandardCharsets.UTF_8));
+        } catch (RocksDBException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void put(String key, Object value) {
         try {
-            db.put(key.getBytes(StandardCharsets.UTF_8), value.toString().getBytes(StandardCharsets.UTF_8));
+            db.put(key.getBytes(StandardCharsets.UTF_8), String.valueOf(value).getBytes(StandardCharsets.UTF_8));
         } catch (RocksDBException e) {
             throw new RuntimeException(e);
         }
