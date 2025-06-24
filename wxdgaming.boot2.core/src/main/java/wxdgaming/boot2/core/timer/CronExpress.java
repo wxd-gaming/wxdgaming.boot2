@@ -170,7 +170,7 @@ public class CronExpress extends ObjectBase {
 
     /** 取下一次可用的时间 */
     public long[] validateTimeAfter(long time) {
-        return findValidateTime(time, 1000);
+        return findValidateTime(time, ChangeAbs.After);
     }
 
     /** 获取下一次可用的格式化时间字符串 */
@@ -221,7 +221,7 @@ public class CronExpress extends ObjectBase {
 
     /** 获取上一次可用的时间 */
     public long[] validateTimeBefore(long time) {
-        return findValidateTime(time, -1000);
+        return findValidateTime(time, ChangeAbs.Before);
     }
 
     /** 获取上一次可用时间的格式化字符串 */
@@ -243,7 +243,7 @@ public class CronExpress extends ObjectBase {
 
     /** 获取上一次可用时间 持续结束时间 */
     public long validateOverTimeBefore(long time) {
-        long[] validateTime = findValidateTime(time, -1000);
+        long[] validateTime = findValidateTime(time, ChangeAbs.Before);
         if (validateTime == null) {
             return -1;
         }
@@ -271,25 +271,25 @@ public class CronExpress extends ObjectBase {
     }
 
     public long[] findValidateTime(long now) {
-        long[] validateTime = findValidateTime(now, -1000);
+        long[] validateTime = findValidateTime(now, ChangeAbs.Before);
         if (validateTime != null) {
             if (validateTime[0] <= now && now <= validateTime[1] + offsetTime) {
                 return validateTime;
             }
         }
-        return findValidateTime(now, 1000);
+        return findValidateTime(now, ChangeAbs.After);
     }
 
     /**
      * 获取开启时间
      *
-     * @param time   时间磋
-     * @param change 每一次变更的时间差查找上一次就是 -1000
+     * @param time      时间磋
+     * @param changeAbs 每一次变更的时间差查找上一次就是 只能是
      * @return
      */
-    private long[] findValidateTime(long time, long change) {
-        long seconds = TimeUnit.DAYS.toSeconds(30);
-        for (int i = 0; i < seconds; i++) {
+    private long[] findValidateTime(long time, ChangeAbs changeAbs) {
+        long minutes = TimeUnit.DAYS.toMinutes(30);
+        for (int i = 0; i < minutes; i++) {
             int second = MyClock.getSecond(time);
             int minute = MyClock.getMinute(time);
             int hour = MyClock.getHour(time);
@@ -301,9 +301,25 @@ public class CronExpress extends ObjectBase {
                 time = time / 1000 * 1000;
                 return new long[]{time, time + offsetTime};
             }
-            time += change;
+            time += changeAbs.getAbs() * changeAbs.getTimeUnit().toMillis(1);
         }
         return null;
+    }
+
+    @Getter
+    private enum ChangeAbs {
+
+        Before(-1, TimeUnit.MINUTES),
+        After(1, TimeUnit.MINUTES);
+
+        private final int abs;
+        private final TimeUnit timeUnit;
+
+        ChangeAbs(int abs, TimeUnit timeUnit) {
+            this.abs = abs;
+            this.timeUnit = timeUnit;
+        }
+
     }
 
     public boolean checkJob(int second, int minute, int hour, int dayOfWeek, int dayOfMonth, int month, int year) {
