@@ -1,5 +1,6 @@
 package code;
 
+import com.alibaba.fastjson.JSON;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -10,6 +11,7 @@ import org.mapdb.Serializer;
 import wxdgaming.boot2.core.lang.DiffTime;
 import wxdgaming.boot2.core.util.DumpUtil;
 import wxdgaming.boot2.core.util.RandomUtils;
+import wxdgaming.boot2.starter.batis.mapdb.HoldMap;
 import wxdgaming.boot2.starter.batis.mapdb.MapDBDataHelper;
 
 import java.io.File;
@@ -91,15 +93,16 @@ public class MapDbTest {
         File file = new File("target/file.db");
         try (MapDBDataHelper db = new MapDBDataHelper(file)) {
             System.out.println("start");
-            for (int i = 0; i < 1000; i++) {
-                DiffTime diffTime = new DiffTime();
-                String name = "map" + RandomUtils.random(1000);
-                System.out.println(String.format("打开耗时 %s ms, name=%s", diffTime.diffMs5AndReset(), name));
-                for (int k = 0; k < 1000; k++) {
-                    db.hTreeMapSet(name, "something " + k, new AA().setName("aa" + System.currentTimeMillis()).toString());
-                }
-                System.out.println(String.format("写入耗时 %s ms, name=%s", diffTime.diffMs5AndReset(), name));
-            }
+//            for (int i = 0; i < 1000; i++) {
+//                DiffTime diffTime = new DiffTime();
+//                String cacheName = "map" + RandomUtils.random(1000);
+//                HoldMap holdMap = db.hMap(cacheName);
+//                System.out.println(String.format("打开耗时 %s ms, name=%s", diffTime.diffMs5AndReset(), cacheName));
+//                for (int k = 0; k < 1000; k++) {
+//                    holdMap.put("something " + k, new AA().setName("aa" + System.currentTimeMillis()));
+//                }
+//                System.out.println(String.format("写入耗时 %s ms, name=%s", diffTime.diffMs5AndReset(), cacheName));
+//            }
             System.out.println("=====================");
             readFileDB(db, "map" + RandomUtils.random(100), "something " + RandomUtils.random(1000));
             readFileDB(db, "map" + RandomUtils.random(100), "something " + RandomUtils.random(1000));
@@ -123,16 +126,17 @@ public class MapDbTest {
             return;
         }
         DiffTime diffTime = new DiffTime();
+        HoldMap holdMap = db.hMap(cacheName);
         System.out.println(String.format("打开耗时 %s ms", diffTime.diffMs5AndReset()));
         diffTime.reset();
-        Object o = db.hTreeMapGet(cacheName, key);
-        System.out.println(String.format("读取耗时 %s ms, valueType=%s, value=%s", diffTime.diffMs5AndReset(), o.getClass().getSimpleName(), o));
+        Object o = holdMap.get(key);
+        System.out.println(String.format("读取耗时 %s ms, key=%s, valueType=%s, value=%s", diffTime.diffMs5AndReset(), key, o.getClass().getSimpleName(), o));
         diffTime.reset();
-        Object o1 = db.hTreeMapGet(cacheName, key);
-        System.out.println(String.format("读取耗时 %s ms, valueType=%s, value=%s", diffTime.diffMs5AndReset(), o1.getClass().getSimpleName(), o1));
+        Object o1 = holdMap.get(key);
+        System.out.println(String.format("读取耗时 %s ms, key=%s, valueType=%s, value=%s", diffTime.diffMs5AndReset(), key, o1.getClass().getSimpleName(), o1));
         diffTime.reset();
-        String collect = db.hTreeMap(cacheName).entrySet().stream().map(v -> v.getKey() + ":" + v.getValue()).collect(Collectors.joining("&"));
-        System.out.println(String.format("打印耗时 %s ms, getFileDB:%s", diffTime.diffMs5AndReset(), collect));
+        String jsonString = JSON.toJSONString(holdMap.getHold());
+        System.out.println(String.format("打印耗时 %s ms, getFileDB:%s", diffTime.diffMs5AndReset(), jsonString));
     }
 
     @Test

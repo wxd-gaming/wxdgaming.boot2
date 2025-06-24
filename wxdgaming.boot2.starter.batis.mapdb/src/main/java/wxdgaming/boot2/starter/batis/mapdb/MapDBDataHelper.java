@@ -1,0 +1,124 @@
+package wxdgaming.boot2.starter.batis.mapdb;
+
+import lombok.extern.slf4j.Slf4j;
+import org.mapdb.*;
+
+import java.io.File;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+
+/**
+ * mapdb 辅助
+ *
+ * @author: wxd-gaming(無心道, 15388152619)
+ * @version: 2025-06-23 16:43
+ **/
+@Slf4j
+public class MapDBDataHelper implements AutoCloseable {
+
+    final DB db;
+    final ConcurrentHashMap<String, Object> openCacheMap = new ConcurrentHashMap<>();
+
+    public MapDBDataHelper(String dbPath) {
+        this(new File(dbPath));
+    }
+
+    public MapDBDataHelper(File file) {
+        this.db = DBMaker.fileDB(file)
+                .fileChannelEnable()
+                .closeOnJvmShutdown()
+                .fileMmapEnable()            // 启用内存映射（提升读性能）
+                .fileMmapEnableIfSupported() // 启用内存映射（提升读性能）
+                .fileMmapPreclearDisable()   // 禁用预清理（避免写时阻塞）
+                .cleanerHackEnable()         // 启用清理黑客（提升 mmap 关闭可靠性）
+                .make();
+    }
+
+    public DB db() {
+        return db;
+    }
+
+    @Override public void close() {
+        db.close();
+    }
+
+    public boolean exists(String cacheName) {
+        return db.exists(cacheName);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T cache(String cacheName, Function<String, T> function) {
+        return (T) openCacheMap.computeIfAbsent(cacheName, function);
+    }
+
+    /** 基于hash的map对象，对于随机读写性能很不错 */
+    public HoldMap hMap(String cacheName) {
+        return hMap(cacheName, 1000);
+    }
+
+    @SuppressWarnings("unchecked")
+    public HoldMap hMap(String cacheName, int expireStoreSize) {
+        return cache(
+                cacheName,
+                k -> new HoldMap((HTreeMap<String, Object>) db.hashMap(cacheName, Serializer.STRING, Serializer.JAVA).expireStoreSize(expireStoreSize).createOrOpen())
+        );
+    }
+
+    public HoldMap bMap(String cacheName) {
+        return bMap(cacheName, 32);
+    }
+
+    /** 基于B树的map对象，对于连续读写性能不错，随机较差 */
+    @SuppressWarnings("unchecked")
+    public HoldMap bMap(String cacheName, int maxNodeSize) {
+        return cache(
+                cacheName,
+                k -> new HoldMap((BTreeMap<String, Object>) db.treeMap(cacheName, Serializer.STRING, Serializer.JAVA).maxNodeSize(maxNodeSize).createOrOpen())
+        );
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public Set<Object> hashSet(String cacheName) {
+        return cache(
+                cacheName,
+                k -> (Set<Object>) db.hashSet(cacheName).createOrOpen()
+        );
+    }
+
+    public Atomic.Long atomicLong(String cacheName) {
+        return cache(
+                cacheName,
+                k -> db.atomicLong(cacheName).createOrOpen()
+        );
+    }
+
+    public Atomic.Integer atomicInteger(String cacheName) {
+        return cache(
+                cacheName,
+                k -> db.atomicInteger(cacheName).createOrOpen()
+        );
+    }
+
+    public Atomic.String atomicString(String cacheName) {
+        return cache(
+                cacheName,
+                k -> {
+                    return db.atomicString(cacheName).createOrOpen();
+                }
+        );
+    }
+
+    public <T> Atomic.Var<T> atomicVar(String cacheName) {
+        return cache(
+                cacheName,
+                k -> {
+                    Serializer<T> java = Serializer.JAVA;
+                    return db.atomicVar(cacheName, java).createOrOpen();
+                }
+        );
+    }
+
+
+}

@@ -1,8 +1,10 @@
 package run;
 
+import com.alibaba.fastjson.JSONObject;
 import com.mysql.cj.jdbc.Driver;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
+import run.entity.EntityDouble;
 import run.entity.EntityTest;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.batis.TableMapping;
@@ -32,6 +34,7 @@ public class MysqlTest {
         sqlConfig.setPassword("test");
         dataHelper = new MysqlDataHelper(sqlConfig);
         dataHelper.checkTable(EntityTest.class);
+        dataHelper.checkTable(EntityDouble.class);
         TableMapping tableMapping = dataHelper.tableMapping(EntityTest.class);
         /*TODO 处理分区表 */
         LocalDateTime localDate = LocalDateTime.now();
@@ -62,6 +65,21 @@ public class MysqlTest {
         for (EntityTest entityTest : all) {
             System.out.println(entityTest);
         }
+    }
+
+    @Test
+    public void doubleTest() {
+        EntityDouble entityDouble = new EntityDouble();
+        entityDouble.setUid(System.currentTimeMillis());
+        entityDouble.setD1(1);
+
+        dataHelper.insert(entityDouble);
+
+        List<JSONObject> jsonObjects = dataHelper.queryList("select * from entitydouble");
+        for (JSONObject jsonObject : jsonObjects) {
+            System.out.println(jsonObject);
+        }
+
     }
 
 }

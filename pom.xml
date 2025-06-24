@@ -29,6 +29,7 @@
         <module>wxdgaming.game.server</module>
         <module>wxdgaming.game.server-script</module>
         <module>wxdgaming.game.login</module>
+        <module>wxdgaming.boot2.starter.batis.mapdb</module>
     </modules>
 
     <properties>
