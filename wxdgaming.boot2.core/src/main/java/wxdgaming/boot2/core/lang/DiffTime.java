@@ -45,9 +45,22 @@ public class DiffTime {
         return diffNs() / 1000_000;
     }
 
+    /** 从初始化到调用的时间差，单位毫秒 */
+    public long diffMsAndReset() {
+        long l = diffMs();
+        reset();
+        return l;
+    }
+
     /** 从初始化到调用的时间差，单位毫秒, 保留5位小数 */
     public float diffMs5() {
         return diffNs() / 10 / 100000f;
     }
 
+    /** 从初始化到调用的时间差，单位毫秒, 保留5位小数 */
+    public float diffMs5AndReset() {
+        float l = diffMs5();
+        reset();
+        return l;
+    }
 }
