@@ -7,6 +7,7 @@ import wxdgaming.boot2.core.collection.ListOf;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.bean.goods.ItemCfg;
+import wxdgaming.game.bean.goods.BagChangeArgs4ItemCfg;
 import wxdgaming.game.cfg.QTaskTable;
 import wxdgaming.game.cfg.bean.QTask;
 import wxdgaming.game.core.Reason;
@@ -146,13 +147,21 @@ public abstract class ITaskScript extends HoldRunApplication {
 
         List<ItemCfg> rewards = qTask.getRewards();
 
-        taskInfo.setRewards(true);
+        BagChangeArgs4ItemCfg rewardArgs4ItemCfg = BagChangeArgs4ItemCfg.builder()
+                .setItemCfgList(rewards)
+                .setBagFullNoticeClient(true)
+                .setBagFullSendMail(false)
+                .setReasonArgs(reasonArgs)
+                .build();
 
+        if (!bagService.gainItems4Cfg(player, rewardArgs4ItemCfg)) {
+            return;
+        }
+
+        taskInfo.setRewards(true);
+        taskPack.addFinishTask(type(), taskId);
         log.info("{} 提交任务 {}, {}, {}, rewards={}", player, type(), qTask.getInnerTaskDetail(), reasonArgs, rewards);
 
-        bagService.gainItems4Cfg(player, rewards, reasonArgs);
-
-        taskPack.getTaskFinishList().computeIfAbsent(type(), k -> new ArrayList<>()).add(taskId);
         ResSubmitTask resSubmitTask = new ResSubmitTask();
         resSubmitTask.setTaskType(type());
         resSubmitTask.setTaskId(taskId);

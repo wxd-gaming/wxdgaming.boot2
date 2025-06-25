@@ -11,8 +11,7 @@ import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
-import wxdgaming.game.bean.goods.ItemCfg;
-import wxdgaming.game.bean.goods.ItemTypeConst;
+import wxdgaming.game.bean.goods.*;
 import wxdgaming.game.cfg.QItemTable;
 import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.core.ReasonArgs;
@@ -21,7 +20,6 @@ import wxdgaming.game.message.bag.ResBagInfo;
 import wxdgaming.game.server.bean.bag.BagChangesEvent;
 import wxdgaming.game.server.bean.bag.BagPack;
 import wxdgaming.game.server.bean.bag.ItemBag;
-import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnCreateRole;
 import wxdgaming.game.server.event.OnLogin;
@@ -185,34 +183,35 @@ public class BagService extends HoldRunApplication implements InitPrint {
     }
 
     /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
-    public boolean gainItems4Cfg(Player player, List<ItemCfg> itemCfgs, ReasonArgs reasonArgs) {
-        List<Item> items = newItems(itemCfgs);
-        BagPack bagPack = player.getBagPack();
-        ItemBag itemBag = bagPack.itemBag(BagType.Bag);
-        if (itemBag.freeGrid() < items.size()) {
-            if (log.isDebugEnabled()) {
-                log.debug("添加道具背包空间不足 {} 背包空间：{} 需要格子数：{}, {}", player, itemBag.freeGrid(), items.size(), reasonArgs);
-            }
-            return false;/* TODO 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
-        }
-        gainItems(player, BagType.Bag, itemBag, items, reasonArgs);
-        return true;
-    }
-
-    /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
-    public boolean gainItems4CfgNotice(Player player, List<ItemCfg> itemCfgs, ReasonArgs reasonArgs) {
-        boolean gained = gainItems4Cfg(player, itemCfgs, reasonArgs);
-        if (!gained) {
-            tipsService.tips(player, "背包已满");
-        }
-        return gained;
+    public boolean gainItems4Cfg(Player player, BagChangeArgs4ItemCfg rewardArgs4ItemCfg) {
+        List<Item> items = newItems(rewardArgs4ItemCfg.getItemCfgList());
+        return gainItemsBefore(player, rewardArgs4ItemCfg, items);
     }
 
     /** 默认是往背包添加 */
-    public void gainItems(Player player, List<Item> items, ReasonArgs reasonArgs) {
-        BagPack bagPack = player.getBagPack();
-        ItemBag itemBag = bagPack.itemBag(BagType.Bag);
-        gainItems(player, BagType.Bag, itemBag, items, reasonArgs);
+    public boolean gainItems(Player player, BagChangeArgs4Item changeArgs4Item) {
+        return gainItemsBefore(player, changeArgs4Item, changeArgs4Item.getItemList());
+    }
+
+    private boolean gainItemsBefore(Player player, BagChangeArgs bagChangeArgs, List<Item> items) {
+        BagType bagType = bagChangeArgs.getBagType();
+        ItemBag itemBag = player.getBagPack().itemBag(bagType);
+        if (!bagChangeArgs.isBagFullSendMail()) {
+            if (itemBag.freeGrid() < items.size()) {
+                if (log.isInfoEnabled()) {
+                    log.info(
+                            "添加道具背包空间不足 {} 背包空间：{} 需要格子数：{}, {}",
+                            player, itemBag.freeGrid(), items.size(), bagChangeArgs.getReasonArgs()
+                    );
+                }
+                if (bagChangeArgs.isBagFullNoticeClient()) {
+                    tipsService.tips(player, "背包已满");
+                }
+                return false;/* TODO 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
+            }
+        }
+        gainItems(player, bagType, itemBag, items, bagChangeArgs.getReasonArgs());
+        return true;
     }
 
     /** 最终入口 */

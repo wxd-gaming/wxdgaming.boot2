@@ -3,6 +3,7 @@ package wxdgaming.game.server.script.role.event;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.game.bean.goods.BagChangeArgs4ItemCfg;
 import wxdgaming.game.core.Reason;
 import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.bean.goods.ItemCfg;
@@ -42,7 +43,11 @@ public class PlayerCreateHandler {
         rewards.add(builder.cfgId(4).num(100000).build());
         rewards.add(builder.cfgId(5).num(1).build());
         ReasonArgs reasonArgs = ReasonArgs.of(Reason.CreateRole);
-        bagService.gainItems4Cfg(player, rewards, reasonArgs);
+        BagChangeArgs4ItemCfg rewardArgs4ItemCfg = BagChangeArgs4ItemCfg.builder()
+                .setItemCfgList(rewards)
+                .setReasonArgs(reasonArgs)
+                .build();
+        bagService.gainItems4Cfg(player, rewardArgs4ItemCfg);
     }
 
 }

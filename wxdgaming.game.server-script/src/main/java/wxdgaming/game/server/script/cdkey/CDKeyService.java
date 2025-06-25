@@ -11,6 +11,7 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.httpclient.HttpBuilder;
 import wxdgaming.boot2.starter.net.httpclient.PostText;
+import wxdgaming.game.bean.goods.BagChangeArgs4Item;
 import wxdgaming.game.bean.goods.ItemCfg;
 import wxdgaming.game.core.Reason;
 import wxdgaming.game.core.ReasonArgs;
@@ -95,7 +96,14 @@ public class CDKeyService {
 
         List<Item> itemList = bagService.newItems(rewards);
 
-        bagService.gainItems(player, itemList, reasonArgs);
+        BagChangeArgs4Item rewardItemArgs =  BagChangeArgs4Item.builder()
+                .setItemList(itemList)
+                .setBagFullSendMail(true)
+                .setBagFullNoticeClient(false)
+                .setReasonArgs(reasonArgs)
+                .build();
+
+        bagService.gainItems(player, rewardItemArgs);
 
         ResUseCdKey resUseCdKey = new ResUseCdKey();
         resUseCdKey.setCdKey(cdKey);

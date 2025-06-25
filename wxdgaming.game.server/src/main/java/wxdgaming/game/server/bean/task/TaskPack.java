@@ -27,4 +27,8 @@ public class TaskPack extends ObjectBase {
     @JSONField(ordinal = 12)
     private Table<TaskType, Integer, TaskInfo> tasks = new Table<>();
 
+    public void addFinishTask(TaskType taskType, int taskId) {
+        taskFinishList.computeIfAbsent(taskType, l -> new ArrayList<>()).add(taskId);
+    }
+
 }
