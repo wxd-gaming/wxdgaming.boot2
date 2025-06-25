@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.starter.net.ChannelUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
-import wxdgaming.boot2.starter.net.server.SocketServerImpl;
+import wxdgaming.boot2.starter.net.server.SocketServer;
 import wxdgaming.game.gateway.bean.ServerMapping;
 import wxdgaming.game.gateway.bean.UserMapping;
 import wxdgaming.game.message.inner.InnerRegisterServer;
@@ -35,10 +35,10 @@ public class DataCenterService extends HoldRunApplication {
     private final ServerMapping chartServiceMapping = new ServerMapping();
     /** key:account, value:mapping */
     private final ConcurrentHashMap<String, UserMapping> userMappings = new ConcurrentHashMap<>();
-    private final SocketServerImpl socketServer;
+    private final SocketServer socketServer;
 
     @Inject
-    public DataCenterService(SocketServerImpl socketServer) {
+    public DataCenterService(SocketServer socketServer) {
         this.socketServer = socketServer;
     }
 

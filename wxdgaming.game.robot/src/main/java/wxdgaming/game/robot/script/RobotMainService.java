@@ -13,7 +13,7 @@ import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.RandomUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
-import wxdgaming.boot2.starter.net.client.SocketClientImpl;
+import wxdgaming.boot2.starter.net.client.SocketClient;
 import wxdgaming.boot2.starter.net.httpclient.HttpBuilder;
 import wxdgaming.boot2.starter.net.httpclient.PostText;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
@@ -42,11 +42,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RobotMainService {
 
     final LoginConfig loginConfig;
-    final SocketClientImpl socketClient;
+    final SocketClient socketClient;
     final ConcurrentHashMap<String, Robot> robotMap = new ConcurrentHashMap<>();
 
     @Inject
-    public RobotMainService(LoginConfig loginConfig, SocketClientImpl socketClient) {
+    public RobotMainService(LoginConfig loginConfig, SocketClient socketClient) {
         this.loginConfig = loginConfig;
         this.socketClient = socketClient;
     }

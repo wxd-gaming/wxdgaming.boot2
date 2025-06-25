@@ -20,7 +20,7 @@ import wxdgaming.boot2.starter.net.httpclient.HttpBuilder;
 import wxdgaming.boot2.starter.net.httpclient.PostText;
 import wxdgaming.boot2.starter.net.httpclient.Response;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
-import wxdgaming.boot2.starter.net.server.SocketServerImpl;
+import wxdgaming.boot2.starter.net.server.SocketServer;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.login.bean.info.InnerServerInfoBean;
@@ -46,14 +46,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Gateway2GameSessionService extends HoldRunApplication {
 
     final LoginConfig loginConfig;
-    final SocketServerImpl socketServer;
+    final SocketServer socketServer;
     final ConcurrentHashMap<Integer, Gateway2GameSocketClientImpl> gameSessionMap = new ConcurrentHashMap<>();
 
     private final ProtoListenerFactory protoListenerFactory;
     private final HttpListenerFactory httpListenerFactory;
 
     @Inject
-    public Gateway2GameSessionService(LoginConfig loginConfig, SocketServerImpl socketServer,
+    public Gateway2GameSessionService(LoginConfig loginConfig, SocketServer socketServer,
                                       ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
         this.loginConfig = loginConfig;
         this.socketServer = socketServer;

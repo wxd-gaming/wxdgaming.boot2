@@ -30,9 +30,8 @@ public class SocketServerGuiceModule extends ServiceGuiceModule {
                 if (serverConfig.isEnabledWebSocket() && StringUtils.isBlank(serverConfig.getWebSocketPrefix())) {
                     throw new RuntimeException("WebSocket 模块配置错误，WebSocket 模块需要配置 WebSocket 前缀");
                 }
-                SocketServerImpl server = new SocketServerImpl(serverConfig);
+                SocketServer server = new SocketServer(serverConfig);
                 bindInstance(server);
-                bindInstance(SocketServer.class, server);
                 bindInstance(SocketServer.class, "socket.server", server);
             }
         }
@@ -42,8 +41,7 @@ public class SocketServerGuiceModule extends ServiceGuiceModule {
                 if (serverConfig.isEnabledWebSocket() && StringUtils.isBlank(serverConfig.getWebSocketPrefix())) {
                     throw new RuntimeException("WebSocket 模块配置错误，WebSocket 模块需要配置 WebSocket 前缀");
                 }
-                SocketServerImpl2 server = new SocketServerImpl2(serverConfig);
-                bindInstance(server);
+                SocketServer server = new SocketServer(serverConfig);
                 bindInstance(SocketServer.class, "socket.server-second", server);
             }
         }

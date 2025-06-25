@@ -12,7 +12,7 @@ import wxdgaming.boot2.core.util.Md5Util;
 import wxdgaming.boot2.starter.net.httpclient.HttpBuilder;
 import wxdgaming.boot2.starter.net.httpclient.PostText;
 import wxdgaming.boot2.starter.net.httpclient.Response;
-import wxdgaming.boot2.starter.net.server.SocketServerImpl;
+import wxdgaming.boot2.starter.net.server.SocketServer;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.login.bean.info.InnerServerInfoBean;
 import wxdgaming.game.login.LoginConfig;
@@ -30,12 +30,12 @@ import java.util.List;
 @Singleton
 public class GameTimerService {
 
-    final SocketServerImpl socketServer;
+    final SocketServer socketServer;
     final LoginConfig loginConfig;
     final PlayerDriveService playerDriveService;
 
     @Inject
-    public GameTimerService(SocketServerImpl socketServer, LoginConfig loginConfig, PlayerDriveService playerDriveService) {
+    public GameTimerService(SocketServer socketServer, LoginConfig loginConfig, PlayerDriveService playerDriveService) {
         this.socketServer = socketServer;
         this.loginConfig = loginConfig;
         this.playerDriveService = playerDriveService;

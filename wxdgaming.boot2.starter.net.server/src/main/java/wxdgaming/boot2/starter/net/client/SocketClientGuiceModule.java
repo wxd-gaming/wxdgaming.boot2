@@ -27,9 +27,9 @@ public class SocketClientGuiceModule extends ServiceGuiceModule {
                         throw new RuntimeException("WebSocket 模块配置错误，WebSocket 模块需要配置 WebSocket 前缀");
                     }
                 }
-                SocketClientImpl socketClient = new SocketClientImpl(clientConfig);
+                SocketClient socketClient = new SocketClient(clientConfig);
                 bindInstance(SocketClient.class, socketClient);
-                bindInstance(SocketClientImpl.class, socketClient);
+                bindInstance(SocketClient.class, "socket.client", socketClient);
             }
         }
     }

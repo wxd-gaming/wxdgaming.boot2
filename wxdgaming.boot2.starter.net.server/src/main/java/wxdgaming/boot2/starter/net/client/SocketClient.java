@@ -40,7 +40,7 @@ import java.util.function.Consumer;
  **/
 @Slf4j
 @Getter
-public abstract class SocketClient {
+public class SocketClient {
 
     protected Bootstrap bootstrap;
     protected final SocketClientConfig config;
