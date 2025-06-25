@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.util.ConvertUtil;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -20,8 +21,13 @@ import java.io.Serializable;
 @Accessors(chain = true)
 public class TimeFormat implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
+    public static String of(long costTime) {
+        return new TimeFormat().addTime(costTime).toString();
+    }
+
+    @Getter
     public static enum FormatInfo {
         All(0, ""),
         Day(24f * 60 * 60 * 1000, "d"),
@@ -37,13 +43,6 @@ public class TimeFormat implements Serializable {
             this.comment = comment;
         }
 
-        public float getCode() {
-            return code;
-        }
-
-        public String getComment() {
-            return comment;
-        }
     }
 
     /** 为了保留两位小数, 精度是 毫秒 * 100 */
