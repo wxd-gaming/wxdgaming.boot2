@@ -71,20 +71,17 @@ public class TimeFormat implements Serializable {
 
         long d = h / 24;
         h = h % 24;
+
+
         if (d > 0) {
-            stringBuilder.append(d).append(" d, ");
-        }
-        if (h > 0) {
-            stringBuilder.append(h).append(" h, ");
-        }
-        if (m > 0) {
-            stringBuilder.append(m).append(" m, ");
-        }
-        if (s > 0) {
-            stringBuilder.append(s).append(" s, ");
-        }
-        if (ms > 0) {
-            stringBuilder.append(ms).append(" ms");
+            String format = "%02d %02d:%02d:%02d.%03d";
+            stringBuilder.append(String.format(format, d, h, m, s, ms));
+        } else if (h > 0) {
+            String format = "%02d:%02d:%02d.%03d";
+            stringBuilder.append(String.format(format, h, m, s, ms));
+        } else  {
+            String format = "%02d:%02d.%03d";
+            stringBuilder.append(String.format(format, m, s, ms));
         }
     }
 
