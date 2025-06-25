@@ -3,6 +3,7 @@ package update;
 import lombok.Getter;
 import org.junit.Test;
 import wxdgaming.boot2.core.format.TimeFormat;
+import wxdgaming.boot2.core.lang.DiffTime;
 import wxdgaming.boot2.core.util.RandomUtils;
 
 import java.util.List;
@@ -22,13 +23,14 @@ public class FightTest {
         Role roleLeft = createRole(1, "left");
         Role roleRight = createRole(2, "right");
         Fight fight = new Fight(List.of(roleLeft), List.of(roleRight));
+        DiffTime diffTime = new DiffTime();
         fight.execute();
-
+        float v = diffTime.diffMs5();
         for (FightEvent fightEvent : fight.getFightResult().getFightEventList()) {
             System.out.println(fightEvent);
         }
 
-        System.out.println("战斗持续时间：" + TimeFormat.of(fight.getFightResult().getTimes() * 100));
+        System.out.println("战斗持续时间：" + TimeFormat.of(fight.getFightResult().getTimes() * 100) + " - 战报耗时：" + v);
     }
 
     public Role createRole(long id, String name) {
