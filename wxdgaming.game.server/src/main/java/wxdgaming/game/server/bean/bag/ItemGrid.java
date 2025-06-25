@@ -1,18 +1,17 @@
 package wxdgaming.game.server.bean.bag;
 
 import lombok.Getter;
+import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.game.bean.goods.Item;
 
-import java.util.Objects;
-
 /**
- * 变化
+ * 格子，
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-06-07 11:47
  **/
 @Getter
-public class ItemGrid {
+public class ItemGrid extends ObjectBase {
 
     private final int grid;
     private final Item item;
@@ -25,11 +24,12 @@ public class ItemGrid {
     @Override public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
-        ItemGrid that = (ItemGrid) o;
-        return Objects.equals(getItem(), that.getItem());
+        ItemGrid itemGrid = (ItemGrid) o;
+        return getGrid() == itemGrid.getGrid();
     }
 
     @Override public int hashCode() {
-        return Objects.hashCode(getItem());
+        return getGrid();
     }
+
 }

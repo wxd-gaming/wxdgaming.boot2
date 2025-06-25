@@ -102,12 +102,16 @@ public abstract class ITaskScript extends HoldRunApplication {
             tipsService.tips(player, "已经接取");
             return;
         }
+        ReasonArgs reasonArgs = ReasonArgs.of(Reason.TASK_ACCEPT, "taskCfg=" + taskId);
         if (!ListOf.isEmpty(qTask.getAcceptCost())) {
-            if (!bagService.checkCostNotice(player, qTask.getAcceptCost())) {
+            BagChangeArgs4ItemCfg changeArgs4ItemCfg = BagChangeArgs4ItemCfg.builder()
+                    .setItemCfgList(qTask.getAcceptCost())
+                    .setReasonArgs(reasonArgs)
+                    .build();
+            if (!bagService.checkCost(player, changeArgs4ItemCfg)) {
                 return;
             }
-            ReasonArgs reasonArgs = ReasonArgs.of(Reason.TASK_ACCEPT, "taskCfg=" + taskId);
-            bagService.cost(player, qTask.getAcceptCost(), reasonArgs);
+            bagService.cost(player, changeArgs4ItemCfg);
         }
         taskInfo.setAcceptTime(System.currentTimeMillis());
         log.info("{} 接取任务：{}, {}, {}", player, type(), qTask.getInnerTaskDetail(), taskInfo.toJSONString());
@@ -139,17 +143,21 @@ public abstract class ITaskScript extends HoldRunApplication {
         ReasonArgs reasonArgs = ReasonArgs.of(Reason.TASK_SUBMIT, "taskCfg=" + taskId);
 
         if (!ListOf.isEmpty(qTask.getSubmitCost())) {
-            if (!bagService.checkCostNotice(player, qTask.getSubmitCost())) {
+            BagChangeArgs4ItemCfg changeArgs4ItemCfg = BagChangeArgs4ItemCfg.builder()
+                    .setItemCfgList(qTask.getSubmitCost())
+                    .setReasonArgs(reasonArgs)
+                    .build();
+            if (!bagService.checkCost(player, changeArgs4ItemCfg)) {
                 return;
             }
-            bagService.cost(player, qTask.getSubmitCost(), reasonArgs);
+            bagService.cost(player, changeArgs4ItemCfg);
         }
 
         List<ItemCfg> rewards = qTask.getRewards();
 
         BagChangeArgs4ItemCfg rewardArgs4ItemCfg = BagChangeArgs4ItemCfg.builder()
                 .setItemCfgList(rewards)
-                .setBagFullNoticeClient(true)
+                .setBagErrorNoticeClient(true)
                 .setBagFullSendMail(false)
                 .setReasonArgs(reasonArgs)
                 .build();

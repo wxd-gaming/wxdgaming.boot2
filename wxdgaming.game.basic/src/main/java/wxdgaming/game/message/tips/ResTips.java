@@ -39,6 +39,8 @@ public class ResTips extends PojoBase {
     @Tag(3) private List<String> params = new ArrayList<>();
     /** 提示消息id，如果客户端在监听这个id */
     @Tag(4) private int resMessageId;
+    /** 触发原因，可能null */
+    @Tag(5) private String reason;
 
 
 }

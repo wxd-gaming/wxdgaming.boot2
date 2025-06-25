@@ -99,7 +99,7 @@ public class CDKeyService {
         BagChangeArgs4Item rewardItemArgs =  BagChangeArgs4Item.builder()
                 .setItemList(itemList)
                 .setBagFullSendMail(true)
-                .setBagFullNoticeClient(false)
+                .setBagErrorNoticeClient(false)
                 .setReasonArgs(reasonArgs)
                 .build();
 

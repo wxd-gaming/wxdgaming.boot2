@@ -4,7 +4,6 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.cfg.bean.QItem;
-import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.server.bean.bag.ItemBag;
 import wxdgaming.game.server.bean.bag.ItemGrid;
@@ -28,19 +27,12 @@ public class CurrencyCostScript extends CostScript {
         return ItemTypeConst.CurrencyType;
     }
 
-    @Override public void cost(Player player, BagChangesEvent bagChangesEvent, QItem qItem, long count, ReasonArgs reasonArgs) {
+    @Override public void cost(Player player, BagChangesEvent bagChangesEvent, QItem qItem, long count) {
         int cfgId = qItem.getId();
-        BagType bagType = bagChangesEvent.getBagType();
-        ItemBag itemBag = bagChangesEvent.getItemBag();
-        HashMap<Integer, Long> currencyMap = itemBag.getCurrencyMap();
-        long hasNum = currencyMap.getOrDefault(cfgId, 0L);
-        if (hasNum < count) {
-            throw new IllegalArgumentException("货币不足");
-        }
         bagChangesEvent.subtractCurrency(cfgId, count);
     }
 
-    @Override public void cost(Player player, BagChangesEvent bagChangesEvent, ItemGrid itemGrid, long count, ReasonArgs reasonArgs) {
-        cost(player, bagChangesEvent, itemGrid.getItem().qItem(), count, reasonArgs);
+    @Override public void cost(Player player, BagChangesEvent bagChangesEvent, ItemGrid itemGrid, long count) {
+        cost(player, bagChangesEvent, itemGrid.getItem().qItem(), count);
     }
 }

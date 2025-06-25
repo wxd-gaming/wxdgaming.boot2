@@ -9,6 +9,7 @@ package wxdgaming.game.core;
 public enum Reason {
     /** 未知 */
     UNKNOWN,
+    SYSTEM,
     CreateRole,
     GM,
     Heart,

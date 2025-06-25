@@ -4,7 +4,6 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.cfg.bean.QItem;
-import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.server.bean.bag.BagChangesEvent;
 import wxdgaming.game.server.bean.bag.ItemGrid;
 import wxdgaming.game.server.bean.role.Player;
@@ -24,18 +23,17 @@ public class ExpCostScript extends CostScript {
         return ItemTypeConst.EXP;
     }
 
-    @Override public void cost(Player player, BagChangesEvent bagChangesEvent,
-                               QItem qItem, long count, ReasonArgs reasonArgs) {
+    @Override public void cost(Player player, BagChangesEvent bagChangesEvent, QItem qItem, long count) {
         long hasExp = player.getExp();
         if (hasExp < count) {
             throw new IllegalArgumentException("经验不足");
         }
-        playerService.setExp(player, hasExp - count, reasonArgs);
-        log.info("{} 当前经验：{} 扣除经验:{}, {}", player, player.getExp(), count, reasonArgs);
+        playerService.setExp(player, hasExp - count, bagChangesEvent.getReasonArgs());
+        log.info("{} 当前经验：{} 扣除经验:{}, {}", player, player.getExp(), count, bagChangesEvent.getReasonArgs());
     }
 
-    @Override public void cost(Player player, BagChangesEvent bagChangesEvent, ItemGrid itemGrid, long count, ReasonArgs reasonArgs) {
-        cost(player, bagChangesEvent, itemGrid.getItem().qItem(), count, reasonArgs);
+    @Override public void cost(Player player, BagChangesEvent bagChangesEvent, ItemGrid itemGrid, long count) {
+        cost(player, bagChangesEvent, itemGrid.getItem().qItem(), count);
     }
 
 }

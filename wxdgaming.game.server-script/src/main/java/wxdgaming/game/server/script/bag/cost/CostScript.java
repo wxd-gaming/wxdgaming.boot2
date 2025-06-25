@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.cfg.bean.QItem;
-import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.server.bean.bag.BagChangesEvent;
 import wxdgaming.game.server.bean.bag.ItemBag;
@@ -37,7 +36,7 @@ public class CostScript {
         return ItemTypeConst.NONE;
     }
 
-    public void cost(Player player, BagChangesEvent bagChangesEvent, QItem qItem, long count, ReasonArgs reasonArgs) {
+    public void cost(Player player, BagChangesEvent bagChangesEvent, QItem qItem, long count) {
         BagType bagType = bagChangesEvent.getBagType();
         ItemBag itemBag = bagChangesEvent.getItemBag();
         List<ItemGrid> itemGridList = itemBag.itemGridListByCfgId(qItem.getId());
@@ -66,7 +65,7 @@ public class CostScript {
                 if (hasNum <= count) {
                     log.info(
                             "背包变更：{}, {}, 道具扣除, 格子：{}, {}, {}, 从背包移除, {}",
-                            player, bagType, itemGrid.getGrid(), item.toName(), item.getCount(), reasonArgs
+                            player, bagType, itemGrid.getGrid(), item.toName(), item.getCount(), bagChangesEvent.getReasonArgs()
                     );
                     itemBag.remove(itemGrid);
                     bagChangesEvent.addDel(itemGrid);
@@ -77,7 +76,7 @@ public class CostScript {
                     bagChangesEvent.addChange(itemGrid);
                     log.info(
                             "背包变更：{}, {}, 道具扣除, 格子：{}, {}, {}-{}={}, {}",
-                            player, bagType, itemGrid.getGrid(), item.toName(), hasNum, count, item.getCount(), reasonArgs
+                            player, bagType, itemGrid.getGrid(), item.toName(), hasNum, count, item.getCount(), bagChangesEvent.getReasonArgs()
                     );
                     count = 0;
                 }
@@ -89,14 +88,14 @@ public class CostScript {
         AssertUtil.assertTrue(count <= 0, "背包变更：%s, %s, %s, 数量不足", player, bagType, qItem.getToName());
     }
 
-    public void cost(Player player, BagChangesEvent bagChangesEvent, ItemGrid itemGrid, long count, ReasonArgs reasonArgs) {
+    public void cost(Player player, BagChangesEvent bagChangesEvent, ItemGrid itemGrid, long count) {
         ItemBag itemBag = bagChangesEvent.getItemBag();
         Item item = itemGrid.getItem();
         long hasNum = item.getCount();
         if (hasNum <= count) {
             log.info(
                     "背包变更：{}, {}, 道具扣除, 格子：{}, {}, {}, 从背包移除, {}",
-                    player, bagChangesEvent.getBagType(), itemGrid.getGrid(), item.toName(), item.getCount(), reasonArgs
+                    player, bagChangesEvent.getBagType(), itemGrid.getGrid(), item.toName(), item.getCount(), bagChangesEvent.getBagType()
             );
             itemBag.remove(itemGrid);
             bagChangesEvent.addDel(itemGrid);
@@ -106,7 +105,7 @@ public class CostScript {
             bagChangesEvent.addChange(itemGrid);
             log.info(
                     "背包变更：{}, {}, 道具扣除, 格子：{}, {}, {}-{}={}, {}",
-                    player, bagChangesEvent.getBagType(), itemGrid.getGrid(), item.toName(), hasNum, count, item.getCount(), reasonArgs
+                    player, bagChangesEvent.getBagType(), itemGrid.getGrid(), item.toName(), hasNum, count, item.getCount(), bagChangesEvent.getBagType()
             );
         }
     }
