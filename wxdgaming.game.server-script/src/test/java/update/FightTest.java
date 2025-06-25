@@ -2,6 +2,7 @@ package update;
 
 import lombok.Getter;
 import org.junit.Test;
+import org.junit.jupiter.api.RepeatedTest;
 import wxdgaming.boot2.core.format.TimeFormat;
 import wxdgaming.boot2.core.lang.DiffTime;
 import wxdgaming.boot2.core.util.RandomUtils;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class FightTest {
 
     @Test
+    @RepeatedTest(5)
     public void f1() {
 
         Role roleLeft = createRole(1, "left");
@@ -30,7 +32,10 @@ public class FightTest {
             System.out.println(fightEvent);
         }
 
-        System.out.println("战斗持续时间：" + TimeFormat.of(fight.getFightResult().getTimes() * 100) + " - 战报耗时：" + v);
+        System.out.printf(
+                "战斗持续时间：%s - 回合：%d - 战报耗时：%s ms%n",
+                TimeFormat.of(fight.getFightResult().getTimes() * 100), fight.getFightResult().getFightEventList().size(), v
+        );
     }
 
     public Role createRole(long id, String name) {
