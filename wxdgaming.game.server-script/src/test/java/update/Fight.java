@@ -23,7 +23,7 @@ public class Fight {
         long time = 0;
         List<Role> attackRoleList = new ArrayList<>(leftRoleList);
         List<Role> targetRoleList = new ArrayList<>(rightRoleList);
-        int interval = 1000;
+        int interval = 100;
         while (true) {
             {
 

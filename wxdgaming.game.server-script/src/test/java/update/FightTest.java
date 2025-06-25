@@ -28,7 +28,7 @@ public class FightTest {
             System.out.println(fightEvent);
         }
 
-        System.out.println(TimeFormat.of(fight.getFightResult().getTimes()*100));
+        System.out.println("战斗持续时间：" + TimeFormat.of(fight.getFightResult().getTimes() * 100));
     }
 
     public Role createRole(long id, String name) {
