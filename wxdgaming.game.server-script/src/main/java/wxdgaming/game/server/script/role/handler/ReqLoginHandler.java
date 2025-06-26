@@ -52,6 +52,7 @@ public class ReqLoginHandler extends HoldRunApplication {
             int sid = req.getSid();
             String token = req.getToken();
             JsonToken jsonToken = JsonTokenParse.parse(loginConfig.getJwtKey(), token);
+            int appId = jsonToken.getIntValue("appId");
             String account = jsonToken.getString("account");
             String platform = jsonToken.getString("platform");
             /*平台返回的userid*/
@@ -63,6 +64,7 @@ public class ReqLoginHandler extends HoldRunApplication {
 
             clientSessionMapping.setSid(sid);
             clientSessionMapping.setAccount(account);
+            clientSessionMapping.setAppId(appId);
             clientSessionMapping.setPlatform(platform);
             clientSessionMapping.setPlatformUserId(platformUserId);
             clientSessionMapping.setSession(socketSession);

@@ -36,6 +36,7 @@ public class Player extends MapNpc {
     private boolean del;
     private int sid;
     private String account;
+    private int appId;
     private String platform;
     private String platformUserId;
     private HashMap<String, Object> clientData = new HashMap<>();

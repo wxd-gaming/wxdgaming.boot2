@@ -30,6 +30,7 @@ public class ClientSessionMapping extends ObjectBase {
     private long clientSessionId;
     private int sid;
     private String account;
+    private int appId;
     private String platform;
     private String platformUserId;
     private long rid;
