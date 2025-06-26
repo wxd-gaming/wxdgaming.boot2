@@ -11,6 +11,7 @@ import wxdgaming.boot2.starter.net.ann.HttpPath;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
+import wxdgaming.game.login.AppPlatformParams;
 import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
 
 import java.util.Collections;
@@ -28,12 +29,12 @@ import java.util.Map;
 @RequestMapping(path = "/login")
 public class LoginController extends HoldRunApplication {
 
-    Map<Integer, AbstractSdkLoginApi> sdkMap = new HashMap<>();
+    Map<AppPlatformParams.Platform, AbstractSdkLoginApi> sdkMap = new HashMap<>();
 
     @Init
     public void init() {
 
-        HashMap<Integer, AbstractSdkLoginApi> map = new HashMap<>();
+        HashMap<AppPlatformParams.Platform, AbstractSdkLoginApi> map = new HashMap<>();
 
         runApplication.classWithSuper(AbstractSdkLoginApi.class)
                 .forEach(sdkLoginApi -> {
@@ -46,16 +47,21 @@ public class LoginController extends HoldRunApplication {
     }
 
     @HttpRequest
-    public RunResult check(HttpContext context, @Param(path = "platform") int platform) {
+    public RunResult check(HttpContext context, @Param(path = "appId") int appId) {
+        AppPlatformParams appPlatformParams = AppPlatformParams.getAppPlatformParams(appId);
+        if (appPlatformParams == null) {
+            return RunResult.fail("not support appId: " + appId + " not exist");
+        }
+        AppPlatformParams.Platform platform = appPlatformParams.getPlatform();
         AbstractSdkLoginApi sdkLoginApi = sdkMap.get(platform);
         if (sdkLoginApi == null) {
             return RunResult.fail("not support platform: " + platform);
         }
-        return sdkLoginApi.login(context);
+        return sdkLoginApi.login(context, appPlatformParams);
     }
 
     @HttpRequest(path = "test/{id}/sdk")
-    public RunResult checkSdk(HttpContext context, @Param(path = "platform") int platform, @HttpPath("id") int id) {
+    public RunResult checkSdk(HttpContext context, @HttpPath("id") int id) {
         return RunResult.fail(String.valueOf(id));
     }
 

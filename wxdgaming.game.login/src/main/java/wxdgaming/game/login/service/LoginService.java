@@ -23,10 +23,9 @@ import wxdgaming.game.login.bean.UserData;
 public class LoginService {
 
     HexId userHexId;
-    @SuppressWarnings("rawtypes") final SqlDataHelper sqlDataHelper;
+    final SqlDataHelper sqlDataHelper;
 
     @Inject
-    @SuppressWarnings("rawtypes")
     public LoginService(SqlDataHelper sqlDataHelper) {
         this.sqlDataHelper = sqlDataHelper;
     }

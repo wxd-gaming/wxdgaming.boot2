@@ -6,6 +6,7 @@ import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
+import wxdgaming.game.login.AppPlatformParams;
 import wxdgaming.game.login.bean.UserData;
 import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
 
@@ -19,12 +20,11 @@ import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
 @Singleton
 public class LocalSdkLoginApi extends AbstractSdkLoginApi {
 
-
-    @Override public int platform() {
-        return 1;
+    @Override public AppPlatformParams.Platform platform() {
+        return AppPlatformParams.Platform.LOCAL;
     }
 
-    @Override public RunResult login(HttpContext context) {
+    @Override public RunResult login(HttpContext context, AppPlatformParams appPlatformParams) {
 
         if (!GlobalUtil.DEBUG.get()) {
             return RunResult.fail("not debug ban login");
@@ -40,16 +40,16 @@ public class LocalSdkLoginApi extends AbstractSdkLoginApi {
             return RunResult.fail("account is null");
         }
 
-        account = "local-" + account;
+        String finalAccount = platform().name() + "-" + account;
 
-        UserData userData = loginService.userData(account);
-        if (userData == null) {
-            userData = createUserData(account, "local", account);
-            userData.setToken(token);
-        } else {
-            if (!token.equals(userData.getToken())) {
-                return RunResult.fail("token error");
-            }
+        UserData userData = getUserData(finalAccount, () -> {
+            UserData ud = createUserData(finalAccount, appPlatformParams, finalAccount);
+            ud.setToken(token);
+            return ud;
+        });
+
+        if (!token.equals(userData.getToken())) {
+            return RunResult.fail("token error");
         }
 
         return buildResult(userData);
