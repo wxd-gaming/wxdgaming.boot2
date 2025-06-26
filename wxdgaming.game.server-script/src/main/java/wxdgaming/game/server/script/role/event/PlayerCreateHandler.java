@@ -47,7 +47,7 @@ public class PlayerCreateHandler {
                 .setItemCfgList(rewards)
                 .setReasonArgs(reasonArgs)
                 .build();
-        bagService.gainItems4Cfg(player, rewardArgs4ItemCfg);
+        bagService.gainItemCfg(player, rewardArgs4ItemCfg);
     }
 
 }

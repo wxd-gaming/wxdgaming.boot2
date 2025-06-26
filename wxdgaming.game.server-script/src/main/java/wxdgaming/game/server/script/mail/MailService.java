@@ -59,10 +59,14 @@ public class MailService extends HoldRunApplication {
             int vipLv = player.getVipInfo().getLv();
             if (mailInfo.getVipLvMin() > vipLv || mailInfo.getVipLvMax() < vipLv)
                 continue;
-            if (mailPack.getMailInfoList().contains(mailInfo))
+            if (!mailInfo.getRidList().isEmpty() && !mailInfo.getRidList().contains(player.getUid()))
+                /*指定的角色才可用领取*/
                 continue;
-            mailPack.getMailInfoList().add(mailInfo);
-            log.info("{} 领取邮件 {}", player, mailInfo);
+            if (mailInfo.getRewardRidList().contains(player.getUid()))
+                /*该角色已经领取过了*/
+                continue;
+            mailInfo.getRewardRidList().add(player.getUid());
+            addMail(player, mailInfo);
         }
     }
 
@@ -76,7 +80,12 @@ public class MailService extends HoldRunApplication {
         mailInfo.getContentParams().addAll(contentArgs);
         mailInfo.setItems(items);
         mailInfo.setSourceLog(logMsg);
-        player.getMailPack().getMailInfoList().add(mailInfo);
+        addMail(player, mailInfo);
+    }
+
+    public void addMail(Player player, MailInfo mailInfo) {
+        MailPack mailPack = player.getMailPack();
+        mailPack.getMailInfoList().add(mailInfo);
         log.info("获得邮件：{}, {}", player, mailInfo);
     }
 

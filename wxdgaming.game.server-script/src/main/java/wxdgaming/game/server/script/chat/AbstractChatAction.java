@@ -1,11 +1,13 @@
 package wxdgaming.game.server.script.chat;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.game.message.chat.ChatType;
 import wxdgaming.game.message.chat.ReqChatMessage;
 import wxdgaming.game.server.bean.role.Player;
+import wxdgaming.game.server.module.data.DataCenterService;
+import wxdgaming.game.server.script.inner.InnerService;
 import wxdgaming.game.server.script.tips.TipsService;
 
 /**
@@ -16,14 +18,11 @@ import wxdgaming.game.server.script.tips.TipsService;
  **/
 @Slf4j
 @Singleton
-public abstract class ChatHandler {
+public abstract class AbstractChatAction {
 
-    protected TipsService tipsService;
-
-    @Init
-    public void init(TipsService tipsService) {
-        this.tipsService = tipsService;
-    }
+    @Inject protected TipsService tipsService;
+    @Inject protected InnerService innerService;
+    @Inject protected DataCenterService dataCenterService;
 
     public ChatType chatType() {
         return ChatType.Chat_TYPE_NONE;

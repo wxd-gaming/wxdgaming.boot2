@@ -11,7 +11,7 @@ import wxdgaming.game.server.bean.role.Player;
 import java.util.HashSet;
 
 /**
- * 扣除参数
+ * 背包变更事件
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-06-05 19:20

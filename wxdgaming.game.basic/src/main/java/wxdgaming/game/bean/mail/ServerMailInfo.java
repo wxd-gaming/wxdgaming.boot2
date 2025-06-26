@@ -22,14 +22,10 @@ public class ServerMailInfo extends MailInfo {
     private int lvMax;
     private int vipLvMin;
     private int vipLvMax;
-    /** 指定的账号可以领取 */
-    private List<String> accountList = new ArrayList<>();
     /** 指定的角色可以领取 */
     private List<Long> ridList = new ArrayList<>();
 
-    /** 指定的账号可以领取 */
-    private List<String> rewardAccountList = new ArrayList<>();
-    /** 指定的角色可以领取 */
+    /** 已经领取过该邮件的角色 */
     private List<Long> rewardRidList = new ArrayList<>();
 
 

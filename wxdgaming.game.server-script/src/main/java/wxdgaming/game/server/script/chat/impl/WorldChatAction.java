@@ -6,9 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.message.chat.ChatType;
 import wxdgaming.game.message.chat.ReqChatMessage;
 import wxdgaming.game.message.chat.ResChatMessage;
+import wxdgaming.game.message.inner.ServiceType;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
-import wxdgaming.game.server.script.chat.ChatHandler;
+import wxdgaming.game.server.script.chat.AbstractChatAction;
+import wxdgaming.game.server.script.inner.InnerService;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 聊天接口
@@ -18,38 +22,22 @@ import wxdgaming.game.server.script.chat.ChatHandler;
  **/
 @Slf4j
 @Singleton
-public class PrivateChatHandler extends ChatHandler {
+public class WorldChatAction extends AbstractChatAction {
 
-
-    private final DataCenterService dataCenterService;
-
-    @Inject
-    public PrivateChatHandler(DataCenterService dataCenterService) {
-        this.dataCenterService = dataCenterService;
-    }
 
     public ChatType chatType() {
-        return ChatType.Chat_TYPE_Private;
+        return ChatType.Chat_TYPE_World;
     }
 
     public void chat(Player player, ReqChatMessage req) {
-        Player targetPlayer = dataCenterService.getPlayer(req.getTargetId());
-        if (targetPlayer == null) {
-            tipsService.tips(player, "目标玩家不存在");
-            return;
-        }
-        if (!targetPlayer.checkOnline()) {
-            tipsService.tips(player, "目标玩家不在线");
-            return;
-        }
         ResChatMessage res = new ResChatMessage();
         res.setType(req.getType());
         res.setContent(req.getContent());
         res.setParams(req.getParams());
         res.setSenderId(player.getUid());
         res.setSenderName(player.getName());
-        player.write(res);
-        targetPlayer.write(res);
+        ConcurrentHashMap<Long, Long> onlinePlayerGroup = this.dataCenterService.getOnlinePlayerGroup();
+        innerService.forwardMessage(ServiceType.GATEWAY, onlinePlayerGroup.values(), res);
     }
 
 }

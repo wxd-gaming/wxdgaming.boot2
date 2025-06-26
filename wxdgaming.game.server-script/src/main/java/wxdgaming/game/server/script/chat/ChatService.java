@@ -19,20 +19,20 @@ import java.util.HashMap;
 @Singleton
 public class ChatService extends HoldRunApplication {
 
-    HashMap<ChatType, ChatHandler> chatHandlerMap = new HashMap<>();
+    HashMap<ChatType, AbstractChatAction> chatHandlerMap = new HashMap<>();
 
     @Init
     public void init() {
-        HashMap<ChatType, ChatHandler> tmpChatHandlerMap = new HashMap<>();
-        runApplication.classWithSuper(ChatHandler.class)
-                .forEach(chatHandler -> {
-                    ChatHandler put = tmpChatHandlerMap.put(chatHandler.chatType(), chatHandler);
-                    AssertUtil.assertTrue(put == null, "重复注册类型：" + chatHandler.chatType());
+        HashMap<ChatType, AbstractChatAction> tmpChatHandlerMap = new HashMap<>();
+        runApplication.classWithSuper(AbstractChatAction.class)
+                .forEach(abstractChatAction -> {
+                    AbstractChatAction put = tmpChatHandlerMap.put(abstractChatAction.chatType(), abstractChatAction);
+                    AssertUtil.assertTrue(put == null, "重复注册类型：" + abstractChatAction.chatType());
                 });
         this.chatHandlerMap = tmpChatHandlerMap;
     }
 
-    public ChatHandler chatHandler(ChatType chatType) {
+    public AbstractChatAction chatHandler(ChatType chatType) {
         return chatHandlerMap.getOrDefault(chatType, chatHandlerMap.get(ChatType.Chat_TYPE_NONE));
     }
 

@@ -162,7 +162,7 @@ public abstract class ITaskScript extends HoldRunApplication {
                 .setReasonArgs(reasonArgs)
                 .build();
 
-        if (!bagService.gainItems4Cfg(player, rewardArgs4ItemCfg)) {
+        if (!bagService.gainItemCfg(player, rewardArgs4ItemCfg)) {
             return;
         }
 

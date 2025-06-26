@@ -14,7 +14,6 @@ import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.bean.goods.*;
 import wxdgaming.game.cfg.QItemTable;
 import wxdgaming.game.cfg.bean.QItem;
-import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.message.bag.ResBagInfo;
 import wxdgaming.game.server.bean.bag.BagChangesEvent;
@@ -183,17 +182,17 @@ public class BagService extends HoldRunApplication implements InitPrint {
     }
 
     /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
-    public boolean gainItems4Cfg(Player player, BagChangeArgs4ItemCfg rewardArgs4ItemCfg) {
+    public boolean gainItemCfg(Player player, BagChangeArgs4ItemCfg rewardArgs4ItemCfg) {
         List<Item> items = newItems(rewardArgs4ItemCfg.getItemCfgList());
-        return gainItemsBefore(player, rewardArgs4ItemCfg, items);
+        return _gainItems(player, rewardArgs4ItemCfg, items);
     }
 
     /** 默认是往背包添加 */
     public boolean gainItems(Player player, BagChangeArgs4Item changeArgs4Item) {
-        return gainItemsBefore(player, changeArgs4Item, changeArgs4Item.getItemList());
+        return _gainItems(player, changeArgs4Item, changeArgs4Item.getItemList());
     }
 
-    private boolean gainItemsBefore(Player player, BagChangeArgs bagChangeArgs, List<Item> items) {
+    private boolean _gainItems(Player player, BagChangeArgs bagChangeArgs, List<Item> items) {
         BagType bagType = bagChangeArgs.getBagType();
         ItemBag itemBag = player.getBagPack().itemBag(bagType);
         if (!bagChangeArgs.isBagFullSendMail()) {
