@@ -35,9 +35,21 @@ public class DiffTime {
         return diffNs() / 1000;
     }
 
+    public long diffUsAndReset() {
+        long l = diffUs();
+        reset();
+        return l;
+    }
+
     /** 从初始化到调用的时间差，单位微妙, 保留3位小数 */
     public float diffUs5() {
         return diffNs() / 1000f;
+    }
+
+    public float diffUs5AndReset() {
+        float v = diffUs5();
+        reset();
+        return v;
     }
 
     /** 从初始化到调用的时间差，单位毫秒 */
