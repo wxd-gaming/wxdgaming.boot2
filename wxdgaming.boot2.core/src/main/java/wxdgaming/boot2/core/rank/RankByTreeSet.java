@@ -19,20 +19,20 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  **/
 @Getter
 @Setter
-public class RankMapBySet {
+public class RankByTreeSet {
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
     private final ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
 
     private final HashMap<String, RankScore> map = new HashMap<>();
-    private final TreeSet<RankScore> rankMap = new TreeSet<>();
+    private final TreeSet<RankScore> rankTreeSet = new TreeSet<>();
 
-    public RankMapBySet() {
+    public RankByTreeSet() {
 
     }
 
-    public RankMapBySet(List<RankScore> rankScores) {
+    public RankByTreeSet(List<RankScore> rankScores) {
         push(rankScores);
     }
 
@@ -44,9 +44,9 @@ public class RankMapBySet {
                 RankScore oldRankScore = map.get(rankScore.getKey());
                 long oldScore = oldRankScore.getScore();
                 if (oldScore != rankScore.getScore()) {
-                    rankMap.remove(oldRankScore);
+                    rankTreeSet.remove(oldRankScore);
                     // 插入新的ScoreKey
-                    rankMap.add(rankScore);
+                    rankTreeSet.add(rankScore);
                 }
             });
         } finally {
@@ -61,17 +61,28 @@ public class RankMapBySet {
      * @param newScore 新的分数
      */
     public RankScore updateScore(String key, long newScore) {
+        return updateScore(key, newScore, System.nanoTime());
+    }
+
+    /**
+     * 更新用户分数
+     *
+     * @param key       key
+     * @param newScore  分数
+     * @param timestamp 时间戳,建议使用 {@link System#nanoTime()}
+     */
+    public RankScore updateScore(String key, long newScore, long timestamp) {
         writeLock.lock();
         try {
             RankScore rankScore = map.computeIfAbsent(key, k -> new RankScore().setKey(key));
             long oldScore = rankScore.getScore();
             if (oldScore != newScore) {
-                rankMap.remove(rankScore);
+                rankTreeSet.remove(rankScore);
 
                 rankScore.setScore(newScore);
-                rankScore.setTimestamp(System.nanoTime());
+                rankScore.setTimestamp(timestamp);
                 // 插入新的ScoreKey
-                rankMap.add(rankScore);
+                rankTreeSet.add(rankScore);
             }
             return rankScore;
         } finally {
@@ -86,8 +97,12 @@ public class RankMapBySet {
             if (rankScore == null) {
                 return -1;
             }
+            //                        SortedSet<RankScore> rankScores = rankMap.headSet(rankScore);
+            //                        if (!rankScores.isEmpty()) {
+            //                            return rankScores.size() + 1;
+            //                        }
             int rank = 0;
-            for (RankScore value : rankMap) {
+            for (RankScore value : rankTreeSet) {
                 rank++;
                 if (value.getKey().equals(key)) {
                     return rank;
@@ -119,7 +134,7 @@ public class RankMapBySet {
                 return null;
             }
             int currentRank = 0;
-            for (RankScore value : rankMap) {
+            for (RankScore value : rankTreeSet) {
                 currentRank++;
                 if (currentRank >= rank) {
                     return value;
@@ -140,7 +155,7 @@ public class RankMapBySet {
         try {
             ArrayList<RankScore> rankScores = new ArrayList<>(endRank - startRank + 1);
             int currentRank = 0;
-            for (RankScore rankScore : rankMap) {
+            for (RankScore rankScore : rankTreeSet) {
                 currentRank++;
                 if (currentRank < startRank) {
                     continue;
@@ -170,7 +185,7 @@ public class RankMapBySet {
                 return List.of();
             }
             ArrayList<RankScore> rankScores = new ArrayList<>(n);
-            for (RankScore rankScore : rankMap) {
+            for (RankScore rankScore : rankTreeSet) {
                 rankScores.add(rankScore);
                 if (rankScores.size() >= n) {
                     return rankScores;
@@ -183,7 +198,7 @@ public class RankMapBySet {
     }
 
     public List<RankScore> toList() {
-        return rankBySize(rankMap.size());
+        return rankBySize(rankTreeSet.size());
     }
 
 }

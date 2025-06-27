@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 
 /**
  * 缓存持有类
@@ -28,6 +29,14 @@ public class HoldMap {
 
     public Set<Map.Entry<String, Object>> entrySet() {
         return hold.entrySet();
+    }
+
+    public void clear() {
+        hold.clear();
+    }
+
+    public int size() {
+        return hold.size();
     }
 
     public Collection<Object> values() {
@@ -62,6 +71,11 @@ public class HoldMap {
     @SuppressWarnings("unchecked")
     public <T> T put(String key, T value) {
         return (T) hold.put(key, value);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T computeIfAbsent(String key, Function<String, T> function) {
+        return (T) hold.computeIfAbsent(key, function);
     }
 
     public void put(Map<String, Object> map) {

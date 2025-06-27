@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.batis.convert.impl;
 
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
-import wxdgaming.boot2.core.rank.RankGroupMap;
+import wxdgaming.boot2.core.rank.RankByGroupMap;
 import wxdgaming.boot2.core.rank.RankScore;
 import wxdgaming.boot2.starter.batis.convert.Converter;
 
@@ -14,15 +14,15 @@ import java.util.List;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-05-21 09:21
  **/
-public class RankGroupMapConverter extends Converter<RankGroupMap, String> {
+public class RankGroupMapConverter extends Converter<RankByGroupMap, String> {
 
-    @Override public String toDb(RankGroupMap source) {
+    @Override public String toDb(RankByGroupMap source) {
         return FastJsonUtil.toJSONStringAsWriteType(source.toList());
     }
 
-    @Override public RankGroupMap fromDb(Type type, String s) {
+    @Override public RankByGroupMap fromDb(Type type, String s) {
         List<RankScore> parseArray = FastJsonUtil.parseArray(s, RankScore.class);
-        return new RankGroupMap(parseArray);
+        return new RankByGroupMap(parseArray);
     }
 
 }

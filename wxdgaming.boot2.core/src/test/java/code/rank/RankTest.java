@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
 import wxdgaming.boot2.core.lang.DiffTime;
-import wxdgaming.boot2.core.rank.RankGroupMap;
+import wxdgaming.boot2.core.rank.RankByGroupMap;
 import wxdgaming.boot2.core.rank.RankScore;
 import wxdgaming.boot2.core.util.RandomUtils;
 
@@ -21,7 +21,7 @@ import java.util.concurrent.locks.LockSupport;
 public class RankTest {
 
     public static void main(String[] args) {
-        RankGroupMap rankGroupMap = new RankGroupMap();
+        RankByGroupMap rankByGroupMap = new RankByGroupMap();
         ExecutorServicePlatform executorService = ExecutorFactory.create("map", 3);
         for (int k = 0; k < 10; k++) {
             executorService.execute(() -> {
@@ -31,30 +31,30 @@ public class RankTest {
                 int iCount = 1000;
                 int maxRandom = 5;
                 for (int i = 0; i < iCount; i++) {
-                    rankGroupMap.updateScore(String.valueOf(i + 1), RandomUtils.random(1, maxRandom));
+                    rankByGroupMap.updateScore(String.valueOf(i + 1), RandomUtils.random(1, maxRandom));
                 }
                 stringBuilder.append("插入 " + iCount + " 对象 " + diffTime.diffUs5() + "us").append("\n");
                 diffTime.reset();
                 for (int i = 0; i < iCount; i++) {
-                    rankGroupMap.updateScore(String.valueOf(i + 1), RandomUtils.random(1, maxRandom));
+                    rankByGroupMap.updateScore(String.valueOf(i + 1), RandomUtils.random(1, maxRandom));
                 }
                 stringBuilder.append("修改 " + iCount + " 对象 " + diffTime.diffUs5() + "us").append("\n");
                 String random = String.valueOf(RandomUtils.random(1, iCount));
                 {
                     diffTime.reset();
-                    rankGroupMap.updateScore(random, RandomUtils.random(1, maxRandom));
+                    rankByGroupMap.updateScore(random, RandomUtils.random(1, maxRandom));
                     stringBuilder.append("随机修改一个对象 " + random + " - " + diffTime.diffUs5() + "us").append("\n");
                 }
                 {
                     diffTime.reset();
-                    int rank = rankGroupMap.rank(random);
+                    int rank = rankByGroupMap.rank(random);
                     stringBuilder.append("随机读取一个对象 " + random + " 排名 " + rank + " - " + diffTime.diffUs5() + "us").append("\n");
                     diffTime.reset();
-                    RankScore rankScore = rankGroupMap.rankDataByRank(rank);
+                    RankScore rankScore = rankByGroupMap.rankDataByRank(rank);
                     stringBuilder.append("随机读取一个排名 " + rank + " 对象 " + rankScore.getKey() + " - " + diffTime.diffUs5() + "us").append("\n");
                 }
                 diffTime.reset();
-                rankGroupMap.rankBySize(100);
+                rankByGroupMap.rankBySize(100);
                 stringBuilder.append("返回前 100 名 " + diffTime.diffUs5() + "us").append("\n");
                 stringBuilder.append("=========================================").append("\n");
                 System.out.println(stringBuilder.toString());

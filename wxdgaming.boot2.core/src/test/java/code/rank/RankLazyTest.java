@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
 import wxdgaming.boot2.core.lang.DiffTime;
-import wxdgaming.boot2.core.rank.RankListLazySort;
+import wxdgaming.boot2.core.rank.RankByLazyListSort;
 import wxdgaming.boot2.core.rank.RankScore;
 import wxdgaming.boot2.core.util.RandomUtils;
 
@@ -21,7 +21,7 @@ import java.util.concurrent.locks.LockSupport;
 public class RankLazyTest {
 
     public static void main(String[] args) {
-        RankListLazySort rankMap = new RankListLazySort(10000);
+        RankByLazyListSort rankMap = new RankByLazyListSort(10000);
         ExecutorServicePlatform executorService = ExecutorFactory.create("map", 2);
         for (int k = 0; k < 10; k++) {
             executorService.execute(() -> {

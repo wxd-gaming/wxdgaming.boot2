@@ -20,6 +20,12 @@ import java.util.Objects;
 public class RankScore extends ObjectBase implements Comparable<RankScore> {
 
     private String key;
+    /**
+     * 严谨性，如果副本3星通关最短时间者排名最靠前，
+     * <p>假设副本存在最大时间是9999，用时最短实际分数越大
+     * <p>1,应该 考虑 （9999-时间）*10+星数 算法
+     * <p>2,也可以使用 通关时间 * 系数 +星星数 * 系数
+     */
     private long score;
     private long timestamp;
     private HashMap<String, String> other = new HashMap<>();

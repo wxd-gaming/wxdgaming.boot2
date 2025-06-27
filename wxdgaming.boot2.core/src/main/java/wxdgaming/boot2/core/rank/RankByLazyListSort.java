@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  **/
 @Getter
 @Setter
-public class RankListLazySort {
+public class RankByLazyListSort {
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
@@ -34,7 +34,7 @@ public class RankListLazySort {
      *
      * @param lazyTimeMs 排行榜延迟刷新时间
      */
-    public RankListLazySort(long lazyTimeMs) {
+    public RankByLazyListSort(long lazyTimeMs) {
         rankCache = LRUIntCache.<RankScore[]>builder()
                 .expireAfterWriteMs(lazyTimeMs)
                 .heartTimeMs(lazyTimeMs)
@@ -57,7 +57,7 @@ public class RankListLazySort {
      * @param lazyTimeMs 排行榜延迟刷新时间
      * @param rankScores 排行榜容器数据
      */
-    public RankListLazySort(long lazyTimeMs, List<RankScore> rankScores) {
+    public RankByLazyListSort(long lazyTimeMs, List<RankScore> rankScores) {
         this(lazyTimeMs);
         push(rankScores);
     }
@@ -86,6 +86,17 @@ public class RankListLazySort {
      * @param newScore 新的分数
      */
     public RankScore updateScore(String key, long newScore) {
+        return updateScore(key, newScore, System.nanoTime());
+    }
+
+    /**
+     * 更新用户分数
+     *
+     * @param key       key
+     * @param newScore  分数
+     * @param timestamp 时间戳,建议使用 {@link System#nanoTime()}
+     */
+    public RankScore updateScore(String key, long newScore, long timestamp) {
         writeLock.lock();
         try {
             RankScore rankScore = map.computeIfAbsent(key, k -> {
@@ -95,7 +106,7 @@ public class RankListLazySort {
             long oldScore = rankScore.getScore();
             if (oldScore != newScore) {
                 rankScore.setScore(newScore);
-                rankScore.setTimestamp(System.nanoTime());
+                rankScore.setTimestamp(timestamp);
             }
             return rankScore;
         } finally {
