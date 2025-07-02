@@ -9,7 +9,7 @@ import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.server.bean.bag.ItemBag;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
-import wxdgaming.game.server.bean.bag.BagChangesEvent;
+import wxdgaming.game.server.bean.bag.BagChangesProcess;
 import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.bag.gain.GainScript;
 import wxdgaming.game.server.script.role.PlayerService;
@@ -42,8 +42,8 @@ public class EquipGainScript extends GainScript {
         super.initItem(item);
     }
 
-    @Override public boolean gain(BagChangesEvent bagChangesEvent, Item newItem) {
-        return super.gain(bagChangesEvent, newItem);
+    @Override public boolean gain(BagChangesProcess bagChangesProcess, Item newItem) {
+        return super.gain(bagChangesProcess, newItem);
     }
 
     @Override public long getCount(Player player, ItemBag itemBag, int cfgId) {

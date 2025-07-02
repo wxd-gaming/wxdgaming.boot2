@@ -11,13 +11,13 @@ import wxdgaming.game.server.bean.role.Player;
 import java.util.HashSet;
 
 /**
- * 背包变更事件
+ * 背包操作变更过程参数
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-06-05 19:20
  **/
 @Getter
-public class BagChangesEvent {
+public class BagChangesProcess {
 
     final Player player;
     final BagType bagType;
@@ -26,7 +26,7 @@ public class BagChangesEvent {
     @Getter(AccessLevel.PRIVATE) final ResUpdateBagInfo resUpdateBagInfo;
     final HashSet<ItemGrid> changeItems = new HashSet<>();
 
-    public BagChangesEvent(Player player, BagType bagType, ItemBag itemBag, ReasonArgs reasonArgs) {
+    public BagChangesProcess(Player player, BagType bagType, ItemBag itemBag, ReasonArgs reasonArgs) {
         this.player = player;
         this.bagType = bagType;
         this.itemBag = itemBag;

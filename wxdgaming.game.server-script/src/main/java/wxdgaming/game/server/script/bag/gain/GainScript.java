@@ -11,7 +11,7 @@ import wxdgaming.game.cfg.QItemTable;
 import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.bag.BagType;
-import wxdgaming.game.server.bean.bag.BagChangesEvent;
+import wxdgaming.game.server.bean.bag.BagChangesProcess;
 import wxdgaming.game.server.bean.bag.ItemBag;
 import wxdgaming.game.server.bean.bag.ItemGrid;
 import wxdgaming.game.bean.goods.Item;
@@ -76,11 +76,11 @@ public class GainScript extends HoldRunApplication {
     }
 
     /** 将道具添加进入背包 */
-    public boolean gain(BagChangesEvent bagChangesEvent, Item newItem) {
-        Player player = bagChangesEvent.getPlayer();
-        BagType bagType = bagChangesEvent.getBagType();
-        ItemBag itemBag = bagChangesEvent.getItemBag();
-        ReasonArgs reasonArgs = bagChangesEvent.getReasonArgs();
+    public boolean gain(BagChangesProcess bagChangesProcess, Item newItem) {
+        Player player = bagChangesProcess.getPlayer();
+        BagType bagType = bagChangesProcess.getBagType();
+        ItemBag itemBag = bagChangesProcess.getItemBag();
+        ReasonArgs reasonArgs = bagChangesProcess.getReasonArgs();
         long count = newItem.getCount();
         /* TODO 叠加 */
         QItem qItem = DataRepository.getIns().dataTable(QItemTable.class, newItem.getCfgId());
@@ -111,7 +111,7 @@ public class GainScript extends HoldRunApplication {
                         );
                         count = 0;
                     }
-                    bagChangesEvent.addChange(new ItemGrid(i, value));
+                    bagChangesProcess.addChange(new ItemGrid(i, value));
                 }
                 if (count < 1)
                     break;
@@ -129,7 +129,7 @@ public class GainScript extends HoldRunApplication {
                     "背包变更：{}, {}, 道具新增, 格子：{}, {}, count={}, {}",
                     player, bagType, itemGrid.getGrid(), newItem.toName(), newItem.getCount(), reasonArgs
             );
-            bagChangesEvent.addChange(itemGrid);
+            bagChangesProcess.addChange(itemGrid);
         }
         return true;
     }

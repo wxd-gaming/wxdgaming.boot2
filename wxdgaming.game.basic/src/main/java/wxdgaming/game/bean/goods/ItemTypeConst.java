@@ -32,6 +32,11 @@ public abstract class ItemTypeConst {
     /** 消耗类型 */
     public static final ItemTypeConst ConsumeType = new ItemTypeConst(10, 0, 0) {};
 
+    /** 等级丹 */
+    public static final ItemTypeConst LVUP = new ItemTypeConst(10, 1, 0) {};
+    /** 回复血量 */
+    public static final ItemTypeConst HPADD = new ItemTypeConst(10, 2, 0) {};
+
     private final int type;
     private final int subType;
     private final int cfgId;
@@ -41,4 +46,5 @@ public abstract class ItemTypeConst {
         this.subType = subType;
         this.cfgId = cfgId;
     }
+
 }

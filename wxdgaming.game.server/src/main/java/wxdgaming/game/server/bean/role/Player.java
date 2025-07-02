@@ -16,6 +16,7 @@ import wxdgaming.game.server.bean.MapKey;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.StatusConst;
 import wxdgaming.game.server.bean.bag.BagPack;
+import wxdgaming.game.server.bean.equip.EquipPack;
 import wxdgaming.game.server.bean.task.TaskPack;
 
 import java.util.HashMap;
@@ -54,6 +55,7 @@ public class Player extends MapNpc {
     private BagPack bagPack = new BagPack();
     private TaskPack taskPack = new TaskPack();
     private MailPack mailPack = new MailPack();
+    private EquipPack equipPack = new EquipPack();
     @JSONField(serialize = false, deserialize = false)
     private transient BlockingQueue<Runnable> eventList = new ArrayBlockingQueue<>(1024);
     @JSONField(serialize = false, deserialize = false)

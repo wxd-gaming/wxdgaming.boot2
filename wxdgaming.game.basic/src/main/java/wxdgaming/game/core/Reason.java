@@ -16,6 +16,9 @@ public enum Reason {
     Buff,
     Login,
     Level,
+    /** 使用道具 */
+    USE_ITEM,
+    /** 使用激活码 */
     USE_CDKEY,
     /** 任务接受 */
     TASK_ACCEPT,
