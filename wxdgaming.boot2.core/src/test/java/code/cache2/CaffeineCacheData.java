@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.concurrent.Executors;
@@ -54,7 +52,7 @@ public class CaffeineCacheData {
         }
 
         innerDataCache = innerCaffeine.build(new CacheLoader<String, Object>() {
-            @Override public Object load(@NotNull String key) throws Exception {
+            @Override public Object load(String key) throws Exception {
                 if (loader == null) return null;
                 return loader.load(key);
             }
@@ -66,7 +64,7 @@ public class CaffeineCacheData {
                 .executor(scheduledExecutorService);
 
         outerCaffeine.removalListener(new RemovalListener<Object, Hold>() {
-            @Override public void onRemoval(@Nullable Object key, @Nullable Hold value, @NotNull RemovalCause cause) {
+            @Override public void onRemoval(Object key, Hold value, RemovalCause cause) {
                 if (value == null || value.getValue() == null) return;
                 if (heartListener != null)
                     heartListener.onRemoval(String.valueOf(key), value.getValue(), cause);
@@ -74,7 +72,7 @@ public class CaffeineCacheData {
         });
 
         outerDataCache = outerCaffeine.build(new CacheLoader<String, Hold>() {
-            @Override public Hold load(@NotNull String key) throws Exception {
+            @Override public Hold load(String key) throws Exception {
                 Object object = innerDataCache.get(key);
                 /*防止缓存穿透，object 允许null*/
                 return new Hold(object);
