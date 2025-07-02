@@ -36,10 +36,10 @@ public class RankByLimitSet {
         this.limit = limit;
     }
 
-    public RankByLimitSet(int limit, List<RankScore> rankScores, Map<Long, Integer> scoreSizeMap) {
+    public RankByLimitSet(int limit, Rank2Db rank2Db) {
         this.limit = limit;
-        this.scoreSizeMap.putAll(scoreSizeMap);
-        push(rankScores);
+        this.scoreSizeMap.putAll(rank2Db.getScoreSizeMap());
+        push(rank2Db.rankScoreList);
     }
 
     /** 所有的排行 */
@@ -65,6 +65,7 @@ public class RankByLimitSet {
                 rankTreeSet.remove(rankScore);
             }
         }
+        scoreSizeMap.entrySet().removeIf(entry -> entry.getValue() == 0);
     }
 
     /**
@@ -151,7 +152,7 @@ public class RankByLimitSet {
     @Setter
     public static class Rank2Db {
 
-        private HashMap<String, RankScore> map;
+        private List<RankScore> rankScoreList;
         /** 根据分数阶段记录排名 */
         private HashMap<Long, Integer> scoreSizeMap;
 
@@ -159,7 +160,7 @@ public class RankByLimitSet {
         }
 
         public Rank2Db(RankByLimitSet rankByLimitSet) {
-            this.map = new HashMap<>(rankByLimitSet.map);
+            this.rankScoreList = new ArrayList<>(rankByLimitSet.map.values());
             this.scoreSizeMap = new HashMap<>(rankByLimitSet.scoreSizeMap);
         }
 

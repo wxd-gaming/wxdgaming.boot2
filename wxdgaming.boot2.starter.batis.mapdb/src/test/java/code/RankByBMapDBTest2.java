@@ -15,12 +15,13 @@ import java.util.concurrent.ConcurrentSkipListSet;
 public class RankByBMapDBTest2 {
 
     static final MapDBDataHelper mapDBDataHelper = new MapDBDataHelper("target/btreerank2.db");
+    static final HoldMap holdMap = mapDBDataHelper.bMap("lv-rank");
 
     @Test
     @Order(1)
     public void aputRank() {
 
-        HoldMap holdMap = mapDBDataHelper.bMap("lv-rank");
+
         holdMap.clear();
 
         for (int i = 0; i < 100000; i++) {
@@ -34,7 +35,6 @@ public class RankByBMapDBTest2 {
     @Order(2)
     public void b1treeSet() {
         DiffTime diffTime = new DiffTime();
-        HoldMap holdMap = mapDBDataHelper.bMap("lv-rank");
         ArrayList<Object> objects = new ArrayList<>(holdMap.values());
         System.out.println("读取耗时：" + diffTime.diffMs5AndReset());
         TreeSet<RankScore> rankScores = new TreeSet<>();
@@ -56,7 +56,6 @@ public class RankByBMapDBTest2 {
     @Order(2)
     public void b2skipSet() {
         DiffTime diffTime = new DiffTime();
-        HoldMap holdMap = mapDBDataHelper.bMap("lv-rank");
         ArrayList<Object> objects = new ArrayList<>(holdMap.values());
         System.out.println("读取耗时：" + diffTime.diffMs5AndReset());
         ConcurrentSkipListSet<RankScore> rankScores = new ConcurrentSkipListSet<>();
@@ -78,7 +77,6 @@ public class RankByBMapDBTest2 {
     @Order(3)
     public void clistSort() {
         DiffTime diffTime = new DiffTime();
-        HoldMap holdMap = mapDBDataHelper.bMap("lv-rank");
         ArrayList<Object> objects = new ArrayList<>(holdMap.values());
         System.out.println("读取耗时：" + diffTime.diffMs5AndReset());
         List<RankScore> list = objects.stream().map(value -> (RankScore) value).sorted().limit(20).toList();
@@ -94,7 +92,6 @@ public class RankByBMapDBTest2 {
     @Order(4)
     public void darraySort() {
         DiffTime diffTime = new DiffTime();
-        HoldMap holdMap = mapDBDataHelper.bMap("lv-rank");
         ArrayList<Object> objects = new ArrayList<>(holdMap.values());
         System.out.println("读取耗时：" + diffTime.diffMs5AndReset());
         RankScore[] array = objects.toArray(new RankScore[0]);
@@ -109,7 +106,6 @@ public class RankByBMapDBTest2 {
 
     public void memery() {
         DiffTime diffTime = new DiffTime();
-        HoldMap holdMap = mapDBDataHelper.bMap("lv-rank");
         Collection<Object> values = holdMap.values();
         String string = Data2Size.totalSizes0(values);
         System.out.println("内存占用：" + string);

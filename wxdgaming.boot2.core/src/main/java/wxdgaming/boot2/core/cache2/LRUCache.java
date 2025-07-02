@@ -3,6 +3,7 @@ package wxdgaming.boot2.core.cache2;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.format.data.Data2Size;
 import wxdgaming.boot2.core.timer.MyClock;
@@ -64,8 +65,13 @@ public class LRUCache<K, V> extends Cache<K, V> {
 
         for (int i = 0; i < this.area; i++) {
             final int hashIndex = i;
-            Runnable heartEvent = new Runnable() {
-                @Override public void run() {
+            Runnable heartEvent = new ExecutorEvent() {
+
+                @Override public String queueName() {
+                    return "cache-heart-event";
+                }
+
+                @Override public void onEvent() throws Exception {
                     CacheLock cacheLock = reentrantLocks.get(hashIndex);
                     cacheLock.writeLock.lock();
                     try {

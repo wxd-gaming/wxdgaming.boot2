@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter.batis.mapdb;
 
+import kotlin.jvm.functions.Function1;
 import lombok.extern.slf4j.Slf4j;
 import org.mapdb.*;
 
@@ -54,14 +55,21 @@ public class MapDBDataHelper implements AutoCloseable {
 
     /** 基于hash的map对象，对于随机读写性能很不错 */
     public HoldMap hMap(String cacheName) {
-        return hMap(cacheName, 1000);
+        return hMap(cacheName, 1000, null);
     }
 
     @SuppressWarnings("unchecked")
-    public HoldMap hMap(String cacheName, int expireStoreSize) {
+    public HoldMap hMap(String cacheName, int expireStoreSize, Function1<String, Object> valueLoader) {
         return cache(
                 cacheName,
-                k -> new HoldMap((HTreeMap<String, Object>) db.hashMap(cacheName, Serializer.STRING, Serializer.JAVA).expireStoreSize(expireStoreSize).createOrOpen())
+                k -> {
+                    DB.HashMapMaker<String, Object> hashMapMaker = db.hashMap(cacheName, Serializer.STRING, Serializer.JAVA);
+                    if (valueLoader != null) {
+                        hashMapMaker.valueLoader(valueLoader);
+                    }
+                    hashMapMaker.expireStoreSize(expireStoreSize);
+                    return new HoldMap(hashMapMaker.createOrOpen());
+                }
         );
     }
 

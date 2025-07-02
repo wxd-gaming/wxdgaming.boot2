@@ -12,6 +12,7 @@ public class OOPTest {
     private void a1(int a, int b, int c, int d) {}
 
     private void a2(AArgs aArgs) {
+
     }
 
     public static class AArgs {
