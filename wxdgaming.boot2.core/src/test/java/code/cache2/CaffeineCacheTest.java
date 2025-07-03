@@ -13,21 +13,23 @@ public class CaffeineCacheTest {
     @Test
     public void t1() {
 
-        CaffeineCacheData caffeineCacheData = new CaffeineCacheData()
-                .setLoader(key -> "1".equals(key) ? null : key)
-                .setHeartDuration(Duration.ofSeconds(1))
-                .setHeartListener((key, value, cause) -> log.info("心跳处理 key: {}, value: {}, cause: {}", key, value, cause))
-                .setRemovalListener((key, value, cause) -> log.info("移除过期 key: {}, value: {}, cause: {}", key, value, cause))
-                .build();
+        CaffeineCacheImpl<String, Object> caffeineCacheImpl = CaffeineCacheImpl.builder()
+                .loader(key -> "1".equals(key) ? null : key)
+                .heartDuration(Duration.ofSeconds(1))
+                .heartListener((key, value, cause) -> log.info("心跳处理 key: {}, value: {}, cause: {}", key, value, cause))
+                .removalListener((key, value, cause) -> log.info("移除过期 key: {}, value: {}, cause: {}", key, value, cause))
+                .build()
+                .start();
 
-        for (int i = 0; i < 10; i++) {
-            log.info("get " + String.valueOf((Object) caffeineCacheData.get("1")));
-            log.info("get " + String.valueOf((Object) caffeineCacheData.get("2")));
-            log.info("get " + String.valueOf((Object) caffeineCacheData.get("3")));
-            log.info("==========================");
+        for (int i = 0; i < 2; i++) {
             LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(3));
+            log.info("get " + caffeineCacheImpl.get("1"));
+            log.info("get " + caffeineCacheImpl.get("2"));
+            log.info("get " + caffeineCacheImpl.get("3"));
+            caffeineCacheImpl.put("2", "e"+System.currentTimeMillis());
+            log.info("==========================");
         }
-
+        caffeineCacheImpl.invalidateAll();
     }
 
 }

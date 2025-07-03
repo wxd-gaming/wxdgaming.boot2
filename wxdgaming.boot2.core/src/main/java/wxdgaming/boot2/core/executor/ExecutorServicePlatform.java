@@ -26,7 +26,7 @@ public class ExecutorServicePlatform extends ExecutorService {
                 threadSize, threadSize,
                 0L, TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<>(queueSize),
-                new NameThreadFactory(namePrefix),
+                new NameThreadFactory(namePrefix, false),
                 queuePolicy.getRejectedExecutionHandler()
         );
     }

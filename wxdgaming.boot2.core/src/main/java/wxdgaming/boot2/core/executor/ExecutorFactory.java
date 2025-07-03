@@ -34,7 +34,7 @@ public class ExecutorFactory {
     static void init() {
         EXECUTOR_MAP = new ConcurrentHashMap<>();
         EXECUTOR_MONITOR = new ExecutorMonitor();
-        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorService = newSingleThreadScheduledExecutor("scheduled");
         BootConfig bootConfig = BootConfig.getIns();
         EXECUTOR_SERVICE_BASIC = create("basic", bootConfig.basicConfig());
         EXECUTOR_SERVICE_LOGIC = create("logic", bootConfig.logicConfig());
@@ -43,6 +43,10 @@ public class ExecutorFactory {
 
     public static ExecutorService getExecutor(String name) {
         return getExecutorMap().get(name);
+    }
+
+    public static ScheduledExecutorService newSingleThreadScheduledExecutor(String name) {
+        return Executors.newSingleThreadScheduledExecutor(new NameThreadFactory(name, true));
     }
 
     public static ExecutorServicePlatform create(String name, ExecutorConfig executorConfig) {
