@@ -13,7 +13,7 @@ public class LoadingCacheTest {
     @Test
     public void c1() {
         /*2秒钟读取过期缓存*/
-        CacheDriver<String, Object> cacheDriver = CacheDriver.<String, Object>builder()
+        LoadingCacheImpl<String, Object> cacheDriver = LoadingCacheImpl.<String, Object>builder()
                 .expireAfterAccess(Duration.ofSeconds(2))
                 .loader(key -> "value")
                 .removalListener((key, value, cause) -> log.info("removalListener key:{} value:{} cause:{}", key, value, cause))
@@ -37,7 +37,7 @@ public class LoadingCacheTest {
     @Test
     public void c2() {
         /**没有过期的缓存*/
-        CacheDriver<String, Object> cacheDriver = CacheDriver.<String, Object>builder()
+        LoadingCacheImpl<String, Object> cacheDriver = LoadingCacheImpl.<String, Object>builder()
                 .expireAfterAccess(null)
                 .expireAfterWrite(null)
                 .loader(key -> "value")

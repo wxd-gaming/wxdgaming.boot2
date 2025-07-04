@@ -46,7 +46,9 @@ public class LoadingCacheImpl<K, V> {
                 CacheDriver.<K, Hold>builder()
                         .loader(key -> new Hold(innerCacheReference.get().get(key)))
                         .removalListener((k, hold, removalCause) -> {
-                            heartListener.accept(k, hold.v, removalCause);
+                            if (removalCause != CacheDriver.RemovalCause.EXPIRE) return;
+                            if (heartListener != null)
+                                heartListener.accept(k, hold.v, removalCause);
                         })
                         .expireAfterWrite(expireHeartAfterWrite)
                         .build()
@@ -69,6 +71,7 @@ public class LoadingCacheImpl<K, V> {
     }
 
     public void put(K k, V v) {
+        outerCacheReference.get().remove(k, CacheDriver.RemovalCause.SPECIAL);
         innerCacheReference.get().put(k, v);
     }
 
@@ -77,6 +80,7 @@ public class LoadingCacheImpl<K, V> {
         innerCacheReference.get().remove(k, CacheDriver.RemovalCause.EXPLICIT);
     }
 
+    /** 强制刷新，定时清理过期数据可能出现延迟，所以也可以手动调用清理 */
     public void refresh() {
         outerCacheReference.get().refresh();
         innerCacheReference.get().refresh();
