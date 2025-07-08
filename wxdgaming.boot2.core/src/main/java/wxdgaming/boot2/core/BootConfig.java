@@ -40,6 +40,7 @@ public class BootConfig {
     public void loadConfig() throws Exception {
         String property = JvmUtil.getProperty("boot.config", "boot.yml", s -> s);
         Tuple2<Path, byte[]> inputStream = FileUtil.findInputStream(BootConfig.class.getClassLoader(), property);
+        AssertUtil.assertNull(inputStream, "未找到配置文件：" + property);
         if (property.endsWith(".json")) {
             String json = new String(inputStream.getRight(), StandardCharsets.UTF_8);
             config = JSONObject.parseObject(json);

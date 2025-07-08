@@ -229,7 +229,6 @@ public class SocketClient {
             sessionGroup.add(socketSession);
             /*添加事件，如果链接关闭了触发*/
             socketSession.getChannel().closeFuture().addListener(closeFuture -> {
-                sessionGroup.remove(socketSession);
                 reconnection(consumer);
             });
 

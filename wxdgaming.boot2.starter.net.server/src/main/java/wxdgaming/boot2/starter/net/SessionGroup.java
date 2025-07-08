@@ -21,6 +21,7 @@ public class SessionGroup extends ConcurrentLoopList<SocketSession> {
     protected final ConcurrentHashMap<Long, SocketSession> channelMap = new ConcurrentHashMap<>();
 
     @Override public boolean add(SocketSession session) {
+        session.getChannel().closeFuture().addListener(future -> remove(session));
         channelGroup.add(session.getChannel());
         channelMap.put(session.getUid(), session);
         return super.add(session);

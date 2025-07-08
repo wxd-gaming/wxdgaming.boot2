@@ -3,6 +3,7 @@ package wxdgaming.boot2.starter.batis.mapdb;
 import kotlin.jvm.functions.Function1;
 import lombok.extern.slf4j.Slf4j;
 import org.mapdb.*;
+import wxdgaming.boot2.core.io.FileUtil;
 
 import java.io.File;
 import java.util.Set;
@@ -26,6 +27,7 @@ public class MapDBDataHelper implements AutoCloseable {
     }
 
     public MapDBDataHelper(File file) {
+        FileUtil.mkdirs(file);
         this.db = DBMaker.fileDB(file)
                 .fileChannelEnable()
                 .closeOnJvmShutdown()
@@ -49,7 +51,7 @@ public class MapDBDataHelper implements AutoCloseable {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T cache(String cacheName, Function<String, T> function) {
+    private  <T> T cache(String cacheName, Function<String, T> function) {
         return (T) openCacheMap.computeIfAbsent(cacheName, function);
     }
 

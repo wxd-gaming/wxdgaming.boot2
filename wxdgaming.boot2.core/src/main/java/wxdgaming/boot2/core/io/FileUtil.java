@@ -369,6 +369,7 @@ public class FileUtil implements Serializable {
      * @param file 需要创建文件夹
      */
     public static void mkdirs(File file) {
+        if (file == null) return;
         final File absoluteFile = file.getAbsoluteFile();
         if (absoluteFile.isDirectory()) {
             absoluteFile.mkdirs();

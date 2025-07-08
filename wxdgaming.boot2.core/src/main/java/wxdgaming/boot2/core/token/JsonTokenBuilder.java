@@ -20,7 +20,7 @@ public class JsonTokenBuilder {
     protected static final int[] DECODE_KK = {3, 7, 2};
 
     /**
-     * 构建器， 默认5分支过期
+     * 构建器， 默认5分钟过期
      *
      * @param key 私钥
      */

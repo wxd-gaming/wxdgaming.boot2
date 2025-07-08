@@ -16,7 +16,9 @@ import lombok.Setter;
 @Setter
 public class JsonToken {
 
+    /** 过期时间 */
     private long expire;
+    /** 签名 */
     private String signature;
     private final JSONObject data = new JSONObject();
 
