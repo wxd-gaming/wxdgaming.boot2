@@ -283,6 +283,10 @@ const wxd = {
             return this;
         }
 
+        remove(p) {
+            delete this.nodes[p];
+        }
+
         toJson() {
             return JSON.stringify(this.nodes);
         }
