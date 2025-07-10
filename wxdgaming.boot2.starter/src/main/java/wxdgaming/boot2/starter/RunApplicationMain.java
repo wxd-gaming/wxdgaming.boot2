@@ -41,6 +41,14 @@ public final class RunApplicationMain extends RunApplication {
                 System.out.println("--------------------------shutdown---------------------------");
                 GlobalUtil.Exiting.set(true);
                 executeMethodWithAnnotatedException(Shutdown.class);
+                classWithSuper(AutoCloseable.class)
+                        .forEach(closeable -> {
+                            try {
+                                closeable.close();
+                            } catch (Exception e) {
+                                log.error("关闭异常: {}", closeable.getClass(), e);
+                            }
+                        });
             });
 
             StringBuilder stringAppend = new StringBuilder(1024);

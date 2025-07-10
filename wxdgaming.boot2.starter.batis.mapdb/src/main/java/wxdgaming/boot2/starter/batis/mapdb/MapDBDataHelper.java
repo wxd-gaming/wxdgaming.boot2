@@ -22,15 +22,18 @@ public class MapDBDataHelper implements AutoCloseable {
     final DB db;
     final ConcurrentHashMap<String, Object> openCacheMap = new ConcurrentHashMap<>();
 
+    final File dbFile;
+
     public MapDBDataHelper(String dbPath) {
         this(new File(dbPath));
     }
 
     public MapDBDataHelper(File file) {
         FileUtil.mkdirs(file);
+        this.dbFile = file;
         this.db = DBMaker.fileDB(file)
                 .fileChannelEnable()
-                .closeOnJvmShutdown()
+//                .closeOnJvmShutdown()
                 .fileMmapEnable()            // 启用内存映射（提升读性能）
                 .fileMmapEnableIfSupported() // 启用内存映射（提升读性能）
                 .fileMmapPreclearDisable()   // 禁用预清理（避免写时阻塞）
@@ -44,6 +47,7 @@ public class MapDBDataHelper implements AutoCloseable {
 
     @Override public void close() {
         db.close();
+        log.info("关闭 map db {}", this.dbFile);
     }
 
     public boolean exists(String cacheName) {
@@ -51,7 +55,7 @@ public class MapDBDataHelper implements AutoCloseable {
     }
 
     @SuppressWarnings("unchecked")
-    private  <T> T cache(String cacheName, Function<String, T> function) {
+    private <T> T cache(String cacheName, Function<String, T> function) {
         return (T) openCacheMap.computeIfAbsent(cacheName, function);
     }
 
