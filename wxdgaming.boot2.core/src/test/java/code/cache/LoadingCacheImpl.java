@@ -42,6 +42,10 @@ public class LoadingCacheImpl<K, V> {
                         .start()
         );
 
+        Duration tmpExpireHeartAfterWrite = expireHeartAfterWrite;
+        if (tmpExpireHeartAfterWrite != null) {
+            tmpExpireHeartAfterWrite = Duration.ofSeconds(2);
+        }
         outerCacheReference.set(
                 CacheDriver.<K, Hold>builder()
                         .loader(key -> new Hold(innerCacheReference.get().get(key)))
@@ -50,7 +54,7 @@ public class LoadingCacheImpl<K, V> {
                             if (heartListener != null)
                                 heartListener.accept(k, hold.v, removalCause);
                         })
-                        .expireAfterWrite(expireHeartAfterWrite)
+                        .expireAfterWrite(tmpExpireHeartAfterWrite)
                         .build()
                         .start()
         );
