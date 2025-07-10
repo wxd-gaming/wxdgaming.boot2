@@ -44,12 +44,12 @@ class ExecutorMonitor extends Thread {
     @Override public void run() {
         while (!Thread.interrupted()) {
             try {
-                LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(10));
+                LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(30));
                 for (Map.Entry<Thread, JobContent> entry : executorJobConcurrentHashMap.entrySet()) {
                     Thread thread = entry.getKey();
                     JobContent jobContent = entry.getValue();
                     long diff = System.currentTimeMillis() - jobContent.start();
-                    if (diff > TimeUnit.SECONDS.toMillis(10)) {
+                    if (diff > TimeUnit.SECONDS.toMillis(30)) {
                         log.warn(
                                 "线程执行器监视, 线程: {}, 执行器: {}, 执行时间: {}ms\n{}",
                                 thread.getName(), jobContent.executorJob().getStack(), diff,

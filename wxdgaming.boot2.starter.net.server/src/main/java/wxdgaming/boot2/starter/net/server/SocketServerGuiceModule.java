@@ -33,6 +33,7 @@ public class SocketServerGuiceModule extends ServiceGuiceModule {
                 SocketServer server = new SocketServer(serverConfig);
                 bindInstance(server);
                 bindInstance(SocketServer.class, "socket.server", server);
+                bindInstance(SocketServerConfig.class, "socket.server.config", serverConfig);
             }
         }
         {

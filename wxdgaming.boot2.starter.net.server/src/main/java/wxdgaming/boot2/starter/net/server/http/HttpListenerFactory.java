@@ -1,6 +1,7 @@
 package wxdgaming.boot2.starter.net.server.http;
 
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,6 +18,7 @@ import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.http.HttpHeadValueType;
+import wxdgaming.boot2.starter.net.server.SocketServerConfig;
 
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -40,10 +42,11 @@ public class HttpListenerFactory {
     @Init
     @Order(7)
     public void init(RunApplication runApplication,
+                     @Named("socket.server.config") SocketServerConfig serverConfig,
                      @Value(path = "socket.server.http", nestedPath = true, required = false) HttpServerConfig httpServerConfig) {
         this.httpServerConfig = httpServerConfig;
         this.runApplication = runApplication;
-        this.httpListenerContent = new HttpListenerContent(runApplication);
+        this.httpListenerContent = new HttpListenerContent(runApplication, serverConfig);
     }
 
     public void dispatch(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) {

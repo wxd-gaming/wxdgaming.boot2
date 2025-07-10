@@ -11,6 +11,7 @@ import wxdgaming.boot2.core.lang.Tuple2;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
+import wxdgaming.boot2.starter.net.server.SocketServerConfig;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public class HttpListenerContent {
 
     static final Tuple2<HttpMapping, Map<String, String>> NUllTuple = new Tuple2<>(null, MapOf.of());
 
-    public HttpListenerContent(RunApplication runApplication) {
+    public HttpListenerContent(RunApplication runApplication, SocketServerConfig serverConfig) {
 
         this.httpFilterList = runApplication.classWithSuper(HttpFilter.class).toList();
 
@@ -109,8 +110,11 @@ public class HttpListenerContent {
                                 );
                         throw new RuntimeException(formatted);
                     }
-                    log.debug("http listener url: http://localhost:{}{}", 0, lowerCase);
+                    log.debug("http listener url: http://localhost:{}{}", serverConfig.getPort(), lowerCase);
                 });
+
+        log.debug("http listener url: http://localhost:{}/index.html", serverConfig.getPort());
+
     }
 
     @SuppressWarnings("unchecked")

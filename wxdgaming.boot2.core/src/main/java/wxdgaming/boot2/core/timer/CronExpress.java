@@ -174,17 +174,6 @@ public class CronExpress extends ObjectBase {
         return findValidateTime(time, ChangeAbs.After);
     }
 
-    /** 获取下一次可用的格式化时间字符串 */
-    public String validateDateAfter() {
-        return validateDateAfter(MyClock.millis());
-    }
-
-    /** 获取下一次可用的格式化时间字符串 */
-    public String validateDateAfter(long time) {
-        CronDuration longs = validateTimeAfter(time);
-        if (longs == null) return null;
-        return MyClock.formatDate(longs.getStart());
-    }
 
     /** 取下一次可用的时间 */
     public CronDuration validateOverTimeAfter() {
@@ -194,18 +183,6 @@ public class CronExpress extends ObjectBase {
     /** 取下一次可用的时间 */
     public CronDuration validateOverTimeAfter(long time) {
         return validateTimeAfter(time);
-    }
-
-    /** 获取下一次可用的时间 持续结束时间 格式化字符串 */
-    public String validateOverDateAfter() {
-        return validateOverDateAfter(MyClock.millis());
-    }
-
-    /** 获取下一次可用的时间 持续结束时间 格式化字符串 */
-    public String validateOverDateAfter(long time) {
-        CronDuration longs = validateOverTimeAfter(time);
-        if (longs == null) return null;
-        return MyClock.formatDate(longs.getEnd());
     }
 
     /** 取上一次执行时间戳 */
@@ -225,17 +202,6 @@ public class CronExpress extends ObjectBase {
         return findValidateTime(time, ChangeAbs.Before);
     }
 
-    /** 获取上一次可用时间的格式化字符串 */
-    public String validateDateBefore() {
-        return validateDateBefore(MyClock.millis());
-    }
-
-    /** 获取上一次可用时间的格式化字符串 */
-    public String validateDateBefore(long time) {
-        CronDuration longs = validateTimeBefore(time);
-        if (longs == null) return null;
-        return MyClock.formatDate(longs.getStart());
-    }
 
     /** 获取上一次可用时间 持续结束时间 */
     public long validateOverTimeBefore() {
@@ -249,20 +215,6 @@ public class CronExpress extends ObjectBase {
             return -1;
         }
         return validateTime.getEnd();
-    }
-
-    /** 获取上一次可用时间 持续结束时间 的格式化字符串 */
-    public String validateOverDateBefore() {
-        return validateOverDateBefore(MyClock.millis());
-    }
-
-    /** 获取上一次可用时间 持续结束时间 的格式化字符串 */
-    public String validateOverDateBefore(long time) {
-        long date = validateOverTimeBefore(time);
-        if (date == -1) {
-            return null;
-        }
-        return MyClock.formatDate(date);
     }
 
     /** 获取开启时间 */
@@ -303,6 +255,7 @@ public class CronExpress extends ObjectBase {
                 return new CronDuration(cron, time, time + offsetTime);
             }
             time += changeAbs.getChange();
+            localDateTime = MyClock.localDateTime(time);
         }
         return null;
     }

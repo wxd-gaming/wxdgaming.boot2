@@ -14,6 +14,8 @@ import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.net.http.HttpHeadValueType;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,12 +39,21 @@ public class HttpListenerTriggerFile extends ExecutorEvent {
         cache = CASCache.<String, byte[]>builder()
                 .expireAfterWriteMs(TimeUnit.HOURS.toMillis(2))
                 .heartTimeMs(TimeUnit.HOURS.toMillis(1))
-                .loader((key) -> {
-                    Tuple2<Path, byte[]> inputStream = FileUtil.findInputStream(HttpListenerTriggerFile.class.getClassLoader(), key);
-                    return inputStream != null ? inputStream.getRight() : null;
-                })
+                .loader(HttpListenerTriggerFile::fileInputStream0)
                 .build();
         cache.start();
+    }
+
+    private static byte[] fileInputStream(String path) {
+        if (log.isDebugEnabled()) {
+            return fileInputStream0(path);
+        }
+        return cache.getIfPresent(path);
+    }
+
+    private static byte[] fileInputStream0(String path) {
+        Tuple2<Path, byte[]> inputStream = FileUtil.findInputStream(HttpListenerTriggerFile.class.getClassLoader(), path);
+        return inputStream != null ? inputStream.getRight() : null;
     }
 
     public static void execute(HttpListenerFactory factory, HttpMapping topHttpMapping, HttpContext httpContext) {
@@ -64,7 +75,7 @@ public class HttpListenerTriggerFile extends ExecutorEvent {
     @Override public void onEvent() throws Exception {
         String htmlPath = "html" + httpContext.getRequest().getUriPath();
         try {
-            byte[] inputStream = cache.getIfPresent(htmlPath);
+            byte[] inputStream = fileInputStream(htmlPath);
             if (inputStream != null) {
                 HttpHeadValueType contentType = HttpHeadValueType.findContentType(htmlPath);
                 /*如果是固有资源增加缓存效果*/

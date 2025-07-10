@@ -23,7 +23,6 @@
         <module>wxdgaming.boot2.starter.net.httpclient</module>
         <module>wxdgaming.boot2.starter.net.server</module>
         <module>wxdgaming.boot2.starter.scheduled</module>
-        <module>wxdgaming.chatroom</module>
         <module>wxdgaming.game.basic</module>
         <module>wxdgaming.game.chat</module>
         <module>wxdgaming.game.gateway</module>

@@ -37,7 +37,7 @@ public class Utils {
             builder.append("    at ");
             builder.append(traceElement.getClassName()).append("#").append(traceElement.getMethodName())
                     .append("(").append(traceElement.getFileName()).append(":").append(traceElement.getLineNumber()).append(")");
-            builder.append("\n");
+            builder.append("=>");
         }
         return builder.toString();
     }
