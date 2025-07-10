@@ -140,8 +140,14 @@ class CacheDriver<K, V> {
                     cacheNode = new CacheNode(key, value);
                     nodeMap.put(key, cacheNode);
                     expireSet.add(cacheNode);
+                } else {
+                    if (expireAfterWrite == null) {
+                        /*TODO 固定缓存不需要刷新，因为时间不会边*/
+                        expireSet.remove(cacheNode);
+                        cacheNode.refresh();
+                        expireSet.add(cacheNode);
+                    }
                 }
-                cacheNode.refresh();
                 return cacheNode.value;
             } finally {
                 lock.unlock();

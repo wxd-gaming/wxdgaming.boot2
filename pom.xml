@@ -552,6 +552,8 @@
                             <arg>-Xpkginfo:always</arg>
                             <!-- 过期的方法的警告-->
                             <arg>-Xlint:deprecation</arg>
+                            <arg>--add-modules=java.sql</arg>
+                            <arg>--add-modules=java.management</arg>
                             <arg>--add-opens=java.base/java.lang=ALL-UNNAMED</arg>
                             <arg>--add-opens=java.base/java.util=ALL-UNNAMED</arg>
                             <arg>--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED</arg>
