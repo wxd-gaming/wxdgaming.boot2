@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.chatset;
 
+import org.checkerframework.checker.units.qual.A;
 import wxdgaming.boot2.core.util.RandomUtils;
 
 import java.nio.charset.Charset;
@@ -34,6 +35,9 @@ public class StringUtils {
     public static final Pattern PATTERN_REPLACE_UUU_2 = Pattern.compile("[^0-9]");
     /** 验证必须是 数字 or 字母 or 下划线 */
     public static final Pattern PATTERN_ABC_0 = Pattern.compile("^[_\\s@a-zA-Z0-9]*$");
+
+    /** 数字。字母，汉字 */
+    public static final Pattern PATTERN_ACCOUNT = Pattern.compile("^[A-Za-z0-9\u4e00-\u9fa5]+$");
 
     public static final char[] NUMBER_CHARS = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '9'};
 
