@@ -32,8 +32,22 @@ public class StringUtils {
     public static final Pattern PATTERN_Have_UUU = Pattern.compile(".*[\\u4e00-\\u9fa5]+.*");
     /** 只保留数字 */
     public static final Pattern PATTERN_REPLACE_UUU_2 = Pattern.compile("[^0-9]");
+    /** 验证必须是 数字 or 字母 or 下划线 */
+    public static final Pattern PATTERN_ABC_0 = Pattern.compile("^[_\\s@a-zA-Z0-9]*$");
 
     public static final char[] NUMBER_CHARS = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '9'};
+
+    /**
+     * 检查是否能通过,正则表达式全匹配规则
+     * <p>
+     * {@link Pattern#matches}
+     *
+     * @param str  需要匹配的字符串
+     * @param regx 正则表达式
+     */
+    public static boolean checkMatches(String str, Pattern regx) {
+        return regx.matcher(str).matches();
+    }
 
     /** 保留数值字 */
     public static String retainNumbers(String source) {
