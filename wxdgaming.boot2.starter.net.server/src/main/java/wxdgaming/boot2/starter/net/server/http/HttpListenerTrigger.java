@@ -82,7 +82,7 @@ public class HttpListenerTrigger extends ExecutorEvent {
             StringBuilder stringBuilder = httpContext.showLog();
             GlobalUtil.exception(stringBuilder.toString(), e);
             stringBuilder.setLength(0);
-            httpContext.getResponse().setStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+            httpContext.getResponse().setStatus(HttpResponseStatus.OK);
             httpContext.getResponse().response(RunResult.fail("server error " + e.getMessage()));
         } finally {
             httpContext.close();
