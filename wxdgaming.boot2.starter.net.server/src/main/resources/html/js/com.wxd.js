@@ -23,6 +23,11 @@ const wxd = {
         }
     },
 
+    /** 判定当前浏览器是不是移动端浏览器 */
+    isMobileDevice: function () {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    },
+
     /** 把文本换行换成 br */
     replaceLine: function (obj) {
         if (wxd.isNull(obj)) {
