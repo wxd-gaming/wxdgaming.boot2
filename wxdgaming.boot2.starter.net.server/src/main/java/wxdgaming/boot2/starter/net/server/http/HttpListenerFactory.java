@@ -8,20 +8,24 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.RunApplication;
+import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.ann.Value;
-import wxdgaming.boot2.core.executor.ExecutorFactory;
+import wxdgaming.boot2.core.cache2.CASCache;
+import wxdgaming.boot2.core.cache2.Cache;
 import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.core.lang.Tuple2;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.http.HttpHeadValueType;
 import wxdgaming.boot2.starter.net.server.SocketServerConfig;
 
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
 /**
  * http 监听 绑定工厂
@@ -32,21 +36,39 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @Getter
 @Singleton
-public class HttpListenerFactory {
+public class HttpListenerFactory extends HoldRunApplication {
 
-    RunApplication runApplication;
     HttpServerConfig httpServerConfig;
     /** 相当于用 read and copy write方式作为线程安全性 */
     HttpListenerContent httpListenerContent;
+    Cache<String, byte[]> cache = null;
+
+    protected byte[] fileInputStream(String path) {
+        if (log.isDebugEnabled() || cache == null) {
+            return fileInputStream0(path);
+        }
+        return cache.getIfPresent(path);
+    }
+
+    protected byte[] fileInputStream0(String path) {
+        Tuple2<Path, byte[]> inputStream = FileUtil.findInputStream(HttpListenerTriggerFile.class.getClassLoader(), path);
+        return inputStream != null ? inputStream.getRight() : null;
+    }
 
     @Init
     @Order(7)
-    public void init(RunApplication runApplication,
-                     @Named("socket.server.config") SocketServerConfig serverConfig,
-                     @Value(path = "socket.server.http", nestedPath = true, required = false) HttpServerConfig httpServerConfig) {
+    public void init(@Named("socket.server.config") SocketServerConfig serverConfig,
+                     @Named("socket.server.http.config") HttpServerConfig httpServerConfig) {
         this.httpServerConfig = httpServerConfig;
-        this.runApplication = runApplication;
         this.httpListenerContent = new HttpListenerContent(runApplication, serverConfig);
+        if (cache == null && httpServerConfig.getExperienceSeconds() > 0) {
+            cache = CASCache.<String, byte[]>builder()
+                    .expireAfterWriteMs(TimeUnit.SECONDS.toMillis(httpServerConfig.getExperienceSeconds()))
+                    .heartTimeMs(TimeUnit.SECONDS.toMillis(httpServerConfig.getExperienceSeconds() / 2))
+                    .loader(this::fileInputStream0)
+                    .build();
+            cache.start();
+        }
     }
 
     public void dispatch(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) {

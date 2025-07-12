@@ -54,6 +54,12 @@ public abstract class GuiceModuleBase extends AbstractModule {
     }
 
     @SuppressWarnings({"unchecked", "rawtype"})
+    public <T> void bindInstance(String name, T instance) {
+        Class<T> aClass = (Class<T>) instance.getClass();
+        bind(aClass).annotatedWith(Names.named(name)).toInstance(instance);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtype"})
     public <T> void bindInstance(Class clazz, String name, T instance) {
         bind(clazz).annotatedWith(Names.named(name)).toInstance(instance);
     }

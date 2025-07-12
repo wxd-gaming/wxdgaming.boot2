@@ -45,7 +45,7 @@ public class OutConfigTest {
                         .fluentPut(
                                 "server",
                                 new SocketServerConfig().toJSONObject()
-                                        .fluentPut("http", HttpServerConfig.INSTANCE.toJSONObject())
+                                        .fluentPut("http", FastJsonUtil.toJSONString(HttpServerConfig.INSTANCE.get()))
                         )
                         .fluentPut("client", new SocketClientConfig().toJSONObject())
         );

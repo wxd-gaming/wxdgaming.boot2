@@ -4,8 +4,8 @@ package wxdgaming.boot2.starter.net.server;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ServiceGuiceModule;
 import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
+import wxdgaming.boot2.starter.net.server.http.HttpServerConfig;
 
 import java.util.function.Supplier;
 
@@ -33,8 +33,10 @@ public class SocketServerGuiceModule extends ServiceGuiceModule {
                 SocketServer server = new SocketServer(serverConfig);
                 bindInstance(server);
                 bindInstance(SocketServer.class, "socket.server", server);
-                bindInstance(SocketServerConfig.class, "socket.server.config", serverConfig);
+                bindInstance("socket.server.config", serverConfig);
             }
+            HttpServerConfig httpServerConfig = BootConfig.getIns().getNestedValue("socket.server.http", HttpServerConfig.class, HttpServerConfig.INSTANCE);
+            bindInstance("socket.server.http.config", httpServerConfig);
         }
         {
             SocketServerConfig serverConfig = BootConfig.getIns().getNestedValue("socket.server-second", SocketServerConfig.class);
