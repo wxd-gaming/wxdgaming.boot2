@@ -37,8 +37,8 @@ public class HttpListenerTriggerFile extends ExecutorEvent {
 
     static {
         cache = CASCache.<String, byte[]>builder()
-                .expireAfterWriteMs(TimeUnit.HOURS.toMillis(2))
-                .heartTimeMs(TimeUnit.HOURS.toMillis(1))
+                .expireAfterWriteMs(TimeUnit.SECONDS.toMillis(30))
+                .heartTimeMs(TimeUnit.SECONDS.toMillis(10))
                 .loader(HttpListenerTriggerFile::fileInputStream0)
                 .build();
         cache.start();
