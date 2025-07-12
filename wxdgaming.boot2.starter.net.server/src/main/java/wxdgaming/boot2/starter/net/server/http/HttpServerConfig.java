@@ -14,16 +14,25 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 @Getter
 public class HttpServerConfig extends ObjectBase {
 
-    public static final HttpServerConfig INSTANCE = new HttpServerConfig(false, false);
+    public static final HttpServerConfig INSTANCE = new HttpServerConfig(false, false, 30);
 
     private final boolean showRequest;
     private final boolean showResponse;
+    private final int experienceSeconds;
 
     @JSONCreator
     public HttpServerConfig(@JSONField(name = "showRequest") boolean showRequest,
-                            @JSONField(name = "showResponse") boolean showResponse) {
+                            @JSONField(name = "showResponse") boolean showResponse,
+                            @JSONField(name = "experienceSeconds") int experienceSeconds) {
         this.showRequest = showRequest;
         this.showResponse = showResponse;
+        this.experienceSeconds = experienceSeconds;
     }
 
+    public int getExperienceSeconds() {
+        if (experienceSeconds == 0) {
+            return 30;
+        }
+        return experienceSeconds;
+    }
 }
