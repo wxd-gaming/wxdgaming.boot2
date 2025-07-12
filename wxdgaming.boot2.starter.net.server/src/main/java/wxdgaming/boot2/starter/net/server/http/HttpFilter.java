@@ -10,8 +10,8 @@ import java.lang.reflect.Method;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-13 16:32
  **/
-public abstract class HttpFilter {
+public interface HttpFilter {
 
-    public abstract Object doFilter(HttpRequest httpRequest, Method method, HttpContext httpContext);
+    Object doFilter(HttpRequest httpRequest, Method method, HttpContext httpContext);
 
 }

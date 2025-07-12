@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
  **/
 @Slf4j
 @Singleton
-public class InnerFilter extends HttpFilter {
+public class InnerFilter implements HttpFilter {
 
     final LoginConfig loginConfig;
 

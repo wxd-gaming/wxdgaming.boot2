@@ -1,6 +1,5 @@
 package wxdgaming.boot2.core.chatset;
 
-import org.checkerframework.checker.units.qual.A;
 import wxdgaming.boot2.core.util.RandomUtils;
 
 import java.nio.charset.Charset;
@@ -66,6 +65,19 @@ public class StringUtils {
         return !isBlank(s);
     }
 
+    /**
+     * Gets a CharSequence length or {@code 0} if the CharSequence is
+     * {@code null}.
+     *
+     * @param cs a CharSequence or {@code null}
+     * @return CharSequence length or {@code 0} if the CharSequence is
+     * {@code null}.
+     * @since 2.4
+     * @since 3.0 Changed signature from length(String) to length(CharSequence)
+     */
+    public static int length(final CharSequence cs) {
+        return cs == null ? 0 : cs.length();
+    }
 
     /**
      * 将字符串的首字母转大写

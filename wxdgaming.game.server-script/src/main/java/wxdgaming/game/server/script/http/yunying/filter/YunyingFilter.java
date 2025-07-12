@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
  **/
 @Slf4j
 @Singleton
-public class YunyingFilter extends HttpFilter {
+public class YunyingFilter implements HttpFilter {
 
 
     @Override public Object doFilter(HttpRequest httpRequest, Method method, HttpContext httpContext) {
