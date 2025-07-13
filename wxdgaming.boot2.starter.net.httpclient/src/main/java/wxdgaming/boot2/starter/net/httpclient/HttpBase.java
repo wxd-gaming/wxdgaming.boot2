@@ -12,7 +12,6 @@ import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.NoHttpResponseException;
 import reactor.core.publisher.Mono;
-import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.starter.net.http.HttpHeadNameType;
@@ -105,7 +104,9 @@ public abstract class HttpBase<H extends HttpBase> {
         } finally {
             close();
         }
-        throw Throw.of(exception);
+        response.statusCode = 500;
+        response.exception = exception;
+        return this.response;
     }
 
     protected abstract void request0() throws IOException;

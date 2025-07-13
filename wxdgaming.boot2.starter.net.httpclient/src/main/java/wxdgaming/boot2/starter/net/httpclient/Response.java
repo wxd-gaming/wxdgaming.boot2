@@ -29,7 +29,9 @@ public final class Response<H extends HttpBase> {
     final String uriPath;
     String postText = null;
     ClassicHttpResponse httpResponse;
-    private byte[] bodys = null;
+    int statusCode = 0;
+    Exception exception;
+    byte[] bodys = null;
     List<Cookie> cookieStore = null;
 
     Response(H httpBase, String uriPath) {
@@ -52,8 +54,8 @@ public final class Response<H extends HttpBase> {
                 .orElse(null);
     }
 
-    public int responseCode() {
-        return httpResponse.getCode();
+    public boolean isSuccess() {
+        return statusCode == 200;
     }
 
     public void setBodys(byte[] data) {
@@ -79,14 +81,6 @@ public final class Response<H extends HttpBase> {
 
     public String bodyString(Charset charset) {
         return new String(body(), charset);
-    }
-
-    public RunResult bodySyncJson() {
-        return bodySyncJson(StandardCharsets.UTF_8);
-    }
-
-    public RunResult bodySyncJson(Charset charset) {
-        return RunResult.parse(bodyString(charset));
     }
 
     public String bodyUnicodeDecodeString() {
