@@ -6,6 +6,7 @@ import org.apache.hc.client5.http.cookie.Cookie;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.NameValuePair;
 import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.starter.net.http.HttpHeadNameType;
@@ -73,6 +74,11 @@ public final class Response<H extends HttpBase> {
     public RunResult bodyRunResult() {
         String string = bodyString(StandardCharsets.UTF_8);
         return RunResult.parse(string);
+    }
+
+    public <T> T bodyObject(Class<T> clazz) {
+        String string = bodyString(StandardCharsets.UTF_8);
+        return FastJsonUtil.parse(string, clazz);
     }
 
     public String bodyString() {

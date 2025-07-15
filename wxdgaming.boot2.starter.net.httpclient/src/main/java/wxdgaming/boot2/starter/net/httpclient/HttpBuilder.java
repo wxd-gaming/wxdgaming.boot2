@@ -2,6 +2,7 @@ package wxdgaming.boot2.starter.net.httpclient;
 
 
 import org.apache.hc.core5.http.ContentType;
+import wxdgaming.boot2.core.lang.AssertException;
 
 import java.io.File;
 
@@ -57,6 +58,19 @@ public class HttpBuilder {
 
     public static PostText postJson(HttpClientPool httpClientPool, String uriPath) {
         return new PostText(httpClientPool, uriPath).setContentType(HttpConst.APPLICATION_JSON);
+    }
+
+    public IPInfo getCity4Ip(String ip) {
+        final String format = "http://ip-api.com/json/%s?lang=zh-CN";
+        Get get = get(String.format(format, ip));
+        IPInfo ipInfo = get
+                .readTimeout(3000)
+                .connectionRequestTimeout(1000)
+                .request()
+                .bodyObject(IPInfo.class);
+        if (!"success".equals(ipInfo.getStatus()))
+            throw new AssertException("ip地址解析失败");
+        return ipInfo;
     }
 
 }
