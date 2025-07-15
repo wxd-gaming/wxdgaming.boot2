@@ -5,7 +5,6 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 /**

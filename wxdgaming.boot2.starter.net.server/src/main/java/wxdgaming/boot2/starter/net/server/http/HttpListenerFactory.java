@@ -61,10 +61,11 @@ public class HttpListenerFactory extends HoldRunApplication {
                      @Named("socket.server.http.config") HttpServerConfig httpServerConfig) {
         this.httpServerConfig = httpServerConfig;
         this.httpListenerContent = new HttpListenerContent(runApplication, serverConfig);
-        if (cache == null && httpServerConfig.getExperienceSeconds() > 0) {
+        int experienceSeconds = httpServerConfig.getExperienceSeconds();
+        if (cache == null && experienceSeconds > 0) {
             cache = CASCache.<String, byte[]>builder()
-                    .expireAfterWriteMs(TimeUnit.SECONDS.toMillis(httpServerConfig.getExperienceSeconds()))
-                    .heartTimeMs(TimeUnit.SECONDS.toMillis(httpServerConfig.getExperienceSeconds() / 2))
+                    .expireAfterWriteMs(TimeUnit.SECONDS.toMillis(experienceSeconds))
+                    .heartTimeMs(TimeUnit.SECONDS.toMillis(experienceSeconds / 2))
                     .loader(this::fileInputStream0)
                     .build();
             cache.start();

@@ -48,12 +48,14 @@ public class HttpListenerTriggerFile extends ExecutorEvent {
             byte[] inputStream = factory.fileInputStream(htmlPath);
             if (inputStream != null) {
                 HttpHeadValueType contentType = HttpHeadValueType.findContentType(htmlPath);
-                /*如果是固有资源增加缓存效果*/
-                httpContext.getResponse().header(HttpHeaderNames.PRAGMA.toString(), "private");
-                /*过期时间10个小时*/
-                httpContext.getResponse().header(HttpHeaderNames.EXPIRES.toString(), ExpiresFormat.format(new Date(MyClock.addHourOfTime(10))) + " GMT");
-                /*过期时间10个小时*/
-                httpContext.getResponse().header(HttpHeaderNames.CACHE_CONTROL.toString(), "max-age=" + (60 * 60 * 10));
+                if (factory.getHttpServerConfig().getExperienceSeconds() > 0) {
+                    /*如果是固有资源增加缓存效果*/
+                    httpContext.getResponse().header(HttpHeaderNames.PRAGMA.toString(), "private");
+                    /*过期时间10个小时*/
+                    httpContext.getResponse().header(HttpHeaderNames.EXPIRES.toString(), ExpiresFormat.format(new Date(MyClock.addHourOfTime(10))) + " GMT");
+                    /*过期时间10个小时*/
+                    httpContext.getResponse().header(HttpHeaderNames.CACHE_CONTROL.toString(), "max-age=" + (60 * 60 * 10));
+                }
                 httpContext.getResponse().setResponseContentType(contentType);
                 if (httpContext.getHttpServerConfig().isShowResponse()) {
                     StringBuilder stringBuilder = httpContext.showLog();
