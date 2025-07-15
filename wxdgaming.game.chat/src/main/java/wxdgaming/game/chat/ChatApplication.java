@@ -14,7 +14,7 @@ import wxdgaming.game.login.LoginServiceGuiceModule;
 public class ChatApplication {
 
     public static void main(String[] args) {
-        RunApplicationMain applicationMain = WxdApplication.run(
+        RunApplicationMain runApplication = WxdApplication.run(
                 CoreScan.class,
                 SocketScan.class,
                 ScheduledScan.class,
@@ -22,7 +22,8 @@ public class ChatApplication {
                 ChatApplication.class
         );
 
-        applicationMain.start();
+        runApplication.start();
+        runApplication.registerShutdownHook();
     }
 
 }

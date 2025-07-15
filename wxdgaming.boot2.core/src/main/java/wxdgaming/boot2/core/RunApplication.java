@@ -3,15 +3,17 @@ package wxdgaming.boot2.core;
 import com.google.inject.Binding;
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Qualifier;
+import wxdgaming.boot2.core.ann.Shutdown;
 import wxdgaming.boot2.core.ann.Value;
-import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.reflect.GuiceBeanProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
+import wxdgaming.boot2.core.util.GlobalUtil;
+import wxdgaming.boot2.core.util.JvmUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
@@ -25,6 +27,7 @@ import java.util.stream.Stream;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-02-14 16:55
  **/
+@Slf4j
 @Getter
 public abstract class RunApplication {
 
@@ -67,6 +70,23 @@ public abstract class RunApplication {
         });
     }
 
+    public void registerShutdownHook() {
+        JvmUtil.addShutdownHook(this::stop);
+    }
+
+    public void stop() {
+        if (!GlobalUtil.Exiting.compareAndSet(false, true)) return;
+        System.out.println("--------------------------shutdown---------------------------");
+        executeMethodWithAnnotatedException(Shutdown.class);
+        classWithSuper(AutoCloseable.class)
+                .forEach(closeable -> {
+                    try {
+                        closeable.close();
+                    } catch (Exception e) {
+                        log.error("关闭异常: {}", closeable.getClass(), e);
+                    }
+                });
+    }
 
     void allBindings(Injector context, Map<Key<?>, Binding<?>> allBindings) {
         if (context.getParent() != null) {

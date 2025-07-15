@@ -14,7 +14,7 @@ import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 public class LoginApplication {
 
     public static void main(String[] args) {
-        RunApplicationMain applicationMain = WxdApplication.run(
+        RunApplicationMain runApplication = WxdApplication.run(
                 CoreScan.class,
                 SocketScan.class,
                 ScheduledScan.class,
@@ -23,7 +23,8 @@ public class LoginApplication {
                 LoginApplication.class
         );
 
-        applicationMain.start();
+        runApplication.start();
+        runApplication.registerShutdownHook();
     }
 
 }

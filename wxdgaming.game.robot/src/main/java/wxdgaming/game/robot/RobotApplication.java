@@ -28,7 +28,7 @@ public class RobotApplication {
         );
 
         runApplication.start();
-
+        runApplication.registerShutdownHook();
 
     }
 

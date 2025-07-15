@@ -7,10 +7,8 @@ import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.Shutdown;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.FileReadUtil;
-import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.core.util.JvmUtil;
 
 /**
@@ -36,21 +34,6 @@ public final class RunApplicationMain extends RunApplication {
 
         try {
             executeMethodWithAnnotated(Start.class);
-
-            JvmUtil.addShutdownHook(() -> {
-                System.out.println("--------------------------shutdown---------------------------");
-                GlobalUtil.Exiting.set(true);
-                executeMethodWithAnnotatedException(Shutdown.class);
-                classWithSuper(AutoCloseable.class)
-                        .forEach(closeable -> {
-                            try {
-                                closeable.close();
-                            } catch (Exception e) {
-                                log.error("关闭异常: {}", closeable.getClass(), e);
-                            }
-                        });
-            });
-
             StringBuilder stringAppend = new StringBuilder(1024);
 
             String printString = FileReadUtil.readString("print.txt");

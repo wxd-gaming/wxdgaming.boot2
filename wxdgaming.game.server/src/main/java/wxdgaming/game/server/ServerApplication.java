@@ -7,6 +7,7 @@ import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
+import wxdgaming.boot2.core.util.JvmUtil;
 import wxdgaming.boot2.starter.RunApplicationMain;
 import wxdgaming.boot2.starter.RunApplicationSub;
 import wxdgaming.boot2.starter.WxdApplication;
@@ -25,6 +26,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ServerApplication {
 
+    static RunApplicationSub runApplicationSub = null;
+
     public static void main(String[] args) throws Exception {
         try {
             RunApplicationMain runApplication = WxdApplication.run(
@@ -38,6 +41,10 @@ public class ServerApplication {
             );
             loadScript();
             runApplication.start();
+            JvmUtil.addShutdownHook(() -> {
+                runApplicationSub.stop();
+            });
+
             QPlayerTable qPlayerTable = DataRepository.getIns().dataTable(QPlayerTable.class);
             QPlayer qPlayer = qPlayerTable.get(1);
             log.info("{}", qPlayer);
@@ -123,7 +130,8 @@ public class ServerApplication {
         }
 
         ReflectProvider reflectProvider = ReflectProvider.Builder.of(classDirLoader, "wxdgaming.game.server.script").build();
-        RunApplicationSub runApplicationSub = WxdApplication.createRunApplicationSub(reflectProvider);
+
+        runApplicationSub = WxdApplication.createRunApplicationSub(reflectProvider);
         runApplicationSub.executeMethodWithAnnotated(Init.class);
         log.info("加载脚本模块完成");
     }
