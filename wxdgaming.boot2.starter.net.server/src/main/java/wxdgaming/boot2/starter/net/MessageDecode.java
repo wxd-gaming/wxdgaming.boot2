@@ -13,7 +13,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.util.BytesUnit;
-import wxdgaming.boot2.starter.net.pojo.IWebSocketStringListener;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 
@@ -30,8 +29,8 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
 
     public static final AttributeKey<ByteBuf> byteBufAttributeKey = AttributeKey.<ByteBuf>valueOf("__ctx_byteBuf__");
 
-    final ProtoListenerFactory protoListenerFactory;
-    final HttpListenerFactory httpListenerFactory;
+    protected final ProtoListenerFactory protoListenerFactory;
+    protected final HttpListenerFactory httpListenerFactory;
 
     public MessageDecode(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
         this.protoListenerFactory = protoListenerFactory;
@@ -179,13 +178,6 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
         protoListenerFactory.dispatch(socketSession, messageId, messageBytes);
     }
 
-    protected void dispatch(SocketSession socketSession, String messageBytes) throws Exception {
-        IWebSocketStringListener instance = protoListenerFactory.getIWebSocketStringListener();
-        if (instance != null) {
-            instance.onMessage(socketSession, messageBytes);
-        } else {
-            socketSession.close("不支持 websocket text 文件监听");
-        }
-    }
+    protected abstract void dispatch(SocketSession socketSession, String messageBytes) throws Exception;
 
 }

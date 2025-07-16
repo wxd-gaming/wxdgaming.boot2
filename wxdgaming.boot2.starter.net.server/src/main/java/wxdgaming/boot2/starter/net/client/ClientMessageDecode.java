@@ -8,7 +8,9 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.net.ChannelUtil;
 import wxdgaming.boot2.starter.net.MessageDecode;
+import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
+import wxdgaming.boot2.starter.net.server.IServerWebSocketStringListener;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 
 /**
@@ -49,4 +51,12 @@ public class ClientMessageDecode extends MessageDecode {
         ChannelUtil.closeSession(ctx.channel(), "不支持 Http 服务");
     }
 
+    @Override protected void dispatch(SocketSession socketSession, String messageBytes) throws Exception {
+        IClientWebSocketStringListener instance = protoListenerFactory.getClientWebSocketStringListener();
+        if (instance != null) {
+            instance.onMessage(socketSession, messageBytes);
+        } else {
+            socketSession.close("不支持 websocket text 文件监听");
+        }
+    }
 }

@@ -4,27 +4,27 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.net.SocketSession;
+import wxdgaming.boot2.starter.net.pojo.ClientProtoFilter;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerTrigger;
-import wxdgaming.boot2.starter.net.pojo.ServerProtoFilter;
 import wxdgaming.game.gateway.module.data.DataCenterService;
 
 /**
- * 网关消息拦截
+ * 游戏服务传递到网关
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-05-28 15:19
  **/
 @Slf4j
 @Singleton
-public class ClientProtoFilterImpl implements ServerProtoFilter {
+public class GameServer2GatewayProtoFilterImpl implements ClientProtoFilter {
 
     private final DataCenterService dataCenterService;
     private final ProtoListenerFactory listenerFactory;
 
 
     @Inject
-    public ClientProtoFilterImpl(DataCenterService dataCenterService, ProtoListenerFactory listenerFactory) {
+    public GameServer2GatewayProtoFilterImpl(DataCenterService dataCenterService, ProtoListenerFactory listenerFactory) {
         this.dataCenterService = dataCenterService;
         this.listenerFactory = listenerFactory;
     }

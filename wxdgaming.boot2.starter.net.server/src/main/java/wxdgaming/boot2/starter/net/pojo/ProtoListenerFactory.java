@@ -8,6 +8,8 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
+import wxdgaming.boot2.starter.net.client.IClientWebSocketStringListener;
+import wxdgaming.boot2.starter.net.server.IServerWebSocketStringListener;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -25,7 +27,8 @@ public class ProtoListenerFactory {
 
     /** 相当于用 read and copy write方式作为线程安全性 */
     ProtoListenerContent protoListenerContent = null;
-    IWebSocketStringListener iWebSocketStringListener = null;
+    IServerWebSocketStringListener serverWebSocketStringListener = null;
+    IClientWebSocketStringListener clientWebSocketStringListener = null;
     ProtoUnknownMessageEvent protoUnknownMessageEvent = null;
     List<ServerProtoFilter> serverProtoFilters;
     List<ClientProtoFilter> clientProtoFilters;
@@ -34,7 +37,8 @@ public class ProtoListenerFactory {
     @Order(6)
     public void init(RunApplication runApplication) {
         protoListenerContent = new ProtoListenerContent(runApplication);
-        iWebSocketStringListener = runApplication.classWithSuper(IWebSocketStringListener.class).findFirst().orElse(null);
+        serverWebSocketStringListener = runApplication.classWithSuper(IServerWebSocketStringListener.class).findFirst().orElse(null);
+        clientWebSocketStringListener = runApplication.classWithSuper(IClientWebSocketStringListener.class).findFirst().orElse(null);
         protoUnknownMessageEvent = runApplication.classWithSuper(ProtoUnknownMessageEvent.class).findFirst().orElse(null);
         serverProtoFilters = runApplication.classWithSuper(ServerProtoFilter.class).toList();
         clientProtoFilters = runApplication.classWithSuper(ClientProtoFilter.class).toList();

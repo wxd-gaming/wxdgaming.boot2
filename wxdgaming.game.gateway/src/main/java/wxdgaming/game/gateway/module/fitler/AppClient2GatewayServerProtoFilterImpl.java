@@ -10,21 +10,21 @@ import wxdgaming.boot2.starter.net.pojo.ServerProtoFilter;
 import wxdgaming.game.gateway.module.data.DataCenterService;
 
 /**
- * 网关消息拦截
+ * 客户端传递到网关
  *
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-05-28 15:19
  **/
 @Slf4j
 @Singleton
-public class ServerProtoFilterImpl implements ServerProtoFilter {
+public class AppClient2GatewayServerProtoFilterImpl implements ServerProtoFilter {
 
     private final DataCenterService dataCenterService;
     private final ProtoListenerFactory listenerFactory;
 
 
     @Inject
-    public ServerProtoFilterImpl(DataCenterService dataCenterService, ProtoListenerFactory listenerFactory) {
+    public AppClient2GatewayServerProtoFilterImpl(DataCenterService dataCenterService, ProtoListenerFactory listenerFactory) {
         this.dataCenterService = dataCenterService;
         this.listenerFactory = listenerFactory;
     }
