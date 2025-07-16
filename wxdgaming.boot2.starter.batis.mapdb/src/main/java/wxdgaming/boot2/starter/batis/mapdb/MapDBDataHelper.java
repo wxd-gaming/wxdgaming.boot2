@@ -33,6 +33,8 @@ public class MapDBDataHelper implements AutoCloseable {
         this.dbFile = file;
         this.db = DBMaker.fileDB(file)
                 .fileChannelEnable()
+                .checksumHeaderBypass()
+//                .checksumStoreEnable()  // 启用完整校验
 //                .closeOnJvmShutdown()
                 .fileMmapEnable()            // 启用内存映射（提升读性能）
                 .fileMmapEnableIfSupported() // 启用内存映射（提升读性能）
