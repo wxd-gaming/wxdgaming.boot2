@@ -13,8 +13,8 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Shutdown;
+import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.ChannelUtil;
@@ -246,7 +246,7 @@ public class SocketClient {
 
     protected boolean reconnection(Consumer<SocketSession> consumer) {
 
-        if (closed || !config.isEnabledReconnection() || 1 == 1)
+        if (closed || !config.isEnabledReconnection())
             return false;
 
         long l = atomicLong.get();
