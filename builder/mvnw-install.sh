@@ -7,7 +7,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 # 打印出Java版本信息以验证设置是否成功
 java -version
 
-mvnw clean compile -T 1C test -Dmaven.compile.fork=true -DfailIfNoTests=false package
+./mvnw clean compile -T 1C test -Dmaven.compile.fork=true -DfailIfNoTests=false package
 if [ $? != 0 ]; then
   echo "打包失败"
   exit 1
