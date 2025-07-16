@@ -1,0 +1,4 @@
+git init
+git remote add origin https://gitee.com/wxd-gaming/wxdgaming.boot2.git
+git fetch
+git pull origin master
