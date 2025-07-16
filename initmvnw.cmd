@@ -6,9 +6,8 @@ set PATH=%JAVA_HOME%\bin;%PATH%
 
 :: 检查JAVA_HOME是否配置成功
 echo %JAVA_HOME%
-echo %PATH%
 
 :: 打印Java版本信息，确认配置成功
-java -version
+call java -version
 
-C:\java\apache-maven-3.9.9\\bin\\mvn clean compile -T 1C test -Dmaven.compile.fork=true -DfailIfNoTests=false install
+C:\java\apache-maven-3.9.9\\bin\\mvn -N io.takari:maven:wrapper
