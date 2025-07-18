@@ -1,9 +1,12 @@
 #!/bin/bash
 
 
-MEM=450m
-JAR=`pwd`/server-execute.jar
+MEM=700m
+WK=`pwd`
+JAR=`pwd`/bootstrap.jar
 PID=`ps -ef | grep ${JAR} | grep -v grep | awk '{print $2}'`
+
+mkdir -p target
 
 exists()
 {
@@ -23,7 +26,7 @@ start()
 		exit 1
 	fi
 
-	JAVA_PARAM="-Xms${MEM} -Xmx${MEM} -Xss512k -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 -XX:CICompilerCount=4 -Dlogback.configurationFile=./logback.xml -XX:-OmitStackTraceInFastThrow -XX:MaxDirectMemorySize=128m -XX:MaxGCPauseMillis=100 -Djdk.attach.allowAttachSelf=true -Xlog:gc*:target/gc.log:time,level,tags -XX:+UseZGC -XX:+ZGenerational -XX:-ZUncommit -XX:ConcGCThreads=2 -XX:+UseDynamicNumberOfGCThreads -server -jar"
+	JAVA_PARAM="-Dw.k=${WK} -Xms${MEM} -Xmx${MEM} -Xss512k -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 -Dlogback.configurationFile=./logback.xml -XX:CICompilerCount=4 -XX:-OmitStackTraceInFastThrow -XX:MaxDirectMemorySize=128m -XX:MaxGCPauseMillis=100 -Djdk.attach.allowAttachSelf=true -XX:+UseZGC -XX:+ZGenerational -XX:-ZUncommit -Xlog:gc*:target/gc.log:time,level,tags -XX:ConcGCThreads=2 -XX:+UseDynamicNumberOfGCThreads -server -jar"
 
 	nohup /usr/local/openjdk-21/bin/java ${JAVA_PARAM} ${JAR} > nohup.out 2>&1 &
 
