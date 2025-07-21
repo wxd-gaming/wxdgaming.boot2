@@ -32,7 +32,7 @@ public class MapMergeTest {
         map2.put("b", new JSONObject().fluentPut("2", "2"));
         map2.put("c", new JSONObject().fluentPut("2", new JSONObject().fluentPut("1", "1")));
 
-        Map<String, Object> map3 = Objects.mergeMaps(map1, map2);
+        Map<String, Object> map3 = Objects.mergeMapsNew(map1, map2);
         System.out.println(FastJsonUtil.toJSONStringAsFmt(map3));
 
     }
