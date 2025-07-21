@@ -1,6 +1,8 @@
 debug: true
 gid: 1
 sid: 1
+profiles:
+  active: [dev, test]
 executor:
   basic:
     coreSize: 2                        #默认线程池的核心线程数

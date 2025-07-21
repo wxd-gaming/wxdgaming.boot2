@@ -1,12 +1,14 @@
 package wxdgaming.boot2.core;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import lombok.Getter;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.io.FileUtil;
+import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.Tuple2;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.core.util.JvmUtil;
@@ -14,8 +16,8 @@ import wxdgaming.boot2.core.util.YamlUtil;
 
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -39,17 +41,21 @@ public class BootConfig {
 
     public void loadConfig() throws Exception {
         String property = JvmUtil.getProperty("boot.config", "boot.yml", s -> s);
-        Tuple2<Path, byte[]> inputStream = FileUtil.findInputStream(BootConfig.class.getClassLoader(), property);
-        AssertUtil.assertNull(inputStream, "未找到配置文件：" + property);
-        if (property.endsWith(".json")) {
-            String json = new String(inputStream.getRight(), StandardCharsets.UTF_8);
-            config = JSONObject.parseObject(json);
-        } else {
-            config = YamlUtil.loadYaml(new ByteArrayInputStream(inputStream.getRight()));
+        configNode = load0(property);
+        List<String> actives = getNestedValue("profiles.active", new TypeReference<List<String>>() {}.getType(), List::of);
+        for (String active : actives) {
+            JSONObject activeJsonObject = load0("boot-%s.yml".formatted(active));
+            Objects.mergeMaps(configNode, activeJsonObject);
         }
     }
 
-    private JSONObject config = new JSONObject(true);
+    private JSONObject load0(String property) {
+        Tuple2<Path, byte[]> inputStream = FileUtil.findInputStream(BootConfig.class.getClassLoader(), property);
+        AssertUtil.assertNull(inputStream, "未找到配置文件：" + property);
+        return YamlUtil.loadYaml(new ByteArrayInputStream(inputStream.getRight()));
+    }
+
+    private JSONObject configNode = new JSONObject(true);
 
     @SuppressWarnings("unchecked")
     public <R> R value(Value value, Type type) {
@@ -81,23 +87,23 @@ public class BootConfig {
     }
 
     public boolean isDebug() {
-        return config.getBooleanValue("debug");
+        return configNode.getBooleanValue("debug");
     }
 
     public int gid() {
-        Integer sid = config.getInteger("gid");
+        Integer sid = configNode.getInteger("gid");
         AssertUtil.assertNull(sid, "gid is null");
         return sid;
     }
 
     public int sid() {
-        Integer sid = config.getInteger("sid");
+        Integer sid = configNode.getInteger("sid");
         AssertUtil.assertNull(sid, "sid is null");
         return sid;
     }
 
     public String sname() {
-        String sname = config.getString("sname");
+        String sname = configNode.getString("sname");
         if (sname == null) {
             return "boot server";
         }
@@ -117,40 +123,40 @@ public class BootConfig {
     }
 
     public int getIntValue(String key) {
-        return config.getIntValue(key);
+        return configNode.getIntValue(key);
     }
 
     public Integer getInteger(String key) {
-        return config.getInteger(key);
+        return configNode.getInteger(key);
     }
 
     public Long getLong(String key) {
-        return config.getLong(key);
+        return configNode.getLong(key);
     }
 
     public long getLongValue(String key) {
-        return config.getLongValue(key);
+        return configNode.getLongValue(key);
     }
 
     public String getString(String key) {
-        return config.getString(key);
+        return configNode.getString(key);
     }
 
     public <T> T getObject(String key, Type clazz) {
-        return config.getObject(key, clazz);
+        return configNode.getObject(key, clazz);
     }
 
     public <T> T getObject(String key, Type clazz, Supplier<Object> supplier) {
-        return FastJsonUtil.getObject(config, key, clazz, supplier);
+        return FastJsonUtil.getObject(configNode, key, clazz, supplier);
     }
 
     public <T> T getNestedValue(String path, Type clazz) {
-        return FastJsonUtil.getNestedValue(config, path, clazz, null);
+        return FastJsonUtil.getNestedValue(configNode, path, clazz, null);
     }
 
     /** 泛型方法：通过路由获取嵌套的 JSON 数据并转换为指定类型 */
     public <T> T getNestedValue(String path, Type clazz, Supplier<Object> supplier) {
-        return FastJsonUtil.getNestedValue(config, path, clazz, supplier);
+        return FastJsonUtil.getNestedValue(configNode, path, clazz, supplier);
     }
 
 

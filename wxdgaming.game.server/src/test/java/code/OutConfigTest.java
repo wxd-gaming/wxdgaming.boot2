@@ -24,7 +24,7 @@ public class OutConfigTest {
 
     @Test
     public void out() {
-        JSONObject config = BootConfig.getIns().getConfig();
+        JSONObject config = BootConfig.getIns().getConfigNode();
         config.put("debug", true);
         config.put("sid", 1);
         config.put("executor",

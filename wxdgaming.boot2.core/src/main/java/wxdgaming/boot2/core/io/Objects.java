@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -188,6 +189,31 @@ public class Objects {
             ts1[i] = ats[i - ts.length];
         }
         return ts1;
+    }
+
+    /** 合并两个 Map，支持嵌套结构 */
+    public static Map<String, Object> mergeMapsNew(Map<String, Object> target, Map<String, Object> source) {
+        Map<String, Object> mergeMaps = new HashMap<>();
+        mergeMaps(mergeMaps, target);
+        mergeMaps(mergeMaps, source);
+        return target;
+    }
+
+    /** 合并两个 Map，支持嵌套结构 */
+    @SuppressWarnings("unchecked")
+    public static void mergeMaps(Map<String, Object> target, Map<String, Object> source) {
+        for (Map.Entry<String, Object> entry : source.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            if (value instanceof Map && target.containsKey(key) && target.get(key) instanceof Map) {
+                // 递归合并嵌套 Map
+                mergeMaps((Map<String, Object>) target.get(key), (Map<String, Object>) value);
+            } else {
+                // 覆盖或添加键值
+                target.put(key, value);
+            }
+        }
     }
 
     /** 检查数组是否包含某个值 */
