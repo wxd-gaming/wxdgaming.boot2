@@ -42,7 +42,7 @@ public class HttpClientConfig extends ObjectBase {
     private final int keepAliveTimeout;
     @JSONField(ordinal = 8)
     private final String sslProtocol;
-    @JSONField(ordinal = 9)
+    @JSONField(ordinal = 9, defaultValue = "true")
     private final boolean autoUseGzip;
 
     @JSONCreator
@@ -54,7 +54,7 @@ public class HttpClientConfig extends ObjectBase {
                             @JSONField(name = "readTimeout") int readTimeout,
                             @JSONField(name = "keepAliveTimeout") int keepAliveTimeout,
                             @JSONField(name = "sslProtocol", defaultValue = "TLS") String sslProtocol,
-                            @JSONField(name = "autoUseGzip", defaultValue = "false") boolean autoUseGzip) {
+                            @JSONField(name = "autoUseGzip", defaultValue = "true") boolean autoUseGzip) {
         this.routeMaxSize = routeMaxSize;
         this.totalMaxSize = totalMaxSize;
         this.resetTimeM = resetTimeM;

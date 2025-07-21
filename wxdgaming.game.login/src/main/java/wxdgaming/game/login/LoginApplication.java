@@ -5,6 +5,7 @@ import wxdgaming.boot2.starter.RunApplicationMain;
 import wxdgaming.boot2.starter.WxdApplication;
 import wxdgaming.boot2.starter.batis.sql.pgsql.MysqlScan;
 import wxdgaming.boot2.starter.net.SocketScan;
+import wxdgaming.boot2.starter.net.httpclient.HttpClientScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 
 /**
@@ -16,6 +17,7 @@ public class LoginApplication {
     public static void main(String[] args) {
         RunApplicationMain runApplication = WxdApplication.run(
                 CoreScan.class,
+                HttpClientScan.class,
                 SocketScan.class,
                 ScheduledScan.class,
                 MysqlScan.class,

@@ -1,6 +1,7 @@
 package wxdgaming.boot2.starter.net.httpclient;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -27,6 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2023-04-28 12:30
  **/
+@Slf4j
 @Getter
 public class HttpClientPool {
 
@@ -35,6 +37,7 @@ public class HttpClientPool {
 
     static {
         HttpClientConfig clientConfig = BootConfig.getIns().getNestedValue("http.client", HttpClientConfig.class, HttpClientConfig.DEFAULT);
+        log.debug("HttpClientConfig: {}", clientConfig);
         HTTP_CLIENT_CACHE = CASCache.<String, HttpClientPool>builder()
                 .cacheName("http-client")
                 .expireAfterWriteMs(TimeUnit.MINUTES.toMillis(clientConfig.getResetTimeM()))

@@ -17,7 +17,7 @@ import wxdgaming.boot2.core.util.YamlUtil;
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -42,7 +42,12 @@ public class BootConfig {
     public void loadConfig() throws Exception {
         String property = JvmUtil.getProperty("boot.config", "boot.yml", s -> s);
         configNode = load0(property);
-        List<String> actives = getNestedValue("profiles.active", new TypeReference<List<String>>() {}.getType(), List::of);
+        Set<String> actives = getNestedValue("profiles.active", new TypeReference<Set<String>>() {}.getType(), Set::of);
+        String profilesActive = System.getProperty("profiles.active");
+        if (StringUtils.isNotBlank(profilesActive)) {
+            String[] split = profilesActive.split(",");
+            actives.addAll(Set.of(split));
+        }
         for (String active : actives) {
             JSONObject activeJsonObject = load0("boot-%s.yml".formatted(active));
             Objects.mergeMaps(configNode, activeJsonObject);
