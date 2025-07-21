@@ -22,6 +22,10 @@ public class JsonToken {
     private String signature;
     private final JSONObject data = new JSONObject();
 
+    public Object get(String key) {
+        return data.get(key);
+    }
+
     public <T> T getObject(String key, Class<T> clazz) {
         return data.getObject(key, clazz);
     }

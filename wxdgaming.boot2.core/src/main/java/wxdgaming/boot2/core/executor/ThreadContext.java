@@ -151,6 +151,14 @@ public class ThreadContext extends HashMap<String, Object> {
         return (String) get("queueName");
     }
 
+    public String getString(String key) {
+        Object value = get(key);
+        if (value != null) {
+            return value.toString();
+        }
+        return null;
+    }
+
     public int getIntValue(String key) {
         Object value = get(key);
         if (value instanceof Number) {

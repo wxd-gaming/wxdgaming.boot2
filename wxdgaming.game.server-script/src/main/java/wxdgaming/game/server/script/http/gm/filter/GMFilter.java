@@ -22,7 +22,7 @@ public class GMFilter implements HttpFilter {
     @Override public Object doFilter(HttpRequest httpRequest, Method method, HttpContext httpContext) {
         // if (url.startsWith("/gm")) {
         //     if (!BootConfig.getIns().isDebug())
-        //         return RunResult.error("功能未开启");
+        //         return RunResult.fail("功能未开启");
         // }
         return null;
     }
