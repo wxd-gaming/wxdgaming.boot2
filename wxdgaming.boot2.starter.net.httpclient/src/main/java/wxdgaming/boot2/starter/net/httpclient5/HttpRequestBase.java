@@ -88,7 +88,6 @@ public abstract class HttpRequestBase {
                 exception = e;
             }
         }
-        log.error("请求异常，重试失败 {}", retry, exception);
         HttpContent httpContent = new HttpContent();
         httpContent.code = 500;
         httpContent.exception = Throw.of(exception);

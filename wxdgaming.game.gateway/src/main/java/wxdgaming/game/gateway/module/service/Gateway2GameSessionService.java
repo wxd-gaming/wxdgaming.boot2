@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.HoldRunApplication;
+import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.executor.ExecutorWith;
@@ -90,6 +91,10 @@ public class Gateway2GameSessionService extends HoldRunApplication {
 
         String string = jsonObject.toString();
         HttpContent execute = PostRequest.ofJson(loginConfig.getUrl() + "/inner/registerGateway", string).execute();
+        if (!execute.isSuccess()) {
+            log.error("访问登陆服务器失败{}", Throw.ofString(execute.getException(), false));
+            return;
+        }
         log.info("登录服务器注册完成返回信息: {}", execute.bodyString());
         RunResult runResult = execute.bodyRunResult();
         if (runResult.code() == 1) {

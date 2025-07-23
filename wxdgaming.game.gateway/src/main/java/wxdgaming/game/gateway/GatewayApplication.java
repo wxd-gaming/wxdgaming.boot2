@@ -4,6 +4,7 @@ import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.starter.RunApplicationMain;
 import wxdgaming.boot2.starter.WxdApplication;
 import wxdgaming.boot2.starter.net.SocketScan;
+import wxdgaming.boot2.starter.net.httpclient5.HttpClientScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 import wxdgaming.game.login.LoginServiceGuiceModule;
 
@@ -17,6 +18,7 @@ public class GatewayApplication {
         RunApplicationMain runApplication = WxdApplication.run(
                 CoreScan.class,
                 SocketScan.class,
+                HttpClientScan.class,
                 ScheduledScan.class,
                 LoginServiceGuiceModule.class,
                 GatewayApplication.class
