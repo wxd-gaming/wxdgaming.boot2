@@ -1,4 +1,4 @@
-package wxdgaming.boot2.starter.net.httpclient;
+package wxdgaming.boot2.starter.net.httpclient5;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

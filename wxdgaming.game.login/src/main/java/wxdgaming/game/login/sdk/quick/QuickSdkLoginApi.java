@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.starter.net.httpclient.HttpBuilder;
+import wxdgaming.boot2.starter.net.httpclient5.PostRequest;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
 import wxdgaming.game.login.AppPlatformParams;
 import wxdgaming.game.login.bean.UserData;
@@ -59,7 +59,7 @@ public class QuickSdkLoginApi extends AbstractSdkLoginApi {
             if (log.isDebugEnabled()) {
                 log.debug("{}：post url：{}?{}", appPlatformParams, APP_LOGIN_URL, urlData);
             }
-            String URLGetStr = HttpBuilder.postText(APP_LOGIN_URL, urlData).request().bodyString();
+            String URLGetStr = PostRequest.of(APP_LOGIN_URL, urlData).execute().bodyString();
             if (log.isDebugEnabled()) {
                 log.debug("{}：check login ret：{}", appPlatformParams, URLGetStr);
             }

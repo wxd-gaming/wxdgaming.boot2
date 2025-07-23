@@ -12,7 +12,7 @@ import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.util.YamlUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 import wxdgaming.boot2.starter.net.client.SocketClientConfig;
-import wxdgaming.boot2.starter.net.httpclient.HttpClientConfig;
+import wxdgaming.boot2.starter.net.httpclient5.HttpClientConfig;
 import wxdgaming.boot2.starter.net.server.SocketServerConfig;
 import wxdgaming.boot2.starter.net.server.http.HttpServerConfig;
 

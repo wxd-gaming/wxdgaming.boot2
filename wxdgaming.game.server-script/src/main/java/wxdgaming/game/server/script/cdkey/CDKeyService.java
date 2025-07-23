@@ -9,15 +9,15 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.starter.net.httpclient.HttpBuilder;
-import wxdgaming.boot2.starter.net.httpclient.PostText;
+import wxdgaming.boot2.starter.net.httpclient5.HttpContent;
+import wxdgaming.boot2.starter.net.httpclient5.PostRequest;
 import wxdgaming.game.bean.goods.BagChangeArgs4Item;
+import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.bean.goods.ItemCfg;
 import wxdgaming.game.core.Reason;
 import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.cdkey.ResUseCdKey;
 import wxdgaming.game.server.bean.BackendConfig;
-import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.bag.BagService;
@@ -68,8 +68,8 @@ public class CDKeyService {
         params.put("account", player.getAccount());
         params.put("rid", player.getUid());
 
-        PostText postText = HttpBuilder.postJson(url, FastJsonUtil.toJSONString(params));
-        RunResult runResult = postText.request().bodyRunResult();
+        HttpContent execute = PostRequest.ofJson(url, FastJsonUtil.toJSONString(params)).execute();
+        RunResult runResult = execute.bodyRunResult();
 
         if (runResult.isFail()) {
             tipsService.tips(player, runResult.msg());
@@ -96,7 +96,7 @@ public class CDKeyService {
 
         List<Item> itemList = bagService.newItems(rewards);
 
-        BagChangeArgs4Item rewardItemArgs =  BagChangeArgs4Item.builder()
+        BagChangeArgs4Item rewardItemArgs = BagChangeArgs4Item.builder()
                 .setItemList(itemList)
                 .setBagFullSendMail(true)
                 .setBagErrorNoticeClient(false)

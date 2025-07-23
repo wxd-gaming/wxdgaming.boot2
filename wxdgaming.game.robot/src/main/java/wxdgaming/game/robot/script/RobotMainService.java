@@ -14,8 +14,8 @@ import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.RandomUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.SocketClient;
-import wxdgaming.boot2.starter.net.httpclient.HttpBuilder;
-import wxdgaming.boot2.starter.net.httpclient.PostText;
+import wxdgaming.boot2.starter.net.httpclient5.HttpContent;
+import wxdgaming.boot2.starter.net.httpclient5.PostRequest;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.login.LoginConfig;
 import wxdgaming.game.message.chat.ChatType;
@@ -66,8 +66,8 @@ public class RobotMainService {
         jsonObject.put("token", robot.getAccount());
 
         String uriPath = getLoginConfig().getUrl() + "/login/check";
-        PostText postText = HttpBuilder.postJson(uriPath, jsonObject.toJSONString());
-        RunResult runResult = postText.request().bodyRunResult();
+        HttpContent execute = PostRequest.ofJson(uriPath, jsonObject.toJSONString()).execute();
+        RunResult runResult = execute.bodyRunResult();
         if (runResult.isFail()) {
             log.error("登录失败：{}", runResult.msg());
         }

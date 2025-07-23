@@ -1,4 +1,4 @@
-package wxdgaming.boot2.starter.net.httpclient;
+package wxdgaming.boot2.starter.net.httpclient5;
 
 
 import wxdgaming.boot2.core.ServiceGuiceModule;

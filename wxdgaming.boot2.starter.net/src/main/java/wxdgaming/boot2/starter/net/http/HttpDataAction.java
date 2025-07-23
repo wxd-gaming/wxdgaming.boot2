@@ -46,19 +46,17 @@ public class HttpDataAction {
         return URLDecoder.decode(valueOf, StandardCharsets.UTF_8);
     }
 
-    public static String httpData(Map paramsMap) {
+    public static String httpData(Map<String, ?> paramsMap) {
         if (paramsMap == null) return "";
-        Map<Object, Object> paramsMaps = paramsMap;
-        return paramsMaps.entrySet()
+        return paramsMap.entrySet()
                 .stream()
                 .map(v -> v.getKey() + "=" + v.getValue())
                 .collect(Collectors.joining("&"));
     }
 
-    public static String httpDataEncoder(Map paramsMap) {
+    public static String httpDataEncoder(Map<String, ?> paramsMap) {
         if (paramsMap == null) return "";
-        Map<Object, Object> paramsMaps = paramsMap;
-        return paramsMaps.entrySet()
+        return paramsMap.entrySet()
                 .stream()
                 .map(v -> v.getKey() + "=" + urlEncoder(v.getValue()))
                 .collect(Collectors.joining("&"));
