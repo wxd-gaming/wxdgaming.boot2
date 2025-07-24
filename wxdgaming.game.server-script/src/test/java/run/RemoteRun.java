@@ -7,8 +7,8 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
 import wxdgaming.boot2.core.loader.RemoteClassLoader;
 import wxdgaming.boot2.core.zip.GzipUtil;
-import wxdgaming.boot2.starter.net.httpclient5.HttpContent;
-import wxdgaming.boot2.starter.net.httpclient5.PostRequest;
+import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
+import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -37,7 +37,7 @@ public class RemoteRun {
         jsonObject.put("sign", "ABC");/*签名*/
         jsonObject.put("code", URLEncoder.encode(base64, StandardCharsets.UTF_8));/*代码*/
 
-        HttpContent execute = PostRequest.ofJson("http://localhost:8000/888/dynamic", jsonObject.toJSONString()).execute();
+        HttpResponse execute = HttpRequestPost.ofJson("http://localhost:8000/888/dynamic", jsonObject.toJSONString()).execute();
         String string = execute.bodyString();
         System.out.println(string);
 

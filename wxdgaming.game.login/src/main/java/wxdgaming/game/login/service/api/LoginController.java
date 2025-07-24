@@ -3,6 +3,7 @@ package wxdgaming.game.login.service.api;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
+import wxdgaming.boot2.core.ann.Body;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Param;
 import wxdgaming.boot2.core.lang.RunResult;
@@ -63,6 +64,12 @@ public class LoginController extends HoldRunApplication {
     @HttpRequest(path = "test/{id}/sdk")
     public RunResult checkSdk(HttpContext context, @HttpPath("id") int id) {
         return RunResult.fail(String.valueOf(id));
+    }
+
+    @HttpRequest(path = "test/{id}/v1")
+    public RunResult testV1(HttpContext context, @Body() String body) {
+        log.info("body: {}", body);
+        return RunResult.ok().fluentPut("data", body);
     }
 
 }

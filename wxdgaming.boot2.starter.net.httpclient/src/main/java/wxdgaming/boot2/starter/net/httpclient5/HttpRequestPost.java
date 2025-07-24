@@ -25,66 +25,70 @@ import java.util.Map;
 @Slf4j
 @Getter
 @SuperBuilder
-public class PostRequest extends HttpRequestBase {
+public class HttpRequestPost extends AbstractHttpRequest {
 
-    public static PostRequest of(String url) {
-        return PostRequest.builder().uriPath(url).build();
+    public static HttpRequestPost of(String url) {
+        return HttpRequestPost.builder().uriPath(url).build();
     }
 
-    public static PostRequest of(String url, String params) {
-        return PostRequest.builder().uriPath(url).build().setParams(params);
+    public static HttpRequestPost of(String url, String params) {
+        return HttpRequestPost.builder().uriPath(url).params(params).build();
     }
 
-    public static PostRequest of(String url, Map<String, ?> params) {
-        return PostRequest.builder().uriPath(url).build().setParams(params);
+    public static HttpRequestPost of(String url, Map<String, ?> params) {
+        return HttpRequestPost.builder().uriPath(url).build().setParams(params);
     }
 
-    public static PostRequest ofJson(String url, String params) {
-        return PostRequest.builder().uriPath(url).build().setJson(params);
+    public static HttpRequestPost ofJson(String url, String params) {
+        return HttpRequestPost.builder().uriPath(url).build().setJson(params);
     }
 
-    public static PostRequest ofJson(String url, Map<String, ?> params) {
-        return PostRequest.builder().uriPath(url).build().setJson(params);
+    public static HttpRequestPost ofJson(String url, Map<String, ?> params) {
+        return HttpRequestPost.builder().uriPath(url).build().setJson(params);
     }
 
-    @Builder.Default
-    private ContentType contentType = HttpConst.APPLICATION_FORM_URLENCODED;
     private String params;
+    /** 发送数据的时候是否开启gzip压缩 */
     @Builder.Default
-    private boolean gzip = true;
+    private boolean useGzip = false;
 
-    @Override public PostRequest addHeader(HttpHeaderNames key, ContentType contentType) {
+    @Override public HttpRequestPost addHeader(HttpHeaderNames key, ContentType contentType) {
         super.addHeader(key, contentType);
         return this;
     }
 
-    @Override public PostRequest addHeader(String key, String value) {
+    @Override public HttpRequestPost addHeader(String key, String value) {
         super.addHeader(key, value);
         return this;
     }
 
-    public PostRequest setParams(Map<String, ?> params) {
+    public HttpRequestPost setParams(Map<String, ?> params) {
         return setParams(HttpDataAction.httpData(params));
     }
 
-    public PostRequest setParamsEncoder(Map<String, ?> params) {
+    public HttpRequestPost setParamsEncoder(Map<String, ?> params) {
         return setParams(HttpDataAction.httpDataEncoder(params));
     }
 
-    public PostRequest setParamsRawEncoder(Map<String, ?> params) {
+    public HttpRequestPost setParamsRawEncoder(Map<String, ?> params) {
         return setParams(HttpDataAction.httpDataRawEncoder(params));
     }
 
-    public PostRequest setParams(String params) {
+    public HttpRequestPost setParams(String params) {
         this.params = params;
         return this;
     }
 
-    public PostRequest setJson(Map<String, ?> params) {
+    public HttpRequestPost useGzip() {
+        this.useGzip = true;
+        return this;
+    }
+
+    public HttpRequestPost setJson(Map<String, ?> params) {
         return setJson(JSON.toJSONString(params, SerializerFeature.SortField, SerializerFeature.MapSortField));
     }
 
-    public PostRequest setJson(String params) {
+    public HttpRequestPost setJson(String params) {
         this.params = params;
         this.contentType = HttpConst.APPLICATION_JSON;
         return this;
@@ -94,10 +98,11 @@ public class PostRequest extends HttpRequestBase {
         HttpPost httpPost = new HttpPost(this.getUriPath());
         if (this.params != null) {
             byte[] bytes = params.getBytes(contentType.getCharset());
-            if (gzip && bytes.length > 512) {
+            if (useGzip && bytes.length > HttpDataAction.USE_GZIP_MIN_LENGTH) {
                 // 设置请求头，告知服务器请求内容使用 Gzip 压缩
                 addHeader(HttpHeaderNames.CONTENT_ENCODING.toString(), "gzip");
                 bytes = GzipUtil.gzip(bytes);
+                log.debug("use gzip");
             }
             ByteArrayEntity requestEntity = new ByteArrayEntity(bytes, contentType);
             httpPost.setEntity(requestEntity);

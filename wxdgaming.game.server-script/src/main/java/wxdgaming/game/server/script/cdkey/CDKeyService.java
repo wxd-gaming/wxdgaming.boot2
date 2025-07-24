@@ -9,8 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.starter.net.httpclient5.HttpContent;
-import wxdgaming.boot2.starter.net.httpclient5.PostRequest;
+import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
+import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.game.bean.goods.BagChangeArgs4Item;
 import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.bean.goods.ItemCfg;
@@ -68,7 +68,7 @@ public class CDKeyService {
         params.put("account", player.getAccount());
         params.put("rid", player.getUid());
 
-        HttpContent execute = PostRequest.ofJson(url, FastJsonUtil.toJSONString(params)).execute();
+        HttpResponse execute = HttpRequestPost.ofJson(url, FastJsonUtil.toJSONString(params)).execute();
         RunResult runResult = execute.bodyRunResult();
 
         if (runResult.isFail()) {

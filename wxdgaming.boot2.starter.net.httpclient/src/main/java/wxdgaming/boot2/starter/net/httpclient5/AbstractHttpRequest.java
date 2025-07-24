@@ -29,9 +29,11 @@ import java.util.Map;
 @Slf4j
 @Getter
 @SuperBuilder
-public abstract class HttpRequestBase {
+public abstract class AbstractHttpRequest {
 
     protected String uriPath;
+    @Builder.Default
+    protected ContentType contentType = HttpConst.APPLICATION_FORM_URLENCODED;
     /** 重试次数，最小值是1 */
     @Builder.Default
     protected int retry = 1;
@@ -40,7 +42,7 @@ public abstract class HttpRequestBase {
 
     protected abstract HttpUriRequestBase buildRequest();
 
-    public HttpContent execute() {
+    public HttpResponse execute() {
         AssertUtil.assertNull(uriPath, "uriPath不能为空");
         AssertUtil.assertTrue(retry > 0, "重试次数不能小于1");
         HttpUriRequestBase httpUriRequestBase = buildRequest();
@@ -51,7 +53,7 @@ public abstract class HttpRequestBase {
 
         /*告诉服务器我支持gzip*/
         httpUriRequestBase.setHeader(HttpHeaderNames.ACCEPT_ENCODING.toString(), HttpHeaderValues.GZIP.toString());
-
+        httpUriRequestBase.setHeader(HttpHeaderNames.CONTENT_TYPE.toString(), contentType.toString());
         // 防止被当成攻击添加的
         httpUriRequestBase.setHeader(HttpHeaderNames.USER_AGENT.toString(), "Mozilla/5.0 (Windows NT 6.2; Win64; x64) wxd");
 
@@ -61,12 +63,13 @@ public abstract class HttpRequestBase {
                 HttpClientPool httpClientPool = HttpClientPool.getDefault();
                 CloseableHttpClient closeableHttpClient = httpClientPool.getCloseableHttpClient();
                 return closeableHttpClient.execute(httpUriRequestBase, classicHttpResponse -> {
-                    HttpContent httpContent = new HttpContent();
-                    httpContent.classicHttpResponse = classicHttpResponse;
-                    httpContent.code = classicHttpResponse.getCode();
-                    httpContent.cookieStore = httpClientPool.getCookieStore().getCookies();
-                    httpContent.content = EntityUtils.toByteArray(classicHttpResponse.getEntity());
-                    return httpContent;
+                    /*apache http client 已经自动处理过 gzip 问题*/
+                    HttpResponse httpResponse = new HttpResponse();
+                    httpResponse.classicHttpResponse = classicHttpResponse;
+                    httpResponse.code = classicHttpResponse.getCode();
+                    httpResponse.cookieStore = httpClientPool.getCookieStore().getCookies();
+                    httpResponse.content = EntityUtils.toByteArray(classicHttpResponse.getEntity());
+                    return httpResponse;
                 });
             } catch (NoHttpResponseException
                      | SocketTimeoutException
@@ -88,18 +91,18 @@ public abstract class HttpRequestBase {
                 exception = e;
             }
         }
-        HttpContent httpContent = new HttpContent();
-        httpContent.code = 500;
-        httpContent.exception = Throw.of(exception);
-        return httpContent;
+        HttpResponse httpResponse = new HttpResponse();
+        httpResponse.code = 500;
+        httpResponse.exception = Throw.of(exception);
+        return httpResponse;
     }
 
-    public HttpRequestBase addHeader(HttpHeaderNames key, ContentType contentType) {
+    public AbstractHttpRequest addHeader(HttpHeaderNames key, ContentType contentType) {
         reqHeaderMap.put(key.toString(), contentType.toString());
         return this;
     }
 
-    public HttpRequestBase addHeader(String key, String value) {
+    public AbstractHttpRequest addHeader(String key, String value) {
         reqHeaderMap.put(key, value);
         return this;
     }

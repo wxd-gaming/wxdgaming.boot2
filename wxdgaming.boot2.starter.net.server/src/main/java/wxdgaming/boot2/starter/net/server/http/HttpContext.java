@@ -367,7 +367,7 @@ public class HttpContext implements AutoCloseable {
 
             boolean accept_gzip = false;
 
-            if (dataBytes.length > 512) {
+            if (dataBytes.length > HttpDataAction.USE_GZIP_MIN_LENGTH) {
                 String accept_Encoding = HttpContext.this.getRequest().headerOptional(HttpHeaderNames.ACCEPT_ENCODING)
                         .map(String::toLowerCase)
                         .orElse(null);
@@ -427,7 +427,7 @@ public class HttpContext implements AutoCloseable {
                             .append("\n")
                             .append("Session: ").append(ChannelUtil.getCtxName(getCtx()))
                             .append("\n")
-                            .append(HttpHeaderNames.CONTENT_TYPE).append("=").append(responseContentType)
+                            .append(HttpHeaderNames.CONTENT_TYPE).append("=").append(responseContentType).append(", useGzip=").append(accept_gzip)
                             .append("\n")
                             .append(HttpHeaderNames.COOKIE).append("=").append(responseCookie)
                             .append("\n")

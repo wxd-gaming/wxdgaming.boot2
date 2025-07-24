@@ -17,8 +17,8 @@ import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.Md5Util;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.SocketClientConfig;
-import wxdgaming.boot2.starter.net.httpclient5.HttpContent;
-import wxdgaming.boot2.starter.net.httpclient5.PostRequest;
+import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
+import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.SocketServer;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
@@ -90,13 +90,13 @@ public class Gateway2GameSessionService extends HoldRunApplication {
         jsonObject.put("sign", md5DigestEncode);
 
         String string = jsonObject.toString();
-        HttpContent execute = PostRequest.ofJson(loginConfig.getUrl() + "/inner/registerGateway", string).execute();
-        if (!execute.isSuccess()) {
-            log.error("访问登陆服务器失败{}", Throw.ofString(execute.getException(), false));
+        HttpResponse httpResponse = HttpRequestPost.ofJson(loginConfig.getUrl() + "/inner/registerGateway", string).execute();
+        if (!httpResponse.isSuccess()) {
+            log.error("访问登陆服务器失败{}", Throw.ofString(httpResponse.getException(), false));
             return;
         }
-        log.info("登录服务器注册完成返回信息: {}", execute.bodyString());
-        RunResult runResult = execute.bodyRunResult();
+        log.info("登录服务器注册完成返回信息: {}", httpResponse.bodyString());
+        RunResult runResult = httpResponse.bodyRunResult();
         if (runResult.code() == 1) {
 
             InnerRegisterServer registerServer = new InnerRegisterServer();

@@ -9,8 +9,8 @@ import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.core.util.Md5Util;
-import wxdgaming.boot2.starter.net.httpclient5.HttpContent;
-import wxdgaming.boot2.starter.net.httpclient5.PostRequest;
+import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
+import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.server.SocketServer;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.login.LoginConfig;
@@ -67,7 +67,7 @@ public class GameTimerService {
         String md5DigestEncode = Md5Util.md5DigestEncode0("#", json, loginConfig.getJwtKey());
         jsonObject.put("sign", md5DigestEncode);
 
-        HttpContent execute = PostRequest.ofJson(loginConfig.getUrl() + "/inner/registerGame", jsonObject.toString()).execute();
+        HttpResponse execute = HttpRequestPost.ofJson(loginConfig.getUrl() + "/inner/registerGame", jsonObject.toString()).execute();
         log.info("向登陆服务器注册: {}", execute.bodyString());
     }
 

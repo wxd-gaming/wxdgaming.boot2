@@ -23,7 +23,7 @@ public class UserData extends Entity {
     @DbColumn(length = 128)
     private String token;
     private long createTime;
-    @DbColumn(key = true)
+    @DbColumn(index = true)
     private int appId;
     @DbColumn(index = true, length = 64)
     private String platform;

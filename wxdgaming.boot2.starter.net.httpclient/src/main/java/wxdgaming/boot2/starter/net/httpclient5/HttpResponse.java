@@ -3,6 +3,7 @@ package wxdgaming.boot2.starter.net.httpclient5;
 import lombok.Getter;
 import org.apache.hc.client5.http.cookie.Cookie;
 import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.Header;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
@@ -19,7 +20,7 @@ import java.util.List;
  * @version: 2025-07-23 14:11
  **/
 @Getter
-public class HttpContent {
+public class HttpResponse {
 
     ClassicHttpResponse classicHttpResponse;
     int code;
@@ -33,8 +34,25 @@ public class HttpContent {
 
     private void check() {
         if (!isSuccess()) {
+            if (exception == null) {
+                String c = "";
+                if (content != null) {
+                    try {
+                        c = new String(content, StandardCharsets.UTF_8);
+                    } catch (Exception ignored) {}
+                }
+                exception = new Throw("请求失败, code: " + code + ", " + c);
+            }
             throw exception;
         }
+    }
+
+    public String getHeader(String name) {
+        Header firstHeader = classicHttpResponse.getFirstHeader(name);
+        if (firstHeader == null) {
+            return null;
+        }
+        return firstHeader.getValue();
     }
 
     public RunResult bodyRunResult() {

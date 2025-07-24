@@ -2,8 +2,8 @@ package wxdgaming.boot2.starter.net.httpclient5;
 
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.boot2.core.lang.ObjectBase;
+import wxdgaming.boot2.core.util.AssertUtil;
 
 /**
  * ip数据查询
@@ -15,12 +15,12 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 @Setter
 public class IPInfo extends ObjectBase {
 
-    public static IPInfo of(String ip) {
-        final String format = "http://ip-api.com/json/%s?lang=zh-CN";
-        GetRequest getRequest = GetRequest.of(String.format(format, ip));
-        IPInfo ipInfo = getRequest.execute().bodyObject(IPInfo.class);
-        if (!"success".equals(ipInfo.getStatus()))
-            throw new AssertException("ip地址解析失败");
+    static final String format = "http://ip-api.com/json/%s?lang=zh-CN";
+
+    public static IPInfo get(String ip) {
+        HttpRequestGet httpRequestGet = HttpRequestGet.of(String.format(format, ip));
+        IPInfo ipInfo = httpRequestGet.execute().bodyObject(IPInfo.class);
+        AssertUtil.assertTrue(!"success".equals(ipInfo.getStatus()), "ip地址解析失败");
         return ipInfo;
     }
 

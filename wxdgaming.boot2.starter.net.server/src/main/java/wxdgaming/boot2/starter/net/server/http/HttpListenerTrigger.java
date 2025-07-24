@@ -1,17 +1,20 @@
 package wxdgaming.boot2.starter.net.server.http;
 
 import com.google.inject.Injector;
-import com.google.inject.name.Named;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.*;
+import wxdgaming.boot2.core.ann.Body;
+import wxdgaming.boot2.core.ann.Param;
+import wxdgaming.boot2.core.ann.ThreadParam;
+import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.reflect.GuiceBeanProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
@@ -83,7 +86,11 @@ public class HttpListenerTrigger extends ExecutorEvent {
             GlobalUtil.exception(stringBuilder.toString(), e);
             stringBuilder.setLength(0);
             httpContext.getResponse().setStatus(HttpResponseStatus.OK);
-            httpContext.getResponse().response(RunResult.fail("server error " + e.getMessage()));
+            if (e instanceof AssertException assertException) {
+                httpContext.getResponse().response(RunResult.fail("server error " + assertException.getMessage()));
+            } else {
+                httpContext.getResponse().response(RunResult.fail("server error"));
+            }
         } finally {
             httpContext.close();
         }

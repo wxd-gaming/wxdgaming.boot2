@@ -17,18 +17,18 @@ import org.apache.hc.core5.http.ContentType;
 @Slf4j
 @Getter
 @SuperBuilder
-public class GetRequest extends HttpRequestBase {
+public class HttpRequestGet extends AbstractHttpRequest {
 
-    public static GetRequest of(String url) {
-        return GetRequest.builder().uriPath(url).build();
+    public static HttpRequestGet of(String url) {
+        return HttpRequestGet.builder().uriPath(url).build();
     }
 
-    @Override public GetRequest addHeader(HttpHeaderNames key, ContentType contentType) {
+    @Override public HttpRequestGet addHeader(HttpHeaderNames key, ContentType contentType) {
         super.addHeader(key, contentType);
         return this;
     }
 
-    @Override public GetRequest addHeader(String key, String value) {
+    @Override public HttpRequestGet addHeader(String key, String value) {
         super.addHeader(key, value);
         return this;
     }
