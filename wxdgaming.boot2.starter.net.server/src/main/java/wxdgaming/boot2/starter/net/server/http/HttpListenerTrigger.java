@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter.net.server.http;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Injector;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.extern.slf4j.Slf4j;
@@ -183,7 +184,15 @@ public class HttpListenerTrigger extends ExecutorEvent {
                 Body body = parameter.getAnnotation(Body.class);
                 if (body != null) {
                     Object o = null;
-                    if (StringUtils.isNotBlank(httpContext.getRequest().getReqContent())) {
+                    if (String.class.equals(parameterType)) {
+                        o = httpContext.getRequest().getReqContent();
+                        if (StringUtils.isBlank(httpContext.getRequest().getReqContent())
+                            && !httpContext.getRequest().getReqParams().isEmpty()) {
+                            o = httpContext.getRequest().getReqParams().toJSONString();
+                        }
+                    } else if (JSONObject.class.equals(parameterType)) {
+                        o = httpContext.getRequest().getReqParams();
+                    } else if (!httpContext.getRequest().getReqParams().isEmpty()) {
                         o = httpContext.getRequest().getReqParams().toJavaObject(parameterType);
                     }
                     if (o == null && StringUtils.isNotBlank(body.defaultValue())) {

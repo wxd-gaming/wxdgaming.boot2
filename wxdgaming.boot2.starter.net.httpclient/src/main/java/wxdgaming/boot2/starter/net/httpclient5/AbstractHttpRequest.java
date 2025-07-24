@@ -32,8 +32,6 @@ import java.util.Map;
 public abstract class AbstractHttpRequest {
 
     protected String uriPath;
-    @Builder.Default
-    protected ContentType contentType = HttpConst.APPLICATION_FORM_URLENCODED;
     /** 重试次数，最小值是1 */
     @Builder.Default
     protected int retry = 1;
@@ -53,7 +51,6 @@ public abstract class AbstractHttpRequest {
 
         /*告诉服务器我支持gzip*/
         httpUriRequestBase.setHeader(HttpHeaderNames.ACCEPT_ENCODING.toString(), HttpHeaderValues.GZIP.toString());
-        httpUriRequestBase.setHeader(HttpHeaderNames.CONTENT_TYPE.toString(), contentType.toString());
         // 防止被当成攻击添加的
         httpUriRequestBase.setHeader(HttpHeaderNames.USER_AGENT.toString(), "Mozilla/5.0 (Windows NT 6.2; Win64; x64) wxd");
 

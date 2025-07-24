@@ -9,9 +9,10 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.entity.GzipCompressingEntity;
 import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
-import wxdgaming.boot2.core.zip.GzipUtil;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import wxdgaming.boot2.starter.net.http.HttpDataAction;
 
 import java.util.Map;
@@ -51,6 +52,8 @@ public class HttpRequestPost extends AbstractHttpRequest {
     /** 发送数据的时候是否开启gzip压缩 */
     @Builder.Default
     private boolean useGzip = false;
+    @Builder.Default
+    protected ContentType contentType = HttpConst.APPLICATION_FORM_URLENCODED;
 
     @Override public HttpRequestPost addHeader(HttpHeaderNames key, ContentType contentType) {
         super.addHeader(key, contentType);
@@ -97,15 +100,11 @@ public class HttpRequestPost extends AbstractHttpRequest {
     @Override protected HttpUriRequestBase buildRequest() {
         HttpPost httpPost = new HttpPost(this.getUriPath());
         if (this.params != null) {
-            byte[] bytes = params.getBytes(contentType.getCharset());
-            if (useGzip && bytes.length > HttpDataAction.USE_GZIP_MIN_LENGTH) {
-                // 设置请求头，告知服务器请求内容使用 Gzip 压缩
-                addHeader(HttpHeaderNames.CONTENT_ENCODING.toString(), "gzip");
-                bytes = GzipUtil.gzip(bytes);
-                log.debug("use gzip");
+            HttpEntity httpEntity = new StringEntity(params, contentType);
+            if (useGzip && httpEntity.getContentLength() > HttpDataAction.USE_GZIP_MIN_LENGTH) {
+                httpEntity = new GzipCompressingEntity(httpEntity);
             }
-            ByteArrayEntity requestEntity = new ByteArrayEntity(bytes, contentType);
-            httpPost.setEntity(requestEntity);
+            httpPost.setEntity(httpEntity);
         }
         if (log.isDebugEnabled()) {
             log.debug("send post url={}, params={}", getUriPath(), params);
