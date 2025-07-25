@@ -9,7 +9,6 @@ import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -57,32 +56,34 @@ public class HttpResponse {
 
     public RunResult bodyRunResult() {
         check();
-        String string = bodyString(StandardCharsets.UTF_8);
+        String string = bodyString0();
         return RunResult.parse(string);
     }
 
     public <T> T bodyObject(Class<T> clazz) {
         check();
-        String string = bodyString(StandardCharsets.UTF_8);
+        String string = bodyString0();
         return FastJsonUtil.parse(string, clazz);
     }
 
     public String bodyString() {
         check();
-        return bodyString(StandardCharsets.UTF_8);
+        return bodyString0();
     }
 
-    public String bodyString(Charset charset) {
-        check();
-        return new String(getContent(), charset);
+    private String bodyString0() {
+        if (content == null) {
+            return null;
+        }
+        return new String(getContent(), StandardCharsets.UTF_8);
     }
 
     public String bodyUnicodeDecodeString() {
         check();
-        return StringUtils.unicodeDecode(bodyString());
+        return StringUtils.unicodeDecode(bodyString0());
     }
 
     @Override public String toString() {
-        return "HttpContent{code=%d, content=%s}".formatted(code, bodyString());
+        return "HttpContent{code=%d, content=%s}".formatted(code, bodyString0());
     }
 }
