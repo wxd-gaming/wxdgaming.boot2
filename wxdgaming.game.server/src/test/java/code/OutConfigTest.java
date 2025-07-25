@@ -55,7 +55,7 @@ public class OutConfigTest {
             SqlConfig sqlConfig = new SqlConfig();
             sqlConfig.setDebug(true);
             sqlConfig.setDriverClassName(org.postgresql.Driver.class.getName());
-            sqlConfig.setUrl("jdbc:postgresql://192.168.137.10:5432/test2");
+            sqlConfig.setUrl("jdbc:postgresql://127.0.0.1:5432/test2");
             sqlConfig.setUsername("postgres");
             sqlConfig.setPassword("test");
             db.put("pgsql", sqlConfig.toJSONObject());
@@ -64,7 +64,7 @@ public class OutConfigTest {
         {
             SqlConfig sqlConfig = new SqlConfig();
             sqlConfig.setDebug(true);
-            sqlConfig.setUrl("jdbc:mysql://192.168.137.10:3306/test2");
+            sqlConfig.setUrl("jdbc:mysql://127.0.0.1:3306/test2");
             sqlConfig.setUsername("root");
             sqlConfig.setPassword("test");
             sqlConfig.setDriverClassName(Driver.class.getName());

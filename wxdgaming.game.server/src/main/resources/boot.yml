@@ -59,7 +59,7 @@ db:
   mysql:
     debug: false                                                 #调试模式将会显示sql语句
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    url: "jdbc:mysql://192.168.137.10:3306/test_game"
+    url: "jdbc:mysql://127.0.0.1:3306/test_game"
     username: "root"
     password: "test"
     scanPackage: "wxdgaming.game.server.bean"                   #扫描路径
@@ -72,7 +72,7 @@ db:
   mysql-second:
     debug: false                                                 #调试模式将会显示sql语句
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    url: "jdbc:mysql://192.168.137.10:3306/test_game_global"
+    url: "jdbc:mysql://127.0.0.1:3306/test_game_global"
     username: "root"
     password: "test"
     scanPackage: "wxdgaming.game.global.bean"                 #扫描路径
@@ -85,7 +85,7 @@ db:
 #  pgsql:
 #    debug: false                                                 #调试模式将会显示sql语句
 #    driverClassName: "org.postgresql.Driver"
-#    url: "jdbc:postgresql://192.168.137.10:5432/test_game"
+#    url: "jdbc:postgresql://127.0.0.1:5432/test_game"
 #    username: "postgres"
 #    password: "test"
 #    scanPackage: "wxdgaming.game.server.bean"                   #扫描路径

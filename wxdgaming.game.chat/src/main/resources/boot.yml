@@ -52,7 +52,7 @@ db:
   mysql:
     debug: false                                                 #调试模式将会显示sql语句
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    url: "jdbc:mysql://192.168.137.10:3306/test_login"
+    url: "jdbc:mysql://127.0.0.1:3306/test_login"
     username: "root"
     password: "test"
     scanPackage: "wxdgaming.game.login.bean"                   #扫描路径

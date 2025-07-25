@@ -29,7 +29,7 @@ public class PgsqlTest {
         SqlConfig sqlConfig = new SqlConfig();
         sqlConfig.setDebug(true);
         sqlConfig.setDriverClassName("org.postgresql.Driver");
-        sqlConfig.setUrl("jdbc:postgresql://192.168.137.10:5432/test2");
+        sqlConfig.setUrl("jdbc:postgresql://127.0.0.1:5432/test2");
         sqlConfig.setUsername("postgres");
         sqlConfig.setPassword("test");
         sqlConfig.setScanPackage(EntityTest.class.getPackageName());

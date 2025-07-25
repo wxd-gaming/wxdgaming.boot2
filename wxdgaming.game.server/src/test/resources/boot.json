@@ -68,7 +68,7 @@
     "mysql": {
       "debug": true,
       "driverClassName": "com.mysql.cj.jdbc.Driver",
-      "url": "jdbc:mysql://192.168.137.10:3306/test2",
+      "url": "jdbc:mysql://127.0.0.1:3306/test2",
       "username": "root",
       "password": "test",
       "connectionTimeoutMs": 2000,
@@ -80,7 +80,7 @@
     "pgsql-second": {
       "debug": true,
       "driverClassName": "org.postgresql.Driver",
-      "url": "jdbc:postgresql://192.168.137.10:5432/test2",
+      "url": "jdbc:postgresql://127.0.0.1:5432/test2",
       "username": "postgres",
       "password": "test",
       "connectionTimeoutMs": 2000,
@@ -92,7 +92,7 @@
     "pgsql": {
       "debug": true,
       "driverClassName": "org.postgresql.Driver",
-      "url": "jdbc:postgresql://192.168.137.10:5432/test2",
+      "url": "jdbc:postgresql://127.0.0.1:5432/test2",
       "username": "postgres",
       "password": "test",
       "connectionTimeoutMs": 2000,
@@ -104,7 +104,7 @@
     "mysql-second": {
       "debug": true,
       "driverClassName": "com.mysql.cj.jdbc.Driver",
-      "url": "jdbc:mysql://192.168.137.10:3306/test2",
+      "url": "jdbc:mysql://127.0.0.1:3306/test2",
       "username": "root",
       "password": "test",
       "connectionTimeoutMs": 2000,

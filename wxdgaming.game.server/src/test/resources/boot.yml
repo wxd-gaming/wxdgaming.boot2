@@ -60,7 +60,7 @@ db:
   pgsql:
     debug: true                 #调试模式将会显示sql语句
     driverClassName: "org.postgresql.Driver"
-    url: "jdbc:postgresql://192.168.137.10:5432/test1"
+    url: "jdbc:postgresql://127.0.0.1:5432/test1"
     username: "postgres"
     password: "test"
     scanPackage: ""             #扫描路径
@@ -74,7 +74,7 @@ db:
   pgsql-second: #第二个数据库
     debug: true                 #调试模式将会显示sql语句
     driverClassName: "org.postgresql.Driver"
-    url: "jdbc:postgresql://192.168.137.10:5432/test2"
+    url: "jdbc:postgresql://127.0.0.1:5432/test2"
     username: "postgres"
     password: "test"
     scanPackage: ""             #扫描路径
@@ -88,7 +88,7 @@ db:
   mysql:
     debug: true                 #调试模式将会显示sql语句
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    url: "jdbc:mysql://192.168.137.10:3306/test1"
+    url: "jdbc:mysql://127.0.0.1:3306/test1"
     username: "root"
     password: "test"
     scanPackage: ""             #扫描路径
@@ -102,7 +102,7 @@ db:
   mysql-second: #第二个数据库
     debug: true                 #调试模式将会显示sql语句
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    url: "jdbc:mysql://192.168.137.10:3306/test2"
+    url: "jdbc:mysql://127.0.0.1:3306/test2"
     username: "root"
     password: "test"
     scanPackage: ""             #扫描路径
