@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.bean.goods.ItemTypeConst;
-import wxdgaming.game.server.bean.bag.BagChangesProcess;
+import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.fight.FightService;
 import wxdgaming.game.server.script.role.PlayerService;
@@ -24,11 +24,11 @@ public abstract class UseItemAction extends HoldRunApplication {
         return ItemTypeConst.NONE;
     }
 
-    public boolean canUse(Player player, BagChangesProcess bagChangesProcess, Item item) {
+    public boolean canUse(Player player, BagChangesContext bagChangesContext, Item item) {
         return false;
     }
 
-    public void doUse(Player player, BagChangesProcess bagChangesProcess, Item item) {
+    public void doUse(Player player, BagChangesContext bagChangesContext, Item item) {
         throw new RuntimeException("Not Implement");
     }
 

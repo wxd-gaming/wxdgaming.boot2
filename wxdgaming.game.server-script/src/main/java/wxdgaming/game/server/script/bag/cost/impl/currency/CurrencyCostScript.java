@@ -6,7 +6,7 @@ import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.server.bean.bag.ItemGrid;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.bean.bag.BagChangesProcess;
+import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.script.bag.cost.CostScript;
 
 /**
@@ -23,12 +23,12 @@ public class CurrencyCostScript extends CostScript {
         return ItemTypeConst.CurrencyType;
     }
 
-    @Override public void cost(Player player, BagChangesProcess bagChangesProcess, QItem qItem, long count) {
+    @Override public void cost(Player player, BagChangesContext bagChangesContext, QItem qItem, long count) {
         int cfgId = qItem.getId();
-        bagChangesProcess.subtractCurrency(cfgId, count);
+        bagChangesContext.subtractCurrency(cfgId, count);
     }
 
-    @Override public void cost(Player player, BagChangesProcess bagChangesProcess, ItemGrid itemGrid, long count) {
-        cost(player, bagChangesProcess, itemGrid.getItem().qItem(), count);
+    @Override public void cost(Player player, BagChangesContext bagChangesContext, ItemGrid itemGrid, long count) {
+        cost(player, bagChangesContext, itemGrid.getItem().qItem(), count);
     }
 }

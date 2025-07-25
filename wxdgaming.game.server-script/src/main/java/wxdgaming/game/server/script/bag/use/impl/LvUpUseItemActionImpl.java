@@ -3,7 +3,7 @@ package wxdgaming.game.server.script.bag.use.impl;
 import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.cfg.bean.QItem;
-import wxdgaming.game.server.bean.bag.BagChangesProcess;
+import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.bag.use.UseItemAction;
 
@@ -19,13 +19,13 @@ public class LvUpUseItemActionImpl extends UseItemAction {
         return ItemTypeConst.HPADD;
     }
 
-    @Override public boolean canUse(Player player, BagChangesProcess bagChangesProcess, Item item) {
+    @Override public boolean canUse(Player player, BagChangesContext bagChangesContext, Item item) {
         return player.getHp() < player.maxHp();
     }
 
-    @Override public void doUse(Player player, BagChangesProcess bagChangesProcess, Item item) {
+    @Override public void doUse(Player player, BagChangesContext bagChangesContext, Item item) {
         QItem qItem = item.qItem();
-        playerService.addLevel(player, qItem.getParam1(), bagChangesProcess.getReasonArgs());
+        playerService.addLevel(player, qItem.getParam1(), bagChangesContext.getReasonArgs());
     }
 
 }

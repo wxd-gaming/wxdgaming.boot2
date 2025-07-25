@@ -6,7 +6,7 @@ import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.server.bean.bag.ItemBag;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.bean.bag.BagChangesProcess;
+import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.script.bag.gain.impl.currency.CurrencyGainScript;
 
 /**
@@ -27,9 +27,9 @@ public class ExpGainScript extends CurrencyGainScript {
         return player.getExp();
     }
 
-    @Override public boolean gain(BagChangesProcess bagChangesProcess, Item newItem) {
+    @Override public boolean gain(BagChangesContext bagChangesContext, Item newItem) {
         long count = newItem.getCount();
-        playerService.addExp(bagChangesProcess.getPlayer(), count, bagChangesProcess.getReasonArgs());
+        playerService.addExp(bagChangesContext.getPlayer(), count, bagChangesContext.getReasonArgs());
         return true;
     }
 

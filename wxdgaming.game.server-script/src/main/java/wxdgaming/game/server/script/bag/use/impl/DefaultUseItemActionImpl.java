@@ -2,7 +2,7 @@ package wxdgaming.game.server.script.bag.use.impl;
 
 import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.bean.goods.ItemTypeConst;
-import wxdgaming.game.server.bean.bag.BagChangesProcess;
+import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.bag.use.UseItemAction;
 
@@ -18,12 +18,12 @@ public class DefaultUseItemActionImpl extends UseItemAction {
         return super.type();
     }
 
-    @Override public boolean canUse(Player player, BagChangesProcess bagChangesProcess, Item item) {
-        return super.canUse(player, bagChangesProcess, item);
+    @Override public boolean canUse(Player player, BagChangesContext bagChangesContext, Item item) {
+        return super.canUse(player, bagChangesContext, item);
     }
 
-    @Override public void doUse(Player player, BagChangesProcess bagChangesProcess, Item item) {
-        super.doUse(player, bagChangesProcess, item);
+    @Override public void doUse(Player player, BagChangesContext bagChangesContext, Item item) {
+        super.doUse(player, bagChangesContext, item);
     }
 
 }

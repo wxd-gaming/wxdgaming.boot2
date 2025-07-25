@@ -28,7 +28,7 @@ public class BagChangeArgs {
     private boolean bagFullSendMail = false;
 
     @Override public String toString() {
-        return "BagChangeArgs" + JSON.toJSONString(this);
+        return this.getClass().getSimpleName() + JSON.toJSONString(this);
     }
 
 }

@@ -16,7 +16,7 @@ import wxdgaming.game.cfg.QItemTable;
 import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.message.bag.ResBagInfo;
-import wxdgaming.game.server.bean.bag.BagChangesProcess;
+import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.bag.BagPack;
 import wxdgaming.game.server.bean.bag.ItemBag;
 import wxdgaming.game.server.bean.role.Player;
@@ -210,7 +210,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
             }
         }
         Iterator<Item> iterator = items.iterator();
-        BagChangesProcess bagChangesProcess = new BagChangesProcess(player, bagType, itemBag, bagChangeArgs.getReasonArgs());
+        BagChangesContext bagChangesContext = new BagChangesContext(player, bagType, itemBag, bagChangeArgs.getReasonArgs());
         while (iterator.hasNext()) {
             Item newItem = iterator.next();
 
@@ -226,7 +226,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
             long change = newItem.getCount();
             AssertUtil.assertTrue(change >= 0, "添加数量不能是负数");
 
-            boolean gain = gainScript.gain(bagChangesProcess, newItem);
+            boolean gain = gainScript.gain(bagChangesContext, newItem);
 
             if (gain || newItem.getCount() != change) {
                 long newCount = gainScript.getCount(player, itemBag, newItem.getCfgId());
@@ -245,7 +245,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
             }
         }
 
-        player.write(bagChangesProcess.toResUpdateBagInfo());
+        player.write(bagChangesContext.toResUpdateBagInfo());
 
         /* TODO 发送邮件 */
         if (!items.isEmpty()) {
@@ -287,7 +287,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
     public void cost(Player player, BagChangeArgs4ItemCfg bagChangeArgs4ItemCfg) {
         BagType bagType = bagChangeArgs4ItemCfg.getBagType();
         ItemBag itemBag = player.getBagPack().itemBag(bagType);
-        BagChangesProcess bagChangesProcess = new BagChangesProcess(player, bagType, itemBag, bagChangeArgs4ItemCfg.getReasonArgs());
+        BagChangesContext bagChangesContext = new BagChangesContext(player, bagType, itemBag, bagChangeArgs4ItemCfg.getReasonArgs());
 
         for (ItemCfg itemCfg : bagChangeArgs4ItemCfg.getItemCfgList()) {
             int cfgId = itemCfg.getCfgId();
@@ -303,12 +303,12 @@ public class BagService extends HoldRunApplication implements InitPrint {
             long oldCount = gainScript.getCount(player, itemBag, cfgId);
             CostScript costScript = getCostScript(type, subtype);
 
-            costScript.cost(player, bagChangesProcess, qItem, change);
+            costScript.cost(player, bagChangesContext, qItem, change);
             long newCount = gainScript.getCount(player, itemBag, cfgId);
 
             log.info("消耗道具：{}, {}, {} {}-{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeArgs4ItemCfg.getReasonArgs());
         }
-        player.write(bagChangesProcess.toResUpdateBagInfo());
+        player.write(bagChangesContext.toResUpdateBagInfo());
 
     }
 

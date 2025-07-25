@@ -7,7 +7,7 @@ import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.message.bag.BagType;
-import wxdgaming.game.server.bean.bag.BagChangesProcess;
+import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.bag.ItemBag;
 import wxdgaming.game.server.bean.bag.ItemGrid;
 import wxdgaming.game.bean.goods.Item;
@@ -36,9 +36,9 @@ public class CostScript {
         return ItemTypeConst.NONE;
     }
 
-    public void cost(Player player, BagChangesProcess bagChangesProcess, QItem qItem, long count) {
-        BagType bagType = bagChangesProcess.getBagType();
-        ItemBag itemBag = bagChangesProcess.getItemBag();
+    public void cost(Player player, BagChangesContext bagChangesContext, QItem qItem, long count) {
+        BagType bagType = bagChangesContext.getBagType();
+        ItemBag itemBag = bagChangesContext.getItemBag();
         List<ItemGrid> itemGridList = itemBag.itemGridListByCfgId(qItem.getId());
         itemGridList.sort((itemGrid1, itemGrid2) -> {
             Item o1 = itemGrid1.getItem();
@@ -65,18 +65,18 @@ public class CostScript {
                 if (hasNum <= count) {
                     log.info(
                             "背包变更：{}, {}, 道具扣除, 格子：{}, {}, {}, 从背包移除, {}",
-                            player, bagType, itemGrid.getGrid(), item.toName(), item.getCount(), bagChangesProcess.getReasonArgs()
+                            player, bagType, itemGrid.getGrid(), item.toName(), item.getCount(), bagChangesContext.getReasonArgs()
                     );
                     itemBag.remove(itemGrid);
-                    bagChangesProcess.addDel(itemGrid);
+                    bagChangesContext.addDel(itemGrid);
                     count -= hasNum;
                 } else {
                     /*正常扣除*/
                     item.setCount(hasNum - count);
-                    bagChangesProcess.addChange(itemGrid);
+                    bagChangesContext.addChange(itemGrid);
                     log.info(
                             "背包变更：{}, {}, 道具扣除, 格子：{}, {}, {}-{}={}, {}",
-                            player, bagType, itemGrid.getGrid(), item.toName(), hasNum, count, item.getCount(), bagChangesProcess.getReasonArgs()
+                            player, bagType, itemGrid.getGrid(), item.toName(), hasNum, count, item.getCount(), bagChangesContext.getReasonArgs()
                     );
                     count = 0;
                 }
@@ -88,24 +88,24 @@ public class CostScript {
         AssertUtil.assertTrue(count <= 0, "背包变更：%s, %s, %s, 数量不足", player, bagType, qItem.getToName());
     }
 
-    public void cost(Player player, BagChangesProcess bagChangesProcess, ItemGrid itemGrid, long count) {
-        ItemBag itemBag = bagChangesProcess.getItemBag();
+    public void cost(Player player, BagChangesContext bagChangesContext, ItemGrid itemGrid, long count) {
+        ItemBag itemBag = bagChangesContext.getItemBag();
         Item item = itemGrid.getItem();
         long hasNum = item.getCount();
         if (hasNum <= count) {
             log.info(
                     "背包变更：{}, {}, 道具扣除, 格子：{}, {}, {}, 从背包移除, {}",
-                    player, bagChangesProcess.getBagType(), itemGrid.getGrid(), item.toName(), item.getCount(), bagChangesProcess.getBagType()
+                    player, bagChangesContext.getBagType(), itemGrid.getGrid(), item.toName(), item.getCount(), bagChangesContext.getBagType()
             );
             itemBag.remove(itemGrid);
-            bagChangesProcess.addDel(itemGrid);
+            bagChangesContext.addDel(itemGrid);
         } else {
             /*正常扣除*/
             item.setCount(hasNum - count);
-            bagChangesProcess.addChange(itemGrid);
+            bagChangesContext.addChange(itemGrid);
             log.info(
                     "背包变更：{}, {}, 道具扣除, 格子：{}, {}, {}-{}={}, {}",
-                    player, bagChangesProcess.getBagType(), itemGrid.getGrid(), item.toName(), hasNum, count, item.getCount(), bagChangesProcess.getBagType()
+                    player, bagChangesContext.getBagType(), itemGrid.getGrid(), item.toName(), hasNum, count, item.getCount(), bagChangesContext.getBagType()
             );
         }
     }
