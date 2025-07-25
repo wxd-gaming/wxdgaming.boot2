@@ -18,6 +18,7 @@ import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.bag.BagService;
+import wxdgaming.game.server.script.bag.IBagScript;
 import wxdgaming.game.server.script.role.PlayerService;
 
 import java.util.List;
@@ -30,16 +31,11 @@ import java.util.List;
  **/
 @Slf4j
 @Singleton
-public class GainScript extends HoldRunApplication {
+public class GainScript extends HoldRunApplication implements IBagScript {
 
     @Inject protected DataCenterService dataCenterService;
     @Inject protected PlayerService playerService;
     @Inject protected BagService bagService;
-
-
-    public ItemTypeConst type() {
-        return ItemTypeConst.NONE;
-    }
 
     @SuppressWarnings("unchecked")
     protected <T extends Item> T newItem() {

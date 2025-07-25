@@ -8,7 +8,6 @@ import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.bean.goods.*;
@@ -42,9 +41,9 @@ import java.util.*;
 @Singleton
 public class BagService extends HoldRunApplication implements InitPrint {
 
-    Table<Integer, Integer, GainScript> gainImplTable = new Table<>();
-    Table<Integer, Integer, CostScript> costImplTable = new Table<>();
-    Table<Integer, Integer, UseItemAction> useItemImplTable = new Table<>();
+    final BagScriptProvider<GainScript> gainScriptProvider = new BagScriptProvider<>(GainScript.class);
+    final BagScriptProvider<CostScript> costScriptProvider = new BagScriptProvider<>(CostScript.class);
+    final BagScriptProvider<UseItemAction> useItemScriptProvider = new BagScriptProvider<>(UseItemAction.class);
 
     final DataCenterService dataCenterService;
     final TipsService tipsService;
@@ -61,38 +60,9 @@ public class BagService extends HoldRunApplication implements InitPrint {
 
     @Init
     public void init(RunApplication runApplication) {
-        {
-            Table<Integer, Integer, GainScript> tmpGainScriptTable = new Table<>();
-            runApplication.classWithSuper(GainScript.class)
-                    .forEach(gainScript -> {
-                        ItemTypeConst itemTypeConst = gainScript.type();
-                        GainScript old = tmpGainScriptTable.put(itemTypeConst.getType(), itemTypeConst.getSubType(), gainScript);
-                        AssertUtil.assertTrue(old == null, "重复注册类型：" + itemTypeConst);
-                    });
-            this.gainImplTable = tmpGainScriptTable;
-        }
-
-        {
-            Table<Integer, Integer, CostScript> tmpCostScriptTable = new Table<>();
-            runApplication.classWithSuper(CostScript.class)
-                    .forEach(costScript -> {
-                        ItemTypeConst itemTypeConst = costScript.type();
-                        CostScript old = tmpCostScriptTable.put(itemTypeConst.getType(), itemTypeConst.getSubType(), costScript);
-                        AssertUtil.assertTrue(old == null, "重复注册类型：" + itemTypeConst);
-                    });
-            this.costImplTable = tmpCostScriptTable;
-        }
-
-        {
-            Table<Integer, Integer, UseItemAction> tmpUseImplTable = new Table<>();
-            runApplication.classWithSuper(UseItemAction.class)
-                    .forEach(gainScript -> {
-                        ItemTypeConst itemTypeConst = gainScript.type();
-                        UseItemAction old = tmpUseImplTable.put(itemTypeConst.getType(), itemTypeConst.getSubType(), gainScript);
-                        AssertUtil.assertTrue(old == null, "重复注册类型：" + itemTypeConst);
-                    });
-            this.useItemImplTable = tmpUseImplTable;
-        }
+        this.gainScriptProvider.init(runApplication);
+        this.costScriptProvider.init(runApplication);
+        this.useItemScriptProvider.init(runApplication);
     }
 
     /** 创建角色之后创建背包 */
@@ -133,28 +103,6 @@ public class BagService extends HoldRunApplication implements InitPrint {
         player.write(resBagInfo);
     }
 
-    public GainScript getGainScript(int type, int subtype) {
-        GainScript gainScript = gainImplTable.get(type, subtype);
-        if (gainScript == null) {
-            gainScript = gainImplTable.get(type, 0);
-        }
-        if (gainScript == null) {
-            gainScript = gainImplTable.get(0, 0);
-        }
-        return gainScript;
-    }
-
-    public CostScript getCostScript(int type, int subtype) {
-        CostScript costScript = costImplTable.get(type, subtype);
-        if (costScript == null) {
-            costScript = costImplTable.get(type, 0);
-        }
-        if (costScript == null) {
-            costScript = costImplTable.get(0, 0);
-        }
-        return costScript;
-    }
-
     public List<Item> newItems(ItemCfg itemCfg) {
         return newItems(List.of(itemCfg));
     }
@@ -165,7 +113,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
             QItem qItem = dataRepository.dataTable(QItemTable.class, itemCfg.getCfgId());
             int type = qItem.getItemType();
             int subtype = qItem.getItemSubType();
-            GainScript gainScript = getGainScript(type, subtype);
+            GainScript gainScript = gainScriptProvider.getScript(type, subtype);
             gainScript.newItem(items, itemCfg);
         }
         return items;
@@ -178,7 +126,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
         QItem qItem = dataRepository.dataTable(QItemTable.class, itemCfgId);
         int type = qItem.getItemType();
         int subtype = qItem.getItemSubType();
-        return getGainScript(type, subtype).getCount(player, itemBag, itemCfgId);
+        return gainScriptProvider.getScript(type, subtype).getCount(player, itemBag, itemCfgId);
     }
 
     /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
@@ -220,7 +168,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
             int type = qItem.getItemType();
             int subtype = qItem.getItemSubType();
 
-            GainScript gainScript = getGainScript(type, subtype);
+            GainScript gainScript = gainScriptProvider.getScript(type, subtype);
 
             long oldCount = gainScript.getCount(player, itemBag, newItem.getCfgId());
             long change = newItem.getCount();
@@ -271,7 +219,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
             QItem qItem = dataRepository.dataTable(QItemTable.class, cfgId);
             int type = qItem.getItemType();
             int subtype = qItem.getItemSubType();
-            GainScript gainScript = getGainScript(type, subtype);
+            GainScript gainScript = gainScriptProvider.getScript(type, subtype);
             long oldCount = gainScript.getCount(player, itemBag, cfgId);
             if (oldCount < change) {
                 if (bagChangeArgs.isBagErrorNoticeClient()) {
@@ -298,10 +246,10 @@ public class BagService extends HoldRunApplication implements InitPrint {
             QItem qItem = dataRepository.dataTable(QItemTable.class, cfgId);
             int type = qItem.getItemType();
             int subtype = qItem.getItemSubType();
-            GainScript gainScript = getGainScript(type, subtype);
+            GainScript gainScript = gainScriptProvider.getScript(type, subtype);
 
             long oldCount = gainScript.getCount(player, itemBag, cfgId);
-            CostScript costScript = getCostScript(type, subtype);
+            CostScript costScript = costScriptProvider.getScript(type, subtype);
 
             costScript.cost(player, bagChangesContext, qItem, change);
             long newCount = gainScript.getCount(player, itemBag, cfgId);

@@ -3,9 +3,9 @@ package wxdgaming.game.server.script.bag.use;
 import com.google.inject.Inject;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.game.bean.goods.Item;
-import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.role.Player;
+import wxdgaming.game.server.script.bag.IBagScript;
 import wxdgaming.game.server.script.fight.FightService;
 import wxdgaming.game.server.script.role.PlayerService;
 
@@ -15,14 +15,10 @@ import wxdgaming.game.server.script.role.PlayerService;
  * @author: wxd-gaming(無心道, 15388152619)
  * @version: 2025-04-22 17:27
  **/
-public abstract class UseItemAction extends HoldRunApplication {
+public abstract class UseItemAction extends HoldRunApplication implements IBagScript {
 
     @Inject protected PlayerService playerService;
     @Inject protected FightService fightService;
-
-    public ItemTypeConst type() {
-        return ItemTypeConst.NONE;
-    }
 
     public boolean canUse(Player player, BagChangesContext bagChangesContext, Item item) {
         return false;

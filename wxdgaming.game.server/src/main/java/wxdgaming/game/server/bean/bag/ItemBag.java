@@ -49,10 +49,6 @@ public class ItemBag {
         return this;
     }
 
-    public Stream<Item> stream() {
-        return Arrays.stream(itemGrids);
-    }
-
     /** 获取道具，根据uid */
     public ItemGrid itemGridById(long uid) {
         for (int i = 0; i < itemGrids.length; i++) {

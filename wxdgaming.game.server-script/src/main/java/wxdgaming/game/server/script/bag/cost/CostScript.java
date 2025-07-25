@@ -3,17 +3,19 @@ package wxdgaming.game.server.script.bag.cost;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.util.AssertUtil;
+import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.bag.ItemBag;
 import wxdgaming.game.server.bean.bag.ItemGrid;
-import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.bag.BagService;
+import wxdgaming.game.server.script.bag.IBagScript;
 import wxdgaming.game.server.script.role.PlayerService;
 
 import java.util.List;
@@ -26,15 +28,11 @@ import java.util.List;
  **/
 @Slf4j
 @Singleton
-public class CostScript {
+public class CostScript extends HoldRunApplication implements IBagScript {
 
     @Inject protected DataCenterService dataCenterService;
     @Inject protected PlayerService playerService;
     @Inject protected BagService bagService;
-
-    public ItemTypeConst type() {
-        return ItemTypeConst.NONE;
-    }
 
     public void cost(Player player, BagChangesContext bagChangesContext, QItem qItem, long count) {
         BagType bagType = bagChangesContext.getBagType();
