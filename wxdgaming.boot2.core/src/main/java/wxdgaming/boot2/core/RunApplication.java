@@ -158,6 +158,7 @@ public abstract class RunApplication {
         return (T) hashMap.get(key);
     }
 
+    /** 获取参数 */
     public <T> T getInstanceByParameter(Parameter parameter) {
         Type parameterizedType = parameter.getParameterizedType();
         {
