@@ -1,7 +1,7 @@
 package wxdgaming.boot2.core.chatset.json;
 
 import wxdgaming.boot2.core.function.SLFunction1;
-import wxdgaming.boot2.core.util.LambdaUtil;
+import wxdgaming.boot2.core.util.LambdaFactory;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -27,7 +27,7 @@ public class ParameterizedTypeImpl implements ParameterizedType, Serializable {
      * @return
      */
     public static <T> Type genericFieldTypes(SLFunction1<T, ?> fn) {
-        Field field = LambdaUtil.ofField(fn);
+        Field field = LambdaFactory.ofField(fn);
         Class<?> ownerType = field.getType();
         Type genericType = field.getGenericType();
         return genericFieldTypes(ownerType, genericType);

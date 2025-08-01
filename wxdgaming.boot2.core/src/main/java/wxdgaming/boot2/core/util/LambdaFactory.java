@@ -23,7 +23,7 @@ import java.util.function.Consumer;
  * @version: 2021-11-05 17:51
  **/
 @Slf4j
-public class LambdaUtil implements Serializable {
+public class LambdaFactory implements Serializable {
 
     @Serial private static final long serialVersionUID = 1L;
 
@@ -330,7 +330,7 @@ public class LambdaUtil implements Serializable {
         for (Method method : methods) {
             Annotation methodAnnotation = method.getAnnotation(annotation);
             if (methodAnnotation != null) {
-                Mapping<M> delegate = LambdaUtil.createDelegate(clsProxy, proxyMethod, ins, method);
+                Mapping<M> delegate = LambdaFactory.createDelegate(clsProxy, proxyMethod, ins, method);
                 mappings.add(delegate);
             }
         }
