@@ -1,6 +1,5 @@
 package wxdgaming.boot2.starter.net.pojo;
 
-import com.google.inject.Singleton;
 import io.protostuff.Tag;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,12 +18,16 @@ import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 
+import java.awt.*;
 import java.io.File;
+import java.io.Serial;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
@@ -35,8 +38,8 @@ import java.util.stream.Stream;
 /**
  * pojo生成
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-05-27 16:39
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-05-27 16:39
  **/
 public class ProtoBuf2Pojo {
 
@@ -61,6 +64,8 @@ public class ProtoBuf2Pojo {
                     imports.add(Setter.class.getName());
                     imports.add(PojoBase.class.getName());
                     imports.add(Accessors.class.getName());
+                    imports.add(Serializable.class.getName());
+                    imports.add(Serial.class.getName());
                     imports.add(List.class.getName());
                     imports.add(ArrayList.class.getName());
                     imports.add(Map.class.getName());
@@ -98,8 +103,8 @@ public class ProtoBuf2Pojo {
                             start.set(true);
                         } else if (line.contains("}")) {
                             String p1 = filePath.getFileName().toString().replace(".proto", "").replace("Message", "");
-                            p1 = wxdgaming.boot2.core.chatset.StringUtils.lowerFirst(p1);
-                            comment.get().packageName = " %s.%s".formatted(packageName.get(), p1);
+                            p1 = StringUtils.lowerFirst(p1);
+                            comment.get().packageName = " %s.%s.message".formatted(packageName.get(), p1);
                             String to = "package %s;".formatted(comment.get().packageName);
                             to += "\n";
                             for (String anImport : imports) {
@@ -107,7 +112,7 @@ public class ProtoBuf2Pojo {
                             }
                             to += "\n\n\n";
                             to += comment.get().string();
-                            String javaFileName = "%s/%s/%s/%s.java".formatted(outPath, packageName.get().replace(".", "/"), p1, comment.get().getClassName());
+                            String javaFileName = "%s/%s/%s.java".formatted(outPath, comment.get().packageName.trim().replace(".", "/"), comment.get().getClassName());
                             File javaFile = new File(javaFileName);
                             if (clean_files.compareAndSet(false, true)) {
                                 FileUtil.del(javaFile.getParent());
@@ -185,7 +190,9 @@ public class ProtoBuf2Pojo {
                     @Setter
                     @Accessors(chain = true)
                     @Comment("%s")
-                    public class %s extends PojoBase {                        
+                    public class %s extends PojoBase implements Serializable {
+                    
+                        @Serial private static final long serialVersionUID = 1L;
                     
                         /** 消息ID */
                         public static int _msgId() {
@@ -363,8 +370,8 @@ public class ProtoBuf2Pojo {
      * @param packageName     输出包名
      * @param readPackageName 读取包名
      * @param spi             要处理的接口 例如Req or Res
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-01-15 14:58
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2025-01-15 14:58
      */
     public static void createMapping(String outPath, String packageName, String spi,
                                      String readPackageName,
@@ -403,7 +410,7 @@ public class ProtoBuf2Pojo {
         TreeSet<String> imports = new TreeSet<>();
         imports.add(ProtoRequest.class.getName());
         imports.add(Slf4j.class.getName());
-        imports.add(Singleton.class.getName());
+        imports.add(Component.class.getName());
         imports.add(SocketSession.class.getName());
         imports.add(cls.getName());
 
@@ -430,11 +437,11 @@ public class ProtoBuf2Pojo {
                 /**
                  * %s
                  *
-                 * @author: wxd-gaming(無心道, 15388152619)
-                 * @version: v1.1
+                 * @author wxd-gaming(無心道, 15388152619)
+                 * @version v1.1
                  **/
                 @Slf4j
-                @Singleton
+                @Component
                 public class %s {
                 
                     /** %s */

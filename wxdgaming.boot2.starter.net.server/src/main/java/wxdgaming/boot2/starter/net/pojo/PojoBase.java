@@ -4,13 +4,18 @@ package wxdgaming.boot2.starter.net.pojo;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.ObjectBase;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * protobuf 映射 基类
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-05-28 21:24
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-05-28 21:24
  **/
-public abstract class PojoBase extends ObjectBase {
+public abstract class PojoBase extends ObjectBase implements Serializable {
+
+    @Serial private static final long serialVersionUID = 1L;
 
     public int msgId() {
         return 0;
