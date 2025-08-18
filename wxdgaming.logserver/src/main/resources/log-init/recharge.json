@@ -17,7 +17,8 @@
     {
       "fieldName": "sid",
       "fieldComment": "区服",
-      "fieldType": "int"
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:38px;"
     },
     {
       "fieldName": "openId",

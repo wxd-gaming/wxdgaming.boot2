@@ -6,7 +6,9 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.ann.RequestParam;
+import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.logserver.module.logs.LogService;
@@ -21,7 +23,7 @@ import java.util.List;
  **/
 @Slf4j
 @Singleton
-@RequestMapping("/api/log")
+@RequestMapping("/log/find")
 public class LogFindController implements InitPrint {
 
     final LogService logService;
@@ -37,13 +39,13 @@ public class LogFindController implements InitPrint {
         return RunResult.ok().data(nav);
     }
 
-    @HttpRequest("/logTitle")
+    @HttpRequest("/title")
     public RunResult logTitle(@RequestParam("tableName") String tableName) {
-        List<JSONObject> list = logService.logTitle(tableName);
-        return RunResult.ok().data(list);
+        AssertUtil.assertTrue(StringUtils.isNotBlank(tableName), "tableName不能为空");
+        return logService.logTitle(tableName);
     }
 
-    @HttpRequest("/logPage")
+    @HttpRequest("/page")
     public RunResult logPage(
             @RequestParam("tableName") String tableName,
             @RequestParam("pageIndex") int pageIndex,

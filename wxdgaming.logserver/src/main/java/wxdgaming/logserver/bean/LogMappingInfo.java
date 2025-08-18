@@ -23,6 +23,7 @@ public class LogMappingInfo extends ObjectBase {
     private String logName;
     /** 表注释 */
     private String logComment;
+    private String htmlStyle;
     /** 是否开启分区 是按照每天进行区分 */
     private boolean partition;
     private List<LogField> fieldList = new ArrayList<>();

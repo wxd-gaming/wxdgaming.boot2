@@ -25,7 +25,7 @@ import java.util.List;
  **/
 @Slf4j
 @Singleton
-@RequestMapping("/api/log")
+@RequestMapping("/log/push")
 public class LogPushController {
 
     final LogService logService;
@@ -35,7 +35,7 @@ public class LogPushController {
         this.logService = logService;
     }
 
-    @HttpRequest("/pushList")
+    @HttpRequest("/List")
     public RunResult pushList(HttpContext request, @RequestBody String json) {
         if (StringUtils.isBlank(json)) {
             return RunResult.fail("log list 不能为空");
@@ -52,19 +52,6 @@ public class LogPushController {
             }
             logService.submitLog(logEntity);
         }
-        return RunResult.ok();
-    }
-
-    @HttpRequest("/push")
-    public RunResult push(HttpContext request, @RequestBody LogEntity logEntity) {
-        if (StringUtils.isBlank(logEntity.getLogType())) {
-            return RunResult.fail("logType 不能为空");
-        }
-
-        String authorization = request.getRequest().header(HttpHeaderNames.AUTHORIZATION.toString());
-        String jsonString = JSON.toJSONString(logEntity, SerializerFeature.SortField, SerializerFeature.MapSortField);
-
-        logService.submitLog(logEntity);
         return RunResult.ok();
     }
 

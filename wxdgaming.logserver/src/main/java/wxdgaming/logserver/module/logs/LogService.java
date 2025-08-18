@@ -75,15 +75,32 @@ public class LogService implements InitPrint {
                 .toList();
     }
 
-    public List<JSONObject> logTitle(String tableName) {
-        return dataCenterService.getLogMappingInfoMap().get(tableName).getFieldList().stream()
+    public RunResult logTitle(String tableName) {
+
+        LogMappingInfo logMappingInfo = dataCenterService.getLogMappingInfoMap().get(tableName);
+
+        List<JSONObject> list = logMappingInfo.getFieldList().stream()
                 .map(logField -> {
                     JSONObject jsonObject = MapOf.newJSONObject();
                     jsonObject.put("name", logField.getFieldName());
                     jsonObject.put("comment", logField.getFieldComment());
+                    String fieldHtmlStyle = logField.getFieldHtmlStyle();
+                    if (StringUtils.isBlank(fieldHtmlStyle)) {
+                        fieldHtmlStyle = "";
+                    }
+                    jsonObject.put("style", fieldHtmlStyle);
                     return jsonObject;
                 })
                 .toList();
+
+        String htmlStyle = logMappingInfo.getHtmlStyle();
+        if (StringUtils.isBlank(htmlStyle)) {
+            htmlStyle = "";
+        }
+        return RunResult.ok()
+                .fluentPut("comment", logMappingInfo.getLogComment())
+                .fluentPut("style", htmlStyle)
+                .data(list);
     }
 
     public RunResult logPage(String tableName,

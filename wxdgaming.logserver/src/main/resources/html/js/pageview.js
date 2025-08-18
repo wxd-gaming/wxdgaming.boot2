@@ -5,8 +5,7 @@ class PageView {
     url;
     gameId = 0;
     pathname = null;
-    columnNames = [];
-    columnComments = [];
+    columns = [];
     items = [];
     dataCount = 0;
     rowFunction = null;

@@ -4,4 +4,4 @@ logbus:
   token: "dwe"
   split-org: 200
   gzip: true
-  post-url: "http://localhost:18888/api/log/pushList"
+  post-url: "http://localhost:18888/log/push/List"

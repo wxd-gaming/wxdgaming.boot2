@@ -69,10 +69,12 @@
 
         function createRow(index, row) {
             let tr = `<tr>`;
-            for (let i = 0; i < pageView.columnNames.length; i++) {
-                let columnName = pageView.columnNames[i];
-                let columnComment = pageView.columnComments[i];
-                tr += `<td ondblclick="alertShow(this,'${columnComment}');">${row[columnName]}</td>`;
+            for (const key in pageView.columns) {
+                let column = pageView.columns[key];
+                let columnName = column.name;
+                let columnComment = column.comment;
+                let columnStyle = column.style;
+                tr += `<td ondblclick="alertShow(this,'${columnComment}');" style="${columnStyle}">${row[columnName]}</td>`;
             }
             tr += `</tr>`;
             return tr;
@@ -88,22 +90,23 @@
         $(() => {
             wxd.loading();
             let urlQuery = new wxd.Map().loadSearch();
-            pageView = new PageView("/api/log/logPage", search, createRow);
+            pageView = new PageView("/log/find/page", search, createRow);
             pageView.gameId = urlQuery.get("gameId");
 
 
-            let url = "/api/log/logTitle";
+            let url = "/log/find/title";
             let map = new wxd.Map();
             map.loadSearch();
             wxd.netty.post(url, map.toString(), (response) => {
                 if (response.code === 1) {
+                    document.title = response.comment;
+                    $(".tableDom").attr("style", $(".tableDom").attr("style") + "" + response.style);
                     let data = response.data;
                     for (let i = 0; i < data.length; i++) {
                         let item = data[i];
-                        pageView.columnNames[i] = item.name;
-                        pageView.columnComments[i] = item.comment;
+                        pageView.columns[item.name] = item;
                         $("#where").append(`<option value="${item.name}">${item.comment}</option>`);
-                        let l = `<th class="${item.name}">${item.comment}</th>`;
+                        let l = `<th class="${item.name}" style="${item.style}">${item.comment}</th>`;
                         $(".table_head").append(l);
                     }
                     search();
