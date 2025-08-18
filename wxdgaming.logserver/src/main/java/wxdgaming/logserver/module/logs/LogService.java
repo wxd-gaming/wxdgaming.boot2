@@ -152,6 +152,7 @@ public class LogService implements InitPrint {
         for (LogEntity logEntity : logEntities) {
             JSONObject jsonObject = new JSONObject(logEntity.getLogData());
             jsonObject.put("uid", logEntity.getUid());
+            jsonObject.put("dataKey", logEntity.getDayKey());
             jsonObject.put("createTime", MyClock.formatDate("yyyy-MM-dd HH:mm:ss.SSS", logEntity.getCreateTime()));
             list.add(jsonObject);
         }

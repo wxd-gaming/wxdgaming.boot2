@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Shutdown;
+import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
@@ -32,7 +32,7 @@ public class ScheduledService {
 
     protected ScheduledFuture<?> future;
     /*                          类名字                  方法名    实例 */
-    protected List<ScheduledInfo> jobList = new ArrayList<>();
+    protected List<AbstractCronTrigger> jobList = new ArrayList<>();
 
     protected final ExecutorConfig config;
     protected ExecutorServicePlatform executorServicePlatform;
@@ -45,7 +45,7 @@ public class ScheduledService {
     @Init
     public void init(RunApplication runApplication) {
         log.debug("------------------------------初始化定时任务调度器------------------------------");
-        List<ScheduledInfo> tmpJobList = new ArrayList<>();
+        List<AbstractCronTrigger> tmpJobList = new ArrayList<>();
         runApplication.getGuiceBeanProvider().withMethodAnnotated(Scheduled.class)
                 .forEach(methodContent -> {
                     ScheduledInfo scheduledInfo = new ScheduledInfo(
@@ -56,6 +56,13 @@ public class ScheduledService {
                     log.debug("Scheduled job {}", methodContent.getMethod());
                     tmpJobList.add(scheduledInfo);
                 });
+        sort(tmpJobList);
+        jobList = tmpJobList;
+    }
+
+    public void addJob(AbstractCronTrigger abstractCronTrigger) {
+        List<AbstractCronTrigger> tmpJobList = new ArrayList<>(jobList);
+        tmpJobList.add(abstractCronTrigger);
         sort(tmpJobList);
         jobList = tmpJobList;
     }
@@ -82,8 +89,8 @@ public class ScheduledService {
         }
     }
 
-    public void sort(List<ScheduledInfo> jobs) {
-        jobs.sort(Comparator.comparingLong(ScheduledInfo::getNextRunTime));
+    public void sort(List<AbstractCronTrigger> jobs) {
+        jobs.sort(Comparator.comparingLong(AbstractCronTrigger::getNextRunTime));
     }
 
 
@@ -108,11 +115,11 @@ public class ScheduledService {
             }
             curSecond = second;
             boolean needSort = false;
-            for (ScheduledInfo scheduledInfo : jobList) {
-                if (!scheduledInfo.checkRunTime(millis)) {
+            for (AbstractCronTrigger cronTrigger : jobList) {
+                if (!cronTrigger.checkRunTime(millis)) {
                     break;
                 }
-                if (runJob(scheduledInfo, millis)) {
+                if (runJob(cronTrigger, millis)) {
                     needSort = true;
                 }
             }
@@ -121,10 +128,10 @@ public class ScheduledService {
             }
         }
 
-        public boolean runJob(ScheduledInfo scheduledInfo, long millis) {
+        public boolean runJob(AbstractCronTrigger scheduledInfo, long millis) {
             scheduledInfo.lock.lock();
             try {
-                if (!scheduledInfo.isScheduleAtFixedRate() && !scheduledInfo.runEnd.get())
+                if (!scheduledInfo.scheduleAtFixedRate() && !scheduledInfo.runEnd.get())
                     return false;
                 /*标记为正在执行*/
                 scheduledInfo.runEnd.set(false);

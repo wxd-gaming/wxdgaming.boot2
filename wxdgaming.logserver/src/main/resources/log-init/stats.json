@@ -1,0 +1,38 @@
+{
+  "logName": "stats",
+  "logComment": "统计日志",
+  "sort": "0-1",
+  "partition": true,
+  "fieldList": [
+    {
+      "fieldName": "dataKey",
+      "fieldComment": "日期",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "registerAccountCount",
+      "fieldComment": "新增用户",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "registerRoleCount",
+      "fieldComment": "新增角色",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "activeAccountCount",
+      "fieldComment": "活跃账号",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "orderCount",
+      "fieldComment": "订单数",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "orderMoneyCount",
+      "fieldComment": "订单金额",
+      "fieldType": "long"
+    }
+  ]
+}

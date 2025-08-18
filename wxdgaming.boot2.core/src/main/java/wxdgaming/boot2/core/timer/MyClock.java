@@ -121,6 +121,14 @@ public class MyClock {
         return time.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
+    /** 当前时间毫秒时间磋 */
+    public static long time2Milli(LocalDate time) {
+        if (time == null) {
+            return 0;
+        }
+        return time.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
     /** yyyyMMdd */
     public static int dayInt() {
         LocalDateTime localDateTime = LocalDateTime.now();
