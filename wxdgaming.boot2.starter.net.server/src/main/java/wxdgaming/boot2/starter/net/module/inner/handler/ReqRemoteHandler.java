@@ -10,8 +10,8 @@ import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
-import wxdgaming.boot2.starter.net.module.inner.*;
-import wxdgaming.boot2.starter.net.module.inner.message.ReqRemote;
+import wxdgaming.boot2.starter.net.message.inner.ReqRemote;
+import wxdgaming.boot2.starter.net.module.rpc.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;

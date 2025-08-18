@@ -1,10 +1,12 @@
 package wxdgaming.boot2.core.executor;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.LockSupport;
 
 /**
@@ -14,7 +16,7 @@ import java.util.concurrent.locks.LockSupport;
  * @version: 2025-05-15 14:46
  **/
 @Slf4j
-class ExecutorMonitor extends Thread {
+public final class ExecutorMonitor extends Thread {
 
     public static ConcurrentHashMap<Thread, JobContent> executorJobConcurrentHashMap = new ConcurrentHashMap<>();
 
@@ -35,6 +37,7 @@ class ExecutorMonitor extends Thread {
         }
     }
 
+    @Getter AtomicBoolean exit = new AtomicBoolean(false);
 
     public ExecutorMonitor() {
         super("executor-monitor");
@@ -42,7 +45,7 @@ class ExecutorMonitor extends Thread {
     }
 
     @Override public void run() {
-        while (!Thread.interrupted()) {
+        while (!exit.get()) {
             try {
                 LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(30));
                 for (Map.Entry<Thread, JobContent> entry : executorJobConcurrentHashMap.entrySet()) {

@@ -268,7 +268,7 @@ public class TableMapping {
                                 object = FastJsonUtil.toJSONString(object, FastJsonUtil.Writer_Features_Type_Name);
                             }
                         }
-                        case Json -> {
+                        case Json , Jsonb-> {
                             if (object instanceof BitSet bitSet) {
                                 long[] longArray = bitSet.toLongArray();
                                 object = FastJsonUtil.toJSONString(longArray);

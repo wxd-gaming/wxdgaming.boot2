@@ -13,7 +13,7 @@ import wxdgaming.boot2.core.format.HexId;
 import wxdgaming.boot2.core.keywords.KeywordsMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryResult;
-import wxdgaming.boot2.starter.net.module.inner.RpcService;
+import wxdgaming.boot2.starter.net.module.rpc.RpcService;
 import wxdgaming.game.server.api.role.GetPlayerStrategyFactory;
 import wxdgaming.game.server.api.role.GetPlayerStrategy;
 import wxdgaming.game.server.api.role.impl.DatabaseGetPlayerStrategy;

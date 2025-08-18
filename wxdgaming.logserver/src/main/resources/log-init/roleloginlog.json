@@ -1,0 +1,53 @@
+{
+  "logName": "roleloginlog",
+  "logComment": "角色登录日志",
+  "sort": "1-3",
+  "partition": true,
+  "fieldList": [
+    {
+      "fieldName": "uid",
+      "fieldComment": "UID",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "createTime",
+      "fieldComment": "日期",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "sid",
+      "fieldComment": "区服",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "account",
+      "fieldComment": "账号",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "roleId",
+      "fieldComment": "角色ID",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "roleName",
+      "fieldComment": "角色名字",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "lv",
+      "fieldComment": "角色等级",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "ip",
+      "fieldComment": "ip",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "clientData",
+      "fieldComment": "客户端附加",
+      "fieldType": "string"
+    }
+  ]
+}

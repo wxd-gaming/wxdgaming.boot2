@@ -1,6 +1,8 @@
 package  wxdgaming.game.message.bag;
 
 import io.protostuff.Tag;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,7 +20,9 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 @Setter
 @Accessors(chain = true)
 @Comment("响应背包信息")
-public class ResBagInfo extends PojoBase {
+public class ResBagInfo extends PojoBase implements Serializable {
+
+    @Serial private static final long serialVersionUID = 1L;
 
     /** 消息ID */
     public static int _msgId() {

@@ -8,7 +8,10 @@ import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.game.gateway.bean.ServerMapping;
 import wxdgaming.game.gateway.module.data.DataCenterService;
+import wxdgaming.game.message.inner.InnerForwardMessage;
 import wxdgaming.game.message.role.ReqLogin;
+
+import java.util.function.Consumer;
 
 /**
  * 登录请求
@@ -41,7 +44,11 @@ public class ReqLoginHandler {
             return;
         }
         socketSession.bindData("gameServerId", sid);
-        serverMapping.forwardMessage(socketSession.getUid(), req.msgId(), req.encode());
+        serverMapping.forwardMessage(socketSession.getUid(), req.msgId(), req.encode(), new Consumer<InnerForwardMessage>() {
+            @Override public void accept(InnerForwardMessage innerForwardMessage) {
+                innerForwardMessage.getKvBeansMap().put("clientIp", socketSession.getIP());
+            }
+        });
 
     }
 

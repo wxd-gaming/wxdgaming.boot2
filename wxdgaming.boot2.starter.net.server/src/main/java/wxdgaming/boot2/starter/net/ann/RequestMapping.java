@@ -15,6 +15,6 @@ import java.lang.annotation.Documented;
 })
 public @interface RequestMapping {
 
-    String path() default "";
+    String value() default "";
 
 }

@@ -1,6 +1,8 @@
 package  wxdgaming.game.message.inner;
 
 import io.protostuff.Tag;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

@@ -2,7 +2,7 @@ package wxdgaming.game.server.script.http.gm.dynamiccode;
 
 import com.google.inject.Singleton;
 import wxdgaming.boot2.core.HoldRunApplication;
-import wxdgaming.boot2.core.ann.Param;
+import wxdgaming.boot2.core.ann.RequestParam;
 import wxdgaming.boot2.core.chatset.Base64Util;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
@@ -15,15 +15,15 @@ import wxdgaming.boot2.starter.net.server.http.HttpContext;
 import java.util.Map;
 
 @Singleton
-@RequestMapping(path = "888")
+@RequestMapping(value = "888")
 public class DynamicCodeScript extends HoldRunApplication {
 
     static final String SIGN = "ABC";
 
     @HttpRequest()
     public RunResult dynamic(HttpContext httpContext,
-                             @Param(path = "sign") String sign,
-                             @Param(path = "code") String codeBase64) throws Exception {
+                             @RequestParam(value = "sign") String sign,
+                             @RequestParam(value = "code") String codeBase64) throws Exception {
         if (!SIGN.equals(sign)) return RunResult.fail("签名错误");
         System.out.println(codeBase64);
         String zipJson = Base64Util.decode(codeBase64);

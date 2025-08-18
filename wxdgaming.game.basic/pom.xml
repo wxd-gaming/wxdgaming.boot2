@@ -42,6 +42,11 @@
             <artifactId>wxdgaming.boot2.starter.excel</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>wxdgaming.boot2</groupId>
+            <artifactId>wxdgaming.logbus</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

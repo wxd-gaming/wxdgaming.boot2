@@ -2,7 +2,7 @@ package wxdgaming.game.server.api.role.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.net.SocketSession;
-import wxdgaming.boot2.starter.net.module.inner.RpcService;
+import wxdgaming.boot2.starter.net.module.rpc.RpcService;
 import wxdgaming.game.global.bean.role.PlayerSnap;
 import wxdgaming.game.server.api.role.GetPlayerStrategy;
 import wxdgaming.game.server.bean.role.Player;

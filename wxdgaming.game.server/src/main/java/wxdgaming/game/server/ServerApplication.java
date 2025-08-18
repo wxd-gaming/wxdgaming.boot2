@@ -16,6 +16,7 @@ import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.boot2.starter.net.SocketScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
+import wxdgaming.game.BasicScan;
 import wxdgaming.game.cfg.QPlayerTable;
 import wxdgaming.game.cfg.bean.QPlayer;
 import wxdgaming.game.login.LoginServiceGuiceModule;
@@ -36,7 +37,7 @@ public class ServerApplication {
                     ScheduledScan.class,
                     SocketScan.class,
                     MysqlScan.class,
-                    LoginServiceGuiceModule.class,
+                    BasicScan.class,
                     ServerApplication.class
             );
             loadScript();

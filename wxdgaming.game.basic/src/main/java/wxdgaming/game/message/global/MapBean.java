@@ -1,6 +1,8 @@
 package  wxdgaming.game.message.global;
 
 import io.protostuff.Tag;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,7 +20,9 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 @Setter
 @Accessors(chain = true)
 @Comment("null")
-public class MapBean extends PojoBase {
+public class MapBean extends PojoBase implements Serializable {
+
+    @Serial private static final long serialVersionUID = 1L;
 
     /** 消息ID */
     public static int _msgId() {

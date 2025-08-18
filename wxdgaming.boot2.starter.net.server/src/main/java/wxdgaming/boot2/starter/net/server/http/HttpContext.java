@@ -249,9 +249,16 @@ public class HttpContext implements AutoCloseable {
                     HttpDataAction.httpDataDecoder(getReqParams(), this.reqContent);
                 } else if (this.reqContentType.contains("json")) {
                     if (StringUtils.isNotBlank(this.reqContent)) {
-                        final JSONObject jsonObject = FastJsonUtil.parse(this.reqContent);
-                        if (jsonObject != null && !jsonObject.isEmpty()) {
-                            this.getReqParams().putAll(jsonObject);
+                        if (!this.reqContent.startsWith("[") || !this.reqContent.endsWith("]")) {
+                            /*TODO[]这个表示数组非键值对对象不能转换*/
+                            try {
+                                final JSONObject jsonObject = FastJsonUtil.parse(this.reqContent);
+                                if (jsonObject != null && !jsonObject.isEmpty()) {
+                                    this.getReqParams().putAll(jsonObject);
+                                }
+                            } catch (Exception e) {
+                                log.debug("json error {}", this.reqContent, e);
+                            }
                         }
                     }
                 }

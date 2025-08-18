@@ -1,0 +1,83 @@
+{
+  "logName": "itemlog",
+  "logComment": "背包日志",
+  "sort": "3-1",
+  "partition": true,
+  "fieldList": [
+    {
+      "fieldName": "uid",
+      "fieldComment": "UID",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "createTime",
+      "fieldComment": "日期",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "sid",
+      "fieldComment": "区服",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "account",
+      "fieldComment": "账号",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "roleId",
+      "fieldComment": "角色ID",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "roleName",
+      "fieldComment": "角色名字",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "changeType",
+      "fieldComment": "分组",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "bagType",
+      "fieldComment": "背包类型",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "itemCfgId",
+      "fieldComment": "道具id",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "itemName",
+      "fieldComment": "道具名字",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "oldNum",
+      "fieldComment": "变更前",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "change",
+      "fieldComment": "变更量",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "newNum",
+      "fieldComment": "变更后",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "reason",
+      "fieldComment": "原因",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "reasonStr",
+      "fieldComment": "详情",
+      "fieldType": "string"
+    }
+  ]
+}

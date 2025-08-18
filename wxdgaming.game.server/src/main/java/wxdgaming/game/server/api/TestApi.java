@@ -4,9 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
-import wxdgaming.boot2.core.ann.Body;
+import wxdgaming.boot2.core.ann.RequestBody;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.ann.Param;
+import wxdgaming.boot2.core.ann.RequestParam;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ExecutorConfig;
@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 @Slf4j
 @Singleton
-@RequestMapping(path = "/")
+@RequestMapping(value = "/")
 public class TestApi {
 
     RunApplication runApplication;
@@ -46,7 +46,7 @@ public class TestApi {
         this.runApplication = runApplication;
     }
 
-    @HttpRequest(path = "user/login")
+    @HttpRequest(value = "user/login")
     public String userLogin(RunApplication runApplication) {
         return "index";
     }
@@ -55,8 +55,8 @@ public class TestApi {
     public String index(RunApplication runApplication,
                         @Value(path = "executor") ExecutorConfig executorConfig,
                         @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
-                        @Body(defaultValue = "1") String body,
-                        @Param(path = "b1", defaultValue = "2") int b1) {
+                        @RequestBody(defaultValue = "1") String body,
+                        @RequestParam(value = "b1", defaultValue = "2") int b1) {
         return "index";
     }
 
@@ -64,8 +64,8 @@ public class TestApi {
     public RunResult json(RunApplication runApplication,
                           @Value(path = "executor") ExecutorConfig executorConfig,
                           @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
-                          @Body(defaultValue = "1") String body,
-                          @Param(path = "b1", defaultValue = "2") String b1) {
+                          @RequestBody(defaultValue = "1") String body,
+                          @RequestParam(value = "b1", defaultValue = "2") String b1) {
         return RunResult.ok();
     }
 
@@ -73,8 +73,8 @@ public class TestApi {
     public String error(RunApplication runApplication,
                         @Value(path = "executor") ExecutorConfig executorConfig,
                         @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
-                        @Body(defaultValue = "1") String body,
-                        @Param(path = "b1", defaultValue = "2") String b1) {
+                        @RequestBody(defaultValue = "1") String body,
+                        @RequestParam(value = "b1", defaultValue = "2") String b1) {
         throw new RuntimeException("d");
     }
 
@@ -85,7 +85,7 @@ public class TestApi {
     }
 
     @RpcRequest
-    public JSONObject rpcIndex2(JSONObject paramData, @Param(path = "a", nestedPath = true) String a) {
+    public JSONObject rpcIndex2(JSONObject paramData, @RequestParam(value = "a", nestedPath = true) String a) {
         log.debug("{} {} {}", a, paramData, ThreadContext.context().queueName());
         return paramData;
     }

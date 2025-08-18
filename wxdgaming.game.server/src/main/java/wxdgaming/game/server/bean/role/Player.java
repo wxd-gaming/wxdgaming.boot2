@@ -11,6 +11,7 @@ import wxdgaming.game.bean.mail.MailPack;
 import wxdgaming.game.bean.vip.VipInfo;
 import wxdgaming.game.global.bean.role.OnlineInfo;
 import wxdgaming.game.global.bean.role.PlayerSnap;
+import wxdgaming.game.message.global.MapBean;
 import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.bean.MapKey;
 import wxdgaming.game.server.bean.MapNpc;
@@ -19,6 +20,7 @@ import wxdgaming.game.server.bean.bag.BagPack;
 import wxdgaming.game.server.bean.equip.EquipPack;
 import wxdgaming.game.server.bean.task.TaskPack;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -40,7 +42,7 @@ public class Player extends MapNpc {
     private int appId;
     private String platform;
     private String platformUserId;
-    private HashMap<String, Object> clientData = new HashMap<>();
+    private ArrayList<MapBean> clientData = new ArrayList<>();
     /** 上一次进入的地图 */
     private MapKey lastMapKey;
     /** 上一次所在地图坐标， */

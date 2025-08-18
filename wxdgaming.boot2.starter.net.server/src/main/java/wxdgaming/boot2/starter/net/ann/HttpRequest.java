@@ -15,7 +15,7 @@ import java.lang.annotation.Documented;
 })
 public @interface HttpRequest {
 
-    String path() default "";
+    String value() default "";
 
     /** post or get */
     String method() default "";

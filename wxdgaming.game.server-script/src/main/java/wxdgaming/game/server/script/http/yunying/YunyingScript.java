@@ -18,7 +18,7 @@ import wxdgaming.game.server.module.data.GlobalDataService;
  **/
 @Slf4j
 @Singleton
-@RequestMapping(path = "yunying")
+@RequestMapping(value = "yunying")
 public class YunyingScript extends HoldRunApplication {
 
     private final GlobalDataService globalDataService;

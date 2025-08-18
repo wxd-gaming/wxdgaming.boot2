@@ -55,7 +55,7 @@ public class HttpListenerContent {
                     String path = "";
 
                     if (insRequestMapping != null) {
-                        path += insRequestMapping.path();
+                        path += insRequestMapping.value();
                     } else {
                         String simpleName = ins.getClass().getSimpleName();
                         if (simpleName.endsWith("Spi")) {
@@ -73,10 +73,10 @@ public class HttpListenerContent {
                     }
                     if (!path.startsWith("/")) path = "/" + path;
                     if (!path.endsWith("/")) path += "/";
-                    if (StringUtils.isBlank(methodRequestMapping.path())) {
+                    if (StringUtils.isBlank(methodRequestMapping.value())) {
                         path += method.getName();
                     } else {
-                        path += methodRequestMapping.path();
+                        path += methodRequestMapping.value();
                     }
 
                     if (path.endsWith(TopPath)) {

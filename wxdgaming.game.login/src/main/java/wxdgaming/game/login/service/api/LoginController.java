@@ -3,9 +3,9 @@ package wxdgaming.game.login.service.api;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
-import wxdgaming.boot2.core.ann.Body;
+import wxdgaming.boot2.core.ann.RequestBody;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.ann.Param;
+import wxdgaming.boot2.core.ann.RequestParam;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.net.ann.HttpPath;
@@ -27,7 +27,7 @@ import java.util.Map;
  **/
 @Slf4j
 @Singleton
-@RequestMapping(path = "/login")
+@RequestMapping(value = "/login")
 public class LoginController extends HoldRunApplication {
 
     Map<AppPlatformParams.Platform, AbstractSdkLoginApi> sdkMap = new HashMap<>();
@@ -48,7 +48,7 @@ public class LoginController extends HoldRunApplication {
     }
 
     @HttpRequest
-    public RunResult check(HttpContext context, @Param(path = "appId") int appId) {
+    public RunResult check(HttpContext context, @RequestParam(value = "appId") int appId) {
         AppPlatformParams appPlatformParams = AppPlatformParams.getAppPlatformParams(appId);
         if (appPlatformParams == null) {
             return RunResult.fail("not support appId: " + appId + " not exist");
@@ -61,13 +61,13 @@ public class LoginController extends HoldRunApplication {
         return sdkLoginApi.login(context, appPlatformParams);
     }
 
-    @HttpRequest(path = "test/{id}/sdk")
+    @HttpRequest(value = "test/{id}/sdk")
     public RunResult checkSdk(HttpContext context, @HttpPath("id") int id) {
         return RunResult.fail(String.valueOf(id));
     }
 
-    @HttpRequest(path = "test/{id}/v1")
-    public RunResult testV1(HttpContext context, @Body() String body) {
+    @HttpRequest(value = "test/{id}/v1")
+    public RunResult testV1(HttpContext context, @RequestBody() String body) {
         log.info("body: {}", body);
         return RunResult.ok().fluentPut("data", body);
     }

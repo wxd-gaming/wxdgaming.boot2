@@ -30,6 +30,8 @@
         <module>wxdgaming.game.server</module>
         <module>wxdgaming.game.server-script</module>
         <module>wxdgaming.game.login</module>
+        <module>wxdgaming.logserver</module>
+        <module>wxdgaming.logbus</module>
     </modules>
 
     <properties>

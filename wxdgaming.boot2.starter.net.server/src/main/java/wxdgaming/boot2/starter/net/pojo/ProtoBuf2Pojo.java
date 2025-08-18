@@ -104,7 +104,7 @@ public class ProtoBuf2Pojo {
                         } else if (line.contains("}")) {
                             String p1 = filePath.getFileName().toString().replace(".proto", "").replace("Message", "");
                             p1 = StringUtils.lowerFirst(p1);
-                            comment.get().packageName = " %s.%s.message".formatted(packageName.get(), p1);
+                            comment.get().packageName = " %s.%s".formatted(packageName.get(), p1);
                             String to = "package %s;".formatted(comment.get().packageName);
                             to += "\n";
                             for (String anImport : imports) {

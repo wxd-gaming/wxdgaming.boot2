@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script charset="utf-8" type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script charset="utf-8" type="text/javascript" src="/js/com.wxd.js"></script>
+    <script charset="utf-8" type="text/javascript" src="/js/pageview.js"></script>
+    <title>b</title>
+    <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
+    <link rel="stylesheet" type="text/css" href="/style/table.css"/>
+    <style>
+
+        html, body {
+            display: block;overflow: auto;width: 100%;height: 100%;
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            color: #535252;
+            min-width: 1400px;
+        }
+
+        a:link {color: #0866b4;}
+
+        a:visited { color: #0866b4;}
+
+        label {padding-left: 5px;padding-right: 5px;}
+    </style>
+    <script>
+
+        let pageView = null;
+
+        function search() {
+            wxd.loading();
+            let urlQuery = new wxd.Map().loadSearch();
+            urlQuery.put("minDay", $("#minDay").val());
+            urlQuery.put("maxDay", $("#maxDay").val());
+            urlQuery.put("where", $("#labWhere").text());
+            pageView.remoteGetData(urlQuery);
+        }
+
+        // 用于显示的格式化版本
+        function formatForDisplay(str) {
+            if (typeof str === "string") {
+                return str;
+            }
+            return JSON.stringify(str, null, 2); // 会保留换行和缩进
+        }
+
+        function formatJsonWithNewlines(obj) {
+            if (typeof obj === 'string') {
+                try {
+                    obj = JSON.parse(obj);
+                } catch (e) {
+                    // 如果解析失败，直接格式化字符串
+                    return obj;
+                }
+            }
+            // 使用2个空格进行缩进，自动包含换行符
+            return JSON.stringify(obj, null, 2);
+        }
+
+        function escapeJSString(str) {
+            return formatForDisplay(str).replace(/\\/g, "\\\\")
+                .replace(/'/g, "\\'")
+                .replace(/"/g, "\\\"")
+                .replace(/\n/g, "\\n")
+                .replace(/\r/g, "\\r")
+                .replace(/\t/g, "\\t");
+        }
+
+        function createRow(index, row) {
+            let tr = `<tr>`;
+            for (let i = 0; i < pageView.columnNames.length; i++) {
+                let columnName = pageView.columnNames[i];
+                let columnComment = pageView.columnComments[i];
+                tr += `<td ondblclick="alertShow(this,'${columnComment}');">${row[columnName]}</td>`;
+            }
+            tr += `</tr>`;
+            return tr;
+        }
+
+        function alertShow(self, title) {
+            let content = $(self).text();
+            content = formatJsonWithNewlines(content);
+            console.log(typeof content, content);
+            wxd.message.alert(`<pre>${content}</pre>`, title);
+        }
+
+        $(() => {
+            wxd.loading();
+            let urlQuery = new wxd.Map().loadSearch();
+            pageView = new PageView("/api/log/logPage", search, createRow);
+            pageView.gameId = urlQuery.get("gameId");
+
+
+            let url = "/api/log/logTitle";
+            let map = new wxd.Map();
+            map.loadSearch();
+            wxd.netty.post(url, map.toString(), (response) => {
+                if (response.code === 1) {
+                    let data = response.data;
+                    for (let i = 0; i < data.length; i++) {
+                        let item = data[i];
+                        pageView.columnNames[i] = item.name;
+                        pageView.columnComments[i] = item.comment;
+                        $("#where").append(`<option value="${item.name}">${item.comment}</option>`);
+                        let l = `<th class="${item.name}">${item.comment}</th>`;
+                        $(".table_head").append(l);
+                    }
+                    search();
+                }
+            });
+
+        });
+
+        let whereJsonArray = [];
+
+        function addWhere() {
+            let whereJson = {};
+            whereJson["where"] = $("#where").val();
+            whereJson["and"] = $("#and").val();
+            whereJson["whereValue"] = $("#whereValue").val();
+            whereJsonArray[whereJsonArray.length] = whereJson;
+            $("#labWhere").text(JSON.stringify(whereJsonArray));
+            $("#whereValue").val("")
+            $("#and").val("=");
+        }
+
+        function clearWhere() {
+            whereJsonArray = [];
+            $("#labWhere").text("");
+        }
+
+    </script>
+</head>
+<body>
+<div class="btn_box" style="width: 100%;height: 180px;padding-left: 10px; padding-top: 8px; text-align: left;vertical-align: center;">
+    <label for="minDay">开始日期: </label><input id="minDay" type="date"/>
+    <label for="maxDay">结束日期: </label><input id="maxDay" type="date"/>
+    <br>
+    <label for="where">查询条件:</label>
+
+    <select id="where">
+
+    </select>
+
+    <select id="and" style="width: 40px;">
+        <option value="=">=</option>
+        <option value="<="><=</option>
+        <option value="<"><</option>
+        <option value=">=">>=</option>
+        <option value=">">></option>
+    </select>
+
+    <input id="whereValue" type="text"/>
+    <input type="button" onclick="addWhere();" value="添加"/>
+    <input type="button" onclick="clearWhere();" value="清理"/>
+    <br>
+    <label id="labWhere"></label>
+    <br>
+    <br>
+    <button onclick="search();">查询</button>
+</div>
+<div class="tableDom" style="position: absolute;left: 20px;top: 200px;right: 20px;bottom: 40px;padding-right: 10px;border-radius: 0;">
+    <table>
+        <thead>
+        <tr class="table_head">
+        </tr>
+        </thead>
+        <tbody class="tbody">
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -11,7 +11,7 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
-import wxdgaming.game.bean.goods.BagChangeArgs4Item;
+import wxdgaming.game.bean.goods.BagChangeDTO4Item;
 import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.bean.goods.ItemCfg;
 import wxdgaming.game.core.Reason;
@@ -96,7 +96,7 @@ public class CDKeyService {
 
         List<Item> itemList = bagService.newItems(rewards);
 
-        BagChangeArgs4Item rewardItemArgs = BagChangeArgs4Item.builder()
+        BagChangeDTO4Item rewardItemArgs = BagChangeDTO4Item.builder()
                 .setItemList(itemList)
                 .setBagFullSendMail(true)
                 .setBagErrorNoticeClient(false)

@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
-import wxdgaming.boot2.core.ann.Body;
+import wxdgaming.boot2.core.ann.RequestBody;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
@@ -27,7 +27,7 @@ import java.util.List;
  **/
 @Slf4j
 @Singleton
-@RequestMapping(path = "/inner")
+@RequestMapping(value = "/inner")
 public class InnerController extends HoldRunApplication {
 
     final InnerService innerService;
@@ -38,7 +38,7 @@ public class InnerController extends HoldRunApplication {
     }
 
     @HttpRequest
-    public RunResult registerGame(HttpContext context, @Body JSONObject data) {
+    public RunResult registerGame(HttpContext context, @RequestBody JSONObject data) {
         ArrayList<Integer> sidList = data.getObject("sidList", new TypeReference<ArrayList<Integer>>() {});
         String jsonBean = data.getString("serverBean");
         InnerServerInfoBean serverBean = FastJsonUtil.parse(jsonBean, InnerServerInfoBean.class);
@@ -54,7 +54,7 @@ public class InnerController extends HoldRunApplication {
     }
 
     @HttpRequest
-    public RunResult registerGateway(HttpContext context, @Body JSONObject data) {
+    public RunResult registerGateway(HttpContext context, @RequestBody JSONObject data) {
         Integer sid = data.getInteger("sid");
         String jsonBean = data.getString("serverBean");
         InnerServerInfoBean serverBean = FastJsonUtil.parse(jsonBean, InnerServerInfoBean.class);
@@ -74,7 +74,7 @@ public class InnerController extends HoldRunApplication {
     }
 
     @HttpRequest
-    public RunResult gameServerList(HttpContext context, @Body JSONObject data) {
+    public RunResult gameServerList(HttpContext context, @RequestBody JSONObject data) {
         List<InnerServerInfoBean> list = innerService.getInnerGameServerInfoMap().values()
                 .stream()
                 .sorted((o1, o2) -> Integer.compare(o2.getServerId(), o1.getServerId()))
@@ -83,7 +83,7 @@ public class InnerController extends HoldRunApplication {
     }
 
     @HttpRequest
-    public RunResult gatewayServerList(HttpContext context, @Body JSONObject data) {
+    public RunResult gatewayServerList(HttpContext context, @RequestBody JSONObject data) {
         List<InnerServerInfoBean> list = innerService.getInnerGatewayServerInfoMap().values()
                 .stream()
                 .sorted((o1, o2) -> Integer.compare(o2.getServerId(), o1.getServerId()))

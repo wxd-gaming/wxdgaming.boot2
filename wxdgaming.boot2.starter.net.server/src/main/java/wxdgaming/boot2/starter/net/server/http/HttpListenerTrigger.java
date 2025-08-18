@@ -7,8 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.Body;
-import wxdgaming.boot2.core.ann.Param;
+import wxdgaming.boot2.core.ann.RequestBody;
+import wxdgaming.boot2.core.ann.RequestParam;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.StringUtils;
@@ -152,27 +152,27 @@ public class HttpListenerTrigger extends ExecutorEvent {
                 }
             }
             {
-                Param param = parameter.getAnnotation(Param.class);
-                if (param != null) {
-                    String name = param.path();
+                RequestParam requestParam = parameter.getAnnotation(RequestParam.class);
+                if (requestParam != null) {
+                    String name = requestParam.value();
                     Object o;
                     try {
 
-                        if (param.nestedPath()) {
+                        if (requestParam.nestedPath()) {
                             o = FastJsonUtil.getNestedValue(httpContext.getRequest().getReqParams(), name, parameterizedType);
                         } else {
                             o = httpContext.getRequest().getReqParams().getObject(name, parameterizedType);
                         }
-                        if (o == null && StringUtils.isNotBlank(param.defaultValue())) {
+                        if (o == null && StringUtils.isNotBlank(requestParam.defaultValue())) {
                             if (String.class.equals(parameterizedType))
-                                o = param.defaultValue();
+                                o = requestParam.defaultValue();
                             else
-                                o = FastJsonUtil.parse(param.defaultValue(), parameterizedType);
+                                o = FastJsonUtil.parse(requestParam.defaultValue(), parameterizedType);
                         }
                     } catch (Exception e) {
                         throw Throw.of("参数：" + name, e);
                     }
-                    if (param.required() && o == null) {
+                    if (requestParam.required() && o == null) {
                         throw new RuntimeException("param:" + name + " is null");
                     }
                     params[i] = o;
@@ -181,8 +181,8 @@ public class HttpListenerTrigger extends ExecutorEvent {
             }
 
             {
-                Body body = parameter.getAnnotation(Body.class);
-                if (body != null) {
+                RequestBody requestBody = parameter.getAnnotation(RequestBody.class);
+                if (requestBody != null) {
                     Object o = null;
                     if (String.class.equals(parameterType)) {
                         o = httpContext.getRequest().getReqContent();
@@ -195,10 +195,10 @@ public class HttpListenerTrigger extends ExecutorEvent {
                     } else if (!httpContext.getRequest().getReqParams().isEmpty()) {
                         o = httpContext.getRequest().getReqParams().toJavaObject(parameterType);
                     }
-                    if (o == null && StringUtils.isNotBlank(body.defaultValue())) {
-                        o = body.defaultValue();
+                    if (o == null && StringUtils.isNotBlank(requestBody.defaultValue())) {
+                        o = requestBody.defaultValue();
                     }
-                    if (body.required() && o == null) {
+                    if (requestBody.required() && o == null) {
                         throw new RuntimeException("body is null");
                     }
                     params[i] = o;

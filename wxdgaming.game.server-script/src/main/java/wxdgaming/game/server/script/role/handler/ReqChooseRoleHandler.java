@@ -1,5 +1,6 @@
 package wxdgaming.game.server.script.role.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,8 @@ import wxdgaming.game.server.event.OnLogout;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.module.data.GlobalDbDataCenterService;
 import wxdgaming.game.server.module.drive.PlayerDriveService;
+import wxdgaming.game.server.script.role.log.RoleLoginLog;
+import wxdgaming.game.slog.SlogService;
 
 import java.util.HashSet;
 
@@ -34,12 +37,16 @@ public class ReqChooseRoleHandler extends HoldRunApplication {
     final DataCenterService dataCenterService;
     final GlobalDbDataCenterService globalDbDataCenterService;
     final PlayerDriveService playerDriveService;
+    final SlogService slogService;
 
     @Inject
-    public ReqChooseRoleHandler(DataCenterService dataCenterService, GlobalDbDataCenterService globalDbDataCenterService, PlayerDriveService playerDriveService) {
+    public ReqChooseRoleHandler(DataCenterService dataCenterService,
+                                GlobalDbDataCenterService globalDbDataCenterService,
+                                PlayerDriveService playerDriveService, SlogService slogService) {
         this.dataCenterService = dataCenterService;
         this.globalDbDataCenterService = globalDbDataCenterService;
         this.playerDriveService = playerDriveService;
+        this.slogService = slogService;
     }
 
     /** 选择角色 */
@@ -64,6 +71,8 @@ public class ReqChooseRoleHandler extends HoldRunApplication {
                 runApplication.executeMethodWithAnnotatedException(OnLogout.class, player);
             }
 
+            player.setClientData(clientSessionMapping.getClientParams());
+
             PlayerSnap playerSnap = globalDbDataCenterService.playerSnap(player.getUid());
             player.buildPlayerSnap(playerSnap);
 
@@ -81,6 +90,10 @@ public class ReqChooseRoleHandler extends HoldRunApplication {
             log.info("sid={}, {} 触发登录事件", sid, player);
             runApplication.executeMethodWithAnnotatedException(OnLogin.class, player, 1, 1);
             log.info("sid={}, {} 选择角色成功", sid, player);
+
+            RoleLoginLog roleLoginLog = new RoleLoginLog(player, clientSessionMapping.getClientIp(), JSON.toJSONString(clientSessionMapping.getClientParams()));
+            slogService.addLog(roleLoginLog);
+
         });
     }
 

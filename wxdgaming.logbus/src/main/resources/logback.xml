@@ -1,0 +1,96 @@
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
+<configuration debug="false" scan="true" scanPeriod="5 seconds">
+    <!--关闭自身日志-->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+    <property name="LOG_PATH" value="target/logs"/>
+    <property name="LOG_PATTERN_CONSOLE"
+              value="%red([%d{MM-dd HH:mm:ss:SSS}]) %green([%thread]) %highlight([%-5level]) %boldMagenta([%C{0}#%M:%-3L]) - %msg%n"/>
+    <property name="LOG_PATTERN" value="[%d{MM-dd HH:mm:ss:SSS}][%thread][%-5level][%logger#%M:%-3L] - %msg%n"/>
+
+    <!-- 日志记录器，日期滚动记录 -->
+    <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 正在记录的日志文件的路径及文件名 -->
+        <file>${LOG_PATH}/app.log</file>
+        <!-- 追加方式记录日志 -->
+        <append>true</append>
+        <!-- 日志文件的格式 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+        <!-- 过滤重设时间，一般是当调试服务器或者调试活动的时候手动改时间需要触发 -->
+        <filter class="ch.qos.logback.core.LogbackResetTimeFilter">
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <!--  这个狗东西必须放后面 否则不生效-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/logback/app-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>20</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- 日志记录器，日期滚动记录 -->
+    <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 正在记录的日志文件的路径及文件名 -->
+        <file>${LOG_PATH}/error.log</file>
+        <!-- 追加方式记录日志 -->
+        <append>true</append>
+        <!-- 日志文件的格式 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+        <!-- 此日志文件只记录info级别的 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>error</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <!-- 日志记录器的滚动策略，按日期记录 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/logback/error-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>20</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <!--encoder 默认配置为PatternLayoutEncoder-->
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNC-FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 0表示不丢失日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 设置日志事件的最大队列长度 -->
+        <queueSize>512</queueSize>
+        <!-- 添加真正的日志appender -->
+        <appender-ref ref="file_info"/>
+        <!-- 如果为true，logback对日志封装的事件中将包含更多调用者和父线程的信息，将降低性能。默认为false -->
+        <includeCallerData>false</includeCallerData>
+        <!-- 设置队列入队时非阻塞，当队列满时会直接丢弃日志，但是对性能提升极大 -->
+        <neverBlock>true</neverBlock>
+    </appender>
+
+    <logger name="io.netty" level="INFO" additivity="true"/>
+    <logger name="io.undertow" level="INFO" additivity="true"/>
+    <logger name="org.apache.hc.client5" level="INFO" additivity="true"/>
+    <logger name="com.zaxxer.hikari" level="INFO" additivity="true"/>
+    <logger name="io.lettuce" level="INFO" additivity="true"/>
+    <logger name="org.jboss" level="INFO" additivity="true"/>
+    <logger name="reactor.util" level="INFO" additivity="true"/>
+    <logger name="org.hibernate" level="INFO" additivity="true"/>
+    <logger name="org.xnio" level="info" additivity="true"/>
+    <logger name="org.springframework" level="info" additivity="true"/>
+
+    <!-- 生产环境下，将此级别配置为适合的级别，以免日志文件太多或影响程序性能 -->
+    <root level="DEBUG"> <!-- ERROR, WARN, INFO, DEBUG -->
+        <appender-ref ref="file_info"/>
+        <appender-ref ref="file_error"/>
+        <!-- 生产环境将请stdout,testfile去掉 -->
+        <appender-ref ref="console"/>
+    </root>
+
+</configuration>

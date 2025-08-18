@@ -1,6 +1,8 @@
 package  wxdgaming.game.message.role;
 
 import io.protostuff.Tag;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,7 +21,9 @@ import wxdgaming.game.message.global.*;
 @Setter
 @Accessors(chain = true)
 @Comment("心跳包响应")
-public class ResHeartbeat extends PojoBase {
+public class ResHeartbeat extends PojoBase implements Serializable {
+
+    @Serial private static final long serialVersionUID = 1L;
 
     /** 消息ID */
     public static int _msgId() {

@@ -1,4 +1,8 @@
-html, body {width: 100%;height: 100%;overflow: hidden;font-size: 12px;}
+html, body {
+    width: 100%;height: 100%;overflow: hidden;font-size: 12px;
+    font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    min-width: 1400px;
+}
 
 html, body, div, table, thead, tbody, tr, th, td, a, object, iframe, h1, h3, ul, li, dt, dl, label, span, strong, select, input, button {
     padding: 0;margin: 0;border: 0;box-sizing: border-box;border-collapse: collapse;border-spacing: 0;
@@ -111,5 +115,7 @@ a:hover, a:active { color: #33be85; }
 .upload_file_bg .upload_file_c .upload_file_c_b { position: absolute;bottom: 15px;right: 30px; }
 
 .btn_box input, .btn_box select {margin-top: 5px;margin-left: 10px;width: 160px;height: 22px;line-height: 22px;border: #4c4c4c 1px solid;border-radius: 5px;}
+
+.btn_box input[type=button] {width: auto;padding-left: 5px;padding-right: 5px;}
 
 .btn_box button {margin-top: 5px;color: rgb(255, 253, 253); background-color: rgb(241, 52, 10); border: none;padding: 8px 15px;}

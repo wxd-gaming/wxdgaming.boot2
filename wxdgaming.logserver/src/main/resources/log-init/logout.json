@@ -1,0 +1,28 @@
+{
+  "logName": "logout",
+  "logComment": "登出日志",
+  "sort": "1-2",
+  "partition": true,
+  "fieldList": [
+    {
+      "fieldName": "uid",
+      "fieldComment": "UID",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "createTime",
+      "fieldComment": "日期",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "openId",
+      "fieldComment": "账号Id",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "account",
+      "fieldComment": "账号",
+      "fieldType": "string"
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script charset="utf-8" type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script charset="utf-8" type="text/javascript" src="/js/com.wxd.js"></script>
+    <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
+    <title>nav</title>
+    <style>
+        html, body, ul, li, label, span {border: 0;margin: 0;padding: 0;box-sizing: border-box;}
+
+        html, body {
+            display: block;overflow: hidden;width: 100%;height: 100%;
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            color: #535252;
+        }
+
+        ul, li {width: 100%;}
+
+        li {cursor: pointer;}
+
+        .title_one {height: 32px;line-height: 28px;padding-left: 3px;}
+
+        .title_one.check {background-color: #1a78d6;}
+
+        .title_one:hover {background-color: #1a78d6;}
+
+        /*.title_one {border-bottom: 1px solid #888888;}*/
+
+        .title_sub_box {border: 1px solid #888888;border-right: 0;}
+
+        .title_sub {font-size: 12px;}
+
+        .title_sub li {padding-left: 12px;height: 26px;line-height: 22px;}
+
+        .title_sub li.check {background-color: #cf7e47;height: 32px;line-height: 32px;}
+
+        .title_sub li:hover {background-color: #cf7e47;height: 32px;line-height: 32px;}
+    </style>
+    <script>
+        function selectNav(self) {
+            // 移除所有 title_one 的 check 类，然后给当前元素添加 check 类
+            $(".title_one").removeClass("check");
+            $(self).addClass("check");
+            let next = $(self).next("li");
+            $(".title_sub_box").each(function () {
+                if (this === next[0]) {
+                    $(this).slideDown(500);
+                    return;
+                }
+                $(this).slideUp(200);
+            });
+        }
+
+        function selectNav2(self, url) {
+            $(".title_sub li").removeClass("check");
+            $(self).addClass("check");
+            window.parent.changeContent(url);
+        }
+
+        $(() => {
+            let url = "/api/log/nav";
+            wxd.netty.post(url, "", (response) => {
+                if (response.code === 1) {
+                    let data = response.data;
+                    for (let i = 0; i < data.length; i++) {
+                        let item = data[i];
+
+                        let l = `<li onclick="selectNav2(this, 'log-table.html?tableName=${item.name}')">${item.comment}</li>`;
+
+                        $(".log_nav").append(l);
+                    }
+                }
+            });
+        });
+
+    </script>
+</head>
+<body>
+<ul>
+    <li style="height: 80px;">
+        Admin
+    </li>
+</ul>
+<ul>
+    <li class="title_one check" onclick="selectNav(this)">xxxx 1</li>
+    <li class="title_sub_box">
+        <ul class="title_sub">
+            <li onclick="selectNav2(this)">登录日志</li>
+            <li onclick="selectNav2(this)">充值日志</li>
+            <li onclick="selectNav2(this)">充值日志</li>
+            <li onclick="selectNav2(this)">充值日志</li>
+            <li onclick="selectNav2(this)">充值日志</li>
+            <li onclick="selectNav2(this)">充值日志</li>
+        </ul>
+    </li>
+</ul>
+<ul>
+    <li class="title_one" onclick="selectNav(this)">日志系统</li>
+    <li class="title_sub_box" style="display: none;">
+        <ul class="title_sub log_nav"></ul>
+    </li>
+</ul>
+<ul>
+    <li class="title_one" onclick="selectNav(this)">日志系统</li>
+    <li class="title_sub_box" style="display: none;">
+        <ul class="title_sub">
+            <li onclick="selectNav2(this)">登录日志</li>
+            <li onclick="selectNav2(this)">充值日志</li>
+            <li onclick="selectNav2(this)">充值日志</li>
+            <li onclick="selectNav2(this)">充值日志</li>
+            <li onclick="selectNav2(this)">充值日志</li>
+            <li onclick="selectNav2(this)">充值日志</li>
+            <li onclick="selectNav2(this)">充值日志</li>
+        </ul>
+    </li>
+</ul>
+</body>
+</html>

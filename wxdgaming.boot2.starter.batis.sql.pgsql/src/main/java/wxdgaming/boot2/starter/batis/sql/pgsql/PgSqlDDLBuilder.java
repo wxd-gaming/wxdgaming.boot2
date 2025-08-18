@@ -63,6 +63,9 @@ public class PgSqlDDLBuilder extends SqlDDLBuilder {
             case Json -> {
                 columnDefinition = "JSON";
             }
+            case Jsonb -> {
+                columnDefinition = "JSONB";
+            }
             case null, default -> {
                 throw new RuntimeException("无法处理的数据库类型 " + columnType);
             }
@@ -75,13 +78,18 @@ public class PgSqlDDLBuilder extends SqlDDLBuilder {
 
     @Override public String buildAlterColumnIndex(String tableName, TableMapping.FieldMapping fieldMapping) {
         String columnName = fieldMapping.getColumnName();
-        return "CREATE INDEX \"%s_%s\" ON \"%s\" (\"%s\");".formatted(tableName, columnName, tableName, columnName);
+        if (fieldMapping.getColumnType() == ColumnType.Json || fieldMapping.getColumnType() == ColumnType.Jsonb) {
+            return "CREATE INDEX \"%s_%s\" ON \"%s\" USING gin(\"%s\");".formatted(tableName, columnName, tableName, columnName);
+        } else {
+            return "CREATE INDEX \"%s_%s\" ON \"%s\" (\"%s\");".formatted(tableName, columnName, tableName, columnName);
+        }
     }
 
     /** pgsql 如果字段是json的 ? => ?::json */
     @Override public String build$$(TableMapping.FieldMapping fieldMapping) {
         return switch (fieldMapping.getColumnType()) {
             case Json -> "?::json";
+            case Jsonb -> "?::jsonb";
             case Byte, Short -> "?::int2";
             case null, default -> super.build$$(fieldMapping);
         };

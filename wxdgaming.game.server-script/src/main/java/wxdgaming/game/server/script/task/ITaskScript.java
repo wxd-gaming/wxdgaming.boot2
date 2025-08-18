@@ -7,7 +7,7 @@ import wxdgaming.boot2.core.collection.ListOf;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.bean.goods.ItemCfg;
-import wxdgaming.game.bean.goods.BagChangeArgs4ItemCfg;
+import wxdgaming.game.bean.goods.BagChangeDTO4ItemCfg;
 import wxdgaming.game.cfg.QTaskTable;
 import wxdgaming.game.cfg.bean.QTask;
 import wxdgaming.game.core.Reason;
@@ -104,7 +104,7 @@ public abstract class ITaskScript extends HoldRunApplication {
         }
         ReasonArgs reasonArgs = ReasonArgs.of(Reason.TASK_ACCEPT, "taskCfg=" + taskId);
         if (!ListOf.isEmpty(qTask.getAcceptCost())) {
-            BagChangeArgs4ItemCfg changeArgs4ItemCfg = BagChangeArgs4ItemCfg.builder()
+            BagChangeDTO4ItemCfg changeArgs4ItemCfg = BagChangeDTO4ItemCfg.builder()
                     .setItemCfgList(qTask.getAcceptCost())
                     .setReasonArgs(reasonArgs)
                     .build();
@@ -143,7 +143,7 @@ public abstract class ITaskScript extends HoldRunApplication {
         ReasonArgs reasonArgs = ReasonArgs.of(Reason.TASK_SUBMIT, "taskCfg=" + taskId);
 
         if (!ListOf.isEmpty(qTask.getSubmitCost())) {
-            BagChangeArgs4ItemCfg changeArgs4ItemCfg = BagChangeArgs4ItemCfg.builder()
+            BagChangeDTO4ItemCfg changeArgs4ItemCfg = BagChangeDTO4ItemCfg.builder()
                     .setItemCfgList(qTask.getSubmitCost())
                     .setReasonArgs(reasonArgs)
                     .build();
@@ -155,7 +155,7 @@ public abstract class ITaskScript extends HoldRunApplication {
 
         List<ItemCfg> rewards = qTask.getRewards();
 
-        BagChangeArgs4ItemCfg rewardArgs4ItemCfg = BagChangeArgs4ItemCfg.builder()
+        BagChangeDTO4ItemCfg rewardArgs4ItemCfg = BagChangeDTO4ItemCfg.builder()
                 .setItemCfgList(rewards)
                 .setBagErrorNoticeClient(true)
                 .setBagFullSendMail(false)

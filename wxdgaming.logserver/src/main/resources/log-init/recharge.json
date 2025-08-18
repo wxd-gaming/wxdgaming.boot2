@@ -1,0 +1,48 @@
+{
+  "logName": "recharge",
+  "logComment": "充值日志",
+  "sort": "2-1",
+  "partition": true,
+  "fieldList": [
+    {
+      "fieldName": "uid",
+      "fieldComment": "UID",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "createTime",
+      "fieldComment": "日期",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "sid",
+      "fieldComment": "区服",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "openId",
+      "fieldComment": "账号Id",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "account",
+      "fieldComment": "账号",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "spOrderId",
+      "fieldComment": "平台订单",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "cpOrderId",
+      "fieldComment": "研发订单",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "money",
+      "fieldComment": "金额",
+      "fieldType": "int"
+    }
+  ]
+}

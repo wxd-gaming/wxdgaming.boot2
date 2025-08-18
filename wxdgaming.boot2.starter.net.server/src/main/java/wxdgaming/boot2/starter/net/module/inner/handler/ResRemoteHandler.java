@@ -8,8 +8,8 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
-import wxdgaming.boot2.starter.net.module.inner.RpcService;
-import wxdgaming.boot2.starter.net.module.inner.message.ResRemote;
+import wxdgaming.boot2.starter.net.message.inner.ResRemote;
+import wxdgaming.boot2.starter.net.module.rpc.RpcService;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;

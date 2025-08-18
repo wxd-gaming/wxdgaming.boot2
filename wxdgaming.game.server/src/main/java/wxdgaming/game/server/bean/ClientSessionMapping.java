@@ -7,9 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
+import wxdgaming.game.message.global.MapBean;
 import wxdgaming.game.message.inner.InnerForwardMessage;
 import wxdgaming.game.server.bean.role.Player;
 
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
 /**
@@ -31,8 +33,10 @@ public class ClientSessionMapping extends ObjectBase {
     private int sid;
     private String account;
     private int appId;
+    private String clientIp;
     private String platform;
     private String platformUserId;
+    private ArrayList<MapBean> clientParams = new ArrayList<>();
     private long rid;
 
     public void forwardMessage(Player player, PojoBase message) {

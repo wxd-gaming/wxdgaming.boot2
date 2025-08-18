@@ -90,7 +90,7 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
                     columnDefinition = "LONGBLOB";
                 }
             }
-            case Json -> {
+            case Json , Jsonb-> {
                 columnDefinition = "JSON";
             }
             case null, default -> {

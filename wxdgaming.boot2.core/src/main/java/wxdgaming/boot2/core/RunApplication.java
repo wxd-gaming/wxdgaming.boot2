@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Qualifier;
 import wxdgaming.boot2.core.ann.Shutdown;
 import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.reflect.GuiceBeanProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.core.util.GlobalUtil;
@@ -86,6 +87,7 @@ public abstract class RunApplication {
                         log.error("关闭异常: {}", closeable.getClass(), e);
                     }
                 });
+        ExecutorFactory.getExecutorMonitor().getExit().set(true);
     }
 
     void allBindings(Injector context, Map<Key<?>, Binding<?>> allBindings) {

@@ -1,15 +1,10 @@
 package wxdgaming.game.global.bean.role;
 
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.starter.batis.EntityLongUID;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
 import wxdgaming.game.bean.Vector3D;
-import wxdgaming.game.bean.mail.MailPack;
-import wxdgaming.game.bean.vip.VipInfo;
-
-import java.util.Vector;
 
 /**
  * 玩家快照
@@ -23,6 +18,7 @@ import java.util.Vector;
 public class PlayerSnap extends EntityLongUID {
 
     private int sid;
+    private String platform;
     private String account;
     private String name;
     private int level;

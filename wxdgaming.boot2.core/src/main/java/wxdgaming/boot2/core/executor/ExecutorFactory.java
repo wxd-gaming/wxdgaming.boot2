@@ -113,4 +113,8 @@ public class ExecutorFactory {
         check();
         return EXECUTOR_SERVICE_VIRTUAL;
     }
+
+    public static ExecutorMonitor getExecutorMonitor() {
+        return EXECUTOR_MONITOR;
+    }
 }

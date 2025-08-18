@@ -25,9 +25,11 @@ import wxdgaming.game.server.event.OnLoginBefore;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.bag.cost.CostScript;
 import wxdgaming.game.server.script.bag.gain.GainScript;
+import wxdgaming.game.server.script.bag.log.ItemLog;
 import wxdgaming.game.server.script.bag.use.UseItemAction;
 import wxdgaming.game.server.script.mail.MailService;
 import wxdgaming.game.server.script.tips.TipsService;
+import wxdgaming.game.slog.SlogService;
 
 import java.util.*;
 
@@ -49,13 +51,15 @@ public class BagService extends HoldRunApplication implements InitPrint {
     final TipsService tipsService;
     final DataRepository dataRepository;
     final MailService mailService;
+    final SlogService slogService;
 
     @Inject
-    public BagService(DataCenterService dataCenterService, TipsService tipsService, DataRepository dataRepository, MailService mailService) {
+    public BagService(DataCenterService dataCenterService, TipsService tipsService, DataRepository dataRepository, MailService mailService, SlogService slogService) {
         this.dataCenterService = dataCenterService;
         this.tipsService = tipsService;
         this.dataRepository = dataRepository;
         this.mailService = mailService;
+        this.slogService = slogService;
     }
 
     @Init
@@ -130,59 +134,69 @@ public class BagService extends HoldRunApplication implements InitPrint {
     }
 
     /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
-    public boolean gainItemCfg(Player player, BagChangeArgs4ItemCfg rewardArgs4ItemCfg) {
+    public boolean gainItemCfg(Player player, BagChangeDTO4ItemCfg rewardArgs4ItemCfg) {
         List<Item> items = newItems(rewardArgs4ItemCfg.getItemCfgList());
         return _gainItems(player, rewardArgs4ItemCfg, items);
     }
 
     /** 默认是往背包添加 */
-    public boolean gainItems(Player player, BagChangeArgs4Item changeArgs4Item) {
+    public boolean gainItems(Player player, BagChangeDTO4Item changeArgs4Item) {
         return _gainItems(player, changeArgs4Item, changeArgs4Item.getItemList());
     }
 
-    private boolean _gainItems(Player player, BagChangeArgs bagChangeArgs, List<Item> items) {
-        BagType bagType = bagChangeArgs.getBagType();
+    private boolean _gainItems(Player player, BagChangeDTO bagChangeDTO, List<Item> items) {
+        BagType bagType = bagChangeDTO.getBagType();
         ItemBag itemBag = player.getBagPack().itemBag(bagType);
-        if (!bagChangeArgs.isBagFullSendMail()) {
+        if (!bagChangeDTO.isBagFullSendMail()) {
             if (itemBag.freeGrid() < items.size()) {
                 if (log.isInfoEnabled()) {
                     log.info(
                             "添加道具背包空间不足 {} 背包空间：{} 需要格子数：{}, {}",
-                            player, itemBag.freeGrid(), items.size(), bagChangeArgs.getReasonArgs()
+                            player, itemBag.freeGrid(), items.size(), bagChangeDTO.getReasonArgs()
                     );
                 }
-                if (bagChangeArgs.isBagErrorNoticeClient()) {
+                if (bagChangeDTO.isBagErrorNoticeClient()) {
                     tipsService.tips(player, "背包已满");
                 }
                 return false;/* TODO 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
             }
         }
         Iterator<Item> iterator = items.iterator();
-        BagChangesContext bagChangesContext = new BagChangesContext(player, bagType, itemBag, bagChangeArgs.getReasonArgs());
+        BagChangesContext bagChangesContext = new BagChangesContext(player, bagType, itemBag, bagChangeDTO.getReasonArgs());
         while (iterator.hasNext()) {
             Item newItem = iterator.next();
 
             if (itemBag.checkFull()) break; /* TODO 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
 
-            QItem qItem = dataRepository.dataTable(QItemTable.class, newItem.getCfgId());
+            int cfgId = newItem.getCfgId();
+            QItem qItem = dataRepository.dataTable(QItemTable.class, cfgId);
             int type = qItem.getItemType();
             int subtype = qItem.getItemSubType();
 
             GainScript gainScript = gainScriptProvider.getScript(type, subtype);
 
-            long oldCount = gainScript.getCount(player, itemBag, newItem.getCfgId());
+            long oldCount = gainScript.getCount(player, itemBag, cfgId);
             long change = newItem.getCount();
             AssertUtil.assertTrue(change >= 0, "添加数量不能是负数");
 
             boolean gain = gainScript.gain(bagChangesContext, newItem);
 
             if (gain || newItem.getCount() != change) {
-                long newCount = gainScript.getCount(player, itemBag, newItem.getCfgId());
+                long newCount = gainScript.getCount(player, itemBag, cfgId);
                 if (!gain) {
                     /*表示叠加之后，剩余的东西没办法入包，需要发邮件*/
                     change -= newItem.getCount();
                 }
-                log.info("获得道具：{}, {}, {} {}+{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeArgs);
+                log.info("获得道具：{}, {}, {} {}+{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeDTO);
+
+                ItemLog itemLog = new ItemLog(player, bagType.name(),
+                        "获得",
+                        cfgId, qItem.getName(),
+                        oldCount, change, newCount,
+                        bagChangeDTO.getReasonArgs().getReason().name(),
+                        bagChangeDTO.getReasonArgs().getReasonText()
+                );
+                slogService.addLog(itemLog);
             }
 
             if (gain) {
@@ -197,13 +211,13 @@ public class BagService extends HoldRunApplication implements InitPrint {
 
         /* TODO 发送邮件 */
         if (!items.isEmpty()) {
-            mailService.sendMail(player, "系统", "背包已满", "背包已满", List.of(), items, bagChangeArgs.toString());
+            mailService.sendMail(player, "系统", "背包已满", "背包已满", List.of(), items, bagChangeDTO.toString());
         }
         return true;
     }
 
     /** 在执行 cost 之前切记用这个 */
-    public boolean checkCost(Player player, BagChangeArgs4ItemCfg bagChangeArgs) {
+    public boolean checkCost(Player player, BagChangeDTO4ItemCfg bagChangeArgs) {
         BagType bagType = bagChangeArgs.getBagType();
         ItemBag itemBag = player.getBagPack().itemBag(bagType);
         HashMap<Integer, Long> costMap = new HashMap<>();
@@ -231,13 +245,13 @@ public class BagService extends HoldRunApplication implements InitPrint {
         return true;
     }
 
-    /** 调用之前请使用 {@link BagService#checkCost(Player, BagChangeArgs4ItemCfg)} 函数 是否够消耗 */
-    public void cost(Player player, BagChangeArgs4ItemCfg bagChangeArgs4ItemCfg) {
-        BagType bagType = bagChangeArgs4ItemCfg.getBagType();
+    /** 调用之前请使用 {@link BagService#checkCost(Player, BagChangeDTO4ItemCfg)} 函数 是否够消耗 */
+    public void cost(Player player, BagChangeDTO4ItemCfg bagChangeDTO) {
+        BagType bagType = bagChangeDTO.getBagType();
         ItemBag itemBag = player.getBagPack().itemBag(bagType);
-        BagChangesContext bagChangesContext = new BagChangesContext(player, bagType, itemBag, bagChangeArgs4ItemCfg.getReasonArgs());
+        BagChangesContext bagChangesContext = new BagChangesContext(player, bagType, itemBag, bagChangeDTO.getReasonArgs());
 
-        for (ItemCfg itemCfg : bagChangeArgs4ItemCfg.getItemCfgList()) {
+        for (ItemCfg itemCfg : bagChangeDTO.getItemCfgList()) {
             int cfgId = itemCfg.getCfgId();
             long change = itemCfg.getNum();
 
@@ -254,7 +268,17 @@ public class BagService extends HoldRunApplication implements InitPrint {
             costScript.cost(player, bagChangesContext, qItem, change);
             long newCount = gainScript.getCount(player, itemBag, cfgId);
 
-            log.info("消耗道具：{}, {}, {} {}-{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeArgs4ItemCfg.getReasonArgs());
+            log.info("消耗道具：{}, {}, {} {}-{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeDTO.getReasonArgs());
+
+            ItemLog itemLog = new ItemLog(player, bagType.name(),
+                    "消耗",
+                    cfgId, qItem.getName(),
+                    oldCount, change, newCount,
+                    bagChangeDTO.getReasonArgs().getReason().name(),
+                    bagChangeDTO.getReasonArgs().getReasonText()
+            );
+            slogService.addLog(itemLog);
+
         }
         player.write(bagChangesContext.toResUpdateBagInfo());
 

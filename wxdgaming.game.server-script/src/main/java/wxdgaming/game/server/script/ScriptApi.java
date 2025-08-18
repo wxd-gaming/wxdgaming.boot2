@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
-import wxdgaming.boot2.core.ann.Body;
-import wxdgaming.boot2.core.ann.Param;
+import wxdgaming.boot2.core.ann.RequestBody;
+import wxdgaming.boot2.core.ann.RequestParam;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.lang.RunResult;
@@ -23,15 +23,15 @@ import java.util.concurrent.locks.LockSupport;
  **/
 @Slf4j
 @Singleton
-@RequestMapping(path = "script")
+@RequestMapping(value = "script")
 public class ScriptApi {
 
     @HttpRequest()
     public String index(RunApplication runApplication,
                         @Value(path = "executor") ExecutorConfig executorConfig,
                         @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
-                        @Body(defaultValue = "1") String body,
-                        @Param(path = "b1", defaultValue = "2") int b1) {
+                        @RequestBody(defaultValue = "1") String body,
+                        @RequestParam(value = "b1", defaultValue = "2") int b1) {
         return "index";
     }
 
@@ -48,8 +48,8 @@ public class ScriptApi {
     public RunResult json(RunApplication runApplication,
                           @Value(path = "executor") ExecutorConfig executorConfig,
                           @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
-                          @Body(defaultValue = "1") String body,
-                          @Param(path = "b1", defaultValue = "2") String b1) {
+                          @RequestBody(defaultValue = "1") String body,
+                          @RequestParam(value = "b1", defaultValue = "2") String b1) {
         return RunResult.ok();
     }
 
@@ -57,13 +57,13 @@ public class ScriptApi {
     public String error(RunApplication runApplication,
                         @Value(path = "executor") ExecutorConfig executorConfig,
                         @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
-                        @Body(defaultValue = "1") String body,
-                        @Param(path = "b1", defaultValue = "2") String b1) {
+                        @RequestBody(defaultValue = "1") String body,
+                        @RequestParam(value = "b1", defaultValue = "2") String b1) {
         throw new RuntimeException("d");
     }
 
     @RpcRequest
-    public JSONObject rpcIndex(@Param(path = "a", defaultValue = "2") String a, JSONObject paramData) {
+    public JSONObject rpcIndex(@RequestParam(value = "a", defaultValue = "2") String a, JSONObject paramData) {
         log.info("{} {} {}", a, paramData, ThreadContext.context().queueName());
         return paramData;
     }

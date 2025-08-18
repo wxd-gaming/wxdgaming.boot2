@@ -139,8 +139,7 @@ public class JavassistBox {
                 ctClass.addMethod(method);
                 return this;
             } catch (Exception e) {
-
-                throw Throw.of(e);
+                throw Throw.of(methodStr, e);
             }
         }
 

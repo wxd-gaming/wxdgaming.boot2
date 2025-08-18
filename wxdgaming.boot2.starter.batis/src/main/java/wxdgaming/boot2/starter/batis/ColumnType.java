@@ -22,6 +22,7 @@ public enum ColumnType {
     String("字符串"),
     Blob("二进制"),
     Json("JSON"),
+    Jsonb("JSONB"),
     ;
 
     private final String comment;
