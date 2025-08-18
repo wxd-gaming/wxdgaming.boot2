@@ -13,8 +13,8 @@ import java.io.Serializable;
 /**
  * 流量统计
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2020-11-21 17:09
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2020-11-21 17:09
  **/
 @Getter
 @Setter

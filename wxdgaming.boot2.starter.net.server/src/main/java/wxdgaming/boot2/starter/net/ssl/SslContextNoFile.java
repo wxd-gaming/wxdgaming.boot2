@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 没有文件的ssl上下文实现
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-01-11 14:29
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-01-11 14:29
  **/
 public class SslContextNoFile implements Serializable {
 

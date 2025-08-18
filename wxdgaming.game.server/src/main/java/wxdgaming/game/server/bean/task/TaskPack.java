@@ -13,8 +13,8 @@ import java.util.HashMap;
 /**
  * 任务管理器 包装
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-15 17:03
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-15 17:03
  **/
 @Getter
 @Setter

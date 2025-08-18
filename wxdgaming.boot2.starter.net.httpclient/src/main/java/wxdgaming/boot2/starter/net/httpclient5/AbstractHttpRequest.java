@@ -23,8 +23,8 @@ import java.util.Map;
 /**
  * 请求
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-07-23 13:16
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-07-23 13:16
  **/
 @Slf4j
 @Getter

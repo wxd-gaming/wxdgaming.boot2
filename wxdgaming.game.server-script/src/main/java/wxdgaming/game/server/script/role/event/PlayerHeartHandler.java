@@ -7,8 +7,8 @@ import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.game.core.Reason;
-import wxdgaming.game.core.ReasonArgs;
+import wxdgaming.game.basic.core.Reason;
+import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.*;
 import wxdgaming.game.server.script.fight.FightService;
@@ -18,8 +18,8 @@ import java.util.concurrent.BlockingQueue;
 /**
  * 角色的心跳执行
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-08 13:26
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-08 13:26
  **/
 @Slf4j
 @Singleton
@@ -48,13 +48,13 @@ public class PlayerHeartHandler extends HoldRunApplication {
         }
     }
 
-    final ReasonArgs reasonArgs = ReasonArgs.of(Reason.Heart, "心跳回血");
+    final ReasonDTO reasonDTO = ReasonDTO.of(Reason.Heart, "心跳回血");
 
     @OnHeartSecond
     public void onHeartSecond(Player player, int second) {
         if (second % 10 == 0) {
             if (player.getHp() < player.maxHp()) {
-                fightService.changeHp(player, 10, reasonArgs);
+                fightService.changeHp(player, 10, reasonDTO);
             }
         }
         long millis = MyClock.millis();

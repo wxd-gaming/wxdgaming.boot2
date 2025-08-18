@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * excel to java code
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-10-08 19:49
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-10-08 19:49
  **/
 @Slf4j
 public class CreateJavaCode extends ICreateCode {

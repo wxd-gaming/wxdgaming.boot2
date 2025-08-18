@@ -11,8 +11,8 @@ import java.io.Serializable;
  * <p>因为无符号 所以每一秒的id最大值是52万
  * <p>hexId 取值范围 1 ~ 16500
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-09-24 15:08
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-09-24 15:08
  */
 public class HexId implements Serializable {
 

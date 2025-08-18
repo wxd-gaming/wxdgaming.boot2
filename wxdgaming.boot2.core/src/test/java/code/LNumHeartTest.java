@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * test
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-07-21 16:35
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-07-21 16:35
  **/
 public class LNumHeartTest {
 

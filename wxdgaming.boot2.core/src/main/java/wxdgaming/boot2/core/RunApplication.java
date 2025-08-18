@@ -25,8 +25,8 @@ import java.util.stream.Stream;
 /**
  * 运行类
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-14 16:55
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-14 16:55
  **/
 @Slf4j
 @Getter

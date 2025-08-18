@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.bean.goods.Item;
-import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.server.bean.bag.BagChangesContext;
@@ -23,8 +22,8 @@ import java.util.List;
 /**
  * 背包变更
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-22 19:14
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-22 19:14
  **/
 @Slf4j
 @Singleton
@@ -63,7 +62,7 @@ public class CostScript extends HoldRunApplication implements IBagScript {
                 if (hasNum <= count) {
                     log.info(
                             "背包变更：{}, {}, 道具扣除, 格子：{}, {}, {}, 从背包移除, {}",
-                            player, bagType, itemGrid.getGrid(), item.toName(), item.getCount(), bagChangesContext.getReasonArgs()
+                            player, bagType, itemGrid.getGrid(), item.toName(), item.getCount(), bagChangesContext.getReasonDTO()
                     );
                     itemBag.remove(itemGrid);
                     bagChangesContext.addDel(itemGrid);
@@ -74,7 +73,7 @@ public class CostScript extends HoldRunApplication implements IBagScript {
                     bagChangesContext.addChange(itemGrid);
                     log.info(
                             "背包变更：{}, {}, 道具扣除, 格子：{}, {}, {}-{}={}, {}",
-                            player, bagType, itemGrid.getGrid(), item.toName(), hasNum, count, item.getCount(), bagChangesContext.getReasonArgs()
+                            player, bagType, itemGrid.getGrid(), item.toName(), hasNum, count, item.getCount(), bagChangesContext.getReasonDTO()
                     );
                     count = 0;
                 }

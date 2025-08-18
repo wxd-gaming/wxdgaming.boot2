@@ -15,8 +15,8 @@ import java.util.Formatter;
  * <p>
  * 并发会导致输出混乱
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-01-12 15:02
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-01-12 15:02
  **/
 public class StreamWriter implements Closeable, AutoCloseable {
 

@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 /**
  * java log
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-03-04 09:18
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-03-04 09:18
  **/
 @Slf4j
 @Singleton

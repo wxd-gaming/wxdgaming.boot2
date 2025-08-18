@@ -8,8 +8,8 @@ import wxdgaming.game.server.bean.StatusConst;
 /**
  * 状态测试
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-15 19:56
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-15 19:56
  **/
 @Slf4j
 public class StatusConstTest {

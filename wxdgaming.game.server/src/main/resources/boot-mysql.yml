@@ -1,0 +1,27 @@
+db:
+  mysql:
+    debug: false                                                 #调试模式将会显示sql语句
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    url: "jdbc:mysql://10.28.0.26:3306/test_game"
+    username: "root"
+    password: "test"
+    scanPackage: "wxdgaming.game.server.bean"                   #扫描路径
+    connectionTimeoutMs: 2000                                 #链接超时单位毫秒
+    idleTimeoutM: 10                                          #空闲超时单位分钟
+    minPoolSize: 5                                            #最小连接数
+    maxPoolSize: 20                                           #最大连接数
+    batchSubmitSize: 500                                      #批量提交数量
+    batchThreadSize: 1                                        #批量提交线程数
+  mysql-second:
+    debug: false                                                 #调试模式将会显示sql语句
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    url: "jdbc:mysql://10.28.0.26:3306/test_game_global"
+    username: "root"
+    password: "test"
+    scanPackage: "wxdgaming.game.global.bean"                 #扫描路径
+    connectionTimeoutMs: 2000                                 #链接超时单位毫秒
+    idleTimeoutM: 10                                          #空闲超时单位分钟
+    minPoolSize: 5                                            #最小连接数
+    maxPoolSize: 20                                           #最大连接数
+    batchSubmitSize: 500                                      #批量提交数量
+    batchThreadSize: 1                                        #批量提交线程数

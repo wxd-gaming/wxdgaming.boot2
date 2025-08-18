@@ -9,8 +9,8 @@ import java.util.Map;
 /**
  * 属性类型
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-03-23 18:23
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-03-23 18:23
  **/
 @Getter
 public enum AttrType {

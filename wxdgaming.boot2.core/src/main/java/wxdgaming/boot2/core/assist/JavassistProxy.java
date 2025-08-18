@@ -9,8 +9,8 @@ import java.lang.reflect.Method;
 /**
  * assist asm 的代理类
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-03 17:26
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-03 17:26
  **/
 @Slf4j
 @Getter

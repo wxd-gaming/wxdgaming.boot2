@@ -8,8 +8,8 @@ import java.util.*;
 
 /***
  * 读取方法
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2023-10-20 15:29
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2023-10-20 15:29
  */
 @Slf4j
 public class MethodUtil {

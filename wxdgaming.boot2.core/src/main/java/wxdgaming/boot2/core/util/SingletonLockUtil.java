@@ -10,8 +10,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * 重入锁,单例锁
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-12-15 20:54
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-12-15 20:54
  **/
 public class SingletonLockUtil {
 

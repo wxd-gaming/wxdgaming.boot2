@@ -12,8 +12,8 @@ import java.util.Map;
 /**
  * excel 构建 活动, src/main/cfg/活动.xlsx, q_activity,
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-05 10:08:09
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-05 10:08:09
  **/
 @Getter
 public class QActivityTable extends DataTable<QActivity> implements Serializable {

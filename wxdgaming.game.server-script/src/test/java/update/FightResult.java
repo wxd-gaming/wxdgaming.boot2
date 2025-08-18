@@ -10,8 +10,8 @@ import java.util.List;
 /**
  * 战斗结果
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-25 17:00
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-25 17:00
  **/
 @Getter
 @Setter

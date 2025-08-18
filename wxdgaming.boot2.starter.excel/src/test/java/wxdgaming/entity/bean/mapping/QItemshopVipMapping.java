@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * excel 构建 vip礼包, src/main/resources/范例.xlsx, q_itemshop_vip,
  *
- * @author: wxd-gaming(無心道, 15388152619)
+ * @author wxd-gaming(無心道, 15388152619)
  **/
 @Getter
 @Setter

@@ -1,11 +1,12 @@
-debug: true
-gid: 1
-sid: 1
-sname: "日志服"
-serverType: 1
+boot:
+  debug: true
+  gid: 1
+  sid: 1
+  name: "日志服"
+  jwtKey: "wert23"
 
 profiles:
-  active: [socket,pgdb]
+  active: [ socket,pgsql ]
 
 executor:
   basic:

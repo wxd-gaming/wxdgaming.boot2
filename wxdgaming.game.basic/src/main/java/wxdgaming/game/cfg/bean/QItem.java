@@ -13,8 +13,8 @@ import java.util.Map;
 /**
  * excel 构建 任务集合, src/cfg/道具.xlsx, q_item,
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-09 15:05:31
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-09 15:05:31
  **/
 @Getter
 public class QItem extends QItemMapping implements Serializable, DataChecked {

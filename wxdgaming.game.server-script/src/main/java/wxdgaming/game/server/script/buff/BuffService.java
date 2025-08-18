@@ -14,8 +14,8 @@ import wxdgaming.game.bean.buff.BuffType;
 import wxdgaming.game.bean.buff.BuffTypeConst;
 import wxdgaming.game.cfg.QBuffTable;
 import wxdgaming.game.cfg.bean.QBuff;
-import wxdgaming.game.core.Reason;
-import wxdgaming.game.core.ReasonArgs;
+import wxdgaming.game.basic.core.Reason;
+import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.buff.Buff;
 import wxdgaming.game.server.bean.role.Player;
@@ -34,8 +34,8 @@ import java.util.stream.Stream;
 /**
  * buff管理
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-08 10:16
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-08 10:16
  **/
 @Slf4j
 @Singleton
@@ -68,8 +68,8 @@ public class BuffService extends HoldRunApplication {
     @OnHeartMinute
     public void onHeartMinuteBuffActionTest(MapNpc mapNpc, long mill) {
 
-        addBuff(mapNpc, mapNpc, 2, 1, ReasonArgs.of(Reason.GM));
-        addBuff(mapNpc, mapNpc, 3, 1, ReasonArgs.of(Reason.GM));
+        addBuff(mapNpc, mapNpc, 2, 1, ReasonDTO.of(Reason.GM));
+        addBuff(mapNpc, mapNpc, 3, 1, ReasonDTO.of(Reason.GM));
     }
 
     @OnHeart
@@ -120,11 +120,11 @@ public class BuffService extends HoldRunApplication {
     /** 触发属性计算 */
     public void executeAttrCalculator(MapNpc mapNpc) {
         CalculatorType[] calculatorTypes = {CalculatorType.BUFF};
-        ReasonArgs reasonArgs = ReasonArgs.of(Reason.Buff);
+        ReasonDTO reasonDTO = ReasonDTO.of(Reason.Buff);
         if (mapNpc instanceof Player player) {
-            playerAttributeService.onPlayerAttributeCalculator(player, calculatorTypes, reasonArgs);
+            playerAttributeService.onPlayerAttributeCalculator(player, calculatorTypes, reasonDTO);
         } else {
-            npcAttributeService.onNpcAttributeCalculator(mapNpc, calculatorTypes, reasonArgs);
+            npcAttributeService.onNpcAttributeCalculator(mapNpc, calculatorTypes, reasonDTO);
         }
     }
 
@@ -146,19 +146,19 @@ public class BuffService extends HoldRunApplication {
         }
     }
 
-    public void addBuff(MapNpc sender, MapNpc targetMapNpc, int buffCfgId, int lv, ReasonArgs reasonArgs) {
+    public void addBuff(MapNpc sender, MapNpc targetMapNpc, int buffCfgId, int lv, ReasonDTO reasonDTO) {
         QBuffTable qBuffTable = DataRepository.getIns().dataTable(QBuffTable.class);
         QBuff qBuff = qBuffTable.getIdLvTable().get(buffCfgId, lv);
-        addBuff(sender, targetMapNpc, qBuff, reasonArgs);
+        addBuff(sender, targetMapNpc, qBuff, reasonDTO);
     }
 
-    public void addBuff(MapNpc sender, MapNpc targetMapNpc, int buffId, ReasonArgs reasonArgs) {
+    public void addBuff(MapNpc sender, MapNpc targetMapNpc, int buffId, ReasonDTO reasonDTO) {
         QBuff qBuff = DataRepository.getIns().dataTable(QBuffTable.class, buffId);
-        addBuff(sender, targetMapNpc, qBuff, reasonArgs);
+        addBuff(sender, targetMapNpc, qBuff, reasonDTO);
     }
 
 
-    public void addBuff(MapNpc sender, MapNpc targetMapNpc, QBuff qbuff, ReasonArgs reasonArgs) {
+    public void addBuff(MapNpc sender, MapNpc targetMapNpc, QBuff qbuff, ReasonDTO reasonDTO) {
         ArrayList<Buff> buffs = targetMapNpc.getBuffs();
         Buff oldBuff = null;
         for (Buff buff : buffs) {
@@ -169,21 +169,21 @@ public class BuffService extends HoldRunApplication {
         }
         int addType = qbuff.getAddType();
         if (addType == 1 && oldBuff != null) {
-            log.debug("添加buff {}, 已有相同的buff {} 忽略 {}", targetMapNpc, oldBuff, reasonArgs);
+            log.debug("添加buff {}, 已有相同的buff {} 忽略 {}", targetMapNpc, oldBuff, reasonDTO);
             return;
         }
 
         if (addType == 2 && oldBuff != null) {
             Tuple2<Long, Long> tuple2 = new Tuple2<>(MyClock.millis(), MyClock.millis() + qbuff.getDuration());
             oldBuff.getTimeList().add(tuple2);
-            log.debug("添加buff {}, 已有相同的buff {} 叠加 {}, {}", targetMapNpc, oldBuff, tuple2, reasonArgs);
+            log.debug("添加buff {}, 已有相同的buff {} 叠加 {}, {}", targetMapNpc, oldBuff, tuple2, reasonDTO);
             return;
         }
 
         if (oldBuff != null) {
             buffs.remove(oldBuff);
             onRemoveBuff(targetMapNpc, oldBuff);
-            log.debug("添加buff {}, 已有相同的buff {} -> {} 移除 {}", targetMapNpc, qbuff.getId(), oldBuff, reasonArgs);
+            log.debug("添加buff {}, 已有相同的buff {} -> {} 移除 {}", targetMapNpc, qbuff.getId(), oldBuff, reasonDTO);
         }
 
         if (qbuff.getClearBuffIdList() != null) {
@@ -195,7 +195,7 @@ public class BuffService extends HoldRunApplication {
                     if (buff.getBuffCfgId() == clearBuffId) {
                         iterator.remove();
                         onRemoveBuff(targetMapNpc, buff);
-                        log.debug("添加buff {}, 移除已有的buffId {} -> {} 添加 {}", targetMapNpc, qbuff.getId(), buff, reasonArgs);
+                        log.debug("添加buff {}, 移除已有的buffId {} -> {} 添加 {}", targetMapNpc, qbuff.getId(), buff, reasonDTO);
                     }
                 }
             }
@@ -210,7 +210,7 @@ public class BuffService extends HoldRunApplication {
                     if (buff.qBuff().getBuffGroup() == clearGroup) {
                         iterator.remove();
                         onRemoveBuff(targetMapNpc, buff);
-                        log.debug("添加buff {}, 移除已有的buffGroup {} -> {} 添加 {}", targetMapNpc, qbuff.getId(), buff, reasonArgs);
+                        log.debug("添加buff {}, 移除已有的buffGroup {} -> {} 添加 {}", targetMapNpc, qbuff.getId(), buff, reasonDTO);
                     }
                 }
             }
@@ -233,7 +233,7 @@ public class BuffService extends HoldRunApplication {
         }
 
         if (qbuff.getDuration() < 100) {
-            log.debug("添加buff {}, {}, buff持续时间过小，视为一次性buff ,{}", targetMapNpc, newBuff, reasonArgs);
+            log.debug("添加buff {}, {}, buff持续时间过小，视为一次性buff ,{}", targetMapNpc, newBuff, reasonDTO);
             return;
         }
 
@@ -242,7 +242,7 @@ public class BuffService extends HoldRunApplication {
         if (qbuff.getBuffType() == BuffTypeConst.ChangeAttr) {
             executeAttrCalculator(targetMapNpc);
         }
-        log.debug("添加buff {}, {}, {}", targetMapNpc, newBuff, reasonArgs);
+        log.debug("添加buff {}, {}, {}", targetMapNpc, newBuff, reasonDTO);
     }
 
     public void onAddBuff(MapNpc mapNpc, Buff buff) {

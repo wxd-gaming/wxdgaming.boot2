@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 /**
  * 数据对象合并
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2020-07-29 10:33
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2020-07-29 10:33
  */
 public class Objects {
 
@@ -130,8 +130,8 @@ public class Objects {
      * @param ats 待合并数组
      * @param <T> 对象
      * @return 返回新数组
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-03-20 14:45
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2025-03-20 14:45
      */
     public static <T> T[] merge(T[] ts, T... ats) {
         T[] ts1 = Arrays.copyOf(ts, ts.length + ats.length);

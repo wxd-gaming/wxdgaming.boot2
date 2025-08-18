@@ -22,8 +22,8 @@ import java.util.Map;
 /**
  * 多段式
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-07-23 16:35
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-07-23 16:35
  **/
 @Slf4j
 @Getter

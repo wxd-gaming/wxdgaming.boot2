@@ -6,8 +6,8 @@ import wxdgaming.game.server.bean.role.RoleEntity;
 /**
  * 获取player对象
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-18 19:42
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-18 19:42
  **/
 public interface GetPlayerStrategy {
 

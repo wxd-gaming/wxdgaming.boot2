@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * excel 构建 怪物表, src/main/cfg/怪物信息.xlsx, q_monster,
  *
- * @author: wxd-gaming(無心道, 15388152619)
+ * @author wxd-gaming(無心道, 15388152619)
  **/
 @Getter
 @Setter

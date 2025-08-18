@@ -6,12 +6,13 @@ import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.collection.ListOf;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
-import wxdgaming.game.bean.goods.ItemCfg;
+import wxdgaming.game.basic.core.Reason;
+import wxdgaming.game.basic.core.ReasonDTO;
+import wxdgaming.game.basic.slog.SlogService;
 import wxdgaming.game.bean.goods.BagChangeDTO4ItemCfg;
+import wxdgaming.game.bean.goods.ItemCfg;
 import wxdgaming.game.cfg.QTaskTable;
 import wxdgaming.game.cfg.bean.QTask;
-import wxdgaming.game.core.Reason;
-import wxdgaming.game.core.ReasonArgs;
 import wxdgaming.game.message.task.*;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.task.TaskInfo;
@@ -19,15 +20,20 @@ import wxdgaming.game.server.bean.task.TaskPack;
 import wxdgaming.game.server.event.OnLoginBefore;
 import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.inner.InnerService;
+import wxdgaming.game.server.script.task.slog.AcceptTaskSlog;
+import wxdgaming.game.server.script.task.slog.SubmitTaskSlog;
 import wxdgaming.game.server.script.tips.TipsService;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * 任务基类
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-03 15:15
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-03 15:15
  */
 @Slf4j
 public abstract class ITaskScript extends HoldRunApplication {
@@ -36,6 +42,7 @@ public abstract class ITaskScript extends HoldRunApplication {
     @Inject protected TaskService taskService;
     @Inject protected TipsService tipsService;
     @Inject protected InnerService innerService;
+    @Inject protected SlogService slogService;
 
     public abstract TaskType type();
 
@@ -102,11 +109,11 @@ public abstract class ITaskScript extends HoldRunApplication {
             tipsService.tips(player, "已经接取");
             return;
         }
-        ReasonArgs reasonArgs = ReasonArgs.of(Reason.TASK_ACCEPT, "taskCfg=" + taskId);
+        ReasonDTO reasonDTO = ReasonDTO.of(Reason.TASK_ACCEPT, "taskCfg=" + taskId);
         if (!ListOf.isEmpty(qTask.getAcceptCost())) {
             BagChangeDTO4ItemCfg changeArgs4ItemCfg = BagChangeDTO4ItemCfg.builder()
                     .setItemCfgList(qTask.getAcceptCost())
-                    .setReasonArgs(reasonArgs)
+                    .setReasonDTO(reasonDTO)
                     .build();
             if (!bagService.checkCost(player, changeArgs4ItemCfg)) {
                 return;
@@ -115,6 +122,10 @@ public abstract class ITaskScript extends HoldRunApplication {
         }
         taskInfo.setAcceptTime(System.currentTimeMillis());
         log.info("{} 接取任务：{}, {}, {}", player, type(), qTask.getInnerTaskDetail(), taskInfo.toJSONString());
+        {
+            AcceptTaskSlog acceptTaskSlog = new AcceptTaskSlog(player, taskId, qTask.getName(), reasonDTO.getReasonText());
+            slogService.addLog(acceptTaskSlog);
+        }
         ResAcceptTask resAcceptTask = new ResAcceptTask();
         resAcceptTask.setTaskType(type());
         resAcceptTask.setTaskId(taskId);
@@ -140,12 +151,12 @@ public abstract class ITaskScript extends HoldRunApplication {
         }
 
         QTask qTask = taskInfo.qTask();
-        ReasonArgs reasonArgs = ReasonArgs.of(Reason.TASK_SUBMIT, "taskCfg=" + taskId);
+        ReasonDTO reasonDTO = ReasonDTO.of(Reason.TASK_SUBMIT, "taskCfg=" + taskId);
 
         if (!ListOf.isEmpty(qTask.getSubmitCost())) {
             BagChangeDTO4ItemCfg changeArgs4ItemCfg = BagChangeDTO4ItemCfg.builder()
                     .setItemCfgList(qTask.getSubmitCost())
-                    .setReasonArgs(reasonArgs)
+                    .setReasonDTO(reasonDTO)
                     .build();
             if (!bagService.checkCost(player, changeArgs4ItemCfg)) {
                 return;
@@ -159,7 +170,7 @@ public abstract class ITaskScript extends HoldRunApplication {
                 .setItemCfgList(rewards)
                 .setBagErrorNoticeClient(true)
                 .setBagFullSendMail(false)
-                .setReasonArgs(reasonArgs)
+                .setReasonDTO(reasonDTO)
                 .build();
 
         if (!bagService.gainItemCfg(player, rewardArgs4ItemCfg)) {
@@ -168,7 +179,12 @@ public abstract class ITaskScript extends HoldRunApplication {
 
         taskInfo.setRewards(true);
         taskPack.addFinishTask(type(), taskId);
-        log.info("{} 提交任务 {}, {}, {}, rewards={}", player, type(), qTask.getInnerTaskDetail(), reasonArgs, rewards);
+        log.info("{} 提交任务 {}, {}, {}, rewards={}", player, type(), qTask.getInnerTaskDetail(), reasonDTO, rewards);
+
+        {
+            SubmitTaskSlog acceptTaskSlog = new SubmitTaskSlog(player, taskId, qTask.getName(), reasonDTO.getReasonText());
+            slogService.addLog(acceptTaskSlog);
+        }
 
         ResSubmitTask resSubmitTask = new ResSubmitTask();
         resSubmitTask.setTaskType(type());

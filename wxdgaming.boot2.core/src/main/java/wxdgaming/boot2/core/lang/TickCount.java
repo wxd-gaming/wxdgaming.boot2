@@ -5,8 +5,8 @@ import lombok.Getter;
 /**
  * 定时器处理，间隔多少心跳什么的
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2023-12-13 10:26
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2023-12-13 10:26
  **/
 @Getter
 public class TickCount extends ObjectBase {

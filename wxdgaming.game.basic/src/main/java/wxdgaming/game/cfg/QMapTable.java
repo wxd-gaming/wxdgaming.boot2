@@ -12,8 +12,8 @@ import java.util.Map;
 /**
  * excel 构建 怪物表, src/main/cfg/地图信息.xlsx, q_map,
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-05 10:08:09
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-05 10:08:09
  **/
 @Getter
 public class QMapTable extends DataTable<QMap> implements Serializable {

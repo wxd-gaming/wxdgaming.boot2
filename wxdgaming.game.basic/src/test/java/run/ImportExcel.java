@@ -9,8 +9,8 @@ import java.nio.file.Paths;
 /**
  * 导出excel
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-09 10:42
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-09 10:42
  **/
 public class ImportExcel {
 

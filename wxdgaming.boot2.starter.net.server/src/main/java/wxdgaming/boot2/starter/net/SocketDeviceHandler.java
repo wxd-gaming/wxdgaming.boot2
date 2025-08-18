@@ -12,8 +12,8 @@ import wxdgaming.boot2.core.util.GlobalUtil;
 import java.util.Optional;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2020-12-26 15:03
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2020-12-26 15:03
  **/
 @Slf4j
 @Getter

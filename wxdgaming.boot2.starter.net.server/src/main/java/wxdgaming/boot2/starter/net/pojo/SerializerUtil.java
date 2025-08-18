@@ -10,8 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * pojo 处理
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-08-17 21:03
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-08-17 21:03
  */
 @Slf4j
 public class SerializerUtil {
@@ -23,8 +23,8 @@ public class SerializerUtil {
      * @param object 数据对象
      * @param <T>
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-08-17 21:06
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-08-17 21:06
      */
     public static <T> byte[] encode(T object) {
         Class<T> aClass = (Class<T>) object.getClass();
@@ -38,8 +38,8 @@ public class SerializerUtil {
      * @param clazz
      * @param <T>
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-08-17 21:08
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-08-17 21:08
      */
     public static <T> byte[] encode(T object, Class<T> clazz) {
         Schema<T> schema = RuntimeSchema.getSchema(clazz);
@@ -66,8 +66,8 @@ public class SerializerUtil {
      * @param object
      * @param <T>
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-08-17 21:06
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-08-17 21:06
      */
     public static <T> T decode(byte[] bytes, T object) {
         return decode(bytes, (Class<T>) object.getClass(), object);

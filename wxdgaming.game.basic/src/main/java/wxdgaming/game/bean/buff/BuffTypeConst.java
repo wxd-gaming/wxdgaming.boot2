@@ -9,8 +9,8 @@ import java.util.Map;
 /**
  * 常量
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-15 10:11
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-15 10:11
  **/
 @Getter
 public enum BuffTypeConst implements BuffType {

@@ -17,8 +17,8 @@ import wxdgaming.boot2.starter.net.server.SocketServerConfig;
 import wxdgaming.boot2.starter.net.server.http.HttpServerConfig;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-14 16:05
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-14 16:05
  **/
 public class OutConfigTest {
 

@@ -14,8 +14,8 @@ import java.util.concurrent.locks.LockSupport;
 /**
  * 队列测试
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-30 15:30
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-30 15:30
  **/
 @Slf4j
 public class ExecutorQueueTest {

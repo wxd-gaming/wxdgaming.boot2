@@ -7,8 +7,8 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 /**
  * 任务进度
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-02 10:11
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-02 10:11
  **/
 @Getter
 @Setter

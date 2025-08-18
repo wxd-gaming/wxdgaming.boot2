@@ -14,8 +14,8 @@ import java.util.concurrent.locks.LockSupport;
 /**
  * 测试
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-20 21:08
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-20 21:08
  **/
 @Slf4j
 public class RankLazyTest {

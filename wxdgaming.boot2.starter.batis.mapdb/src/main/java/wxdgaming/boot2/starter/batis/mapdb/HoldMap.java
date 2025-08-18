@@ -11,8 +11,8 @@ import java.util.function.Function;
 /**
  * 缓存持有类
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-24 17:05
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-24 17:05
  **/
 @Getter
 public class HoldMap {

@@ -12,8 +12,8 @@ import wxdgaming.game.server.script.role.PlayerService;
 /**
  * 使用道具
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-22 17:27
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-22 17:27
  **/
 public abstract class UseItemAction extends HoldRunApplication implements IBagScript {
 

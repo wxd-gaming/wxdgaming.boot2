@@ -13,7 +13,7 @@ import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
-import wxdgaming.game.login.bean.info.InnerServerInfoBean;
+import wxdgaming.game.basic.login.bean.info.InnerServerInfoBean;
 import wxdgaming.game.login.inner.InnerService;
 
 import java.util.ArrayList;
@@ -22,8 +22,8 @@ import java.util.List;
 /**
  * 登录接口
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-07 18:41
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-07 18:41
  **/
 @Slf4j
 @Singleton

@@ -1,8 +1,13 @@
-debug: true
-gid: 1
-sid: 1
-sname: "游戏一服"
-serverType: 1
+boot:
+  debug: true
+  gid: 1
+  sid: 1
+  name: "游戏一服"
+  serverType: 1
+
+profiles:
+  active: [ socket, pgsql, httpclient,logbus ]
+
 executor:
   basic:
     coreSize: 2                        #默认线程池的核心线程数
@@ -16,91 +21,11 @@ executor:
   scheduled:
     coreSize: 1
     maxQueueSize: 500
-http:
-  client:
-    routeMaxSize: 20                    #连接池的核心连接数
-    totalMaxSize: 300                   #连接池的最大连接数
-    resetTimeM: 30                      #连接池重置时间，时间太长连接池会异常 单位分钟
-    sslProtocol: TLS                    #ssl 类型
-    connectTimeOut: 3000                #创建连接超时时间
-    connectionRequestTimeout: 1000      #从连接池获取连接超时
-    keepAliveTimeout: 30000             #连接有效时间
-    readTimeout: 3000                   #读取超时时间
-socket:
-  server:
-    debug: false
-    port: 8000
-    enabledHttp: true                                        #是否启用http
-    enabledTcp: true                                         #是否启用tcp
-    enabledScheduledFlush: true                             # 开启定时器flush
-    scheduledFlushMs: 10                                    #定时调用flush的频率单位是ms
-    enabledWebSocket: false                                  #是否启用websocket
-    webSocketPrefix: "/ws"                                   #websocket前缀
-    maxAggregatorLength: 64                                  #聚合器最大长度
-    maxFrameBytes: -1                                        #单个消息最大长度
-    maxFrameLength: -1                                       #一秒钟接收消息最大数量
-    sslProtocolType: TLS                                     #ssll类型
-    sslKeyStorePath: "jks/wxdtest-1.8.jks"                   #jks证书路径
-    sslPasswordPath: "jks/wxdtest-1.8.jks.pwd"               #jks证书密码路径
-    idleTimeout: 0
-    writeTimeout: 0
-    readTimeout: 0
-    recvByteBufM: 12                                          #接收缓冲区大小 单位MB
-    writeByteBufM: 12                                         #发送缓冲区大小 单位MB
-    http:
-      showRequest: true
-      showResponse: true
 
 data:
   json:
     path: "cfg_json"
     scan: "wxdgaming.game.cfg"
-db:
-  mysql:
-    debug: false                                                 #调试模式将会显示sql语句
-    driverClassName: "com.mysql.cj.jdbc.Driver"
-    url: "jdbc:mysql://127.0.0.1:3306/test_game"
-    username: "root"
-    password: "test"
-    scanPackage: "wxdgaming.game.server.bean"                   #扫描路径
-    connectionTimeoutMs: 2000                                 #链接超时单位毫秒
-    idleTimeoutM: 10                                          #空闲超时单位分钟
-    minPoolSize: 5                                            #最小连接数
-    maxPoolSize: 20                                           #最大连接数
-    batchSubmitSize: 500                                      #批量提交数量
-    batchThreadSize: 1                                        #批量提交线程数
-  mysql-second:
-    debug: false                                                 #调试模式将会显示sql语句
-    driverClassName: "com.mysql.cj.jdbc.Driver"
-    url: "jdbc:mysql://127.0.0.1:3306/test_game_global"
-    username: "root"
-    password: "test"
-    scanPackage: "wxdgaming.game.global.bean"                 #扫描路径
-    connectionTimeoutMs: 2000                                 #链接超时单位毫秒
-    idleTimeoutM: 10                                          #空闲超时单位分钟
-    minPoolSize: 5                                            #最小连接数
-    maxPoolSize: 20                                           #最大连接数
-    batchSubmitSize: 500                                      #批量提交数量
-    batchThreadSize: 1                                        #批量提交线程数
-#  pgsql:
-#    debug: false                                                 #调试模式将会显示sql语句
-#    driverClassName: "org.postgresql.Driver"
-#    url: "jdbc:postgresql://127.0.0.1:5432/test_game"
-#    username: "postgres"
-#    password: "test"
-#    scanPackage: "wxdgaming.game.server.bean"                   #扫描路径
-#    connectionTimeoutMs: 2000                                 #链接超时单位毫秒
-#    idleTimeoutM: 10                                          #空闲超时单位分钟
-#    minPoolSize: 5                                            #最小连接数
-#    maxPoolSize: 20                                           #最大连接数
-#    batchSubmitSize: 500                                      #批量提交数量
-#    batchThreadSize: 1                                        #批量提交线程数
-
-backends:
-  url: "http://127.0.0.1:8000"
-  gameId: 1
-  appToken: "123456"
-  logToken: "123456"
 
 login:
   url: http://127.0.0.1:19800

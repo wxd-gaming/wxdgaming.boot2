@@ -8,8 +8,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * 每秒钟能产生 1亿 个ID
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2020-12-30 20:33
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2020-12-30 20:33
  */
 public class StringIdFormat {
 

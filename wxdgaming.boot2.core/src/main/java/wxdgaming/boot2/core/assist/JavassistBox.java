@@ -10,8 +10,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * javassist 代码编辑器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2023-12-06 20:07
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2023-12-06 20:07
  **/
 @Getter
 public class JavassistBox {
@@ -46,8 +46,8 @@ public class JavassistBox {
     /**
      * 回调
      *
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-01-05 21:16
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-01-05 21:16
      **/
     public interface Call<T> {
         void accept(T t) throws Exception;

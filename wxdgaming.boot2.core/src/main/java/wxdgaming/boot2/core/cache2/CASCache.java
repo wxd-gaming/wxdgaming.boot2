@@ -15,8 +15,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * cas 类型的缓存, 具有防止缓存穿透效果
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-03-20 16:14
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-03-20 16:14
  **/
 @Slf4j
 @SuperBuilder

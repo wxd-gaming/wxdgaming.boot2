@@ -7,8 +7,8 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 /**
  * 场景掉落物
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-08 11:35
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-08 11:35
  **/
 @Getter
 @Setter

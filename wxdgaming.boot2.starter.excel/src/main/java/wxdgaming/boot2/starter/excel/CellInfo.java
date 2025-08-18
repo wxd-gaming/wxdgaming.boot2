@@ -6,8 +6,8 @@ import lombok.experimental.Accessors;
 /**
  * 单元格信息
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-08-08 20:46
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-08-08 20:46
  **/
 @Getter
 @Setter

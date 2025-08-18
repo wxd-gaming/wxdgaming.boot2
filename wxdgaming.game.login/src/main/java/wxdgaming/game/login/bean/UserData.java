@@ -9,8 +9,8 @@ import wxdgaming.boot2.starter.batis.ann.DbTable;
 /**
  * 登录数据
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-07 18:29
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-07 18:29
  **/
 @Getter
 @Setter
@@ -22,6 +22,7 @@ public class UserData extends Entity {
     /** 登录密钥，如果是渠道sdk这个其实无意义 */
     @DbColumn(length = 128)
     private String token;
+    @DbColumn(index = true)
     private long createTime;
     @DbColumn(index = true)
     private int appId;

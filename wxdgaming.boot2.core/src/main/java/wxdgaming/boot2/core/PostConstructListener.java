@@ -12,8 +12,8 @@ import java.util.Set;
 /**
  * 构造监听
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-22 09:57
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-22 09:57
  **/
 public class PostConstructListener implements TypeListener {
 

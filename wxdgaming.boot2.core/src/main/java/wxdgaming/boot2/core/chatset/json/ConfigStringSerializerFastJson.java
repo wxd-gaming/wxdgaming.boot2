@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2022-04-21 10:11
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2022-04-21 10:11
  **/
 public class ConfigStringSerializerFastJson implements ObjectSerializer, ObjectDeserializer {
 

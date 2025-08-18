@@ -14,8 +14,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * <br>
  * 分散型排行榜容器，比较适合战力排行榜，分数排行榜，竞技场排行榜
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-20 20:57
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-20 20:57
  **/
 @Getter
 @Setter

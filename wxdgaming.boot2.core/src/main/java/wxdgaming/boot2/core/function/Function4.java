@@ -3,8 +3,8 @@ package wxdgaming.boot2.core.function;
 /**
  * 传递两个参数的消费类
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2023-10-10 10:25
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2023-10-10 10:25
  **/
 @FunctionalInterface
 public interface Function4<T1, T2, T3, T4, R> extends SerializableLambda {

@@ -6,8 +6,8 @@ import java.util.List;
 /**
  * 字符串切割
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-24 19:42
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-24 19:42
  */
 public class StringSplit4Char {
 

@@ -12,8 +12,8 @@ import wxdgaming.game.message.bag.ItemBean;
 /**
  * 道具
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-21 19:44
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-21 19:44
  **/
 @Getter
 @Setter

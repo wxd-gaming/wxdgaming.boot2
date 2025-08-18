@@ -21,8 +21,8 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * https协议证书
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2020-12-18 16:18
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2020-12-18 16:18
  **/
 @Slf4j
 public class SslContextByJks implements Serializable {

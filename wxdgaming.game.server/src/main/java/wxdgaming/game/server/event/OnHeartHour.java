@@ -5,8 +5,8 @@ import java.lang.annotation.*;
 /**
  * 每小时
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-08 13:15
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-08 13:15
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

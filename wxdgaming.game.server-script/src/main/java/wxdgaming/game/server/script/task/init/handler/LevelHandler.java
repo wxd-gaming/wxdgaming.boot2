@@ -9,8 +9,8 @@ import wxdgaming.game.server.script.task.init.ConditionInitValueHandler;
 /**
  * 初始化任务的时候获取等级
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-21 20:55
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-21 20:55
  **/
 @Singleton
 public class LevelHandler implements ConditionInitValueHandler {

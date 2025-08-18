@@ -71,7 +71,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>wxdgaming.game.server.ServerApplication</mainClass> <!-- 替换为你的主类 -->
+                            <mainClass>wxdgaming.game.server.GameServerApplication</mainClass> <!-- 替换为你的主类 -->
                         </manifest>
                     </archive>
                 </configuration>

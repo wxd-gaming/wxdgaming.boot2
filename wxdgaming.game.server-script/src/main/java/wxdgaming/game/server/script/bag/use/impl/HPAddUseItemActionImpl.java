@@ -10,8 +10,8 @@ import wxdgaming.game.server.script.bag.use.UseItemAction;
 /**
  * 血量增加
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-07-02 11:12
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-07-02 11:12
  */
 public class HPAddUseItemActionImpl extends UseItemAction {
 
@@ -25,7 +25,7 @@ public class HPAddUseItemActionImpl extends UseItemAction {
 
     @Override public void doUse(Player player, BagChangesContext bagChangesContext, Item item) {
         QItem qItem = item.qItem();
-        fightService.changeHp(player, qItem.getParam1(), bagChangesContext.getReasonArgs());
+        fightService.changeHp(player, qItem.getParam1(), bagChangesContext.getReasonDTO());
     }
 
 }

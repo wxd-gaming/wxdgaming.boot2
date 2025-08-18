@@ -5,11 +5,10 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Shutdown;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
-import wxdgaming.game.login.bean.info.InnerServerInfoBean;
+import wxdgaming.game.basic.login.bean.info.InnerServerInfoBean;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -17,8 +16,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * 内网服务
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-10 20:52
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-10 20:52
  **/
 @Slf4j
 @Getter

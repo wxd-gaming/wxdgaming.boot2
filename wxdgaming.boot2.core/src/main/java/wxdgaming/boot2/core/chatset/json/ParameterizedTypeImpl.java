@@ -11,8 +11,8 @@ import java.lang.reflect.Type;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-09-11 18:15
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-09-11 18:15
  **/
 public class ParameterizedTypeImpl implements ParameterizedType, Serializable {
 

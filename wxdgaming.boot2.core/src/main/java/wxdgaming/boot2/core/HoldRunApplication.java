@@ -7,8 +7,8 @@ import wxdgaming.boot2.core.ann.Order;
 /**
  * 持有RunApplication
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-23 17:38
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-23 17:38
  **/
 @Getter
 public abstract class HoldRunApplication implements InitPrint{

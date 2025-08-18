@@ -10,8 +10,8 @@ import java.util.List;
 /**
  * 全服邮件
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-12 15:30
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-12 15:30
  **/
 @Getter
 @Setter

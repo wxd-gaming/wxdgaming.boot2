@@ -14,8 +14,8 @@ import java.util.Map;
 /**
  * url处理
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-12-23 20:06
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-12-23 20:06
  **/
 public class URLUtil {
 

@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-08-10 11:05
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-08-10 11:05
  **/
 @Getter
 public class JavaFileObjectManager extends ForwardingJavaFileManager<StandardJavaFileManager> {

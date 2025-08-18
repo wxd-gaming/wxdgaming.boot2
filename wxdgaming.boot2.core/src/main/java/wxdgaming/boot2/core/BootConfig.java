@@ -23,8 +23,8 @@ import java.util.function.Supplier;
 /**
  * 启动配置
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-14 15:55
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-14 15:55
  **/
 @Getter
 public class BootConfig {
@@ -91,30 +91,6 @@ public class BootConfig {
         return r;
     }
 
-    public boolean isDebug() {
-        return configNode.getBooleanValue("debug");
-    }
-
-    public int gid() {
-        Integer sid = configNode.getInteger("gid");
-        AssertUtil.assertNull(sid, "gid is null");
-        return sid;
-    }
-
-    public int sid() {
-        Integer sid = configNode.getInteger("sid");
-        AssertUtil.assertNull(sid, "sid is null");
-        return sid;
-    }
-
-    public String sname() {
-        String sname = configNode.getString("sname");
-        if (sname == null) {
-            return "boot server";
-        }
-        return sname;
-    }
-
     public ExecutorConfig basicConfig() {
         return getNestedValue("executor.basic", ExecutorConfig.class, ExecutorConfig.BASIC_INSTANCE);
     }
@@ -153,6 +129,13 @@ public class BootConfig {
 
     public <T> T getObject(String key, Type clazz, Supplier<Object> supplier) {
         return FastJsonUtil.getObject(configNode, key, clazz, supplier);
+    }
+
+    public <T> T getValue(String key, Type clazz) {
+        if (key.startsWith("${") && key.endsWith("}")) {
+            return FastJsonUtil.getNestedValue(configNode, key.substring(2, key.length() - 1), clazz, null);
+        }
+        return configNode.getObject(key, clazz);
     }
 
     public <T> T getNestedValue(String path, Type clazz) {

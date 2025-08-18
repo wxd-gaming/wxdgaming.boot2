@@ -10,8 +10,8 @@ import java.util.function.Function;
 /**
  * 加载缓存
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-07-03 10:57
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-07-03 10:57
  **/
 @Builder
 public class LoadingCacheImpl<K, V> {

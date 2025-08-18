@@ -1,5 +1,6 @@
 package wxdgaming.game.server.script.role.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -7,9 +8,9 @@ import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
-import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.game.basic.slog.SlogService;
 import wxdgaming.game.message.role.ReqCreateRole;
 import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.bean.role.Player;
@@ -17,6 +18,7 @@ import wxdgaming.game.server.bean.role.RoleEntity;
 import wxdgaming.game.server.event.OnCreateRole;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.role.PlayerService;
+import wxdgaming.game.server.script.role.log.RoleRegisterLog;
 import wxdgaming.game.server.script.tips.TipsService;
 
 import java.util.HashSet;
@@ -24,8 +26,8 @@ import java.util.HashSet;
 /**
  * 创建角色
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: v1.1
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version v1.1
  **/
 @Slf4j
 @Singleton
@@ -34,12 +36,14 @@ public class ReqCreateRoleHandler extends HoldRunApplication {
     private final DataCenterService dataCenterService;
     private final PlayerService playerService;
     private final TipsService tipsService;
+    final SlogService slogService;
 
     @Inject
-    public ReqCreateRoleHandler(DataCenterService dataCenterService, PlayerService playerService, TipsService tipsService) {
+    public ReqCreateRoleHandler(DataCenterService dataCenterService, PlayerService playerService, TipsService tipsService, SlogService slogService) {
         this.dataCenterService = dataCenterService;
         this.playerService = playerService;
         this.tipsService = tipsService;
+        this.slogService = slogService;
     }
 
     /** 创建角色 */
@@ -109,6 +113,10 @@ public class ReqCreateRoleHandler extends HoldRunApplication {
             dataCenterService.getAccount2RidsMap().computeIfAbsent(sid, account, l -> new HashSet<>()).add(player.getUid());
             dataCenterService.getName2RidMap().put(name, player.getUid());
             dataCenterService.getRid2NameMap().put(player.getUid(), name);
+
+            RoleRegisterLog roleLoginLog = new RoleRegisterLog(player, clientSessionMapping.getClientIp(), JSON.toJSONString(clientSessionMapping.getClientParams()));
+            slogService.addLog(roleLoginLog);
+
         } finally {
             SingletonLockUtil.unlock("role_" + name);
         }

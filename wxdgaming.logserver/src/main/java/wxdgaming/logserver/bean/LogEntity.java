@@ -52,7 +52,7 @@ public class LogEntity extends Entity implements Serializable, EntityName {
     private final JSONObject logData = MapOf.newJSONObject();
 
     @Override public String tableName() {
-        return logType;
+        return logType.toLowerCase();
     }
 
     public void checkDataKey() {

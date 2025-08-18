@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
 /**
  * 字符串拼接 Scale
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-13 13:44
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-13 13:44
  **/
 public class StringUtils {
 

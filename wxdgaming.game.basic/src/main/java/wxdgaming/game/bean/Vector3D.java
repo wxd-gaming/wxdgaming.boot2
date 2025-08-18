@@ -7,8 +7,8 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 /**
  * 三维坐标
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-15 17:26
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-15 17:26
  **/
 @Getter
 @Setter

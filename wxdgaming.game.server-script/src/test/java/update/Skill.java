@@ -7,8 +7,8 @@ import lombok.experimental.Accessors;
 /**
  * 技能
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-25 16:48
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-25 16:48
  **/
 @Getter
 @Setter

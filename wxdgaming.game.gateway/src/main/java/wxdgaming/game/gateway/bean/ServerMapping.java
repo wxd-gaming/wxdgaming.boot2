@@ -17,8 +17,8 @@ import java.util.function.Consumer;
 /**
  * 服务映射
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-28 10:24
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-28 10:24
  **/
 @Slf4j
 @Getter

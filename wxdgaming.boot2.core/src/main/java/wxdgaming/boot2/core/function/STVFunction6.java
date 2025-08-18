@@ -5,8 +5,8 @@ package wxdgaming.boot2.core.function;
  * </p>
  * 类::方法
  *
- * @author: Proy.Chen(無心道, 15388152619)
- * @version: 2022-10-20 19:27
+ * @author Proy.Chen(無心道, 15388152619)
+ * @version 2022-10-20 19:27
  **/
 @FunctionalInterface
 public interface STVFunction6<T, P1, P2, P3, P4, P5, P6> extends SerializableLambda {

@@ -8,8 +8,8 @@ import java.lang.reflect.Type;
 /**
  * 转换器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-16 09:20
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-16 09:20
  **/
 @Getter
 public abstract class Converter<X, Y> {

@@ -8,8 +8,8 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-08-06 17:10
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-08-06 17:10
  **/
 @Getter
 @Setter

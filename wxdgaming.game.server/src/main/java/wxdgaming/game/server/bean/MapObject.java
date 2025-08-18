@@ -10,8 +10,8 @@ import wxdgaming.game.bean.Vector3D;
 /**
  * 场景对象
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-15 17:15
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-15 17:15
  **/
 @Getter
 @Setter

@@ -12,8 +12,8 @@ import java.lang.reflect.Type;
 /**
  * long 类型的序列化和反序列化
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-08 15:24
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-08 15:24
  **/
 public class LongSerializerFastJson implements ObjectSerializer, ObjectDeserializer {
 

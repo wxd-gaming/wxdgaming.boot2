@@ -17,8 +17,8 @@ import java.util.Map;
 /**
  * 主线任务实现类
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-22 10:46
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-22 10:46
  **/
 @Slf4j
 @Singleton

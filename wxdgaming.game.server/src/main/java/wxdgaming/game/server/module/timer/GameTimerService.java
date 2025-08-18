@@ -5,16 +5,16 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.BootConfig;
+import wxdgaming.boot2.core.BootstrapProperties;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.core.util.Md5Util;
-import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
+import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.server.SocketServer;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
-import wxdgaming.game.login.LoginConfig;
-import wxdgaming.game.login.bean.info.InnerServerInfoBean;
+import wxdgaming.game.basic.login.LoginProperties;
+import wxdgaming.game.basic.login.bean.info.InnerServerInfoBean;
 import wxdgaming.game.server.module.drive.PlayerDriveService;
 
 import java.util.List;
@@ -22,21 +22,23 @@ import java.util.List;
 /**
  * 游戏进程的定时器服务
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-11 20:22
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-11 20:22
  **/
 @Slf4j
 @Singleton
 public class GameTimerService {
 
     final SocketServer socketServer;
-    final LoginConfig loginConfig;
+    final BootstrapProperties bootstrapProperties;
+    final LoginProperties loginProperties;
     final PlayerDriveService playerDriveService;
 
     @Inject
-    public GameTimerService(SocketServer socketServer, LoginConfig loginConfig, PlayerDriveService playerDriveService) {
+    public GameTimerService(SocketServer socketServer, BootstrapProperties bootstrapProperties, LoginProperties loginProperties, PlayerDriveService playerDriveService) {
         this.socketServer = socketServer;
-        this.loginConfig = loginConfig;
+        this.bootstrapProperties = bootstrapProperties;
+        this.loginProperties = loginProperties;
         this.playerDriveService = playerDriveService;
     }
 
@@ -47,27 +49,27 @@ public class GameTimerService {
     public void registerLoginServer() {
 
         InnerServerInfoBean serverInfoBean = new InnerServerInfoBean();
-        serverInfoBean.setServerId(BootConfig.getIns().sid());
-        serverInfoBean.setMainId(BootConfig.getIns().sid());
-        serverInfoBean.setGid(BootConfig.getIns().gid());
-        serverInfoBean.setName(BootConfig.getIns().sname());
+        serverInfoBean.setServerId(bootstrapProperties.getSid());
+        serverInfoBean.setMainId(bootstrapProperties.getSid());
+        serverInfoBean.setGid(bootstrapProperties.getGid());
+        serverInfoBean.setName(bootstrapProperties.getName());
         serverInfoBean.setPort(socketServer.getConfig().getPort());
         serverInfoBean.setHttpPort(socketServer.getConfig().getPort());
 
-        serverInfoBean.setMaxOnlineSize(loginConfig.getMaxOnlineSize());
+        serverInfoBean.setMaxOnlineSize(loginProperties.getMaxOnlineSize());
         serverInfoBean.setOnlineSize(playerDriveService.onlineSize());
 
 
         JSONObject jsonObject = MapOf.newJSONObject();
-        jsonObject.put("sidList", List.of(BootConfig.getIns().sid()));
-        jsonObject.put("sid", BootConfig.getIns().sid());
+        jsonObject.put("sidList", List.of(bootstrapProperties.getSid()));
+        jsonObject.put("sid", bootstrapProperties.getSid());
         jsonObject.put("serverBean", serverInfoBean.toJSONString());
 
         String json = jsonObject.toString(SerializerFeature.MapSortField, SerializerFeature.SortField);
-        String md5DigestEncode = Md5Util.md5DigestEncode0("#", json, loginConfig.getJwtKey());
+        String md5DigestEncode = Md5Util.md5DigestEncode0("#", json, loginProperties.getJwtKey());
         jsonObject.put("sign", md5DigestEncode);
 
-        HttpResponse execute = HttpRequestPost.ofJson(loginConfig.getUrl() + "/inner/registerGame", jsonObject.toString()).execute();
+        HttpResponse execute = HttpRequestPost.ofJson(loginProperties.getUrl() + "/inner/registerGame", jsonObject.toString()).execute();
         log.info("向登陆服务器注册: {}", execute.bodyString());
     }
 

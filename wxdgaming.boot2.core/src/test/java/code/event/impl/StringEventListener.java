@@ -7,8 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 字符串监听
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-22 17:30
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-22 17:30
  **/
 @Slf4j
 public abstract class StringEventListener extends EventListener<StringEvent> {

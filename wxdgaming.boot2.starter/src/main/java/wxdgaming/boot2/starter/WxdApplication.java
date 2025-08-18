@@ -10,7 +10,6 @@ import wxdgaming.boot2.core.collection.SetOf;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.util.DumpUtil;
-import wxdgaming.boot2.core.util.GlobalUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,8 +22,8 @@ import java.util.stream.Stream;
 /**
  * 启动器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-13 11:00
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-13 11:00
  **/
 @Slf4j
 public class WxdApplication {
@@ -41,7 +40,6 @@ public class WxdApplication {
             log.info("boot2-starter starting");
             isRunning.set(true);
             BootConfig.getIns().loadConfig();
-            GlobalUtil.DEBUG.set(BootConfig.getIns().isDebug());
 
             String[] packages = Arrays.stream(classes).map(Class::getPackageName).toArray(String[]::new);
 
@@ -61,7 +59,8 @@ public class WxdApplication {
             List<GuiceModuleBase> collect = moduleStream
                     .map(cls -> ReflectProvider.newInstance(cls, reflectProvider))
                     .collect(Collectors.toList());
-            collect.addFirst(new ApplicationGuiceModule(reflectProvider));
+            collect.add(0, new ConfigurationGuiceModule(reflectProvider));
+            collect.add(1, new ApplicationGuiceModule(reflectProvider));
             collect.add(new SingletonGuiceModule(reflectProvider));
 
             Injector injector = Guice.createInjector(Stage.PRODUCTION, collect);

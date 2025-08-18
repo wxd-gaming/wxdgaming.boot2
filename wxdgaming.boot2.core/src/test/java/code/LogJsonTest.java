@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * 测试log输出格式
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-13 11:46
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-13 11:46
  **/
 @Slf4j
 public class LogJsonTest {

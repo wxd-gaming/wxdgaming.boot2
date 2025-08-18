@@ -5,8 +5,8 @@ import lombok.Getter;
 /**
  * 时间差记录器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-10-15 14:19
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-10-15 14:19
  **/
 @Getter
 public class DiffTime {

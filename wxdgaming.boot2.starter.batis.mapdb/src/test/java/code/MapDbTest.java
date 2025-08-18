@@ -25,8 +25,8 @@ import java.util.concurrent.locks.LockSupport;
 import java.util.stream.Collectors;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-20 17:14
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-20 17:14
  **/
 public class MapDbTest {
 

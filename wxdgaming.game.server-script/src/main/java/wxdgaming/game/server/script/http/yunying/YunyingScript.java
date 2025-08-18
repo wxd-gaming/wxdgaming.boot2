@@ -13,8 +13,8 @@ import wxdgaming.game.server.module.data.GlobalDataService;
 /**
  * 运营接口
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-30 09:28
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-30 09:28
  **/
 @Slf4j
 @Singleton

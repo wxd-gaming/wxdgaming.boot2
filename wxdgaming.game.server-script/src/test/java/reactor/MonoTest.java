@@ -12,8 +12,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * 数据流
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-03-29 22:10
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-03-29 22:10
  **/
 @Slf4j
 public class MonoTest {

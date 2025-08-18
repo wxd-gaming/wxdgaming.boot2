@@ -14,8 +14,8 @@ import java.util.Map;
 /**
  * 机器人
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-27 13:50
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-27 13:50
  **/
 @Getter
 @Setter

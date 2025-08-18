@@ -6,8 +6,8 @@ import wxdgaming.boot2.core.format.ByteFormat;
 /**
  * 数据大小
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2023-08-29 15:39
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2023-08-29 15:39
  **/
 public interface Data2Size {
 

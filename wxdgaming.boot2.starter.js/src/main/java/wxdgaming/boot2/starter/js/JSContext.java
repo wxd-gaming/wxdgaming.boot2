@@ -11,8 +11,8 @@ import java.nio.charset.StandardCharsets;
 /**
  * js 容器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-03-04 09:12
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-03-04 09:12
  **/
 public class JSContext {
 

@@ -13,8 +13,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * 战斗测试
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-25 16:51
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-25 16:51
  **/
 public class FightTest {
 

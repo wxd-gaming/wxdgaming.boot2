@@ -36,8 +36,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * http 请求当前上下文
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-14 20:07
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-14 20:07
  **/
 @Slf4j
 @Getter

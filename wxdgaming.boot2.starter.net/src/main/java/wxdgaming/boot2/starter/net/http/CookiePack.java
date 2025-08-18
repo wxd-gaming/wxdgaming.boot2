@@ -17,8 +17,8 @@ import java.util.Set;
 /**
  * cookie管理
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2022-03-14 11:34
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2022-03-14 11:34
  **/
 @Getter
 @Slf4j

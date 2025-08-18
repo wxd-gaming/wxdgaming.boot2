@@ -5,8 +5,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2020-07-29 10:33
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2020-07-29 10:33
  */
 public class Base64Util {
 

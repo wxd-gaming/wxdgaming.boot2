@@ -15,8 +15,8 @@ import java.util.function.Predicate;
 /**
  * 切记，json序列化 请使用type类型, 如果是枚举类型，会泛型丢失导致异常
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2022-04-19 16:08
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2022-04-19 16:08
  **/
 @Getter
 @Setter

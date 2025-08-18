@@ -5,8 +5,8 @@ import wxdgaming.boot2.core.chatset.StringUtils;
 /**
  * 数字辅助
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-21 11:35
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-21 11:35
  **/
 public class NumberUtil {
 

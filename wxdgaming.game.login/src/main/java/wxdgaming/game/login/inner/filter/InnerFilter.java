@@ -11,25 +11,25 @@ import wxdgaming.boot2.core.util.Md5Util;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
 import wxdgaming.boot2.starter.net.server.http.HttpFilter;
-import wxdgaming.game.login.LoginConfig;
+import wxdgaming.game.login.LoginServerProperties;
 
 import java.lang.reflect.Method;
 
 /**
  * 拦截器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-11 15:20
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-11 15:20
  **/
 @Slf4j
 @Singleton
 public class InnerFilter implements HttpFilter {
 
-    final LoginConfig loginConfig;
+    final LoginServerProperties loginServerProperties;
 
     @Inject
-    public InnerFilter(LoginConfig loginConfig) {
-        this.loginConfig = loginConfig;
+    public InnerFilter(LoginServerProperties loginServerProperties) {
+        this.loginServerProperties = loginServerProperties;
     }
 
 
@@ -38,7 +38,7 @@ public class InnerFilter implements HttpFilter {
             JSONObject reqParams = httpContext.getRequest().getReqParams();
             Object sign = reqParams.remove("sign");
             String json = reqParams.toString(SerializerFeature.MapSortField, SerializerFeature.SortField);
-            String md5DigestEncode = Md5Util.md5DigestEncode0("#", json, loginConfig.getJwtKey());
+            String md5DigestEncode = Md5Util.md5DigestEncode0("#", json, loginServerProperties.getJwtKey());
             if (!Objects.equals(sign, md5DigestEncode)) {
                 return RunResult.fail("签名错误");
             }

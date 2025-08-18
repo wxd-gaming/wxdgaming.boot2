@@ -8,8 +8,8 @@ import wxdgaming.boot2.core.timer.MyClock;
 /**
  * long 类型
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-03-18 20:12
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-03-18 20:12
  **/
 @Getter
 @Setter

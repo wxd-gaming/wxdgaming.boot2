@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * excel 构建 活动, src/main/cfg/活动.xlsx, q_activity,
  *
- * @author: wxd-gaming(無心道, 15388152619)
+ * @author wxd-gaming(無心道, 15388152619)
  **/
 @Getter
 @Setter

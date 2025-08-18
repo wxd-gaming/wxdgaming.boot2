@@ -5,8 +5,8 @@ import java.lang.annotation.*;
 /**
  * 数据映射注解
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-10-09 10:55
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-10-09 10:55
  */
 @Inherited
 @Documented

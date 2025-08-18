@@ -12,8 +12,8 @@ import wxdgaming.game.server.script.bag.gain.impl.currency.CurrencyGainScript;
 /**
  * 货币的获得
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-23 17:35
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-23 17:35
  **/
 @Slf4j
 @Singleton
@@ -29,7 +29,7 @@ public class ExpGainScript extends CurrencyGainScript {
 
     @Override public boolean gain(BagChangesContext bagChangesContext, Item newItem) {
         long count = newItem.getCount();
-        playerService.addExp(bagChangesContext.getPlayer(), count, bagChangesContext.getReasonArgs());
+        playerService.addExp(bagChangesContext.getPlayer(), count, bagChangesContext.getReasonDTO());
         return true;
     }
 

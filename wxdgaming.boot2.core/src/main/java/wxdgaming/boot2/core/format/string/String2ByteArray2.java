@@ -6,8 +6,8 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 /**
  * 把 string 转化成 byte[][]
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-10-12 21:14
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-10-12 21:14
  */
 public class String2ByteArray2 {
 
@@ -18,8 +18,8 @@ public class String2ByteArray2 {
      *
      * @param trim 字符
      * @return byte[][]
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-10-12 21:14
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-10-12 21:14
      */
     public static byte[][] parse(String trim) {
         byte[][] arrays;

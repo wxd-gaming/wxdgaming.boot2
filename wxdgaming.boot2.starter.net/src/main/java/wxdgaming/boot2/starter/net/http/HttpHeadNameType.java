@@ -5,8 +5,8 @@ import lombok.Getter;
 /**
  * http 协议类型
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2020-12-30 20:33
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2020-12-30 20:33
  */
 @Getter
 public enum HttpHeadNameType {

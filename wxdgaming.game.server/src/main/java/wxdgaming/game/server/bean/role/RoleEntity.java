@@ -11,8 +11,8 @@ import wxdgaming.boot2.starter.batis.ann.DbTable;
 /**
  * 角色数据
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-30 14:43
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-30 14:43
  **/
 @Getter
 @Setter

@@ -25,8 +25,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * 基于apache的http 连接池
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2023-04-28 12:30
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2023-04-28 12:30
  **/
 @Slf4j
 @Getter

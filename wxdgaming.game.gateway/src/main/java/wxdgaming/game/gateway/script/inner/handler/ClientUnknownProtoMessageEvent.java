@@ -14,8 +14,8 @@ import wxdgaming.game.gateway.module.data.DataCenterService;
 /**
  * 前端发送消息网关无监听，转发到游戏或者社交进程
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-28 20:28
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-28 20:28
  **/
 @Slf4j
 @Singleton

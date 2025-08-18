@@ -10,8 +10,8 @@ import java.util.function.Supplier;
 /**
  * 线程池配置
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-13 15:05
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-13 15:05
  **/
 @Getter
 public class ExecutorConfig extends ObjectBase {

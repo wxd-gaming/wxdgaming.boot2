@@ -8,8 +8,8 @@ import java.lang.annotation.Target;
 /**
  * 注释
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-22 14:05
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-22 14:05
  */
 @Documented
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)

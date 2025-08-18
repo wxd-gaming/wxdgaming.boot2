@@ -14,8 +14,8 @@ import java.util.*;
 /**
  * java 文件编译
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2020-12-30 20:33
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2020-12-30 20:33
  **/
 @Accessors(chain = true)
 public class JavaCoderCompile {
@@ -205,8 +205,8 @@ public class JavaCoderCompile {
      *
      * @param forceClear 强制覆盖目录
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-04-04 23:31
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-04-04 23:31
      */
     public ClassDirLoader classLoader(boolean forceClear) {
         return classLoader(this.parentClassLoader, "target/bin", forceClear);
@@ -217,8 +217,8 @@ public class JavaCoderCompile {
      *
      * @param outClassPath 文件所在的目录
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-04-04 23:31
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-04-04 23:31
      */
     public ClassDirLoader classLoader(String outClassPath) {
         return classLoader(this.parentClassLoader, outClassPath, true);
@@ -230,8 +230,8 @@ public class JavaCoderCompile {
      * @param outClassPath class文件输出的目录
      * @param forceClear   强制覆盖目录
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-04-04 23:31
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-04-04 23:31
      */
     public ClassDirLoader classLoader(String outClassPath, boolean forceClear) {
         return classLoader(this.parentClassLoader, outClassPath, forceClear);
@@ -245,8 +245,8 @@ public class JavaCoderCompile {
      * @param forceClear   强制覆盖目录
      * @return
      * @throws Exception
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-04-04 23:21
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-04-04 23:21
      */
     public ClassDirLoader classLoader(ClassLoader parent, String outClassPath, boolean forceClear) {
         outPutFile(outClassPath, forceClear);

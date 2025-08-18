@@ -12,8 +12,8 @@ import java.util.concurrent.locks.LockSupport;
  * <p> 假设1秒钟5000万次add，队列的可用时长是long.maxvalue() /5000w / 60 /60 /24 / 365=5000年
  *
  * @param <T>
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-09 11:21
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-09 11:21
  */
 public class RingQueue<T> {
 

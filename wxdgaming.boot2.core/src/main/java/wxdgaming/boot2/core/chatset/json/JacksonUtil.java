@@ -9,8 +9,8 @@
 ///**
 // * jackson
 // *
-// * @author: wxd-gaming(無心道, 15388152619)
-// * @version: 2025-05-08 19:56
+// * @author wxd-gaming(無心道, 15388152619)
+// * @version 2025-05-08 19:56
 // **/
 //public class JacksonUtil {
 //

@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ServerApplication" type="Application" factoryName="Application" nameIsGenerated="true">
-    <option name="MAIN_CLASS_NAME" value="wxdgaming.game.server.ServerApplication" />
+  <configuration default="false" name="GameServerApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="wxdgaming.game.server.GameServerApplication" />
     <module name="wxdgaming.game.server" />
     <extension name="coverage">
       <pattern>

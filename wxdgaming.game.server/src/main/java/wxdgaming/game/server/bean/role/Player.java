@@ -28,8 +28,8 @@ import java.util.concurrent.BlockingQueue;
 /**
  * 角色
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-15 17:13
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-15 17:13
  **/
 @Getter
 @Setter

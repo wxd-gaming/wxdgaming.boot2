@@ -6,13 +6,13 @@ import wxdgaming.boot2.starter.WxdApplication;
 import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.net.SocketScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
-import wxdgaming.game.login.LoginServiceGuiceModule;
+import wxdgaming.game.basic.login.LoginProperties;
 
 /**
  * 启动器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-27 11:27
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-27 11:27
  **/
 public class RobotApplication {
 
@@ -20,10 +20,10 @@ public class RobotApplication {
 
         RunApplicationMain runApplication = WxdApplication.run(
                 CoreScan.class,
+                LoginProperties.class,
                 SocketScan.class,
                 DataExcelScan.class,
                 ScheduledScan.class,
-                LoginServiceGuiceModule.class,
                 RobotApplication.class
         );
 

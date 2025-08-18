@@ -31,8 +31,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * sql 模型 批量 处理
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-16 20:43
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-16 20:43
  **/
 @Slf4j
 public abstract class SqlDataBatch extends DataBatch {
@@ -215,7 +215,7 @@ public abstract class SqlDataBatch extends DataBatch {
                         long diff = diffTime.diffNs() / 10000;
                         executeDiffTime += diff;
                         this.executeCount += executeCount;
-                        log.info("GlobalUtil.Exiting={}", GlobalUtil.Exiting.get());
+                        log.debug("GlobalUtil.Exiting={}", GlobalUtil.Exiting.get());
                         if (sqlDataHelper.getSqlConfig().isDebug() || ticket.need() || closed.get() || GlobalUtil.Exiting.get()) {
                             log.info(
                                     """

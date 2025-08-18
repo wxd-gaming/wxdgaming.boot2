@@ -7,7 +7,7 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.bean.attr.AttrType;
-import wxdgaming.game.core.ReasonArgs;
+import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.MapObject;
 
@@ -18,8 +18,8 @@ import java.util.TreeMap;
 /**
  * 属性计算器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-09 19:14
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-09 19:14
  **/
 @Slf4j
 @Singleton
@@ -61,14 +61,14 @@ public class NpcAttributeService extends HoldRunApplication {
         finalCalculator(mapNpc);
     }
 
-    public void onNpcAttributeCalculator(MapNpc mapNpc, CalculatorType[] calculatorTypes, ReasonArgs msg) {
+    public void onNpcAttributeCalculator(MapNpc mapNpc, CalculatorType[] calculatorTypes, ReasonDTO msg) {
         for (CalculatorType calculatorType : calculatorTypes) {
             calculator(mapNpc, calculatorType, msg);
         }
         finalCalculator(mapNpc);
     }
 
-    public void calculator(MapNpc mapNpc, CalculatorType calculatorType, ReasonArgs msg) {
+    public void calculator(MapNpc mapNpc, CalculatorType calculatorType, ReasonDTO msg) {
 
         AbstractCalculatorAction calculatorAction = calculatorImplMap.get(calculatorType.getCode());
 

@@ -12,8 +12,8 @@ import java.util.Map;
 /**
  * excel 构建 怪物表, src/cfg/玩家信息.xlsx, q_player,
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-09 14:13:57
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-09 14:13:57
  **/
 @Getter
 public class QPlayerTable extends DataTable<QPlayer> implements Serializable {

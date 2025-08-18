@@ -15,8 +15,8 @@ import wxdgaming.game.server.module.data.DataCenterService;
 /**
  * 角色创建事件
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-27 19:51
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-27 19:51
  **/
 @Slf4j
 @Singleton

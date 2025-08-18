@@ -7,8 +7,8 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 /**
  * 礼包奖励
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-14 13:49
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-14 13:49
  **/
 @Getter
 @Setter

@@ -12,8 +12,8 @@ import java.util.Map;
 /**
  * excel 构建 ${tableComment}, ${filePath}, ${tableName},
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: ${.now?string("yyyy-MM-dd HH:mm:ss")}
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version ${.now?string("yyyy-MM-dd HH:mm:ss")}
  **/
 @Getter
 public class ${codeClassName}Table extends DataTable<${codeClassName}> implements Serializable {

@@ -19,8 +19,8 @@ import java.util.function.Consumer;
 /**
  * 数据库配置
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-15 12:43
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-15 12:43
  **/
 @Slf4j
 @Getter

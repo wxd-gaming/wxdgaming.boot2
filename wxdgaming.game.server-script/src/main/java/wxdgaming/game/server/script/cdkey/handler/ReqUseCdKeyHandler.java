@@ -14,8 +14,8 @@ import wxdgaming.game.server.script.cdkey.CDKeyService;
 /**
  * 请求使用cdkey
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: v1.1
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version v1.1
  **/
 @Slf4j
 @Singleton

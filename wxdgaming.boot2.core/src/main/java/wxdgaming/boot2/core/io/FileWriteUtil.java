@@ -14,8 +14,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-08-18 15:47
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-08-18 15:47
  **/
 @Slf4j
 public class FileWriteUtil implements Serializable {

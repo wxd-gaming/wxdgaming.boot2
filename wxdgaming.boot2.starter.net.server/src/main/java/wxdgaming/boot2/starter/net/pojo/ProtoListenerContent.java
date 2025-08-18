@@ -18,8 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * proto容器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-18 08:39
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-18 08:39
  **/
 @Slf4j
 @Getter

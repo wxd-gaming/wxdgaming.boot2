@@ -12,8 +12,8 @@ import java.util.HashMap;
 /**
  * 聊天模块
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-28 19:30
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-28 19:30
  **/
 @Slf4j
 @Singleton

@@ -9,8 +9,8 @@ import wxdgaming.game.bean.goods.Equipment;
 /**
  * 装备拦
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-07-02 11:29
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-07-02 11:29
  **/
 @Getter
 @Setter

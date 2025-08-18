@@ -14,8 +14,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * 邮件
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-12 15:10
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-12 15:10
  **/
 @Getter
 @Setter

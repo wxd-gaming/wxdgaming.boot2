@@ -10,8 +10,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * 线程执行器工厂
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-15 11:20
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-15 11:20
  **/
 public class ExecutorFactory {
 

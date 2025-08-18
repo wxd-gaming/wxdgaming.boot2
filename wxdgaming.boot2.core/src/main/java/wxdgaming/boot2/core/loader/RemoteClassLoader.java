@@ -19,8 +19,8 @@ import java.util.zip.ZipInputStream;
 /**
  * 远程loader
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-07-05 14:08
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-07-05 14:08
  **/
 @Getter
 public class RemoteClassLoader extends URLClassLoader {

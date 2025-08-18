@@ -15,8 +15,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * <br>
  * 如果需要可用调用{@link #forceRefresh()}方法进行强制刷新
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-20 20:57
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-20 20:57
  **/
 @Getter
 @Setter
@@ -155,8 +155,8 @@ public class RankByLazyListSort {
      *
      * @param rank 1 ~
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-05-26 11:01
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2025-05-26 11:01
      */
     public RankScore rankDataByRank(final int rank) {
         readLock.lock();

@@ -16,8 +16,8 @@ import java.util.Map;
 /**
  * 代码生成器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-14 09:28
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-14 09:28
  */
 @Slf4j
 public abstract class ICreateCode {
@@ -31,8 +31,8 @@ public abstract class ICreateCode {
      * @param outPath     输出路径
      * @param packageName 包名
      * @param belong      归属
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-04-14 09:26
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2025-04-14 09:26
      */
     public void createCode(TableData tableData, String outPath, String packageName, String belong) {
         if (!outPath.endsWith("/")) {

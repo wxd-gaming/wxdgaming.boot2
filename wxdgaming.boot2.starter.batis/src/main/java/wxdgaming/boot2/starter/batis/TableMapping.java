@@ -28,8 +28,8 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * 数据表映射
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-15 16:14
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-15 16:14
  **/
 @Getter
 @Setter
@@ -295,8 +295,8 @@ public class TableMapping {
         /**
          * @param bean 需要赋值的实例
          * @param data 数据库读取的行数据
-         * @author: wxd-gaming(無心道, 15388152619)
-         * @version: 2025-02-24 09:39
+         * @author wxd-gaming(無心道, 15388152619)
+         * @version 2025-02-24 09:39
          */
         public void setValue(Object bean, JSONObject data) {
             Object colValue = data.get(getColumnName());

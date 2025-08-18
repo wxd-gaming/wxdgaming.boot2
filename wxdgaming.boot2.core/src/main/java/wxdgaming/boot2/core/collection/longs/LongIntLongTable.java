@@ -11,8 +11,8 @@ import java.util.Optional;
 /**
  * long int int table
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-08 19:08
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-08 19:08
  **/
 @Getter
 @Setter

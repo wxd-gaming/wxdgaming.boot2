@@ -1,8 +1,8 @@
 package wxdgaming.boot2.core.function;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-03-18 15:48
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-03-18 15:48
  **/
 @FunctionalInterface
 public interface ConsumerE5<T1, T2, T3, T4, T5> extends SerializableLambda {

@@ -9,8 +9,8 @@ import lombok.Setter;
 /**
  * json 密钥
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-16 13:55
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-16 13:55
  **/
 @Getter
 @Setter

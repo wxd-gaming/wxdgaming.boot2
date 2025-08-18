@@ -1,24 +1,32 @@
 package wxdgaming.game.login.sdk.local;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.BootstrapProperties;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
-import wxdgaming.game.login.AppPlatformParams;
+import wxdgaming.game.basic.login.AppPlatformParams;
 import wxdgaming.game.login.bean.UserData;
 import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
 
 /**
  * 本地服
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-07 18:26
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-07 18:26
  **/
 @Slf4j
 @Singleton
 public class LocalSdkLoginApi extends AbstractSdkLoginApi {
+
+    private final BootstrapProperties bootstrapProperties;
+
+    @Inject
+    public LocalSdkLoginApi(BootstrapProperties bootstrapProperties) {
+        this.bootstrapProperties = bootstrapProperties;
+    }
 
     @Override public AppPlatformParams.Platform platform() {
         return AppPlatformParams.Platform.LOCAL;
@@ -26,7 +34,7 @@ public class LocalSdkLoginApi extends AbstractSdkLoginApi {
 
     @Override public RunResult login(HttpContext context, AppPlatformParams appPlatformParams) {
 
-        if (!GlobalUtil.DEBUG.get()) {
+        if (!bootstrapProperties.isDebug()) {
             return RunResult.fail("not debug ban login");
         }
 
@@ -43,7 +51,7 @@ public class LocalSdkLoginApi extends AbstractSdkLoginApi {
         String finalAccount = platform().name() + "-" + account;
 
         UserData userData = getUserData(finalAccount, () -> {
-            UserData ud = createUserData(finalAccount, appPlatformParams, finalAccount);
+            UserData ud = createUserData(context.getIp(), finalAccount, appPlatformParams, finalAccount);
             ud.setToken(token);
             return ud;
         });
@@ -52,7 +60,7 @@ public class LocalSdkLoginApi extends AbstractSdkLoginApi {
             return RunResult.fail("token error");
         }
 
-        return buildResult(userData);
+        return loginSuccess(userData, context.getIp());
     }
 
 

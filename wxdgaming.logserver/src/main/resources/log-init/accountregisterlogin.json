@@ -1,0 +1,38 @@
+{
+  "logName": "accountregisterlog",
+  "logComment": "账户注册日志",
+  "sort": "1-1",
+  "partition": true,
+  "fieldList": [
+    {
+      "fieldName": "uid",
+      "fieldComment": "UID",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "createTime",
+      "fieldComment": "日期",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "ip",
+      "fieldComment": "ip",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "platform",
+      "fieldComment": "平台",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "channel",
+      "fieldComment": "渠道",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "account",
+      "fieldComment": "账号",
+      "fieldType": "string"
+    }
+  ]
+}

@@ -12,8 +12,8 @@ import wxdgaming.game.server.script.task.init.ConditionInitValueHandler;
 /**
  * 获取背包道具数量
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-21 20:55
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-21 20:55
  **/
 @Singleton
 public class BagItemCountHandler implements ConditionInitValueHandler {

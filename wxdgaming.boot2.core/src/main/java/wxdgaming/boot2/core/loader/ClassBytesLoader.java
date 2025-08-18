@@ -8,8 +8,8 @@ import java.util.Map;
 /**
  * class byte 加载器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-04-29 09:36
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-04-29 09:36
  **/
 public class ClassBytesLoader extends ClassDirLoader {
 

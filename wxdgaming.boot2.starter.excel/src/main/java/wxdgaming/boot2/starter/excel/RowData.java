@@ -7,8 +7,8 @@ import wxdgaming.boot2.core.util.ConvertUtil;
 /**
  * excel 一行数据
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-08-09 20:17
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-08-09 20:17
  */
 public class RowData extends JSONObject {
 

@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 /**
  * http 协议数据处理
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2022-01-28 09:56
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2022-01-28 09:56
  **/
 public class HttpDataAction {
 

@@ -12,8 +12,8 @@ import wxdgaming.game.server.script.buff.AbstractBuffAction;
 /**
  * 处理属性变更
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-15 13:28
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-15 13:28
  **/
 @Slf4j
 @Singleton

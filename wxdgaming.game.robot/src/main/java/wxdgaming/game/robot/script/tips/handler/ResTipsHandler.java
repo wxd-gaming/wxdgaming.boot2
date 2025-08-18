@@ -9,8 +9,8 @@ import wxdgaming.game.message.tips.ResTips;
 /**
  * 提示内容
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: v1.1
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version v1.1
  **/
 @Slf4j
 @Singleton

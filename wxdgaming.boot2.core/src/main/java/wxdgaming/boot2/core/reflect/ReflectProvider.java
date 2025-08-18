@@ -28,8 +28,8 @@ import java.util.stream.Stream;
 /**
  * 资源处理
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2023-10-16 10:11
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2023-10-16 10:11
  **/
 @Getter
 public class ReflectProvider {

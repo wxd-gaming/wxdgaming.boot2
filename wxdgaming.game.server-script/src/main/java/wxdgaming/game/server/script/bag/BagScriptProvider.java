@@ -9,8 +9,8 @@ import wxdgaming.game.bean.goods.ItemTypeConst;
 /**
  * 背包相关的脚本持有
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-07-25 10:52
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-07-25 10:52
  **/
 @Getter
 public class BagScriptProvider<T extends IBagScript> {

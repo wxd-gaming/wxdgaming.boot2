@@ -114,7 +114,9 @@ public class LogBusService implements InitPrint {
     private class PostLog2FileEvent extends ExecutorEvent {
 
         @Override public void onEvent() throws Exception {
-            Files.walk(Path.of(logBusProperties.getFilePath()))
+            Path path = Path.of(logBusProperties.getFilePath());
+            if (!Files.exists(path)) return;
+            Files.walk(path)
                     .filter(Files::isRegularFile)
                     .map(Path::toFile)
                     .filter(f -> System.currentTimeMillis() - f.lastModified() > TimeUnit.SECONDS.toMillis(5))

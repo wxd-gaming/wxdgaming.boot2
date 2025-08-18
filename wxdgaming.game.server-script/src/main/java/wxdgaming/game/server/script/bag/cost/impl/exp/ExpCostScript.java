@@ -12,8 +12,8 @@ import wxdgaming.game.server.script.bag.cost.CostScript;
 /**
  * 经验扣除
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-23 17:35
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-23 17:35
  **/
 @Slf4j
 @Singleton
@@ -28,8 +28,8 @@ public class ExpCostScript extends CostScript {
         if (hasExp < count) {
             throw new IllegalArgumentException("经验不足");
         }
-        playerService.setExp(player, hasExp - count, bagChangesContext.getReasonArgs());
-        log.info("{} 当前经验：{} 扣除经验:{}, {}", player, player.getExp(), count, bagChangesContext.getReasonArgs());
+        playerService.setExp(player, hasExp - count, bagChangesContext.getReasonDTO());
+        log.info("{} 当前经验：{} 扣除经验:{}, {}", player, player.getExp(), count, bagChangesContext.getReasonDTO());
     }
 
     @Override public void cost(Player player, BagChangesContext bagChangesContext, ItemGrid itemGrid, long count) {

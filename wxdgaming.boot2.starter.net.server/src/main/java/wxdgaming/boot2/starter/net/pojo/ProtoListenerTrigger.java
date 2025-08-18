@@ -21,8 +21,8 @@ import java.lang.reflect.Type;
 /**
  * 事件触发器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-18 08:45
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-18 08:45
  **/
 @Slf4j
 @Getter

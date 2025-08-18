@@ -10,8 +10,8 @@ import java.util.ArrayList;
 /**
  * 全服邮件数据
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-30 10:59
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-30 10:59
  **/
 @Getter
 @Setter

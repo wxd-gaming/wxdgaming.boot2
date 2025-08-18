@@ -16,8 +16,8 @@ import java.nio.file.Path;
 /**
  * yaml文件读取
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-04-23 17:23
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-04-23 17:23
  **/
 public class YamlUtil {
 

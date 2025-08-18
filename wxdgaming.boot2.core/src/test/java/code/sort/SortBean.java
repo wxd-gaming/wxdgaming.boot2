@@ -7,8 +7,8 @@ import lombok.experimental.Accessors;
 import java.util.Objects;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-26 09:46
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-26 09:46
  **/
 @Getter
 @Setter

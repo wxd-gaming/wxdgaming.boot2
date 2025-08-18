@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * excel 构建 ${tableComment}, ${filePath}, ${tableName},
  *
- * @author: wxd-gaming(無心道, 15388152619)
+ * @author wxd-gaming(無心道, 15388152619)
  **/
 @Getter
 @Setter

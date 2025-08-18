@@ -5,8 +5,8 @@ import lombok.Getter;
 /**
  * 道具类型
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-09 14:40
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-09 14:40
  **/
 @Getter
 public abstract class ItemTypeConst {

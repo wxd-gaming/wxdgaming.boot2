@@ -10,8 +10,8 @@ import java.util.function.Supplier;
 /**
  * 执行
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-15 10:49
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-15 10:49
  **/
 public class RunResult extends JSONObject {
 

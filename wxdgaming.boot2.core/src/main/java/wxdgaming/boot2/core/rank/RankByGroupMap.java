@@ -14,8 +14,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * <br>
  * 集中型排行榜容器，比较适合比如副本通关排行，3星通过，2星通过，由于大部分的数据会是3星，或者2星这种重叠概念，所以更加高效
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-20 20:57
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-20 20:57
  **/
 @Getter
 @Setter

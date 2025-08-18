@@ -11,8 +11,8 @@ import java.util.List;
 /**
  * RankMap 数据库转换器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-21 09:21
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-21 09:21
  **/
 public class RankGroupMapConverter extends Converter<RankByGroupMap, String> {
 

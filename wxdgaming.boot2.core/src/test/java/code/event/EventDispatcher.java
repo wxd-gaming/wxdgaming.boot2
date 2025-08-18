@@ -9,8 +9,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * 事件派发
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-22 17:16
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-22 17:16
  **/
 @Slf4j
 public class EventDispatcher {

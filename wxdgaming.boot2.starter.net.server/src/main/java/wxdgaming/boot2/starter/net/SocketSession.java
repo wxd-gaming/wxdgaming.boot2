@@ -16,8 +16,8 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * socket session
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-08-16 08:58
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-08-16 08:58
  **/
 @Slf4j
 @Getter

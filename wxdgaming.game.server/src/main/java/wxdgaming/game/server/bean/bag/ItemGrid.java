@@ -7,8 +7,8 @@ import wxdgaming.game.bean.goods.Item;
 /**
  * 格子，
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-07 11:47
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-07 11:47
  **/
 @Getter
 public class ItemGrid extends ObjectBase {

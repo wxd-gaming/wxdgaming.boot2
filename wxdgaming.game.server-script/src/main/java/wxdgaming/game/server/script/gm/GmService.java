@@ -19,8 +19,8 @@ import java.util.List;
 /**
  * gm服务, 运营接口
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-30 09:23
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-30 09:23
  **/
 @Slf4j
 @Singleton

@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.slog.AbstractSLog;
+import wxdgaming.game.basic.slog.AbstractSlog;
 
 /**
  * 角色日志
@@ -15,7 +15,7 @@ import wxdgaming.game.slog.AbstractSLog;
 @Getter
 @Setter
 @NoArgsConstructor
-public abstract class AbstractRoleLog extends AbstractSLog {
+public abstract class AbstractRoleLog extends AbstractSlog {
 
     private String openId;
     private String account;
@@ -33,7 +33,5 @@ public abstract class AbstractRoleLog extends AbstractSLog {
         this.roleName = player.getName();
         this.lv = player.getLevel();
     }
-
-    public abstract String logType();
 
 }

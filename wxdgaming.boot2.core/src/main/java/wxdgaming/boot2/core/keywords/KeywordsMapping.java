@@ -12,8 +12,8 @@ import java.util.Map;
 /**
  * 关键字
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-21 11:40
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-21 11:40
  **/
 @Getter
 public class KeywordsMapping {

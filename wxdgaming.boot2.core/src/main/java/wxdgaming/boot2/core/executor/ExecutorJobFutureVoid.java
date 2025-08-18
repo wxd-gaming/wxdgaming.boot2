@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-15 09:39
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-15 09:39
  **/
 @Slf4j
 @Getter

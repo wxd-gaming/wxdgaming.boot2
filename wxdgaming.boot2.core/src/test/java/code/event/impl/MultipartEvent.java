@@ -7,8 +7,8 @@ import lombok.Getter;
 /**
  * 多参数
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-23 15:08
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-23 15:08
  **/
 @Getter
 @Builder

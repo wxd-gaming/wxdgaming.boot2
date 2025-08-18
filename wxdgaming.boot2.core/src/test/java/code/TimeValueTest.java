@@ -7,8 +7,8 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.TimeValue;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-03-18 20:23
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-03-18 20:23
  **/
 public class TimeValueTest {
 

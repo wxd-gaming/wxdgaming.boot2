@@ -7,8 +7,8 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.bean.attr.AttrType;
-import wxdgaming.game.core.Reason;
-import wxdgaming.game.core.ReasonArgs;
+import wxdgaming.game.basic.core.Reason;
+import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.message.role.ResUpdateFightValue;
 import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.server.bean.role.Player;
@@ -23,8 +23,8 @@ import java.util.TreeMap;
 /**
  * 属性计算器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-09 19:14
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-09 19:14
  **/
 @Slf4j
 @Singleton
@@ -67,7 +67,7 @@ public class PlayerAttributeService extends HoldRunApplication {
         player.setAttrMap(attrMap);
         player.setAttrProMap(attrProMap);
 
-        finalCalculator(player, true, ReasonArgs.of(Reason.Level));
+        finalCalculator(player, true, ReasonDTO.of(Reason.Level));
     }
 
     public void calculator(Player player, CalculatorType calculatorType) {
@@ -81,7 +81,7 @@ public class PlayerAttributeService extends HoldRunApplication {
 
     }
 
-    public void finalCalculator(Player player, boolean isLogin, ReasonArgs msg) {
+    public void finalCalculator(Player player, boolean isLogin, ReasonDTO msg) {
 
         /*累计基础属性*/
         AttrInfo finalAttrInfo = new AttrInfo();
@@ -148,11 +148,11 @@ public class PlayerAttributeService extends HoldRunApplication {
     @OnLevelUp
     public void onLevel(Player player) {
         calculator(player, CalculatorType.BASE);
-        finalCalculator(player, false, ReasonArgs.of(Reason.Level));
+        finalCalculator(player, false, ReasonDTO.of(Reason.Level));
     }
 
     @OnPlayerAttributeCalculator
-    public void onPlayerAttributeCalculator(Player player, CalculatorType[] calculatorTypes, ReasonArgs msg) {
+    public void onPlayerAttributeCalculator(Player player, CalculatorType[] calculatorTypes, ReasonDTO msg) {
         for (CalculatorType calculatorType : calculatorTypes) {
             calculator(player, calculatorType);
         }

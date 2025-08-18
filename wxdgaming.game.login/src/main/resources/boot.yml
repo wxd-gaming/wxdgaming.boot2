@@ -1,8 +1,11 @@
-debug: true
-gid: 1
-sid: 1
+boot:
+  debug: true
+  gid: 1
+  sid: 1
+  jwtKey: "123456789012345678901234567890123456789012345678901234567890"
+
 profiles:
-  active: [ socket, db, httpclient ]
+  active: [ socket, pgsql, httpclient,logbus ]
 executor:
   basic:
     coreSize: 2                        #默认线程池的核心线程数
@@ -16,6 +19,3 @@ executor:
   scheduled:
     coreSize: 1
     maxQueueSize: 50000
-
-login:
-  jwtKey: "123456789012345678901234567890123456789012345678901234567890"

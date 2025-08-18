@@ -24,8 +24,8 @@ import javax.net.ssl.SSLContext;
 /**
  * socket 服务
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-12 20:16
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-12 20:16
  **/
 @Slf4j
 @Getter

@@ -1,7 +1,9 @@
-debug: true
-gid: 1
-sid: 1
-sname: "网关"
+boot:
+  debug: true
+  gid: 1
+  sid: 1
+  name: "网关"
+
 executor:
   basic:
     coreSize: 2                        #默认线程池的核心线程数

@@ -18,8 +18,8 @@ import java.util.function.Consumer;
 /**
  * 内置服务
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-28 10:53
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-28 10:53
  **/
 @Slf4j
 @Singleton

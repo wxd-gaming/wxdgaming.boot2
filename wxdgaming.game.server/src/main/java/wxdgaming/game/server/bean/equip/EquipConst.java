@@ -8,8 +8,8 @@ import java.util.Map;
 /**
  * 装备常量
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-07-02 11:22
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-07-02 11:22
  **/
 public interface EquipConst {
 

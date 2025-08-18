@@ -68,7 +68,7 @@ public class DataCenterService implements InitPrint {
             String tableComment = logMappingInfo.getLogComment();
             TableMapping tableMapping = sqlDataHelper.tableMapping(LogEntity.class);
             checkSLogTable(sqlDataHelper, dbTableMap, tableStructMap, tableMapping, logMappingInfo.isPartition(), tableName, tableComment);
-            tmp.put(logMappingInfo.getLogName(), logMappingInfo);
+            tmp.put(tableName, logMappingInfo);
         });
         logMappingInfoList = tmp.values().stream().sorted(Comparator.comparing(LogMappingInfo::getSort)).toList();
         logMappingInfoMap = tmp;

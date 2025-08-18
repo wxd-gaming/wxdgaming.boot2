@@ -14,8 +14,8 @@ import wxdgaming.game.server.script.bag.BagService;
 /**
  * 请求背包信息
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: v1.1
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version v1.1
  **/
 @Slf4j
 @Singleton

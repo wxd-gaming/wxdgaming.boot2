@@ -8,8 +8,8 @@ import wxdgaming.game.server.script.fight.AbstractFightAction;
 /**
  * 固定值加血
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-09 09:47
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-09 09:47
  **/
 @Slf4j
 @Singleton

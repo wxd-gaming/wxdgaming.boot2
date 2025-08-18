@@ -7,8 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 转换工厂
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-16 10:56
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-16 10:56
  **/
 public class ConvertFactory {
 

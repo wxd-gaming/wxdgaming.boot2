@@ -4,7 +4,7 @@
     <module name="wxdgaming.game.gateway" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="wxdgaming.game.login.*" />
+        <option name="PATTERN" value="wxdgaming.game.basic.login.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>

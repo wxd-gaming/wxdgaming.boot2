@@ -12,8 +12,8 @@ import java.io.InputStream;
 /**
  * 扩展加载器,
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-12-23 16:05
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-12-23 16:05
  **/
 @Getter
 @Setter

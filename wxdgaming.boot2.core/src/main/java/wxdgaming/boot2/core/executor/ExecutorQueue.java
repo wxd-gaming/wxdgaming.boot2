@@ -11,8 +11,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * 执行器队列
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-15 10:09
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-15 10:09
  **/
 @Slf4j
 @Getter

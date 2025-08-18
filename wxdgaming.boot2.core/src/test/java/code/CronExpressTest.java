@@ -8,8 +8,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * ces
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-24 13:23
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-24 13:23
  **/
 public class CronExpressTest {
 

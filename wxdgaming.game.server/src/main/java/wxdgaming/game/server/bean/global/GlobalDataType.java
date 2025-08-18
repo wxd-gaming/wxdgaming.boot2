@@ -13,8 +13,8 @@ import java.util.function.Supplier;
 /**
  * 类型
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-30 10:48
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-30 10:48
  **/
 @Getter
 public enum GlobalDataType {

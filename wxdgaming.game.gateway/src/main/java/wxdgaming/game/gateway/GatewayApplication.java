@@ -6,21 +6,21 @@ import wxdgaming.boot2.starter.WxdApplication;
 import wxdgaming.boot2.starter.net.SocketScan;
 import wxdgaming.boot2.starter.net.httpclient5.HttpClientScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
-import wxdgaming.game.login.LoginServiceGuiceModule;
+import wxdgaming.game.basic.login.LoginProperties;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-27 20:56
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-27 20:56
  **/
 public class GatewayApplication {
 
     public static void main(String[] args) {
         RunApplicationMain runApplication = WxdApplication.run(
                 CoreScan.class,
+                LoginProperties.class,
                 SocketScan.class,
                 HttpClientScan.class,
                 ScheduledScan.class,
-                LoginServiceGuiceModule.class,
                 GatewayApplication.class
         );
 

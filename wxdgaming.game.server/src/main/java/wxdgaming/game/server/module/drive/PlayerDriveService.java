@@ -23,8 +23,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 角色驱动
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-08 11:41
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-08 11:41
  **/
 @Slf4j
 @Singleton

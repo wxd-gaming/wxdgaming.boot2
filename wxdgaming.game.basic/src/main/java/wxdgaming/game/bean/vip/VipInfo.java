@@ -8,8 +8,8 @@ import java.util.ArrayList;
 /**
  * vip
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-12 13:16
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-12 13:16
  **/
 @Getter
 @Setter

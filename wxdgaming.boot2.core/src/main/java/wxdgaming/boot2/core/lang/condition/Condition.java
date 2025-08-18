@@ -14,8 +14,8 @@ import java.util.Objects;
 /**
  * 完成条件
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2022-10-10 15:36
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2022-10-10 15:36
  **/
 @Getter
 @Setter

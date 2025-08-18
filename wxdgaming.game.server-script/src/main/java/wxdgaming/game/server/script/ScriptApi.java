@@ -18,8 +18,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-14 19:22
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-14 19:22
  **/
 @Slf4j
 @Singleton

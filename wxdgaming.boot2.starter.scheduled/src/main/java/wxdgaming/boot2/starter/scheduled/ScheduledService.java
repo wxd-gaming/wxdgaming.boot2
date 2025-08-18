@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * 定时任务调度器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-09-24 18:21
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-09-24 18:21
  **/
 @Slf4j
 @Getter

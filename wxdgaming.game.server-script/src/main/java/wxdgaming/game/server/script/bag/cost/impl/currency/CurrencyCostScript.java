@@ -12,8 +12,8 @@ import wxdgaming.game.server.script.bag.cost.CostScript;
 /**
  * 货币的扣除
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-23 17:35
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-23 17:35
  **/
 @Slf4j
 @Singleton

@@ -11,8 +11,8 @@ import java.util.List;
 /**
  * 数据集
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-15 12:36
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-15 12:36
  **/
 @Getter
 @Setter
@@ -59,8 +59,8 @@ public abstract class DataHelper {
      * @param args 参数
      * @param <R>  实体模型
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-02-16 01:15
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2025-02-16 01:15
      */
     public abstract <R extends Entity> R findByKey(Class<R> cls, Object... args);
 
@@ -72,8 +72,8 @@ public abstract class DataHelper {
      * @param args      参数
      * @param <R>       实体模型
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-02-16 01:15
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2025-02-16 01:15
      */
     public abstract <R extends Entity> R findByKey(String tableName, Class<R> cls, Object... args);
 
@@ -82,8 +82,8 @@ public abstract class DataHelper {
      *
      * @param entity 实体对象
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-02-16 01:16
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2025-02-16 01:16
      */
     public abstract boolean existBean(Entity entity);
 

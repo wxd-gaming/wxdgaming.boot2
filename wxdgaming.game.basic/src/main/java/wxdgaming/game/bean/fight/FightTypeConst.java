@@ -9,8 +9,8 @@ import java.util.Map;
 /**
  * 战斗类型常量
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-15 10:07
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-15 10:07
  **/
 @Getter
 public enum FightTypeConst implements FightType {

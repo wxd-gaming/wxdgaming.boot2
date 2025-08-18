@@ -10,8 +10,8 @@ import java.io.Serializable;
 /**
  * long 类型 数量
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2023-08-09 14:30
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2023-08-09 14:30
  **/
 @Getter
 @Setter

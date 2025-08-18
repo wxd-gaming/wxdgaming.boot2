@@ -10,8 +10,8 @@ import java.util.Map;
 /**
  * 字段读取
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2023-10-20 15:35
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2023-10-20 15:35
  **/
 @Slf4j
 public class FieldUtil {
@@ -22,8 +22,8 @@ public class FieldUtil {
      * @param readStatic true 读取静态字段
      * @param clazz      类
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-02-15 16:26
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2025-02-15 16:26
      */
     public static Map<String, Field> getFields(boolean readStatic, Class<?> clazz) {
         Map<String, Field> mapf = new LinkedHashMap<>();

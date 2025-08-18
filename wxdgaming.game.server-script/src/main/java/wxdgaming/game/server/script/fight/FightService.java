@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.game.core.ReasonArgs;
+import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.server.bean.MapNpc;
 
 import java.util.HashMap;
@@ -14,8 +14,8 @@ import java.util.List;
 /**
  * 战斗
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-08 10:16
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-08 10:16
  **/
 @Slf4j
 @Singleton
@@ -34,7 +34,7 @@ public class FightService extends HoldRunApplication {
         actionImplMap = map;
     }
 
-    public void changeHp(MapNpc mapNpc, long change, ReasonArgs reasonArgs) {
+    public void changeHp(MapNpc mapNpc, long change, ReasonDTO reasonDTO) {
         long oldHp = mapNpc.getHp();
         long maxHp = mapNpc.maxHp();
         if (oldHp >= maxHp) {
@@ -47,10 +47,10 @@ public class FightService extends HoldRunApplication {
         if (mapNpc.getHp() < 0) {
             mapNpc.setHp(0);
         }
-        log.info("{} 改变血量 {} -> {} -> {}, maxMp={}, {}", mapNpc, oldHp, change, mapNpc.getHp(), maxHp, reasonArgs);
+        log.info("{} 改变血量 {} -> {} -> {}, maxMp={}, {}", mapNpc, oldHp, change, mapNpc.getHp(), maxHp, reasonDTO);
     }
 
-    public void changeMp(MapNpc player, long change, ReasonArgs reasonArgs) {
+    public void changeMp(MapNpc player, long change, ReasonDTO reasonDTO) {
         long oldMp = player.getMp();
         long maxMp = player.maxMp();
         if (oldMp >= maxMp) {
@@ -63,7 +63,7 @@ public class FightService extends HoldRunApplication {
         if (player.getMp() < 0) {
             player.setMp(0);
         }
-        log.info("{} 改变魔量 {} -> {} -> {}, maxMp={}, {}", player, oldMp, change, player.getMp(), maxMp, reasonArgs);
+        log.info("{} 改变魔量 {} -> {} -> {}, maxMp={}, {}", player, oldMp, change, player.getMp(), maxMp, reasonDTO);
     }
 
     public List<MapNpc> selectAttack(MapNpc player) {

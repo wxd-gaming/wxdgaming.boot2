@@ -8,8 +8,8 @@ import java.util.Map;
 /**
  * 属性计算器类型
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-09 19:30
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-09 19:30
  **/
 @Getter
 public enum CalculatorType {

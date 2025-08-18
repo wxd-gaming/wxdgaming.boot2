@@ -10,8 +10,8 @@ import java.util.List;
 /**
  * 映射关系绑定
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-18 08:50
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-18 08:50
  */
 @Slf4j
 public record HttpMapping(HttpRequest httpRequest, String path, JavassistProxy javassistProxy,

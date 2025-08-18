@@ -7,8 +7,8 @@ import java.nio.charset.StandardCharsets;
 /**
  * 静态
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-28 16:06
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-28 16:06
  **/
 public interface HttpConst {
 

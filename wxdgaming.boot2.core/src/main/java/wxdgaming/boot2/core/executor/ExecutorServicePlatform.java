@@ -7,8 +7,8 @@ import java.util.concurrent.*;
 /**
  * 执行器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-15 09:03
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-15 09:03
  **/
 @Slf4j
 public class ExecutorServicePlatform extends ExecutorService {

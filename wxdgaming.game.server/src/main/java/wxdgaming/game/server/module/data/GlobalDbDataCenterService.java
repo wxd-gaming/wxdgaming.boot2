@@ -15,8 +15,8 @@ import wxdgaming.game.server.bean.role.Player;
 /**
  * 全服的全局数据，公共数据
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-23 16:34
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-23 16:34
  **/
 @Slf4j
 @Getter
@@ -27,14 +27,9 @@ public class GlobalDbDataCenterService {
     final DataCenterService dataCenterService;
 
     @Inject
-    public GlobalDbDataCenterService(@Named("db.mysql-second") SqlDataHelper globalDbHelper, DataCenterService dataCenterService) {
+    public GlobalDbDataCenterService(@Named("db.pgsql-second") SqlDataHelper globalDbHelper, DataCenterService dataCenterService) {
         this.globalDbHelper = globalDbHelper;
         this.dataCenterService = dataCenterService;
-    }
-
-    @Start
-    public void start(@Value(path = "sid") int sid) {
-
     }
 
     public PlayerSnap playerSnap(long uid) {

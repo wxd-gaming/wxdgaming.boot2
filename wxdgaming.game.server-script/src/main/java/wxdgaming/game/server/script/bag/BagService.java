@@ -29,15 +29,15 @@ import wxdgaming.game.server.script.bag.log.ItemLog;
 import wxdgaming.game.server.script.bag.use.UseItemAction;
 import wxdgaming.game.server.script.mail.MailService;
 import wxdgaming.game.server.script.tips.TipsService;
-import wxdgaming.game.slog.SlogService;
+import wxdgaming.game.basic.slog.SlogService;
 
 import java.util.*;
 
 /**
  * 背包逻辑脚本
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-22 09:39
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-22 09:39
  **/
 @Slf4j
 @Singleton
@@ -152,7 +152,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
                 if (log.isInfoEnabled()) {
                     log.info(
                             "添加道具背包空间不足 {} 背包空间：{} 需要格子数：{}, {}",
-                            player, itemBag.freeGrid(), items.size(), bagChangeDTO.getReasonArgs()
+                            player, itemBag.freeGrid(), items.size(), bagChangeDTO.getReasonDTO()
                     );
                 }
                 if (bagChangeDTO.isBagErrorNoticeClient()) {
@@ -162,7 +162,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
             }
         }
         Iterator<Item> iterator = items.iterator();
-        BagChangesContext bagChangesContext = new BagChangesContext(player, bagType, itemBag, bagChangeDTO.getReasonArgs());
+        BagChangesContext bagChangesContext = new BagChangesContext(player, bagType, itemBag, bagChangeDTO.getReasonDTO());
         while (iterator.hasNext()) {
             Item newItem = iterator.next();
 
@@ -193,8 +193,8 @@ public class BagService extends HoldRunApplication implements InitPrint {
                         "获得",
                         cfgId, qItem.getName(),
                         oldCount, change, newCount,
-                        bagChangeDTO.getReasonArgs().getReason().name(),
-                        bagChangeDTO.getReasonArgs().getReasonText()
+                        bagChangeDTO.getReasonDTO().getReason().name(),
+                        bagChangeDTO.getReasonDTO().getReasonText()
                 );
                 slogService.addLog(itemLog);
             }
@@ -237,7 +237,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
             long oldCount = gainScript.getCount(player, itemBag, cfgId);
             if (oldCount < change) {
                 if (bagChangeArgs.isBagErrorNoticeClient()) {
-                    tipsService.tips(player, qItem.getToName() + "道具不足", bagChangeArgs.getReasonArgs().getReason());
+                    tipsService.tips(player, qItem.getToName() + "道具不足", bagChangeArgs.getReasonDTO().getReason());
                 }
                 return false;
             }
@@ -249,7 +249,7 @@ public class BagService extends HoldRunApplication implements InitPrint {
     public void cost(Player player, BagChangeDTO4ItemCfg bagChangeDTO) {
         BagType bagType = bagChangeDTO.getBagType();
         ItemBag itemBag = player.getBagPack().itemBag(bagType);
-        BagChangesContext bagChangesContext = new BagChangesContext(player, bagType, itemBag, bagChangeDTO.getReasonArgs());
+        BagChangesContext bagChangesContext = new BagChangesContext(player, bagType, itemBag, bagChangeDTO.getReasonDTO());
 
         for (ItemCfg itemCfg : bagChangeDTO.getItemCfgList()) {
             int cfgId = itemCfg.getCfgId();
@@ -268,14 +268,14 @@ public class BagService extends HoldRunApplication implements InitPrint {
             costScript.cost(player, bagChangesContext, qItem, change);
             long newCount = gainScript.getCount(player, itemBag, cfgId);
 
-            log.info("消耗道具：{}, {}, {} {}-{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeDTO.getReasonArgs());
+            log.info("消耗道具：{}, {}, {} {}-{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeDTO.getReasonDTO());
 
             ItemLog itemLog = new ItemLog(player, bagType.name(),
                     "消耗",
                     cfgId, qItem.getName(),
                     oldCount, change, newCount,
-                    bagChangeDTO.getReasonArgs().getReason().name(),
-                    bagChangeDTO.getReasonArgs().getReasonText()
+                    bagChangeDTO.getReasonDTO().getReason().name(),
+                    bagChangeDTO.getReasonDTO().getReasonText()
             );
             slogService.addLog(itemLog);
 

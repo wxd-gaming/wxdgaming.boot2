@@ -12,8 +12,8 @@ import java.util.List;
 /**
  * 接口
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-05 11:20
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-05 11:20
  **/
 public class FastJsonTest {
 

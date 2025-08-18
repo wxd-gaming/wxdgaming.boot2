@@ -20,8 +20,8 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-01-11 14:27
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-01-11 14:27
  **/
 @Slf4j
 public class NioFactory implements Serializable {

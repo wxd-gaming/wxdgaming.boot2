@@ -31,8 +31,8 @@ import java.util.function.Predicate;
 /**
  * 数据集
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-15 12:36
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-15 12:36
  **/
 @Slf4j
 @Getter
@@ -276,8 +276,8 @@ public abstract class SqlDataHelper extends DataHelper {
      * @param sql    需要执行的 sql 语句
      * @param params 参数列表
      * @return 执行影响的行数
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-02-21 13:35
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2025-02-21 13:35
      */
     public int executeUpdate(String sql, Object... params) {
         AssertUtil.assertTrue(StringUtils.isNotBlank(sql), "sql 语句不能为空");
@@ -333,8 +333,8 @@ public abstract class SqlDataHelper extends DataHelper {
      * @param sqlWhere sql 语句的 where 条件
      * @param args
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-02-21 09:18
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2025-02-21 09:18
      */
     public List<JSONObject> queryListByEntityWhere(Class<? extends Entity> cls, String sqlWhere, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
@@ -391,8 +391,8 @@ public abstract class SqlDataHelper extends DataHelper {
      * @param args     参数
      * @param <R>      实体模型
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-02-16 01:14
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2025-02-16 01:14
      */
     public <R extends Entity> List<R> findListByWhere(Class<R> cls, String sqlWhere, Object... args) {
         TableMapping tableMapping = tableMapping(cls);
@@ -442,8 +442,8 @@ public abstract class SqlDataHelper extends DataHelper {
      * @param args 参数
      * @param <R>  实体模型
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-02-16 01:15
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2025-02-16 01:15
      */
     public <R extends Entity> R findByWhere(Class<R> cls, String sqlWhere, Object... args) {
         TableMapping tableMapping = tableMapping(cls);

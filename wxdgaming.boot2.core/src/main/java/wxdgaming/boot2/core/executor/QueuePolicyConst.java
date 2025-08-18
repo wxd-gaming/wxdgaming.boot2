@@ -9,8 +9,8 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-30 15:57
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-30 15:57
  **/
 @Slf4j
 public enum QueuePolicyConst implements QueuePolicy {

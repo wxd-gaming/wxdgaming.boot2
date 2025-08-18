@@ -12,8 +12,8 @@ import java.util.stream.Stream;
  * <p>后面加入的元素是会替换前面的元素
  * <p>请注意，替换规则是调用 在调用 hashcode equals 方法
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2022-02-16 10:46
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2022-02-16 10:46
  **/
 @Getter
 public class ConvertCollection<E> extends ObjectBase {

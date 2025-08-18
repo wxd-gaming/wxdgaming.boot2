@@ -8,8 +8,8 @@ import wxdgaming.boot2.core.reflect.ReflectProvider;
 /**
  * 线程模块
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-14 16:57
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-14 16:57
  **/
 @Order(1)
 class ApplicationGuiceModule extends GuiceModuleBase {
@@ -21,8 +21,6 @@ class ApplicationGuiceModule extends GuiceModuleBase {
     @Override protected void bind() throws Throwable {
         bind(RunApplicationMain.class);
         bindInstance(BootConfig.getIns());
-        bindInstance(int.class, "sid", BootConfig.getIns().sid());
-        bindInstance(boolean.class, "debug", BootConfig.getIns().isDebug());
     }
 
 }

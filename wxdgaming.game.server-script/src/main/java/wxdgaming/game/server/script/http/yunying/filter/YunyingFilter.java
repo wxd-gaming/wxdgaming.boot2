@@ -11,8 +11,8 @@ import java.lang.reflect.Method;
 /**
  * 运营过滤器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-30 09:36
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-30 09:36
  **/
 @Slf4j
 @Singleton

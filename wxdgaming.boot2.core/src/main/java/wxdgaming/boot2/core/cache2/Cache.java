@@ -14,8 +14,8 @@ import java.util.concurrent.ScheduledFuture;
 /**
  * cache
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-03-20 16:05
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-03-20 16:05
  **/
 @SuperBuilder
 public abstract class Cache<K, V> {

@@ -10,8 +10,8 @@ import java.util.Arrays;
 /**
  * 位标记
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2022-05-11 12:08
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2022-05-11 12:08
  **/
 @Getter
 public class BitFlag implements Serializable {
@@ -43,8 +43,8 @@ public class BitFlag implements Serializable {
 
     /**
      * @param sizeLong 你需要几个long来存储
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-06-13 15:20
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-06-13 15:20
      */
     protected void checkBounds(int sizeLong) {
         sizeLong++;
@@ -175,8 +175,8 @@ public class BitFlag implements Serializable {
      * @param index
      * @param value 会对参数进行取反操作
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-06-13 14:09
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-06-13 14:09
      */
     public BitFlag removeFlag(int index, long value) {
         AssertUtil.assertTrue(index > 0, "index 大于 0");
@@ -259,8 +259,8 @@ public class BitFlag implements Serializable {
      *
      * @param sizeLong 你需要几个long来存储
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-06-13 15:19
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-06-13 15:19
      */
     public BitFlag reset(int sizeLong) {
         longs = null;

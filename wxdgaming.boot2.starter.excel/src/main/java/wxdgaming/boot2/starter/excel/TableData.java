@@ -15,8 +15,8 @@ import java.util.Optional;
 /**
  * excel sheet 数据
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-08-08 20:49
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-08-08 20:49
  **/
 @Getter
 @Accessors(chain = true)
@@ -196,8 +196,8 @@ public class TableData {
      * 把所有的数据，转化成json字符串
      *
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-08-10 14:05
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-08-10 14:05
      */
     public String data2Json() {
         Object array = rows.values().stream().toList();

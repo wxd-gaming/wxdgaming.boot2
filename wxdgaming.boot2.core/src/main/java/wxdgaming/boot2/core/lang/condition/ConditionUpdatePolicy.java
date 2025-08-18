@@ -3,8 +3,8 @@ package wxdgaming.boot2.core.lang.condition;
 /**
  * 更新策略
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-02 10:09
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-02 10:09
  */
 public interface ConditionUpdatePolicy {
 

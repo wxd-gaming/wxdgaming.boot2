@@ -7,8 +7,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * 重入锁,单例锁
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-14 13:22
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-14 13:22
  */
 @Getter
 public class CacheLock {

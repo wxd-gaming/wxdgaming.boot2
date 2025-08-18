@@ -11,8 +11,8 @@ import java.util.List;
 /**
  * 测试
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-03-04 09:21
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-03-04 09:21
  **/
 public class JSTest {
 

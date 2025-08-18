@@ -22,8 +22,8 @@ import java.util.HashMap;
 /**
  * json
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-03 11:16
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-03 11:16
  **/
 @Slf4j
 @Getter

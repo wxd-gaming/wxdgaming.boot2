@@ -3,12 +3,11 @@ package wxdgaming.game.server.script.chat.handler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.chat.ReqChatMessage;
-import wxdgaming.game.server.bean.ClientSessionMapping;
+import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.bean.global.GlobalDataType;
 import wxdgaming.game.server.bean.global.impl.YunyingData;
 import wxdgaming.game.server.bean.role.Player;
@@ -21,13 +20,14 @@ import wxdgaming.game.server.script.tips.TipsService;
 /**
  * 请求聊天
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: v1.1
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version v1.1
  **/
 @Slf4j
 @Singleton
 public class ReqChatMessageHandler {
 
+    private final GameServerProperties gameServerProperties;
     private final GlobalDataService globalDataService;
     private final DataCenterService dataCenterService;
     private final ChatService chatService;
@@ -35,7 +35,8 @@ public class ReqChatMessageHandler {
     private final GmService gmService;
 
     @Inject
-    public ReqChatMessageHandler(GlobalDataService globalDataService, DataCenterService dataCenterService, ChatService chatService, TipsService tipsService, GmService gmService) {
+    public ReqChatMessageHandler(GameServerProperties gameServerProperties, GlobalDataService globalDataService, DataCenterService dataCenterService, ChatService chatService, TipsService tipsService, GmService gmService) {
+        this.gameServerProperties = gameServerProperties;
         this.globalDataService = globalDataService;
         this.dataCenterService = dataCenterService;
         this.chatService = chatService;
@@ -51,7 +52,7 @@ public class ReqChatMessageHandler {
         log.info("{} 聊天消息 {}", player, req);
         if (content.startsWith("@gm")) {
             YunyingData yunyingData = globalDataService.get(GlobalDataType.YUNYINGDATA);
-            if (BootConfig.getIns().isDebug()
+            if (gameServerProperties.isDebug()
                 || yunyingData.getGmAccountSet().contains(player.getAccount())
                 || yunyingData.getGmPlayerIdSet().contains(player.getUid())) {
                 gmService.doGm(player, content.substring(3).trim().split(" "));

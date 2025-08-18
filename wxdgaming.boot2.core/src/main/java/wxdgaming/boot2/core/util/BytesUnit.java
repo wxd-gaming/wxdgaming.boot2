@@ -3,8 +3,8 @@ package wxdgaming.boot2.core.util;
 /**
  * 字节格式化方案
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2022-11-05 10:34
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2022-11-05 10:34
  **/
 public enum BytesUnit {
     B() {

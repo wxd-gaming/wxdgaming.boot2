@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * 构建器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-16 13:59
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-16 13:59
  **/
 public class JsonTokenBuilder {
 

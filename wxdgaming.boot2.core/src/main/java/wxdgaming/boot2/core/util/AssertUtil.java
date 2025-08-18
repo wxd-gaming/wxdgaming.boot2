@@ -9,8 +9,8 @@ import java.util.Objects;
 /**
  * 断言辅助
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-07-31 09:34
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-07-31 09:34
  */
 public class AssertUtil {
 

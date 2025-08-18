@@ -7,8 +7,8 @@ import wxdgaming.boot2.core.util.LambdaFactory;
 /**
  * lambda
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-08-01 13:56
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-08-01 13:56
  */
 @Slf4j
 public class LambdaFactoryTest {

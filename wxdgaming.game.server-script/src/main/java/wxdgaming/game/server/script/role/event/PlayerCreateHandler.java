@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.bean.goods.BagChangeDTO4ItemCfg;
-import wxdgaming.game.core.Reason;
-import wxdgaming.game.core.ReasonArgs;
+import wxdgaming.game.basic.core.Reason;
+import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.bean.goods.ItemCfg;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnCreateRole;
@@ -17,8 +17,8 @@ import java.util.List;
 /**
  * 角色创建事件
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-27 19:51
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-27 19:51
  **/
 @Slf4j
 @Singleton
@@ -42,10 +42,10 @@ public class PlayerCreateHandler {
         rewards.add(builder.cfgId(3).num(100000).build());
         rewards.add(builder.cfgId(4).num(100000).build());
         rewards.add(builder.cfgId(5).num(1).build());
-        ReasonArgs reasonArgs = ReasonArgs.of(Reason.CreateRole);
+        ReasonDTO reasonDTO = ReasonDTO.of(Reason.CreateRole);
         BagChangeDTO4ItemCfg rewardArgs4ItemCfg = BagChangeDTO4ItemCfg.builder()
                 .setItemCfgList(rewards)
-                .setReasonArgs(reasonArgs)
+                .setReasonDTO(reasonDTO)
                 .build();
         bagService.gainItemCfg(player, rewardArgs4ItemCfg);
     }

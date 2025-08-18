@@ -19,8 +19,8 @@ import java.util.Set;
 /**
  * 判定是 socket 还是 web socket
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2023-08-25 09:47
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2023-08-25 09:47
  **/
 @Slf4j
 public class SocketServerChooseHandler extends ByteToMessageDecoder {

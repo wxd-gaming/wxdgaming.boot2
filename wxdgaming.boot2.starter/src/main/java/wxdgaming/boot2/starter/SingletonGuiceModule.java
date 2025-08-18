@@ -7,8 +7,8 @@ import wxdgaming.boot2.core.reflect.ReflectProvider;
 /**
  * 构建Singleton
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-16 10:35
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-16 10:35
  **/
 public class SingletonGuiceModule extends GuiceModuleBase {
 

@@ -8,8 +8,8 @@ import wxdgaming.boot2.core.token.JsonTokenBuilder;
 import wxdgaming.boot2.core.token.JsonTokenParse;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-16 14:20
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-16 14:20
  **/
 public class JsonTokenTest {
 

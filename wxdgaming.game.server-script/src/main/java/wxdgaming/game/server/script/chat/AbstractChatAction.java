@@ -13,8 +13,8 @@ import wxdgaming.game.server.script.tips.TipsService;
 /**
  * 聊天接口
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-28 19:32
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-28 19:32
  **/
 @Slf4j
 @Singleton

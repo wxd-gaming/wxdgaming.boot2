@@ -14,8 +14,8 @@ import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.game.bean.goods.BagChangeDTO4Item;
 import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.bean.goods.ItemCfg;
-import wxdgaming.game.core.Reason;
-import wxdgaming.game.core.ReasonArgs;
+import wxdgaming.game.basic.core.Reason;
+import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.message.cdkey.ResUseCdKey;
 import wxdgaming.game.server.bean.BackendConfig;
 import wxdgaming.game.server.bean.role.Player;
@@ -31,8 +31,8 @@ import java.util.List;
 /**
  * cdkey
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-29 11:14
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-29 11:14
  **/
 @Slf4j
 @Getter
@@ -89,7 +89,7 @@ public class CDKeyService {
             rewards.add(itemCfg);
         }
 
-        ReasonArgs reasonArgs = ReasonArgs.of(
+        ReasonDTO reasonDTO = ReasonDTO.of(
                 Reason.USE_CDKEY,
                 "cdkey=", cdKey, "cid=%d(%s)".formatted(runResult.getIntValue("cid"), runResult.getString("comment"))
         );
@@ -100,7 +100,7 @@ public class CDKeyService {
                 .setItemList(itemList)
                 .setBagFullSendMail(true)
                 .setBagErrorNoticeClient(false)
-                .setReasonArgs(reasonArgs)
+                .setReasonDTO(reasonDTO)
                 .build();
 
         bagService.gainItems(player, rewardItemArgs);

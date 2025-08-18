@@ -17,8 +17,8 @@ import wxdgaming.game.server.script.role.PlayerService;
 /**
  * 获得道具
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-22 19:13
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-22 19:13
  **/
 @Slf4j
 @Singleton

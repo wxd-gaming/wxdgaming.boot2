@@ -3,8 +3,8 @@ package wxdgaming.boot2.core.util;
 import wxdgaming.boot2.core.chatset.Base64Util;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2020-07-29 10:33
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2020-07-29 10:33
  */
 public class AesUtil {
 

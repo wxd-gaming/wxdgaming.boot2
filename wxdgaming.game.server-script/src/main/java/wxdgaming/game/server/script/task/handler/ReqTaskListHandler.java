@@ -11,8 +11,8 @@ import wxdgaming.game.server.bean.role.Player;
 /**
  * 任务列表
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: v1.1
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version v1.1
  **/
 @Slf4j
 @Singleton

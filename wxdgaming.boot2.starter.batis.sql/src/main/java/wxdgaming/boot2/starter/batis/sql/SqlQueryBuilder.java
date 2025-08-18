@@ -13,8 +13,8 @@ import java.util.List;
 /**
  * sql 查询 构造器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-21 09:43
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-21 09:43
  **/
 @Getter
 @Setter
@@ -80,8 +80,8 @@ public abstract class SqlQueryBuilder {
      * @param where 例如： a=?
      * @param param 1
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2025-03-08 20:49
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2025-03-08 20:49
      */
     public SqlQueryBuilder pushWhereByValueNotNull(String where, Object param) {
         if (Objects.nonNullEmpty(param))

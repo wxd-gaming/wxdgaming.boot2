@@ -3,7 +3,7 @@ package wxdgaming.game.server.bean.bag;
 import lombok.AccessLevel;
 import lombok.Getter;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.game.core.ReasonArgs;
+import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.message.bag.ResUpdateBagInfo;
 import wxdgaming.game.server.bean.role.Player;
@@ -13,8 +13,8 @@ import java.util.HashSet;
 /**
  * 背包操作上下文持有
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-05 19:20
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-05 19:20
  **/
 @Getter
 public class BagChangesContext {
@@ -22,18 +22,18 @@ public class BagChangesContext {
     final Player player;
     final BagType bagType;
     final ItemBag itemBag;
-    final ReasonArgs reasonArgs;
+    final ReasonDTO reasonDTO;
     @Getter(AccessLevel.PRIVATE) final ResUpdateBagInfo resUpdateBagInfo;
     final HashSet<ItemGrid> changeItems = new HashSet<>();
 
-    public BagChangesContext(Player player, BagType bagType, ItemBag itemBag, ReasonArgs reasonArgs) {
+    public BagChangesContext(Player player, BagType bagType, ItemBag itemBag, ReasonDTO reasonDTO) {
         this.player = player;
         this.bagType = bagType;
         this.itemBag = itemBag;
-        this.reasonArgs = reasonArgs;
+        this.reasonDTO = reasonDTO;
         this.resUpdateBagInfo = new ResUpdateBagInfo();
         this.resUpdateBagInfo.setBagType(bagType);
-        this.resUpdateBagInfo.setReason(reasonArgs.getReason().name());
+        this.resUpdateBagInfo.setReason(reasonDTO.getReason().name());
     }
 
     /** 添加货币 */

@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2020-12-30 20:33
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2020-12-30 20:33
  */
 @Slf4j
 public class DumpUtil {

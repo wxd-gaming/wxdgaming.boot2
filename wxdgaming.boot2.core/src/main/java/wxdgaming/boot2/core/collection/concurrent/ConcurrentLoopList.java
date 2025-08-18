@@ -13,8 +13,8 @@ import java.util.function.Consumer;
  * 循环列表
  *
  * @param <T>
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-09-07 12:05
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-09-07 12:05
  */
 public class ConcurrentLoopList<T> extends ObjectBase {
 

@@ -15,8 +15,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2022-08-01 13:56
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2022-08-01 13:56
  **/
 public class WxdOptionalSslHandler extends ByteToMessageDecoder implements Serializable {
 

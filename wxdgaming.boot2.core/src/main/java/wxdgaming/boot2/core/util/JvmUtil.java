@@ -11,8 +11,8 @@ import java.util.concurrent.locks.LockSupport;
 import java.util.function.Function;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-04-02 15:07
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-04-02 15:07
  **/
 public class JvmUtil {
 

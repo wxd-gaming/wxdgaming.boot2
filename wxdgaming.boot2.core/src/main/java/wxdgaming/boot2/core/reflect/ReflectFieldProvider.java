@@ -9,8 +9,8 @@ import java.lang.reflect.Method;
 /**
  * 字段
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-17 10:33
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-17 10:33
  */
 @Slf4j
 @Getter

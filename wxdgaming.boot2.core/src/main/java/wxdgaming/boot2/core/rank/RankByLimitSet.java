@@ -11,8 +11,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * <p>排行榜数据记录的是前{@link #limit}名
  * <p>超过前{@link #limit}名的数据会只会记录分数段位的并列排名
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-27 16:02
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-27 16:02
  **/
 @Getter
 public class RankByLimitSet {

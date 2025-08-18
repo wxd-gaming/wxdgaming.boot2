@@ -16,8 +16,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * 块集合
  * <p> 非线程安全的
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-10-25 12:05
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-10-25 12:05
  **/
 @Slf4j
 @Getter

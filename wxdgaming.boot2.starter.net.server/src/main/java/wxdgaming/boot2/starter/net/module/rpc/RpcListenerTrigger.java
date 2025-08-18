@@ -22,8 +22,8 @@ import java.lang.reflect.Type;
 /**
  * rpc 触发 事件
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-18 09:15
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-18 09:15
  **/
 @Slf4j
 public class RpcListenerTrigger extends ExecutorEvent {

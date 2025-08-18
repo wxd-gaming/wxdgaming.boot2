@@ -15,8 +15,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * lru 类型的缓存
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-03-20 16:14
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-03-20 16:14
  **/
 @Slf4j
 @Getter

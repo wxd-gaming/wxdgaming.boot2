@@ -17,8 +17,8 @@ import java.util.List;
 /**
  * 测试
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-15 19:44
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-15 19:44
  **/
 @Slf4j
 public class MysqlTest {

@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
-import wxdgaming.game.core.Reason;
+import wxdgaming.game.basic.core.Reason;
 import wxdgaming.game.message.tips.ResTips;
 import wxdgaming.game.message.tips.TipsType;
 import wxdgaming.game.server.bean.ClientSessionMapping;
@@ -18,8 +18,8 @@ import java.util.List;
 /**
  * 提示
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-27 11:02
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-27 11:02
  **/
 @Slf4j
 @Singleton

@@ -15,8 +15,8 @@ import java.util.Map;
 /**
  * excel 构建 buff, src/main/cfg/buff.xlsx, q_buff,
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-15 10:24:13
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-15 10:24:13
  **/
 @Getter
 @Keys(value = {"buffId#lv"})

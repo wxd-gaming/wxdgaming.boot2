@@ -1,5 +1,6 @@
-debug: true
-sid: 1
+boot:
+  debug: true
+  sid: 1
 executor:
   default:
     coreSize: 2                        #默认线程池的核心线程数

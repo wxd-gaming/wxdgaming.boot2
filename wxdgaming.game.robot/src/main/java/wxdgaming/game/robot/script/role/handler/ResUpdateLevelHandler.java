@@ -10,8 +10,8 @@ import wxdgaming.game.robot.bean.Robot;
 /**
  * 更新等级
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: v1.1
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version v1.1
  **/
 @Slf4j
 @Singleton

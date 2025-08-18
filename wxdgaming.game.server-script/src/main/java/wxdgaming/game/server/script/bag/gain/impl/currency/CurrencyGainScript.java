@@ -15,8 +15,8 @@ import java.util.List;
 /**
  * 货币的获得
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-23 17:35
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-23 17:35
  **/
 @Slf4j
 @Singleton

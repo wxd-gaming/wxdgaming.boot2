@@ -9,8 +9,8 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 /**
  * Fight 事件
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-25 17:01
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-25 17:01
  **/
 @Getter
 @Setter

@@ -12,8 +12,8 @@ import java.util.Objects;
 /**
  * protobuf篡改
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-05-27 13:15
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-05-27 13:15
  **/
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class GatewayProtoTest {

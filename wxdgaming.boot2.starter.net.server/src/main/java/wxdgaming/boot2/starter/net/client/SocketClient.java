@@ -35,8 +35,8 @@ import java.util.function.Consumer;
 /**
  * tcp client
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-08-15 13:12
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-08-15 13:12
  **/
 @Slf4j
 @Getter

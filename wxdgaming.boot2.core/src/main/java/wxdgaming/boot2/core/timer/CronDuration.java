@@ -5,8 +5,8 @@ import lombok.Getter;
 /**
  * 表达式有效期
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-24 13:15
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-24 13:15
  **/
 @Getter
 public class CronDuration {

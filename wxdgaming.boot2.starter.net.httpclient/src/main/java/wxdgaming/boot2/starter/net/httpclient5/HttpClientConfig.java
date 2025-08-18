@@ -10,8 +10,8 @@ import java.util.function.Supplier;
 /**
  * 配置
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-18 10:26
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-18 10:26
  **/
 @Getter
 public class HttpClientConfig extends ObjectBase {

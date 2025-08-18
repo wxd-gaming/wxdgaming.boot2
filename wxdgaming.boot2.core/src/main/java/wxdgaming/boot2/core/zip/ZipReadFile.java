@@ -18,8 +18,8 @@ import java.util.zip.ZipFile;
 /**
  * 读取 zip 文件
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2022-05-09 20:17
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2022-05-09 20:17
  **/
 @Slf4j
 public class ZipReadFile implements Serializable, Closeable {

@@ -4,8 +4,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-04-26 18:20
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-04-26 18:20
  **/
 public interface ILock {
 

@@ -26,8 +26,8 @@ import java.util.Map;
 /**
  * 数据模型
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-10-09 10:08
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-10-09 10:08
  **/
 @Getter
 public abstract class DataTable<E extends DataKey> extends ObjectBase implements Serializable {

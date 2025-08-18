@@ -12,8 +12,8 @@ import java.util.function.Function;
 /**
  * 配置字符串
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-10-08 20:44
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-10-08 20:44
  **/
 public class ConfigString {
 

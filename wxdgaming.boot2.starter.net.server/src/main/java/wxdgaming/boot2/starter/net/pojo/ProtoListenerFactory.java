@@ -17,8 +17,8 @@ import java.util.function.Supplier;
 /**
  * 派发器
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-14 20:01
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-14 20:01
  **/
 @Slf4j
 @Getter

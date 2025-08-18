@@ -42,4 +42,8 @@ public class LogMappingInfo extends ObjectBase {
                 .orElse(null);
     }
 
+    public LogMappingInfo setLogName(String logName) {
+        this.logName = logName.toLowerCase();
+        return this;
+    }
 }

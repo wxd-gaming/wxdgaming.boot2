@@ -11,8 +11,8 @@ import java.util.Arrays;
 /**
  * 读取测试
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-08-09 19:29
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-08-09 19:29
  **/
 public class ReadTest {
 

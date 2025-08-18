@@ -7,8 +7,8 @@ import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 /**
  * 服务
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-17 15:08
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-17 15:08
  **/
 public class ClientMessageEncode extends MessageEncode {
 

@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * excel 构建 任务集合, src/main/cfg/道具.xlsx, q_item,
  *
- * @author: wxd-gaming(無心道, 15388152619)
+ * @author wxd-gaming(無心道, 15388152619)
  **/
 @Getter
 @Setter

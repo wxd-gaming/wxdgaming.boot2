@@ -7,8 +7,8 @@ import lombok.Setter;
 /**
  * 在线信息
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-12 13:20
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-12 13:20
  **/
 @Getter
 @Setter

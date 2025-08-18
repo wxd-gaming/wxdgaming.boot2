@@ -19,8 +19,8 @@ import java.util.stream.Stream;
 /**
  * 文件读取
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-08-18 14:41
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-08-18 14:41
  **/
 public class FileReadUtil implements Serializable {
 

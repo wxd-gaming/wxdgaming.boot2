@@ -2,6 +2,8 @@ package wxdgaming.logbus;
 
 import lombok.Getter;
 import lombok.Setter;
+import wxdgaming.boot2.core.ann.Configuration;
+import wxdgaming.boot2.core.ann.ConfigurationProperties;
 
 /**
  * 配置
@@ -11,6 +13,8 @@ import lombok.Setter;
  **/
 @Getter
 @Setter
+@Configuration
+@ConfigurationProperties(prefix = "logbus")
 public class LogBusProperties {
 
     private int splitOrg = 300;

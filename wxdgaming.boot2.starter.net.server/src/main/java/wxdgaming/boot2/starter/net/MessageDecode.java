@@ -19,8 +19,8 @@ import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 /**
  * 消息解码，收到消息处理
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-08-20 09:09
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-08-20 09:09
  **/
 @Slf4j
 @Getter

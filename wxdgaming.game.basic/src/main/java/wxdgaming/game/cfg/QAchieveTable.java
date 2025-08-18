@@ -12,8 +12,8 @@ import java.util.Map;
 /**
  * excel 构建 成就集合, src/cfg/任务成就.xlsx, q_achieve,
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-03 15:28:21
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-03 15:28:21
  **/
 @Getter
 public class QAchieveTable extends DataTable<QAchieve> implements Serializable {

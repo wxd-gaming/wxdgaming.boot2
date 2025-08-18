@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.game.core.Reason;
-import wxdgaming.game.core.ReasonArgs;
+import wxdgaming.game.basic.core.Reason;
+import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.gm.ann.GM;
 import wxdgaming.game.server.script.role.PlayerService;
@@ -13,8 +13,8 @@ import wxdgaming.game.server.script.role.PlayerService;
 /**
  * 角色等级相关
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-30 09:50
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-30 09:50
  **/
 @Slf4j
 @Singleton
@@ -38,7 +38,7 @@ public class PlayerGmScript {
     @GM
     public Object addExp(Player player, JSONArray args) {
         long exp = args.getLongValue(1);
-        this.playerService.addExp(player, exp, ReasonArgs.of(Reason.GM));
+        this.playerService.addExp(player, exp, ReasonDTO.of(Reason.GM));
         return null;
     }
 

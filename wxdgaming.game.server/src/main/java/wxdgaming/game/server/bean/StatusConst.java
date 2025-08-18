@@ -6,8 +6,8 @@ import wxdgaming.boot2.core.lang.bit.BitFlagGroup;
 /**
  * 状态
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-15 19:12
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-15 19:12
  **/
 public interface StatusConst {
 

@@ -9,8 +9,8 @@ import java.lang.reflect.Method;
 /**
  * 事件
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-15 19:56
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-15 19:56
  **/
 @Slf4j
 public abstract class ExecutorEvent extends ExecutorJob implements IExecutorQueue {

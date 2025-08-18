@@ -17,7 +17,7 @@ import wxdgaming.boot2.starter.net.client.SocketClient;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
-import wxdgaming.game.login.LoginConfig;
+import wxdgaming.game.basic.login.LoginProperties;
 import wxdgaming.game.message.chat.ChatType;
 import wxdgaming.game.message.chat.ReqChatMessage;
 import wxdgaming.game.message.role.ReqHeartbeat;
@@ -33,39 +33,40 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * socket
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-27 13:20
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-27 13:20
  **/
 @Slf4j
 @Getter
 @Singleton
 public class RobotMainService {
 
-    final LoginConfig loginConfig;
+    final LoginProperties loginProperties;
     final SocketClient socketClient;
     final ConcurrentHashMap<String, Robot> robotMap = new ConcurrentHashMap<>();
 
     @Inject
-    public RobotMainService(LoginConfig loginConfig, SocketClient socketClient) {
-        this.loginConfig = loginConfig;
+    public RobotMainService(LoginProperties loginProperties, SocketClient socketClient) {
+        this.loginProperties = loginProperties;
         this.socketClient = socketClient;
     }
 
     @Start
     public void start() {
-        for (int i = 0; i < 1; i++) {
-            String account = "b4" + (i + 1);
+        for (int i = 0; i < 100; i++) {
+            String account = "b7" + (i + 1);
             robotMap.put(account, new Robot().setAccount(account).setName(account));
         }
     }
 
     public RunResult httpLogin(Robot robot) {
         JSONObject jsonObject = MapOf.newJSONObject();
+        jsonObject.put("appId", 1);
         jsonObject.put("platform", 1);
         jsonObject.put("account", robot.getAccount());
         jsonObject.put("token", robot.getAccount());
 
-        String uriPath = getLoginConfig().getUrl() + "/login/check";
+        String uriPath = getLoginProperties().getUrl() + "/login/check";
         HttpResponse httpResponse = HttpRequestPost.ofJson(uriPath, jsonObject.toJSONString()).execute();
         RunResult runResult = httpResponse.bodyRunResult();
         if (runResult.isFail()) {

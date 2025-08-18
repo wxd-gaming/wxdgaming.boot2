@@ -14,8 +14,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * cron 表达式解析 {@code {"cron":"0 0","timeUnit":"SECONDS","duration":500}}
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-09-27 10:40
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-09-27 10:40
  **/
 @Slf4j
 public class CronExpress extends ObjectBase {

@@ -3,7 +3,7 @@ package wxdgaming.boot2.starter;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.BootConfig;
+import wxdgaming.boot2.core.BootstrapProperties;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Start;
@@ -14,8 +14,8 @@ import wxdgaming.boot2.core.util.JvmUtil;
 /**
  * 运行类
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-14 16:55
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-14 16:55
  **/
 @Slf4j
 public final class RunApplicationMain extends RunApplication {
@@ -35,7 +35,7 @@ public final class RunApplicationMain extends RunApplication {
         try {
             executeMethodWithAnnotated(Start.class);
             StringBuilder stringAppend = new StringBuilder(1024);
-
+            BootstrapProperties bootstrapProperties = getInstance(BootstrapProperties.class);
             String printString = FileReadUtil.readString("print.txt");
 
             int len = 60;
@@ -43,8 +43,8 @@ public final class RunApplicationMain extends RunApplication {
             stringAppend.append("\n\n")
                     .append(printString)
                     .append("\n")
-                    .append("    -[ " + StringUtils.padRight("debug = " + BootConfig.getIns().isDebug() + " | " + JvmUtil.processIDString(), len, ' ') + " ]-\n")
-                    .append("    -[ " + StringUtils.padRight(BootConfig.getIns().sid() + " | " + BootConfig.getIns().sname(), len, ' ') + " ]-\n")
+                    .append("    -[ " + StringUtils.padRight("debug = " + bootstrapProperties.isDebug() + " | " + JvmUtil.processIDString(), len, ' ') + " ]-\n")
+                    .append("    -[ " + StringUtils.padRight(bootstrapProperties.getSid() + " | " + bootstrapProperties.getName(), len, ' ') + " ]-\n")
                     .append("    -[ " + StringUtils.padRight(JvmUtil.timeZone(), len, ' ') + " ]-\n");
             stringAppend.append("\n");
             log.info("=== start end ===");

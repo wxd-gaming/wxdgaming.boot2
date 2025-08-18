@@ -9,8 +9,8 @@ import wxdgaming.game.server.bean.role.RoleEntity;
 /**
  * 通过数据库获取player
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-18 20:39
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-18 20:39
  **/
 @Slf4j
 public class DatabaseGetPlayerStrategy implements GetPlayerStrategy {

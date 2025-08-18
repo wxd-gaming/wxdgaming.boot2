@@ -7,8 +7,8 @@ import java.util.concurrent.RejectedExecutionHandler;
 /**
  * 队列策略
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-30 15:56
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-30 15:56
  **/
 public interface QueuePolicy {
 

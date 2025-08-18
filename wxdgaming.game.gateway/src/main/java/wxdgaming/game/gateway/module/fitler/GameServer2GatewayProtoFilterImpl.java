@@ -12,8 +12,8 @@ import wxdgaming.game.gateway.module.data.DataCenterService;
 /**
  * 游戏服务传递到网关
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-28 15:19
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-28 15:19
  **/
 @Slf4j
 @Singleton

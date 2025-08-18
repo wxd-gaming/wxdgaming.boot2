@@ -20,15 +20,15 @@ import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.module.data.GlobalDbDataCenterService;
 import wxdgaming.game.server.module.drive.PlayerDriveService;
 import wxdgaming.game.server.script.role.log.RoleLoginLog;
-import wxdgaming.game.slog.SlogService;
+import wxdgaming.game.basic.slog.SlogService;
 
 import java.util.HashSet;
 
 /**
  * 选择角色
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: v1.1
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version v1.1
  **/
 @Slf4j
 @Singleton

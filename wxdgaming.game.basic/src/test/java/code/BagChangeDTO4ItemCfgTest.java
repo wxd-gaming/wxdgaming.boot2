@@ -2,8 +2,8 @@ package code;
 
 import org.junit.Test;
 import wxdgaming.game.bean.goods.BagChangeDTO4ItemCfg;
-import wxdgaming.game.core.Reason;
-import wxdgaming.game.core.ReasonArgs;
+import wxdgaming.game.basic.core.Reason;
+import wxdgaming.game.basic.core.ReasonDTO;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public class BagChangeDTO4ItemCfgTest {
 
         BagChangeDTO4ItemCfg build = BagChangeDTO4ItemCfg.builder()
                 .setItemCfgList(List.of())
-                .setReasonArgs(ReasonArgs.of(Reason.CreateRole))
+                .setReasonDTO(ReasonDTO.of(Reason.CreateRole))
                 .build();
 
         System.out.println(build);

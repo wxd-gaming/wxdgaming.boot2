@@ -11,8 +11,8 @@ import java.util.Objects;
 /**
  * 排行榜分数
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-20 20:57
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-20 20:57
  **/
 @Getter
 @Setter

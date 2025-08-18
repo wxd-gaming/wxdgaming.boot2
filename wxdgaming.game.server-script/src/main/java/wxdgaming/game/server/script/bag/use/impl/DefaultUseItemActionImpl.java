@@ -9,8 +9,8 @@ import wxdgaming.game.server.script.bag.use.UseItemAction;
 /**
  * 默认使用
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-22 17:29
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-22 17:29
  **/
 public class DefaultUseItemActionImpl extends UseItemAction {
 

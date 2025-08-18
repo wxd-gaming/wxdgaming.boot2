@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-15 09:39
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-15 09:39
  **/
 @Slf4j
 class ExecutorJob implements Runnable {

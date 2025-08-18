@@ -13,8 +13,8 @@ import java.util.function.Function;
 /**
  * mapdb 辅助
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-23 16:43
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-23 16:43
  **/
 @Slf4j
 public class MapDBDataHelper implements AutoCloseable {

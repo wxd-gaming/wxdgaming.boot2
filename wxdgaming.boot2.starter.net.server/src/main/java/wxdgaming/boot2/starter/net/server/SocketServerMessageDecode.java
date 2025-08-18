@@ -15,8 +15,8 @@ import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 /**
  * 服务
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-17 15:07
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-17 15:07
  **/
 @Slf4j
 @ChannelHandler.Sharable

@@ -17,14 +17,15 @@ import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.Md5Util;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.SocketClientConfig;
-import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
+import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.SocketServer;
 import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
-import wxdgaming.game.login.LoginConfig;
-import wxdgaming.game.login.bean.info.InnerServerInfoBean;
+import wxdgaming.game.gateway.GatewayProperties;
+import wxdgaming.game.basic.login.LoginProperties;
+import wxdgaming.game.basic.login.bean.info.InnerServerInfoBean;
 import wxdgaming.game.message.inner.InnerRegisterServer;
 import wxdgaming.game.message.inner.ServiceType;
 
@@ -37,15 +38,16 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 网关和游戏服之间的连接管理服务
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-28 13:45
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-28 13:45
  **/
 @Slf4j
 @Getter
 @Singleton
 public class Gateway2GameSessionService extends HoldRunApplication {
 
-    final LoginConfig loginConfig;
+    final GatewayProperties gatewayProperties;
+    final LoginProperties loginProperties;
     final SocketServer socketServer;
     final ConcurrentHashMap<Integer, Gateway2GameSocketClientImpl> gameSessionMap = new ConcurrentHashMap<>();
 
@@ -53,9 +55,10 @@ public class Gateway2GameSessionService extends HoldRunApplication {
     private final HttpListenerFactory httpListenerFactory;
 
     @Inject
-    public Gateway2GameSessionService(LoginConfig loginConfig, SocketServer socketServer,
+    public Gateway2GameSessionService(GatewayProperties gatewayProperties, LoginProperties loginProperties, SocketServer socketServer,
                                       ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
-        this.loginConfig = loginConfig;
+        this.gatewayProperties = gatewayProperties;
+        this.loginProperties = loginProperties;
         this.socketServer = socketServer;
         this.protoListenerFactory = protoListenerFactory;
         this.httpListenerFactory = httpListenerFactory;
@@ -72,25 +75,25 @@ public class Gateway2GameSessionService extends HoldRunApplication {
     public void registerLoginServer() {
 
         InnerServerInfoBean serverInfoBean = new InnerServerInfoBean();
-        serverInfoBean.setServerId(BootConfig.getIns().sid());
-        serverInfoBean.setMainId(BootConfig.getIns().sid());
-        serverInfoBean.setName(BootConfig.getIns().sname());
+        serverInfoBean.setServerId(gatewayProperties.getSid());
+        serverInfoBean.setMainId(gatewayProperties.getSid());
+        serverInfoBean.setName(gatewayProperties.getName());
         serverInfoBean.setPort(socketServer.getConfig().getPort());
         serverInfoBean.setHttpPort(socketServer.getConfig().getPort());
 
-        serverInfoBean.setMaxOnlineSize(loginConfig.getMaxOnlineSize());
+        serverInfoBean.setMaxOnlineSize(loginProperties.getMaxOnlineSize());
         serverInfoBean.setOnlineSize(socketServer.getSessionGroup().size());
 
         JSONObject jsonObject = MapOf.newJSONObject();
-        jsonObject.put("sid", BootConfig.getIns().sid());
+        jsonObject.put("sid", gatewayProperties.getSid());
         jsonObject.put("serverBean", serverInfoBean.toJSONString());
 
         String json = jsonObject.toString(SerializerFeature.MapSortField, SerializerFeature.SortField);
-        String md5DigestEncode = Md5Util.md5DigestEncode0("#", json, loginConfig.getJwtKey());
+        String md5DigestEncode = Md5Util.md5DigestEncode0("#", json, loginProperties.getJwtKey());
         jsonObject.put("sign", md5DigestEncode);
 
         String string = jsonObject.toString();
-        HttpResponse httpResponse = HttpRequestPost.ofJson(loginConfig.getUrl() + "/inner/registerGateway", string).execute();
+        HttpResponse httpResponse = HttpRequestPost.ofJson(loginProperties.getUrl() + "/inner/registerGateway", string).execute();
         if (!httpResponse.isSuccess()) {
             log.error("访问登陆服务器失败{}", Throw.ofString(httpResponse.getException(), false));
             return;
@@ -101,7 +104,7 @@ public class Gateway2GameSessionService extends HoldRunApplication {
 
             InnerRegisterServer registerServer = new InnerRegisterServer();
             registerServer.setServiceType(ServiceType.GATEWAY);
-            registerServer.setMainSid(BootConfig.getIns().sid());
+            registerServer.setMainSid(gatewayProperties.getSid());
 
             List<InnerServerInfoBean> data = runResult.getObject("data", new TypeReference<List<InnerServerInfoBean>>() {});
             HashSet<Integer> hasServerIdSet = new HashSet<>();

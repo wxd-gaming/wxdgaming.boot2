@@ -48,7 +48,8 @@ public class LogService implements InitPrint {
     }
 
     public void submitLog(LogEntity logEntity) {
-        LogTableContext logTableContext = logTableContext(logEntity.getLogType());
+        String logType = logEntity.getLogType().toLowerCase();
+        LogTableContext logTableContext = logTableContext(logType);
         if (logEntity.getUid() == 0) {
             log.debug("uid 为0 {}", logEntity);
             logEntity.setUid(logTableContext.newId());
@@ -59,7 +60,7 @@ public class LogService implements InitPrint {
         }
         logEntity.checkDataKey();
         logTableContext.addFilter(logEntity.getUid());
-        log.debug("保存 uid={}, logType={}, entity={}", logEntity.getUid(), logEntity.getLogType(), logEntity);
+        log.debug("保存 uid={}, logType={}, entity={}", logEntity.getUid(), logType, logEntity);
         pgsqlDataHelper.getDataBatch().insert(logEntity);
     }
 

@@ -14,8 +14,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * jdbc cache
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-17 11:28
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-17 11:28
  **/
 @Slf4j
 @Getter

@@ -11,8 +11,8 @@ import java.util.stream.Stream;
 /**
  * 道具背包
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-23 17:21
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-23 17:21
  **/
 @Getter
 @Setter

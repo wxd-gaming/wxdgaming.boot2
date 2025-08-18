@@ -12,8 +12,8 @@ import java.util.function.Supplier;
 /**
  * socket 模块
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-13 09:45
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-13 09:45
  **/
 public class SocketServerGuiceModule extends ServiceGuiceModule {
 

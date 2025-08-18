@@ -1,0 +1,11 @@
+http:
+  client:
+    routeMaxSize: 500                    #连接池的核心连接数
+    totalMaxSize: 3000                   #连接池的最大连接数
+    resetTimeM: 30                      #连接池重置时间，时间太长连接池会异常 单位分钟
+    sslProtocol: TLS                    #ssl 类型
+    connectTimeOut: 3000                #创建连接超时时间
+    connectionRequestTimeout: 1000      #从连接池获取连接超时
+    keepAliveTimeout: 30000             #连接有效时间
+    readTimeout: 3000                   #读取超时时间
+    autoUseGzip: true                   #开启gzip

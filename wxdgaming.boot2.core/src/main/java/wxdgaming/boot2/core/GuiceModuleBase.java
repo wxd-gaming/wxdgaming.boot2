@@ -7,20 +7,21 @@ import com.google.inject.name.Names;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
+import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.lang.annotation.Annotation;
 
 /**
  * 基础模块
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2023-09-15 10:12
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2023-09-15 10:12
  **/
 @Slf4j
 @Getter
 public abstract class GuiceModuleBase extends AbstractModule {
 
-    final ReflectProvider reflectProvider;
+    protected final ReflectProvider reflectProvider;
 
     public GuiceModuleBase(ReflectProvider reflectProvider) {
         this.reflectProvider = reflectProvider;
@@ -50,6 +51,7 @@ public abstract class GuiceModuleBase extends AbstractModule {
 
     @SuppressWarnings({"unchecked", "rawtype"})
     public void bindInstance(Class clazz, Object instance) {
+        AssertUtil.assertNull(instance, "%s null", clazz.getName());
         bind(clazz).toInstance(instance);
     }
 

@@ -7,15 +7,15 @@ import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
-import wxdgaming.game.login.AppPlatformParams;
+import wxdgaming.game.basic.login.AppPlatformParams;
 import wxdgaming.game.login.bean.UserData;
 import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
 
 /**
  * Quick
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-26 10:12
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-26 10:12
  */
 @Slf4j
 @Singleton
@@ -41,13 +41,13 @@ public class QuickSdkLoginApi extends AbstractSdkLoginApi {
             String finalAccount = appPlatformParams.getAppId() + "_" + channelId + "_" + user_id;
 
             UserData userData = getUserData(finalAccount, () -> {
-                UserData ud = createUserData(finalAccount, appPlatformParams, user_id);
+                UserData ud = createUserData(context.getIp(), finalAccount, appPlatformParams, user_id);
                 ud.setPlatformChannelId(channelId);
                 ud.setToken("*");
                 return ud;
             });
 
-            return buildResult(userData);
+            return loginSuccess(userData, context.getIp());
 
         }
         return RunResult.fail("登陆失败 token error");

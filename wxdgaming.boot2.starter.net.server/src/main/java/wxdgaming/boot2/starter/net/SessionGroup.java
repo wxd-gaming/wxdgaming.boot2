@@ -11,8 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * channel 列表
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-09-09 16:04
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-09-09 16:04
  **/
 @Getter
 public class SessionGroup extends ConcurrentLoopList<SocketSession> {

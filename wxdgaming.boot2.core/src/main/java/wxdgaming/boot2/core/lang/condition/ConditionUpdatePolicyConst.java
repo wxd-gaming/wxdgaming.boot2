@@ -5,8 +5,8 @@ import lombok.Getter;
 /**
  * 更新操作
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-01 13:50
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-01 13:50
  **/
 @Getter
 public enum ConditionUpdatePolicyConst implements ConditionUpdatePolicy {

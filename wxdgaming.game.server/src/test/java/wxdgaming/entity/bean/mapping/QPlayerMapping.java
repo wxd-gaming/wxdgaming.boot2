@@ -13,7 +13,7 @@ import java.io.Serializable;
 /**
  * excel 构建 怪物表, src/cfg/玩家信息.xlsx, q_player,
  *
- * @author: wxd-gaming(無心道, 15388152619)
+ * @author wxd-gaming(無心道, 15388152619)
  **/
 @Getter
 @Setter

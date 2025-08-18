@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * 网络监听配置
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-13 09:14
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-13 09:14
  **/
 @Getter
 @Setter

@@ -8,8 +8,8 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 /**
  * 地图索引
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-15 17:22
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-15 17:22
  **/
 @Getter
 public class MapKey extends ObjectBase {

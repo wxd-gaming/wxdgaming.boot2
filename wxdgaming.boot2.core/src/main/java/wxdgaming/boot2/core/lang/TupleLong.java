@@ -9,8 +9,8 @@ import lombok.Setter;
 import java.io.Serializable;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2020-11-18 13:46
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2020-11-18 13:46
  **/
 @Getter
 @Setter

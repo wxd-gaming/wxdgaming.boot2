@@ -1,0 +1,58 @@
+{
+  "logName": "roleregisterlog",
+  "logComment": "角色注册日志",
+  "sort": "1-3",
+  "partition": true,
+  "fieldList": [
+    {
+      "fieldName": "uid",
+      "fieldComment": "UID",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "createTime",
+      "fieldComment": "日期",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "sid",
+      "fieldComment": "区服",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "account",
+      "fieldComment": "账号",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "platform",
+      "fieldComment": "平台",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "channel",
+      "fieldComment": "渠道",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "roleId",
+      "fieldComment": "角色ID",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "roleName",
+      "fieldComment": "角色名字",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "ip",
+      "fieldComment": "ip",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "clientData",
+      "fieldComment": "客户端附加",
+      "fieldType": "string"
+    }
+  ]
+}

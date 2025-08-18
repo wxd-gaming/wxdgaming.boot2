@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * 基于 caffeine 缓存数据
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-30 20:09
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-30 20:09
  */
 @Slf4j
 @Builder

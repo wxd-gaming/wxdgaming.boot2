@@ -6,8 +6,8 @@ import lombok.Setter;
 /**
  * 基类
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-13 14:21
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-13 14:21
  **/
 @Getter
 @Setter

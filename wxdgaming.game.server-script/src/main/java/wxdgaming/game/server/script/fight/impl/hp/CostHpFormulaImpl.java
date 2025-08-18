@@ -8,8 +8,8 @@ import wxdgaming.game.server.script.fight.AbstractFightAction;
 /**
  * 公式 formula 扣血
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-09 09:47
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-09 09:47
  **/
 @Slf4j
 @Singleton

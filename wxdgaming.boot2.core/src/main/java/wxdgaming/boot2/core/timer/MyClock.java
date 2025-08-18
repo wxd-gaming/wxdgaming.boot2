@@ -22,8 +22,8 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * 修改到最新api
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2020-07-29 10:33
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2020-07-29 10:33
  */
 public class MyClock {
 
@@ -493,8 +493,8 @@ public class MyClock {
      * 验证是否是同一天
      *
      * @param targetTime 目标时间和当前时间做比较，凌晨结算
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-04-28 17:11
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-04-28 17:11
      */
     public static boolean isSameDay(long targetTime) {
         return isSameDay(millis(), targetTime, 0);
@@ -505,8 +505,8 @@ public class MyClock {
      *
      * @param sourceTime 需要对比的时间,相当于当前时间
      * @param targetTime 目标时间和对比时间做比较，凌晨结算
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-04-28 17:11
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-04-28 17:11
      */
     public static boolean isSameDay(long sourceTime, long targetTime) {
         return isSameDay(sourceTime, targetTime, 0);
@@ -518,8 +518,8 @@ public class MyClock {
      * @param sourceTime 需要对比的时间,相当于当前时间
      * @param targetTime 目标时间和对比时间做比较
      * @param checkHour  检查的时间,确切的小时,比如凌晨5点到第二天凌晨5点
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-04-28 17:11
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-04-28 17:11
      */
     public static boolean isSameDay(long sourceTime, long targetTime, int checkHour) {
         long startTime = dayOfStartMillis(sourceTime);

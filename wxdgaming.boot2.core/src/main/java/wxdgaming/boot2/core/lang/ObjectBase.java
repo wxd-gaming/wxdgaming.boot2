@@ -9,8 +9,8 @@ import java.io.Serializable;
 /**
  * 基类
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-13 14:21
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-13 14:21
  **/
 public abstract class ObjectBase implements Serializable, Cloneable {
 

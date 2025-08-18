@@ -16,8 +16,8 @@ import java.util.function.Consumer;
 /**
  * 网关到游戏服的连接
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-06-03 10:13
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-06-03 10:13
  **/
 @Setter
 public class Gateway2GameSocketClientImpl extends SocketClient {

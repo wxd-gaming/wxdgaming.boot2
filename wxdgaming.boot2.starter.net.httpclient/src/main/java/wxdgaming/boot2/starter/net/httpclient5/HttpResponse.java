@@ -15,8 +15,8 @@ import java.util.List;
 /**
  * 请求结果
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-07-23 14:11
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-07-23 14:11
  **/
 @Getter
 public class HttpResponse {

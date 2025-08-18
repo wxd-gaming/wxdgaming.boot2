@@ -12,8 +12,8 @@ import wxdgaming.boot2.starter.net.pojo.PojoBase;
 /**
  * 用户映射关系
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-28 17:03
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-28 17:03
  **/
 @Getter
 @Setter

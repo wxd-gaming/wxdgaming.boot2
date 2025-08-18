@@ -30,8 +30,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * http 监听 绑定工厂
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-13 16:36
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-13 16:36
  **/
 @Slf4j
 @Getter

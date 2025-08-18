@@ -7,8 +7,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-15 09:39
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-15 09:39
  **/
 @Slf4j
 @Getter

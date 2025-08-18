@@ -1,0 +1,58 @@
+{
+  "logName": "submittaskslog",
+  "logComment": "提交任务日志",
+  "sort": "5-2",
+  "partition": true,
+  "fieldList": [
+    {
+      "fieldName": "uid",
+      "fieldComment": "UID",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "createTime",
+      "fieldComment": "日期",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "sid",
+      "fieldComment": "区服",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "account",
+      "fieldComment": "账号",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "roleId",
+      "fieldComment": "角色ID",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "roleName",
+      "fieldComment": "角色名字",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "lv",
+      "fieldComment": "角色等级",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "taskId",
+      "fieldComment": "任务ID",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "taskName",
+      "fieldComment": "任务名字",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "reason",
+      "fieldComment": "备注",
+      "fieldType": "string"
+    }
+  ]
+}

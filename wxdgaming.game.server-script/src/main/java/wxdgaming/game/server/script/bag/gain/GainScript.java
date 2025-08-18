@@ -6,10 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.bean.goods.ItemCfg;
-import wxdgaming.game.bean.goods.ItemTypeConst;
 import wxdgaming.game.cfg.QItemTable;
 import wxdgaming.game.cfg.bean.QItem;
-import wxdgaming.game.core.ReasonArgs;
+import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.bag.ItemBag;
@@ -26,8 +25,8 @@ import java.util.List;
 /**
  * 获得道具
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-22 19:13
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-22 19:13
  **/
 @Slf4j
 @Singleton
@@ -76,7 +75,7 @@ public class GainScript extends HoldRunApplication implements IBagScript {
         Player player = bagChangesContext.getPlayer();
         BagType bagType = bagChangesContext.getBagType();
         ItemBag itemBag = bagChangesContext.getItemBag();
-        ReasonArgs reasonArgs = bagChangesContext.getReasonArgs();
+        ReasonDTO reasonDTO = bagChangesContext.getReasonDTO();
         long count = newItem.getCount();
         /* TODO 叠加 */
         QItem qItem = DataRepository.getIns().dataTable(QItemTable.class, newItem.getCfgId());
@@ -97,13 +96,13 @@ public class GainScript extends HoldRunApplication implements IBagScript {
                         value.setCount(maxCount);
                         log.info(
                                 "背包变更：{}, {}, 道具叠加, 格子：{}, {}, {}+{}={}, {}",
-                                player, bagType, i, value.toName(), oldCount, addChange, value.getCount(), reasonArgs
+                                player, bagType, i, value.toName(), oldCount, addChange, value.getCount(), reasonDTO
                         );
                     } else {
                         value.setCount(oldCount + count);
                         log.info(
                                 "背包变更：{}, {}, 道具叠加, 格子：{}, {}, {}+{}={}, {}",
-                                player, bagType, i, value.toName(), oldCount, count, value.getCount(), reasonArgs
+                                player, bagType, i, value.toName(), oldCount, count, value.getCount(), reasonDTO
                         );
                         count = 0;
                     }
@@ -123,7 +122,7 @@ public class GainScript extends HoldRunApplication implements IBagScript {
             ItemGrid itemGrid = itemBag.add(newItem);
             log.info(
                     "背包变更：{}, {}, 道具新增, 格子：{}, {}, count={}, {}",
-                    player, bagType, itemGrid.getGrid(), newItem.toName(), newItem.getCount(), reasonArgs
+                    player, bagType, itemGrid.getGrid(), newItem.toName(), newItem.getCount(), reasonDTO
             );
             bagChangesContext.addChange(itemGrid);
         }

@@ -9,8 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * cache服务
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-22 09:13
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-22 09:13
  **/
 @Getter
 public class SqlDataCacheService {

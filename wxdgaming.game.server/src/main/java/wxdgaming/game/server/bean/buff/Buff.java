@@ -19,8 +19,8 @@ import java.util.Iterator;
 /**
  * 场景对象身上的buff
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-08 10:56
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-08 10:56
  **/
 @Getter
 @Setter

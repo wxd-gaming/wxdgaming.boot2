@@ -6,8 +6,8 @@ import wxdgaming.boot2.core.timer.MyClock;
 import java.io.Serializable;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2022-07-02 14:36
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2022-07-02 14:36
  **/
 @Slf4j
 public class NewId implements Serializable {

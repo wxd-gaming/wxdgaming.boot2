@@ -17,8 +17,8 @@ import java.util.function.Function;
 /**
  * 缓存驱动
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-07-03 10:57
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-07-03 10:57
  **/
 @Builder
 class CacheDriver<K, V> {

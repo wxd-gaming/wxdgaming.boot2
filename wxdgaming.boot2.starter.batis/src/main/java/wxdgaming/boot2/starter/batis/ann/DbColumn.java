@@ -8,8 +8,8 @@ import java.lang.annotation.ElementType;
 /**
  * 表 列 构建
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-15 12:47
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-15 12:47
  **/
 @Documented
 @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME)

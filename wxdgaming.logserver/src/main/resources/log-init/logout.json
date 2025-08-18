@@ -1,7 +1,7 @@
 {
   "logName": "logout",
   "logComment": "登出日志",
-  "sort": "1-2",
+  "sort": "1-9",
   "partition": true,
   "fieldList": [
     {

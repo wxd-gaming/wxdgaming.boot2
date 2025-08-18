@@ -6,7 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.net.SocketSession;
-import wxdgaming.game.core.ReasonArgs;
+import wxdgaming.game.basic.core.ReasonDTO;
+import wxdgaming.game.basic.slog.SlogService;
 import wxdgaming.game.message.role.ResLogin;
 import wxdgaming.game.message.role.ResUpdateExp;
 import wxdgaming.game.message.role.ResUpdateLevel;
@@ -16,12 +17,13 @@ import wxdgaming.game.server.event.OnLevelUp;
 import wxdgaming.game.server.event.OnTask;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.inner.InnerService;
+import wxdgaming.game.server.script.role.log.RoleLvLog;
 
 import java.util.HashSet;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-22 11:44
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-22 11:44
  **/
 @Slf4j
 @Singleton
@@ -29,11 +31,13 @@ public class PlayerService extends HoldRunApplication {
 
     final InnerService innerService;
     final DataCenterService dataCenterService;
+    final SlogService slogService;
 
     @Inject
-    public PlayerService(InnerService innerService, DataCenterService dataCenterService) {
+    public PlayerService(InnerService innerService, DataCenterService dataCenterService, SlogService slogService) {
         this.innerService = innerService;
         this.dataCenterService = dataCenterService;
+        this.slogService = slogService;
     }
 
 
@@ -56,34 +60,37 @@ public class PlayerService extends HoldRunApplication {
         log.info("clientSessionId={}, sid={}, account={} 发送角色列表:{}", clientSessionId, sid, account, resLogin);
     }
 
-    public void addExp(Player player, long exp, ReasonArgs reasonArgs) {
-        log.info("{} 当前经验：{} 增加经验:{}, {}", player, player.getExp(), exp, reasonArgs);
+    public void addExp(Player player, long exp, ReasonDTO reasonDTO) {
+        log.info("{} 当前经验：{} 增加经验:{}, {}", player, player.getExp(), exp, reasonDTO);
         long tmp = player.getExp() + exp;
         while (tmp >= 100L * player.getLevel()) {
             /*假设升级需要100*/
             tmp -= 100L * player.getLevel();
-            addLevel(player, 1, reasonArgs.copyFrom("经验升级"));
+            addLevel(player, 1, reasonDTO.copyFrom("经验升级"));
         }
-        setExp(player, tmp, reasonArgs);
+        setExp(player, tmp, reasonDTO);
     }
 
-    public void setExp(Player player, long exp, ReasonArgs reasonArgs) {
+    public void setExp(Player player, long exp, ReasonDTO reasonDTO) {
         player.setExp(exp);
         ResUpdateExp resUpdateLevel = new ResUpdateExp()
                 .setExp(player.getExp())
-                .setReason(reasonArgs.getReason().name());
+                .setReason(reasonDTO.getReason().name());
         player.write(resUpdateLevel);
     }
 
 
-    public void addLevel(Player player, int lv, ReasonArgs reasonArgs) {
+    public void addLevel(Player player, int lv, ReasonDTO reasonDTO) {
         int oldLevel = player.getLevel();
         player.setLevel(player.getLevel() + lv);
-        log.info("{} 等级变更: oldLv={} change={} newLv={}, {}", player, oldLevel, lv, player.getLevel(), reasonArgs);
+        log.info("{} 等级变更: oldLv={} change={} newLv={}, {}", player, oldLevel, lv, player.getLevel(), reasonDTO);
+
+        RoleLvLog roleLvLog = new RoleLvLog(player, reasonDTO.getReasonText());
+        slogService.addLog(roleLvLog);
 
         ResUpdateLevel resUpdateLevel = new ResUpdateLevel()
                 .setLevel(player.getLevel())
-                .setReason(reasonArgs.getReason().name());
+                .setReason(reasonDTO.getReason().name());
 
         player.write(resUpdateLevel);
         /*触发升级, 比如功能开放监听需要*/

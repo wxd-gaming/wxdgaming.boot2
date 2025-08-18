@@ -20,8 +20,8 @@ import java.util.concurrent.locks.LockSupport;
 /**
  * 函数参数泛型类型获取
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-04-09 17:17
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-04-09 17:17
  **/
 @Slf4j
 public class ReactorTest {

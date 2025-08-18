@@ -16,8 +16,8 @@ import java.util.Map;
 /**
  * sql ddl
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-15 17:38
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-15 17:38
  **/
 public abstract class SqlDDLBuilder extends DDLBuilder {
 

@@ -8,8 +8,8 @@ import wxdgaming.boot2.core.util.AssertUtil;
 /**
  * ip数据查询
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2024-10-28 20:26
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2024-10-28 20:26
  **/
 @Getter
 @Setter

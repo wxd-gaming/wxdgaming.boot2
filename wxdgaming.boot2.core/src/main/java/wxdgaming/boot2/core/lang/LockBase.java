@@ -8,8 +8,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * 基类
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2023-06-26 17:12
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2023-06-26 17:12
  **/
 @Getter
 public class LockBase implements ILock {

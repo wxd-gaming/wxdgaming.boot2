@@ -7,8 +7,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import wxdgaming.boot2.core.BootConfig;
-import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.BootstrapProperties;
 import wxdgaming.boot2.core.cache2.CASCache;
 import wxdgaming.boot2.core.cache2.Cache;
 import wxdgaming.boot2.core.format.HexId;
@@ -24,8 +23,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * rpc 服务
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-17 19:25
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-17 19:25
  **/
 @Slf4j
 @Getter
@@ -33,15 +32,15 @@ import java.util.concurrent.TimeUnit;
 public class RpcService {
 
     final HexId hexId;
+    final String rpcToken;
     final RpcListenerFactory rpcListenerFactory;
     final Cache<Long, CompletableFuture<JSONObject>> rpcCache;
 
-    String rpcToken = null;
-
     @Inject
-    public RpcService(RpcListenerFactory rpcListenerFactory) {
+    public RpcService(BootConfig bootConfig, BootstrapProperties bootstrapProperties, RpcListenerFactory rpcListenerFactory) {
+        this.hexId = new HexId(bootstrapProperties.getSid());
+        this.rpcToken = bootConfig.getObject("rpc.token", String.class, () -> "dgbhw32t5cs9023r5j23r5490dcvj23409tu13@#$$%^@");
         this.rpcListenerFactory = rpcListenerFactory;
-        this.hexId = new HexId(BootConfig.getIns().sid());
         this.rpcCache = CASCache.<Long, CompletableFuture<JSONObject>>builder()
                 .cacheName("rpc-server")
                 .heartTimeMs(TimeUnit.SECONDS.toMillis(1))
@@ -53,11 +52,6 @@ public class RpcService {
                 })
                 .build();
         this.rpcCache.start();
-    }
-
-    @Start
-    public void start(@Value(path = "rpc.token", defaultValue = "abab") String rpcToken) {
-        this.rpcToken = rpcToken;
     }
 
     public String sign(long rpcId) {

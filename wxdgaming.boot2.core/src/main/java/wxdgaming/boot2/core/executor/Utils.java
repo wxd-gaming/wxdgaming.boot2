@@ -3,8 +3,8 @@ package wxdgaming.boot2.core.executor;
 /**
  * 帮助
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-15 14:24
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-15 14:24
  **/
 public class Utils {
 

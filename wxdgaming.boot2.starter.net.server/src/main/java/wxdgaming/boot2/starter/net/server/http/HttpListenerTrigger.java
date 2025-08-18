@@ -29,8 +29,8 @@ import java.lang.reflect.Type;
 /**
  * http 监听 事件
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-13 16:29
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-13 16:29
  **/
 @Slf4j
 public class HttpListenerTrigger extends ExecutorEvent {

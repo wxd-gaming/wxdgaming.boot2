@@ -6,8 +6,8 @@ import wxdgaming.boot2.core.reflect.ReflectProvider;
 /**
  * pgsql 模块
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-02-15 12:42
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-15 12:42
  **/
 public class JsGuiceModule extends ServiceGuiceModule {
 

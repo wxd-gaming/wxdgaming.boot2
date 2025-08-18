@@ -17,8 +17,8 @@ import java.util.ArrayList;
 /**
  * Buff属性的计算
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2025-05-09 19:29
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-05-09 19:29
  **/
 @Slf4j
 @Singleton

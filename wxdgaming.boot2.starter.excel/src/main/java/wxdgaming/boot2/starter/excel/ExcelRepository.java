@@ -26,8 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * excel 仓储
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2021-10-14 11:20
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2021-10-14 11:20
  **/
 @Slf4j
 @Getter
@@ -204,8 +204,8 @@ public class ExcelRepository {
      * @param entityField 单元格
      * @param cellData    单元格数据
      * @return
-     * @author: wxd-gaming(無心道, 15388152619)
-     * @version: 2024-08-10 10:02
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2024-08-10 10:02
      */
     private Object readCellValue(TableData tableData, int rowNumber, CellInfo entityField, Cell cellData) {
         /*空白的话，根据传入的类型返回默认值*/

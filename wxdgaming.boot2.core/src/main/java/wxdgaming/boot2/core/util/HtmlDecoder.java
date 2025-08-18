@@ -6,8 +6,8 @@ import java.util.HashMap;
 /**
  * html内容转义
  *
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2023-01-04 19:07
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2023-01-04 19:07
  **/
 public class HtmlDecoder {
 
