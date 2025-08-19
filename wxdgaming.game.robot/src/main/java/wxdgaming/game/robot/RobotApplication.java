@@ -5,7 +5,7 @@ import wxdgaming.boot2.starter.RunApplicationMain;
 import wxdgaming.boot2.starter.WxdApplication;
 import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.net.SocketScan;
-import wxdgaming.boot2.starter.scheduled.ScheduledScan;
+import wxdgaming.boot2.starter.scheduled.ScheduledProperties;
 import wxdgaming.game.basic.login.LoginProperties;
 
 /**
@@ -23,7 +23,7 @@ public class RobotApplication {
                 LoginProperties.class,
                 SocketScan.class,
                 DataExcelScan.class,
-                ScheduledScan.class,
+                ScheduledProperties.class,
                 RobotApplication.class
         );
 

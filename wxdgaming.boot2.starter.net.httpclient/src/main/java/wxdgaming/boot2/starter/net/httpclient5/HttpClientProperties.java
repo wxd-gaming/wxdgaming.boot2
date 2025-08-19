@@ -3,6 +3,9 @@ package wxdgaming.boot2.starter.net.httpclient5;
 import com.alibaba.fastjson.annotation.JSONCreator;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
+import wxdgaming.boot2.core.InitPrint;
+import wxdgaming.boot2.core.ann.Configuration;
+import wxdgaming.boot2.core.ann.ConfigurationProperties;
 import wxdgaming.boot2.core.lang.ObjectBase;
 
 import java.util.function.Supplier;
@@ -14,9 +17,11 @@ import java.util.function.Supplier;
  * @version 2025-02-18 10:26
  **/
 @Getter
-public class HttpClientConfig extends ObjectBase {
+@Configuration
+@ConfigurationProperties(prefix = "http.client")
+public class HttpClientProperties extends ObjectBase implements InitPrint {
 
-    public static Supplier<Object> DEFAULT = () -> new HttpClientConfig(
+    public static final Supplier<HttpClientProperties> DEFAULT = () -> new HttpClientProperties(
             500, 5000,
             30,
             3000, 3000, 3000, 30000,
@@ -46,15 +51,15 @@ public class HttpClientConfig extends ObjectBase {
     private final boolean autoUseGzip;
 
     @JSONCreator
-    public HttpClientConfig(@JSONField(name = "routeMaxSize") int routeMaxSize,
-                            @JSONField(name = "totalMaxSize") int totalMaxSize,
-                            @JSONField(name = "resetTimeM") int resetTimeM,
-                            @JSONField(name = "connectionRequestTimeout") int connectionRequestTimeout,
-                            @JSONField(name = "connectTimeOut") int connectTimeOut,
-                            @JSONField(name = "readTimeout") int readTimeout,
-                            @JSONField(name = "keepAliveTimeout") int keepAliveTimeout,
-                            @JSONField(name = "sslProtocol", defaultValue = "TLS") String sslProtocol,
-                            @JSONField(name = "autoUseGzip", defaultValue = "true") boolean autoUseGzip) {
+    public HttpClientProperties(@JSONField(name = "routeMaxSize") int routeMaxSize,
+                                @JSONField(name = "totalMaxSize") int totalMaxSize,
+                                @JSONField(name = "resetTimeM") int resetTimeM,
+                                @JSONField(name = "connectionRequestTimeout") int connectionRequestTimeout,
+                                @JSONField(name = "connectTimeOut") int connectTimeOut,
+                                @JSONField(name = "readTimeout") int readTimeout,
+                                @JSONField(name = "keepAliveTimeout") int keepAliveTimeout,
+                                @JSONField(name = "sslProtocol", defaultValue = "TLS") String sslProtocol,
+                                @JSONField(name = "autoUseGzip", defaultValue = "true") boolean autoUseGzip) {
         this.routeMaxSize = routeMaxSize;
         this.totalMaxSize = totalMaxSize;
         this.resetTimeM = resetTimeM;

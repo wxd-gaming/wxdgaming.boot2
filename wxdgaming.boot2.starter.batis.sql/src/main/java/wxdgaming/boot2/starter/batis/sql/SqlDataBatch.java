@@ -215,7 +215,6 @@ public abstract class SqlDataBatch extends DataBatch {
                         long diff = diffTime.diffNs() / 10000;
                         executeDiffTime += diff;
                         this.executeCount += executeCount;
-                        log.debug("GlobalUtil.Exiting={}", GlobalUtil.Exiting.get());
                         if (sqlDataHelper.getSqlConfig().isDebug() || ticket.need() || closed.get() || GlobalUtil.Exiting.get()) {
                             log.info(
                                     """

@@ -5,7 +5,7 @@ import wxdgaming.boot2.starter.RunApplicationMain;
 import wxdgaming.boot2.starter.WxdApplication;
 import wxdgaming.boot2.starter.net.SocketScan;
 import wxdgaming.boot2.starter.net.httpclient5.HttpClientScan;
-import wxdgaming.boot2.starter.scheduled.ScheduledScan;
+import wxdgaming.boot2.starter.scheduled.ScheduledProperties;
 import wxdgaming.game.basic.login.LoginProperties;
 
 /**
@@ -20,7 +20,7 @@ public class GatewayApplication {
                 LoginProperties.class,
                 SocketScan.class,
                 HttpClientScan.class,
-                ScheduledScan.class,
+                ScheduledProperties.class,
                 GatewayApplication.class
         );
 

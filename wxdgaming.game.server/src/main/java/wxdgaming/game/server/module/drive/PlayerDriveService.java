@@ -1,14 +1,15 @@
 package wxdgaming.game.server.module.drive;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Shutdown;
+import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
+import wxdgaming.boot2.core.executor.ExecutorProperties;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.*;
@@ -31,12 +32,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PlayerDriveService extends HoldRunApplication {
 
     private final ConcurrentHashMap<Integer, PlayerDriveContent> playerDriveContentMap = new ConcurrentHashMap<>();
-    private int logicCoreSize = 0;
+    private final int logicCoreSize;
     private final AtomicInteger onlineSize = new AtomicInteger();
+
+    @Inject
+    public PlayerDriveService(ExecutorProperties executorProperties) {
+        logicCoreSize = executorProperties.getLogic().getCoreSize();
+    }
 
     @Start
     public void start() {
-        logicCoreSize = BootConfig.getIns().logicConfig().getCoreSize();
+
         for (int i = 0; i < logicCoreSize; i++) {
             PlayerDriveContent driveContent = new PlayerDriveContent("player-drive-" + i);
             playerDriveContentMap.put(i, driveContent);

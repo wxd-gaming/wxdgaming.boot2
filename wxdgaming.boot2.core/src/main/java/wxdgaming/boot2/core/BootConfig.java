@@ -6,7 +6,6 @@ import lombok.Getter;
 import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
-import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.Tuple2;
@@ -89,18 +88,6 @@ public class BootConfig {
             throw new RuntimeException("value:" + path + " is null");
         }
         return r;
-    }
-
-    public ExecutorConfig basicConfig() {
-        return getNestedValue("executor.basic", ExecutorConfig.class, ExecutorConfig.BASIC_INSTANCE);
-    }
-
-    public ExecutorConfig logicConfig() {
-        return getNestedValue("executor.logic", ExecutorConfig.class, ExecutorConfig.LOGIC_INSTANCE);
-    }
-
-    public ExecutorConfig virtualConfig() {
-        return getNestedValue("executor.virtual", ExecutorConfig.class, ExecutorConfig.VIRTUAL_INSTANCE);
     }
 
     public int getIntValue(String key) {

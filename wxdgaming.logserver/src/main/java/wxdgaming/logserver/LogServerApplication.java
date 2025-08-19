@@ -6,7 +6,7 @@ import wxdgaming.boot2.starter.RunApplicationMain;
 import wxdgaming.boot2.starter.WxdApplication;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
 import wxdgaming.boot2.starter.net.SocketScan;
-import wxdgaming.boot2.starter.scheduled.ScheduledScan;
+import wxdgaming.boot2.starter.scheduled.ScheduledProperties;
 
 /**
  * 日子中心启动器
@@ -24,7 +24,7 @@ public class LogServerApplication {
             RunApplicationMain runApplication = WxdApplication.run(
                     CoreScan.class,
                     PgsqlScan.class,
-                    ScheduledScan.class,
+                    ScheduledProperties.class,
                     SocketScan.class,
                     LogServerApplication.class
             );

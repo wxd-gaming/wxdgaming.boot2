@@ -5,7 +5,10 @@ import com.google.inject.Injector;
 import com.google.inject.Stage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.*;
+import wxdgaming.boot2.core.BootConfig;
+import wxdgaming.boot2.core.CoreScan;
+import wxdgaming.boot2.core.GuiceModuleBase;
+import wxdgaming.boot2.core.ServiceGuiceModule;
 import wxdgaming.boot2.core.collection.SetOf;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
@@ -54,7 +57,6 @@ public class WxdApplication {
             Stream<Class<? extends GuiceModuleBase>> moduleStream = Stream.empty();
 
             moduleStream = Stream.concat(moduleStream, reflectProvider.classWithSuper(ServiceGuiceModule.class));
-            moduleStream = Stream.concat(moduleStream, reflectProvider.classWithSuper(UserGuiceModule.class));
 
             List<GuiceModuleBase> collect = moduleStream
                     .map(cls -> ReflectProvider.newInstance(cls, reflectProvider))
@@ -83,11 +85,10 @@ public class WxdApplication {
     }
 
     public static RunApplicationSub createRunApplicationSub(ReflectProvider reflectProvider) {
-        List<GuiceModuleBase> collect = reflectProvider.classWithSuper(UserGuiceModule.class)
-                .map(cls -> ReflectProvider.newInstance(cls, reflectProvider))
-                .collect(Collectors.toList());
-        /* TODO 这里把子容器注入进去 */
-        collect.add(new SingletonGuiceModule(reflectProvider, RunApplicationSub.class));
+        List<GuiceModuleBase> collect = List.of(
+                new ConfigurationGuiceModule(reflectProvider),
+                new SingletonGuiceModule(reflectProvider, RunApplicationSub.class)
+        );
 
         Injector injector = runApplicationMain.getInjector().createChildInjector(collect);
         RunApplicationSub runApplicationSub = injector.getInstance(RunApplicationSub.class);

@@ -1,11 +1,14 @@
 package wxdgaming.boot2.core.executor;
 
-import wxdgaming.boot2.core.BootConfig;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import wxdgaming.boot2.core.InitPrint;
+import wxdgaming.boot2.core.ann.Order;
+import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 线程执行器工厂
@@ -13,32 +16,32 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-05-15 11:20
  **/
-public class ExecutorFactory {
+@Order(value = Integer.MIN_VALUE)
+@Singleton
+public class ExecutorFactory implements InitPrint {
 
-    private static final AtomicBoolean InitEnd = new AtomicBoolean();
-    private static ExecutorMonitor EXECUTOR_MONITOR;
-    private static ScheduledExecutorService scheduledExecutorService;
-    private static ConcurrentHashMap<String, ExecutorService> EXECUTOR_MAP;
-
-    private static ExecutorService EXECUTOR_SERVICE_BASIC;
-    private static ExecutorService EXECUTOR_SERVICE_LOGIC;
-    private static ExecutorService EXECUTOR_SERVICE_VIRTUAL;
-
-    static void check() {
-        if (!InitEnd.get() && InitEnd.compareAndSet(false, true)) {
-            init();
-            InitEnd.set(true);
-        }
+    private static class Lazy {
+        static ExecutorFactory instance = null;
     }
 
-    static void init() {
+    private final ExecutorMonitor EXECUTOR_MONITOR;
+    private final ScheduledExecutorService scheduledExecutorService;
+    private final ConcurrentHashMap<String, ExecutorService> EXECUTOR_MAP;
+
+    private final ExecutorService EXECUTOR_SERVICE_BASIC;
+    private final ExecutorService EXECUTOR_SERVICE_LOGIC;
+    private final ExecutorService EXECUTOR_SERVICE_VIRTUAL;
+
+    @Inject
+    public ExecutorFactory(ExecutorProperties executorProperties) {
+        AssertUtil.assertTrue(Lazy.instance == null, "ExecutorFactory is already exists");
+        Lazy.instance = this;
         EXECUTOR_MAP = new ConcurrentHashMap<>();
         EXECUTOR_MONITOR = new ExecutorMonitor();
-        scheduledExecutorService = newSingleThreadScheduledExecutor("scheduled");
-        BootConfig bootConfig = BootConfig.getIns();
-        EXECUTOR_SERVICE_BASIC = create("basic", bootConfig.basicConfig());
-        EXECUTOR_SERVICE_LOGIC = create("logic", bootConfig.logicConfig());
-        EXECUTOR_SERVICE_VIRTUAL = createVirtual("virtual", bootConfig.virtualConfig());
+        scheduledExecutorService = newSingleThreadScheduledExecutor("core.scheduled");
+        EXECUTOR_SERVICE_BASIC = create("basic", executorProperties.getBasic());
+        EXECUTOR_SERVICE_LOGIC = create("logic", executorProperties.getLogic());
+        EXECUTOR_SERVICE_VIRTUAL = createVirtual("virtual", executorProperties.getVirtual());
     }
 
     public static ExecutorService getExecutor(String name) {
@@ -90,31 +93,26 @@ public class ExecutorFactory {
     }
 
     public static ScheduledExecutorService getScheduledExecutorService() {
-        check();
-        return scheduledExecutorService;
+        return Lazy.instance.scheduledExecutorService;
     }
 
     public static ConcurrentHashMap<String, ExecutorService> getExecutorMap() {
-        check();
-        return EXECUTOR_MAP;
+        return Lazy.instance.EXECUTOR_MAP;
     }
 
     public static ExecutorService getExecutorServiceBasic() {
-        check();
-        return EXECUTOR_SERVICE_BASIC;
+        return Lazy.instance.EXECUTOR_SERVICE_BASIC;
     }
 
     public static ExecutorService getExecutorServiceLogic() {
-        check();
-        return EXECUTOR_SERVICE_LOGIC;
+        return Lazy.instance.EXECUTOR_SERVICE_LOGIC;
     }
 
     public static ExecutorService getExecutorServiceVirtual() {
-        check();
-        return EXECUTOR_SERVICE_VIRTUAL;
+        return Lazy.instance.EXECUTOR_SERVICE_VIRTUAL;
     }
 
     public static ExecutorMonitor getExecutorMonitor() {
-        return EXECUTOR_MONITOR;
+        return Lazy.instance.EXECUTOR_MONITOR;
     }
 }

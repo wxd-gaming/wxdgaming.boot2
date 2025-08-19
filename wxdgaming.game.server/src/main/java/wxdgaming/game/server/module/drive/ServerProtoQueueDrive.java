@@ -5,9 +5,10 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.executor.ExecutorProperties;
 import wxdgaming.boot2.core.executor.ThreadContext;
-import wxdgaming.boot2.starter.net.pojo.ServerProtoFilter;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerTrigger;
+import wxdgaming.boot2.starter.net.pojo.ServerProtoFilter;
 import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.bean.MapKey;
 import wxdgaming.game.server.bean.role.Player;
@@ -24,10 +25,12 @@ import wxdgaming.game.server.module.data.DataCenterService;
 public class ServerProtoQueueDrive implements ServerProtoFilter {
 
 
+    final ExecutorProperties executorProperties;
     final DataCenterService dataCenterService;
 
     @Inject
-    public ServerProtoQueueDrive(DataCenterService dataCenterService) {
+    public ServerProtoQueueDrive(ExecutorProperties executorProperties, DataCenterService dataCenterService) {
+        this.executorProperties = executorProperties;
         this.dataCenterService = dataCenterService;
     }
 
@@ -37,7 +40,7 @@ public class ServerProtoQueueDrive implements ServerProtoFilter {
         if (clientSessionMapping != null && clientSessionMapping.getRid() > 0) {
             Player player = dataCenterService.getPlayer(clientSessionMapping.getRid());
             if (StringUtils.isBlank(protoListenerTrigger.queueName())) {
-                protoListenerTrigger.setQueueName("player-drive-" + (player.getUid() % BootConfig.getIns().logicConfig().getCoreSize()));
+                protoListenerTrigger.setQueueName("player-drive-" + (player.getUid() % executorProperties.getLogic().getCoreSize()));
             } else if ("map-drive".equalsIgnoreCase(protoListenerTrigger.queueName())) {
                 MapKey mapKey = player.getMapKey();
 

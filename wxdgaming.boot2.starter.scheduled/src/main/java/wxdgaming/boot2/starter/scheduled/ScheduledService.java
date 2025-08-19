@@ -1,5 +1,7 @@
 package wxdgaming.boot2.starter.scheduled;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
@@ -7,7 +9,6 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Shutdown;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
@@ -28,18 +29,18 @@ import java.util.concurrent.TimeUnit;
  **/
 @Slf4j
 @Getter
+@Singleton
 public class ScheduledService {
 
     protected ScheduledFuture<?> future;
     /*                          类名字                  方法名    实例 */
     protected List<AbstractCronTrigger> jobList = new ArrayList<>();
 
-    protected final ExecutorConfig config;
     protected ExecutorServicePlatform executorServicePlatform;
 
-    public ScheduledService(ExecutorConfig config) {
-        executorServicePlatform = ExecutorFactory.create("scheduled-executor", config);
-        this.config = config;
+    @Inject
+    public ScheduledService(ExecutorFactory executorFactory, ScheduledProperties executorProperties) {
+        executorServicePlatform = ExecutorFactory.create("scheduled-executor", executorProperties.getExecutor());
     }
 
     @Init

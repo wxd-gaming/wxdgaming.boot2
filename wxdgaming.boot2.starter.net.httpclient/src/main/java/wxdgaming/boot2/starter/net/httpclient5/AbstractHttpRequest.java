@@ -57,7 +57,7 @@ public abstract class AbstractHttpRequest {
         Exception exception = null;
         for (int k = 0; k < retry; k++) {
             try {
-                HttpClientPool httpClientPool = HttpClientPool.getDefault();
+                HttpClientPool httpClientPool = HttpClientPool.getInstance();
                 CloseableHttpClient closeableHttpClient = httpClientPool.getCloseableHttpClient();
                 return closeableHttpClient.execute(httpUriRequestBase, classicHttpResponse -> {
                     /*apache http client 已经自动处理过 gzip 问题*/

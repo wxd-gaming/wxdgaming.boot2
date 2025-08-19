@@ -1,8 +1,11 @@
 package wxdgaming.boot2.starter.batis.mapdb;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import kotlin.jvm.functions.Function1;
 import lombok.extern.slf4j.Slf4j;
 import org.mapdb.*;
+import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.io.FileUtil;
 
 import java.io.File;
@@ -17,12 +20,18 @@ import java.util.function.Function;
  * @version 2025-06-23 16:43
  **/
 @Slf4j
-public class MapDBDataHelper implements AutoCloseable {
+@Singleton
+public class MapDBDataHelper implements AutoCloseable, InitPrint {
 
     final DB db;
     final ConcurrentHashMap<String, Object> openCacheMap = new ConcurrentHashMap<>();
 
     final File dbFile;
+
+    @Inject
+    public MapDBDataHelper(MapdbProperties mapdbProperties) {
+        this(new File(mapdbProperties.getPath()));
+    }
 
     public MapDBDataHelper(String dbPath) {
         this(new File(dbPath));
@@ -34,8 +43,8 @@ public class MapDBDataHelper implements AutoCloseable {
         this.db = DBMaker.fileDB(file)
                 .fileChannelEnable()
                 .checksumHeaderBypass()
-//                .checksumStoreEnable()  // 启用完整校验
-//                .closeOnJvmShutdown()
+                //                .checksumStoreEnable()  // 启用完整校验
+                //                .closeOnJvmShutdown()
                 .fileMmapEnable()            // 启用内存映射（提升读性能）
                 .fileMmapEnableIfSupported() // 启用内存映射（提升读性能）
                 .fileMmapPreclearDisable()   // 禁用预清理（避免写时阻塞）

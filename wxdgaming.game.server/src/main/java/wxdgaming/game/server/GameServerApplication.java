@@ -15,11 +15,11 @@ import wxdgaming.boot2.starter.batis.sql.pgsql.MysqlScan;
 import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.boot2.starter.net.SocketScan;
-import wxdgaming.boot2.starter.scheduled.ScheduledScan;
-import wxdgaming.game.cfg.QPlayerTable;
-import wxdgaming.game.cfg.bean.QPlayer;
+import wxdgaming.boot2.starter.scheduled.ScheduledProperties;
 import wxdgaming.game.basic.login.LoginProperties;
 import wxdgaming.game.basic.slog.SlogService;
+import wxdgaming.game.cfg.QPlayerTable;
+import wxdgaming.game.cfg.bean.QPlayer;
 import wxdgaming.logbus.LogBusService;
 
 import java.io.File;
@@ -35,7 +35,7 @@ public class GameServerApplication {
             RunApplicationMain runApplication = WxdApplication.run(
                     CoreScan.class,
                     DataExcelScan.class,
-                    ScheduledScan.class,
+                    ScheduledProperties.class,
                     SocketScan.class,
                     MysqlScan.class,
                     LogBusService.class,

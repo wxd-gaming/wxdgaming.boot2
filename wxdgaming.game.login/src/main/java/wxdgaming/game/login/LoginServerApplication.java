@@ -6,8 +6,7 @@ import wxdgaming.boot2.starter.WxdApplication;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
 import wxdgaming.boot2.starter.net.SocketScan;
 import wxdgaming.boot2.starter.net.httpclient5.HttpClientScan;
-import wxdgaming.boot2.starter.scheduled.ScheduledScan;
-import wxdgaming.game.basic.login.LoginProperties;
+import wxdgaming.boot2.starter.scheduled.ScheduledProperties;
 import wxdgaming.game.basic.slog.SlogService;
 import wxdgaming.logbus.LogBusService;
 
@@ -22,7 +21,7 @@ public class LoginServerApplication {
                 CoreScan.class,
                 HttpClientScan.class,
                 SocketScan.class,
-                ScheduledScan.class,
+                ScheduledProperties.class,
                 PgsqlScan.class,
                 SlogService.class,
                 LogBusService.class,

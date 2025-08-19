@@ -8,13 +8,14 @@ import org.junit.Test;
 import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.collection.MapOf;
-import wxdgaming.boot2.core.executor.ExecutorConfig;
+import wxdgaming.boot2.core.executor.ExecutorProperties;
 import wxdgaming.boot2.core.util.YamlUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 import wxdgaming.boot2.starter.net.client.SocketClientConfig;
-import wxdgaming.boot2.starter.net.httpclient5.HttpClientConfig;
+import wxdgaming.boot2.starter.net.httpclient5.HttpClientProperties;
 import wxdgaming.boot2.starter.net.server.SocketServerConfig;
 import wxdgaming.boot2.starter.net.server.http.HttpServerConfig;
+import wxdgaming.boot2.starter.scheduled.ScheduledProperties;
 
 /**
  * @author wxd-gaming(無心道, 15388152619)
@@ -25,20 +26,16 @@ public class OutConfigTest {
     @Test
     public void out() {
         JSONObject config = BootConfig.getIns().getConfigNode();
-        config.put("debug", true);
-        config.put("sid", 1);
-        config.put("executor",
+        config.put(
+                "boot",
                 MapOf.newJSONObject()
-                        .fluentPut("default", FastJsonUtil.toJSONString(ExecutorConfig.BASIC_INSTANCE.get()))
-                        .fluentPut("logic", FastJsonUtil.toJSONString(ExecutorConfig.LOGIC_INSTANCE.get()))
-                        .fluentPut("virtual", FastJsonUtil.toJSONString(ExecutorConfig.VIRTUAL_INSTANCE.get()))
-                        .fluentPut("scheduled", FastJsonUtil.toJSONString(ExecutorConfig.VIRTUAL_INSTANCE.get()))
+                        .fluentPut("debug", true)
+                        .fluentPut("sid", 1)
         );
-        config.put("http",
-                MapOf.newJSONObject()
-                        .fluentPut("client", ((HttpClientConfig) HttpClientConfig.DEFAULT.get()).toJSONObject())
-
+        config.put("core", MapOf.newJSONObject().fluentPut("executor", new ExecutorProperties().toJSONObject())
         );
+        config.put("scheduled", new ScheduledProperties().toJSONObject());
+        config.put("http", MapOf.newJSONObject().fluentPut("client", ((HttpClientProperties) HttpClientProperties.DEFAULT.get()).toJSONObject()));
         config.put(
                 "socket",
                 new JSONObject()

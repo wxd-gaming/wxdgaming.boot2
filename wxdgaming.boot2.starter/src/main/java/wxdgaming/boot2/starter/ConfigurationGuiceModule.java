@@ -32,15 +32,20 @@ public class ConfigurationGuiceModule extends GuiceModuleBase {
         reflectProvider.classWithAnnotated(Configuration.class)
                 .forEach(cls -> {
                     Configuration configuration = AnnUtil.ann(cls, Configuration.class);
+
+                    Object nestedValue = null;
                     ConfigurationProperties configurationProperties = AnnUtil.ann(cls, ConfigurationProperties.class);
+                    if (configurationProperties != null) {
+                        nestedValue = BootConfig.getIns().getValue("${" + configurationProperties.prefix() + "}", cls);
 
-                    Object nestedValue = BootConfig.getIns().getValue(configurationProperties.prefix(), cls);
-
-                    if (nestedValue == null) {
-                        log.debug("{} {} 配置未找到", cls, configurationProperties.prefix());
+                        if (nestedValue == null) {
+                            log.debug("{} {} 配置未找到", cls, configurationProperties.prefix());
+                            nestedValue = ReflectProvider.newInstance(cls);
+                        }
+                    } else {
                         nestedValue = ReflectProvider.newInstance(cls);
                     }
-
+                    log.debug("{} {} 配置", cls, nestedValue.hashCode());
                     if (nestedValue instanceof BootstrapProperties v) {
                         bootstrapProperties.set(v);
                     }

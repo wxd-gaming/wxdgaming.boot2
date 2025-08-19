@@ -4,7 +4,7 @@ import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.starter.RunApplicationMain;
 import wxdgaming.boot2.starter.WxdApplication;
 import wxdgaming.boot2.starter.net.SocketScan;
-import wxdgaming.boot2.starter.scheduled.ScheduledScan;
+import wxdgaming.boot2.starter.scheduled.ScheduledProperties;
 
 /**
  * @author wxd-gaming(無心道, 15388152619)
@@ -16,7 +16,7 @@ public class ChatApplication {
         RunApplicationMain runApplication = WxdApplication.run(
                 CoreScan.class,
                 SocketScan.class,
-                ScheduledScan.class,
+                ScheduledProperties.class,
                 ChatApplication.class
         );
 
