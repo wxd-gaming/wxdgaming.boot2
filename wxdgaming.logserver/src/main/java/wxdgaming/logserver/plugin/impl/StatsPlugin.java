@@ -1,7 +1,8 @@
-package plugin;
+package wxdgaming.logserver.plugin.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import org.slf4j.Logger;
+import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.timer.MyClock;
@@ -17,9 +18,9 @@ import java.time.LocalDate;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-08-18 18:28
  **/
-public class RegisterRolePlugin extends AbstractPlugin {
-
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(RegisterRolePlugin.class);
+@Slf4j
+@Singleton
+public class StatsPlugin extends AbstractPlugin {
 
     @Override public String cron() {
         return "0 * * * * ?";
@@ -27,9 +28,11 @@ public class RegisterRolePlugin extends AbstractPlugin {
 
     @Override public void trigger(RunApplication runApplication) {
         SqlDataHelper sqlDataHelper = runApplication.getInstance(SqlDataHelper.class);
-        LocalDate localDate = LocalDate.now().plusDays(-31);
-        for (int i = 0; i < 31; i++) {
-            localDate = localDate.plusDays(1);
+        LocalDate now = LocalDate.now();
+        int beforeDay = 121;
+        LocalDate startDate = now.plusDays(-beforeDay);
+        for (int i = 0; i <= beforeDay; i++) {
+            LocalDate localDate = startDate.plusDays(i);
             log.info("开始处理{}", localDate);
             int dataKey = localDate.getYear() * 10000 + localDate.getMonthValue() * 100 + localDate.getDayOfMonth();
             int registerRoleCount = registerRoleCount(sqlDataHelper, dataKey);
@@ -42,8 +45,16 @@ public class RegisterRolePlugin extends AbstractPlugin {
             jsonObject.put("orderCount", 0);
             jsonObject.put("orderMoneyCount", 0);
             JSONObject loginAccountDay = MapOf.newJSONObject();
-            int loginAccountCount = loginAccountCount(sqlDataHelper, dataKey, dataKey);
-            loginAccountDay.put("1", loginAccountCount);
+            {
+                for (int j = 0; j <= beforeDay; j++) {
+                    LocalDate loginDate = localDate.plusDays(j);
+                    if (loginDate.isAfter(now))
+                        break;
+                    int loginDataKey = loginDate.getYear() * 10000 + loginDate.getMonthValue() * 100 + loginDate.getDayOfMonth();
+                    int loginAccountCount = loginAccountCount(sqlDataHelper, dataKey, loginDataKey);
+                    loginAccountDay.put(String.valueOf(j + 1), loginAccountCount);
+                }
+            }
             jsonObject.put("loginAccountDay", loginAccountDay);
             log.info("{} {} {}", localDate, dataKey, jsonObject);
             addLog(sqlDataHelper, "stats", MyClock.time2Milli(localDate), jsonObject);

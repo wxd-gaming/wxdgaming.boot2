@@ -1,6 +1,7 @@
 {
   "logName": "accountregisterlog",
   "logComment": "账户注册日志",
+  "routing": "/log-table.html",
   "sort": "1-1",
   "partition": true,
   "fieldList": [

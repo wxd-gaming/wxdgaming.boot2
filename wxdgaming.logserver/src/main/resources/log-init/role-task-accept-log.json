@@ -1,6 +1,7 @@
 {
   "logName": "accepttaskslog",
   "logComment": "接受任务日志",
+  "routing": "/log-table.html",
   "sort": "5-1",
   "partition": true,
   "fieldList": [

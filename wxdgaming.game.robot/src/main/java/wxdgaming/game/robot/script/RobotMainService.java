@@ -53,8 +53,8 @@ public class RobotMainService {
 
     @Start
     public void start() {
-        for (int i = 0; i < 100; i++) {
-            String account = "b7" + (i + 1);
+        for (int i = 0; i < 20; i++) {
+            String account = "b3" + (i + 1);
             robotMap.put(account, new Robot().setAccount(account).setName(account));
         }
     }

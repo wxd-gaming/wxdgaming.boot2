@@ -1,6 +1,7 @@
 {
   "logName": "logout",
   "logComment": "登出日志",
+  "routing": "/log-table.html",
   "sort": "1-9",
   "partition": true,
   "fieldList": [

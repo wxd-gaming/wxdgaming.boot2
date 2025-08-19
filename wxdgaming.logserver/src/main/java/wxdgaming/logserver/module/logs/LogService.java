@@ -70,6 +70,7 @@ public class LogService implements InitPrint {
                     JSONObject jsonObject = MapOf.newJSONObject();
                     jsonObject.put("name", li.getLogName());
                     jsonObject.put("comment", li.getLogComment());
+                    jsonObject.put("routing", li.getRouting());
                     return jsonObject;
                 })
                 .toList();

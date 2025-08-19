@@ -1,6 +1,7 @@
 {
   "logName": "submittaskslog",
   "logComment": "提交任务日志",
+  "routing": "/log-table.html",
   "sort": "5-2",
   "partition": true,
   "fieldList": [

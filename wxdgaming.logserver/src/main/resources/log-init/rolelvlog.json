@@ -1,6 +1,7 @@
 {
   "logName": "rolelvlog",
   "logComment": "角色升级日志",
+  "routing": "/log-table.html",
   "sort": "4-1",
   "partition": true,
   "fieldList": [

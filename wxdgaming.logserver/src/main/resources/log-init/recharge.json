@@ -1,6 +1,7 @@
 {
   "logName": "recharge",
   "logComment": "充值日志",
+  "routing": "/log-table.html",
   "sort": "2-1",
   "partition": true,
   "fieldList": [

@@ -1,6 +1,7 @@
 {
   "logName": "itemlog",
   "logComment": "背包日志",
+  "routing": "/log-table.html",
   "sort": "3-1",
   "partition": true,
   "fieldList": [

@@ -67,7 +67,7 @@
                     for (let i = 0; i < data.length; i++) {
                         let item = data[i];
 
-                        let l = `<li onclick="selectNav2(this, 'log-table.html?tableName=${item.name}')">${item.comment}</li>`;
+                        let l = `<li onclick="selectNav2(this, '${item.routing}?tableName=${item.name}')">${item.comment}</li>`;
 
                         $(".log_nav").append(l);
                     }

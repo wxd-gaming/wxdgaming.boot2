@@ -1,6 +1,7 @@
 {
   "logName": "roleloginlog",
   "logComment": "角色登录日志",
+  "routing": "/log-table.html",
   "sort": "1-4",
   "partition": true,
   "fieldList": [

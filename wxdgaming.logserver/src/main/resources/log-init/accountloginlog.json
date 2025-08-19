@@ -1,6 +1,7 @@
 {
   "logName": "accountloginlog",
   "logComment": "账户登录日志",
+  "routing": "/log-table.html",
   "sort": "1-2",
   "partition": true,
   "fieldList": [

@@ -1,6 +1,7 @@
 {
   "logName": "stats",
   "logComment": "统计日志",
+  "routing": "/log-table.html",
   "sort": "0-1",
   "partition": true,
   "fieldList": [
