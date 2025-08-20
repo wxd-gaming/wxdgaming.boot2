@@ -2,7 +2,7 @@ package wxdgaming.boot2.starter.batis.sql;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.ann.Shutdown;
+import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.collection.ConvertCollection;
@@ -49,8 +49,7 @@ public abstract class SqlDataBatch extends DataBatch {
         }
     }
 
-    @Shutdown
-    public void shutdown() {
+    @Stop @Override public void stop() {
         for (BatchThread batchThread : batchThreads) {
             log.info("准备关闭线程 {}", batchThread);
             batchThread.closed.set(true);

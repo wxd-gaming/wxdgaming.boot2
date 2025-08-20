@@ -113,7 +113,7 @@ public class NioFactory implements Serializable {
         return eventExecutors;
     }
 
-    public static void shutdown() {
+    public static void stop() {
         if (Boss_Thread_Group != null) {
             Boss_Thread_Group.shutdownGracefully();
             Boss_Thread_Group = null;

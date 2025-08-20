@@ -46,6 +46,6 @@ public abstract class ExecutorService implements Executor {
         return scheduledFuture;
     }
 
-    public abstract void shutdown();
+    public abstract void stop();
 
 }

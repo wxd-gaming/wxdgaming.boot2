@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.ann.Shutdown;
+import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
@@ -80,9 +80,9 @@ public class ScheduledService {
         );
     }
 
-    @Shutdown
+    @Stop
     @Order(1000)
-    public void shutdown() {
+    public void stop() {
         log.info("线程 Scheduled 调度器 退出");
         if (future != null) {
             future.cancel(true);

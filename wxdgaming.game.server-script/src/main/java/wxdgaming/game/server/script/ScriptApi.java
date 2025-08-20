@@ -6,10 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.RequestBody;
 import wxdgaming.boot2.core.ann.RequestParam;
-import wxdgaming.boot2.core.ann.Value;
-import wxdgaming.boot2.core.executor.ExecutorConfig;
-import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;
@@ -28,8 +26,6 @@ public class ScriptApi {
 
     @HttpRequest()
     public String index(RunApplication runApplication,
-                        @Value(path = "executor") ExecutorConfig executorConfig,
-                        @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
                         @RequestBody(defaultValue = "1") String body,
                         @RequestParam(value = "b1", defaultValue = "2") int b1) {
         return "index";
@@ -46,8 +42,6 @@ public class ScriptApi {
 
     @HttpRequest()
     public RunResult json(RunApplication runApplication,
-                          @Value(path = "executor") ExecutorConfig executorConfig,
-                          @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
                           @RequestBody(defaultValue = "1") String body,
                           @RequestParam(value = "b1", defaultValue = "2") String b1) {
         return RunResult.ok();
@@ -55,8 +49,6 @@ public class ScriptApi {
 
     @HttpRequest()
     public String error(RunApplication runApplication,
-                        @Value(path = "executor") ExecutorConfig executorConfig,
-                        @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
                         @RequestBody(defaultValue = "1") String body,
                         @RequestParam(value = "b1", defaultValue = "2") String b1) {
         throw new RuntimeException("d");

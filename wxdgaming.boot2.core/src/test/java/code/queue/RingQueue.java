@@ -17,11 +17,11 @@ import java.util.concurrent.locks.LockSupport;
  */
 public class RingQueue<T> {
 
-    static final AtomicBoolean shutdown = new AtomicBoolean(false);
+    static final AtomicBoolean stop = new AtomicBoolean(false);
 
     static {
         JvmUtil.addShutdownHook(() -> {
-            shutdown.set(true);
+            stop.set(true);
         });
     }
 
@@ -76,7 +76,7 @@ public class RingQueue<T> {
     }
 
     public boolean isClose() {
-        return close.get() || shutdown.get();
+        return close.get() || stop.get();
     }
 
 }

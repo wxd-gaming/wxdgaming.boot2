@@ -8,8 +8,7 @@ import com.google.inject.name.Names;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Qualifier;
-import wxdgaming.boot2.core.ann.Shutdown;
-import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.reflect.GuiceBeanProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
@@ -57,18 +56,6 @@ public abstract class RunApplication {
 
         HashSet<Object> beanList = new HashSet<>(hashMap.values());
         guiceBeanProvider = new GuiceBeanProvider(this, beanList);
-        guiceBeanProvider.withFieldAnnotated(Value.class).forEach(fieldProvider -> {
-            Value annotation = fieldProvider.getField().getAnnotation(Value.class);
-            if (annotation == null) return;
-            Object valued = BootConfig.getIns().value(annotation, fieldProvider.getField().getType());
-            try {
-                if (valued != null) {
-                    fieldProvider.invoke(valued);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 
     public void registerShutdownHook() {
@@ -77,8 +64,8 @@ public abstract class RunApplication {
 
     public void stop() {
         if (!GlobalUtil.Exiting.compareAndSet(false, true)) return;
-        System.out.println("--------------------------shutdown---------------------------");
-        executeMethodWithAnnotatedException(Shutdown.class);
+        System.out.println("--------------------------stop---------------------------");
+        executeMethodWithAnnotatedException(Stop.class);
         classWithSuper(AutoCloseable.class)
                 .forEach(closeable -> {
                     try {

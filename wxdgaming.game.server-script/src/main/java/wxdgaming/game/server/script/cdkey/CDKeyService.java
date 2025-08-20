@@ -4,18 +4,17 @@ import com.alibaba.fastjson.TypeReference;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.ann.Value;
+import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
+import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
+import wxdgaming.game.basic.core.Reason;
+import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.bean.goods.BagChangeDTO4Item;
 import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.bean.goods.ItemCfg;
-import wxdgaming.game.basic.core.Reason;
-import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.message.cdkey.ResUseCdKey;
 import wxdgaming.game.server.bean.BackendConfig;
 import wxdgaming.game.server.bean.role.Player;
@@ -36,24 +35,21 @@ import java.util.List;
  **/
 @Slf4j
 @Getter
-@Setter
 @Singleton
-public class CDKeyService {
+public class CDKeyService implements InitPrint {
 
     private final DataCenterService dataCenterService;
     private final TipsService tipsService;
     private final BagService bagService;
-    private BackendConfig backendConfig;
+    private final BackendConfig backendConfig;
 
-    public void init(@Value(path = "backends") BackendConfig backendConfig) {
-        this.backendConfig = backendConfig;
-    }
 
     @Inject
-    public CDKeyService(DataCenterService dataCenterService, TipsService tipsService, BagService bagService) {
+    public CDKeyService(DataCenterService dataCenterService, TipsService tipsService, BagService bagService, BackendConfig backendConfig) {
         this.dataCenterService = dataCenterService;
         this.tipsService = tipsService;
         this.bagService = bagService;
+        this.backendConfig = backendConfig;
     }
 
     public void use(Player player, String cdKey) {

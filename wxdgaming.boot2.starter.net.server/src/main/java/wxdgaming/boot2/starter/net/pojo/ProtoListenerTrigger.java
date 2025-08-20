@@ -1,14 +1,10 @@
 package wxdgaming.boot2.starter.net.pojo;
 
 import com.google.inject.Injector;
-import com.google.inject.name.Named;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
-import wxdgaming.boot2.core.ann.Qualifier;
 import wxdgaming.boot2.core.ann.ThreadParam;
-import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.reflect.GuiceBeanProvider;
@@ -79,15 +75,6 @@ public class ProtoListenerTrigger extends ExecutorEvent {
                 continue;
             }
             /*实现注入*/
-            {
-                Value value = parameter.getAnnotation(Value.class);
-                if (value != null) {
-                    Object valued = BootConfig.getIns().value(value, parameterizedType);
-                    params[i] = parameterType.cast(valued);
-                    continue;
-                }
-            }
-
             {
                 ThreadParam threadParam = parameter.getAnnotation(ThreadParam.class);
                 if (threadParam != null) {

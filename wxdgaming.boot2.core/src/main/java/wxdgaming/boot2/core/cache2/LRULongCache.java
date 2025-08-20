@@ -129,7 +129,7 @@ public class LRULongCache<V> extends Cache<Long, V> {
         this.nodes = Collections.unmodifiableList(tmpNodes);
     }
 
-    @Override public void shutdown() {
+    @Override public void stop() {
         for (ScheduledFuture<?> timerJob : timerJobs) {
             timerJob.cancel(true);
         }

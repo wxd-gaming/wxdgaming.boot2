@@ -7,8 +7,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.ann.Shutdown;
 import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
@@ -77,20 +77,20 @@ public abstract class SqlDataHelper extends DataHelper {
         }
     }
 
-    @Shutdown
+    @Stop
     @Order(100/*优先清空缓存*/)
-    public void shutdownCache() {
+    public void stopCache() {
         log.info("关闭数据库缓存：{}", this.getSqlConfig().getUrl());
         if (this.cacheService != null)
-            this.cacheService.shutdown();
+            this.cacheService.stop();
     }
 
-    @Shutdown
+    @Stop
     @Order(Integer.MAX_VALUE/*最后关闭*/)
-    public void shutdown() {
+    @Override public void stop() {
         log.info("准备关闭数据库服务：{}", this.getSqlConfig().getUrl());
         if (this.dataBatch != null)
-            this.dataBatch.shutdown();
+            this.dataBatch.stop();
         this.hikariDataSource.close();
     }
 

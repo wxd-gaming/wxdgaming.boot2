@@ -111,14 +111,6 @@ public class RpcListenerTrigger extends ExecutorEvent {
             }
             /*实现注入*/
             {
-                Value value = parameter.getAnnotation(Value.class);
-                if (value != null) {
-                    params[i] = BootConfig.getIns().value(value, parameterizedType);
-                    continue;
-                }
-            }
-
-            {
                 ThreadParam threadParam = parameter.getAnnotation(ThreadParam.class);
                 if (threadParam != null) {
                     params[i] = ThreadContext.context(threadParam, parameterizedType);

@@ -3,7 +3,7 @@ package wxdgaming.boot2.starter.batis;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.ann.Shutdown;
+import wxdgaming.boot2.core.ann.Stop;
 
 import java.sql.Connection;
 import java.util.List;
@@ -29,8 +29,8 @@ public abstract class DataHelper {
         return (DDL) ddlBuilder;
     }
 
-    @Shutdown
-    public abstract void shutdown();
+    @Stop
+    public abstract void stop();
 
     public TableMapping tableMapping(Class<? extends Entity> cls) {
         return ddlBuilder.tableMapping(cls);

@@ -13,7 +13,7 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.ann.Shutdown;
+import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.util.BytesUnit;
@@ -158,11 +158,11 @@ public class SocketClient {
     protected void addChanelHandler(SocketChannel socketChannel, ChannelPipeline pipeline) {}
 
     @Order(100)
-    @Shutdown
-    public void shutdown() {
+    @Stop
+    public void stop() {
         closed = true;
         sessionGroup.getChannelGroup().disconnect();
-        log.info("shutdown tcp client：{}:{}", config.getHost(), config.getPort());
+        log.info("stop tcp client：{}:{}", config.getHost(), config.getPort());
     }
 
     public void check(Consumer<SocketSession> consumer) {

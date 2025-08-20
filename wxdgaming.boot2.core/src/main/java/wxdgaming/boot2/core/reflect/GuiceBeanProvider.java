@@ -151,13 +151,6 @@ public class GuiceBeanProvider {
                 params[i] = parameterType.cast(runApplication);
                 continue;
             }
-            /*实现注入*/
-            Value value = parameter.getAnnotation(Value.class);
-            if (value != null) {
-                params[i] = BootConfig.getIns().value(value, parameterizedType);
-                continue;
-            }
-
             {
                 ThreadParam threadParam = parameter.getAnnotation(ThreadParam.class);
                 if (threadParam != null) {

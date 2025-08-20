@@ -61,7 +61,7 @@ public class ExecutorServicePlatform extends ExecutorService {
         threadPoolExecutor.execute(executorJob);
     }
 
-    @Override public void shutdown() {
+    @Override public void stop() {
         threadPoolExecutor.shutdown();
     }
 

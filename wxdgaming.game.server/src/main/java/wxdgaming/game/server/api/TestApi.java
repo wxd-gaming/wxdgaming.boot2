@@ -4,12 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.RunApplication;
-import wxdgaming.boot2.core.ann.RequestBody;
 import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.RequestBody;
 import wxdgaming.boot2.core.ann.RequestParam;
-import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
-import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
@@ -53,8 +51,6 @@ public class TestApi {
 
     @HttpRequest()
     public String index(RunApplication runApplication,
-                        @Value(path = "executor") ExecutorConfig executorConfig,
-                        @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
                         @RequestBody(defaultValue = "1") String body,
                         @RequestParam(value = "b1", defaultValue = "2") int b1) {
         return "index";
@@ -62,8 +58,6 @@ public class TestApi {
 
     @HttpRequest()
     public RunResult json(RunApplication runApplication,
-                          @Value(path = "executor") ExecutorConfig executorConfig,
-                          @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
                           @RequestBody(defaultValue = "1") String body,
                           @RequestParam(value = "b1", defaultValue = "2") String b1) {
         return RunResult.ok();
@@ -71,8 +65,6 @@ public class TestApi {
 
     @HttpRequest()
     public String error(RunApplication runApplication,
-                        @Value(path = "executor") ExecutorConfig executorConfig,
-                        @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
                         @RequestBody(defaultValue = "1") String body,
                         @RequestParam(value = "b1", defaultValue = "2") String b1) {
         throw new RuntimeException("d");
@@ -104,7 +96,7 @@ public class TestApi {
     }
 
     @RunTest
-    public void runTestParam(@Value(path = "sid") int sid, int a, int b) {
+    public void runTestParam(int sid, int a, int b) {
         log.info("{} sid={}, a={}, b={}", "runTest()", sid, a, b);
     }
 

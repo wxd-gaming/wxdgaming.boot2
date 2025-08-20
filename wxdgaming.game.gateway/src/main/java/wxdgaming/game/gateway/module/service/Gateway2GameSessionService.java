@@ -116,7 +116,7 @@ public class Gateway2GameSessionService extends HoldRunApplication {
             while (iterator.hasNext()) {
                 Map.Entry<Integer, Gateway2GameSocketClientImpl> next = iterator.next();
                 if (!hasServerIdSet.contains(next.getKey())) {
-                    next.getValue().shutdown();
+                    next.getValue().stop();
                     iterator.remove();
                     SocketClientConfig config = next.getValue().getConfig();
                     log.info("sid={}, host={}, port={} 游戏服务下线，不在需要链接", next.getKey(), config.getHost(), config.getPort());

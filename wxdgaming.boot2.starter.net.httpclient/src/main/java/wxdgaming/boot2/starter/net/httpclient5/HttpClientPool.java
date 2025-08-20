@@ -16,7 +16,7 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.core5.util.TimeValue;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.ann.Shutdown;
+import wxdgaming.boot2.core.ann.Stop;
 
 import java.util.concurrent.TimeUnit;
 
@@ -52,8 +52,8 @@ public class HttpClientPool implements InitPrint {
         Lazy.instance = this;
     }
 
-    @Shutdown
-    public void close() {
+    @Stop
+    public void stop() {
         try {
             if (this.connPoolMng != null) {
                 this.connPoolMng.close();

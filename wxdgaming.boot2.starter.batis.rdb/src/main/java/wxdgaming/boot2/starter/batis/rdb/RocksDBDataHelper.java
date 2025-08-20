@@ -48,7 +48,7 @@ public class RocksDBDataHelper {
         }
     }
 
-    public void shutdown() {
+    public void stop() {
         try {
             db.close();
         } catch (Exception e) {

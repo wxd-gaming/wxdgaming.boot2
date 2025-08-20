@@ -124,7 +124,7 @@ public class LRUCache<K, V> extends Cache<K, V> {
         this.nodes = Collections.unmodifiableList(tmpNodes);
     }
 
-    @Override public void shutdown() {
+    @Override public void stop() {
         for (ScheduledFuture<?> timerJob : timerJobs) {
             timerJob.cancel(true);
         }

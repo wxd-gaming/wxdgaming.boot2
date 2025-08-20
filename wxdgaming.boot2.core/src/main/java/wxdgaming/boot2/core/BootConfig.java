@@ -3,7 +3,6 @@ package wxdgaming.boot2.core;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import lombok.Getter;
-import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.io.FileUtil;
@@ -60,35 +59,6 @@ public class BootConfig {
     }
 
     private JSONObject configNode = new JSONObject(true);
-
-    @SuppressWarnings("unchecked")
-    public <R> R value(Value value, Type type) {
-        /*实现注入*/
-        String path = value.path();
-        R r;
-        try {
-            if (value.nestedPath()) {
-                r = BootConfig.getIns().getNestedValue(path, type);
-            } else {
-                r = BootConfig.getIns().getObject(path, type);
-            }
-            if (type instanceof Class<?> clazz && clazz.isInstance(r)) {
-                return (R) clazz.cast(r);
-            }
-            if (r == null && StringUtils.isNotBlank(value.defaultValue())) {
-                if (String.class.equals(type)) {
-                    return (R) value.defaultValue();
-                }
-                r = FastJsonUtil.parse(value.defaultValue(), type);
-            }
-        } catch (Exception e) {
-            throw Throw.of("参数：" + path, e);
-        }
-        if (value.required() && r == null) {
-            throw new RuntimeException("value:" + path + " is null");
-        }
-        return r;
-    }
 
     public int getIntValue(String key) {
         return configNode.getIntValue(key);

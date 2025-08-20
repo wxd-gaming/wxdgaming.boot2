@@ -22,7 +22,7 @@ public class ExecutorServiceVirtual extends ExecutorService {
     private final ReentrantLock reentrantLock = new ReentrantLock();
     private final AtomicInteger threadSize = new AtomicInteger();
     private final Thread.Builder.OfVirtual ofVirtual;
-    private final AtomicBoolean shutdown = new AtomicBoolean(false);
+    private final AtomicBoolean stop = new AtomicBoolean(false);
     private final int core;
     /** 队列上限 */
     private final int queueSize;
@@ -36,13 +36,13 @@ public class ExecutorServiceVirtual extends ExecutorService {
         this.queue = new ArrayBlockingQueue<>(queueSize);
     }
 
-    @Override public void shutdown() {
-        shutdown.set(true);
+    @Override public void stop() {
+        stop.set(true);
     }
 
     @Override public void execute(Runnable command) {
-        if (shutdown.get()) {
-            throw new RejectedExecutionException("ExecutorServiceVirtual is shutdown");
+        if (stop.get()) {
+            throw new RejectedExecutionException("ExecutorServiceVirtual is stop");
         }
         ExecutorJob executorJob;
         if (!(command instanceof ExecutorQueue)) {
@@ -92,7 +92,7 @@ public class ExecutorServiceVirtual extends ExecutorService {
     private void checkExecute(ExecutorJobVirtual executorJobVirtual) {
         reentrantLock.lock();
         try {
-            if (shutdown.get()) return;
+            if (stop.get()) return;
             if (threadSize.get() < this.core) {
                 Runnable task;
                 if (executorJobVirtual != null) {

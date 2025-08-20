@@ -53,7 +53,7 @@ public abstract class Cache<K, V> {
     }
 
     /** 关闭缓存 */
-    public abstract void shutdown();
+    public abstract void stop();
 
     /** 计算内存大小 注意特别耗时，并且可能死循环 */
     @Deprecated

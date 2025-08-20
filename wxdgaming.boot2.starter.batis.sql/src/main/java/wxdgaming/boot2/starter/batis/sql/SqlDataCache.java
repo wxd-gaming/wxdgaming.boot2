@@ -69,8 +69,8 @@ public class SqlDataCache<E extends Entity, Key> {
         getCache().start();
     }
 
-    public void shutdown() {
-        getCache().shutdown();
+    public void stop() {
+        getCache().stop();
     }
 
     protected E loader(Key key) {

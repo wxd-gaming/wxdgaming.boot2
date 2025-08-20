@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.Shutdown;
+import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.SessionGroup;
@@ -121,9 +121,9 @@ public class SocketServer {
         }
     }
 
-    @Shutdown
+    @Stop
     @Order(100)
-    public void shutdown() {
+    public void stop() {
         if (scheduledFuture != null) {
             scheduledFuture.cancel(false);
         }

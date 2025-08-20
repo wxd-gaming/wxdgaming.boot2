@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.ann.Shutdown;
+import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.game.basic.login.bean.info.InnerServerInfoBean;
@@ -42,8 +42,8 @@ public class InnerService {
 
 
     @Order(10)
-    @Shutdown
-    public void shutdown() {
+    @Stop
+    public void stop() {
         innerGameServerInfoMap.values().forEach(bean -> {
             sqlDataHelper.getDataBatch().save(bean);
         });

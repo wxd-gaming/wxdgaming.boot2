@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.HoldRunApplication;
 import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.ann.Shutdown;
+import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
@@ -51,8 +51,8 @@ public class PlayerDriveService extends HoldRunApplication {
     }
 
     @Order(1)
-    @Shutdown()
-    public void shutdown() {
+    @Stop()
+    public void stop() {
         playerDriveContentMap.values().forEach(v -> v.timerJob.cancel(true));
     }
 

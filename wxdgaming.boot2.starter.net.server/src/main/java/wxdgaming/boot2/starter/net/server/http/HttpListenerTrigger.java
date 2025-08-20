@@ -4,13 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Injector;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.RequestBody;
 import wxdgaming.boot2.core.ann.RequestParam;
 import wxdgaming.boot2.core.ann.ThreadParam;
-import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
@@ -124,14 +122,6 @@ public class HttpListenerTrigger extends ExecutorEvent {
                 continue;
             }
             /*实现注入*/
-            {
-                Value value = parameter.getAnnotation(Value.class);
-                if (value != null) {
-                    Object valued = BootConfig.getIns().value(value, parameterizedType);
-                    params[i] = parameterType.cast(valued);
-                    continue;
-                }
-            }
             {
                 ThreadParam threadParam = parameter.getAnnotation(ThreadParam.class);
                 if (threadParam != null) {
