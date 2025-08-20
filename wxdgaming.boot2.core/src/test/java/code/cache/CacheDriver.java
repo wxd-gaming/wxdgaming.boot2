@@ -9,8 +9,6 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
@@ -20,24 +18,21 @@ import java.util.function.Function;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-07-03 10:57
  **/
-@Builder
 class CacheDriver<K, V> {
 
     static final ScheduledExecutorService scheduledExecutorService = ExecutorFactory.newSingleThreadScheduledExecutor("cache-scheduled");
 
-    final AtomicBoolean isRunning = new AtomicBoolean(false);
-    final ReentrantLock lock = new ReentrantLock();
-    @Builder.Default
-    private int block = 32;
-    private final AtomicReference<Map<Integer, CacheBlock>> cacheAtomicReference = new AtomicReference<>();
+    protected final ReentrantLock lock = new ReentrantLock();
+    protected final int block;
+    protected final List<CacheBlock> cacheAtomicReference;
 
     /** 读取过期时间 */
-    private Duration expireAfterAccess;
+    protected final Duration expireAfterAccess;
     /** 写入过期时间 */
-    private Duration expireAfterWrite;
+    protected final Duration expireAfterWrite;
 
-    private Function<K, V> loader = null;
-    private Consumer3<K, V, RemovalCause> removalListener = null;
+    protected final Function<K, V> loader;
+    protected final Consumer3<K, V, RemovalCause> removalListener;
 
     public enum RemovalCause {
         /** 删除 */
@@ -53,7 +48,7 @@ class CacheDriver<K, V> {
         ;
     }
 
-    private class CacheNode implements Comparable<CacheNode> {
+    protected class CacheNode implements Comparable<CacheNode> {
 
         private final K key;
         private final V value;
@@ -103,7 +98,7 @@ class CacheDriver<K, V> {
         }
     }
 
-    private class CacheBlock {
+    protected class CacheBlock {
 
         final ReentrantLock lock = new ReentrantLock();
         final HashMap<K, CacheNode> nodeMap = new HashMap<>();
@@ -165,16 +160,22 @@ class CacheDriver<K, V> {
 
     }
 
-    public CacheDriver<K, V> start() {
-        if (isRunning.get()) {
-            throw new RuntimeException("is running");
-        }
+    @Builder
+    public CacheDriver(int block, Duration expireAfterAccess, Duration expireAfterWrite, Function<K, V> loader, Consumer3<K, V, RemovalCause> removalListener) {
 
         if (expireAfterAccess != null && expireAfterWrite != null)
             throw new RuntimeException("expireAfterAccess or expireAfterWrite");
 
-        isRunning.set(true);
-        init();
+        this.block = block;
+        this.expireAfterAccess = expireAfterAccess;
+        this.expireAfterWrite = expireAfterWrite;
+        this.loader = loader;
+        this.removalListener = removalListener;
+
+        cacheAtomicReference = new ArrayList<>(block);
+        for (int i = 0; i < block; i++) {
+            cacheAtomicReference.add(new CacheBlock());
+        }
 
         if (expireAfterAccess != null || expireAfterWrite != null) {
             long delay = expireAfterAccess != null ? expireAfterAccess.toMillis() : expireAfterWrite.toMillis();
@@ -182,21 +183,6 @@ class CacheDriver<K, V> {
                 throw new RuntimeException("expire < 1s");
             delay = delay / 100;
             scheduledExecutorService.scheduleWithFixedDelay(this::refresh, delay, delay, TimeUnit.MILLISECONDS);
-        }
-
-        return this;
-    }
-
-    private void init() {
-        lock.lock();
-        try {
-            HashMap<Integer, CacheBlock> newValue = new HashMap<>();
-            for (int i = 0; i < block; i++) {
-                newValue.put(i, new CacheBlock());
-            }
-            cacheAtomicReference.set(newValue);
-        } finally {
-            lock.unlock();
         }
     }
 
@@ -206,12 +192,12 @@ class CacheDriver<K, V> {
 
     public void put(K key, V value) {
         int blockIndex = getBlockIndex(key);
-        cacheAtomicReference.get().get(blockIndex).put(key, value);
+        cacheAtomicReference.get(blockIndex).put(key, value);
     }
 
     public V get(K key) {
         int blockIndex = getBlockIndex(key);
-        return cacheAtomicReference.get().get(blockIndex).get(key);
+        return cacheAtomicReference.get(blockIndex).get(key);
     }
 
     public V remove(K k) {
@@ -219,7 +205,8 @@ class CacheDriver<K, V> {
     }
 
     public V remove(K k, RemovalCause cause) {
-        CacheBlock cacheBlock = cacheAtomicReference.get().get(getBlockIndex(k));
+        int blockIndex = getBlockIndex(k);
+        CacheBlock cacheBlock = cacheAtomicReference.get(blockIndex);
         cacheBlock.lock.lock();
         try {
             CacheNode remove = cacheBlock.nodeMap.remove(k);
@@ -238,8 +225,7 @@ class CacheDriver<K, V> {
     public void refresh() {
         lock.lock();
         try {
-            Map<Integer, CacheBlock> integerCacheBlockMap = cacheAtomicReference.get();
-            for (CacheBlock cacheBlock : integerCacheBlockMap.values()) {
+            for (CacheBlock cacheBlock : cacheAtomicReference) {
                 cacheBlock.lock.lock();
                 try {
                     Iterator<CacheNode> iterator = cacheBlock.expireSet.iterator();

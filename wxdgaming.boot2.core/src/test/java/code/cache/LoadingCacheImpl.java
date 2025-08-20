@@ -20,6 +20,7 @@ public class LoadingCacheImpl<K, V> {
     private final AtomicReference<CacheDriver<K, V>> innerCacheReference = new AtomicReference<>();
 
     private final AtomicReference<CacheDriver<K, Hold>> outerCacheReference = new AtomicReference<>();
+    private final int block;
     /** 心跳时间 */
     private Duration expireHeartAfterWrite;
     /** 读取过期时间 */
@@ -35,11 +36,11 @@ public class LoadingCacheImpl<K, V> {
         innerCacheReference.set(
                 CacheDriver.<K, V>builder()
                         .loader(loader)
+                        .block(block)
                         .removalListener(removalListener)
                         .expireAfterAccess(expireAfterAccess)
                         .expireAfterWrite(expireAfterWrite)
                         .build()
-                        .start()
         );
 
         Duration tmpExpireHeartAfterWrite = expireHeartAfterWrite;
@@ -48,6 +49,7 @@ public class LoadingCacheImpl<K, V> {
         }
         outerCacheReference.set(
                 CacheDriver.<K, Hold>builder()
+                        .block(block)
                         .loader(key -> new Hold(innerCacheReference.get().get(key)))
                         .removalListener((k, hold, removalCause) -> {
                             if (removalCause != CacheDriver.RemovalCause.EXPIRE) return;
@@ -56,7 +58,6 @@ public class LoadingCacheImpl<K, V> {
                         })
                         .expireAfterWrite(tmpExpireHeartAfterWrite)
                         .build()
-                        .start()
         );
 
         return this;
