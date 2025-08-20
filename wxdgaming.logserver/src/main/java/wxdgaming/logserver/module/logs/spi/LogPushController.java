@@ -1,21 +1,25 @@
 package wxdgaming.logserver.module.logs.spi;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.TypeReference;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ann.RequestBody;
 import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.core.util.Md5Util;
 import wxdgaming.boot2.starter.net.ann.HttpRequest;
 import wxdgaming.boot2.starter.net.ann.RequestMapping;
+import wxdgaming.boot2.starter.net.http.HttpDataAction;
 import wxdgaming.boot2.starter.net.server.http.HttpContext;
+import wxdgaming.logserver.LogServerProperties;
 import wxdgaming.logserver.bean.LogEntity;
 import wxdgaming.logserver.module.logs.LogService;
 
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * 日志接口
@@ -28,10 +32,12 @@ import java.util.List;
 @RequestMapping("/log/push")
 public class LogPushController {
 
+    private final LogServerProperties logServerProperties;
     final LogService logService;
 
     @Inject
-    public LogPushController(LogService logService) {
+    public LogPushController(LogServerProperties logServerProperties, LogService logService) {
+        this.logServerProperties = logServerProperties;
         this.logService = logService;
     }
 
@@ -41,10 +47,17 @@ public class LogPushController {
             return RunResult.fail("log list 不能为空");
         }
 
-        List<LogEntity> logEntityList = JSON.parseArray(json, LogEntity.class);
+        TreeMap<String, String> map = JSON.parseObject(json, new TypeReference<TreeMap<String, String>>() {});
+        String sign = map.remove("sign");
 
-        String authorization = request.getRequest().header(HttpHeaderNames.AUTHORIZATION.toString());
-        String jsonString = JSON.toJSONString(logEntityList, SerializerFeature.SortField, SerializerFeature.MapSortField);
+        String signBefore = HttpDataAction.httpData(map) + logServerProperties.getJwtKey();
+        String selfSign = Md5Util.md5DigestEncode(signBefore);
+        if (!Objects.equals(sign, selfSign)) {
+            log.error("LogPushController sign={} signBefore={}", sign, signBefore);
+            return RunResult.fail("sign 签名错误");
+        }
+        List<LogEntity> logEntityList = JSON.parseArray(map.get("data"), LogEntity.class);
+
 
         for (LogEntity logEntity : logEntityList) {
             if (StringUtils.isBlank(logEntity.getLogType())) {

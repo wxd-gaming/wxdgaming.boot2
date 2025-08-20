@@ -61,7 +61,7 @@ public class WxdApplication {
             List<GuiceModuleBase> collect = moduleStream
                     .map(cls -> ReflectProvider.newInstance(cls, reflectProvider))
                     .collect(Collectors.toList());
-            collect.add(0, new ConfigurationGuiceModule(reflectProvider));
+            collect.add(0, new ConfigurationGuiceModule(reflectProvider, true));
             collect.add(1, new ApplicationGuiceModule(reflectProvider));
             collect.add(new SingletonGuiceModule(reflectProvider));
 
@@ -86,7 +86,7 @@ public class WxdApplication {
 
     public static RunApplicationSub createRunApplicationSub(ReflectProvider reflectProvider) {
         List<GuiceModuleBase> collect = List.of(
-                new ConfigurationGuiceModule(reflectProvider),
+                new ConfigurationGuiceModule(reflectProvider, false),
                 new SingletonGuiceModule(reflectProvider, RunApplicationSub.class)
         );
 

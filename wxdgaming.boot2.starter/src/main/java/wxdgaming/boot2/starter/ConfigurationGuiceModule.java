@@ -19,11 +19,14 @@ import java.util.concurrent.atomic.AtomicReference;
  * @version 2025-02-16 10:35
  **/
 @Slf4j
-public class ConfigurationGuiceModule extends GuiceModuleBase {
+class ConfigurationGuiceModule extends GuiceModuleBase {
 
 
-    public ConfigurationGuiceModule(ReflectProvider reflectProvider) {
+    private final boolean initBoot;
+
+    public ConfigurationGuiceModule(ReflectProvider reflectProvider, boolean initBoot) {
         super(reflectProvider);
+        this.initBoot = initBoot;
     }
 
 
@@ -37,10 +40,9 @@ public class ConfigurationGuiceModule extends GuiceModuleBase {
                     ConfigurationProperties configurationProperties = AnnUtil.ann(cls, ConfigurationProperties.class);
                     if (configurationProperties != null) {
                         nestedValue = BootConfig.getIns().getValue("${" + configurationProperties.prefix() + "}", cls);
-
                         if (nestedValue == null) {
                             log.debug("{} {} 配置未找到", cls, configurationProperties.prefix());
-                            nestedValue = ReflectProvider.newInstance(cls);
+                            return;
                         }
                     } else {
                         nestedValue = ReflectProvider.newInstance(cls);
@@ -57,6 +59,8 @@ public class ConfigurationGuiceModule extends GuiceModuleBase {
                     }
 
                 });
+
+        if (!initBoot) return;
 
         if (bootstrapProperties.get() != null) {
             bindInstance(BootstrapProperties.class, bootstrapProperties.get());

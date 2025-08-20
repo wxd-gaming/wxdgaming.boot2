@@ -3,7 +3,6 @@ package wxdgaming.logbus;
 import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.ann.Start;
@@ -13,6 +12,7 @@ import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.util.Md5Util;
+import wxdgaming.boot2.starter.net.http.HttpDataAction;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 
@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.LockSupport;
@@ -125,12 +126,16 @@ public class LogBusService implements InitPrint {
                     .filter(f -> f.toString().endsWith(".dat"))
                     .forEach(f -> {
                         String json = FileReadUtil.readString(f);
-                        HttpRequestPost httpRequestPost = HttpRequestPost.ofJson(logBusProperties.getPostUrl(), json);
-                        String string = Md5Util.md5DigestEncode(logBusProperties.getToken(), json);
+                        TreeMap<String, String> jsonObject = new TreeMap<>();
+                        jsonObject.put("time", String.valueOf(System.currentTimeMillis()));
+                        jsonObject.put("data", json);
+                        String signBefore = HttpDataAction.httpData(jsonObject) + logBusProperties.getToken();
+                        String sign = Md5Util.md5DigestEncode(signBefore);
+                        jsonObject.put("sign", sign);
+                        HttpRequestPost httpRequestPost = HttpRequestPost.ofJson(logBusProperties.getPostUrl(), jsonObject);
                         if (logBusProperties.isGzip()) {
                             httpRequestPost.useGzip();
                         }
-                        httpRequestPost.addHeader(HttpHeaderNames.AUTHORIZATION.toString(), string);
                         HttpResponse execute = httpRequestPost.execute();
                         if (execute.isSuccess()) {
                             f.delete();

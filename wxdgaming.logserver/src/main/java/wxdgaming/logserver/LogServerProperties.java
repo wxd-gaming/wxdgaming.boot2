@@ -1,5 +1,7 @@
 package wxdgaming.logserver;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.BootstrapProperties;
 import wxdgaming.boot2.core.ann.Comment;
@@ -13,6 +15,8 @@ import wxdgaming.boot2.core.ann.ConfigurationProperties;
  * @version 2025-08-18 10:12
  **/
 @Slf4j
+@Getter
+@Setter
 @Configuration()
 @ConfigurationProperties(prefix = "boot")
 public class LogServerProperties extends BootstrapProperties {

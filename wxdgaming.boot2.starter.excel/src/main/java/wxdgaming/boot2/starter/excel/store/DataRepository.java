@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.Value;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 import java.util.Map;
@@ -25,13 +24,18 @@ import java.util.concurrent.ConcurrentHashMap;
 @Accessors(chain = true)
 public class DataRepository {
 
-    @Getter private static final DataRepository ins = new DataRepository();
+    private static final class Lazy {
+        private static final DataRepository ins = new DataRepository();
+    }
 
-    private String jsonPath;
-    private String scanPackageName;
+    public static DataRepository getIns() {
+        return DataRepository.Lazy.ins;
+    }
+
     @Setter private ClassLoader classLoader;
     /** 存储数据表 */
     private Map<Class<?>, DataTable<?>> dataTableMap = new ConcurrentHashMap<>();
+    private DataRepositoryProperties dataRepositoryProperties;
 
     private DataRepository() {
     }
@@ -47,23 +51,21 @@ public class DataRepository {
 
     @Start
     @Order(1)
-    public void start(@Value(path = "data.json.path", nestedPath = true, required = false) String jsonPath,
-                      @Value(path = "data.json.scan", nestedPath = true, required = false) String scanPackageName) {
-        this.jsonPath = jsonPath;
-        this.scanPackageName = scanPackageName;
+    public void start(DataRepositoryProperties dataRepositoryProperties) {
+        this.dataRepositoryProperties = dataRepositoryProperties;
         loadAll();
     }
 
     public void loadAll() {
-        if (StringUtils.isBlank(jsonPath) || StringUtils.isBlank(scanPackageName)) {
-            log.error("扫描器异常：{}, {}", jsonPath, scanPackageName);
+        if (StringUtils.isBlank(dataRepositoryProperties.getPath()) || StringUtils.isBlank(dataRepositoryProperties.getScan())) {
+            log.debug("扫描器异常：{}, {}", dataRepositoryProperties.getPath(), dataRepositoryProperties.getScan());
             return;
         }
         Map<Class<?>, DataTable<?>> tmpDataTableMap = new ConcurrentHashMap<>();
         if (classLoader == null) {
             classLoader = Thread.currentThread().getContextClassLoader();
         }
-        ReflectProvider reflectProvider = ReflectProvider.Builder.of(classLoader, scanPackageName).build();
+        ReflectProvider reflectProvider = ReflectProvider.Builder.of(classLoader, dataRepositoryProperties.getScan()).build();
         reflectProvider.classWithSuper(DataTable.class)
                 .forEach(dataTableClass -> {
                     DataTable<?> dataTable = buildDataTable(dataTableClass);
@@ -84,7 +86,7 @@ public class DataRepository {
             dataTable.checkData(tmpDataTableMap);
         }
         if (tmpDataTableMap.isEmpty()) {
-            log.error("扫描器异常：{}, {}, 没有任何类", jsonPath, scanPackageName);
+            log.error("扫描器异常：{}, {}, 没有任何类", dataRepositoryProperties.getPath(), dataRepositoryProperties.getScan());
         }
         dataTableMap = tmpDataTableMap;
     }
@@ -96,7 +98,7 @@ public class DataRepository {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        dataTable.loadJson(jsonPath);
+        dataTable.loadJson(dataRepositoryProperties.getPath());
         log.info("load data table 文件：{}, 数据：{}, 行数：{}", dataTable.getDataMapping().excelPath(), dataTable.getDataMapping().name(), dataTable.dbSize());
         return dataTable;
     }

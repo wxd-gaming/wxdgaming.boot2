@@ -33,7 +33,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class ExcelRepository {
 
-    @Getter private static final ExcelRepository ins = new ExcelRepository();
+    private static final class Lazy {
+        private static final ExcelRepository ins = new ExcelRepository();
+    }
+
+    public static ExcelRepository getIns() {
+        return Lazy.ins;
+    }
 
     private final String[] String_Split = {"[,，]", "[:：]"};
 
