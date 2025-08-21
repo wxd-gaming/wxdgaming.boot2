@@ -1,0 +1,14 @@
+package wxdgaming.boot2.util;
+
+import wxdgaming.boot2.core.ApplicationContextProvider;
+
+/**
+ * 运行类
+ *
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-02-14 16:55
+ **/
+public final class ChildApplicationContextProvider extends ApplicationContextProvider {
+
+
+}

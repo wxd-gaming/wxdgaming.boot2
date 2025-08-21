@@ -1,7 +1,7 @@
 package wxdgaming.game.server.script.bag.use;
 
-import com.google.inject.Inject;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.beans.factory.annotation.Autowired;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.role.Player;
@@ -15,10 +15,10 @@ import wxdgaming.game.server.script.role.PlayerService;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-04-22 17:27
  **/
-public abstract class UseItemAction extends HoldRunApplication implements IBagScript {
+public abstract class UseItemAction extends HoldApplicationContext implements IBagScript {
 
-    @Inject protected PlayerService playerService;
-    @Inject protected FightService fightService;
+    @Autowired protected PlayerService playerService;
+    @Autowired protected FightService fightService;
 
     public boolean canUse(Player player, BagChangesContext bagChangesContext, Item item) {
         return false;

@@ -5,8 +5,9 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 
@@ -51,7 +52,7 @@ public class DataRepository {
 
     @Start
     @Order(1)
-    public void start(DataRepositoryProperties dataRepositoryProperties) {
+    public void start(@Qualifier DataRepositoryProperties dataRepositoryProperties) {
         this.dataRepositoryProperties = dataRepositoryProperties;
         loadAll();
     }

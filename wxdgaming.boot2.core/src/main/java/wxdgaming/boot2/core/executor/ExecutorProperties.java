@@ -1,10 +1,10 @@
 package wxdgaming.boot2.core.executor;
 
 import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.ann.Configuration;
-import wxdgaming.boot2.core.ann.ConfigurationProperties;
-import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.lang.ObjectBase;
 
 import java.util.function.Supplier;

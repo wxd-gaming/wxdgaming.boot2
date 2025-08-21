@@ -1,13 +1,14 @@
 package wxdgaming.boot2.starter.net.pojo;
 
-import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.RunApplication;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.ann.ThreadParam;
+import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ThreadContext;
-import wxdgaming.boot2.core.reflect.GuiceBeanProvider;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.starter.net.SocketSession;
 
@@ -25,15 +26,15 @@ import java.lang.reflect.Type;
 public class ProtoListenerTrigger extends ExecutorEvent {
 
     private final ProtoMapping protoMapping;
-    private final RunApplication runApplication;
+    private final ApplicationContextProvider applicationContextProvider;
     private final SocketSession socketSession;
     private final int messageId;
     private final byte[] bytes;
     private PojoBase pojoBase;
 
-    public ProtoListenerTrigger(ProtoMapping protoMapping, RunApplication runApplication, SocketSession socketSession, int messageId, byte[] bytes) {
+    public ProtoListenerTrigger(ProtoMapping protoMapping, ApplicationContextProvider applicationContextProvider, SocketSession socketSession, int messageId, byte[] bytes) {
         this.protoMapping = protoMapping;
-        this.runApplication = runApplication;
+        this.applicationContextProvider = applicationContextProvider;
         this.socketSession = socketSession;
         this.messageId = messageId;
         this.bytes = bytes;
@@ -58,14 +59,11 @@ public class ProtoListenerTrigger extends ExecutorEvent {
             Parameter parameter = parameters[i];
             Class<?> parameterType = parameter.getType();
             Type parameterizedType = parameter.getParameterizedType();
-            if (GuiceBeanProvider.class.isAssignableFrom(parameterType)) {
-                params[i] = parameterType.cast(runApplication.getGuiceBeanProvider());
+            if (ApplicationContextProvider.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(applicationContextProvider);
                 continue;
-            } else if (RunApplication.class.isAssignableFrom(parameterType)) {
-                params[i] = parameterType.cast(runApplication);
-                continue;
-            } else if (Injector.class.isAssignableFrom(parameterType)) {
-                params[i] = parameterType.cast(runApplication.getInjector());
+            } else if (ApplicationContext.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(applicationContextProvider.getApplicationContext());
                 continue;
             } else if (SocketSession.class.isAssignableFrom(parameterType)) {
                 params[i] = parameterType.cast(socketSession);
@@ -82,7 +80,15 @@ public class ProtoListenerTrigger extends ExecutorEvent {
                     continue;
                 }
             }
-            params[i] = runApplication.getInstanceByParameter(parameter);
+            /*实现注入*/
+            Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
+            if (qualifier != null) {
+                String name = qualifier.value();
+                if (StringUtils.isBlank(name))
+                    params[i] = applicationContextProvider.getBean(parameterType);
+                else
+                    params[i] = applicationContextProvider.getBean(name);
+            }
         }
         return params;
     }

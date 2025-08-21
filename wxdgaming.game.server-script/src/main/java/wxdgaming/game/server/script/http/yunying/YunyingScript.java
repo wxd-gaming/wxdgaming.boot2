@@ -1,13 +1,11 @@
 package wxdgaming.game.server.script.http.yunying;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.starter.net.ann.HttpRequest;
-import wxdgaming.boot2.starter.net.ann.RequestMapping;
-import wxdgaming.boot2.starter.net.server.http.HttpContext;
 import wxdgaming.game.server.module.data.GlobalDataService;
 
 /**
@@ -17,55 +15,54 @@ import wxdgaming.game.server.module.data.GlobalDataService;
  * @version 2025-04-30 09:28
  **/
 @Slf4j
-@Singleton
-@RequestMapping(value = "yunying")
-public class YunyingScript extends HoldRunApplication {
+@RestController
+@RequestMapping(value = "/yunying")
+public class YunyingScript extends HoldApplicationContext {
 
     private final GlobalDataService globalDataService;
 
-    @Inject
     public YunyingScript(GlobalDataService globalDataService) {
         this.globalDataService = globalDataService;
     }
 
-    @HttpRequest
-    public Object cdKeyList(HttpContext httpContext) {
+    @RequestMapping(value = "/cdKeyList")
+    public Object cdKeyList(HttpServletRequest httpContext) {
 
         return RunResult.ok();
     }
 
-    @HttpRequest
-    public Object mail(HttpContext httpContext) {
+    @RequestMapping(value = "/mail")
+    public Object mail(HttpServletRequest httpContext) {
 
         return RunResult.ok();
     }
 
-    @HttpRequest
-    public Object banLogin(HttpContext httpContext) {
+    @RequestMapping(value = "/banLogin")
+    public Object banLogin(HttpServletRequest httpContext) {
 
         return RunResult.ok();
     }
 
-    @HttpRequest
-    public Object banChat(HttpContext httpContext) {
+    @RequestMapping(value = "/banChat")
+    public Object banChat(HttpServletRequest httpContext) {
 
         return RunResult.ok();
     }
 
-    @HttpRequest
-    public Object queryRole(HttpContext httpContext) {
+    @RequestMapping(value = "/queryRole")
+    public Object queryRole(HttpServletRequest httpContext) {
 
         return RunResult.ok();
     }
 
-    @HttpRequest
-    public Object addPlayerGm(HttpContext httpContext) {
+    @RequestMapping(value = "/addPlayerGm")
+    public Object addPlayerGm(HttpServletRequest httpContext) {
 
         return RunResult.ok();
     }
 
-    @HttpRequest
-    public Object addAccountGm(HttpContext httpContext) {
+    @RequestMapping(value = "/addAccountGm")
+    public Object addAccountGm(HttpServletRequest httpContext) {
 
         return RunResult.ok();
     }

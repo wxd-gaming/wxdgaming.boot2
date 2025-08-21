@@ -1,13 +1,13 @@
 package wxdgaming.game.login.inner;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.ann.Order;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
+import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
 import wxdgaming.game.basic.login.bean.info.InnerServerInfoBean;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,15 +21,14 @@ import java.util.concurrent.TimeUnit;
  **/
 @Slf4j
 @Getter
-@Singleton
+@Service
 public class InnerService {
 
     final SqlDataHelper sqlDataHelper;
     final ConcurrentHashMap<Integer, InnerServerInfoBean> innerGameServerInfoMap = new ConcurrentHashMap<>();
     final ConcurrentHashMap<Integer, InnerServerInfoBean> innerGatewayServerInfoMap = new ConcurrentHashMap<>();
 
-    @Inject
-    public InnerService(SqlDataHelper sqlDataHelper) {
+    public InnerService(PgsqlDataHelper sqlDataHelper) {
         this.sqlDataHelper = sqlDataHelper;
         this.sqlDataHelper.checkTable(InnerServerInfoBean.class);
 

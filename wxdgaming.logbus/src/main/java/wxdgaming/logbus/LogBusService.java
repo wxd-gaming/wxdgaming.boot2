@@ -1,9 +1,9 @@
 package wxdgaming.logbus;
 
 import com.alibaba.fastjson.JSON;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.chatset.StringUtils;
@@ -33,7 +33,7 @@ import java.util.concurrent.locks.LockSupport;
  * @version 2025-08-08 11:36
  **/
 @Slf4j
-@Singleton
+@Service
 public class LogBusService implements InitPrint {
 
     private final LogBusProperties logBusProperties;
@@ -45,7 +45,6 @@ public class LogBusService implements InitPrint {
 
     private final AtomicBoolean close = new AtomicBoolean(false);
 
-    @Inject
     public LogBusService(LogBusProperties logBusProperties) {
         this.logBusProperties = logBusProperties;
         this.saveLog2FileEvent.reset();
@@ -104,7 +103,7 @@ public class LogBusService implements InitPrint {
                 List<LogEntity> logEntities1 = tmpLogEntities.removeFirst();
                 try {
                     Path path = Path.of(logBusProperties.getFilePath(), "log_" + StringUtils.randomString(8) + "_" + System.nanoTime() + ".dat");
-                    FileWriteUtil.writeString(path.toFile(), JSON.toJSONString(logEntities1));
+                    FileWriteUtil.writeString(path.toFile(), JSON.toJSONString(logEntities1, SerializerFeature.MapSortField, SerializerFeature.SortField));
                 } catch (Exception e) {
                     log.error("LogBusService error", e);
                 }

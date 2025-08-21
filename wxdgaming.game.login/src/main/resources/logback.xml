@@ -7,7 +7,7 @@
     <!-- 日志记录器，日期滚动记录 -->
     <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- 正在记录的日志文件的路径及文件名 -->
-        <file>${LOG_PATH}/error.log</file>
+        <file>${LOG_PATH}/login-error.log</file>
         <!-- 追加方式记录日志 -->
         <append>true</append>
         <!-- 日志文件的格式 -->
@@ -23,7 +23,7 @@
         </filter>
         <!-- 日志记录器的滚动策略，按日期记录 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/logback/error-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/logback/login-error-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
             <maxHistory>20</maxHistory>
         </rollingPolicy>
     </appender>
@@ -31,7 +31,7 @@
     <!-- 日志记录器，日期滚动记录 -->
     <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- 正在记录的日志文件的路径及文件名 -->
-        <file>${LOG_PATH}/app.log</file>
+        <file>${LOG_PATH}/login.log</file>
         <!-- 追加方式记录日志 -->
         <append>true</append>
         <!-- 日志文件的格式 -->
@@ -46,7 +46,7 @@
         </filter>
         <!--  这个狗东西必须放后面 否则不生效-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/logback/app-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/logback/login-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
             <maxHistory>20</maxHistory>
         </rollingPolicy>
     </appender>
@@ -58,9 +58,15 @@
         </encoder>
     </appender>
 
-    <logger name="io.netty" level="info" additivity="false"/>
-    <logger name="com.zaxxer.hikari" level="info" additivity="false"/>
-    <logger name="org.mongodb.driver" level="info" additivity="false"/>
+    <logger name="com.zaxxer.hikari" level="INFO" additivity="true"/>
+    <logger name="io.netty" level="INFO" additivity="true"/>
+    <logger name="io.lettuce" level="INFO" additivity="true"/>
+    <logger name="reactor.util" level="INFO" additivity="true"/>
+    <logger name="org.jboss" level="INFO" additivity="true"/>
+    <logger name="org.hibernate" level="INFO" additivity="true"/>
+    <logger name="org.xnio" level="info" additivity="true"/>
+    <logger name="org.springframework" level="info" additivity="true"/>
+    <logger name="org.apache.hc" level="info" additivity="true"/>
 
     <!-- 生产环境下，将此级别配置为适合的级别，以免日志文件太多或影响程序性能 -->
     <root level="debug"> <!-- ERROR, WARN, INFO, DEBUG -->

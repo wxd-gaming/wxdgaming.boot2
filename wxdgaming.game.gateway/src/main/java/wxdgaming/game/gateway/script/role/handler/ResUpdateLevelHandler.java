@@ -1,7 +1,7 @@
 package wxdgaming.game.gateway.script.role.handler;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.message.role.ResUpdateLevel;
 
@@ -12,7 +12,7 @@ import wxdgaming.game.message.role.ResUpdateLevel;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class ResUpdateLevelHandler {
 
     /** 更新等级 */

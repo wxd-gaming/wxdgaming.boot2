@@ -1,9 +1,8 @@
 package wxdgaming.game.server.script.gm.impl;
 
 import com.alibaba.fastjson.JSONArray;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.game.message.task.ResUpdateTaskList;
 import wxdgaming.game.message.task.TaskType;
 import wxdgaming.game.server.bean.role.Player;
@@ -24,13 +23,12 @@ import java.util.Map;
  * @version 2025-04-30 09:50
  **/
 @Slf4j
-@Singleton
+@Component
 public class PlayerTaskGmScript {
 
     final PlayerService playerService;
     final TaskService taskService;
 
-    @Inject
     public PlayerTaskGmScript(PlayerService playerService, TaskService taskService) {
         this.playerService = playerService;
         this.taskService = taskService;

@@ -1,8 +1,7 @@
 package wxdgaming.logserver.module.system;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
 
 /**
@@ -12,10 +11,9 @@ import wxdgaming.boot2.core.InitPrint;
  * @version 2025-08-09 18:02
  **/
 @Slf4j
-@Singleton
+@Service
 public class SystemService implements InitPrint {
 
-    @Inject
     public SystemService() {
     }
 

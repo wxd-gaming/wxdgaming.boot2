@@ -1,9 +1,7 @@
 package wxdgaming.game.server.module.drive;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.BootConfig;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.executor.ExecutorProperties;
 import wxdgaming.boot2.core.executor.ThreadContext;
@@ -21,14 +19,13 @@ import wxdgaming.game.server.module.data.DataCenterService;
  * @version 2025-05-08 10:34
  **/
 @Slf4j
-@Singleton
+@Component
 public class ServerProtoQueueDrive implements ServerProtoFilter {
 
 
     final ExecutorProperties executorProperties;
     final DataCenterService dataCenterService;
 
-    @Inject
     public ServerProtoQueueDrive(ExecutorProperties executorProperties, DataCenterService dataCenterService) {
         this.executorProperties = executorProperties;
         this.dataCenterService = dataCenterService;

@@ -1,6 +1,6 @@
 package code;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import wxdgaming.game.bean.goods.BagChangeDTO4ItemCfg;
 import wxdgaming.game.basic.core.Reason;
 import wxdgaming.game.basic.core.ReasonDTO;

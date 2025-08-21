@@ -1,14 +1,11 @@
 package wxdgaming.boot2.starter.net.httpclient5;
 
-import com.alibaba.fastjson.annotation.JSONCreator;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.ann.Configuration;
-import wxdgaming.boot2.core.ann.ConfigurationProperties;
 import wxdgaming.boot2.core.lang.ObjectBase;
-
-import java.util.function.Supplier;
 
 /**
  * 配置
@@ -18,16 +15,7 @@ import java.util.function.Supplier;
  **/
 @Getter
 @Configuration
-@ConfigurationProperties(prefix = "http.client")
 public class HttpClientProperties extends ObjectBase implements InitPrint {
-
-    public static final Supplier<HttpClientProperties> DEFAULT = () -> new HttpClientProperties(
-            500, 5000,
-            30,
-            3000, 3000, 3000, 30000,
-            "TLS",
-            true
-    );
 
     /** 每个路由创建的最大连接数 */
     @JSONField(ordinal = 1)
@@ -47,19 +35,18 @@ public class HttpClientProperties extends ObjectBase implements InitPrint {
     private final int keepAliveTimeout;
     @JSONField(ordinal = 8)
     private final String sslProtocol;
-    @JSONField(ordinal = 9, defaultValue = "true")
+    @JSONField(ordinal = 9)
     private final boolean autoUseGzip;
 
-    @JSONCreator
-    public HttpClientProperties(@JSONField(name = "routeMaxSize") int routeMaxSize,
-                                @JSONField(name = "totalMaxSize") int totalMaxSize,
-                                @JSONField(name = "resetTimeM") int resetTimeM,
-                                @JSONField(name = "connectionRequestTimeout") int connectionRequestTimeout,
-                                @JSONField(name = "connectTimeOut") int connectTimeOut,
-                                @JSONField(name = "readTimeout") int readTimeout,
-                                @JSONField(name = "keepAliveTimeout") int keepAliveTimeout,
-                                @JSONField(name = "sslProtocol", defaultValue = "TLS") String sslProtocol,
-                                @JSONField(name = "autoUseGzip", defaultValue = "true") boolean autoUseGzip) {
+    public HttpClientProperties(@Value("${http.client.routeMaxSize:500}") int routeMaxSize,
+                                @Value("${http.client.totalMaxSize:5000}") int totalMaxSize,
+                                @Value("${http.client.resetTimeM:30}") int resetTimeM,
+                                @Value("${http.client.connectionRequestTimeout:3000}") int connectionRequestTimeout,
+                                @Value("${http.client.connectTimeOut:3000}") int connectTimeOut,
+                                @Value("${http.client.readTimeout:3000}") int readTimeout,
+                                @Value("${http.client.keepAliveTimeout:30000}") int keepAliveTimeout,
+                                @Value("${http.client.sslProtocol:TLS}") String sslProtocol,
+                                @Value("${http.client.autoUseGzip:false}") boolean autoUseGzip) {
         this.routeMaxSize = routeMaxSize;
         this.totalMaxSize = totalMaxSize;
         this.resetTimeM = resetTimeM;

@@ -1,9 +1,8 @@
 package wxdgaming.game.server.script.role.event;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.timer.MyClock;
@@ -22,12 +21,11 @@ import java.util.concurrent.BlockingQueue;
  * @version 2025-05-08 13:26
  **/
 @Slf4j
-@Singleton
-public class PlayerHeartHandler extends HoldRunApplication {
+@Component
+public class PlayerHeartHandler extends HoldApplicationContext {
 
     final FightService fightService;
 
-    @Inject
     public PlayerHeartHandler(FightService fightService) {
         this.fightService = fightService;
     }
@@ -64,7 +62,7 @@ public class PlayerHeartHandler extends HoldRunApplication {
             player.getOnlineInfo().setOnlineMills(player.getOnlineInfo().getOnlineMills() + diff);
             player.getOnlineInfo().setOnlineTotalMills(player.getOnlineInfo().getOnlineTotalMills() + diff);
             player.getOnlineInfo().setLastUpdateOnlineTime(millis);
-            runApplication.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("onlineTime", diff));
+            applicationContextProvider.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("onlineTime", diff));
         }
 
     }

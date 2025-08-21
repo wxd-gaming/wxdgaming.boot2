@@ -1,6 +1,6 @@
 package wxdgaming.logserver.plugin;
 
-import wxdgaming.boot2.core.RunApplication;
+import wxdgaming.boot2.core.ApplicationContextProvider;
 
 /**
  * 插件
@@ -13,6 +13,6 @@ public abstract class AbstractPlugin {
     /** 执行间隔时间 */
     public abstract String cron();
 
-    public abstract void trigger(RunApplication runApplication);
+    public abstract void trigger(ApplicationContextProvider runApplication);
 
 }

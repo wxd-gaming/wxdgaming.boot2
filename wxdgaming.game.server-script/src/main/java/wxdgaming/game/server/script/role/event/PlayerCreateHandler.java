@@ -1,11 +1,10 @@
 package wxdgaming.game.server.script.role.event;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.game.bean.goods.BagChangeDTO4ItemCfg;
+import org.springframework.stereotype.Component;
 import wxdgaming.game.basic.core.Reason;
 import wxdgaming.game.basic.core.ReasonDTO;
+import wxdgaming.game.bean.goods.BagChangeDTO4ItemCfg;
 import wxdgaming.game.bean.goods.ItemCfg;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnCreateRole;
@@ -21,12 +20,11 @@ import java.util.List;
  * @version 2025-04-27 19:51
  **/
 @Slf4j
-@Singleton
+@Component
 public class PlayerCreateHandler {
 
     final BagService bagService;
 
-    @Inject
     public PlayerCreateHandler(BagService bagService) {
         this.bagService = bagService;
     }

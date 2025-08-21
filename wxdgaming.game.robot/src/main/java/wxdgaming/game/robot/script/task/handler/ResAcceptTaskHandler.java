@@ -1,13 +1,13 @@
 package wxdgaming.game.robot.script.task.handler;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.game.cfg.QTaskTable;
 import wxdgaming.game.message.task.ResAcceptTask;
 import wxdgaming.game.robot.bean.Robot;
-import wxdgaming.game.cfg.QTaskTable;
 
 /**
  * 接受任务
@@ -16,7 +16,7 @@ import wxdgaming.game.cfg.QTaskTable;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class ResAcceptTaskHandler {
 
     /** 接受任务 */

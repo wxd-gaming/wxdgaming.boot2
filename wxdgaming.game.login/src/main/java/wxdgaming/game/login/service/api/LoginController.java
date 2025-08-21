@@ -1,17 +1,12 @@
 package wxdgaming.game.login.service.api;
 
-import com.google.inject.Singleton;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
-import wxdgaming.boot2.core.ann.RequestBody;
+import org.springframework.web.bind.annotation.*;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.ann.RequestParam;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.boot2.starter.net.ann.HttpPath;
-import wxdgaming.boot2.starter.net.ann.HttpRequest;
-import wxdgaming.boot2.starter.net.ann.RequestMapping;
-import wxdgaming.boot2.starter.net.server.http.HttpContext;
 import wxdgaming.game.basic.login.AppPlatformParams;
 import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
 
@@ -26,9 +21,9 @@ import java.util.Map;
  * @version 2025-06-07 18:41
  **/
 @Slf4j
-@Singleton
+@RestController
 @RequestMapping(value = "/login")
-public class LoginController extends HoldRunApplication {
+public class LoginController extends HoldApplicationContext {
 
     Map<AppPlatformParams.Platform, AbstractSdkLoginApi> sdkMap = new HashMap<>();
 
@@ -37,7 +32,7 @@ public class LoginController extends HoldRunApplication {
 
         HashMap<AppPlatformParams.Platform, AbstractSdkLoginApi> map = new HashMap<>();
 
-        runApplication.classWithSuper(AbstractSdkLoginApi.class)
+        applicationContextProvider.classWithSuper(AbstractSdkLoginApi.class)
                 .forEach(sdkLoginApi -> {
                     AbstractSdkLoginApi oldPut = map.put(sdkLoginApi.platform(), sdkLoginApi);
                     AssertUtil.assertTrue(oldPut == null, "重复注册类型：" + sdkLoginApi.platform());
@@ -47,8 +42,8 @@ public class LoginController extends HoldRunApplication {
         sdkMap = Collections.unmodifiableMap(map);
     }
 
-    @HttpRequest
-    public RunResult check(HttpContext context, @RequestParam(value = "appId") int appId) {
+    @RequestMapping(value = "/check")
+    public RunResult check(HttpServletRequest context, @RequestParam(value = "appId") int appId) throws Exception {
         AppPlatformParams appPlatformParams = AppPlatformParams.getAppPlatformParams(appId);
         if (appPlatformParams == null) {
             return RunResult.fail("not support appId: " + appId + " not exist");
@@ -61,13 +56,13 @@ public class LoginController extends HoldRunApplication {
         return sdkLoginApi.login(context, appPlatformParams);
     }
 
-    @HttpRequest(value = "test/{id}/sdk")
-    public RunResult checkSdk(HttpContext context, @HttpPath("id") int id) {
+    @RequestMapping(value = "/test/{id}/sdk")
+    public RunResult checkSdk(HttpServletRequest context, @PathVariable("id") int id) {
         return RunResult.fail(String.valueOf(id));
     }
 
-    @HttpRequest(value = "test/{id}/v1")
-    public RunResult testV1(HttpContext context, @RequestBody() String body) {
+    @RequestMapping(value = "/test/{id}/v1")
+    public RunResult testV1(HttpServletRequest context, @RequestBody() String body) {
         log.info("body: {}", body);
         return RunResult.ok().fluentPut("data", body);
     }

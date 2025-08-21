@@ -1,9 +1,9 @@
 package wxdgaming.game.server.script.bag.cost;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.cfg.bean.QItem;
@@ -26,12 +26,12 @@ import java.util.List;
  * @version 2025-04-22 19:14
  **/
 @Slf4j
-@Singleton
-public class CostScript extends HoldRunApplication implements IBagScript {
+@Component
+public class CostScript extends HoldApplicationContext implements IBagScript {
 
-    @Inject protected DataCenterService dataCenterService;
-    @Inject protected PlayerService playerService;
-    @Inject protected BagService bagService;
+    @Autowired protected DataCenterService dataCenterService;
+    @Autowired protected PlayerService playerService;
+    @Autowired protected BagService bagService;
 
     public void cost(Player player, BagChangesContext bagChangesContext, QItem qItem, long count) {
         BagType bagType = bagChangesContext.getBagType();

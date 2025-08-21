@@ -1,6 +1,6 @@
 package code.asm;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import wxdgaming.boot2.core.assist.JavassistBox;
 import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.reflect.MethodUtil;

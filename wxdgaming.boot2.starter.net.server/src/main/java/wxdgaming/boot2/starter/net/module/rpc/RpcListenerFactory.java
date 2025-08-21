@@ -1,11 +1,11 @@
 package wxdgaming.boot2.starter.net.module.rpc;
 
-import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.RunApplication;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.ann.Order;
 
 /**
  * rpc 监听 绑定工厂
@@ -15,7 +15,7 @@ import wxdgaming.boot2.core.ann.Order;
  **/
 @Slf4j
 @Getter
-@Singleton
+@Component
 public class RpcListenerFactory {
 
     /** 相当于用 read and copy write方式作为线程安全性 */
@@ -23,7 +23,7 @@ public class RpcListenerFactory {
 
     @Init
     @Order(9)
-    public void init(RunApplication runApplication) {
+    public void init(ApplicationContextProvider runApplication) {
         rpcListenerContent = new RpcListenerContent(runApplication);
     }
 

@@ -1,8 +1,7 @@
 package wxdgaming.game.gateway.script.inner.handler;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
@@ -18,14 +17,13 @@ import wxdgaming.game.gateway.module.data.DataCenterService;
  * @version 2025-05-28 20:28
  **/
 @Slf4j
-@Singleton
+@Component
 public class ClientUnknownProtoMessageEvent implements ProtoUnknownMessageEvent {
 
     private final DataCenterService dataCenterService;
     private final ProtoListenerFactory listenerFactory;
 
 
-    @Inject
     public ClientUnknownProtoMessageEvent(DataCenterService dataCenterService, ProtoListenerFactory listenerFactory) {
         this.dataCenterService = dataCenterService;
         this.listenerFactory = listenerFactory;

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.TestMethodOrder;
-import wxdgaming.boot2.core.assist.Javassist2Proxy;
 import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.io.Objects;
 
@@ -19,23 +18,6 @@ public class ReflectionPerformanceTest {
         LogbackUtil.refreshLoggerLevel(Level.INFO);
     }
 
-    @Order(1)
-    @RepeatedTest(10)
-    public void tempProxyClass() throws Exception {
-        SimpleClass obj = new SimpleClass();
-        // 反射方法调用
-        Method method = SimpleClass.class.getMethod("simpleMethod");
-        // 直接方法调用
-        TempProxyClass proxyClass = new TempProxyClass();
-        proxyClass.init(obj, method);
-        long startTime = System.nanoTime();
-        for (int i = 0; i < 1000000; i++) {
-            proxyClass.proxy0(Objects.ZERO_ARRAY);
-        }
-        long endTime = System.nanoTime();
-        long proxyTime = endTime - startTime;
-        System.out.printf("直接调用 调用耗时: %d 纳秒, %s ms%n", proxyTime, proxyTime / 100 / 10000f);
-    }
 
     @Order(2)
     @RepeatedTest(10)
@@ -69,21 +51,5 @@ public class ReflectionPerformanceTest {
         System.out.printf("asm 调用耗时: %d 纳秒, %s ms%n", proxyTime, proxyTime / 100 / 10000f);
     }
 
-    @Order(4)
-    @RepeatedTest(10)
-    public void compilerCodeClass() throws Exception {
-        SimpleClass obj = new SimpleClass();
-        // 反射方法调用
-        Method method = SimpleClass.class.getMethod("simpleMethod");
-        // 代理方法调用
-        Javassist2Proxy javassistProxy = Javassist2Proxy.of(obj, method);
-        long startTime = System.nanoTime();
-        for (int i = 0; i < 1000000; i++) {
-            javassistProxy.proxyInvoke(Objects.ZERO_ARRAY);
-        }
-        long endTime = System.nanoTime();
-        long proxyTime = endTime - startTime;
-        System.out.printf("compiler 调用耗时: %d 纳秒, %s ms%n", proxyTime, proxyTime / 100 / 10000f);
-    }
 
 }

@@ -1,14 +1,14 @@
 package wxdgaming.game.server.script.attribute;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.game.bean.attr.AttrInfo;
-import wxdgaming.game.bean.attr.AttrType;
 import wxdgaming.game.basic.core.Reason;
 import wxdgaming.game.basic.core.ReasonDTO;
+import wxdgaming.game.bean.attr.AttrInfo;
+import wxdgaming.game.bean.attr.AttrType;
 import wxdgaming.game.message.role.ResUpdateFightValue;
 import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.server.bean.role.Player;
@@ -27,8 +27,8 @@ import java.util.TreeMap;
  * @version 2025-05-09 19:14
  **/
 @Slf4j
-@Singleton
-public class PlayerAttributeService extends HoldRunApplication {
+@Service
+public class PlayerAttributeService extends HoldApplicationContext {
 
     /** 属性计算器 */
     TreeMap<Integer, AbstractCalculatorAction> calculatorImplMap = new TreeMap<>();
@@ -37,7 +37,7 @@ public class PlayerAttributeService extends HoldRunApplication {
     public void init() {
 
         TreeMap<Integer, AbstractCalculatorAction> tmp = new TreeMap<>();
-        runApplication.classWithSuper(AbstractCalculatorAction.class)
+        applicationContextProvider.classWithSuper(AbstractCalculatorAction.class)
                 .forEach(calculatorAction -> {
                     MapObject.MapObjectType mapObjectType = calculatorAction.mapObjectType();
                     if (mapObjectType != null && mapObjectType != MapObject.MapObjectType.Player) {

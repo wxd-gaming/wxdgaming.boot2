@@ -1,10 +1,10 @@
 package wxdgaming.boot2.starter.batis.mapdb;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import kotlin.jvm.functions.Function1;
 import lombok.extern.slf4j.Slf4j;
 import org.mapdb.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.io.FileUtil;
 
@@ -20,7 +20,7 @@ import java.util.function.Function;
  * @version 2025-06-23 16:43
  **/
 @Slf4j
-@Singleton
+@Service
 public class MapDBDataHelper implements AutoCloseable, InitPrint {
 
     final DB db;
@@ -28,7 +28,7 @@ public class MapDBDataHelper implements AutoCloseable, InitPrint {
 
     final File dbFile;
 
-    @Inject
+    @Autowired
     public MapDBDataHelper(MapdbProperties mapdbProperties) {
         this(new File(mapdbProperties.getPath()));
     }

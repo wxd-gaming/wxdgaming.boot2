@@ -1,12 +1,10 @@
 package wxdgaming.game.gateway.script.inner.handler;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ThreadContext;
-import wxdgaming.boot2.starter.net.MessageEncode;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
@@ -24,13 +22,12 @@ import java.util.List;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class InnerForwardMessageHandler {
 
     private final DataCenterService dataCenterService;
     private final ProtoListenerFactory protoListenerFactory;
 
-    @Inject
     public InnerForwardMessageHandler(DataCenterService dataCenterService, ProtoListenerFactory protoListenerFactory) {
         this.dataCenterService = dataCenterService;
         this.protoListenerFactory = protoListenerFactory;

@@ -3,10 +3,10 @@ package wxdgaming.logserver;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import wxdgaming.boot2.core.BootstrapProperties;
 import wxdgaming.boot2.core.ann.Comment;
-import wxdgaming.boot2.core.ann.Configuration;
-import wxdgaming.boot2.core.ann.ConfigurationProperties;
 
 /**
  * 配置

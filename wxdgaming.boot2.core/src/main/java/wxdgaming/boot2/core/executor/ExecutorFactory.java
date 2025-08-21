@@ -1,9 +1,9 @@
 package wxdgaming.boot2.core.executor;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import lombok.Getter;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,14 +17,14 @@ import java.util.concurrent.ScheduledExecutorService;
  * @version 2025-05-15 11:20
  **/
 @Order(value = Integer.MIN_VALUE)
-@Singleton
+@Component
 public class ExecutorFactory implements InitPrint {
 
     private static class Lazy {
         static ExecutorFactory instance = null;
     }
 
-    private final ExecutorMonitor EXECUTOR_MONITOR;
+    @Getter private final ExecutorMonitor EXECUTOR_MONITOR;
     private final ScheduledExecutorService scheduledExecutorService;
     private final ConcurrentHashMap<String, ExecutorService> EXECUTOR_MAP;
 
@@ -32,7 +32,6 @@ public class ExecutorFactory implements InitPrint {
     private final ExecutorService EXECUTOR_SERVICE_LOGIC;
     private final ExecutorService EXECUTOR_SERVICE_VIRTUAL;
 
-    @Inject
     public ExecutorFactory(ExecutorProperties executorProperties) {
         AssertUtil.assertTrue(Lazy.instance == null, "ExecutorFactory is already exists");
         Lazy.instance = this;

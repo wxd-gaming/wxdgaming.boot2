@@ -1,7 +1,6 @@
 package wxdgaming.game.server.script.task.init.handler;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.lang.condition.ConditionUpdatePolicyConst;
 import wxdgaming.game.message.bag.BagType;
@@ -15,12 +14,11 @@ import wxdgaming.game.server.script.task.init.ConditionInitValueHandler;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-04-21 20:55
  **/
-@Singleton
+@Component
 public class BagItemCountHandler implements ConditionInitValueHandler {
 
     private final BagService bagService;
 
-    @Inject
     public BagItemCountHandler(BagService bagsModuleScript) {
         this.bagService = bagsModuleScript;
     }

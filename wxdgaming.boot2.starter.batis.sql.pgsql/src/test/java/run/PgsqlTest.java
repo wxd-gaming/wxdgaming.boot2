@@ -1,7 +1,7 @@
 package run;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.RepeatedTest;
 import run.entity.EntityTest;
 import run.entity.Table2;

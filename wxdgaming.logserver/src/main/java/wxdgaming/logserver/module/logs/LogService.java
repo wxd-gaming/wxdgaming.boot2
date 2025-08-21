@@ -2,9 +2,8 @@ package wxdgaming.logserver.module.logs;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.collection.MapOf;
@@ -30,14 +29,13 @@ import java.util.function.Function;
  * @version 2025-08-07 17:04
  **/
 @Slf4j
-@Singleton
+@Service
 public class LogService implements InitPrint {
 
     final PgsqlDataHelper pgsqlDataHelper;
     final DataCenterService dataCenterService;
     final Map<String, LogTableContext> logTableContextMap = MapOf.newConcurrentHashMap();
 
-    @Inject
     public LogService(PgsqlDataHelper pgsqlDataHelper, DataCenterService dataCenterService) {
         this.pgsqlDataHelper = pgsqlDataHelper;
         this.dataCenterService = dataCenterService;

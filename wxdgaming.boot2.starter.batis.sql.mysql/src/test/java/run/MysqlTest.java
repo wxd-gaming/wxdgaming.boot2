@@ -3,13 +3,13 @@ package run;
 import com.alibaba.fastjson.JSONObject;
 import com.mysql.cj.jdbc.Driver;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import run.entity.EntityDouble;
 import run.entity.EntityTest;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
-import wxdgaming.boot2.starter.batis.sql.pgsql.MysqlDataHelper;
+import wxdgaming.boot2.starter.batis.sql.mysql.MysqlDataHelper;
 
 import java.time.LocalDateTime;
 import java.util.List;

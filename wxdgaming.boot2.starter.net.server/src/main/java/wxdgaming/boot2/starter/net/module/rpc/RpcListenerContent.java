@@ -2,12 +2,12 @@ package wxdgaming.boot2.starter.net.module.rpc;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.RunApplication;
+import org.springframework.web.bind.annotation.RequestMapping;
+import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.AnnUtil;
-import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;
 
 import java.lang.reflect.Method;
@@ -24,14 +24,14 @@ import java.util.List;
 @Getter
 public class RpcListenerContent {
 
-    final RunApplication runApplication;
+    final ApplicationContextProvider applicationContextProvider;
     final List<RpcFilter> rpcFilterList;
     final HashMap<String, RpcMapping> rpcMappingMap = new HashMap<>();
 
-    public RpcListenerContent(RunApplication runApplication) {
-        this.runApplication = runApplication;
-        this.rpcFilterList = runApplication.classWithSuper(RpcFilter.class).toList();
-        this.runApplication.getGuiceBeanProvider()
+    public RpcListenerContent(ApplicationContextProvider applicationContextProvider) {
+        this.applicationContextProvider = applicationContextProvider;
+        this.rpcFilterList = applicationContextProvider.classWithSuper(RpcFilter.class).toList();
+        this.applicationContextProvider
                 .withMethodAnnotated(RpcRequest.class)
                 .forEach(contentMethod -> {
                     Object ins = contentMethod.getBean();

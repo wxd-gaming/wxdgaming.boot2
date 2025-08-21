@@ -1,12 +1,10 @@
 package wxdgaming.boot2.starter.net.module.rpc;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import wxdgaming.boot2.core.BootConfig;
 import wxdgaming.boot2.core.BootstrapProperties;
 import wxdgaming.boot2.core.cache2.CASCache;
 import wxdgaming.boot2.core.cache2.Cache;
@@ -28,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  **/
 @Slf4j
 @Getter
-@Singleton
+@Service
 public class RpcService {
 
     final HexId hexId;
@@ -36,10 +34,9 @@ public class RpcService {
     final RpcListenerFactory rpcListenerFactory;
     final Cache<Long, CompletableFuture<JSONObject>> rpcCache;
 
-    @Inject
-    public RpcService(BootConfig bootConfig, BootstrapProperties bootstrapProperties, RpcListenerFactory rpcListenerFactory) {
+    public RpcService(BootstrapProperties bootstrapProperties, RpcListenerFactory rpcListenerFactory) {
         this.hexId = new HexId(bootstrapProperties.getSid());
-        this.rpcToken = bootConfig.getObject("rpc.token", String.class, () -> "dgbhw32t5cs9023r5j23r5490dcvj23409tu13@#$$%^@");
+        this.rpcToken = bootstrapProperties.getRpcToken();
         this.rpcListenerFactory = rpcListenerFactory;
         this.rpcCache = CASCache.<Long, CompletableFuture<JSONObject>>builder()
                 .cacheName("rpc-server")

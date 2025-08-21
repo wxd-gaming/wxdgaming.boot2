@@ -1,21 +1,20 @@
 package wxdgaming.game.server.script.buff;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.Tuple2;
 import wxdgaming.boot2.core.lang.bit.BitFlagGroup;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
+import wxdgaming.game.basic.core.Reason;
+import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.bean.buff.BuffType;
 import wxdgaming.game.bean.buff.BuffTypeConst;
 import wxdgaming.game.cfg.QBuffTable;
 import wxdgaming.game.cfg.bean.QBuff;
-import wxdgaming.game.basic.core.Reason;
-import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.buff.Buff;
 import wxdgaming.game.server.bean.role.Player;
@@ -38,8 +37,8 @@ import java.util.stream.Stream;
  * @version 2025-05-08 10:16
  **/
 @Slf4j
-@Singleton
-public class BuffService extends HoldRunApplication {
+@Service
+public class BuffService extends HoldApplicationContext {
 
     final DataCenterService dataCenterService;
     final PlayerAttributeService playerAttributeService;
@@ -47,7 +46,6 @@ public class BuffService extends HoldRunApplication {
     HashMap<BuffType, AbstractBuffAction> actionMap = new HashMap<>();
 
 
-    @Inject
     public BuffService(DataCenterService dataCenterService, PlayerAttributeService playerAttributeService, NpcAttributeService npcAttributeService) {
         this.dataCenterService = dataCenterService;
         this.playerAttributeService = playerAttributeService;
@@ -57,7 +55,7 @@ public class BuffService extends HoldRunApplication {
     @Init
     public void init() {
         HashMap<BuffType, AbstractBuffAction> map = new HashMap<>();
-        Stream<AbstractBuffAction> abstractBuffActionStream = runApplication.classWithSuper(AbstractBuffAction.class);
+        Stream<AbstractBuffAction> abstractBuffActionStream = applicationContextProvider.classWithSuper(AbstractBuffAction.class);
         abstractBuffActionStream.forEach(impl -> {
             AbstractBuffAction old = map.put(impl.buffType(), impl);
             AssertUtil.assertTrue(old == null, "重复的buff类型" + impl.buffType());

@@ -10,7 +10,6 @@ import wxdgaming.boot2.starter.net.ChannelUtil;
 import wxdgaming.boot2.starter.net.MessageDecode;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
-import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 
 /**
  * 服务
@@ -24,8 +23,8 @@ public class SocketServerMessageDecode extends MessageDecode {
 
     final SocketServerConfig config;
 
-    public SocketServerMessageDecode(SocketServerConfig config, ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
-        super(protoListenerFactory, httpListenerFactory);
+    public SocketServerMessageDecode(SocketServerConfig config, ProtoListenerFactory protoListenerFactory) {
+        super(protoListenerFactory);
         this.config = config;
     }
 
@@ -51,14 +50,6 @@ public class SocketServerMessageDecode extends MessageDecode {
             return;
         }
         super.actionBytes(ctx, byteBuf);
-    }
-
-    @Override protected void actionHttpRequest(ChannelHandlerContext ctx, FullHttpRequest httpRequest) throws Exception {
-        if (!config.isEnabledHttp()) {
-            ChannelUtil.closeSession(ctx.channel(), "不支持 Http 服务");
-            return;
-        }
-        super.actionHttpRequest(ctx, httpRequest);
     }
 
     @Override protected void dispatch(SocketSession socketSession, String messageBytes) throws Exception {

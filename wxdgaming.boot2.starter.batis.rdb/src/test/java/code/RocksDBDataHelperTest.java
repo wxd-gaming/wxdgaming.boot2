@@ -1,7 +1,7 @@
 package code;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rocksdb.RocksIterator;
 import wxdgaming.boot2.starter.batis.rdb.RocksDBConfig;
 import wxdgaming.boot2.starter.batis.rdb.RocksDBDataHelper;

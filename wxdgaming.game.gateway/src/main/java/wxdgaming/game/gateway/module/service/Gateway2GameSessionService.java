@@ -3,14 +3,11 @@ package wxdgaming.game.gateway.module.service;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.BootConfig;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.core.lang.RunResult;
@@ -21,11 +18,10 @@ import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.server.SocketServer;
-import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
-import wxdgaming.game.gateway.GatewayProperties;
 import wxdgaming.game.basic.login.LoginProperties;
 import wxdgaming.game.basic.login.bean.info.InnerServerInfoBean;
+import wxdgaming.game.gateway.GatewayProperties;
 import wxdgaming.game.message.inner.InnerRegisterServer;
 import wxdgaming.game.message.inner.ServiceType;
 
@@ -43,31 +39,28 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 @Slf4j
 @Getter
-@Singleton
-public class Gateway2GameSessionService extends HoldRunApplication {
+@Service
+public class Gateway2GameSessionService extends HoldApplicationContext {
 
     final GatewayProperties gatewayProperties;
     final LoginProperties loginProperties;
     final SocketServer socketServer;
     final ConcurrentHashMap<Integer, Gateway2GameSocketClientImpl> gameSessionMap = new ConcurrentHashMap<>();
+    final ClientForwardConfig clientForwardConfig;
+    final ProtoListenerFactory protoListenerFactory;
 
-    private final ProtoListenerFactory protoListenerFactory;
-    private final HttpListenerFactory httpListenerFactory;
-
-    @Inject
-    public Gateway2GameSessionService(GatewayProperties gatewayProperties, LoginProperties loginProperties, SocketServer socketServer,
-                                      ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
+    public Gateway2GameSessionService(GatewayProperties gatewayProperties,
+                                      LoginProperties loginProperties,
+                                      SocketServer socketServer,
+                                      ProtoListenerFactory protoListenerFactory,
+                                      ClientForwardConfig clientForwardConfig) {
         this.gatewayProperties = gatewayProperties;
         this.loginProperties = loginProperties;
         this.socketServer = socketServer;
         this.protoListenerFactory = protoListenerFactory;
-        this.httpListenerFactory = httpListenerFactory;
+        this.clientForwardConfig = clientForwardConfig;
     }
 
-    @Start
-    public void start() {
-        // checkGatewaySession();
-    }
 
     /** 向登陆服务器注册 */
     @Scheduled(value = "*/5", async = true)
@@ -130,14 +123,13 @@ public class Gateway2GameSessionService extends HoldRunApplication {
     /** 网关主动连游戏服 */
     public void checkGatewaySession(int sid, final String inetHost, final int inetPort, InnerRegisterServer registerServer) {
         Gateway2GameSocketClientImpl gatewaySocketClient = getGameSessionMap().computeIfAbsent(sid, l -> {
-            SocketClientConfig socketClientConfig = BootConfig.getIns().getNestedValue("socket.client-forward", SocketClientConfig.class);
-            socketClientConfig = (SocketClientConfig) socketClientConfig.clone();
-            socketClientConfig.setHost(inetHost);
-            socketClientConfig.setPort(inetPort);
-            socketClientConfig.setMaxConnectionCount(1);
-            socketClientConfig.setEnabledReconnection(false);
-            Gateway2GameSocketClientImpl socketClient = new Gateway2GameSocketClientImpl(socketClientConfig);
-            socketClient.init(protoListenerFactory, httpListenerFactory);
+            SocketClientConfig clientConfig = (SocketClientConfig) this.clientForwardConfig.clone();
+            clientConfig.setHost(inetHost);
+            clientConfig.setPort(inetPort);
+            clientConfig.setMaxConnectionCount(1);
+            clientConfig.setEnabledReconnection(false);
+            Gateway2GameSocketClientImpl socketClient = new Gateway2GameSocketClientImpl(clientConfig);
+            socketClient.init(protoListenerFactory);
             return socketClient;
         });
 

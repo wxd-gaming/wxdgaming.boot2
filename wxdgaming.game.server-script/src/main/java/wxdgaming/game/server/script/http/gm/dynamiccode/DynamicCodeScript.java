@@ -1,27 +1,32 @@
 package wxdgaming.game.server.script.http.gm.dynamiccode;
 
-import com.google.inject.Singleton;
-import wxdgaming.boot2.core.HoldRunApplication;
-import wxdgaming.boot2.core.ann.RequestParam;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.chatset.Base64Util;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.loader.ClassBytesLoader;
 import wxdgaming.boot2.core.zip.GzipUtil;
-import wxdgaming.boot2.starter.net.ann.HttpRequest;
-import wxdgaming.boot2.starter.net.ann.RequestMapping;
-import wxdgaming.boot2.starter.net.server.http.HttpContext;
 
 import java.util.Map;
 
-@Singleton
+/**
+ * 动态代码
+ *
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-08-20 20:47
+ */
+@RestController
 @RequestMapping(value = "888")
-public class DynamicCodeScript extends HoldRunApplication {
+public class DynamicCodeScript extends HoldApplicationContext {
 
     static final String SIGN = "ABC";
 
-    @HttpRequest()
-    public RunResult dynamic(HttpContext httpContext,
+    @RequestMapping(value = "/dynamic")
+    public RunResult dynamic(HttpServletRequest httpContext,
                              @RequestParam(value = "sign") String sign,
                              @RequestParam(value = "code") String codeBase64) throws Exception {
         if (!SIGN.equals(sign)) return RunResult.fail("签名错误");
@@ -37,7 +42,7 @@ public class DynamicCodeScript extends HoldRunApplication {
             for (Class<?> cls : loadClassMap.values()) {
                 if (IGmDynamic.class.isAssignableFrom(cls)) {
                     IGmDynamic gmDynamic = (IGmDynamic) cls.getDeclaredConstructor().newInstance();
-                    Object result = gmDynamic.execute(runApplication);
+                    Object result = gmDynamic.execute(applicationContextProvider);
                     System.out.println(result);
                     return RunResult.ok().data(result);
                 }

@@ -1,8 +1,8 @@
 package wxdgaming.game.server.module.data;
 
-import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.message.inner.ServiceType;
@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 @Slf4j
 @Getter
-@Singleton
+@Service
 public class ClientSessionService {
 
     /** 服务映射,R:服务类型, C:服务id（网关id）, V:session */

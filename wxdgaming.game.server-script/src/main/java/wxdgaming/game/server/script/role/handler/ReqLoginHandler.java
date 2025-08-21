@@ -1,9 +1,8 @@
 package wxdgaming.game.server.script.role.handler;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.token.JsonToken;
 import wxdgaming.boot2.core.token.JsonTokenParse;
@@ -25,8 +24,8 @@ import java.util.ArrayList;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
-public class ReqLoginHandler extends HoldRunApplication {
+@Component
+public class ReqLoginHandler extends HoldApplicationContext {
 
     private final DataCenterService dataCenterService;
     private final ClientSessionService clientSessionService;
@@ -34,7 +33,6 @@ public class ReqLoginHandler extends HoldRunApplication {
     private final TipsService tipsService;
     private final LoginProperties loginProperties;
 
-    @Inject
     public ReqLoginHandler(DataCenterService dataCenterService,
                            ClientSessionService clientSessionService,
                            PlayerService playerService,

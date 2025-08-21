@@ -1,8 +1,8 @@
 package wxdgaming.boot2.starter.scheduled;
 
 import lombok.Setter;
-import wxdgaming.boot2.core.ann.Configuration;
-import wxdgaming.boot2.core.ann.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import wxdgaming.boot2.core.executor.ExecutorConfig;
 import wxdgaming.boot2.core.executor.QueuePolicyConst;
 import wxdgaming.boot2.core.lang.ObjectBase;

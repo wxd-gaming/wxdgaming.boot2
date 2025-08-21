@@ -1,10 +1,9 @@
 package wxdgaming.logserver.module.data;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
@@ -35,14 +34,13 @@ import java.util.stream.Stream;
  **/
 @Slf4j
 @Getter
-@Singleton
+@Service
 public class DataCenterService implements InitPrint {
 
     final PgsqlDataHelper sqlDataHelper;
     Map<String, LogMappingInfo> logMappingInfoMap = Map.of();
     List<LogMappingInfo> logMappingInfoList = List.of();
 
-    @Inject
     public DataCenterService(PgsqlDataHelper sqlDataHelper) {
         this.sqlDataHelper = sqlDataHelper;
     }

@@ -1,16 +1,16 @@
 package wxdgaming.game.server.script.buff.impl;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.ConfigString;
+import wxdgaming.game.basic.core.Reason;
+import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.bean.attr.AttrType;
 import wxdgaming.game.bean.buff.BuffType;
 import wxdgaming.game.bean.buff.BuffTypeConst;
 import wxdgaming.game.cfg.bean.QBuff;
-import wxdgaming.game.basic.core.Reason;
-import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.buff.Buff;
 import wxdgaming.game.server.script.buff.AbstractBuffAction;
@@ -22,7 +22,7 @@ import wxdgaming.game.server.script.buff.AbstractBuffAction;
  * @version 2025-06-15 13:28
  **/
 @Slf4j
-@Singleton
+@Component
 public class ChangeHpMpBuffAction extends AbstractBuffAction {
 
     @Override public BuffType buffType() {

@@ -1,12 +1,11 @@
 package wxdgaming.game.gateway.module.data;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.starter.net.ChannelUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.server.SocketServer;
@@ -27,8 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 @Slf4j
 @Getter
-@Singleton
-public class DataCenterService extends HoldRunApplication {
+@Service
+public class DataCenterService extends HoldApplicationContext {
 
     /** 服务映射 */
     private final ConcurrentHashMap<Integer, ServerMapping> gameServiceMappings = new ConcurrentHashMap<>();
@@ -37,7 +36,6 @@ public class DataCenterService extends HoldRunApplication {
     private final ConcurrentHashMap<String, UserMapping> userMappings = new ConcurrentHashMap<>();
     private final SocketServer socketServer;
 
-    @Inject
     public DataCenterService(SocketServer socketServer) {
         this.socketServer = socketServer;
     }

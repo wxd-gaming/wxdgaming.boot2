@@ -1,9 +1,8 @@
 package wxdgaming.game.server.script.role;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.basic.core.ReasonDTO;
@@ -26,14 +25,13 @@ import java.util.HashSet;
  * @version 2025-04-22 11:44
  **/
 @Slf4j
-@Singleton
-public class PlayerService extends HoldRunApplication {
+@Service
+public class PlayerService extends HoldApplicationContext {
 
     final InnerService innerService;
     final DataCenterService dataCenterService;
     final SlogService slogService;
 
-    @Inject
     public PlayerService(InnerService innerService, DataCenterService dataCenterService, SlogService slogService) {
         this.innerService = innerService;
         this.dataCenterService = dataCenterService;
@@ -94,11 +92,11 @@ public class PlayerService extends HoldRunApplication {
 
         player.write(resUpdateLevel);
         /*触发升级, 比如功能开放监听需要*/
-        runApplication.executeMethodWithAnnotatedException(OnLevelUp.class, player, lv);
+        applicationContextProvider.executeMethodWithAnnotatedException(OnLevelUp.class, player, lv);
         /*触发当前等级*/
-        runApplication.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("level", player.getLevel()));
+        applicationContextProvider.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("level", player.getLevel()));
         /*触发提升等级*/
-        runApplication.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("levelup", lv));
+        applicationContextProvider.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("levelup", lv));
     }
 
 }

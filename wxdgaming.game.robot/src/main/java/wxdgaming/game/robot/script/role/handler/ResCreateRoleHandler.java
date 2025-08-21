@@ -1,7 +1,7 @@
 package wxdgaming.game.robot.script.role.handler;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.role.ResCreateRole;
@@ -13,7 +13,7 @@ import wxdgaming.game.message.role.ResCreateRole;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class ResCreateRoleHandler {
 
     /** 创建角色响应 */

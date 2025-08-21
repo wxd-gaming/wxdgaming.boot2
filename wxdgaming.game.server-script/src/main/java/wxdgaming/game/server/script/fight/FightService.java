@@ -1,8 +1,8 @@
 package wxdgaming.game.server.script.fight;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.basic.core.ReasonDTO;
@@ -18,15 +18,15 @@ import java.util.List;
  * @version 2025-05-08 10:16
  **/
 @Slf4j
-@Singleton
-public class FightService extends HoldRunApplication {
+@Service
+public class FightService extends HoldApplicationContext {
 
     HashMap<Integer, AbstractFightAction> actionImplMap = new HashMap<>();
 
     @Init
     public void init() {
         HashMap<Integer, AbstractFightAction> map = new HashMap<>();
-        runApplication.classWithSuper(AbstractFightAction.class)
+        applicationContextProvider.classWithSuper(AbstractFightAction.class)
                 .forEach(impl -> {
                     AbstractFightAction old = map.put(impl.type(), impl);
                     AssertUtil.assertTrue(old == null, "重复的战斗动作类型" + impl.type());

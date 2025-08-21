@@ -2,9 +2,9 @@ package wxdgaming.game.login;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import wxdgaming.boot2.core.BootstrapProperties;
-import wxdgaming.boot2.core.ann.Configuration;
-import wxdgaming.boot2.core.ann.ConfigurationProperties;
 
 /**
  * @author wxd-gaming(無心道, 15388152619)

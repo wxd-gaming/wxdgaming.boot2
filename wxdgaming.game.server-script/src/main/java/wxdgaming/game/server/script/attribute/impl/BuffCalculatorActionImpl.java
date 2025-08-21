@@ -1,13 +1,13 @@
 package wxdgaming.game.server.script.attribute.impl;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.bean.buff.BuffTypeConst;
 import wxdgaming.game.cfg.bean.QBuff;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.MapObject;
-import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.server.bean.buff.Buff;
 import wxdgaming.game.server.script.attribute.AbstractCalculatorAction;
 import wxdgaming.game.server.script.attribute.CalculatorType;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
  * @version 2025-05-09 19:29
  **/
 @Slf4j
-@Singleton
+@Component
 public class BuffCalculatorActionImpl extends AbstractCalculatorAction {
 
     @Override public MapObject.MapObjectType mapObjectType() {

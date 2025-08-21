@@ -1,9 +1,8 @@
 package wxdgaming.game.server.script.inner;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.game.message.inner.InnerForwardMessage;
@@ -22,13 +21,12 @@ import java.util.function.Consumer;
  * @version 2025-05-28 10:53
  **/
 @Slf4j
-@Singleton
-public class InnerService extends HoldRunApplication {
+@Service
+public class InnerService extends HoldApplicationContext {
 
     private final DataCenterService dataCenterService;
     private final ClientSessionService clientSessionService;
 
-    @Inject
     public InnerService(DataCenterService dataCenterService, ClientSessionService clientSessionService) {
         this.dataCenterService = dataCenterService;
         this.clientSessionService = clientSessionService;

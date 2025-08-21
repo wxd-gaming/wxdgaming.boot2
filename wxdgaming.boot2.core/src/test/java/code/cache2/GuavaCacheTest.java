@@ -4,7 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import lombok.Getter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import wxdgaming.boot2.core.util.RandomUtils;
 
 import java.util.concurrent.ExecutionException;

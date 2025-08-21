@@ -1,7 +1,7 @@
 package run;
 
 import io.protostuff.Tag;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.boot2.starter.net.pojo.ProtoBuf2Pojo;
 

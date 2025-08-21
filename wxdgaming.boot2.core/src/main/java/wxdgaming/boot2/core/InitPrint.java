@@ -1,7 +1,7 @@
 package wxdgaming.boot2.core;
 
 import ch.qos.logback.core.LogbackUtil;
-import wxdgaming.boot2.core.ann.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 /**
  * 添加初始化打印
@@ -12,7 +12,7 @@ import wxdgaming.boot2.core.ann.PostConstruct;
 public interface InitPrint {
 
     @PostConstruct
-    default void initPrint() {
+    default void ___initPrint() {
         LogbackUtil.logger().debug("init print {}", this.getClass().getName());
     }
 

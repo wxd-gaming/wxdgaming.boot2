@@ -1,7 +1,7 @@
 package code;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import wxdgaming.boot2.core.timer.MyClock;
 
 import java.util.concurrent.TimeUnit;

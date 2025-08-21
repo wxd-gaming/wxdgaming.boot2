@@ -1,11 +1,11 @@
 package wxdgaming.boot2.starter.net.pojo;
 
-import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.RunApplication;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.IClientWebSocketStringListener;
@@ -22,8 +22,8 @@ import java.util.function.Supplier;
  **/
 @Slf4j
 @Getter
-@Singleton
-public class ProtoListenerFactory {
+@Service
+public class ProtoListenerFactory extends HoldApplicationContext {
 
     /** 相当于用 read and copy write方式作为线程安全性 */
     ProtoListenerContent protoListenerContent = null;
@@ -35,17 +35,13 @@ public class ProtoListenerFactory {
 
     @Init
     @Order(6)
-    public void init(RunApplication runApplication) {
-        protoListenerContent = new ProtoListenerContent(runApplication);
-        serverWebSocketStringListener = runApplication.classWithSuper(IServerWebSocketStringListener.class).findFirst().orElse(null);
-        clientWebSocketStringListener = runApplication.classWithSuper(IClientWebSocketStringListener.class).findFirst().orElse(null);
-        protoUnknownMessageEvent = runApplication.classWithSuper(ProtoUnknownMessageEvent.class).findFirst().orElse(null);
-        serverProtoFilters = runApplication.classWithSuper(ServerProtoFilter.class).toList();
-        clientProtoFilters = runApplication.classWithSuper(ClientProtoFilter.class).toList();
-    }
-
-    public RunApplication getRunApplication() {
-        return protoListenerContent.getRunApplication();
+    public void init() {
+        protoListenerContent = new ProtoListenerContent(getApplicationContextProvider());
+        serverWebSocketStringListener = getApplicationContextProvider().classWithSuper(IServerWebSocketStringListener.class).findFirst().orElse(null);
+        clientWebSocketStringListener = getApplicationContextProvider().classWithSuper(IClientWebSocketStringListener.class).findFirst().orElse(null);
+        protoUnknownMessageEvent = getApplicationContextProvider().classWithSuper(ProtoUnknownMessageEvent.class).findFirst().orElse(null);
+        serverProtoFilters = getApplicationContextProvider().classWithSuper(ServerProtoFilter.class).toList();
+        clientProtoFilters = getApplicationContextProvider().classWithSuper(ClientProtoFilter.class).toList();
     }
 
     public int messageId(Class<? extends PojoBase> pojoClass) {
@@ -70,7 +66,7 @@ public class ProtoListenerFactory {
             return;
         }
         /*根据映射解析生成触发事件*/
-        ProtoListenerTrigger protoListenerTrigger = new ProtoListenerTrigger(mapping, protoListenerContent.getRunApplication(), socketSession, messageId, data);
+        ProtoListenerTrigger protoListenerTrigger = new ProtoListenerTrigger(mapping, getApplicationContextProvider(), socketSession, messageId, data);
         boolean allMatch;
         if (socketSession.getType() == SocketSession.Type.server) {
             allMatch = serverProtoFilters.stream()

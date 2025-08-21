@@ -1,8 +1,7 @@
 package wxdgaming.game.server.script.task.handler;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
@@ -20,12 +19,11 @@ import wxdgaming.game.server.script.task.TaskService;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class ReqAcceptTaskHandler {
 
     TaskService taskService;
 
-    @Inject
     public ReqAcceptTaskHandler(TaskService taskService) {
         this.taskService = taskService;
     }

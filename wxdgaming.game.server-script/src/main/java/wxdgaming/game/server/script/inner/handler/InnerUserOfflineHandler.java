@@ -1,9 +1,8 @@
 package wxdgaming.game.server.script.inner.handler;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.inner.InnerUserOffline;
@@ -21,14 +20,13 @@ import wxdgaming.game.server.module.drive.PlayerDriveService;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
-public class InnerUserOfflineHandler extends HoldRunApplication {
+@Component
+public class InnerUserOfflineHandler extends HoldApplicationContext {
 
     private final DataCenterService dataCenterService;
     private final PlayerDriveService playerDriveService;
     private final ClientSessionService clientSessionService;
 
-    @Inject
     public InnerUserOfflineHandler(DataCenterService dataCenterService, PlayerDriveService playerDriveService, ClientSessionService clientSessionService) {
         this.dataCenterService = dataCenterService;
         this.playerDriveService = playerDriveService;
@@ -53,7 +51,7 @@ public class InnerUserOfflineHandler extends HoldRunApplication {
             };
             if (player != null) {
                 playerDriveService.executor(player, () -> {
-                    runApplication.executeMethodWithAnnotatedException(OnLogout.class, player);
+                    applicationContextProvider.executeMethodWithAnnotatedException(OnLogout.class, player);
                     player.setClientSessionMapping(null);
                     afterRunnable.run();
                 });

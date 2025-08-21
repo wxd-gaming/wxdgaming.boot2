@@ -1,8 +1,7 @@
 package wxdgaming.game.server.script.tips;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
@@ -22,13 +21,12 @@ import java.util.List;
  * @version 2025-04-27 11:02
  **/
 @Slf4j
-@Singleton
+@Service
 public class TipsService {
 
     final InnerService innerService;
     final ProtoListenerFactory probeListenerFactory;
 
-    @Inject
     public TipsService(InnerService innerService, ProtoListenerFactory probeListenerFactory) {
         this.innerService = innerService;
         this.probeListenerFactory = probeListenerFactory;

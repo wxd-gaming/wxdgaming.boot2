@@ -1,8 +1,8 @@
 package code.queue;
 
-import org.junit.Test;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 import wxdgaming.boot2.core.lang.DiffTime;
 
 import java.util.LinkedList;
@@ -55,7 +55,6 @@ public class RingQueueTest {
 
     @Test
     @Order(7)
-    @RepeatedTest(10)
     public void RingQueuePutMulti() throws Exception {
         int capacity = 300_0000;
         RingQueue<String> ringBuffer = new RingQueue<>(capacity);

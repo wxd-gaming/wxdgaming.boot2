@@ -1,12 +1,11 @@
 package wxdgaming.game.server.script.gm;
 
 import com.alibaba.fastjson.JSONArray;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.ApplicationContextProvider;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.reflect.GuiceBeanProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.gm.ann.GM;
@@ -23,24 +22,23 @@ import java.util.List;
  * @version 2025-04-30 09:23
  **/
 @Slf4j
-@Singleton
-public class GmService extends HoldRunApplication {
+@Service
+public class GmService extends HoldApplicationContext {
 
-    HashMap<String, GuiceBeanProvider.ProviderMethod> gmMap = new HashMap<>();
+    HashMap<String, ApplicationContextProvider.ProviderMethod> gmMap = new HashMap<>();
     private final TipsService tipsService;
 
-    @Inject
     public GmService(TipsService tipsService) {
         this.tipsService = tipsService;
     }
 
     @Init
     public void init() {
-        HashMap<String, GuiceBeanProvider.ProviderMethod> tmp = new HashMap<>();
-        runApplication.withMethodAnnotated(GM.class)
+        HashMap<String, ApplicationContextProvider.ProviderMethod> tmp = new HashMap<>();
+        applicationContextProvider.withMethodAnnotated(GM.class)
                 .forEach(content -> {
                     Method method = content.getMethod();
-                    GuiceBeanProvider.ProviderMethod old = tmp.put(method.getName().toLowerCase(), content);
+                    ApplicationContextProvider.ProviderMethod old = tmp.put(method.getName().toLowerCase(), content);
                     AssertUtil.assertTrue(old == null, "重复的gm命令: " + method.getName());
                 });
         gmMap = tmp;
@@ -49,7 +47,7 @@ public class GmService extends HoldRunApplication {
     public void doGm(Player player, String[] args) {
         JSONArray jsonArray = new JSONArray(List.of(args));
         String cmd = jsonArray.getString(0).toLowerCase();
-        GuiceBeanProvider.ProviderMethod providerMethod = gmMap.get(cmd);
+        ApplicationContextProvider.ProviderMethod providerMethod = gmMap.get(cmd);
         if (providerMethod == null) {
             tipsService.tips(player, "不存在的gm命令: " + cmd);
             return;

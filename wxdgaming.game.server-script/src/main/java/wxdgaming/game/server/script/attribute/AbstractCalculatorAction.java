@@ -1,11 +1,11 @@
 package wxdgaming.game.server.script.attribute;
 
-import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
+import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.MapObject;
-import wxdgaming.game.bean.attr.AttrInfo;
 
 /**
  * 计算器
@@ -16,7 +16,7 @@ import wxdgaming.game.bean.attr.AttrInfo;
 @Slf4j
 public abstract class AbstractCalculatorAction {
 
-    @Inject protected DataRepository dataRepository;
+    @Autowired protected DataRepository dataRepository;
 
     public abstract MapObject.MapObjectType mapObjectType();
 

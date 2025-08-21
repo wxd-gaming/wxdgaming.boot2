@@ -1,8 +1,7 @@
 package wxdgaming.game.gateway.script.role.handler;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
@@ -21,13 +20,12 @@ import java.util.List;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class ResChooseRoleHandler {
 
     private final DataCenterService dataCenterService;
     private final ProtoListenerFactory protoListenerFactory;
 
-    @Inject
     public ResChooseRoleHandler(DataCenterService dataCenterService, ProtoListenerFactory protoListenerFactory) {
         this.dataCenterService = dataCenterService;
         this.protoListenerFactory = protoListenerFactory;

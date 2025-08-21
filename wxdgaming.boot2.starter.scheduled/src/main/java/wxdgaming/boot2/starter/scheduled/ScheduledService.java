@@ -1,14 +1,13 @@
 package wxdgaming.boot2.starter.scheduled;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.RunApplication;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
@@ -29,8 +28,8 @@ import java.util.concurrent.TimeUnit;
  **/
 @Slf4j
 @Getter
-@Singleton
-public class ScheduledService {
+@Service
+public class ScheduledService extends HoldApplicationContext {
 
     protected ScheduledFuture<?> future;
     /*                          类名字                  方法名    实例 */
@@ -38,16 +37,15 @@ public class ScheduledService {
 
     protected ExecutorServicePlatform executorServicePlatform;
 
-    @Inject
     public ScheduledService(ExecutorFactory executorFactory, ScheduledProperties executorProperties) {
         executorServicePlatform = ExecutorFactory.create("scheduled-executor", executorProperties.getExecutor());
     }
 
     @Init
-    public void init(RunApplication runApplication) {
+    public void init() {
         log.debug("------------------------------初始化定时任务调度器------------------------------");
         List<AbstractCronTrigger> tmpJobList = new ArrayList<>();
-        runApplication.getGuiceBeanProvider().withMethodAnnotated(Scheduled.class)
+        applicationContextProvider.withMethodAnnotated(Scheduled.class)
                 .forEach(methodContent -> {
                     ScheduledInfo scheduledInfo = new ScheduledInfo(
                             methodContent.getBean(),

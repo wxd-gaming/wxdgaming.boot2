@@ -1,11 +1,11 @@
 package wxdgaming.game.login.sdk;
 
-import com.google.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.token.JsonTokenBuilder;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
-import wxdgaming.boot2.starter.net.server.http.HttpContext;
 import wxdgaming.game.basic.login.AppPlatformParams;
 import wxdgaming.game.basic.login.bean.info.InnerServerInfoBean;
 import wxdgaming.game.basic.slog.SlogService;
@@ -27,16 +27,16 @@ import java.util.function.Supplier;
  **/
 public abstract class AbstractSdkLoginApi {
 
-    @Inject protected LoginService loginService;
-    @Inject protected SqlDataHelper sqlDataHelper;
-    @Inject protected LoginServerProperties loginServerProperties;
-    @Inject protected InnerService innerService;
-    @Inject protected SlogService slogService;
+    @Autowired protected LoginService loginService;
+    @Autowired protected SqlDataHelper sqlDataHelper;
+    @Autowired protected LoginServerProperties loginServerProperties;
+    @Autowired protected InnerService innerService;
+    @Autowired protected SlogService slogService;
 
     /** 平台 */
     public abstract AppPlatformParams.Platform platform();
 
-    public abstract RunResult login(HttpContext context, AppPlatformParams appPlatformParams);
+    public abstract RunResult login(HttpServletRequest context, AppPlatformParams appPlatformParams) throws Exception;
 
     protected UserData createUserData(String ip, String account, AppPlatformParams appPlatformParams, String platformUserId) {
         UserData userData = new UserData();

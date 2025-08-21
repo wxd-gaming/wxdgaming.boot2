@@ -1,12 +1,12 @@
 package wxdgaming.game.login.sdk.local;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.BootstrapProperties;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.starter.net.server.http.HttpContext;
+import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.game.basic.login.AppPlatformParams;
 import wxdgaming.game.login.bean.UserData;
 import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
@@ -18,12 +18,11 @@ import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
  * @version 2025-06-07 18:26
  **/
 @Slf4j
-@Singleton
+@Component
 public class LocalSdkLoginApi extends AbstractSdkLoginApi {
 
     private final BootstrapProperties bootstrapProperties;
 
-    @Inject
     public LocalSdkLoginApi(BootstrapProperties bootstrapProperties) {
         this.bootstrapProperties = bootstrapProperties;
     }
@@ -32,14 +31,15 @@ public class LocalSdkLoginApi extends AbstractSdkLoginApi {
         return AppPlatformParams.Platform.LOCAL;
     }
 
-    @Override public RunResult login(HttpContext context, AppPlatformParams appPlatformParams) {
+    @Override public RunResult login(HttpServletRequest context, AppPlatformParams appPlatformParams) {
 
         if (!bootstrapProperties.isDebug()) {
             return RunResult.fail("not debug ban login");
         }
 
-        String account = context.getRequest().getReqParams().getString("account");
-        String token = context.getRequest().getReqParams().getString("token");
+        String account = context.getParameter("account");
+        String token = context.getParameter("token");
+
         if (StringUtils.isBlank(token)) {
             return RunResult.fail("token is null");
         }
@@ -51,7 +51,7 @@ public class LocalSdkLoginApi extends AbstractSdkLoginApi {
         String finalAccount = platform().name() + "-" + account;
 
         UserData userData = getUserData(finalAccount, () -> {
-            UserData ud = createUserData(context.getIp(), finalAccount, appPlatformParams, finalAccount);
+            UserData ud = createUserData(SpringUtil.getClientIp(context), finalAccount, appPlatformParams, finalAccount);
             ud.setToken(token);
             return ud;
         });
@@ -60,7 +60,7 @@ public class LocalSdkLoginApi extends AbstractSdkLoginApi {
             return RunResult.fail("token error");
         }
 
-        return loginSuccess(userData, context.getIp());
+        return loginSuccess(userData, SpringUtil.getClientIp(context));
     }
 
 

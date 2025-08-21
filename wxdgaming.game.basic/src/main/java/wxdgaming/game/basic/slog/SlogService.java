@@ -1,8 +1,7 @@
 package wxdgaming.game.basic.slog;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.BootstrapProperties;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.format.HexId;
@@ -18,14 +17,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 2025-08-12 19:17
  **/
 @Slf4j
-@Singleton
+@Service
 public class SlogService implements InitPrint {
 
     final BootstrapProperties bootstrapProperties;
     final LogBusService logBusService;
     final ConcurrentHashMap<String, HexId> logHexIdMap = new ConcurrentHashMap<>();
 
-    @Inject
     public SlogService(BootstrapProperties bootstrapProperties, LogBusService logBusService) {
         this.bootstrapProperties = bootstrapProperties;
         this.logBusService = logBusService;

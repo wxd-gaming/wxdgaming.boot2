@@ -1,7 +1,7 @@
 package wxdgaming.game.server.script.task.impl;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.game.cfg.bean.QTask;
 import wxdgaming.game.message.task.TaskType;
@@ -21,7 +21,7 @@ import java.util.Map;
  * @version 2025-04-22 10:46
  **/
 @Slf4j
-@Singleton
+@Component
 public class TaskMainScript extends ITaskScript {
 
     @Override public TaskType type() {

@@ -1,9 +1,8 @@
 package wxdgaming.game.server.script.gm.impl;
 
 import com.alibaba.fastjson.JSONArray;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.game.basic.core.Reason;
 import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.server.bean.role.Player;
@@ -17,12 +16,11 @@ import wxdgaming.game.server.script.role.PlayerService;
  * @version 2025-04-30 09:50
  **/
 @Slf4j
-@Singleton
+@Component
 public class PlayerGmScript {
 
     final PlayerService playerService;
 
-    @Inject
     public PlayerGmScript(PlayerService playerService) {
         this.playerService = playerService;
     }

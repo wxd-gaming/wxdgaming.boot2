@@ -1,12 +1,10 @@
 package wxdgaming.game.server.script.http.gm.filter;
 
-import com.google.inject.Singleton;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.starter.net.ann.HttpRequest;
-import wxdgaming.boot2.starter.net.server.http.HttpContext;
-import wxdgaming.boot2.starter.net.server.http.HttpFilter;
-
-import java.lang.reflect.Method;
+import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.WebFilter;
 
 /**
  * gm权限过滤器
@@ -15,16 +13,15 @@ import java.lang.reflect.Method;
  * @version 2025-04-30 09:44
  **/
 @Slf4j
-@Singleton
-public class GMFilter implements HttpFilter {
+@Component
+public class GMFilter implements WebFilter {
 
 
-    @Override public Object doFilter(HttpRequest httpRequest, Method method, HttpContext httpContext) {
-        // if (url.startsWith("/gm")) {
-        //     if (!BootConfig.getIns().isDebug())
-        //         return RunResult.fail("功能未开启");
-        // }
-        return null;
+    @Override public String filterPath() {
+        return "/gm/**";
     }
 
+    @Override public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        return WebFilter.super.preHandle(request, response, handler);
+    }
 }

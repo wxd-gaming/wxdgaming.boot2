@@ -1,7 +1,7 @@
 package wxdgaming.game.chat.script.inner.handler;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.inner.InnerUserOffline;
@@ -13,7 +13,7 @@ import wxdgaming.game.message.inner.InnerUserOffline;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class InnerUserOfflineHandler {
 
     /** 玩家离线 */

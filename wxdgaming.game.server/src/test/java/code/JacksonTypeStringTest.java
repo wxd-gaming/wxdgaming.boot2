@@ -3,7 +3,7 @@
 //import com.fasterxml.jackson.core.type.TypeReference;
 //import com.fasterxml.jackson.databind.JsonNode;
 //import com.google.common.collect.Lists;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 //import wxdgaming.boot2.core.chatset.json.JacksonUtil;
 //import wxdgaming.game.message.task.TaskType;

@@ -9,7 +9,6 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.SocketClient;
 import wxdgaming.boot2.starter.net.client.SocketClientConfig;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
-import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 
 import java.util.function.Consumer;
 
@@ -26,12 +25,12 @@ public class Gateway2GameSocketClientImpl extends SocketClient {
         super(config);
     }
 
-    @Override public void start(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
-        super.start(protoListenerFactory, httpListenerFactory);
+    @Override public void start(ProtoListenerFactory protoListenerFactory) {
+        super.start(protoListenerFactory);
     }
 
-    @Override public void init(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
-        super.init(protoListenerFactory, httpListenerFactory);
+    @Override public void init(ProtoListenerFactory protoListenerFactory) {
+        super.init(protoListenerFactory);
     }
 
     @Override protected void addChanelHandler(SocketChannel socketChannel, ChannelPipeline pipeline) {

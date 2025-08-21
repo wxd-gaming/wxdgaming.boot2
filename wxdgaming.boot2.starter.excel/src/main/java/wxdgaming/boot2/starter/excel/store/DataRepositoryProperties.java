@@ -2,9 +2,9 @@ package wxdgaming.boot2.starter.excel.store;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.ann.Configuration;
-import wxdgaming.boot2.core.ann.ConfigurationProperties;
 import wxdgaming.boot2.core.lang.ObjectBase;
 
 /**

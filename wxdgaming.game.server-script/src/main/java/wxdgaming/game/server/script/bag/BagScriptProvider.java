@@ -1,7 +1,7 @@
 package wxdgaming.game.server.script.bag;
 
 import lombok.Getter;
-import wxdgaming.boot2.core.RunApplication;
+import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.bean.goods.ItemTypeConst;
@@ -22,7 +22,7 @@ public class BagScriptProvider<T extends IBagScript> {
         this.cls = cls;
     }
 
-    public void init(RunApplication runApplication) {
+    public void init(ApplicationContextProvider runApplication) {
         Table<Integer, Integer, T> scriptTable = new Table<>();
         runApplication.classWithSuper(cls)
                 .forEach(script -> {

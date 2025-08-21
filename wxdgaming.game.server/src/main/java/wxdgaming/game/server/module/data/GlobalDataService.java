@@ -1,11 +1,10 @@
 package wxdgaming.game.server.module.data;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
-import wxdgaming.boot2.core.ann.Order;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
@@ -26,8 +25,8 @@ import java.util.List;
  **/
 @Slf4j
 @Getter
-@Singleton
-public class GlobalDataService extends HoldRunApplication {
+@Service
+public class GlobalDataService extends HoldApplicationContext {
 
     final GameServerProperties gameServerProperties;
     private final BackendConfig backendConfig;
@@ -35,7 +34,6 @@ public class GlobalDataService extends HoldRunApplication {
     /** key: sid, key: type, value: 数据 */
     private final ConcurrentTable<Integer, GlobalDataType, GlobalDataEntity> globalDataTable = new ConcurrentTable<>();
 
-    @Inject
     public GlobalDataService(GameServerProperties gameServerProperties, BackendConfig backendConfig) {
         this.gameServerProperties = gameServerProperties;
         this.backendConfig = backendConfig;
@@ -43,7 +41,7 @@ public class GlobalDataService extends HoldRunApplication {
 
     @Start
     public void start() {
-        this.sqlDataHelper = runApplication.getInstance(SqlDataHelper.class);
+        this.sqlDataHelper = applicationContextProvider.getBean(SqlDataHelper.class);
         List<GlobalDataEntity> list = this.sqlDataHelper.findListByWhere(GlobalDataEntity.class, "merge = ?", false);
         for (GlobalDataEntity entity : list) {
             GlobalDataType globalDataType = GlobalDataType.ofOrException(entity.getId());

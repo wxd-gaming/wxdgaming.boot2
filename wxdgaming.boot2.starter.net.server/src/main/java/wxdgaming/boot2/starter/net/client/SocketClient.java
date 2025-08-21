@@ -12,9 +12,10 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.ann.Stop;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.ChannelUtil;
@@ -22,7 +23,6 @@ import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.SessionGroup;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
-import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 import wxdgaming.boot2.starter.net.ssl.WxdSslHandler;
 
 import javax.net.ssl.SSLContext;
@@ -74,9 +74,9 @@ public class SocketClient {
     }
 
 
-    public void init(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
+    public void init(ProtoListenerFactory protoListenerFactory) {
         SocketClientDeviceHandler socketClientDeviceHandler = new SocketClientDeviceHandler();
-        ClientMessageDecode clientMessageDecode = new ClientMessageDecode(config, protoListenerFactory, httpListenerFactory);
+        ClientMessageDecode clientMessageDecode = new ClientMessageDecode(config, protoListenerFactory);
         SSLContext sslContext = config.sslContext();
 
         int writeBytes = (int) BytesUnit.Mb.toBytes(config.getWriteByteBufM());
@@ -148,8 +148,8 @@ public class SocketClient {
 
     @Start
     @Order(2000)
-    public void start(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
-        init(protoListenerFactory, httpListenerFactory);
+    public void start(@Qualifier ProtoListenerFactory protoListenerFactory) {
+        init(protoListenerFactory);
         for (int i = 0; i < config.getMaxConnectionCount(); i++) {
             ChannelFuture future = connect();
         }

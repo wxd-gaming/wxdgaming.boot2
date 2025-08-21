@@ -1,9 +1,9 @@
 package wxdgaming.logserver.plugin.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.RunApplication;
+import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
@@ -19,15 +19,15 @@ import java.time.LocalDate;
  * @version 2025-08-18 18:28
  **/
 @Slf4j
-@Singleton
+@Component
 public class StatsPlugin extends AbstractPlugin {
 
     @Override public String cron() {
         return "0 * * * * ?";
     }
 
-    @Override public void trigger(RunApplication runApplication) {
-        SqlDataHelper sqlDataHelper = runApplication.getInstance(SqlDataHelper.class);
+    @Override public void trigger(ApplicationContextProvider runApplication) {
+        SqlDataHelper sqlDataHelper = runApplication.getBean(SqlDataHelper.class);
         LocalDate now = LocalDate.now();
         int beforeDay = 121;
         LocalDate startDate = now.plusDays(-beforeDay);

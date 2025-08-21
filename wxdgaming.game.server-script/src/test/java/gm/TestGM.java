@@ -1,12 +1,12 @@
 package gm;
 
-import wxdgaming.boot2.core.RunApplication;
+import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.game.server.script.http.gm.dynamiccode.IGmDynamic;
 
 public class TestGM implements IGmDynamic {
 
 
-    @Override public Object execute(RunApplication runApplication) {
+    @Override public Object execute(ApplicationContextProvider runApplication) {
         return "远程3";
     }
 

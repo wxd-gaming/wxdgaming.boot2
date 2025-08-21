@@ -2,9 +2,8 @@ package wxdgaming.game.server.module.timer;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.BootstrapProperties;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.executor.ExecutorWith;
@@ -26,7 +25,7 @@ import java.util.List;
  * @version 2025-06-11 20:22
  **/
 @Slf4j
-@Singleton
+@Service
 public class GameTimerService {
 
     final SocketServer socketServer;
@@ -34,7 +33,6 @@ public class GameTimerService {
     final LoginProperties loginProperties;
     final PlayerDriveService playerDriveService;
 
-    @Inject
     public GameTimerService(SocketServer socketServer, BootstrapProperties bootstrapProperties, LoginProperties loginProperties, PlayerDriveService playerDriveService) {
         this.socketServer = socketServer;
         this.bootstrapProperties = bootstrapProperties;

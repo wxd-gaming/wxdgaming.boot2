@@ -5,8 +5,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.AttributeKey;
 import lombok.Getter;
@@ -14,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
-import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 
 /**
  * 消息解码，收到消息处理
@@ -30,11 +27,9 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
     public static final AttributeKey<ByteBuf> byteBufAttributeKey = AttributeKey.<ByteBuf>valueOf("__ctx_byteBuf__");
 
     protected final ProtoListenerFactory protoListenerFactory;
-    protected final HttpListenerFactory httpListenerFactory;
 
-    public MessageDecode(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
+    public MessageDecode(ProtoListenerFactory protoListenerFactory) {
         this.protoListenerFactory = protoListenerFactory;
-        this.httpListenerFactory = httpListenerFactory;
     }
 
     @Override
@@ -57,17 +52,6 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
             case WebSocketFrame webSocketFrame -> {
                 // 处理websocket客户端的消息
                 actionWebSocketFrame(ctx, webSocketFrame);
-                break;
-            }
-            case HttpRequest httpRequest -> {
-                FullHttpRequest fullHttpRequest = (FullHttpRequest) object;
-
-                if ("websocket".equalsIgnoreCase(fullHttpRequest.headers().get("Upgrade"))) {
-                    super.channelRead(ctx, object);
-                    break;
-                }
-
-                actionHttpRequest(ctx, fullHttpRequest);
                 break;
             }
             case ByteBuf byteBuf -> {
@@ -110,10 +94,6 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
 
     protected void actionBytes(ChannelHandlerContext ctx, ByteBuf byteBuf) throws Exception {
         readBytes(ctx, byteBuf);
-    }
-
-    protected void actionHttpRequest(ChannelHandlerContext ctx, FullHttpRequest httpRequest) throws Exception {
-        dispatch(ctx, httpRequest);
     }
 
     protected void readBytes(ChannelHandlerContext ctx, ByteBuf byteBuf) throws Exception {
@@ -167,10 +147,6 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
                 break;
             }
         }
-    }
-
-    protected void dispatch(ChannelHandlerContext ctx, FullHttpRequest httpRequest) throws Exception {
-        httpListenerFactory.dispatch(ctx, httpRequest);
     }
 
     protected void dispatch(SocketSession socketSession, int messageId, byte[] messageBytes) throws Exception {

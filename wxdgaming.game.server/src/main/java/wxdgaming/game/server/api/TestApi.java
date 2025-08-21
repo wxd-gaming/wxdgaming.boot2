@@ -1,17 +1,15 @@
 package wxdgaming.game.server.api;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.RunApplication;
-import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.ann.RequestBody;
-import wxdgaming.boot2.core.ann.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.starter.net.ann.HttpRequest;
-import wxdgaming.boot2.starter.net.ann.RequestMapping;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 
@@ -25,11 +23,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 2025-02-14 19:22
  **/
 @Slf4j
-@Singleton
+@RestController
 @RequestMapping(value = "/")
-public class TestApi {
+public class TestApi extends HoldApplicationContext {
 
-    RunApplication runApplication;
 
     public ConcurrentHashMap<String, String> strMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, String> str2Map = new ConcurrentHashMap<>();
@@ -39,35 +36,21 @@ public class TestApi {
         str2Map.put("a", "b");
     }
 
-    @Init
-    public void init(RunApplication runApplication) {
-        this.runApplication = runApplication;
-    }
-
-    @HttpRequest(value = "user/login")
-    public String userLogin(RunApplication runApplication) {
+    @RequestMapping(value = "user/login")
+    public String userLogin() {
         return "index";
     }
 
-    @HttpRequest()
-    public String index(RunApplication runApplication,
-                        @RequestBody(defaultValue = "1") String body,
+    @RequestMapping("/index")
+    public String index(@RequestBody() String body,
                         @RequestParam(value = "b1", defaultValue = "2") int b1) {
         return "index";
     }
 
-    @HttpRequest()
-    public RunResult json(RunApplication runApplication,
-                          @RequestBody(defaultValue = "1") String body,
+    @RequestMapping("/json")
+    public RunResult json(@RequestBody() String body,
                           @RequestParam(value = "b1", defaultValue = "2") String b1) {
         return RunResult.ok();
-    }
-
-    @HttpRequest()
-    public String error(RunApplication runApplication,
-                        @RequestBody(defaultValue = "1") String body,
-                        @RequestParam(value = "b1", defaultValue = "2") String b1) {
-        throw new RuntimeException("d");
     }
 
     @RpcRequest
@@ -77,7 +60,7 @@ public class TestApi {
     }
 
     @RpcRequest
-    public JSONObject rpcIndex2(JSONObject paramData, @RequestParam(value = "a", nestedPath = true) String a) {
+    public JSONObject rpcIndex2(JSONObject paramData, @RequestParam(value = "a") String a) {
         log.debug("{} {} {}", a, paramData, ThreadContext.context().queueName());
         return paramData;
     }
@@ -85,7 +68,7 @@ public class TestApi {
     @Scheduled("0 0")
     public void timer() {
         log.debug("{}", "timer()");
-        runApplication.executeMethodWithAnnotated(RunTest.class, 1, 2);
+        getApplicationContextProvider().executeMethodWithAnnotated(RunTest.class, 1, 2);
     }
 
     @Documented

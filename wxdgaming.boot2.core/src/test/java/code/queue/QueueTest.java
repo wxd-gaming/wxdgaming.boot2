@@ -1,6 +1,5 @@
 package code.queue;
 
-import org.junit.Test;
 import org.junit.jupiter.api.RepeatedTest;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -21,7 +20,6 @@ public class QueueTest {
         System.out.printf("%12s, %d 线程 读取: %d 次 cost: % 6.2f ms%n", prefix, threadCount, capacity, (System.nanoTime() - start) / 10000 / 100f);
     }
 
-    @Test
     @RepeatedTest(10)
     public void arrayQueue() throws InterruptedException {
         ArrayBlockingQueue<Object> queue = new ArrayBlockingQueue<>(capacity);
@@ -49,7 +47,6 @@ public class QueueTest {
         end("arrayQueue");
     }
 
-    @Test
     @RepeatedTest(10)
     public void linkedQueue() throws InterruptedException {
         LinkedBlockingQueue<Object> queue = new LinkedBlockingQueue<>(capacity);
@@ -77,7 +74,6 @@ public class QueueTest {
         end("linkedQueue");
     }
 
-    @Test
     @RepeatedTest(10)
     public void ringQueue() throws InterruptedException {
         RingQueue<Object> queue = new RingQueue<>(capacity);

@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.excel;
 
-import wxdgaming.boot2.core.ServiceGuiceModule;
-import wxdgaming.boot2.core.reflect.ReflectProvider;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 
 /**
@@ -10,15 +10,17 @@ import wxdgaming.boot2.starter.excel.store.DataRepository;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-05-09 14:00
  **/
-public class DataServiceGuiceModule extends ServiceGuiceModule {
+@Configuration
+public class DataServiceGuiceModule {
 
-    public DataServiceGuiceModule(ReflectProvider reflectProvider) {
-        super(reflectProvider);
+    @Bean
+    public DataRepository dataRepository() {
+        return DataRepository.getIns();
     }
 
-    @Override protected void bind() throws Throwable {
-        bindInstance(DataRepository.getIns());
-        bindInstance(ExcelRepository.getIns());
+    @Bean
+    public ExcelRepository excelRepository() {
+        return ExcelRepository.getIns();
     }
 
 }

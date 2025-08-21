@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.http.gm.dynamiccode;
 
-import wxdgaming.boot2.core.RunApplication;
+
+import wxdgaming.boot2.core.ApplicationContextProvider;
 
 /**
  * gm动态代码
@@ -10,6 +11,6 @@ import wxdgaming.boot2.core.RunApplication;
  **/
 public interface IGmDynamic {
 
-    Object execute(RunApplication runApplication) throws Exception;
+    Object execute(ApplicationContextProvider runApplication) throws Exception;
 
 }

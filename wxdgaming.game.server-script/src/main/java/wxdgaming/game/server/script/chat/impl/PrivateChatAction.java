@@ -1,7 +1,7 @@
 package wxdgaming.game.server.script.chat.impl;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.game.message.chat.ChatType;
 import wxdgaming.game.message.chat.ReqChatMessage;
 import wxdgaming.game.message.chat.ResChatMessage;
@@ -15,7 +15,7 @@ import wxdgaming.game.server.script.chat.AbstractChatAction;
  * @version 2025-04-28 19:32
  **/
 @Slf4j
-@Singleton
+@Component
 public class PrivateChatAction extends AbstractChatAction {
 
     public ChatType chatType() {

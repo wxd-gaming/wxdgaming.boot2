@@ -1,8 +1,7 @@
 package wxdgaming.game.server.script.chat.handler;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
@@ -24,7 +23,7 @@ import wxdgaming.game.server.script.tips.TipsService;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class ReqChatMessageHandler {
 
     private final GameServerProperties gameServerProperties;
@@ -34,7 +33,6 @@ public class ReqChatMessageHandler {
     private final TipsService tipsService;
     private final GmService gmService;
 
-    @Inject
     public ReqChatMessageHandler(GameServerProperties gameServerProperties, GlobalDataService globalDataService, DataCenterService dataCenterService, ChatService chatService, TipsService tipsService, GmService gmService) {
         this.gameServerProperties = gameServerProperties;
         this.globalDataService = globalDataService;

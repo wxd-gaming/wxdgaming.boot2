@@ -1,8 +1,7 @@
 package wxdgaming.game.server.script.cdkey.handler;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -18,13 +17,12 @@ import wxdgaming.game.server.script.cdkey.CDKeyService;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class ReqUseCdKeyHandler {
 
     private final CDKeyService cdKeyService;
 
 
-    @Inject
     public ReqUseCdKeyHandler(CDKeyService cdKeyService) {
         this.cdKeyService = cdKeyService;
     }

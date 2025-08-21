@@ -1,10 +1,8 @@
 package wxdgaming.game.server.script.role.event;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.executor.ThreadContext;
-import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.bean.StatusConst;
 import wxdgaming.game.server.bean.role.Player;
@@ -19,12 +17,11 @@ import wxdgaming.game.server.module.data.DataCenterService;
  * @version 2025-04-27 19:51
  **/
 @Slf4j
-@Singleton
+@Component
 public class PlayerLogoutHandler {
 
     private final DataCenterService dataCenterService;
 
-    @Inject
     public PlayerLogoutHandler(DataCenterService dataCenterService) {
         this.dataCenterService = dataCenterService;
     }

@@ -1,10 +1,9 @@
 package wxdgaming.game.server.script.cdkey;
 
 import com.alibaba.fastjson.TypeReference;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
@@ -35,7 +34,7 @@ import java.util.List;
  **/
 @Slf4j
 @Getter
-@Singleton
+@Service
 public class CDKeyService implements InitPrint {
 
     private final DataCenterService dataCenterService;
@@ -44,7 +43,6 @@ public class CDKeyService implements InitPrint {
     private final BackendConfig backendConfig;
 
 
-    @Inject
     public CDKeyService(DataCenterService dataCenterService, TipsService tipsService, BagService bagService, BackendConfig backendConfig) {
         this.dataCenterService = dataCenterService;
         this.tipsService = tipsService;

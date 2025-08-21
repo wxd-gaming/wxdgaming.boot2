@@ -11,11 +11,12 @@ import lombok.Setter;
  **/
 @Getter
 @Setter
-public class BootstrapProperties implements InitPrint{
+public abstract class BootstrapProperties implements InitPrint {
 
     boolean debug;
     int gid;
     int sid;
     String name;
+    String rpcToken = "9w283rn123r90cszh$#%^%^*&#$csf0892354";
 
 }

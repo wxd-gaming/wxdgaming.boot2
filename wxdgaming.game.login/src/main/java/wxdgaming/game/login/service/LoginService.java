@@ -1,9 +1,8 @@
 package wxdgaming.game.login.service;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.format.HexId;
 import wxdgaming.boot2.starter.batis.sql.SqlDataCache;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
@@ -18,13 +17,12 @@ import wxdgaming.game.login.bean.UserData;
  **/
 @Slf4j
 @Getter
-@Singleton
+@Service
 public class LoginService {
 
     final HexId userHexId;
     final SqlDataHelper sqlDataHelper;
 
-    @Inject
     public LoginService(LoginServerProperties loginServerProperties, SqlDataHelper sqlDataHelper) {
         this.userHexId = new HexId(loginServerProperties.getSid());
         this.sqlDataHelper = sqlDataHelper;

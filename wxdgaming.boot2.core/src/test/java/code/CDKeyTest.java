@@ -1,6 +1,6 @@
 package code;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.core.util.CDKeyUtil;
 

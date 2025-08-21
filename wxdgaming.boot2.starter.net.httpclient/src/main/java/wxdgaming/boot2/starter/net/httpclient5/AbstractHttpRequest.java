@@ -57,14 +57,14 @@ public abstract class AbstractHttpRequest {
         Exception exception = null;
         for (int k = 0; k < retry; k++) {
             try {
-                HttpClientPool httpClientPool = HttpClientPool.getInstance();
-                CloseableHttpClient closeableHttpClient = httpClientPool.getCloseableHttpClient();
+                HttpClientConfiguration httpClientConfiguration = HttpClientConfiguration.getInstance();
+                CloseableHttpClient closeableHttpClient = httpClientConfiguration.getCloseableHttpClient();
                 return closeableHttpClient.execute(httpUriRequestBase, classicHttpResponse -> {
                     /*apache http client 已经自动处理过 gzip 问题*/
                     HttpResponse httpResponse = new HttpResponse();
                     httpResponse.classicHttpResponse = classicHttpResponse;
                     httpResponse.code = classicHttpResponse.getCode();
-                    httpResponse.cookieStore = httpClientPool.getCookieStore().getCookies();
+                    httpResponse.cookieStore = httpClientConfiguration.getCookieStore().getCookies();
                     httpResponse.content = EntityUtils.toByteArray(classicHttpResponse.getEntity());
                     return httpResponse;
                 });

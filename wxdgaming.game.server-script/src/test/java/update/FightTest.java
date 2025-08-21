@@ -1,7 +1,7 @@
 package update;
 
 import lombok.Getter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.RepeatedTest;
 import wxdgaming.boot2.core.format.TimeFormat;
 import wxdgaming.boot2.core.lang.DiffTime;

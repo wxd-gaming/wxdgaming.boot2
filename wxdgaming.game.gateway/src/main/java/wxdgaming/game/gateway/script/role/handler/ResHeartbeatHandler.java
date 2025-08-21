@@ -1,10 +1,9 @@
 package wxdgaming.game.gateway.script.role.handler;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.starter.net.SocketSession;
-import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.inner.InnerForwardMessage;
 import wxdgaming.game.message.role.ResHeartbeat;
 
@@ -15,7 +14,7 @@ import wxdgaming.game.message.role.ResHeartbeat;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class ResHeartbeatHandler {
 
     /** 心跳包响应 */

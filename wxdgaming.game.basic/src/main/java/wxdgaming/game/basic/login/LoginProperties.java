@@ -2,8 +2,8 @@ package wxdgaming.game.basic.login;
 
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.ann.Configuration;
-import wxdgaming.boot2.core.ann.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import wxdgaming.boot2.core.lang.ObjectBase;
 
 /**

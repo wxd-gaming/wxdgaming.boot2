@@ -4,13 +4,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.5</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
     <groupId>wxdgaming.boot2</groupId>
     <artifactId>wxdgaming.boot2</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+
     <modules>
         <module>wxdgaming.boot2.core</module>
-        <module>wxdgaming.boot2.starter</module>
         <module>wxdgaming.boot2.starter.batis</module>
         <module>wxdgaming.boot2.starter.batis.mapdb</module>
         <module>wxdgaming.boot2.starter.batis.rdb</module>
@@ -26,12 +33,12 @@
         <module>wxdgaming.game.basic</module>
         <module>wxdgaming.game.chat</module>
         <module>wxdgaming.game.gateway</module>
+        <module>wxdgaming.game.login</module>
         <module>wxdgaming.game.robot</module>
         <module>wxdgaming.game.server</module>
         <module>wxdgaming.game.server-script</module>
-        <module>wxdgaming.game.login</module>
-        <module>wxdgaming.logserver</module>
         <module>wxdgaming.logbus</module>
+        <module>wxdgaming.logserver</module>
     </modules>
 
     <properties>
@@ -77,40 +84,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.13.2</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-api</artifactId>
-                <version>5.11.4</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>1.18.30</version>
-            </dependency>
-            <!--日志框架-->
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>1.5.18</version>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-core</artifactId>
-                <version>1.5.18</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>2.0.13</version>
-            </dependency>
-            <!--日志框架-->
-            <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-common</artifactId>
                 <version>4.1.118.Final</version>
@@ -143,17 +116,6 @@
                     <exclusion>
                         <groupId>org.checkerframework</groupId>
                         <artifactId>checker-qual</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.google.inject</groupId>
-                <artifactId>guice</artifactId>
-                <version>7.0.0</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.guava</groupId>
-                        <artifactId>guava</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -375,8 +337,46 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <!-- 移除Tomcat的依赖 -->
+            <exclusions>
+                <!--                <exclusion>-->
+                <!--                    <groupId>org.springframework.boot</groupId>-->
+                <!--                    <artifactId>spring-boot-starter-tomcat</artifactId>-->
+                <!--                </exclusion>-->
+            </exclusions>
+        </dependency>
+        <!--   采用Undertow依赖 -->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.boot</groupId>-->
+        <!--            <artifactId>spring-boot-starter-undertow</artifactId>-->
+        <!--            <exclusions>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>io.undertow</groupId>-->
+        <!--                    <artifactId>undertow-websockets-jsr</artifactId>-->
+        <!--                </exclusion>-->
+        <!--            </exclusions>-->
+        <!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -420,10 +420,6 @@
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-common</artifactId>
         </dependency>
@@ -431,6 +427,10 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -470,73 +470,6 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.3.0</version>
-                    <configuration>
-                        <appendAssemblyId>false</appendAssemblyId>
-                        <!--                        <descriptors>-->
-                        <!--                            <descriptor>src/main/resources/assembly.xml</descriptor>-->
-                        <!--                        </descriptors>-->
-                        <descriptorRefs>
-                            <descriptorRef>jar-with-dependencies</descriptorRef>
-                        </descriptorRefs>
-                        <!-- 需要main方法可执行的jar，请添加如下代码 -->
-                        <archive>
-                            <manifest>
-                                <addClasspath>true</addClasspath>
-                                <classpathPrefix>lib/</classpathPrefix>
-                                <useUniqueVersions>false</useUniqueVersions>
-                                <!-- 加载主要运行类 -->
-                                <mainClass></mainClass>
-                            </manifest>
-                        </archive>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>make-assembly</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>single</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.2</version>
-                    <configuration>
-                        <skip>true</skip>
-                        <testFailureIgnore>true</testFailureIgnore>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <!--kotlin-maven-plugin 编译插件必须在 maven-compiler-plugin 插件的前面-->
-                    <groupId>org.jetbrains.kotlin</groupId>
-                    <artifactId>kotlin-maven-plugin</artifactId>
-                    <version>${kotlin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>compile</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>compile</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>test-compile</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>test-compile</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <jvmTarget>${java.version}</jvmTarget>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <!-- 指定 JDK 版本 -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -571,78 +504,6 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
-                    <configuration>
-                        <archive>
-                            <manifest>
-                                <addClasspath>true</addClasspath>
-                                <classpathPrefix>lib/</classpathPrefix>
-                                <useUniqueVersions>false</useUniqueVersions>
-                                <!-- 加载主要运行类 -->
-                                <mainClass>wxdgaming.chargame.server.CharGameAppMain</mainClass>
-                            </manifest>
-                        </archive>
-                    </configuration>
-                </plugin>
-                <!--要将源码放上去，需要加入这个插件 -->
-                <!--            <plugin>-->
-                <!--                <groupId>org.apache.maven.plugins</groupId>-->
-                <!--                <artifactId>maven-source-plugin</artifactId>-->
-                <!--                <version>3.2.1</version>-->
-                <!--                <executions>-->
-                <!--                    <execution>-->
-                <!--                        <id>attach-sources</id>-->
-                <!--                        <phase>compile</phase>-->
-                <!--                        <goals>-->
-                <!--                            <goal>jar</goal>-->
-                <!--                        </goals>-->
-                <!--                    </execution>-->
-                <!--                </executions>-->
-                <!--            </plugin>-->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.4.0</version>
-                    <configuration>
-                        <docencoding>${encoding}</docencoding>
-                        <encoding>${encoding}</encoding>
-                        <charset>${encoding}</charset>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>attach-javadocs</id>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                            <configuration>
-                                <additionalOptions>-Xdoclint:none</additionalOptions>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.3.0</version>
-                    <executions>
-                        <execution>
-                            <id>copy</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>copy-dependencies</goal>
-                            </goals>
-                            <configuration>
-                                <outputDirectory>
-                                    ${project.build.directory}/lib
-                                </outputDirectory>
-                                <includeScope>runtime</includeScope>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>3.1.0</version>
                     <executions>
@@ -654,26 +515,6 @@
                             <configuration>
                                 <target></target>
                             </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <!-- https://gitee.com/roseboy/classfinal -->
-                    <groupId>net.roseboy</groupId>
-                    <artifactId>classfinal-maven-plugin</artifactId>
-                    <version>1.2.1</version>
-                    <configuration>
-                        <password>#</password><!--加密打包之后pom.xml会被删除，不用担心在jar包里找到此密码-->
-                        <!--                    <cfgfiles>application.yml</cfgfiles>-->
-                        <!--                    <excludes>org.spring</excludes>-->
-                        <!--                    <libjars>a.jar,b.jar</libjars>-->
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>classFinal</goal>
-                            </goals>
                         </execution>
                     </executions>
                 </plugin>
@@ -706,17 +547,9 @@
                 <artifactId>maven-enforcer-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <!-- 指定 JDK 版本 -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

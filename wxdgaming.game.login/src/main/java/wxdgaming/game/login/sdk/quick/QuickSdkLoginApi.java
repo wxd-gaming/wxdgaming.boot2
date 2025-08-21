@@ -1,12 +1,13 @@
 package wxdgaming.game.login.sdk.quick;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.inject.Singleton;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
-import wxdgaming.boot2.starter.net.server.http.HttpContext;
+import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.game.basic.login.AppPlatformParams;
 import wxdgaming.game.login.bean.UserData;
 import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
@@ -18,7 +19,7 @@ import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
  * @version 2025-06-26 10:12
  */
 @Slf4j
-@Singleton
+@Component
 public class QuickSdkLoginApi extends AbstractSdkLoginApi {
 
     private static final String APP_LOGIN_URL = "http://checkuser.quickapi.net/v2/checkUserInfo";
@@ -28,8 +29,8 @@ public class QuickSdkLoginApi extends AbstractSdkLoginApi {
         return AppPlatformParams.Platform.QUICK;
     }
 
-    @Override public RunResult login(HttpContext context, AppPlatformParams appPlatformParams) {
-        JSONObject reqParams = context.getRequest().getReqParams();
+    @Override public RunResult login(HttpServletRequest context, AppPlatformParams appPlatformParams) throws Exception {
+        JSONObject reqParams = SpringUtil.readBodyJson(context);
         String user_id = reqParams.getString("userId");
         String token = reqParams.getString("token");
         String channelId = reqParams.getString("channelId");
@@ -41,13 +42,13 @@ public class QuickSdkLoginApi extends AbstractSdkLoginApi {
             String finalAccount = appPlatformParams.getAppId() + "_" + channelId + "_" + user_id;
 
             UserData userData = getUserData(finalAccount, () -> {
-                UserData ud = createUserData(context.getIp(), finalAccount, appPlatformParams, user_id);
+                UserData ud = createUserData(SpringUtil.getClientIp(context), finalAccount, appPlatformParams, user_id);
                 ud.setPlatformChannelId(channelId);
                 ud.setToken("*");
                 return ud;
             });
 
-            return loginSuccess(userData, context.getIp());
+            return loginSuccess(userData, SpringUtil.getClientIp(context));
 
         }
         return RunResult.fail("登陆失败 token error");

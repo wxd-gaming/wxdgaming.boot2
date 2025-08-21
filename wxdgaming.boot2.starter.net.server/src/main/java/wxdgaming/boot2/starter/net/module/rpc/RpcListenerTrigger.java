@@ -1,18 +1,19 @@
 package wxdgaming.boot2.starter.net.module.rpc;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.inject.Injector;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.BootConfig;
-import wxdgaming.boot2.core.RunApplication;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.*;
+import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.core.reflect.GuiceBeanProvider;
 import wxdgaming.boot2.starter.net.SocketSession;
 
 import java.lang.reflect.InvocationTargetException;
@@ -30,20 +31,20 @@ public class RpcListenerTrigger extends ExecutorEvent {
 
     private final RpcMapping rpcMapping;
     private final RpcService rpcService;
-    private final RunApplication runApplication;
+    private final ApplicationContextProvider applicationContextProvider;
     private final SocketSession socketSession;
     private final long rpcId;
     private final JSONObject paramObject;
 
     public RpcListenerTrigger(RpcMapping rpcMapping,
                               RpcService rpcService,
-                              RunApplication runApplication,
+                              ApplicationContextProvider applicationContextProvider,
                               SocketSession socketSession,
                               long rpcId,
                               JSONObject paramObject) {
         this.rpcMapping = rpcMapping;
         this.rpcService = rpcService;
-        this.runApplication = runApplication;
+        this.applicationContextProvider = applicationContextProvider;
         this.socketSession = socketSession;
         this.rpcId = rpcId;
         this.paramObject = paramObject;
@@ -93,14 +94,11 @@ public class RpcListenerTrigger extends ExecutorEvent {
             Parameter parameter = parameters[i];
             Class<?> parameterType = parameter.getType();
             Type parameterizedType = parameter.getParameterizedType();
-            if (GuiceBeanProvider.class.isAssignableFrom(parameterType)) {
-                params[i] = parameterType.cast(runApplication.getGuiceBeanProvider());
+            if (ApplicationContextProvider.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(applicationContextProvider);
                 continue;
-            } else if (RunApplication.class.isAssignableFrom(parameterType)) {
-                params[i] = parameterType.cast(runApplication);
-                continue;
-            } else if (Injector.class.isAssignableFrom(parameterType)) {
-                params[i] = parameterType.cast(runApplication.getInjector());
+            } else if (ApplicationContext.class.isAssignableFrom(parameterType)) {
+                params[i] = parameterType.cast(applicationContextProvider.getApplicationContext());
                 continue;
             } else if (SocketSession.class.isAssignableFrom(parameterType)) {
                 params[i] = parameterType.cast(socketSession);
@@ -123,8 +121,8 @@ public class RpcListenerTrigger extends ExecutorEvent {
                     String name = requestParam.value();
                     Object o;
                     try {
-                        if (requestParam.nestedPath()) {
-                            o = FastJsonUtil.getNestedValue(paramObject, name, parameterizedType);
+                        if (name.startsWith("${") && name.endsWith("}")) {
+                            o = FastJsonUtil.getNestedValue(paramObject, name.substring(2, name.length() - 1), parameterizedType);
                         } else {
                             o = paramObject.getObject(name, parameterizedType);
                         }
@@ -149,9 +147,6 @@ public class RpcListenerTrigger extends ExecutorEvent {
                     if (!paramObject.isEmpty()) {
                         o = paramObject.toJavaObject(parameterType);
                     }
-                    if (o == null && StringUtils.isNotBlank(requestBody.defaultValue())) {
-                        o = FastJsonUtil.parse(requestBody.defaultValue(), parameterType);
-                    }
                     if (requestBody.required() && o == null) {
                         throw new RuntimeException("body is null");
                     }
@@ -159,7 +154,16 @@ public class RpcListenerTrigger extends ExecutorEvent {
                     continue;
                 }
             }
-            params[i] = runApplication.getInstanceByParameter(parameter);
+            /*实现注入*/
+            Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
+            if (qualifier != null) {
+                String name = qualifier.value();
+                if (StringUtils.isBlank(name))
+                    params[i] = applicationContextProvider.getBean(parameterType);
+                else
+                    params[i] = applicationContextProvider.getBean(name);
+                continue;
+            }
         }
         return params;
     }

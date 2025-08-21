@@ -1,7 +1,7 @@
 package code;
 
 import com.alibaba.fastjson.JSON;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import wxdgaming.boot2.core.chatset.Base64Util;
 import wxdgaming.boot2.core.token.JsonToken;
 import wxdgaming.boot2.core.token.JsonTokenBuilder;

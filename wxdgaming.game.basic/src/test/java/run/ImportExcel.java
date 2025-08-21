@@ -1,6 +1,6 @@
 package run;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import wxdgaming.boot2.starter.excel.ExcelRepository;
 import wxdgaming.boot2.starter.excel.store.CreateJavaCode;
 

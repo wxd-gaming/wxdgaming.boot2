@@ -1,9 +1,8 @@
 package wxdgaming.boot2.starter.net.module.inner.handler;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -19,12 +18,11 @@ import java.util.concurrent.CompletableFuture;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class ResRemoteHandler {
 
     final RpcService rpcService;
 
-    @Inject
     public ResRemoteHandler(RpcService rpcService) {
         this.rpcService = rpcService;
     }

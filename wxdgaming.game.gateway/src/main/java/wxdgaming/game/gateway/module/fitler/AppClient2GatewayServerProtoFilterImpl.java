@@ -1,8 +1,7 @@
 package wxdgaming.game.gateway.module.fitler;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerTrigger;
@@ -16,14 +15,13 @@ import wxdgaming.game.gateway.module.data.DataCenterService;
  * @version 2025-05-28 15:19
  **/
 @Slf4j
-@Singleton
+@Component
 public class AppClient2GatewayServerProtoFilterImpl implements ServerProtoFilter {
 
     private final DataCenterService dataCenterService;
     private final ProtoListenerFactory listenerFactory;
 
 
-    @Inject
     public AppClient2GatewayServerProtoFilterImpl(DataCenterService dataCenterService, ProtoListenerFactory listenerFactory) {
         this.dataCenterService = dataCenterService;
         this.listenerFactory = listenerFactory;

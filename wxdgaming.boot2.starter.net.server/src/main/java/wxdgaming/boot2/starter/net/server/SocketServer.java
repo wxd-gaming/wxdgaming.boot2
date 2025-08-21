@@ -7,15 +7,15 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.ScheduledFuture;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.SessionGroup;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
-import wxdgaming.boot2.starter.net.server.http.HttpListenerFactory;
 import wxdgaming.boot2.starter.net.ssl.WxdOptionalSslHandler;
 
 import javax.net.ssl.SSLContext;
@@ -48,10 +48,10 @@ public class SocketServer {
 
     @Start
     @Order(1000)
-    public void start(ProtoListenerFactory protoListenerFactory, HttpListenerFactory httpListenerFactory) {
+    public void start(@Qualifier ProtoListenerFactory protoListenerFactory) {
 
         SocketServerDeviceHandler socketServerDeviceHandler = new SocketServerDeviceHandler(config, sessionGroup);
-        SocketServerMessageDecode socketServerMessageDecode = new SocketServerMessageDecode(config, protoListenerFactory, httpListenerFactory);
+        SocketServerMessageDecode socketServerMessageDecode = new SocketServerMessageDecode(config, protoListenerFactory);
         SSLContext sslContext = config.sslContext();
 
         int writeBytes = (int) BytesUnit.Mb.toBytes(config.getWriteByteBufM());

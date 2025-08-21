@@ -6,8 +6,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
-import org.junit.Test;
 import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 import wxdgaming.boot2.core.format.data.Data2Size;
 import wxdgaming.boot2.core.lang.DiffTime;
 import wxdgaming.boot2.core.util.RandomUtils;
@@ -39,7 +39,6 @@ public class FastUtilTest {
         Map<Integer, Integer> integerIntegerMap = Collections.unmodifiableMap(map);
     }
 
-    @Test
     @RepeatedTest(10)
     public void f2() {
 
@@ -65,7 +64,6 @@ public class FastUtilTest {
         System.out.println("================================================");
     }
 
-    @Test
     @RepeatedTest(10)
     public void f3() {
 
@@ -100,7 +98,6 @@ public class FastUtilTest {
         System.out.println("================================================");
     }
 
-    @Test
     @RepeatedTest(10)
     public void f4() {
 
@@ -135,7 +132,6 @@ public class FastUtilTest {
     }
 
     /** 测试get性能 */
-    @Test
     @RepeatedTest(10)
     public void f5() {
         {
@@ -171,7 +167,6 @@ public class FastUtilTest {
     }
 
     /** 测试get性能 */
-    @Test
     @RepeatedTest(10)
     public void f6() {
         {

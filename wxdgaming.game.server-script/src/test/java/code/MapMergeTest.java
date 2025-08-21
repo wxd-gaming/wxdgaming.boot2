@@ -1,7 +1,7 @@
 package code;
 
 import com.alibaba.fastjson.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.io.Objects;
 

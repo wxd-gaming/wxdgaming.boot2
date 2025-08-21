@@ -1,8 +1,7 @@
 package wxdgaming.game.server.script.inner.handler;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
@@ -21,14 +20,13 @@ import java.util.Objects;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class InnerRegisterServerHandler {
 
     private final GameServerProperties gameServerProperties;
     private final ProtoListenerFactory protoListenerFactory;
     private final ClientSessionService clientSessionService;
 
-    @Inject
     public InnerRegisterServerHandler(GameServerProperties gameServerProperties, ProtoListenerFactory protoListenerFactory, ClientSessionService clientSessionService) {
         this.gameServerProperties = gameServerProperties;
         this.protoListenerFactory = protoListenerFactory;

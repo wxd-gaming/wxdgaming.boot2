@@ -1,12 +1,10 @@
 package wxdgaming.game.server.script.http.yunying.filter;
 
-import com.google.inject.Singleton;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.starter.net.ann.HttpRequest;
-import wxdgaming.boot2.starter.net.server.http.HttpContext;
-import wxdgaming.boot2.starter.net.server.http.HttpFilter;
-
-import java.lang.reflect.Method;
+import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.WebFilter;
 
 /**
  * 运营过滤器
@@ -15,16 +13,16 @@ import java.lang.reflect.Method;
  * @version 2025-04-30 09:36
  **/
 @Slf4j
-@Singleton
-public class YunyingFilter implements HttpFilter {
+@Component
+public class YunyingFilter implements WebFilter {
 
-
-    @Override public Object doFilter(HttpRequest httpRequest, Method method, HttpContext httpContext) {
-        if (httpContext.getRequest().getUriPath().startsWith("/yunying")) {
-            // 这里可以添加运营权限验证逻辑
-            return null;
-        }
-        return null;
+    @Override public String filterPath() {
+        return "/yunying/**";
     }
+
+    @Override public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        return WebFilter.super.preHandle(request, response, handler);
+    }
+
 
 }

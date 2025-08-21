@@ -1,6 +1,6 @@
 package wxdgaming.logserver.plugin;
 
-import wxdgaming.boot2.core.RunApplication;
+import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.starter.scheduled.AbstractCronTrigger;
 
 import java.util.function.Supplier;
@@ -13,10 +13,10 @@ import java.util.function.Supplier;
  **/
 public class PluginExecutor extends AbstractCronTrigger {
 
-    private final Supplier<RunApplication> applicationProvider;
+    private final Supplier<ApplicationContextProvider> applicationProvider;
     private final AbstractPlugin abstractPlugin;
 
-    public PluginExecutor(Supplier<RunApplication> applicationProvider, AbstractPlugin abstractPlugin) {
+    public PluginExecutor(Supplier<ApplicationContextProvider> applicationProvider, AbstractPlugin abstractPlugin) {
         super(abstractPlugin.cron());
         this.applicationProvider = applicationProvider;
         this.abstractPlugin = abstractPlugin;

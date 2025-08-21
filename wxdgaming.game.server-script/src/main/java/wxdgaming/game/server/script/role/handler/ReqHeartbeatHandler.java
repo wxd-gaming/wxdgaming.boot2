@@ -1,8 +1,7 @@
 package wxdgaming.game.server.script.role.handler;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -20,12 +19,11 @@ import wxdgaming.game.server.module.data.DataCenterService;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class ReqHeartbeatHandler {
 
     final DataCenterService dataCenterService;
 
-    @Inject
     public ReqHeartbeatHandler(DataCenterService dataCenterService) {
         this.dataCenterService = dataCenterService;
     }

@@ -1,8 +1,8 @@
 package wxdgaming.game.server.script.task;
 
-import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.beans.factory.annotation.Autowired;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.collection.ListOf;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
@@ -36,13 +36,13 @@ import java.util.TreeMap;
  * @version 2025-06-03 15:15
  */
 @Slf4j
-public abstract class ITaskScript extends HoldRunApplication {
+public abstract class ITaskScript extends HoldApplicationContext {
 
-    @Inject protected BagService bagService;
-    @Inject protected TaskService taskService;
-    @Inject protected TipsService tipsService;
-    @Inject protected InnerService innerService;
-    @Inject protected SlogService slogService;
+    @Autowired protected BagService bagService;
+    @Autowired protected TaskService taskService;
+    @Autowired protected TipsService tipsService;
+    @Autowired protected InnerService innerService;
+    @Autowired protected SlogService slogService;
 
     public abstract TaskType type();
 

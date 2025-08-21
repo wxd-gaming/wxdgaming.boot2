@@ -1,12 +1,11 @@
 package wxdgaming.game.robot.script;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.collection.MapOf;
@@ -38,14 +37,13 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 @Slf4j
 @Getter
-@Singleton
+@Service
 public class RobotMainService {
 
     final LoginProperties loginProperties;
     final SocketClient socketClient;
     final ConcurrentHashMap<String, Robot> robotMap = new ConcurrentHashMap<>();
 
-    @Inject
     public RobotMainService(LoginProperties loginProperties, SocketClient socketClient) {
         this.loginProperties = loginProperties;
         this.socketClient = socketClient;
@@ -53,8 +51,8 @@ public class RobotMainService {
 
     @Start
     public void start() {
-        for (int i = 0; i < 20; i++) {
-            String account = "b3" + (i + 1);
+        for (int i = 0; i < 70; i++) {
+            String account = "b5" + (i + 1);
             robotMap.put(account, new Robot().setAccount(account).setName(account));
         }
     }
@@ -67,7 +65,7 @@ public class RobotMainService {
         jsonObject.put("token", robot.getAccount());
 
         String uriPath = getLoginProperties().getUrl() + "/login/check";
-        HttpResponse httpResponse = HttpRequestPost.ofJson(uriPath, jsonObject.toJSONString()).execute();
+        HttpResponse httpResponse = HttpRequestPost.of(uriPath, jsonObject).execute();
         RunResult runResult = httpResponse.bodyRunResult();
         if (runResult.isFail()) {
             log.error("登录失败：{}", runResult.msg());

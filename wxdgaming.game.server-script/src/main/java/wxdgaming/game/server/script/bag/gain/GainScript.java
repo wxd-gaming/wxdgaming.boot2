@@ -1,9 +1,9 @@
 package wxdgaming.game.server.script.bag.gain;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.bean.goods.ItemCfg;
 import wxdgaming.game.cfg.QItemTable;
@@ -29,12 +29,12 @@ import java.util.List;
  * @version 2025-04-22 19:13
  **/
 @Slf4j
-@Singleton
-public class GainScript extends HoldRunApplication implements IBagScript {
+@Component
+public class GainScript extends HoldApplicationContext implements IBagScript {
 
-    @Inject protected DataCenterService dataCenterService;
-    @Inject protected PlayerService playerService;
-    @Inject protected BagService bagService;
+    @Autowired protected DataCenterService dataCenterService;
+    @Autowired protected PlayerService playerService;
+    @Autowired protected BagService bagService;
 
     @SuppressWarnings("unchecked")
     protected <T extends Item> T newItem() {

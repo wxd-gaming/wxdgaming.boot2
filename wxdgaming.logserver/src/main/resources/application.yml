@@ -1,0 +1,41 @@
+boot:
+  debug: true
+  gid: 1
+  sid: 1
+  name: "日志服"
+  jwtKey: "dwe"
+
+core:
+  executor:
+    basic:
+      coreSize: 2                        #默认线程池的核心线程数
+      maxQueueSize: 10000                #队列超过就会打印异常
+    logic:
+      coreSize: 32                       #逻辑线程池
+      maxQueueSize: 50000                #队列超过就会打印异常
+    virtual:
+      coreSize: 100                      #虚拟线程池
+      maxQueueSize: 1500000              #队列超过就会打印异常
+
+scheduled:
+  executor:
+    coreSize: 1
+    maxQueueSize: 500
+
+http:
+  client:
+    routeMaxSize: 20                    #连接池的核心连接数
+    totalMaxSize: 300                   #连接池的最大连接数
+    resetTimeM: 30                      #连接池重置时间，时间太长连接池会异常 单位分钟
+    sslProtocol: TLS                    #ssl 类型
+    connectTimeOut: 3000                #创建连接超时时间
+    connectionRequestTimeout: 1000      #从连接池获取连接超时
+    keepAliveTimeout: 30000             #连接有效时间
+    readTimeout: 3000                   #读取超时时间
+
+server:
+  port: 18888
+
+spring:
+  profiles:
+    active: [ pgsql ]

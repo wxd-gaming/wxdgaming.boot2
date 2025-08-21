@@ -1,7 +1,7 @@
 package wxdgaming.game.server.script.fight.impl.hp;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.script.fight.AbstractFightAction;
 
@@ -12,7 +12,7 @@ import wxdgaming.game.server.script.fight.AbstractFightAction;
  * @version 2025-05-09 09:47
  **/
 @Slf4j
-@Singleton
+@Component
 public class CostHpFixedImpl extends AbstractFightAction {
 
     @Override public int type() {

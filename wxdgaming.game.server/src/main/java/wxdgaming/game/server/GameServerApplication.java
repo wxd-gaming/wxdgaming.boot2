@@ -1,21 +1,22 @@
 package wxdgaming.game.server;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import wxdgaming.boot2.core.CoreScan;
-import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
-import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.util.JvmUtil;
-import wxdgaming.boot2.starter.RunApplicationMain;
-import wxdgaming.boot2.starter.RunApplicationSub;
-import wxdgaming.boot2.starter.WxdApplication;
-import wxdgaming.boot2.starter.batis.sql.pgsql.MysqlScan;
+import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlConfiguration;
 import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
-import wxdgaming.boot2.starter.net.SocketScan;
+import wxdgaming.boot2.starter.net.SocketConfiguration;
 import wxdgaming.boot2.starter.scheduled.ScheduledProperties;
+import wxdgaming.boot2.util.ChildApplicationContextProvider;
+import wxdgaming.boot2.core.MainApplicationContextProvider;
+import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.game.basic.login.LoginProperties;
 import wxdgaming.game.basic.slog.SlogService;
 import wxdgaming.game.cfg.QPlayerTable;
@@ -26,27 +27,26 @@ import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
+@SpringBootApplication(scanBasePackageClasses = {
+        CoreScan.class,
+        DataExcelScan.class,
+        ScheduledProperties.class,
+        SocketConfiguration.class,
+        PgsqlConfiguration.class,
+        LogBusService.class,
+        SlogService.class,
+        LoginProperties.class,
+        GameServerApplication.class
+})
 public class GameServerApplication {
-
-    static RunApplicationSub runApplicationSub = null;
 
     public static void main(String[] args) throws Exception {
         try {
-            RunApplicationMain runApplication = WxdApplication.run(
-                    CoreScan.class,
-                    DataExcelScan.class,
-                    ScheduledProperties.class,
-                    SocketScan.class,
-                    MysqlScan.class,
-                    LogBusService.class,
-                    SlogService.class,
-                    LoginProperties.class,
-                    GameServerApplication.class
-            );
+            MainApplicationContextProvider.builder(GameServerApplication.class).run(args);
             loadScript();
-            runApplication.start();
+            SpringUtil.mainApplicationContextProvider.startBootstrap();
             JvmUtil.addShutdownHook(() -> {
-                runApplicationSub.stop();
+                SpringUtil.childApplicationContextProvider.executeMethodWithAnnotatedStop();
             });
 
             QPlayerTable qPlayerTable = DataRepository.getIns().dataTable(QPlayerTable.class);
@@ -133,11 +133,13 @@ public class GameServerApplication {
             }
         }
 
-        ReflectProvider reflectProvider = ReflectProvider.Builder.of(classDirLoader, "wxdgaming.game.server.script").build();
-
-        runApplicationSub = WxdApplication.createRunApplicationSub(reflectProvider);
-        runApplicationSub.executeMethodWithAnnotated(Init.class);
+        ChildApplicationContextProvider childApplicationContextProvider = SpringUtil.newChild((ConfigurableApplicationContext) SpringUtil.mainApplicationContextProvider.getApplicationContext(), ScriptScan.class, classDirLoader);
+        childApplicationContextProvider.executeMethodWithAnnotatedInit();
+        SpringUtil.childApplicationContextProvider = childApplicationContextProvider;
         log.info("加载脚本模块完成");
     }
+
+    @ComponentScan("wxdgaming.game.server.script")
+    public static class ScriptScan {}
 
 }

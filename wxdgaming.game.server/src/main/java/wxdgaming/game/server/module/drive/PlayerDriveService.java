@@ -1,12 +1,11 @@
 package wxdgaming.game.server.module.drive;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
-import wxdgaming.boot2.core.ann.Order;
-import wxdgaming.boot2.core.ann.Stop;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorProperties;
@@ -28,14 +27,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @version 2025-05-08 11:41
  **/
 @Slf4j
-@Singleton
-public class PlayerDriveService extends HoldRunApplication {
+@Service
+public class PlayerDriveService extends HoldApplicationContext {
 
     private final ConcurrentHashMap<Integer, PlayerDriveContent> playerDriveContentMap = new ConcurrentHashMap<>();
     private final int logicCoreSize;
     private final AtomicInteger onlineSize = new AtomicInteger();
 
-    @Inject
     public PlayerDriveService(ExecutorProperties executorProperties) {
         logicCoreSize = executorProperties.getLogic().getCoreSize();
     }
@@ -133,22 +131,22 @@ public class PlayerDriveService extends HoldRunApplication {
             int day = localDateTime.getDayOfMonth();
 
             for (Player player : playerMap.values()) {
-                runApplication.executeMethodWithAnnotatedException(OnHeart.class, player, millis);
+                applicationContextProvider.executeMethodWithAnnotatedException(OnHeart.class, player, millis);
                 if (lsatSecond != second) {
                     lsatSecond = second;
-                    runApplication.executeMethodWithAnnotatedException(OnHeartSecond.class, player, second);
+                    applicationContextProvider.executeMethodWithAnnotatedException(OnHeartSecond.class, player, second);
                 }
                 if (lsatMinute != minute) {
                     lsatMinute = minute;
-                    runApplication.executeMethodWithAnnotatedException(OnHeartMinute.class, player, minute);
+                    applicationContextProvider.executeMethodWithAnnotatedException(OnHeartMinute.class, player, minute);
                 }
                 if (lsatHour != hour && minute == 0) {
                     lsatHour = hour;
-                    runApplication.executeMethodWithAnnotatedException(OnHeartHour.class, player, hour);
+                    applicationContextProvider.executeMethodWithAnnotatedException(OnHeartHour.class, player, hour);
                 }
                 if (lastDay != day && hour == 0 && minute == 0) {
                     lastDay = day;
-                    runApplication.executeMethodWithAnnotatedException(OnHeartDay.class, player, day);
+                    applicationContextProvider.executeMethodWithAnnotatedException(OnHeartDay.class, player, day);
                 }
             }
         }

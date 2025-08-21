@@ -1,10 +1,9 @@
 package wxdgaming.game.server.script.role.handler;
 
 import com.alibaba.fastjson.JSON;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
@@ -30,15 +29,14 @@ import java.util.HashSet;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
-public class ReqCreateRoleHandler extends HoldRunApplication {
+@Component
+public class ReqCreateRoleHandler extends HoldApplicationContext {
 
     private final DataCenterService dataCenterService;
     private final PlayerService playerService;
     private final TipsService tipsService;
     final SlogService slogService;
 
-    @Inject
     public ReqCreateRoleHandler(DataCenterService dataCenterService, PlayerService playerService, TipsService tipsService, SlogService slogService) {
         this.dataCenterService = dataCenterService;
         this.playerService = playerService;
@@ -120,7 +118,7 @@ public class ReqCreateRoleHandler extends HoldRunApplication {
         } finally {
             SingletonLockUtil.unlock("role_" + name);
         }
-        runApplication.executeMethodWithAnnotatedException(OnCreateRole.class, player);
+        applicationContextProvider.executeMethodWithAnnotatedException(OnCreateRole.class, player);
         playerService.sendPlayerList(socketSession, clientSessionId, sid, account);
     }
 

@@ -1,13 +1,11 @@
 package wxdgaming.game.server.script.bag;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.RunApplication;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.ann.Order;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.bean.goods.*;
@@ -40,8 +38,8 @@ import java.util.*;
  * @version 2025-04-22 09:39
  **/
 @Slf4j
-@Singleton
-public class BagService extends HoldRunApplication implements InitPrint {
+@Service
+public class BagService extends HoldApplicationContext implements InitPrint {
 
     final BagScriptProvider<GainScript> gainScriptProvider = new BagScriptProvider<>(GainScript.class);
     final BagScriptProvider<CostScript> costScriptProvider = new BagScriptProvider<>(CostScript.class);
@@ -53,7 +51,6 @@ public class BagService extends HoldRunApplication implements InitPrint {
     final MailService mailService;
     final SlogService slogService;
 
-    @Inject
     public BagService(DataCenterService dataCenterService, TipsService tipsService, DataRepository dataRepository, MailService mailService, SlogService slogService) {
         this.dataCenterService = dataCenterService;
         this.tipsService = tipsService;
@@ -63,10 +60,10 @@ public class BagService extends HoldRunApplication implements InitPrint {
     }
 
     @Init
-    public void init(RunApplication runApplication) {
-        this.gainScriptProvider.init(runApplication);
-        this.costScriptProvider.init(runApplication);
-        this.useItemScriptProvider.init(runApplication);
+    public void init() {
+        this.gainScriptProvider.init(getApplicationContextProvider());
+        this.costScriptProvider.init(getApplicationContextProvider());
+        this.useItemScriptProvider.init(getApplicationContextProvider());
     }
 
     /** 创建角色之后创建背包 */

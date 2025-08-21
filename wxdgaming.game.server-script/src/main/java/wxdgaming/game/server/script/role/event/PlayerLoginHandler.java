@@ -1,10 +1,9 @@
 package wxdgaming.game.server.script.role.event;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
-import wxdgaming.boot2.core.ann.Order;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.bit.BitFlag;
 import wxdgaming.boot2.core.lang.condition.Condition;
@@ -22,10 +21,9 @@ import wxdgaming.game.server.event.OnTask;
  * @version 2025-04-27 19:51
  **/
 @Slf4j
-@Singleton
-public class PlayerLoginHandler extends HoldRunApplication {
+@Component
+public class PlayerLoginHandler extends HoldApplicationContext {
 
-    @Inject
     public PlayerLoginHandler() {
     }
 
@@ -36,11 +34,11 @@ public class PlayerLoginHandler extends HoldRunApplication {
         log.info("玩家上线:{} {}", ThreadContext.context().queueName(), player);
         player.setStatus(new BitFlag());
         /*触发任务登录次数*/
-        runApplication.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("login", 1));
+        applicationContextProvider.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("login", 1));
         if (!MyClock.isSameDay(player.getOnlineInfo().getLastLoginDayTime())) {
             player.getOnlineInfo().setLastLoginDayTime(MyClock.millis());
             /*触发任务登录天数*/
-            runApplication.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("loginDay", 1));
+            applicationContextProvider.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("loginDay", 1));
         }
     }
 

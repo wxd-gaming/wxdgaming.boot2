@@ -1,9 +1,8 @@
 package wxdgaming.game.server.script.task;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import wxdgaming.boot2.core.HoldRunApplication;
-import wxdgaming.boot2.core.RunApplication;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.util.AssertUtil;
@@ -29,22 +28,22 @@ import java.util.List;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-04-21 20:43
  **/
-@Singleton
-public class TaskService extends HoldRunApplication {
+@Slf4j
+@Service
+public class TaskService extends HoldApplicationContext {
 
     private final DataCenterService dataCenterService;
     private HashMap<TaskType, ITaskScript> taskScriptImplHashMap = new HashMap<>();
     private HashMap<Condition, ConditionInitValueHandler> conditionInitValueHandlerMap = new HashMap<>();
 
-    @Inject
     public TaskService(DataCenterService dataCenterService) {
         this.dataCenterService = dataCenterService;
     }
 
     @Init
-    public void init(RunApplication runApplication) {
+    public void init() {
         HashMap<Condition, ConditionInitValueHandler> tmpConditionInitValueHandlerMap = new HashMap<>();
-        runApplication.classWithSuper(ConditionInitValueHandler.class)
+        getApplicationContextProvider().classWithSuper(ConditionInitValueHandler.class)
                 .forEach(conditionInitValueHandler -> {
                     if (tmpConditionInitValueHandlerMap.put(conditionInitValueHandler.condition(), conditionInitValueHandler) != null) {
                         throw new RuntimeException("重复的任务条件处理器：" + conditionInitValueHandler.condition());
@@ -53,7 +52,7 @@ public class TaskService extends HoldRunApplication {
         conditionInitValueHandlerMap = tmpConditionInitValueHandlerMap;
 
         HashMap<TaskType, ITaskScript> tmpTaskScriptImplHashMap = new HashMap<>();
-        runApplication.classWithSuper(ITaskScript.class)
+        getApplicationContextProvider().classWithSuper(ITaskScript.class)
                 .forEach(taskScript -> {
                     if (tmpTaskScriptImplHashMap.put(taskScript.type(), taskScript) != null) {
                         throw new RuntimeException("任务类型处理重复：" + taskScript.type());

@@ -1,7 +1,7 @@
 package wxdgaming.game.chat.module.chart;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 /**
  * 聊天
@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
  * @version 2025-06-09 14:16
  */
 @Slf4j
-@Singleton
+@Service
 public class ChartService {
 
 }

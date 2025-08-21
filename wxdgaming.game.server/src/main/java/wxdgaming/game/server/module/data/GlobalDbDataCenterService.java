@@ -1,10 +1,9 @@
 package wxdgaming.game.server.module.data;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.game.global.bean.role.PlayerSnap;
@@ -18,14 +17,13 @@ import wxdgaming.game.server.bean.role.Player;
  **/
 @Slf4j
 @Getter
-@Singleton
+@Service
 public class GlobalDbDataCenterService {
 
     final SqlDataHelper globalDbHelper;
     final DataCenterService dataCenterService;
 
-    @Inject
-    public GlobalDbDataCenterService(@Named("db.pgsql-second") SqlDataHelper globalDbHelper, DataCenterService dataCenterService) {
+    public GlobalDbDataCenterService(@Qualifier("db.pgsql-second") SqlDataHelper globalDbHelper, DataCenterService dataCenterService) {
         this.globalDbHelper = globalDbHelper;
         this.dataCenterService = dataCenterService;
     }

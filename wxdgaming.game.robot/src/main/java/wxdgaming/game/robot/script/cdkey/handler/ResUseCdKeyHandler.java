@@ -1,7 +1,7 @@
 package wxdgaming.game.robot.script.cdkey.handler;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.cdkey.ResUseCdKey;
@@ -13,7 +13,7 @@ import wxdgaming.game.message.cdkey.ResUseCdKey;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class ResUseCdKeyHandler {
 
     /** 响应使用cdkey */

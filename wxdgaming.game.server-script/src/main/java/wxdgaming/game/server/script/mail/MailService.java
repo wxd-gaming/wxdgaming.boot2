@@ -1,16 +1,15 @@
 package wxdgaming.game.server.script.mail;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.game.server.bean.global.GlobalDataType;
-import wxdgaming.game.server.bean.global.impl.ServerMailData;
 import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.bean.mail.MailInfo;
 import wxdgaming.game.bean.mail.MailPack;
 import wxdgaming.game.bean.mail.ServerMailInfo;
+import wxdgaming.game.server.bean.global.GlobalDataType;
+import wxdgaming.game.server.bean.global.impl.ServerMailData;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnHeartMinute;
 import wxdgaming.game.server.module.data.DataCenterService;
@@ -26,13 +25,12 @@ import java.util.List;
  * @version 2025-05-12 16:22
  **/
 @Slf4j
-@Singleton
-public class MailService extends HoldRunApplication {
+@Service
+public class MailService extends HoldApplicationContext {
 
     final GlobalDataService globalDataService;
     final DataCenterService dataCenterService;
 
-    @Inject
     public MailService(GlobalDataService globalDataService, DataCenterService dataCenterService) {
         this.globalDataService = globalDataService;
         this.dataCenterService = dataCenterService;

@@ -1,6 +1,6 @@
 package code.string;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.RepeatedTest;
 
 import java.util.*;

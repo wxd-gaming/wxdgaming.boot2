@@ -1,11 +1,10 @@
 package wxdgaming.game.server.module.data;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.HoldRunApplication;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
 import wxdgaming.boot2.core.format.HexId;
@@ -32,8 +31,8 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 @Slf4j
 @Getter
-@Singleton
-public class DataCenterService extends HoldRunApplication implements GetPlayerStrategy {
+@Service
+public class DataCenterService extends HoldApplicationContext implements GetPlayerStrategy {
 
     final GameServerProperties gameServerProperties;
 
@@ -53,7 +52,6 @@ public class DataCenterService extends HoldRunApplication implements GetPlayerSt
 
     GetPlayerStrategyFactory getPlayerStrategyFactory;
 
-    @Inject
     public DataCenterService(GameServerProperties gameServerProperties) {
         this.gameServerProperties = gameServerProperties;
         int sid = gameServerProperties.getSid();
@@ -68,7 +66,7 @@ public class DataCenterService extends HoldRunApplication implements GetPlayerSt
     @Start
     public void start() {
         if (gameServerProperties.getServerType() <= 1) {
-            SqlDataHelper sqlDataHelper = runApplication.getInstance(SqlDataHelper.class);
+            SqlDataHelper sqlDataHelper = applicationContextProvider.getBean(SqlDataHelper.class);
             getPlayerStrategyFactory = new GetPlayerStrategyFactory(new DatabaseGetPlayerStrategy(sqlDataHelper));
             String sql = "SELECT uid,sid,name,account FROM role where del=?";
             try (SqlQueryResult sqlQueryResult = sqlDataHelper.queryResultSet(sql, false)) {
@@ -84,9 +82,9 @@ public class DataCenterService extends HoldRunApplication implements GetPlayerSt
                 }
             }
         } else {
-            RpcService rpcService = runApplication.getInstance(RpcService.class);
-            ClientSessionService clientSessionService = runApplication.getInstance(ClientSessionService.class);
-            GlobalDbDataCenterService globalDbDataCenterService = runApplication.getInstance(GlobalDbDataCenterService.class);
+            RpcService rpcService = applicationContextProvider.getBean(RpcService.class);
+            ClientSessionService clientSessionService = applicationContextProvider.getBean(ClientSessionService.class);
+            GlobalDbDataCenterService globalDbDataCenterService = applicationContextProvider.getBean(GlobalDbDataCenterService.class);
             getPlayerStrategyFactory = new GetPlayerStrategyFactory(new RpcGetPlayerStrategy(rpcService, clientSessionService, globalDbDataCenterService));
         }
     }

@@ -1,7 +1,7 @@
 package wxdgaming.game.robot.script.chat.handler;
 
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.chat.ResChatMessage;
@@ -14,7 +14,7 @@ import wxdgaming.game.robot.bean.Robot;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class ResChatMessageHandler {
 
     /** 聊天响应 */

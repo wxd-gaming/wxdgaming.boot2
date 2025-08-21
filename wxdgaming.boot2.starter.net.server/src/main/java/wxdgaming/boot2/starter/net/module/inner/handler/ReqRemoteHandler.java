@@ -1,9 +1,8 @@
 package wxdgaming.boot2.starter.net.module.inner.handler;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.RunResult;
@@ -21,13 +20,12 @@ import java.util.Objects;
  * @version v1.1
  **/
 @Slf4j
-@Singleton
+@Component
 public class ReqRemoteHandler {
 
     final RpcService rpcService;
     final RpcListenerFactory rpcListenerFactory;
 
-    @Inject
     public ReqRemoteHandler(RpcService rpcService, RpcListenerFactory rpcListenerFactory) {
         this.rpcService = rpcService;
         this.rpcListenerFactory = rpcListenerFactory;
@@ -66,7 +64,7 @@ public class ReqRemoteHandler {
             RpcListenerTrigger rpcListenerTrigger = new RpcListenerTrigger(
                     rpcMapping,
                     rpcService,
-                    rpcListenerContent.getRunApplication(),
+                    rpcListenerContent.getApplicationContextProvider(),
                     socketSession,
                     rpcId,
                     paramObject

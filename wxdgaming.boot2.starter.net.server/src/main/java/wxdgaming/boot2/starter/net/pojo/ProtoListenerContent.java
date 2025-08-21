@@ -2,7 +2,7 @@ package wxdgaming.boot2.starter.net.pojo;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.RunApplication;
+import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
@@ -29,11 +29,9 @@ public class ProtoListenerContent {
     private final ConcurrentHashMap<Integer, Class<? extends PojoBase>> messageId2MappingMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Class<? extends PojoBase>, Integer> message2MappingMap = new ConcurrentHashMap<>();
 
-    final RunApplication runApplication;
 
-    public ProtoListenerContent(RunApplication runApplication) {
-        this.runApplication = runApplication;
-        runApplication.getGuiceBeanProvider()
+    public ProtoListenerContent(ApplicationContextProvider applicationContextProvider) {
+        applicationContextProvider
                 .withMethodAnnotated(ProtoRequest.class)
                 .forEach(contentMethod -> {
                     Object ins = contentMethod.getBean();
