@@ -51,9 +51,9 @@ public class HttpClientTest {
     @Test
     public void postMultiGzip() {
         HttpRequestPostMulti httpRequestPost = HttpRequestPostMulti.of("http://localhost:19800/login/test/1/v1");
-        httpRequestPost.addParam("appId", 1);
-        httpRequestPost.addParam("token", "sfo23r409283mnscoijer20389".repeat(10000));
-        httpRequestPost.addParam("account", "我收到");
+        httpRequestPost.setParam("appId", 1);
+        httpRequestPost.setParam("token", "sfo23r409283mnscoijer20389".repeat(10000));
+        httpRequestPost.setParam("account", "我收到");
 
         HttpResponse httpResponse = httpRequestPost.useGzip().execute();
         String string = httpResponse.bodyString();

@@ -2,9 +2,9 @@ package wxdgaming.boot2.starter.net.httpclient5;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.HttpHostConnectException;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
@@ -28,19 +28,19 @@ import java.util.Map;
  **/
 @Slf4j
 @Getter
-@SuperBuilder
+@Setter
+@Accessors(fluent = true)
 public abstract class AbstractHttpRequest {
 
     protected String uriPath;
     /** 重试次数，最小值是1 */
-    @Builder.Default
-    protected int retry = 1;
-    @Builder.Default
+    protected int retry;
     protected final Map<String, String> reqHeaderMap = new LinkedHashMap<>();
 
     protected abstract HttpUriRequestBase buildRequest();
 
     public HttpResponse execute() {
+        retry++;
         AssertUtil.assertNull(uriPath, "uriPath不能为空");
         AssertUtil.assertTrue(retry > 0, "重试次数不能小于1");
         HttpUriRequestBase httpUriRequestBase = buildRequest();

@@ -1,9 +1,9 @@
 package wxdgaming.boot2.starter.net.httpclient5;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
@@ -27,17 +27,27 @@ import java.util.Map;
  **/
 @Slf4j
 @Getter
-@SuperBuilder
+@Setter
+@Accessors(fluent = true)
 public class HttpRequestPostMulti extends AbstractHttpRequest {
 
     public static HttpRequestPostMulti of(String url) {
-        return HttpRequestPostMulti.builder().uriPath(url).build();
+        return new HttpRequestPostMulti().uriPath(url);
     }
 
     private final HashMap<String, Object> objMap = new HashMap<>();
     /** 发送数据的时候是否开启gzip压缩 */
-    @Builder.Default
     private boolean useGzip = false;
+
+    @Override public HttpRequestPostMulti retry(int retry) {
+        super.retry(retry);
+        return this;
+    }
+
+    @Override public HttpRequestPostMulti uriPath(String uriPath) {
+        super.uriPath(uriPath);
+        return this;
+    }
 
     @Override public HttpRequestPostMulti addHeader(HttpHeaderNames key, ContentType contentType) {
         super.addHeader(key, contentType);
@@ -54,21 +64,21 @@ public class HttpRequestPostMulti extends AbstractHttpRequest {
         return this;
     }
 
-    public HttpRequestPostMulti addParam(String key, Object value) {
+    public HttpRequestPostMulti setParam(String key, Object value) {
         objMap.put(key, value);
         return this;
     }
 
-    public HttpRequestPostMulti setParamsEncoder(String key, Object value) {
-        return addParam(key, HttpDataAction.urlEncoder(value));
+    public HttpRequestPostMulti setParamEncoder(String key, Object value) {
+        return setParam(key, HttpDataAction.urlEncoder(value));
     }
 
-    public HttpRequestPostMulti setParamsRawEncoder(String key, Object value) {
-        return addParam(key, HttpDataAction.rawUrlEncode(value));
+    public HttpRequestPostMulti setParamRawEncoder(String key, Object value) {
+        return setParam(key, HttpDataAction.rawUrlEncode(value));
     }
 
     @Override protected HttpUriRequestBase buildRequest() {
-        HttpPost httpRequest = new HttpPost(this.getUriPath());
+        HttpPost httpRequest = new HttpPost(this.uriPath());
         if (!objMap.isEmpty()) {
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
             builder.setContentType(HttpConst.MULTIPART_FORM_DATA);
@@ -91,7 +101,7 @@ public class HttpRequestPostMulti extends AbstractHttpRequest {
             }
             httpRequest.setEntity(httpEntity);
             if (log.isDebugEnabled()) {
-                log.debug("send post multi url={}", getUriPath());
+                log.debug("send post multi url={}", uriPath());
             }
         }
         return httpRequest;

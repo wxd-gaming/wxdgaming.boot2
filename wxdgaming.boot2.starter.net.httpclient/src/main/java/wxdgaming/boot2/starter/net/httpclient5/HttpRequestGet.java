@@ -2,7 +2,6 @@ package wxdgaming.boot2.starter.net.httpclient5;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
@@ -16,11 +15,20 @@ import org.apache.hc.core5.http.ContentType;
  **/
 @Slf4j
 @Getter
-@SuperBuilder
 public class HttpRequestGet extends AbstractHttpRequest {
 
     public static HttpRequestGet of(String url) {
-        return HttpRequestGet.builder().uriPath(url).build();
+        return new HttpRequestGet().uriPath(url).retry(0);
+    }
+
+    @Override public HttpRequestGet uriPath(String uriPath) {
+        super.uriPath(uriPath);
+        return this;
+    }
+
+    @Override public HttpRequestGet retry(int retry) {
+        super.retry(retry);
+        return this;
     }
 
     @Override public HttpRequestGet addHeader(HttpHeaderNames key, ContentType contentType) {
@@ -35,9 +43,9 @@ public class HttpRequestGet extends AbstractHttpRequest {
 
     @Override protected HttpUriRequestBase buildRequest() {
         if (log.isDebugEnabled()) {
-            log.debug("send get url={}", getUriPath());
+            log.debug("send get url={}", uriPath());
         }
-        return new HttpGet(this.getUriPath());
+        return new HttpGet(this.uriPath());
     }
 
 }
