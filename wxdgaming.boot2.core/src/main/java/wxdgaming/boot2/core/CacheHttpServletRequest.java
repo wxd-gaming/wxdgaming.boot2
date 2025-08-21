@@ -31,30 +31,25 @@ public class CacheHttpServletRequest extends ContentCachingRequestWrapper {
         super(request);
     }
 
-    public CacheHttpServletRequest(HttpServletRequest request, int contentCacheLimit) {
-        super(request, contentCacheLimit);
-    }
-
     @Override
     public ServletInputStream getInputStream() throws IOException {
 
-        if (isFirst.get()) {
+        if (isFirst.compareAndSet(true, false)) {
             //首次读取直接调父类的方法，这一次执行完之后 缓存流中有数据了
             //后续读取就读缓存流里的。
-            isFirst.set(false);
             return super.getInputStream();
         }
 
         //用缓存流构建一个新的输入流
-        return new ServletInputStreamNew(super.getContentAsByteArray());
+        return new ServletInputStreamNew(getContentAsByteArray());
     }
 
     public byte[] body() {
-        return super.getContentAsByteArray();
+        return getContentAsByteArray();
     }
 
     public String bodyString() {
-        return new String(super.getContentAsByteArray(), Charset.forName(getCharacterEncoding()));
+        return new String(getContentAsByteArray(), Charset.forName(getCharacterEncoding()));
     }
 
     @Override public BufferedReader getReader() throws IOException {
