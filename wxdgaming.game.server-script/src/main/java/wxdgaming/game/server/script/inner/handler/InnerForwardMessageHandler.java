@@ -3,16 +3,16 @@ package wxdgaming.game.server.script.inner.handler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.game.message.inner.InnerForwardMessage;
 import wxdgaming.game.server.bean.ClientSessionMapping;
+import wxdgaming.game.server.bean.InnerForwardEvent;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.ClientSessionService;
 import wxdgaming.game.server.module.data.DataCenterService;
-import wxdgaming.game.server.script.inner.InnerService;
 
 import java.util.List;
 
@@ -26,44 +26,50 @@ import java.util.List;
 @Component
 public class InnerForwardMessageHandler extends HoldApplicationContext {
 
-    private final InnerService innerService;
     private final ClientSessionService clientSessionService;
     private final ProtoListenerFactory protoListenerFactory;
     private final DataCenterService dataCenterService;
 
-    public InnerForwardMessageHandler(InnerService innerService,
-                                      ClientSessionService clientSessionService,
+    public InnerForwardMessageHandler(ClientSessionService clientSessionService,
                                       ProtoListenerFactory protoListenerFactory,
                                       DataCenterService dataCenterService) {
-        this.innerService = innerService;
         this.clientSessionService = clientSessionService;
         this.protoListenerFactory = protoListenerFactory;
         this.dataCenterService = dataCenterService;
     }
 
     /** 请求转发消息 */
-    @ProtoRequest
-    public void innerForwardMessage(SocketSession socketSession, InnerForwardMessage req) {
+    @ProtoRequest(InnerForwardMessage.class)
+    public void innerForwardMessage(ProtoEvent protoEvent) {
+        SocketSession socketSession = protoEvent.getSocketSession();
+        InnerForwardMessage req = protoEvent.buildMessage();
         List<Long> sessionIds = req.getSessionIds();
         int messageId = req.getMessageId();
         byte[] messages = req.getMessages();
 
+        InnerForwardEvent.InnerForwardEventBuilder eventBuilder = InnerForwardEvent.builder()
+                .applicationContextProvider(getApplicationContextProvider())
+                .protoMapping(protoListenerFactory.getProtoListenerContent().getMappingMap().get(messageId))
+                .socketSession(socketSession)
+                .forwardMessage(req)
+                .messageId(messageId)
+                .bytes(messages);
 
-        ThreadContext.cleanup();
-        ThreadContext.putContent("forwardMessage", req);
         String clientIp = req.getKvBeansMap().get("clientIp");
-        ThreadContext.putContent("clientIp", clientIp);
+        eventBuilder.clientIp(clientIp);
         String clientSessionId = req.getKvBeansMap().get("clientSessionId");
-        ThreadContext.putContent("clientSessionId", Long.parseLong(clientSessionId));
+        eventBuilder.clientSessionId(Long.parseLong(clientSessionId));
         String account = req.getKvBeansMap().get("account");
         if (account != null) {
             ClientSessionMapping clientSessionMapping = clientSessionService.getAccountMappingMap().get(account);
-            ThreadContext.putContent("clientSessionMapping", clientSessionMapping);
+            eventBuilder.clientSessionMapping(clientSessionMapping);
             long rid = clientSessionMapping.getRid();
             Player player = dataCenterService.getPlayer(rid);
-            ThreadContext.putContent("player", player);
+            eventBuilder.player(player);
         }
-        protoListenerFactory.dispatch(socketSession, messageId, messages);
+        InnerForwardEvent forwardEvent = eventBuilder.build();
+
+        protoListenerFactory.dispatch(socketSession, forwardEvent, null);
     }
 
 }

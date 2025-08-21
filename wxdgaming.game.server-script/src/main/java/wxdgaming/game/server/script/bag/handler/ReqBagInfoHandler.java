@@ -2,10 +2,9 @@ package wxdgaming.game.server.script.bag.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.core.ann.ThreadParam;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.bag.ReqBagInfo;
+import wxdgaming.game.server.bean.InnerForwardEvent;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.bag.BagService;
 
@@ -26,8 +25,10 @@ public class ReqBagInfoHandler {
     }
 
     /** 请求背包信息 */
-    @ProtoRequest
-    public void reqBagInfo(SocketSession socketSession, ReqBagInfo req, @ThreadParam(path = "player") Player player) {
+    @ProtoRequest(ReqBagInfo.class)
+    public void reqBagInfo(InnerForwardEvent event) {
+        Player player = event.getPlayer();
+        ReqBagInfo req = event.buildMessage();
         bagService.sendBagInfo(player, req.getBagType());
     }
 

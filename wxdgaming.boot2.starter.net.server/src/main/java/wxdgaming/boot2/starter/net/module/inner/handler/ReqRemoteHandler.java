@@ -11,6 +11,7 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.message.inner.ReqRemote;
 import wxdgaming.boot2.starter.net.module.rpc.*;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
@@ -31,8 +32,10 @@ public class ReqRemoteHandler {
         this.rpcListenerFactory = rpcListenerFactory;
     }
 
-    @ProtoRequest(ignoreQueue = true)
-    public void reqRemote(SocketSession socketSession, ReqRemote req) {
+    @ProtoRequest(value = ReqRemote.class, ignoreQueue = true)
+    public void reqRemote(ProtoEvent event) {
+        SocketSession socketSession = event.getSocketSession();
+        ReqRemote req = event.buildMessage();
         long rpcId = req.getUid();
         String cmd = req.getCmd();
         String token = req.getToken();

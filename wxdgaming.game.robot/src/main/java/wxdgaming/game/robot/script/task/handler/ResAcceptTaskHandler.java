@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.cfg.QTaskTable;
 import wxdgaming.game.message.task.ResAcceptTask;
 import wxdgaming.game.robot.bean.Robot;
@@ -20,8 +21,10 @@ import wxdgaming.game.robot.bean.Robot;
 public class ResAcceptTaskHandler {
 
     /** 接受任务 */
-    @ProtoRequest
-    public void resAcceptTask(SocketSession socketSession, ResAcceptTask req) {
+    @ProtoRequest(ResAcceptTask.class)
+    public void resAcceptTask(ProtoEvent event) {
+        SocketSession socketSession = event.getSocketSession();
+        ResAcceptTask req = event.buildMessage();
         Robot robot = socketSession.bindData("robot");
 
         QTaskTable taskTable = DataRepository.getIns().dataTable(QTaskTable.class);

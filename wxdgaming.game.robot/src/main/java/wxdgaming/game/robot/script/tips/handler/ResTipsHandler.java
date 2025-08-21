@@ -2,8 +2,8 @@ package wxdgaming.game.robot.script.tips.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.message.tips.ResTips;
 
 /**
@@ -17,9 +17,9 @@ import wxdgaming.game.message.tips.ResTips;
 public class ResTipsHandler {
 
     /** 提示内容 */
-    @ProtoRequest
-    public void resTips(SocketSession socketSession, ResTips req) {
-
+    @ProtoRequest(ResTips.class)
+    public void resTips(ProtoEvent event) {
+        ResTips req = event.buildMessage();
         log.info("收到提示内容:{} {}", req.getType(), req.getContent());
 
     }

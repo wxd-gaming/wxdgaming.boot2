@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.game.gateway.bean.ServerMapping;
 import wxdgaming.game.gateway.module.data.DataCenterService;
@@ -32,8 +33,10 @@ public class ReqLoginHandler {
 
 
     /** 登录请求 */
-    @ProtoRequest
-    public void reqLogin(SocketSession socketSession, ReqLogin req) {
+    @ProtoRequest(ReqLogin.class)
+    public void reqLogin(ProtoEvent event) {
+        SocketSession socketSession = event.getSocketSession();
+        ReqLogin req = event.buildMessage();
         int sid = req.getSid();
         ServerMapping serverMapping = dataCenterService.getGameServiceMappings().get(sid);
         if (serverMapping == null) {

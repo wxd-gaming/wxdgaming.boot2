@@ -2,8 +2,8 @@ package wxdgaming.game.robot.script.cdkey.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.message.cdkey.ResUseCdKey;
 
 /**
@@ -17,9 +17,9 @@ import wxdgaming.game.message.cdkey.ResUseCdKey;
 public class ResUseCdKeyHandler {
 
     /** 响应使用cdkey */
-    @ProtoRequest
-    public void resUseCdKey(SocketSession socketSession, ResUseCdKey req) {
-
+    @ProtoRequest(ResUseCdKey.class)
+    public void resUseCdKey(ProtoEvent event) {
+        ResUseCdKey req = event.buildMessage();
     }
 
 }

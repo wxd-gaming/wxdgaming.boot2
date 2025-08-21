@@ -1,12 +1,11 @@
 package run;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.starter.net.pojo.ProtoBuf2Pojo;
-import wxdgaming.game.server.bean.role.Player;
+import wxdgaming.game.server.bean.InnerForwardEvent;
 
 /**
  * protobuf篡改
@@ -38,6 +37,7 @@ public class ProtoTest {
                         """
         );
     }
+
     @Test
     @Order(2)
     public void buildGamePlayerProtoHandler() {
@@ -47,8 +47,9 @@ public class ProtoTest {
                 "Req",
                 "wxdgaming.game.message",
                 null,
+                InnerForwardEvent.class,
                 () -> """
-                        @ThreadParam(path = "player") Player player""",
+                        """,
                 () -> """
                         """
         );

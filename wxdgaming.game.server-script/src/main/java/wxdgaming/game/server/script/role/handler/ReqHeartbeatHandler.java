@@ -2,13 +2,11 @@ package wxdgaming.game.server.script.role.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
-import wxdgaming.game.message.role.ReqHeartbeat;
 import wxdgaming.game.message.role.ResHeartbeat;
 import wxdgaming.game.server.bean.ClientSessionMapping;
+import wxdgaming.game.server.bean.InnerForwardEvent;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
 
@@ -29,12 +27,12 @@ public class ReqHeartbeatHandler {
     }
 
     /** 心跳包 */
-    @ProtoRequest
-    public void reqHeartbeat(SocketSession socketSession, ReqHeartbeat req) {
-        ClientSessionMapping clientSessionMapping = ThreadContext.context("clientSessionMapping");
+    @ProtoRequest(ResHeartbeat.class)
+    public void reqHeartbeat(InnerForwardEvent event) {
+        ClientSessionMapping clientSessionMapping = event.getClientSessionMapping();
         ResHeartbeat resHeartbeat = new ResHeartbeat();
         resHeartbeat.setTimestamp(MyClock.millis());
-        Player player = dataCenterService.getPlayer(clientSessionMapping.getRid());
+        Player player = event.getPlayer();
         clientSessionMapping.forwardMessage(player, resHeartbeat);
     }
 

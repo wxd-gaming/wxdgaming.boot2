@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.message.role.ReqChooseRole;
 import wxdgaming.game.message.role.ReqCreateRole;
 import wxdgaming.game.message.role.ResLogin;
@@ -23,8 +24,10 @@ import java.util.List;
 public class ResLoginHandler {
 
     /** 登录响应 */
-    @ProtoRequest
-    public void resLogin(SocketSession socketSession, ResLogin req) {
+    @ProtoRequest(ResLogin.class)
+    public void resLogin(ProtoEvent event) {
+        ResLogin req = event.buildMessage();
+        SocketSession socketSession = event.getSocketSession();
         Robot robot = socketSession.bindData("robot");
         log.info("登录响应:{}", req);
         List<RoleBean> roles = req.getRoles();

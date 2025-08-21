@@ -4,11 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
-import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.net.pojo.ProtoMapping;
+import wxdgaming.game.gateway.bean.InnerForwardEvent;
 import wxdgaming.game.gateway.bean.UserMapping;
 import wxdgaming.game.gateway.module.data.DataCenterService;
 import wxdgaming.game.message.inner.InnerForwardMessage;
@@ -34,8 +35,10 @@ public class InnerForwardMessageHandler {
     }
 
     /** 请求转发消息 */
-    @ProtoRequest
-    public void reqForwardMessage(SocketSession socketSession, InnerForwardMessage req) {
+    @ProtoRequest(InnerForwardMessage.class)
+    public void reqForwardMessage(ProtoEvent event) {
+        SocketSession socketSession = event.getSocketSession();
+        InnerForwardMessage req = event.buildMessage();
         int messageId = req.getMessageId();
         byte[] messages = req.getMessages();
         ProtoMapping protoMapping = protoListenerFactory.getProtoListenerContent().getMappingMap().get(messageId);
@@ -49,10 +52,15 @@ public class InnerForwardMessageHandler {
                 /*TODO重构队列，1是为了效率把消息分散队列，2是为了绝对的保证消息的顺序*/
                 String queueName = "session-drive-" + clientSession.getUid() % 16;
                 if (protoMapping != null) {
-                    ThreadContext.putContent("forwardMessage", req);
-                    ThreadContext.putContent("clientSession", clientSession);
-                    ThreadContext.putContent("userMapping", userMapping);
-                    protoListenerFactory.dispatch(socketSession, messageId, messages, () -> queueName);
+                    InnerForwardEvent.InnerForwardEventBuilder<?, ?> builder = InnerForwardEvent.builder();
+                    builder.forwardMessage(req);
+                    builder.userMapping(userMapping);
+                    builder.socketSession(clientSession);
+                    builder.protoMapping(protoMapping);
+                    builder.messageId(messageId);
+                    builder.bytes(messages);
+                    InnerForwardEvent forwardEvent = builder.build();
+                    protoListenerFactory.dispatch(socketSession, forwardEvent, () -> queueName);
                 } else {
                     ReqForwardMessageRunnable command = new ReqForwardMessageRunnable(userMapping, messageId, messages);
                     command.setQueueName(queueName);

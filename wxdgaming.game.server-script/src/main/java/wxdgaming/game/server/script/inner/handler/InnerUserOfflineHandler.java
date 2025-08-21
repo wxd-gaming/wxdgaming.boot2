@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.message.inner.InnerUserOffline;
 import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.bean.role.Player;
@@ -34,8 +35,10 @@ public class InnerUserOfflineHandler extends HoldApplicationContext {
     }
 
     /** 玩家离线 */
-    @ProtoRequest
-    public void innerUserOffline(SocketSession socketSession, InnerUserOffline req) {
+    @ProtoRequest(InnerUserOffline.class)
+    public void innerUserOffline(ProtoEvent protoEvent) {
+        SocketSession socketSession = protoEvent.getSocketSession();
+        InnerUserOffline req = protoEvent.buildMessage();
         long clientSessionId = req.getClientSessionId();
         String account = req.getAccount();
         log.info("网关转发玩家离线 {}", req);

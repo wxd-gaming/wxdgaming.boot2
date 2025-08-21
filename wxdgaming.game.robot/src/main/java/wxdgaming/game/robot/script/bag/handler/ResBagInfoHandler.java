@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.message.bag.ResBagInfo;
 import wxdgaming.game.robot.bean.Robot;
 
@@ -18,8 +19,10 @@ import wxdgaming.game.robot.bean.Robot;
 public class ResBagInfoHandler {
 
     /** 响应背包信息 */
-    @ProtoRequest
-    public void resBagInfo(SocketSession socketSession, ResBagInfo req) {
+    @ProtoRequest(ResBagInfo.class)
+    public void resBagInfo(ProtoEvent event) {
+        SocketSession socketSession = event.getSocketSession();
+        ResBagInfo req = event.buildMessage();
         Robot robot = socketSession.bindData("robot");
         log.info("{} 背包响应：\n{}", robot, req.toJSONString());
         robot.setItems(req.getItems());

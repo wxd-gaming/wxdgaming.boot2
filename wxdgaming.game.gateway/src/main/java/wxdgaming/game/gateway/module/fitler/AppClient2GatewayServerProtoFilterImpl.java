@@ -29,7 +29,7 @@ public class AppClient2GatewayServerProtoFilterImpl implements ServerProtoFilter
 
 
     @Override public boolean doFilter(ProtoListenerTrigger protoListenerTrigger) {
-        SocketSession socketSession = protoListenerTrigger.getSocketSession();
+        SocketSession socketSession = protoListenerTrigger.getProtoEvent().getSocketSession();
         if (socketSession.getType() == SocketSession.Type.server) {
             /*表示对外的session*/
             return true;

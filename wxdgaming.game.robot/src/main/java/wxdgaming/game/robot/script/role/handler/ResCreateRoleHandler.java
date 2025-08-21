@@ -2,8 +2,8 @@ package wxdgaming.game.robot.script.role.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.message.role.ResCreateRole;
 
 /**
@@ -17,8 +17,8 @@ import wxdgaming.game.message.role.ResCreateRole;
 public class ResCreateRoleHandler {
 
     /** 创建角色响应 */
-    @ProtoRequest
-    public void resCreateRole(SocketSession socketSession, ResCreateRole req) {
+    @ProtoRequest(ResCreateRole.class)
+    public void resCreateRole(ProtoEvent event) {
 
     }
 

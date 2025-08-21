@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.message.role.ResUpdateLevel;
 import wxdgaming.game.robot.bean.Robot;
 
@@ -18,8 +19,10 @@ import wxdgaming.game.robot.bean.Robot;
 public class ResUpdateLevelHandler {
 
     /** 更新等级 */
-    @ProtoRequest
-    public void resUpdateLevel(SocketSession socketSession, ResUpdateLevel req) {
+    @ProtoRequest(ResUpdateLevel.class)
+    public void resUpdateLevel(ProtoEvent event) {
+        SocketSession socketSession = event.getSocketSession();
+        ResUpdateLevel req = event.buildMessage();
         Robot robot = socketSession.bindData("robot");
         robot.setLevel(req.getLevel());
         log.info("{} 更新等级:{}", robot, req);

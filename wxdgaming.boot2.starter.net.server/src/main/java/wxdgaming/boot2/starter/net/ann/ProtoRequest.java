@@ -1,5 +1,7 @@
 package wxdgaming.boot2.starter.net.ann;
 
+import wxdgaming.boot2.starter.net.pojo.PojoBase;
+
 import java.lang.annotation.Documented;
 
 /**
@@ -14,6 +16,9 @@ import java.lang.annotation.Documented;
         java.lang.annotation.ElementType.METHOD,
 })
 public @interface ProtoRequest {
+
+    /** 绑定关联的消息 */
+    Class<? extends PojoBase> value();
 
     /** 备注 */
     String comment() default "";

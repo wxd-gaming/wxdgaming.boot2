@@ -65,8 +65,13 @@ public class ProtoListenerFactory extends HoldApplicationContext {
             }
             return;
         }
+        ProtoEvent protoEvent = new ProtoEvent(getApplicationContextProvider(), mapping, socketSession, messageId, data);
+        dispatch(socketSession, protoEvent, queueSupplier);
+    }
+
+    public void dispatch(SocketSession socketSession, ProtoEvent protoEvent, Supplier<String> queueSupplier) {
         /*根据映射解析生成触发事件*/
-        ProtoListenerTrigger protoListenerTrigger = new ProtoListenerTrigger(mapping, getApplicationContextProvider(), socketSession, messageId, data);
+        ProtoListenerTrigger protoListenerTrigger = new ProtoListenerTrigger(protoEvent);
         boolean allMatch;
         if (socketSession.getType() == SocketSession.Type.server) {
             allMatch = serverProtoFilters.stream()
@@ -79,11 +84,11 @@ public class ProtoListenerFactory extends HoldApplicationContext {
         }
         if (!allMatch) {
             if (log.isDebugEnabled()) {
-                log.debug("收到消息：{} msgId={}, {} - 被过滤器剔除无需执行", socketSession, messageId, protoListenerTrigger.getPojoBase());
+                log.debug("收到消息：{} msgId={}, {} - 被过滤器剔除无需执行", socketSession, protoEvent.getMessageId(), protoEvent.buildMessage());
             }
             return;
         }
-        if (!mapping.protoRequest().ignoreQueue()) {
+        if (!protoEvent.getProtoMapping().protoRequest().ignoreQueue()) {
             if (StringUtils.isBlank(protoListenerTrigger.queueName())) {
                 String queueName;
                 if (queueSupplier != null) {
@@ -96,7 +101,7 @@ public class ProtoListenerFactory extends HoldApplicationContext {
             }
         }
         if (log.isDebugEnabled()) {
-            log.debug("收到消息：{} queue={}, msgId={}, {}", socketSession, protoListenerTrigger.queueName(), messageId, protoListenerTrigger.getPojoBase());
+            log.debug("收到消息：{} queue={}, msgId={}, {}", socketSession, protoListenerTrigger.queueName(), protoEvent.getMessageId(), protoEvent.buildMessage());
         }
         /*提交到对应的线程和队列*/
         protoListenerTrigger.submit();

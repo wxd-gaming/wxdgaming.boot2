@@ -1,6 +1,7 @@
 package wxdgaming.game.server;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
@@ -42,7 +43,8 @@ public class GameServerApplication {
 
     public static void main(String[] args) throws Exception {
         try {
-            MainApplicationContextProvider.builder(GameServerApplication.class).run(args);
+            MainApplicationContextProvider.builder(GameServerApplication.class)
+                    .run(args);
             loadScript();
             SpringUtil.mainApplicationContextProvider.startBootstrap();
             JvmUtil.addShutdownHook(() -> {

@@ -35,6 +35,10 @@ chat:
   host: 127.0.0.1
   port: 19800
 
+
 spring:
   profiles:
     active: [ socket, pgsql, httpclient,logbus ]
+
+server:
+  port: 18801

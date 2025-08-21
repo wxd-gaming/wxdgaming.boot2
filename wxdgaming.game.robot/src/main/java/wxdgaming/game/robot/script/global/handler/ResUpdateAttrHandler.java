@@ -2,8 +2,8 @@ package wxdgaming.game.robot.script.global.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.message.global.ResUpdateAttr;
 
 /**
@@ -17,8 +17,8 @@ import wxdgaming.game.message.global.ResUpdateAttr;
 public class ResUpdateAttrHandler {
 
     /** 更新属性 */
-    @ProtoRequest
-    public void resUpdateAttr(SocketSession socketSession, ResUpdateAttr req) {
+    @ProtoRequest(ResUpdateAttr.class)
+    public void resUpdateAttr(ProtoEvent protoEvent) {
 
     }
 

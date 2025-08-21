@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.starter.net.SocketSession;
+import wxdgaming.game.gateway.bean.InnerForwardEvent;
 import wxdgaming.game.message.inner.InnerForwardMessage;
 import wxdgaming.game.message.role.ResCreateRole;
 
@@ -18,7 +19,7 @@ import wxdgaming.game.message.role.ResCreateRole;
 public class ResCreateRoleHandler {
 
     /** 创建角色响应 */
-    public void resCreateRole(SocketSession socketSession, ResCreateRole req, @ThreadParam(path = "forwardMessage") InnerForwardMessage forwardMessage) {
+    public void resCreateRole(InnerForwardEvent event) {
         
     }
 

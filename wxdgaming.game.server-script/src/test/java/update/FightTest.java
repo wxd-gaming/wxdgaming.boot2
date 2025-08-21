@@ -1,14 +1,11 @@
 package update;
 
-import lombok.Getter;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.RepeatedTest;
 import wxdgaming.boot2.core.format.TimeFormat;
 import wxdgaming.boot2.core.lang.DiffTime;
 import wxdgaming.boot2.core.util.RandomUtils;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 战斗测试
@@ -18,7 +15,6 @@ import java.util.concurrent.TimeUnit;
  **/
 public class FightTest {
 
-    @Test
     @RepeatedTest(5)
     public void f1() {
 

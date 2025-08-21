@@ -2,8 +2,8 @@ package wxdgaming.game.robot.script.role.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.message.role.ResUpdateFightValue;
 
 /**
@@ -17,8 +17,8 @@ import wxdgaming.game.message.role.ResUpdateFightValue;
 public class ResUpdateFightValueHandler {
 
     /** 更新战斗力 */
-    @ProtoRequest
-    public void resUpdateFightValue(SocketSession socketSession, ResUpdateFightValue req) {
+    @ProtoRequest(ResUpdateFightValue.class)
+    public void resUpdateFightValue(ProtoEvent event) {
 
     }
 

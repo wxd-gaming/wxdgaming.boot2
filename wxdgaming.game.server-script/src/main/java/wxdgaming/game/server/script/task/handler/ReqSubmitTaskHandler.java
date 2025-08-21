@@ -2,11 +2,10 @@ package wxdgaming.game.server.script.task.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.core.ann.ThreadParam;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.message.task.ReqSubmitTask;
 import wxdgaming.game.message.task.TaskType;
+import wxdgaming.game.server.bean.InnerForwardEvent;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.task.TaskPack;
 import wxdgaming.game.server.script.task.ITaskScript;
@@ -29,9 +28,10 @@ public class ReqSubmitTaskHandler {
     }
 
     /** 提交任务 */
-    @ProtoRequest
-    public void reqSubmitTask(SocketSession socketSession, ReqSubmitTask req,
-                              @ThreadParam(path = "player") Player player) {
+    @ProtoRequest(ReqSubmitTask.class)
+    public void reqSubmitTask(InnerForwardEvent event) {
+        ReqSubmitTask req = event.buildMessage();
+        Player player = event.getPlayer();
         TaskType taskType = req.getTaskType();
         int taskId = req.getTaskId();
         ITaskScript taskScript = taskService.getTaskScript(taskType);

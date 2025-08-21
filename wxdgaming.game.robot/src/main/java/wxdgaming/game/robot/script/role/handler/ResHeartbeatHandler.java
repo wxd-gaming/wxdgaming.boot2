@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.message.role.ResHeartbeat;
 
 /**
@@ -17,8 +18,10 @@ import wxdgaming.game.message.role.ResHeartbeat;
 public class ResHeartbeatHandler {
 
     /** null */
-    @ProtoRequest
-    public void resHeartbeat(SocketSession socketSession, ResHeartbeat req) {
+    @ProtoRequest(ResHeartbeat.class)
+    public void resHeartbeat(ProtoEvent event) {
+        SocketSession socketSession = event.getSocketSession();
+        ResHeartbeat req = event.buildMessage();
         Object robot = socketSession.bindData("robot");
         if (log.isDebugEnabled()) {
             log.debug("{} 心跳成功 {}", robot, req.getTimestamp());

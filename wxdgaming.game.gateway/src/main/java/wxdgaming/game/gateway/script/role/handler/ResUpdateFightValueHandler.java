@@ -3,6 +3,7 @@ package wxdgaming.game.gateway.script.role.handler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
+import wxdgaming.game.gateway.bean.InnerForwardEvent;
 import wxdgaming.game.message.role.ResUpdateFightValue;
 
 /**
@@ -16,7 +17,7 @@ import wxdgaming.game.message.role.ResUpdateFightValue;
 public class ResUpdateFightValueHandler {
 
     /** 更新战斗力 */
-    public void resUpdateFightValue(SocketSession socketSession, ResUpdateFightValue req) {
+    public void resUpdateFightValue(InnerForwardEvent event) {
 
     }
 

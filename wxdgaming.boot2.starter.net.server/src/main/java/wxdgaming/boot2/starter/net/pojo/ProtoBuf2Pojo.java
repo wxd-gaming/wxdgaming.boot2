@@ -369,12 +369,19 @@ public class ProtoBuf2Pojo {
      * @param packageName     输出包名
      * @param readPackageName 读取包名
      * @param spi             要处理的接口 例如Req or Res
-     * @author wxd-gaming(無心道, 15388152619)
-     * @version 2025-01-15 14:58
      */
     public static void createMapping(String outPath, String packageName, String spi,
                                      String readPackageName,
                                      Predicate<Class<PojoBase>> filter,
+                                     Supplier<String> methodParamsSupplier,
+                                     Supplier<String> methodContentSupplier) {
+        createMapping(outPath, packageName, spi, readPackageName, filter, ProtoEvent.class, methodParamsSupplier, methodContentSupplier);
+    }
+
+    public static void createMapping(String outPath, String packageName, String spi,
+                                     String readPackageName,
+                                     Predicate<Class<PojoBase>> filter,
+                                     Class<? extends ProtoEvent> eventCls,
                                      Supplier<String> methodParamsSupplier,
                                      Supplier<String> methodContentSupplier) {
         ReflectProvider reflectProvider = ReflectProvider.Builder.of(readPackageName).build();
@@ -383,11 +390,14 @@ public class ProtoBuf2Pojo {
             classStream = classStream.filter(filter);
         }
         classStream.forEach(cls -> {
-            createMapping0(outPath, packageName, spi, cls, methodParamsSupplier, methodContentSupplier);
+            createMapping0(outPath, packageName, spi, cls, eventCls, methodParamsSupplier, methodContentSupplier);
         });
     }
 
-    public static void createMapping0(String outPath, String packageName, String spi, Class<?> cls, Supplier<String> methodParamsSupplier, Supplier<String> methodContentSupplier) {
+    public static void createMapping0(String outPath, String packageName, String spi,
+                                      Class<?> cls, Class<? extends ProtoEvent> eventCls,
+                                      Supplier<String> methodParamsSupplier,
+                                      Supplier<String> methodContentSupplier) {
         String simpleName = cls.getSimpleName();
         if (!simpleName.startsWith(spi)) {
             return;
@@ -408,6 +418,7 @@ public class ProtoBuf2Pojo {
 
         TreeSet<String> imports = new TreeSet<>();
         imports.add(ProtoRequest.class.getName());
+        imports.add(eventCls.getName());
         imports.add(Slf4j.class.getName());
         imports.add(Component.class.getName());
         imports.add(SocketSession.class.getName());
@@ -444,12 +455,23 @@ public class ProtoBuf2Pojo {
                 public class %s {
                 
                     /** %s */
-                    @ProtoRequest
-                    public void %s(SocketSession socketSession, %s req%s) {
+                    @ProtoRequest(%s.class)
+                    public void %s(%s event%s) {
+                        SocketSession socketSession = event.getSocketSession();
+                        %s message = event.buildMessage();
                         %s
                     }
                 
-                }""".formatted(packageName, importString, comment, className, comment, StringUtils.lowerFirst(cls.getSimpleName()), cls.getSimpleName(), methodParams, methodContent);
+                }""".formatted(packageName,
+                importString,
+                comment,
+                className,
+                comment,
+                cls.getSimpleName(),
+                StringUtils.lowerFirst(cls.getSimpleName()), eventCls.getSimpleName(), methodParams,
+                cls.getSimpleName(),
+                methodContent
+        );
 
         System.out.println(spiCode);
         FileWriteUtil.writeString(fileName, spiCode);

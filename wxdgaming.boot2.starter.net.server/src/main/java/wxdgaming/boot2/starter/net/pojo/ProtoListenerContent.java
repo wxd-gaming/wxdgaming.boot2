@@ -11,8 +11,6 @@ import wxdgaming.boot2.core.reflect.MethodUtil;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -39,7 +37,7 @@ public class ProtoListenerContent {
 
                     ProtoRequest methodRequestMapping = AnnUtil.ann(method, ProtoRequest.class);
 
-                    Class<? extends PojoBase> pojoClass = findPojoClass(method);
+                    Class<? extends PojoBase> pojoClass = methodRequestMapping.value();
                     if (pojoClass == null) {
                         throw new RuntimeException("未找到消息类: %s".formatted(method));
                     }
@@ -97,21 +95,6 @@ public class ProtoListenerContent {
             throw new RuntimeException("未注册消息id: %s".formatted(messageId));
         }
         return hashcode;
-    }
-
-    public Class<? extends PojoBase> findPojoClass(Method method) {
-        Parameter[] parameters = method.getParameters();
-        Object[] params = new Object[parameters.length];
-        for (int i = 0; i < params.length; i++) {
-            Parameter parameter = parameters[i];
-            Type type = parameter.getParameterizedType();
-            if (type instanceof Class<?> clazz) {
-                if (PojoBase.class.isAssignableFrom(clazz)) {
-                    return (Class<? extends PojoBase>) clazz;
-                }
-            }
-        }
-        return null;
     }
 
 }

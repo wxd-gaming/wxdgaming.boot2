@@ -4,14 +4,13 @@ import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.ThreadParam;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.basic.slog.SlogService;
 import wxdgaming.game.global.bean.role.PlayerSnap;
 import wxdgaming.game.message.role.ReqChooseRole;
 import wxdgaming.game.message.role.ResChooseRole;
 import wxdgaming.game.server.bean.ClientSessionMapping;
+import wxdgaming.game.server.bean.InnerForwardEvent;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnLogin;
 import wxdgaming.game.server.event.OnLoginBefore;
@@ -48,8 +47,10 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
     }
 
     /** 选择角色 */
-    @ProtoRequest
-    public void reqChooseRole(SocketSession socketSession, ReqChooseRole req, @ThreadParam(path = "clientSessionMapping") ClientSessionMapping clientSessionMapping) {
+    @ProtoRequest(ReqChooseRole.class)
+    public void reqChooseRole(InnerForwardEvent event) {
+        ReqChooseRole req = event.buildMessage();
+        ClientSessionMapping clientSessionMapping = event.getClientSessionMapping();
         long rid = req.getRid();
         log.info("选择角色请求:{}, clientSession={}", req, clientSessionMapping);
         Integer sid = clientSessionMapping.getSid();

@@ -2,10 +2,10 @@ package wxdgaming.game.gateway.script.role.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
+import wxdgaming.game.gateway.bean.InnerForwardEvent;
 import wxdgaming.game.gateway.bean.ServerMapping;
 import wxdgaming.game.gateway.bean.UserMapping;
 import wxdgaming.game.gateway.module.data.DataCenterService;
@@ -36,9 +36,10 @@ public class ResLoginHandler {
 
 
     /** 登录响应 */
-    @ProtoRequest
-    public void resLogin(SocketSession socketSession, ResLogin req) {
-        InnerForwardMessage forwardMessage = ThreadContext.context("forwardMessage");
+    @ProtoRequest(ResLogin.class)
+    public void resLogin(InnerForwardEvent event) {
+        InnerForwardMessage forwardMessage = event.getForwardMessage();
+        ResLogin req = event.buildMessage();
         List<Long> sessionIds = forwardMessage.getSessionIds();
         final Long clientSessionId = sessionIds.getFirst();
         final String account = req.getAccount();

@@ -12,6 +12,7 @@ import wxdgaming.game.basic.login.LoginProperties;
 import wxdgaming.game.message.global.MapBean;
 import wxdgaming.game.message.role.ReqLogin;
 import wxdgaming.game.server.bean.ClientSessionMapping;
+import wxdgaming.game.server.bean.InnerForwardEvent;
 import wxdgaming.game.server.module.data.ClientSessionService;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.role.PlayerService;
@@ -45,8 +46,10 @@ public class ReqLoginHandler extends HoldApplicationContext {
         this.loginProperties = loginProperties;
     }
 
-    @ProtoRequest
-    public void reqLogin(SocketSession socketSession, ReqLogin req) {
+    @ProtoRequest(ReqLogin.class)
+    public void reqLogin(InnerForwardEvent event) {
+        SocketSession socketSession = event.getSocketSession();
+        ReqLogin req = event.buildMessage();
         long clientSessionId = ThreadContext.context().getLongValue("clientSessionId");
         String clientIp = ThreadContext.context().getString("clientIp");
         log.info("登录请求:{}, clientSessionId={}", req, clientSessionId);

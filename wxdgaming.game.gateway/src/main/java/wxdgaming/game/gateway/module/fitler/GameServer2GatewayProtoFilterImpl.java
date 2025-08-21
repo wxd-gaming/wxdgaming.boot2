@@ -29,7 +29,7 @@ public class GameServer2GatewayProtoFilterImpl implements ClientProtoFilter {
 
 
     @Override public boolean doFilter(ProtoListenerTrigger protoListenerTrigger) {
-        SocketSession socketSession = protoListenerTrigger.getSocketSession();
+        SocketSession socketSession = protoListenerTrigger.getProtoEvent().getSocketSession();
         if (socketSession.getType() == SocketSession.Type.client) {
             /*表示对内的session, 比如游戏服发过来的消息*/
             return true;

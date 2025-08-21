@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.cfg.QTaskTable;
 import wxdgaming.game.message.task.ResUpdateTaskList;
 import wxdgaming.game.message.task.TaskBean;
@@ -23,8 +24,10 @@ import java.util.List;
 public class ResUpdateTaskListHandler {
 
     /** 更新任务列表 */
-    @ProtoRequest
-    public void resUpdateTaskList(SocketSession socketSession, ResUpdateTaskList req) {
+    @ProtoRequest(ResUpdateTaskList.class)
+    public void resUpdateTaskList(ProtoEvent event) {
+        SocketSession socketSession = event.getSocketSession();
+        ResUpdateTaskList req = event.buildMessage();
         Robot robot = socketSession.bindData("robot");
         List<TaskBean> tasks = req.getTasks();
         QTaskTable taskTable = DataRepository.getIns().dataTable(QTaskTable.class);

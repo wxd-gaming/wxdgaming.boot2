@@ -1,9 +1,10 @@
-package wxdgaming.game.chat.script.inner.handler;
+package wxdgaming.game.chart.script.inner.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.message.inner.InnerUserOffline;
 
 /**
@@ -17,8 +18,10 @@ import wxdgaming.game.message.inner.InnerUserOffline;
 public class InnerUserOfflineHandler {
 
     /** 玩家离线 */
-    @ProtoRequest
-    public void innerUserOffline(SocketSession socketSession, InnerUserOffline req) {
+    @ProtoRequest(InnerUserOffline.class)
+    public void innerUserOffline(ProtoEvent event) {
+        SocketSession socketSession = event.getSocketSession();
+        InnerUserOffline message = event.buildMessage();
         
     }
 

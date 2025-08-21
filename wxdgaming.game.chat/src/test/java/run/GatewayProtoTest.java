@@ -34,7 +34,7 @@ public class GatewayProtoTest {
                 "wxdgaming.game.message.role",
                 cls -> Objects.equals(cls, ResLogin.class) || true,
                 () -> """
-                        @ThreadParam(path = "forwardMessage") InnerForwardMessage forwardMessage""",
+                        """,
                 null
         );
     }

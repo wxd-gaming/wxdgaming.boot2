@@ -2,10 +2,10 @@ package wxdgaming.game.gateway.script.role.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
+import wxdgaming.game.gateway.bean.InnerForwardEvent;
 import wxdgaming.game.gateway.bean.UserMapping;
 import wxdgaming.game.gateway.module.data.DataCenterService;
 import wxdgaming.game.message.inner.InnerForwardMessage;
@@ -32,9 +32,10 @@ public class ResChooseRoleHandler {
     }
 
     /** 选择角色响应 */
-    @ProtoRequest
-    public void resChooseRole(SocketSession socketSession, ResChooseRole req,
-                              @ThreadParam(path = "forwardMessage") InnerForwardMessage forwardMessage) {
+    @ProtoRequest(ResChooseRole.class)
+    public void resChooseRole(InnerForwardEvent event) {
+        InnerForwardMessage forwardMessage = event.getForwardMessage();
+        ResChooseRole req = event.buildMessage();
         List<Long> sessionIds = forwardMessage.getSessionIds();
         Long sessionId = sessionIds.getFirst();
         SocketSession clientSession = dataCenterService.getClientSession(sessionId);

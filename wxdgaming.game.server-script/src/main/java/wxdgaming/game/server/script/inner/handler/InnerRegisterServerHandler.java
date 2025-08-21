@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.game.message.inner.InnerRegisterServer;
 import wxdgaming.game.message.inner.ServiceType;
@@ -34,8 +35,10 @@ public class InnerRegisterServerHandler {
     }
 
     /** 注册服务 */
-    @ProtoRequest
-    public void innerRegisterServer(SocketSession socketSession, InnerRegisterServer req) {
+    @ProtoRequest(InnerRegisterServer.class)
+    public void innerRegisterServer(ProtoEvent protoEvent) {
+        SocketSession socketSession = protoEvent.getSocketSession();
+        InnerRegisterServer req = protoEvent.buildMessage();
         ServiceType serviceType = req.getServiceType();
         /*网关过来，告诉游戏服务器，我是网关*/
         if (serviceType == ServiceType.GATEWAY) {

@@ -5,13 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.game.basic.slog.SlogService;
 import wxdgaming.game.message.role.ReqCreateRole;
 import wxdgaming.game.server.bean.ClientSessionMapping;
+import wxdgaming.game.server.bean.InnerForwardEvent;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
 import wxdgaming.game.server.event.OnCreateRole;
@@ -45,10 +45,12 @@ public class ReqCreateRoleHandler extends HoldApplicationContext {
     }
 
     /** 创建角色 */
-    @ProtoRequest
-    public void reqCreateRole(SocketSession socketSession, ReqCreateRole req) {
+    @ProtoRequest(ReqCreateRole.class)
+    public void reqCreateRole(InnerForwardEvent event) {
+        SocketSession socketSession = event.getSocketSession();
+        ReqCreateRole req = event.buildMessage();
+        ClientSessionMapping clientSessionMapping = event.getClientSessionMapping();
 
-        ClientSessionMapping clientSessionMapping = ThreadContext.context("clientSessionMapping");
         long clientSessionId = clientSessionMapping.getClientSessionId();
         log.info("创建角色请求:{}, clientSession={}", req, clientSessionMapping);
         Integer sid = clientSessionMapping.getSid();

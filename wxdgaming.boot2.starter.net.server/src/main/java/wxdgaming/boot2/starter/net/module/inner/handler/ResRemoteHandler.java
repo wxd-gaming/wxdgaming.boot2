@@ -9,6 +9,7 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.message.inner.ResRemote;
 import wxdgaming.boot2.starter.net.module.rpc.RpcService;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -27,8 +28,10 @@ public class ResRemoteHandler {
         this.rpcService = rpcService;
     }
 
-    @ProtoRequest(ignoreQueue = true)
-    public void resRemote(SocketSession socketSession, ResRemote req) {
+    @ProtoRequest(value = ResRemote.class, ignoreQueue = true)
+    public void resRemote(ProtoEvent event) {
+        SocketSession socketSession = event.getSocketSession();
+        ResRemote req = event.buildMessage();
         long rpcId = req.getUid();
         String token = req.getToken();
 
