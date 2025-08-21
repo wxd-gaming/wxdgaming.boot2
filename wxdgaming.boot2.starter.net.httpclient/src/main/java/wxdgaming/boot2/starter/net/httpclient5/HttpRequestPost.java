@@ -42,11 +42,11 @@ public class HttpRequestPost extends AbstractHttpRequest {
     }
 
     public static HttpRequestPost ofJson(String url, String params) {
-        return new HttpRequestPost().uriPath(url).setJson(params);
+        return new HttpRequestPost().uriPath(url).setParamsJson(params);
     }
 
     public static HttpRequestPost ofJson(String url, Map<String, ?> params) {
-        return new HttpRequestPost().uriPath(url).setJson(params);
+        return new HttpRequestPost().uriPath(url).setParamsJson(params);
     }
 
     private String params;
@@ -78,19 +78,21 @@ public class HttpRequestPost extends AbstractHttpRequest {
         return params(HttpDataAction.httpData(params));
     }
 
+    /** 采用 urlencode */
     public HttpRequestPost setParamsEncoder(Map<String, ?> params) {
         return params(HttpDataAction.httpDataEncoder(params));
     }
 
+    /** 和php一样的 urlencode */
     public HttpRequestPost setParamsRawEncoder(Map<String, ?> params) {
         return params(HttpDataAction.httpDataRawEncoder(params));
     }
 
-    public HttpRequestPost setJson(Map<String, ?> params) {
-        return setJson(JSON.toJSONString(params, SerializerFeature.SortField, SerializerFeature.MapSortField));
+    public HttpRequestPost setParamsJson(Map<String, ?> params) {
+        return setParamsJson(JSON.toJSONString(params, SerializerFeature.SortField, SerializerFeature.MapSortField));
     }
 
-    public HttpRequestPost setJson(String params) {
+    public HttpRequestPost setParamsJson(String params) {
         this.params = params;
         this.contentType = HttpConst.APPLICATION_JSON;
         return this;
@@ -109,9 +111,6 @@ public class HttpRequestPost extends AbstractHttpRequest {
                 httpEntity = new GzipCompressingEntity(httpEntity);
             }
             httpPost.setEntity(httpEntity);
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("send post url={}, params={}", uriPath(), params);
         }
         return httpPost;
     }

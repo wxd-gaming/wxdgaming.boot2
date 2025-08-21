@@ -16,7 +16,6 @@ import wxdgaming.boot2.starter.net.http.HttpDataAction;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -35,9 +34,14 @@ public class HttpRequestPostMulti extends AbstractHttpRequest {
         return new HttpRequestPostMulti().uriPath(url);
     }
 
-    private final HashMap<String, Object> objMap = new HashMap<>();
+    private final MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
     /** 发送数据的时候是否开启gzip压缩 */
     private boolean useGzip = false;
+
+    public HttpRequestPostMulti() {
+        multipartEntityBuilder.setContentType(HttpConst.MULTIPART_FORM_DATA);
+        multipartEntityBuilder.setCharset(StandardCharsets.UTF_8);
+    }
 
     @Override public HttpRequestPostMulti retry(int retry) {
         super.retry(retry);
@@ -65,45 +69,58 @@ public class HttpRequestPostMulti extends AbstractHttpRequest {
     }
 
     public HttpRequestPostMulti setParam(String key, Object value) {
-        objMap.put(key, value);
+        if (value instanceof File file) {
+            AssertUtil.assertTrue(file.exists(), "文件不存在：%s", file);
+            multipartEntityBuilder.addBinaryBody(key, file);
+            multipartEntityBuilder.addTextBody(file.getName() + "_lastModified", file.lastModified() + "");
+        } else if (value instanceof byte[] bytes) {
+            multipartEntityBuilder.addBinaryBody(key, bytes);
+        } else {
+            multipartEntityBuilder.addTextBody(key, String.valueOf(value));
+        }
         return this;
     }
 
+    public HttpRequestPostMulti setParams(Map<String, ?> params) {
+        for (Map.Entry<String, ?> entry : params.entrySet()) {
+            setParam(entry.getKey(), entry.getValue());
+        }
+        return this;
+    }
+
+    /** urlencode */
+    public HttpRequestPostMulti setParamsEncoder(Map<String, ?> params) {
+        for (Map.Entry<String, ?> entry : params.entrySet()) {
+            setParamEncoder(entry.getKey(), entry.getValue());
+        }
+        return this;
+    }
+
+    /** urlencode */
     public HttpRequestPostMulti setParamEncoder(String key, Object value) {
         return setParam(key, HttpDataAction.urlEncoder(value));
     }
 
+    /** 和php一样的 urlencode */
+    public HttpRequestPostMulti setParamsRawEncoder(Map<String, ?> params) {
+        for (Map.Entry<String, ?> entry : params.entrySet()) {
+            setParamRawEncoder(entry.getKey(), entry.getValue());
+        }
+        return this;
+    }
+
+    /** 和php一样的 urlencode */
     public HttpRequestPostMulti setParamRawEncoder(String key, Object value) {
         return setParam(key, HttpDataAction.rawUrlEncode(value));
     }
 
     @Override protected HttpUriRequestBase buildRequest() {
         HttpPost httpRequest = new HttpPost(this.uriPath());
-        if (!objMap.isEmpty()) {
-            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-            builder.setContentType(HttpConst.MULTIPART_FORM_DATA);
-            builder.setCharset(StandardCharsets.UTF_8);
-            for (Map.Entry<String, Object> entry : objMap.entrySet()) {
-                String key = entry.getKey();
-                if (entry.getValue() instanceof File file) {
-                    AssertUtil.assertTrue(file.exists(), "文件不存在：%s", file);
-                    builder.addBinaryBody(key, file);
-                    builder.addTextBody(file.getName() + "_lastModified", file.lastModified() + "");
-                } else if (entry.getValue() instanceof byte[] bytes) {
-                    builder.addBinaryBody(key, bytes);
-                } else {
-                    builder.addTextBody(key, String.valueOf(entry.getValue()));
-                }
-            }
-            HttpEntity httpEntity = builder.build();
-            if (useGzip && httpEntity.getContentLength() > HttpDataAction.USE_GZIP_MIN_LENGTH) {
-                httpEntity = new GzipCompressingEntity(httpEntity);
-            }
-            httpRequest.setEntity(httpEntity);
-            if (log.isDebugEnabled()) {
-                log.debug("send post multi url={}", uriPath());
-            }
+        HttpEntity httpEntity = multipartEntityBuilder.build();
+        if (useGzip && httpEntity.getContentLength() > HttpDataAction.USE_GZIP_MIN_LENGTH) {
+            httpEntity = new GzipCompressingEntity(httpEntity);
         }
+        httpRequest.setEntity(httpEntity);
         return httpRequest;
     }
 }
