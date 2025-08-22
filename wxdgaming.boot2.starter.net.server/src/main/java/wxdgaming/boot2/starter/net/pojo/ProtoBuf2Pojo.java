@@ -421,7 +421,6 @@ public class ProtoBuf2Pojo {
         imports.add(eventCls.getName());
         imports.add(Slf4j.class.getName());
         imports.add(Component.class.getName());
-        imports.add(SocketSession.class.getName());
         imports.add(cls.getName());
 
         String importString = imports.stream().map(s -> "import " + s + ";").collect(Collectors.joining("\n"));
@@ -457,7 +456,6 @@ public class ProtoBuf2Pojo {
                     /** %s */
                     @ProtoRequest(%s.class)
                     public void %s(%s event%s) {
-                        SocketSession socketSession = event.getSocketSession();
                         %s message = event.buildMessage();
                         %s
                     }

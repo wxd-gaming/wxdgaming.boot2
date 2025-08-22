@@ -11,12 +11,12 @@ import wxdgaming.boot2.core.format.HexId;
 import wxdgaming.boot2.core.keywords.KeywordsMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryResult;
-import wxdgaming.boot2.starter.net.module.rpc.RpcService;
+import wxdgaming.boot2.starter.net.SessionGroup;
 import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.api.role.GetPlayerStrategy;
 import wxdgaming.game.server.api.role.GetPlayerStrategyFactory;
 import wxdgaming.game.server.api.role.impl.DatabaseGetPlayerStrategy;
-import wxdgaming.game.server.api.role.impl.RpcGetPlayerStrategy;
+import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
 
@@ -40,15 +40,15 @@ public class DataCenterService extends HoldApplicationContext implements GetPlay
     final HexId itemHexid;
     final HexId mailHexid;
     final HexId buffHexid;
+    final ConcurrentHashMap<String, UserMapping> userMappingMap = new ConcurrentHashMap<>();
     /** key:serverID, key:account, value: 角色id列表 */
     final ConcurrentTable<Integer, String, HashSet<Long>> account2RidsMap = new ConcurrentTable<>();
     /** 角色名字和id的映射 key:name, value:roleId */
     final ConcurrentHashMap<String, Long> name2RidMap = new ConcurrentHashMap<>();
     /** 角色id和名字的映射 key:roleId, value:name */
     final ConcurrentHashMap<Long, String> rid2NameMap = new ConcurrentHashMap<>();
-    /** key:{@link Player#getUid()}, value:clientSessionId */
-    final ConcurrentHashMap<Long, Long> onlinePlayerGroup = new ConcurrentHashMap<>();
     final KeywordsMapping keywordsMapping = new KeywordsMapping();
+    final SessionGroup onlinePlayers = new SessionGroup();
 
     GetPlayerStrategyFactory getPlayerStrategyFactory;
 
@@ -81,11 +81,6 @@ public class DataCenterService extends HoldApplicationContext implements GetPlay
                     rid2NameMap.put(roleId, name);
                 }
             }
-        } else {
-            RpcService rpcService = applicationContextProvider.getBean(RpcService.class);
-            ClientSessionService clientSessionService = applicationContextProvider.getBean(ClientSessionService.class);
-            GlobalDbDataCenterService globalDbDataCenterService = applicationContextProvider.getBean(GlobalDbDataCenterService.class);
-            getPlayerStrategyFactory = new GetPlayerStrategyFactory(new RpcGetPlayerStrategy(rpcService, clientSessionService, globalDbDataCenterService));
         }
     }
 
@@ -104,4 +99,13 @@ public class DataCenterService extends HoldApplicationContext implements GetPlay
     @Override public void save(RoleEntity roleEntity) {
         getPlayerStrategyFactory.putCache(roleEntity);
     }
+
+    public UserMapping getUserMapping(String account) {
+        return userMappingMap.computeIfAbsent(account, k -> {
+            UserMapping userMapping = new UserMapping(account);
+            userMapping.setDataCenterService(this);
+            return userMapping;
+        });
+    }
+
 }

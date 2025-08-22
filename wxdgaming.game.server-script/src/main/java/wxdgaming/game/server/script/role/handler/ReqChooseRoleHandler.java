@@ -4,13 +4,14 @@ import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.basic.slog.SlogService;
 import wxdgaming.game.global.bean.role.PlayerSnap;
 import wxdgaming.game.message.role.ReqChooseRole;
 import wxdgaming.game.message.role.ResChooseRole;
-import wxdgaming.game.server.bean.ClientSessionMapping;
-import wxdgaming.game.server.bean.InnerForwardEvent;
+import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnLogin;
 import wxdgaming.game.server.event.OnLoginBefore;
@@ -21,6 +22,7 @@ import wxdgaming.game.server.module.drive.PlayerDriveService;
 import wxdgaming.game.server.script.role.slog.RoleInfoSlog;
 import wxdgaming.game.server.script.role.slog.RoleLoginLog;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -49,13 +51,14 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
 
     /** 选择角色 */
     @ProtoRequest(ReqChooseRole.class)
-    public void reqChooseRole(InnerForwardEvent event) {
+    public void reqChooseRole(ProtoEvent event) {
+        SocketSession socketSession = event.getSocketSession();
         ReqChooseRole req = event.buildMessage();
-        ClientSessionMapping clientSessionMapping = event.getClientSessionMapping();
+        UserMapping userMapping = event.bindData();
         long rid = req.getRid();
-        log.info("选择角色请求:{}, clientSession={}", req, clientSessionMapping);
-        Integer sid = clientSessionMapping.getSid();
-        String account = clientSessionMapping.getAccount();
+        log.info("选择角色请求:{}, {} clientSession={}", req, userMapping, socketSession);
+        Integer sid = userMapping.getSid();
+        String account = userMapping.getAccount();
         HashSet<Long> longs = dataCenterService.getAccount2RidsMap().get(sid, account);
         if (longs == null || !longs.contains(rid)) {
             /*选择角色错误*/
@@ -65,33 +68,32 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
 
         Player player = dataCenterService.getPlayer(rid);
         playerDriveService.executor(player, () -> {
-            if (clientSessionMapping.getRid() > 0 && clientSessionMapping.getRid() != player.getUid()) {
+            if (userMapping.getRid() > 0 && userMapping.getRid() != player.getUid()) {
                 /*角色切换*/
-                log.info("sid={}, account={} 角色切换 rid={} -> {}", sid, account, clientSessionMapping.getRid(), player.getUid());
+                log.info("sid={}, account={} 角色切换 rid={} -> {}", sid, account, userMapping.getRid(), player.getUid());
                 applicationContextProvider.executeMethodWithAnnotatedException(OnLogout.class, player);
             }
 
-            player.setClientData(clientSessionMapping.getClientParams());
+            player.setClientData(new ArrayList<>(userMapping.getClientParams()));
 
             PlayerSnap playerSnap = globalDbDataCenterService.playerSnap(player.getUid());
             player.buildPlayerSnap(playerSnap);
+            player.setUserMapping(userMapping);
+            userMapping.setRid(player.getUid());
 
-            player.setClientSessionMapping(clientSessionMapping);
-            clientSessionMapping.setRid(player.getUid());
-
-            dataCenterService.getOnlinePlayerGroup().put(player.getUid(), clientSessionMapping.getClientSessionId());
+            dataCenterService.getOnlinePlayers().add(socketSession);
 
             /*绑定*/
             log.info("sid={}, {} 触发登录之前校验事件", sid, player);
             applicationContextProvider.executeMethodWithAnnotatedException(OnLoginBefore.class, player);
             ResChooseRole resChooseRole = new ResChooseRole();
             resChooseRole.setRid(rid);
-            clientSessionMapping.forwardMessage(player, resChooseRole);
+            socketSession.write(resChooseRole);
             log.info("sid={}, {} 触发登录事件", sid, player);
             applicationContextProvider.executeMethodWithAnnotatedException(OnLogin.class, player, 1, 1);
             log.info("sid={}, {} 选择角色成功", sid, player);
 
-            RoleLoginLog roleLoginLog = new RoleLoginLog(player, clientSessionMapping.getClientIp(), JSON.toJSONString(clientSessionMapping.getClientParams()));
+            RoleLoginLog roleLoginLog = new RoleLoginLog(player, userMapping.getClientIp(), JSON.toJSONString(userMapping.getClientParams()));
             slogService.pushLog(roleLoginLog);
 
             RoleInfoSlog roleInfoSlog = new RoleInfoSlog(player);

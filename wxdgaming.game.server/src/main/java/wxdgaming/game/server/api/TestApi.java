@@ -79,8 +79,8 @@ public class TestApi extends HoldApplicationContext {
     }
 
     @RunTest
-    public void runTestParam(int sid, int a, int b) {
-        log.info("{} sid={}, a={}, b={}", "runTest()", sid, a, b);
+    public void runTestParam(int a, int b) {
+        log.info("{} a={}, b={}", "runTest()", a, b);
     }
 
     // @Scheduled("*/30")

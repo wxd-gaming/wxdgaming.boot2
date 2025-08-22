@@ -7,7 +7,6 @@ import wxdgaming.game.message.chat.ChatType;
 import wxdgaming.game.message.chat.ReqChatMessage;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
-import wxdgaming.game.server.script.inner.InnerService;
 import wxdgaming.game.server.script.tips.TipsService;
 
 /**
@@ -21,7 +20,6 @@ import wxdgaming.game.server.script.tips.TipsService;
 public abstract class AbstractChatAction {
 
     @Autowired protected TipsService tipsService;
-    @Autowired protected InnerService innerService;
     @Autowired protected DataCenterService dataCenterService;
 
     public ChatType chatType() {

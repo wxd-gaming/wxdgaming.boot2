@@ -1,20 +1,21 @@
 package wxdgaming.game.robot.script;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.collection.ListOf;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.RandomUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.SocketClient;
-import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
+import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.basic.login.LoginProperties;
 import wxdgaming.game.message.chat.ChatType;
@@ -27,6 +28,7 @@ import wxdgaming.game.message.task.TaskBean;
 import wxdgaming.game.message.task.TaskType;
 import wxdgaming.game.robot.bean.Robot;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -52,7 +54,7 @@ public class RobotMainService {
     @Start
     public void start() {
         for (int i = 0; i < 100; i++) {
-            String account = "c3" + (i + 1);
+            String account = "c4" + (i + 1);
             robotMap.put(account, new Robot().setAccount(account).setName(account));
         }
     }
@@ -81,14 +83,15 @@ public class RobotMainService {
             if (socketSession == null || !socketSession.isOpen()) {
                 RunResult runResult = httpLogin(robot);
                 if (runResult.isOk()) {
-                    String platformUserId = runResult.getString("userId");
-                    String host = runResult.getString("host");
-                    if (StringUtils.isBlank(host)) {
-                        log.info("无可用的网关。。。。。");
+                    List<JSONObject> serverList = runResult.getObject("serverList", new TypeReference<List<JSONObject>>() {});
+                    if (ListOf.isEmpty(serverList)) {
+                        log.info("游戏服。。。。。");
                         return;
                     }
-                    int port = runResult.getIntValue("port");
-                    log.info("登录成功：{}, 网关地址={}:{}", robot, host, port);
+                    JSONObject jsonObject = RandomUtils.randomItem(serverList);
+                    log.info("登录成功：{}, 选择游戏服={}", robot, jsonObject);
+                    String host = jsonObject.getString("host");
+                    int port = jsonObject.getInteger("port");
                     socketClient.connect(host, port, connect -> {
                         robot.setSocketSession(connect);
                         connect.getChannel().closeFuture().addListener(new ChannelFutureListener() {

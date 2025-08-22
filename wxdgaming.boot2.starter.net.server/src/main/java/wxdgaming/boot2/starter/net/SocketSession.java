@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.lang.TickCount;
 
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * socket session
@@ -159,7 +160,7 @@ public class SocketSession {
                 【%s - %s%s%s%s】""".formatted(
                 type.name(),
                 ChannelUtil.ctxTostring(channel),
-                getBindData().isEmpty() ? "" : ", bindData: " + getBindData().entrySet().stream().map(v -> v.getKey() + "=" + v.getValue()).reduce((a, b) -> a + "," + b).orElse(""),
+                getBindData().isEmpty() ? "" : ", bindData: " + getBindData().entrySet().stream().map(v -> v.getKey() + "=" + v.getValue()).collect(Collectors.joining(", ")),
                 isWebSocket() ? ", websocket" : "",
                 isSsl() ? ", ssl" : ""
         );

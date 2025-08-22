@@ -5,11 +5,8 @@ import org.springframework.stereotype.Component;
 import wxdgaming.game.message.chat.ChatType;
 import wxdgaming.game.message.chat.ReqChatMessage;
 import wxdgaming.game.message.chat.ResChatMessage;
-import wxdgaming.game.message.inner.ServiceType;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.chat.AbstractChatAction;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 聊天接口
@@ -33,8 +30,7 @@ public class WorldChatAction extends AbstractChatAction {
         res.setParams(req.getParams());
         res.setSenderId(player.getUid());
         res.setSenderName(player.getName());
-        ConcurrentHashMap<Long, Long> onlinePlayerGroup = this.dataCenterService.getOnlinePlayerGroup();
-        innerService.forwardMessage(ServiceType.GATEWAY, onlinePlayerGroup.values(), res);
+        dataCenterService.getOnlinePlayers().write(res);
     }
 
 }

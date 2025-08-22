@@ -4,8 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.message.cdkey.ReqUseCdKey;
-import wxdgaming.game.server.bean.InnerForwardEvent;
+import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.cdkey.CDKeyService;
 
@@ -29,9 +30,10 @@ public class ReqUseCdKeyHandler {
     /** 请求使用cdkey */
     @ProtoRequest(ReqUseCdKey.class)
     @ExecutorWith(queueName = "use-cdKey")
-    public void reqUseCdKey(InnerForwardEvent event) {
-        Player player = event.getPlayer();
+    public void reqUseCdKey(ProtoEvent event) {
         ReqUseCdKey req = event.buildMessage();
+        UserMapping userMapping = event.bindData();
+        Player player = userMapping.player();
         cdKeyService.use(player, req.getCdKey());
     }
 

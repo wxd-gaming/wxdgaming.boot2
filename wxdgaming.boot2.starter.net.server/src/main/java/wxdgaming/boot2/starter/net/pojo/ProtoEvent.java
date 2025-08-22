@@ -22,6 +22,7 @@ public class ProtoEvent {
     private final int messageId;
     private final byte[] bytes;
     private PojoBase protoMessage;
+    private Object bindData;
 
     public ProtoEvent(ApplicationContextProvider applicationContextProvider, ProtoMapping protoMapping,
                       SocketSession socketSession, int messageId, byte[] bytes) {
@@ -30,6 +31,14 @@ public class ProtoEvent {
         this.socketSession = socketSession;
         this.messageId = messageId;
         this.bytes = bytes;
+    }
+
+    public void bindData(Object bindData) {
+        this.bindData = bindData;
+    }
+
+    public <R> R bindData() {
+        return (R) bindData;
     }
 
     public <R extends PojoBase> R buildMessage() {

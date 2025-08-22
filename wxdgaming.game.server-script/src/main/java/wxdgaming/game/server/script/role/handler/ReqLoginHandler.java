@@ -7,17 +7,13 @@ import wxdgaming.boot2.core.token.JsonToken;
 import wxdgaming.boot2.core.token.JsonTokenParse;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.basic.login.LoginProperties;
-import wxdgaming.game.message.global.MapBean;
 import wxdgaming.game.message.role.ReqLogin;
-import wxdgaming.game.server.bean.ClientSessionMapping;
-import wxdgaming.game.server.bean.InnerForwardEvent;
-import wxdgaming.game.server.module.data.ClientSessionService;
+import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.role.PlayerService;
 import wxdgaming.game.server.script.tips.TipsService;
-
-import java.util.ArrayList;
 
 /**
  * @author wxd-gaming(無心道, 15388152619)
@@ -28,30 +24,26 @@ import java.util.ArrayList;
 public class ReqLoginHandler extends HoldApplicationContext {
 
     private final DataCenterService dataCenterService;
-    private final ClientSessionService clientSessionService;
     private final PlayerService playerService;
     private final TipsService tipsService;
     private final LoginProperties loginProperties;
 
     public ReqLoginHandler(DataCenterService dataCenterService,
-                           ClientSessionService clientSessionService,
                            PlayerService playerService,
                            TipsService tipsService,
                            LoginProperties loginProperties) {
         this.dataCenterService = dataCenterService;
-        this.clientSessionService = clientSessionService;
         this.playerService = playerService;
         this.tipsService = tipsService;
         this.loginProperties = loginProperties;
     }
 
     @ProtoRequest(ReqLogin.class)
-    public void reqLogin(InnerForwardEvent event) {
+    public void reqLogin(ProtoEvent event) {
         SocketSession socketSession = event.getSocketSession();
         ReqLogin req = event.buildMessage();
-        long clientSessionId = event.getClientSessionId();
-        String clientIp = event.getClientIp();
-        log.info("登录请求:{}, clientSessionId={}", req, clientSessionId);
+        String clientIp = socketSession.getIP();
+        log.info("登录请求: clientSession={}, {}", socketSession, req);
         try {
             int sid = req.getSid();
             String token = req.getToken();
@@ -62,27 +54,25 @@ public class ReqLoginHandler extends HoldApplicationContext {
             /*平台返回的userid*/
             String platformUserId = jsonToken.getString("platformUserId");
 
-            int gatewayId = socketSession.bindData("serviceId");
 
-            ClientSessionMapping clientSessionMapping = clientSessionService.getMapping(account);
+            UserMapping userMapping = dataCenterService.getUserMapping(account);
 
-            clientSessionMapping.setSid(sid);
-            clientSessionMapping.setAccount(account);
-            clientSessionMapping.setAppId(appId);
-            clientSessionMapping.setClientIp(clientIp);
-            clientSessionMapping.setPlatform(platform);
-            clientSessionMapping.setPlatformUserId(platformUserId);
-            clientSessionMapping.setSession(socketSession);
-            clientSessionMapping.setGatewayId(gatewayId);
-            clientSessionMapping.setClientParams((ArrayList<MapBean>) req.getClientParams());
-            clientSessionMapping.setClientSessionId(clientSessionId);
+            userMapping.setSid(sid);
+            userMapping.setAppId(appId);
+            userMapping.setClientIp(clientIp);
+            userMapping.setPlatform(platform);
+            userMapping.setPlatformUserId(platformUserId);
+            userMapping.setSocketSession(socketSession);
+            userMapping.setClientParams(req.getClientParams());
 
-            playerService.sendPlayerList(socketSession, clientSessionId, sid, account);
+            socketSession.bindData("userMapping", userMapping);
 
-            log.info("登录完成:{}", clientSessionMapping);
+            playerService.sendPlayerList(socketSession, sid, account);
+
+            log.info("登录完成:{}", userMapping);
         } catch (Exception e) {
             log.error("登录失败 {}", req, e);
-            tipsService.tips(socketSession, clientSessionId, "服务器异常");
+            tipsService.tips(socketSession, "服务器异常");
         }
     }
 

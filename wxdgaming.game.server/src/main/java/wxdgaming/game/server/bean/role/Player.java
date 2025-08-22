@@ -12,16 +12,15 @@ import wxdgaming.game.bean.vip.VipInfo;
 import wxdgaming.game.global.bean.role.OnlineInfo;
 import wxdgaming.game.global.bean.role.PlayerSnap;
 import wxdgaming.game.message.global.MapBean;
-import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.bean.MapKey;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.StatusConst;
+import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.bag.BagPack;
 import wxdgaming.game.server.bean.equip.EquipPack;
 import wxdgaming.game.server.bean.task.TaskPack;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -61,7 +60,7 @@ public class Player extends MapNpc {
     @JSONField(serialize = false, deserialize = false)
     private transient BlockingQueue<Runnable> eventList = new ArrayBlockingQueue<>(1024);
     @JSONField(serialize = false, deserialize = false)
-    private transient ClientSessionMapping clientSessionMapping;
+    private transient UserMapping userMapping;
 
     public Player() {
         this.setMapObjectType(MapObjectType.Player);
@@ -98,13 +97,13 @@ public class Player extends MapNpc {
     }
 
     public boolean checkOnline() {
-        return getClientSessionMapping() != null && getStatus().hasFlag(StatusConst.Online);
+        return getUserMapping() != null && getStatus().hasFlag(StatusConst.Online);
     }
 
     public void write(PojoBase pojoBase) {
         if (!checkOnline()) {
             return;
         }
-        getClientSessionMapping().forwardMessage(this, pojoBase);
+        getUserMapping().write(pojoBase);
     }
 }

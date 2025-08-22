@@ -19,7 +19,6 @@ import wxdgaming.game.server.bean.task.TaskInfo;
 import wxdgaming.game.server.bean.task.TaskPack;
 import wxdgaming.game.server.event.OnLoginBefore;
 import wxdgaming.game.server.script.bag.BagService;
-import wxdgaming.game.server.script.inner.InnerService;
 import wxdgaming.game.server.script.task.slog.AcceptTaskSlog;
 import wxdgaming.game.server.script.task.slog.SubmitTaskSlog;
 import wxdgaming.game.server.script.tips.TipsService;
@@ -41,7 +40,6 @@ public abstract class ITaskScript extends HoldApplicationContext {
     @Autowired protected BagService bagService;
     @Autowired protected TaskService taskService;
     @Autowired protected TipsService tipsService;
-    @Autowired protected InnerService innerService;
     @Autowired protected SlogService slogService;
 
     public abstract TaskType type();

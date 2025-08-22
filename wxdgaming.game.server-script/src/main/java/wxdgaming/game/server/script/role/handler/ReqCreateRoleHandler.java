@@ -8,10 +8,10 @@ import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.basic.slog.SlogService;
 import wxdgaming.game.message.role.ReqCreateRole;
-import wxdgaming.game.server.bean.ClientSessionMapping;
-import wxdgaming.game.server.bean.InnerForwardEvent;
+import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
 import wxdgaming.game.server.event.OnCreateRole;
@@ -46,21 +46,20 @@ public class ReqCreateRoleHandler extends HoldApplicationContext {
 
     /** 创建角色 */
     @ProtoRequest(ReqCreateRole.class)
-    public void reqCreateRole(InnerForwardEvent event) {
+    public void reqCreateRole(ProtoEvent event) {
         SocketSession socketSession = event.getSocketSession();
         ReqCreateRole req = event.buildMessage();
-        ClientSessionMapping clientSessionMapping = event.getClientSessionMapping();
+        UserMapping userMapping = event.bindData();
 
-        long clientSessionId = clientSessionMapping.getClientSessionId();
-        log.info("创建角色请求:{}, clientSession={}", req, clientSessionMapping);
-        Integer sid = clientSessionMapping.getSid();
-        String account = clientSessionMapping.getAccount();
+        log.info("创建角色请求:{}, clientSession={}", req, socketSession);
+        Integer sid = userMapping.getSid();
+        String account = userMapping.getAccount();
 
         HashSet<Long> longs = dataCenterService.getAccount2RidsMap().get(sid, account);
         if (longs != null && longs.size() >= 10) {
             /*创建角色错误*/
             log.error("sid={}, account={} 创建角色错误 角色数量超过10个", sid, account);
-            this.tipsService.tips(socketSession, clientSessionId, "角色数量超过10个");
+            this.tipsService.tips(socketSession, "角色数量超过10个");
             return;
         }
 
@@ -69,7 +68,7 @@ public class ReqCreateRoleHandler extends HoldApplicationContext {
         if (StringUtils.isBlank(name) | name.length() < 2 || name.length() > 12) {
             /*创建角色错误*/
             log.error("sid={}, account={} 创建角色错误 角色名 {} 字符范围不合符", sid, account, name);
-            this.tipsService.tips(socketSession, clientSessionId, "角色名长度2-12");
+            this.tipsService.tips(socketSession, "角色名长度2-12");
             return;
         }
 
@@ -77,7 +76,7 @@ public class ReqCreateRoleHandler extends HoldApplicationContext {
         if (contains) {
             /*触发敏感词库*/
             log.error("sid={}, account={} 创建角色错误 角色名 {} 有敏感字", sid, account, name);
-            this.tipsService.tips(socketSession, clientSessionId, "角色名不合符规范");
+            this.tipsService.tips(socketSession, "角色名不合符规范");
             return;
         }
         SingletonLockUtil.lock("role_" + name);
@@ -87,7 +86,7 @@ public class ReqCreateRoleHandler extends HoldApplicationContext {
             if (containsKey) {
                 /*创建角色错误*/
                 log.error("sid={}, account={} 创建角色错误 角色名 {} 已存在", sid, account, name);
-                this.tipsService.tips(socketSession, clientSessionId, "角色名已存在");
+                this.tipsService.tips(socketSession, "角色名已存在");
                 return;
             }
 
@@ -96,9 +95,9 @@ public class ReqCreateRoleHandler extends HoldApplicationContext {
             player = new Player();
             player.setUid(dataCenterService.getHexid().newId());
             player.setAccount(account);
-            player.setAppId(clientSessionMapping.getAppId());
-            player.setPlatform(clientSessionMapping.getPlatform());
-            player.setPlatformUserId(clientSessionMapping.getPlatformUserId());
+            player.setAppId(userMapping.getAppId());
+            player.setPlatform(userMapping.getPlatform());
+            player.setPlatformUserId(userMapping.getPlatformUserId());
             player.setSid(sid);
             player.setName(name);
             player.setLevel(1);
@@ -114,14 +113,14 @@ public class ReqCreateRoleHandler extends HoldApplicationContext {
             dataCenterService.getName2RidMap().put(name, player.getUid());
             dataCenterService.getRid2NameMap().put(player.getUid(), name);
 
-            RoleRegisterLog roleLoginLog = new RoleRegisterLog(player, clientSessionMapping.getClientIp(), JSON.toJSONString(clientSessionMapping.getClientParams()));
+            RoleRegisterLog roleLoginLog = new RoleRegisterLog(player, userMapping.getClientIp(), JSON.toJSONString(userMapping.getClientParams()));
             slogService.pushLog(roleLoginLog);
 
         } finally {
             SingletonLockUtil.unlock("role_" + name);
         }
         applicationContextProvider.executeMethodWithAnnotatedException(OnCreateRole.class, player);
-        playerService.sendPlayerList(socketSession, clientSessionId, sid, account);
+        playerService.sendPlayerList(socketSession, sid, account);
     }
 
 }

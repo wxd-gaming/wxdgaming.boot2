@@ -2,10 +2,12 @@ package wxdgaming.game.server.script.chat.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.message.chat.ReqChatMessage;
 import wxdgaming.game.server.GameServerProperties;
-import wxdgaming.game.server.bean.InnerForwardEvent;
+import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.global.GlobalDataType;
 import wxdgaming.game.server.bean.global.impl.YunyingData;
 import wxdgaming.game.server.bean.role.Player;
@@ -43,9 +45,10 @@ public class ReqChatMessageHandler {
 
     /** 请求聊天 */
     @ProtoRequest(ReqChatMessage.class)
-    public void reqChatMessage(InnerForwardEvent event) {
-        Player player = event.getPlayer();
+    public void reqChatMessage(ProtoEvent event) {
         ReqChatMessage req = event.buildMessage();
+        UserMapping userMapping = event.bindData();
+        Player player = userMapping.player();
         String content = req.getContent();
         log.info("{} 聊天消息 {}", player, req);
         if (content.startsWith("@gm")) {
