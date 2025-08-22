@@ -128,7 +128,7 @@ public class LogService implements InitPrint {
 
     public RunResult logPage(String tableName,
                              int pageIndex, int pageSize,
-                             String minDay, String maxDay, String whereJson) {
+                             String minDay, String maxDay, String whereJson, String orderJson) {
         SqlQueryBuilder queryBuilder = pgsqlDataHelper.queryBuilder();
         queryBuilder.setTableName(tableName);
 
@@ -163,7 +163,28 @@ public class LogService implements InitPrint {
         }
 
         queryBuilder.page(pageIndex, pageSize, 1, 1000);
-        queryBuilder.setOrderBy("createtime desc");
+
+        if (StringUtils.isNotBlank(orderJson)) {
+            StringBuilder stringBuilder = new StringBuilder();
+            List<JSONObject> jsonObjects = JSON.parseArray(orderJson, JSONObject.class);
+            for (JSONObject jsonObject : jsonObjects) {
+                String orderField = jsonObject.getString("orderField");
+                String orderOption = jsonObject.getString("orderOption");
+                if (!stringBuilder.isEmpty()) {
+                    stringBuilder.append(",");
+                }
+                if ("uid".equals(orderField) || "createTime".equals(orderField)) {
+                    stringBuilder.append(orderField);
+                } else {
+                    stringBuilder.append("logdata::jsonb->>'%s'".formatted(orderField));
+                }
+                stringBuilder.append(" ").append(orderOption);
+            }
+            queryBuilder.setOrderBy(stringBuilder.toString());
+        } else {
+            queryBuilder.setOrderBy("createtime desc");
+        }
+
         System.out.println(queryBuilder.buildSelectSql());
         long rowCount = queryBuilder.findCount();
         List<LogEntity> logEntities = queryBuilder.findList2Entity(LogEntity.class);

@@ -49,9 +49,10 @@ public class LogFindController implements InitPrint {
             @RequestParam("pageSize") int pageSize,
             @RequestParam("minDay") String minDay,
             @RequestParam("maxDay") String maxDay,
-            @RequestParam("where") String where
+            @RequestParam("where") String where,
+            @RequestParam("order") String orderJson
     ) {
-        return logService.logPage(tableName, pageIndex, pageSize, minDay, maxDay, where);
+        return logService.logPage(tableName, pageIndex, pageSize, minDay, maxDay, where, orderJson);
     }
 
 }

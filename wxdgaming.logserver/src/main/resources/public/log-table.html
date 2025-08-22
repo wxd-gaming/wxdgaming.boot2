@@ -34,6 +34,7 @@
             urlQuery.put("minDay", $("#minDay").val());
             urlQuery.put("maxDay", $("#maxDay").val());
             urlQuery.put("where", $("#labWhere").text());
+            urlQuery.put("order", $("#labOrderBy").text());
             pageView.remoteGetData(urlQuery);
         }
 
@@ -106,6 +107,7 @@
                         let item = data[i];
                         pageView.columns[item.name] = item;
                         $("#where").append(`<option value="${item.name}">${item.comment}</option>`);
+                        $("#orderField").append(`<option value="${item.name}">${item.comment}</option>`);
                         let l = `<th class="${item.name}" style="${item.style}">${item.comment}</th>`;
                         $(".table_head").append(l);
                     }
@@ -133,6 +135,21 @@
             $("#labWhere").text("");
         }
 
+        let orderByJsonArray = [];
+
+        function addOrder() {
+            let orderJson = {};
+            orderJson["orderField"] = $("#orderField").val();
+            orderJson["orderOption"] = $("#orderOption").val();
+            orderByJsonArray[orderByJsonArray.length] = orderJson;
+            $("#labOrderBy").text(JSON.stringify(orderByJsonArray));
+        }
+
+        function clearOrder() {
+            orderByJsonArray = [];
+            $("#labOrderBy").text("");
+        }
+
     </script>
 </head>
 <body>
@@ -146,7 +163,7 @@
 
     </select>
 
-    <select id="and" style="width: 40px;">
+    <select id="and" style="width: 60px;">
         <option value="=">=</option>
         <option value="<="><=</option>
         <option value="<"><</option>
@@ -158,7 +175,23 @@
     <input type="button" onclick="addWhere();" value="添加"/>
     <input type="button" onclick="clearWhere();" value="清理"/>
     <br>
-    <label id="labWhere"></label>
+    <label for="labWhere">查询条件:</label><label id="labWhere"></label>
+    <br>
+    <label for="orderField">排序条件:</label>
+
+    <select id="orderField">
+
+    </select>
+
+    <select id="orderOption" style="width: 60px;">
+        <option value="DESC">降序</option>
+        <option value="ASC">升序</option>
+    </select>
+
+    <input type="button" onclick="addOrder();" value="添加"/>
+    <input type="button" onclick="clearOrder();" value="清理"/>
+    <br>
+    <label for="labOrderBy">排序条件:</label><label id="labOrderBy"></label>
     <br>
     <br>
     <button onclick="search();">查询</button>
