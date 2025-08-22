@@ -14,7 +14,6 @@ import wxdgaming.boot2.starter.batis.sql.SqlConfig;
  **/
 @Getter
 @Setter
-@Configuration
 @ConfigurationProperties(prefix = "db")
 public class MysqlProperties {
 

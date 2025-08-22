@@ -18,13 +18,13 @@ import java.util.function.Supplier;
 @Setter
 @Configuration
 @ConfigurationProperties(prefix = "scheduled")
-public class ScheduledProperties extends ObjectBase {
+public class ScheduledConfiguration extends ObjectBase {
 
     static final Supplier<ExecutorConfig> DEFAULT_INSTANCE = () -> new ExecutorConfig().setCoreSize(1).setMaxQueueSize(5000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
 
     private ExecutorConfig executor;
 
-    public ScheduledProperties() {
+    public ScheduledConfiguration() {
     }
 
     public ExecutorConfig getExecutor() {

@@ -4,7 +4,9 @@ package wxdgaming.boot2.starter.net;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.starter.net.client.SocketClient;
 import wxdgaming.boot2.starter.net.server.SocketServer;
 

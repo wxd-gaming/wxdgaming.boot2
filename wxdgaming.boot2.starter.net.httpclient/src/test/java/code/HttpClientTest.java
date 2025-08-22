@@ -1,13 +1,14 @@
 package code;
 
 import org.junit.jupiter.api.Test;
-import wxdgaming.boot2.starter.net.httpclient5.HttpRequestGet;
-import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
-import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPostMulti;
-import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
+import org.springframework.boot.test.context.SpringBootTest;
+import wxdgaming.boot2.starter.net.httpclient5.*;
 
 import java.util.Map;
 
+@SpringBootTest(classes = {
+        HttpClientScan.class
+})
 public class HttpClientTest {
 
     @Test
@@ -23,6 +24,7 @@ public class HttpClientTest {
         String string = httpResponse.bodyString();
         System.out.println(string);
     }
+
     @Test
     public void postFormData() {
         Map<String, String> jsonString = Map.of("appId", "1", "token", "sfo23r409283mnscoijer20389", "username", "admin", "password", "admin");
@@ -30,6 +32,8 @@ public class HttpClientTest {
         String string = httpResponse.bodyString();
         System.out.println(string);
     }
+
+
     @Test
     public void postJson() {
         Map<String, String> jsonString = Map.of("appId", "1", "token", "sfo23r409283mnscoijer20389", "username", "admin", "password", "admin");
@@ -56,6 +60,18 @@ public class HttpClientTest {
         httpRequestPost.setParam("account", "我收到");
 
         HttpResponse httpResponse = httpRequestPost.useGzip().execute();
+        String string = httpResponse.bodyString();
+        System.out.println(string);
+    }
+
+    @Test
+    public void postMulti() {
+        HttpRequestPostMulti requestPostMulti = HttpRequestPostMulti.of("http://localhost:18888/log/push/m");
+        requestPostMulti.setParam("appId", 1);
+        requestPostMulti.setParam("token", "sfo23r409283mnscoijer20389".repeat(10000));
+        requestPostMulti.setParam("account", "我收到");
+
+        HttpResponse httpResponse = requestPostMulti.execute();
         String string = httpResponse.bodyString();
         System.out.println(string);
     }

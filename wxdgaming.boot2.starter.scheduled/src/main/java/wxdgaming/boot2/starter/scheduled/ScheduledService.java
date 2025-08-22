@@ -2,8 +2,10 @@ package wxdgaming.boot2.starter.scheduled;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Start;
@@ -37,7 +39,7 @@ public class ScheduledService extends HoldApplicationContext {
 
     protected ExecutorServicePlatform executorServicePlatform;
 
-    public ScheduledService(ExecutorFactory executorFactory, ScheduledProperties executorProperties) {
+    public ScheduledService(ExecutorFactory executorFactory, ScheduledConfiguration executorProperties) {
         executorServicePlatform = ExecutorFactory.create("scheduled-executor", executorProperties.getExecutor());
     }
 

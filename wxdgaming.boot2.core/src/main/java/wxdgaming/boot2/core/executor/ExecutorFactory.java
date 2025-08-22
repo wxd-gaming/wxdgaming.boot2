@@ -1,8 +1,8 @@
 package wxdgaming.boot2.core.executor;
 
 import lombok.Getter;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.util.AssertUtil;
 
@@ -17,7 +17,7 @@ import java.util.concurrent.ScheduledExecutorService;
  * @version 2025-05-15 11:20
  **/
 @Order(value = Integer.MIN_VALUE)
-@Component
+@Configuration
 public class ExecutorFactory implements InitPrint {
 
     private static class Lazy {

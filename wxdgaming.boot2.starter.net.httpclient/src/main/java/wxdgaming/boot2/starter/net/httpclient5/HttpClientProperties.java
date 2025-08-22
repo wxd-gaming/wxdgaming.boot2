@@ -2,7 +2,8 @@ package wxdgaming.boot2.starter.net.httpclient5;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.ObjectBase;
@@ -14,47 +15,31 @@ import wxdgaming.boot2.core.lang.ObjectBase;
  * @version 2025-02-18 10:26
  **/
 @Getter
+@Setter
 @Configuration
+@ConfigurationProperties(prefix = "http.client")
 public class HttpClientProperties extends ObjectBase implements InitPrint {
 
     /** 每个路由创建的最大连接数 */
     @JSONField(ordinal = 1)
-    private final int routeMaxSize;
+    private int routeMaxSize = 500;
     /** 总链接数 */
     @JSONField(ordinal = 2)
-    private final int totalMaxSize;
+    private int totalMaxSize = 5000;
     @JSONField(ordinal = 3)
-    private final int resetTimeM;
+    private int resetTimeM = 30;
     @JSONField(ordinal = 4)
-    private final int connectionRequestTimeout;
+    private int connectionRequestTimeout = 3000;
     @JSONField(ordinal = 5)
-    private final int connectTimeOut;
+    private int connectTimeOut = 3000;
     @JSONField(ordinal = 6)
-    private final int readTimeout;
+    private int readTimeout = 3000;
     @JSONField(ordinal = 7)
-    private final int keepAliveTimeout;
+    private int keepAliveTimeout = 30000;
     @JSONField(ordinal = 8)
-    private final String sslProtocol;
+    private String sslProtocol = "TLS";
     @JSONField(ordinal = 9)
-    private final boolean autoUseGzip;
+    private boolean autoUseGzip = false;
 
-    public HttpClientProperties(@Value("${http.client.routeMaxSize:500}") int routeMaxSize,
-                                @Value("${http.client.totalMaxSize:5000}") int totalMaxSize,
-                                @Value("${http.client.resetTimeM:30}") int resetTimeM,
-                                @Value("${http.client.connectionRequestTimeout:3000}") int connectionRequestTimeout,
-                                @Value("${http.client.connectTimeOut:3000}") int connectTimeOut,
-                                @Value("${http.client.readTimeout:3000}") int readTimeout,
-                                @Value("${http.client.keepAliveTimeout:30000}") int keepAliveTimeout,
-                                @Value("${http.client.sslProtocol:TLS}") String sslProtocol,
-                                @Value("${http.client.autoUseGzip:false}") boolean autoUseGzip) {
-        this.routeMaxSize = routeMaxSize;
-        this.totalMaxSize = totalMaxSize;
-        this.resetTimeM = resetTimeM;
-        this.connectionRequestTimeout = connectionRequestTimeout;
-        this.connectTimeOut = connectTimeOut;
-        this.readTimeout = readTimeout;
-        this.keepAliveTimeout = keepAliveTimeout;
-        this.sslProtocol = sslProtocol;
-        this.autoUseGzip = autoUseGzip;
-    }
+
 }

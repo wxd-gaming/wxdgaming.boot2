@@ -1,6 +1,7 @@
 package wxdgaming.boot2.starter.batis.sql.mysql;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Primary;
  * @version 2025-02-15 12:42
  **/
 @Configuration
+@EnableConfigurationProperties(MysqlProperties.class)
 public class MysqlConfiguration {
 
     final MysqlProperties mysqlProperties;

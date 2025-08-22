@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import wxdgaming.boot2.core.CacheHttpServletRequest;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.RunResult;
@@ -20,6 +21,7 @@ import wxdgaming.logserver.module.logs.LogService;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -71,6 +73,12 @@ public class LogPushController {
             logService.submitLog(logEntity);
         }
         return RunResult.ok();
+    }
+
+    @RequestMapping("/m")
+    public String m(CacheHttpServletRequest request) {
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        return "ok";
     }
 
 }

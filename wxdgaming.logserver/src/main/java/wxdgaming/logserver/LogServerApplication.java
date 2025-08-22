@@ -3,10 +3,9 @@ package wxdgaming.logserver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.SpringUtil;
-import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlConfiguration;
-import wxdgaming.boot2.starter.scheduled.ScheduledProperties;
+import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
+import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 
 /**
  * 日子中心启动器
@@ -17,9 +16,8 @@ import wxdgaming.boot2.starter.scheduled.ScheduledProperties;
 @Slf4j
 @SpringBootApplication(
         scanBasePackageClasses = {
-                CoreScan.class,
-                PgsqlConfiguration.class,
-                ScheduledProperties.class,
+                PgsqlScan.class,
+                ScheduledScan.class,
                 LogServerApplication.class
         }
 )

@@ -3,7 +3,6 @@ package wxdgaming.boot2.starter.batis.sql.pgsql;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 
 /**
@@ -14,7 +13,6 @@ import wxdgaming.boot2.starter.batis.sql.SqlConfig;
  **/
 @Getter
 @Setter
-@Configuration
 @ConfigurationProperties(prefix = "db")
 public class PgsqlProperties {
 
