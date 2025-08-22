@@ -32,7 +32,7 @@ import java.util.TreeMap;
  **/
 @Slf4j
 @RestController
-@RequestMapping("/log/push")
+@RequestMapping("/log")
 public class LogPushController {
 
     private final LogServerProperties logServerProperties;
@@ -43,7 +43,7 @@ public class LogPushController {
         this.logService = logService;
     }
 
-    @RequestMapping("/List")
+    @RequestMapping("/push")
     public RunResult pushList(HttpServletRequest request, @RequestBody byte[] bytes) {
 
         String json = null;
@@ -61,6 +61,7 @@ public class LogPushController {
         String selfSign = Md5Util.md5DigestEncode(signBefore);
         if (!Objects.equals(sign, selfSign)) {
             log.error("LogPushController sign={} signBefore={}", sign, signBefore);
+            logService.saveErrorLog("sign 签名错误", json, "pushList");
             return RunResult.fail("sign 签名错误");
         }
         List<LogEntity> logEntityList = JSON.parseArray(map.get("data"), LogEntity.class);
@@ -68,7 +69,8 @@ public class LogPushController {
 
         for (LogEntity logEntity : logEntityList) {
             if (StringUtils.isBlank(logEntity.getLogType())) {
-                return RunResult.fail("logType 不能为空");
+                logService.saveErrorLog("logType 空", logEntity.toJSONString(), "pushList");
+                continue;
             }
             logService.submitLog(logEntity);
         }
@@ -79,6 +81,44 @@ public class LogPushController {
     public String m(CacheHttpServletRequest request) {
         Map<String, String[]> parameterMap = request.getParameterMap();
         return "ok";
+    }
+
+    @RequestMapping("/update")
+    public RunResult updateList(HttpServletRequest request, @RequestBody byte[] bytes) {
+
+        String json = null;
+        String header = request.getHeader(HttpHeaderNames.CONTENT_ENCODING.toString());
+        if (header != null && header.equalsIgnoreCase("gzip")) {
+            json = GzipUtil.unGzip2String(bytes);
+        } else {
+            json = new String(bytes, StandardCharsets.UTF_8);
+        }
+
+        TreeMap<String, String> map = JSON.parseObject(json, new TypeReference<TreeMap<String, String>>() {});
+        String sign = map.remove("sign");
+
+        String signBefore = HttpDataAction.httpData(map) + logServerProperties.getJwtKey();
+        String selfSign = Md5Util.md5DigestEncode(signBefore);
+        if (!Objects.equals(sign, selfSign)) {
+            log.error("LogPushController sign={} signBefore={}", sign, signBefore);
+            logService.saveErrorLog("sign 签名错误", json, "updateList");
+            return RunResult.fail("sign 签名错误");
+        }
+
+        List<LogEntity> logEntityList = JSON.parseArray(map.get("data"), LogEntity.class);
+
+        for (LogEntity logEntity : logEntityList) {
+            if (StringUtils.isBlank(logEntity.getLogType())) {
+                logService.saveErrorLog("logType 空", logEntity.toJSONString(), "updateList");
+                continue;
+            }
+            if (logEntity.getUid() == 0) {
+                logService.saveErrorLog("uid 为0", logEntity.toJSONString(), "updateList");
+                continue;
+            }
+            logService.updateLog(logEntity);
+        }
+        return RunResult.ok();
     }
 
 }

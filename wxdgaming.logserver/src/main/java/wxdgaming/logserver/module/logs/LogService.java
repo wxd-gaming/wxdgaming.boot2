@@ -49,7 +49,6 @@ public class LogService implements InitPrint {
         String logType = logEntity.getLogType().toLowerCase();
         LogTableContext logTableContext = logTableContext(logType);
         if (logEntity.getUid() == 0) {
-            log.debug("uid 为0 {}", logEntity);
             logEntity.setUid(logTableContext.newId());
         }
         if (logTableContext.filter(logEntity.getUid())) {
@@ -58,6 +57,31 @@ public class LogService implements InitPrint {
         }
         logEntity.checkDataKey();
         logTableContext.addFilter(logEntity.getUid());
+        log.debug("保存 uid={}, logType={}, entity={}", logEntity.getUid(), logType, logEntity);
+        pgsqlDataHelper.getDataBatch().insert(logEntity);
+    }
+
+    public void updateLog(LogEntity logEntity) {
+        String logType = logEntity.getLogType().toLowerCase();
+        logEntity.setDayKey(0);
+        log.debug("保存 uid={}, logType={}, entity={}", logEntity.getUid(), logType, logEntity);
+        pgsqlDataHelper.getDataBatch().save(logEntity);
+    }
+
+    public void saveErrorLog(String reason, String data, String stackTrace) {
+        LogEntity logEntity = new LogEntity();
+        logEntity.setCreateTime(System.currentTimeMillis());
+        logEntity.setLogType("systemerrorlog");
+        logEntity.getLogData()
+                .fluentPut("reason", reason)
+                .fluentPut("data", data)
+                .fluentPut("stackTrace", stackTrace);
+        logEntity.checkDataKey();
+
+        String logType = logEntity.getLogType().toLowerCase();
+        LogTableContext logTableContext = logTableContext(logType);
+        logEntity.setUid(logTableContext.newId());
+
         log.debug("保存 uid={}, logType={}, entity={}", logEntity.getUid(), logType, logEntity);
         pgsqlDataHelper.getDataBatch().insert(logEntity);
     }
@@ -120,25 +144,21 @@ public class LogService implements InitPrint {
         if (StringUtils.isNotBlank(whereJson)) {
             List<JSONObject> jsonObjects = JSON.parseArray(whereJson, JSONObject.class);
             for (JSONObject jsonObject : jsonObjects) {
-                String where = jsonObject.getString("where");
-                Function<String, Object> stringObjectFunction = logMappingInfo.fieldValueFunction(where);
+                String whereFiled = jsonObject.getString("where");
+                Function<String, Object> stringObjectFunction = logMappingInfo.fieldValueFunction(whereFiled);
                 String and = jsonObject.getString("and");
-                String format;
-                if ("uid".equals(where) || "createTime".equals(where)) {
-                    format = "%s " + and + " ?";
-                } else if ("<=".equals(and)) {
-                    format = "CAST(logdata::jsonb->>'%s' AS numeric) <= ?";
-                } else if ("<".equals(and)) {
-                    format = "CAST(logdata::jsonb->>'%s' AS numeric) < ?";
-                } else if (">=".equals(and)) {
-                    format = "CAST(logdata::jsonb->>'%s' AS numeric) >= ?";
-                } else if (">".equals(and)) {
-                    format = "CAST(logdata::jsonb->>'%s' AS numeric) > ?";
+                String where;
+                if ("uid".equals(whereFiled) || "createTime".equals(whereFiled)) {
+                    where = whereFiled + " " + and + " ?";
                 } else {
-                    format = "logdata::jsonb @> jsonb_build_object('%s',?)";
+                    if (and.equals("<=") || and.equals("<") || and.equals(">=") || and.equals(">")) {
+                        where = "CAST(logdata::jsonb->>'%s' AS numeric) %s ?".formatted(whereFiled, and);
+                    } else {
+                        where = "logdata::jsonb @> jsonb_build_object('%s',?)".formatted(whereFiled);
+                    }
                 }
                 Object whereValue = stringObjectFunction.apply(jsonObject.getString("whereValue"));
-                queryBuilder.pushWhereAnd(format.formatted(where), whereValue);
+                queryBuilder.pushWhereAnd(where, whereValue);
             }
         }
 

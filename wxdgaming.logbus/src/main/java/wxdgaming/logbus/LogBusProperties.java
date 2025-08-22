@@ -20,7 +20,7 @@ public class LogBusProperties {
     private int splitOrg = 300;
     private boolean gzip = true;
     private String filePath = "target/logbus";
-    private String postUrl = "http://127.0.0.1:8888/logbus/log";
+    private String postUrl = "http://127.0.0.1:8888";
     private String token = "ddddd";
 
 }

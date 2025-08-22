@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
+import wxdgaming.game.message.role.ReqHeartbeat;
 import wxdgaming.game.message.role.ResHeartbeat;
 import wxdgaming.game.server.bean.ClientSessionMapping;
 import wxdgaming.game.server.bean.InnerForwardEvent;
@@ -27,7 +28,7 @@ public class ReqHeartbeatHandler {
     }
 
     /** 心跳包 */
-    @ProtoRequest(ResHeartbeat.class)
+    @ProtoRequest(ReqHeartbeat.class)
     public void reqHeartbeat(InnerForwardEvent event) {
         ClientSessionMapping clientSessionMapping = event.getClientSessionMapping();
         ResHeartbeat resHeartbeat = new ResHeartbeat();

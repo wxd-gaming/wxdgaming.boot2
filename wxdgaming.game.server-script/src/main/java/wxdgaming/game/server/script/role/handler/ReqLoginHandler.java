@@ -3,7 +3,6 @@ package wxdgaming.game.server.script.role.handler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.token.JsonToken;
 import wxdgaming.boot2.core.token.JsonTokenParse;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -50,8 +49,8 @@ public class ReqLoginHandler extends HoldApplicationContext {
     public void reqLogin(InnerForwardEvent event) {
         SocketSession socketSession = event.getSocketSession();
         ReqLogin req = event.buildMessage();
-        long clientSessionId = ThreadContext.context().getLongValue("clientSessionId");
-        String clientIp = ThreadContext.context().getString("clientIp");
+        long clientSessionId = event.getClientSessionId();
+        String clientIp = event.getClientIp();
         log.info("登录请求:{}, clientSessionId={}", req, clientSessionId);
         try {
             int sid = req.getSid();

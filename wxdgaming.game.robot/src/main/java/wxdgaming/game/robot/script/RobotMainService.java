@@ -51,8 +51,8 @@ public class RobotMainService {
 
     @Start
     public void start() {
-        for (int i = 0; i < 70; i++) {
-            String account = "b5" + (i + 1);
+        for (int i = 0; i < 100; i++) {
+            String account = "c3" + (i + 1);
             robotMap.put(account, new Robot().setAccount(account).setName(account));
         }
     }

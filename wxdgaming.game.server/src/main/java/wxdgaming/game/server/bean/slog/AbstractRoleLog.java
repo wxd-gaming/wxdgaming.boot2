@@ -17,7 +17,6 @@ import wxdgaming.game.basic.slog.AbstractSlog;
 @NoArgsConstructor
 public abstract class AbstractRoleLog extends AbstractSlog {
 
-    private String openId;
     private String account;
     private String platform;
     private String channel;

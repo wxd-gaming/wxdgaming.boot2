@@ -37,17 +37,22 @@ import java.util.concurrent.locks.LockSupport;
 public class LogBusService implements InitPrint {
 
     private final LogBusProperties logBusProperties;
-    private final SaveLog2FileEvent saveLog2FileEvent = new SaveLog2FileEvent();
-    private final PostLog2FileEvent postLog2FileEvent = new PostLog2FileEvent();
+    private final SaveLog2FileEvent savePushLog2FileEvent = new SaveLog2FileEvent("push");
+    private final PostLog2FileEvent postPushLog2FileEvent = new PostLog2FileEvent("push");
 
-    private Thread postLogThread;
+    private final SaveLog2FileEvent saveUpdateLog2FileEvent = new SaveLog2FileEvent("update");
+    private final PostLog2FileEvent postUpdateLog2FileEvent = new PostLog2FileEvent("update");
+
+    private Thread postPushLogThread;
+    private Thread postUpdateLogThread;
     private Thread saveLog2FileThread;
 
     private final AtomicBoolean close = new AtomicBoolean(false);
 
     public LogBusService(LogBusProperties logBusProperties) {
         this.logBusProperties = logBusProperties;
-        this.saveLog2FileEvent.reset();
+        this.savePushLog2FileEvent.reset();
+        this.saveUpdateLog2FileEvent.reset();
     }
 
 
@@ -59,18 +64,30 @@ public class LogBusService implements InitPrint {
             while (!close.get()) {
                 try {
                     LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(3000));
-                    saveLog2FileEvent.run();
+                    savePushLog2FileEvent.run();
+                    saveUpdateLog2FileEvent.run();
                 } catch (Exception e) {
                     log.error("LogBusService error", e);
                 }
             }
         });
 
-        postLogThread = Thread.ofPlatform().start(() -> {
+        postPushLogThread = Thread.ofPlatform().start(() -> {
             while (!close.get()) {
                 try {
                     LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(500));
-                    postLog2FileEvent.run();
+                    postPushLog2FileEvent.run();
+                } catch (Exception e) {
+                    log.error("LogBusService error", e);
+                }
+            }
+        });
+
+        postUpdateLogThread = Thread.ofPlatform().start(() -> {
+            while (!close.get()) {
+                try {
+                    LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(500));
+                    postUpdateLog2FileEvent.run();
                 } catch (Exception e) {
                     log.error("LogBusService error", e);
                 }
@@ -79,11 +96,23 @@ public class LogBusService implements InitPrint {
 
     }
 
-    public void addLog(LogEntity logEntity) {
-        saveLog2FileEvent.addLog(logEntity);
+    /** 推送日志 */
+    public void pushLog(LogEntity logEntity) {
+        savePushLog2FileEvent.addLog(logEntity);
+    }
+
+    /** 更新记录 */
+    public void updateLog(LogEntity logEntity) {
+        saveUpdateLog2FileEvent.addLog(logEntity);
     }
 
     private class SaveLog2FileEvent extends ExecutorEvent {
+
+        private final String type;
+
+        public SaveLog2FileEvent(String type) {
+            this.type = type;
+        }
 
         private SplitCollection<LogEntity> logEntities = null;
 
@@ -102,7 +131,7 @@ public class LogBusService implements InitPrint {
             while (!tmpLogEntities.isEmpty()) {
                 List<LogEntity> logEntities1 = tmpLogEntities.removeFirst();
                 try {
-                    Path path = Path.of(logBusProperties.getFilePath(), "log_" + StringUtils.randomString(8) + "_" + System.nanoTime() + ".dat");
+                    Path path = Path.of(logBusProperties.getFilePath(), type, "log_" + StringUtils.randomString(8) + "_" + System.nanoTime() + ".dat");
                     FileWriteUtil.writeString(path.toFile(), JSON.toJSONString(logEntities1, SerializerFeature.MapSortField, SerializerFeature.SortField));
                 } catch (Exception e) {
                     log.error("LogBusService error", e);
@@ -111,10 +140,17 @@ public class LogBusService implements InitPrint {
         }
     }
 
+
     private class PostLog2FileEvent extends ExecutorEvent {
 
+        private final String type;
+
+        public PostLog2FileEvent(String type) {
+            this.type = type;
+        }
+
         @Override public void onEvent() throws Exception {
-            Path path = Path.of(logBusProperties.getFilePath());
+            Path path = Path.of(logBusProperties.getFilePath(), type);
             if (!Files.exists(path)) return;
             Files.walk(path)
                     .filter(Files::isRegularFile)
@@ -131,16 +167,17 @@ public class LogBusService implements InitPrint {
                         String signBefore = HttpDataAction.httpData(jsonObject) + logBusProperties.getToken();
                         String sign = Md5Util.md5DigestEncode(signBefore);
                         jsonObject.put("sign", sign);
-                        HttpRequestPost httpRequestPost = HttpRequestPost.ofJson(logBusProperties.getPostUrl(), jsonObject);
+                        String url = logBusProperties.getPostUrl() + "/log/" + type;
+                        HttpRequestPost httpRequestPost = HttpRequestPost.ofJson(url, jsonObject);
                         if (logBusProperties.isGzip()) {
                             httpRequestPost.useGzip();
                         }
                         HttpResponse execute = httpRequestPost.execute();
                         if (execute.isSuccess()) {
                             f.delete();
-                            log.debug("LogBusService postUrl={} logFile={} gzip={}", execute, f, logBusProperties.isGzip());
+                            log.debug("LogBusService url={} logFile={} gzip={}", url, f, logBusProperties.isGzip());
                         } else {
-                            log.error("LogBusService postUrl={} logFile={} gzip={} error:{}", execute, f, logBusProperties.isGzip(), execute);
+                            log.error("LogBusService url={} logFile={} gzip={} error:{}", url, f, logBusProperties.isGzip(), execute);
                             f.setLastModified(System.currentTimeMillis());
                         }
                     });

@@ -36,8 +36,10 @@ public class MysqlDataHelper extends SqlDataHelper {
         return new MysqlQueryBuilder(this);
     }
 
-    @Override public void checkTable(Map<String, LinkedHashMap<String, JSONObject>> databseTableMap, TableMapping tableMapping, String tableName, String tableComment) {
-        super.checkTable(databseTableMap, tableMapping, tableName, tableComment);
+    @Override public void checkTable(Map<String, LinkedHashMap<String, JSONObject>> databseTableMap,
+                                     TableMapping tableMapping, String tableName, String tableComment,
+                                     boolean actionPartition) {
+        super.checkTable(databseTableMap, tableMapping, tableName, tableComment, actionPartition);
 
         /*TODO 处理索引*/
 
@@ -62,8 +64,8 @@ public class MysqlDataHelper extends SqlDataHelper {
         }
     }
 
-    @Override protected void createTable(TableMapping tableMapping, String tableName, String comment) {
-        super.createTable(tableMapping, tableName, comment);
+    @Override protected void createTable(TableMapping tableMapping, String tableName, String comment, boolean actionPartition) {
+        super.createTable(tableMapping, tableName, comment, actionPartition);
     }
 
     /** 获取指定表的所有分区 */

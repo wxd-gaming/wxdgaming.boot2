@@ -193,7 +193,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
                         bagChangeDTO.getReasonDTO().getReason().name(),
                         bagChangeDTO.getReasonDTO().getReasonText()
                 );
-                slogService.addLog(itemLog);
+                slogService.pushLog(itemLog);
             }
 
             if (gain) {
@@ -274,7 +274,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
                     bagChangeDTO.getReasonDTO().getReason().name(),
                     bagChangeDTO.getReasonDTO().getReasonText()
             );
-            slogService.addLog(itemLog);
+            slogService.pushLog(itemLog);
 
         }
         player.write(bagChangesContext.toResUpdateBagInfo());

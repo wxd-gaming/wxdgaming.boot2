@@ -1,0 +1,34 @@
+{
+  "logName": "systemerrorlog",
+  "logComment": "系统异常",
+  "routing": "/log-table.html",
+  "sort": "1-9",
+  "partition": true,
+  "fieldList": [
+    {
+      "fieldName": "uid",
+      "fieldComment": "UID",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "createTime",
+      "fieldComment": "日期",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "reason",
+      "fieldComment": "注释",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "data",
+      "fieldComment": "数据",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "stackTrace",
+      "fieldComment": "堆栈",
+      "fieldType": "string"
+    }
+  ]
+}

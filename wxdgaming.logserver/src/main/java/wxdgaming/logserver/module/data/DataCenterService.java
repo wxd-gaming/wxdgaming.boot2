@@ -80,7 +80,7 @@ public class DataCenterService implements InitPrint {
                                String tableName,
                                String tableComment) {
 
-        dataHelper.checkTable(tableStructMap, tableMapping, tableName, tableComment);
+        dataHelper.checkTable(tableStructMap, tableMapping, tableName, tableComment, checkPartition);
         if (checkPartition) {
             /*TODO 处理分区表 */
             LocalDateTime localDate = LocalDateTime.now().plusDays(-2);

@@ -99,8 +99,10 @@ public class PgsqlDataHelper extends SqlDataHelper {
         return dbTableStructMap;
     }
 
-    @Override public void checkTable(Map<String, LinkedHashMap<String, JSONObject>> databseTableMap, TableMapping tableMapping, String tableName, String tableComment) {
-        super.checkTable(databseTableMap, tableMapping, tableName, tableComment);
+    @Override public void checkTable(Map<String, LinkedHashMap<String, JSONObject>> databseTableMap,
+                                     TableMapping tableMapping, String tableName, String tableComment,
+                                     boolean actionPartition) {
+        super.checkTable(databseTableMap, tableMapping, tableName, tableComment, actionPartition);
 
         List<String> indexList = executeScalarList("SELECT indexname FROM pg_indexes WHERE tablename=?", String.class, tableName);
 
@@ -131,29 +133,28 @@ public class PgsqlDataHelper extends SqlDataHelper {
         }
     }
 
-    @Override protected void createTable(TableMapping tableMapping, String tableName, String comment) {
-        StringBuilder stringBuilder = ddlBuilder().buildTableSqlString(tableMapping, tableName);
+    @Override protected void createTable(TableMapping tableMapping, String tableName, String comment, boolean actionPartition) {
+        StringBuilder stringBuilder = ddlBuilder().buildTableSqlString(tableMapping, tableName, actionPartition);
         String creteTableSql = stringBuilder.toString();
         creteTableSql = ddlBuilder().buildSql$$(creteTableSql);
         this.executeUpdate(creteTableSql);
         /*创建表备注*/
         this.executeUpdate("COMMENT ON TABLE \"%s\" IS '%s';".formatted(tableName, comment));
-        TableMapping.FieldMapping fieldMapping = tableMapping.getColumns()
-                .values()
-                .stream()
-                .filter(v -> AnnUtil.ann(v.getField(), Partition.class) != null)
-                .findFirst()
-                .orElse(null);
-        if (fieldMapping != null) {
-            Field field = fieldMapping.getField();
-            Partition partition = AnnUtil.ann(field, Partition.class);
-            String[] strings = partition.initRangeArrays();
-            if (strings != null && strings.length > 0 && StringUtils.isNotBlank(strings[0])) {
-                for (String s : strings) {
-                    String[] split = s.split("=");
-                    addPartition(tableName, split[0], split[1]);
-                }
-            }
+        if (actionPartition) {
+            tableMapping.getColumns().values().stream()
+                    .filter(v -> AnnUtil.ann(v.getField(), Partition.class) != null)
+                    .findFirst()
+                    .ifPresent(fieldMapping -> {
+                        Field field = fieldMapping.getField();
+                        Partition partition = AnnUtil.ann(field, Partition.class);
+                        String[] strings = partition.initRangeArrays();
+                        if (strings != null && strings.length > 0 && StringUtils.isNotBlank(strings[0])) {
+                            for (String s : strings) {
+                                String[] split = s.split("=");
+                                addPartition(tableName, split[0], split[1]);
+                            }
+                        }
+                    });
         }
     }
 

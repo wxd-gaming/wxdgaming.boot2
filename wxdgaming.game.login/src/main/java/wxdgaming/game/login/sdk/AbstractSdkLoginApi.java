@@ -52,7 +52,7 @@ public abstract class AbstractSdkLoginApi {
                 userData.getPlatformChannelId(),
                 ip
         );
-        slogService.addLog(accountLoginLog);
+        slogService.pushLog(accountLoginLog);
 
         return userData;
     }
@@ -89,7 +89,7 @@ public abstract class AbstractSdkLoginApi {
                 userData.getPlatformChannelId(),
                 loginIp
         );
-        slogService.addLog(accountLoginLog);
+        slogService.pushLog(accountLoginLog);
 
         return RunResult.ok()
                 .fluentPut("userId", userData.getPlatformUserId())

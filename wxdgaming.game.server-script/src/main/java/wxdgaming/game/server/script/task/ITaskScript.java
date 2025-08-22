@@ -124,7 +124,7 @@ public abstract class ITaskScript extends HoldApplicationContext {
         log.info("{} 接取任务：{}, {}, {}", player, type(), qTask.getInnerTaskDetail(), taskInfo.toJSONString());
         {
             AcceptTaskSlog acceptTaskSlog = new AcceptTaskSlog(player, taskId, qTask.getName(), reasonDTO.getReasonText());
-            slogService.addLog(acceptTaskSlog);
+            slogService.pushLog(acceptTaskSlog);
         }
         ResAcceptTask resAcceptTask = new ResAcceptTask();
         resAcceptTask.setTaskType(type());
@@ -183,7 +183,7 @@ public abstract class ITaskScript extends HoldApplicationContext {
 
         {
             SubmitTaskSlog acceptTaskSlog = new SubmitTaskSlog(player, taskId, qTask.getName(), reasonDTO.getReasonText());
-            slogService.addLog(acceptTaskSlog);
+            slogService.pushLog(acceptTaskSlog);
         }
 
         ResSubmitTask resSubmitTask = new ResSubmitTask();

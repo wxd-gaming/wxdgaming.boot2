@@ -72,7 +72,7 @@ public abstract class SqlDataHelper extends DataHelper {
                             throw new RuntimeException(cls + " not super " + Entity.class);
                         }
 
-                        checkTable(tableStructMap, (Class<? extends Entity>) cls);
+                        checkTable(tableStructMap, (Class<? extends Entity>) cls, true);
                     });
         }
     }
@@ -113,35 +113,35 @@ public abstract class SqlDataHelper extends DataHelper {
             throw new RuntimeException("表映射关系不存在");
         }
         String tableName = tableMapping.getTableName();
-        checkTable(tableMapping, tableName, tableMapping.getTableComment());
+        checkTable(tableMapping, tableName, tableMapping.getTableComment(), true);
     }
 
-    public void checkTable(Class<? extends Entity> cls, String tableName, String tableComment) {
+    public void checkTable(Class<? extends Entity> cls, String tableName, String tableComment, boolean actionPartition) {
         TableMapping tableMapping = tableMapping(cls);
         if (tableMapping == null) {
             throw new RuntimeException("表映射关系不存在");
         }
-        checkTable(tableMapping, tableName, tableComment);
+        checkTable(tableMapping, tableName, tableComment, actionPartition);
     }
 
-    public void checkTable(Map<String, LinkedHashMap<String, JSONObject>> tableStructMap, Class<? extends Entity> cls) {
+    public void checkTable(Map<String, LinkedHashMap<String, JSONObject>> tableStructMap, Class<? extends Entity> cls, boolean actionPartition) {
         TableMapping tableMapping = tableMapping(cls);
         if (tableMapping == null) {
             throw new RuntimeException("表映射关系不存在");
         }
         String tableName = tableMapping.getTableName();
-        checkTable(tableStructMap, tableMapping, tableName, tableMapping.getTableComment());
+        checkTable(tableStructMap, tableMapping, tableName, tableMapping.getTableComment(), actionPartition);
     }
 
-    public void checkTable(TableMapping tableMapping, String tableName, String tableComment) {
+    public void checkTable(TableMapping tableMapping, String tableName, String tableComment, boolean actionPartition) {
         Map<String, LinkedHashMap<String, JSONObject>> tableStructMap = findTableStructMap();
-        checkTable(tableStructMap, tableMapping, tableName, tableComment);
+        checkTable(tableStructMap, tableMapping, tableName, tableComment, actionPartition);
     }
 
-    public void checkTable(Map<String, LinkedHashMap<String, JSONObject>> databseTableMap, TableMapping tableMapping, String tableName, String tableComment) {
+    public void checkTable(Map<String, LinkedHashMap<String, JSONObject>> databseTableMap, TableMapping tableMapping, String tableName, String tableComment, boolean actionPartition) {
         final LinkedHashMap<String, JSONObject> tableColumns = databseTableMap.get(tableName);
         if (tableColumns == null) {
-            createTable(tableMapping, tableName, tableComment);
+            createTable(tableMapping, tableName, tableComment, actionPartition);
         } else {
             tableMapping.getColumns().values().forEach(fieldMapping -> {
                 JSONObject dbColumnMapping = tableColumns.get(fieldMapping.getColumnName());
@@ -154,8 +154,8 @@ public abstract class SqlDataHelper extends DataHelper {
         }
     }
 
-    protected void createTable(TableMapping tableMapping, String tableName, String comment) {
-        StringBuilder stringBuilder = ddlBuilder().buildTableSqlString(tableMapping, tableName);
+    protected void createTable(TableMapping tableMapping, String tableName, String comment, boolean actionPartition) {
+        StringBuilder stringBuilder = ddlBuilder().buildTableSqlString(tableMapping, tableName, actionPartition);
         this.executeUpdate(stringBuilder.toString());
         log.warn("创建表：{}", tableName);
     }

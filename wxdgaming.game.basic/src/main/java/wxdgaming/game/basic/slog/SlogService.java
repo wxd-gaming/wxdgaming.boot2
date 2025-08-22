@@ -34,7 +34,7 @@ public class SlogService implements InitPrint {
     }
 
 
-    public void addLog(AbstractLog abstractLog) {
+    public void pushLog(AbstractLog abstractLog) {
         LogEntity logEntity = new LogEntity();
         logEntity.setUid(newLogId(abstractLog.logType()));
         logEntity.setCreateTime(System.currentTimeMillis());
@@ -48,7 +48,24 @@ public class SlogService implements InitPrint {
                 abstractSlog.setCurSid(bootstrapProperties.getSid());
             }
         }
-        logBusService.addLog(logEntity);
+        logBusService.pushLog(logEntity);
+    }
+
+    public void updateLog(long uid, long time, AbstractLog abstractLog) {
+        LogEntity logEntity = new LogEntity();
+        logEntity.setUid(uid);
+        logEntity.setCreateTime(time);
+        logEntity.setLogType(abstractLog.logType());
+        logEntity.getLogData().putAll(abstractLog.toJSONObject());
+        if (abstractLog instanceof AbstractSlog abstractSlog) {
+            if (abstractSlog.getSid() == 0) {
+                abstractSlog.setSid(bootstrapProperties.getSid());
+            }
+            if (abstractSlog.getCurSid() == 0) {
+                abstractSlog.setCurSid(bootstrapProperties.getSid());
+            }
+        }
+        logBusService.updateLog(logEntity);
     }
 
 }

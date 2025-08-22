@@ -18,7 +18,8 @@ import wxdgaming.game.server.event.OnLogout;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.module.data.GlobalDbDataCenterService;
 import wxdgaming.game.server.module.drive.PlayerDriveService;
-import wxdgaming.game.server.script.role.log.RoleLoginLog;
+import wxdgaming.game.server.script.role.slog.RoleInfoSlog;
+import wxdgaming.game.server.script.role.slog.RoleLoginLog;
 
 import java.util.HashSet;
 
@@ -91,7 +92,10 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
             log.info("sid={}, {} 选择角色成功", sid, player);
 
             RoleLoginLog roleLoginLog = new RoleLoginLog(player, clientSessionMapping.getClientIp(), JSON.toJSONString(clientSessionMapping.getClientParams()));
-            slogService.addLog(roleLoginLog);
+            slogService.pushLog(roleLoginLog);
+
+            RoleInfoSlog roleInfoSlog = new RoleInfoSlog(player);
+            slogService.updateLog(player.getUid(), player.getCreateTime(), roleInfoSlog);
 
         });
     }

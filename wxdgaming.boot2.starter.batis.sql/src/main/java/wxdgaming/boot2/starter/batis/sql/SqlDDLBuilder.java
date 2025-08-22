@@ -30,7 +30,7 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
         return tableMapping;
     }
 
-    public StringBuilder buildTableSqlString(TableMapping tableMapping, String tableName) {
+    public StringBuilder buildTableSqlString(TableMapping tableMapping, String tableName, boolean actionPartition) {
         StringBuilder sb = new StringBuilder();
         sb.append("CREATE TABLE `").append(tableName).append("` (").append("\n");
         for (TableMapping.FieldMapping fieldMapping : tableMapping.getColumns().values()) {

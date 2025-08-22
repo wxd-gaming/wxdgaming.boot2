@@ -1,4 +1,4 @@
-package wxdgaming.game.server.script.role.log;
+package wxdgaming.game.server.script.role.slog;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
  **/
 @Slf4j
 @Getter
-@ComponentScan(basePackageClasses = {CoreScan.class, HttpClientProperties.class,})
 @Configuration
 public class HttpClientConfiguration implements InitPrint {
 

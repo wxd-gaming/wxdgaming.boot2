@@ -15,17 +15,17 @@ import wxdgaming.boot2.starter.batis.sql.ann.Partition;
  **/
 public class PgSqlDDLBuilder extends SqlDDLBuilder {
 
-    @Override public StringBuilder buildTableSqlString(TableMapping tableMapping, String tableName) {
-        StringBuilder table = super.buildTableSqlString(tableMapping, tableName);
-
-        tableMapping.getColumns().values()
-                .stream()
-                .filter(v -> AnnUtil.ann(v.getField(), Partition.class) != null)
-                .findFirst()
-                .ifPresent(fieldMapping -> {
-                    table.append(" PARTITION BY RANGE").append("(\"").append(fieldMapping.getColumnName()).append("\")");
-                });
-
+    @Override public StringBuilder buildTableSqlString(TableMapping tableMapping, String tableName, boolean actionPartition) {
+        StringBuilder table = super.buildTableSqlString(tableMapping, tableName, actionPartition);
+        if (actionPartition) {
+            tableMapping.getColumns().values()
+                    .stream()
+                    .filter(v -> AnnUtil.ann(v.getField(), Partition.class) != null)
+                    .findFirst()
+                    .ifPresent(fieldMapping -> {
+                        table.append(" PARTITION BY RANGE").append("(\"").append(fieldMapping.getColumnName()).append("\")");
+                    });
+        }
         return table;
     }
 

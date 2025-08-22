@@ -17,7 +17,7 @@ import wxdgaming.game.server.bean.role.RoleEntity;
 import wxdgaming.game.server.event.OnCreateRole;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.role.PlayerService;
-import wxdgaming.game.server.script.role.log.RoleRegisterLog;
+import wxdgaming.game.server.script.role.slog.RoleRegisterLog;
 import wxdgaming.game.server.script.tips.TipsService;
 
 import java.util.HashSet;
@@ -115,7 +115,7 @@ public class ReqCreateRoleHandler extends HoldApplicationContext {
             dataCenterService.getRid2NameMap().put(player.getUid(), name);
 
             RoleRegisterLog roleLoginLog = new RoleRegisterLog(player, clientSessionMapping.getClientIp(), JSON.toJSONString(clientSessionMapping.getClientParams()));
-            slogService.addLog(roleLoginLog);
+            slogService.pushLog(roleLoginLog);
 
         } finally {
             SingletonLockUtil.unlock("role_" + name);
