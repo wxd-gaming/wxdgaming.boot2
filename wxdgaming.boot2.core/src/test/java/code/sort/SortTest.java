@@ -1,7 +1,7 @@
 package code.sort;
 
 import org.junit.jupiter.api.Test;
-import wxdgaming.boot2.core.lang.DiffTime;
+import wxdgaming.boot2.core.lang.DiffTimeRecord;
 import wxdgaming.boot2.core.util.RandomUtils;
 
 import java.util.ArrayList;
@@ -18,12 +18,15 @@ public class SortTest {
 
     static int count = 10000;
 
+    public DiffTimeRecord newDiffTimeRecord() {
+        return DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
+    }
 
     @Test
     public void arraySort() {
         ArrayList<SortBean> arrayList = null;
         for (int k = 0; k < 4; k++) {
-            DiffTime diffTime = new DiffTime();
+            DiffTimeRecord diffTime = newDiffTimeRecord();
             arrayList = new ArrayList<>(count);
             for (int i = 0; i < count; i++) {
                 SortBean sortBean = new SortBean();
@@ -32,29 +35,29 @@ public class SortTest {
                 arrayList.add(sortBean);
             }
             arrayList.sort(null);
-            float v = diffTime.diffMs5();
-            System.out.println("array add Sort = " + v);
+            DiffTimeRecord.RecordTime recordTime = diffTime.totalInterval();
+            System.out.println("array add Sort = " + recordTime.toString());
         }
 
         for (int k = 0; k < 4; k++) {
             List<SortBean> sortBeans = List.copyOf(arrayList);
-            DiffTime diffTime = new DiffTime();
+            DiffTimeRecord diffTime = newDiffTimeRecord();
             for (SortBean sortBean : sortBeans) {
                 sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
                 arrayList.sort(null);
             }
-            float v = diffTime.diffMs5();
-            System.out.println("array update all Sort = " + v);
+            DiffTimeRecord.RecordTime recordTime = diffTime.totalInterval();
+            System.out.println("array update all Sort = " + recordTime.toString());
         }
 
 
         for (int k = 0; k < 4; k++) {
-            DiffTime diffTime = new DiffTime();
+            DiffTimeRecord diffTime = newDiffTimeRecord();
             SortBean sortBean = RandomUtils.randomItem(arrayList);
             sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
             arrayList.sort(null);
-            float v = diffTime.diffMs5();
-            System.out.println("array update one Sort = " + v);
+            DiffTimeRecord.RecordTime recordTime = diffTime.totalInterval();
+            System.out.println("array update one Sort = " + recordTime.toString());
         }
     }
 
@@ -63,7 +66,7 @@ public class SortTest {
     public void setSort() {
         TreeSet<SortBean> treeSet = null;
         for (int k = 0; k < 4; k++) {
-            DiffTime diffTime = new DiffTime();
+            DiffTimeRecord diffTime = newDiffTimeRecord();
             treeSet = new TreeSet<>();
             for (int i = 0; i < count; i++) {
                 SortBean sortBean = new SortBean();
@@ -71,30 +74,30 @@ public class SortTest {
                 sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
                 treeSet.add(sortBean);
             }
-            float v = diffTime.diffMs5();
-            System.out.println("set add Sort = " + v);
+            DiffTimeRecord.RecordTime recordTime = diffTime.totalInterval();
+            System.out.println("set add Sort = " + recordTime.toString());
         }
 
         for (int k = 0; k < 4; k++) {
             List<SortBean> sortBeans = List.copyOf(treeSet);
-            DiffTime diffTime = new DiffTime();
+            DiffTimeRecord diffTime = newDiffTimeRecord();
             for (SortBean sortBean : sortBeans) {
                 treeSet.remove(sortBean);
                 sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
                 treeSet.add(sortBean);
             }
-            float v = diffTime.diffMs5();
-            System.out.println("set update all Sort = " + v);
+            DiffTimeRecord.RecordTime recordTime = diffTime.totalInterval();
+            System.out.println("set update all Sort = " + recordTime.toString());
         }
 
         for (int k = 0; k < 4; k++) {
-            DiffTime diffTime = new DiffTime();
+            DiffTimeRecord diffTime = newDiffTimeRecord();
             SortBean sortBean = RandomUtils.randomItem(treeSet);
             treeSet.remove(sortBean);
             sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
             treeSet.add(sortBean);
-            float v = diffTime.diffMs5();
-            System.out.println("set update one Sort = " + v);
+            DiffTimeRecord.RecordTime recordTime = diffTime.totalInterval();
+            System.out.println("set update one Sort = " + recordTime.toString());
         }
     }
 

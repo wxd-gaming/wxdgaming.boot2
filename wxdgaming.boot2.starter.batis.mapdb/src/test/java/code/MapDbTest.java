@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Serializer;
-import wxdgaming.boot2.core.lang.DiffTime;
+import wxdgaming.boot2.core.lang.DiffTimeRecord;
 import wxdgaming.boot2.core.util.DumpUtil;
 import wxdgaming.boot2.core.util.RandomUtils;
 import wxdgaming.boot2.starter.batis.mapdb.HoldMap;
@@ -32,7 +32,7 @@ public class MapDbTest {
 
     @Test
     public void putFileDB() {
-        try (DB db = DBMaker.fileDB("target/file.db")
+        try (DB db = DBMaker.fileDB("target/file00.db")
                 .fileMmapEnableIfSupported() // 启用内存映射（提升读性能）
                 .fileMmapPreclearDisable()   // 禁用预清理（避免写时阻塞）
                 .cleanerHackEnable()         // 启用清理黑客（提升 mmap 关闭可靠性）
@@ -47,7 +47,7 @@ public class MapDbTest {
 
     @Test
     public void getFileDB() {
-        try (DB db = DBMaker.fileDB("target/filet.db")
+        try (DB db = DBMaker.fileDB("target/filet11.db")
                 .fileMmapEnableIfSupported() // 启用内存映射（提升读性能）
                 .fileMmapPreclearDisable()   // 禁用预清理（避免写时阻塞）
                 .cleanerHackEnable()         // 启用清理黑客（提升 mmap 关闭可靠性）
@@ -66,7 +66,7 @@ public class MapDbTest {
     }
 
     public void readFileDB(String cacheName) {
-        try (DB db = DBMaker.fileDB("target/filet.db")
+        try (DB db = DBMaker.fileDB("target/filet22.db")
                 .readOnly()
                 .fileMmapEnableIfSupported() // 启用内存映射（提升读性能）
                 .make()) {
@@ -80,29 +80,30 @@ public class MapDbTest {
             System.out.println("getFileDB:cacheName:" + cacheName + " not exists");
             return;
         }
-        DiffTime diffTime = new DiffTime();
+        DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
         ConcurrentMap<String, Object> map = db.hashMap(cacheName, Serializer.STRING, Serializer.JAVA).open();
-        System.out.println(String.format("读取耗时 %s ms", diffTime.diffMs5AndReset()));
+        diffTime.marker("读取耗时");
         String collect = map.entrySet().stream().map(v -> v.getKey() + ":" + v.getValue()).collect(Collectors.joining("&"));
-        System.out.println(String.format("打印耗时 %s ms, getFileDB:%s", diffTime.diffMs5AndReset(), collect));
+        diffTime.marker("打印耗时");
+        System.out.println(diffTime + "\n" + collect);
     }
 
 
     @Test
     public void putFileDBSize() {
-        File file = new File("target/file.db");
+        File file = new File("target/file444.db");
         try (MapDBDataHelper db = new MapDBDataHelper(file)) {
             System.out.println("start");
-//            for (int i = 0; i < 1000; i++) {
-//                DiffTime diffTime = new DiffTime();
-//                String cacheName = "map" + RandomUtils.random(1000);
-//                HoldMap holdMap = db.hMap(cacheName);
-//                System.out.println(String.format("打开耗时 %s ms, name=%s", diffTime.diffMs5AndReset(), cacheName));
-//                for (int k = 0; k < 1000; k++) {
-//                    holdMap.put("something " + k, new AA().setName("aa" + System.currentTimeMillis()));
-//                }
-//                System.out.println(String.format("写入耗时 %s ms, name=%s", diffTime.diffMs5AndReset(), cacheName));
-//            }
+            //            for (int i = 0; i < 1000; i++) {
+            //                DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
+            //                String cacheName = "map" + RandomUtils.random(1000);
+            //                HoldMap holdMap = db.hMap(cacheName);
+            //                System.out.println(String.format("打开耗时 %s ms, name=%s", diffTime.diffMs5AndReset(), cacheName));
+            //                for (int k = 0; k < 1000; k++) {
+            //                    holdMap.put("something " + k, new AA().setName("aa" + System.currentTimeMillis()));
+            //                }
+            //                System.out.println(String.format("写入耗时 %s ms, name=%s", diffTime.diffMs5AndReset(), cacheName));
+            //            }
             System.out.println("=====================");
             readFileDB(db, "map" + RandomUtils.random(100), "something " + RandomUtils.random(1000));
             readFileDB(db, "map" + RandomUtils.random(100), "something " + RandomUtils.random(1000));
@@ -125,18 +126,16 @@ public class MapDbTest {
             System.out.println("getFileDB:cacheName:" + cacheName + " not exists");
             return;
         }
-        DiffTime diffTime = new DiffTime();
+        DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
         HoldMap holdMap = db.hMap(cacheName);
-        System.out.println(String.format("打开耗时 %s ms", diffTime.diffMs5AndReset()));
-        diffTime.reset();
+        diffTime.marker("打开耗时");
         Object o = holdMap.get(key);
-        System.out.println(String.format("读取耗时 %s ms, key=%s, valueType=%s, value=%s", diffTime.diffMs5AndReset(), key, o.getClass().getSimpleName(), o));
-        diffTime.reset();
+        diffTime.marker(String.format("读取, key=%s, valueType=%s, value=%s", key, o.getClass().getSimpleName(), o));
         Object o1 = holdMap.get(key);
-        System.out.println(String.format("读取耗时 %s ms, key=%s, valueType=%s, value=%s", diffTime.diffMs5AndReset(), key, o1.getClass().getSimpleName(), o1));
-        diffTime.reset();
+        diffTime.marker(String.format("读取, key=%s, valueType=%s, value=%s", key, o1.getClass().getSimpleName(), o1));
         String jsonString = JSON.toJSONString(holdMap.getHold());
-        System.out.println(String.format("打印耗时 %s ms, getFileDB:%s", diffTime.diffMs5AndReset(), jsonString));
+        diffTime.marker("打印耗时");
+        System.out.println(diffTime + "\n" + jsonString);
     }
 
     @Test

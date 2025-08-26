@@ -2,12 +2,9 @@ package wxdgaming.boot2.core.keywords;
 
 import lombok.Getter;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
-import wxdgaming.boot2.core.lang.DiffTime;
+import wxdgaming.boot2.core.lang.DiffTimeRecord;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 关键字
@@ -30,16 +27,13 @@ public class KeywordsMapping {
 
         System.out.println(FastJsonUtil.toJSONStringAsFmt(keywordsMapping));
         System.out.println(keywordsMapping.replace(source, '*'));
-        DiffTime diffTime = new DiffTime();
         for (int i = 0; i < 10; i++) {
-            diffTime.reset();
+            DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
             boolean contains = keywordsMapping.contains(source);
-            float diff = diffTime.diffMs5();
-            System.out.println(diff + " ms " + contains);
-            diffTime.reset();
+            diffTime.marker("contains " + contains);
             List<String> wordsed = keywordsMapping.words(source);
-            diff = diffTime.diffMs5();
-            System.out.println(diff + " ms " + wordsed);
+            diffTime.marker("wordsed " + wordsed.toString());
+            System.out.println(diffTime);
             System.out.println("==================================");
         }
     }

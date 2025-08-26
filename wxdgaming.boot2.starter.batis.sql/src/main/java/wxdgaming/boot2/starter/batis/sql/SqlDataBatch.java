@@ -9,7 +9,7 @@ import wxdgaming.boot2.core.collection.ConvertCollection;
 import wxdgaming.boot2.core.collection.SplitCollection;
 import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.core.io.FileWriteUtil;
-import wxdgaming.boot2.core.lang.DiffTime;
+import wxdgaming.boot2.core.lang.DiffTimeRecord;
 import wxdgaming.boot2.core.lang.Tick;
 import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.starter.batis.DataBatch;
@@ -102,7 +102,7 @@ public abstract class SqlDataBatch extends DataBatch {
         /** key: tableName, value: {key: sql, value: params} */
         protected Table<String, String, ConvertCollection<BatchParam>> batchUpdateMap = new Table<>();
 
-        protected DiffTime diffTime = new DiffTime();
+        DiffTimeRecord diffTimeRecord = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.NS);
         protected long executeDiffTime = 0;
         protected long executeCount = 0;
         protected Tick ticket = new Tick(1, TimeUnit.MINUTES);
@@ -209,9 +209,9 @@ public abstract class SqlDataBatch extends DataBatch {
                     SplitCollection<BatchParam> splitCollection = new SplitCollection<>(batchSubmitSize, values.getNodes());
                     while (!splitCollection.isEmpty()) {
                         List<BatchParam> batchParams = splitCollection.removeFirst();
-                        diffTime.reset();
+                        diffTimeRecord.reset();
                         int executeCount = executeUpdate(sql, batchParams);
-                        long diff = diffTime.diffNs() / 10000;
+                        long diff = diffTimeRecord.totalInterval().interval() / 10000;
                         executeDiffTime += diff;
                         this.executeCount += executeCount;
                         if (sqlDataHelper.getSqlConfig().isDebug() || ticket.need() || closed.get() || GlobalUtil.Exiting.get()) {
