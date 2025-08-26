@@ -17,6 +17,7 @@ import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.FieldUtil;
 import wxdgaming.boot2.core.reflect.MethodUtil;
+import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.core.util.JvmUtil;
 
 import java.io.Closeable;
@@ -24,6 +25,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -144,6 +146,17 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
                         .sorted(ProviderMethod::compareTo)
                         .toList()
         );
+    }
+
+    public <K, B> Map<K, B> toMap(Class<B> cls, Function<B, K> function) {
+        HashMap<K, B> tmp = new HashMap<>();
+        classWithSuper(cls).forEach(bean -> {
+            K key = function.apply(bean);
+            B oldPut = tmp.put(key, bean);
+            AssertUtil.assertTrue(oldPut == null, "重复类型：" + key);
+            log.info("register {}: {}", cls.getSimpleName(), key);
+        });
+        return Collections.unmodifiableMap(tmp);
     }
 
     /** 执行循环过程中某一个函数执行失败中断执行 */

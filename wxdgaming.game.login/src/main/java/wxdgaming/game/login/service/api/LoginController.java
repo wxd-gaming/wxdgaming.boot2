@@ -6,11 +6,9 @@ import org.springframework.web.bind.annotation.*;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.basic.login.AppPlatformParams;
 import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,17 +27,7 @@ public class LoginController extends HoldApplicationContext {
 
     @Init
     public void init() {
-
-        HashMap<AppPlatformParams.Platform, AbstractSdkLoginApi> map = new HashMap<>();
-
-        applicationContextProvider.classWithSuper(AbstractSdkLoginApi.class)
-                .forEach(sdkLoginApi -> {
-                    AbstractSdkLoginApi oldPut = map.put(sdkLoginApi.platform(), sdkLoginApi);
-                    AssertUtil.assertTrue(oldPut == null, "重复注册类型：" + sdkLoginApi.platform());
-                    log.info("register sdk login api: {}", sdkLoginApi.platform());
-                });
-
-        sdkMap = Collections.unmodifiableMap(map);
+        sdkMap = applicationContextProvider.toMap(AbstractSdkLoginApi.class, AbstractSdkLoginApi::platform);
     }
 
     @RequestMapping(value = "/check")
