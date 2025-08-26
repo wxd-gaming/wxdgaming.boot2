@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.gm.ann.GM;
 import wxdgaming.game.server.script.tips.TipsService;
@@ -14,6 +13,7 @@ import wxdgaming.game.server.script.tips.TipsService;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * gm服务, 运营接口
@@ -25,7 +25,7 @@ import java.util.List;
 @Service
 public class GmService extends HoldApplicationContext {
 
-    HashMap<String, ApplicationContextProvider.ProviderMethod> gmMap = new HashMap<>();
+    Map<String, ApplicationContextProvider.ProviderMethod> gmMap = new HashMap<>();
     private final TipsService tipsService;
 
     public GmService(TipsService tipsService) {
@@ -34,14 +34,11 @@ public class GmService extends HoldApplicationContext {
 
     @Init
     public void init() {
-        HashMap<String, ApplicationContextProvider.ProviderMethod> tmp = new HashMap<>();
-        applicationContextProvider.withMethodAnnotated(GM.class)
-                .forEach(content -> {
-                    Method method = content.getMethod();
-                    ApplicationContextProvider.ProviderMethod old = tmp.put(method.getName().toLowerCase(), content);
-                    AssertUtil.assertTrue(old == null, "重复的gm命令: " + method.getName());
-                });
-        gmMap = tmp;
+        gmMap = applicationContextProvider.toMapWithMethodAnnotated(
+                GM.class,
+                providerMethod -> providerMethod.getMethod().getName(),
+                providerMethod -> providerMethod
+        );
     }
 
     public void doGm(Player player, String[] args) {

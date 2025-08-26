@@ -15,6 +15,10 @@ import java.util.stream.Stream;
  **/
 public class AnnUtil {
 
+    public static boolean hasAnn(Class<?> source, Class<? extends Annotation> annClass) {
+        return ann(source, annClass) != null;
+    }
+
     public static <A extends Annotation> Optional<A> annOpt(Class<?> source, Class<A> annClass) {
         return Optional.ofNullable(ann(source, annClass, false));
     }
@@ -39,6 +43,9 @@ public class AnnUtil {
         return null;
     }
 
+    public static boolean hasAnn(Field source, Class<? extends Annotation> annClass) {
+        return ann(source, annClass) != null;
+    }
 
     /**
      * 获取字段上的所有注解
@@ -65,6 +72,10 @@ public class AnnUtil {
         A[] annotationsByType = source.getAnnotationsByType(annClass);
         if (annotationsByType.length > 0) return annotationsByType[0];
         return null;
+    }
+
+    public static boolean hasAnn(Method source, Class<? extends Annotation> annClass) {
+        return ann(source, annClass) != null;
     }
 
     /**

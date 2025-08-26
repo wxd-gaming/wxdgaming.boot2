@@ -4,12 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.server.bean.MapNpc;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 战斗
@@ -21,17 +21,11 @@ import java.util.List;
 @Service
 public class FightService extends HoldApplicationContext {
 
-    HashMap<Integer, AbstractFightAction> actionImplMap = new HashMap<>();
+    Map<Integer, AbstractFightAction> actionImplMap = new HashMap<>();
 
     @Init
     public void init() {
-        HashMap<Integer, AbstractFightAction> map = new HashMap<>();
-        applicationContextProvider.classWithSuper(AbstractFightAction.class)
-                .forEach(impl -> {
-                    AbstractFightAction old = map.put(impl.type(), impl);
-                    AssertUtil.assertTrue(old == null, "重复的战斗动作类型" + impl.type());
-                });
-        actionImplMap = map;
+        actionImplMap = applicationContextProvider.toMap(AbstractFightAction.class, AbstractFightAction::type);
     }
 
     public void changeHp(MapNpc mapNpc, long change, ReasonDTO reasonDTO) {

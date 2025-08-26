@@ -100,7 +100,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     Collection<Provider<Object>> classWithAnnotatedStream(Class<? extends Annotation> annotation) {
         return annotationCacheMap.computeIfAbsent(annotation, k ->
                 getBeanList().stream()
-                        .filter(provider -> provider.withAnnotated(annotation))
+                        .filter(provider -> provider.hasAnn(annotation))
                         .toList()
         );
     }
@@ -148,14 +148,43 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         );
     }
 
-    public <K, B> Map<K, B> toMap(Class<B> cls, Function<B, K> function) {
-        HashMap<K, B> tmp = new HashMap<>();
-        classWithSuper(cls).forEach(bean -> {
-            K key = function.apply(bean);
-            B oldPut = tmp.put(key, bean);
+    public <K, B> Map<K, B> toMap(Class<B> cls, Function<B, K> convertKey) {
+        return toMap(cls, convertKey, bean -> bean);
+    }
+
+    /** 将指定类或者接口的转换成map对象 */
+    public <B, K, V> Map<K, V> toMap(Class<B> cls, Function<B, K> convertKey, Function<B, V> convertValue) {
+        return toMap4Collection(classWithSuper(cls).toList(), convertKey, convertValue);
+    }
+
+    /** 将添加了注解的类转换成map对象 */
+    public <K, V> Map<K, V> toMapWithAnnotated(Class<? extends Annotation> cls, Function<Object, K> convertKey, Function<Object, V> convertValue) {
+        return toMap4Collection(
+                withAnnotated(cls),
+                pb -> convertKey.apply(pb.getBean()),
+                pb -> convertValue.apply(pb.getBean())
+        );
+    }
+
+    /** 针对方法添加注解的实例类转换成map对象 */
+    public <K, V> Map<K, V> toMapWithMethodAnnotated(Class<? extends Annotation> cls,
+                                                     Function<ProviderMethod, K> convertKey,
+                                                     Function<ProviderMethod, V> convertValue) {
+        Collection<ProviderMethod> providerMethods = withMethodAnnotated(cls);
+        return toMap4Collection(providerMethods, convertKey, convertValue);
+    }
+
+    public <B, K, V> Map<K, V> toMap4Collection(Collection<B> stream,
+                                                Function<B, K> convertKey,
+                                                Function<B, V> convertValue) {
+        HashMap<K, V> tmp = new HashMap<>();
+        for (B bean : stream) {
+            K key = convertKey.apply(bean);
+            V value = convertValue.apply(bean);
+            V oldPut = tmp.put(key, value);
             AssertUtil.assertTrue(oldPut == null, "重复类型：" + key);
-            log.info("register {}: {}", cls.getSimpleName(), key);
-        });
+            log.debug("register {}: {}", key, value);
+        }
         return Collections.unmodifiableMap(tmp);
     }
 
@@ -255,41 +284,38 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         return this;
     }
 
-    /** 传递参数提取 */
-    static class HolderArgument {
-
-        private final Object[] arguments;
-        private int argumentIndex = 0;
-
-        public HolderArgument(Object[] arguments) {
-            this.arguments = arguments;
-        }
-
-        @SuppressWarnings("unchecked")
-        public <R> R next() {
-            return (R) arguments[argumentIndex++];
-        }
-
-    }
-
     @Getter
     public class Provider<T> {
 
         private final T bean;
         /** 所有的字段 */
-        private final Collection<ProviderField> fields;
+        private Collection<ProviderField> fields;
         /** 所有的方法 */
-        private final Collection<ProviderMethod> methods;
+        private Collection<ProviderMethod> methods;
 
         Provider(T bean) {
             this.bean = bean;
-            this.fields = FieldUtil.getFields(false, bean.getClass()).values().stream().map(f -> new ProviderField(bean, f)).toList();
-            this.methods = MethodUtil.readAllMethod(false, bean.getClass()).values().stream().map(m -> new ProviderMethod(bean, m)).toList();
+        }
+
+        public Collection<ProviderField> getFields() {
+            if (fields == null) {
+                Map<String, Field> fieldMap = FieldUtil.getFields(false, bean.getClass());
+                this.fields = fieldMap.values().stream().map(f -> new ProviderField(bean, f)).toList();
+            }
+            return fields;
+        }
+
+        public Collection<ProviderMethod> getMethods() {
+            if (methods == null) {
+                Map<String, Method> stringMethodMap = MethodUtil.readAllMethod(false, bean.getClass());
+                this.methods = stringMethodMap.values().stream().map(m -> new ProviderMethod(bean, m)).toList();
+            }
+            return methods;
         }
 
         /** 是否添加了注解 */
-        public boolean withAnnotated(Class<? extends Annotation> annotation) {
-            return AnnUtil.ann(bean.getClass(), annotation) != null;
+        public boolean hasAnn(Class<? extends Annotation> annotation) {
+            return AnnUtil.hasAnn(bean.getClass(), annotation);
         }
 
         /** 是否添加了注解 */
@@ -297,9 +323,13 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
             return cls.isAssignableFrom(bean.getClass());
         }
 
+        public Stream<ProviderMethod> methodStream() {
+            return getMethods().stream();
+        }
+
         /** 所有添加了这个注解的方法 */
         public Stream<ProviderMethod> methodsWithAnnotated(Class<? extends Annotation> annotation) {
-            return methods.stream().filter(provider -> AnnUtil.ann(provider.getMethod(), annotation) != null);
+            return methodStream().filter(provider -> provider.hasAnn(annotation));
         }
 
         /** 所有的字段 */
@@ -309,7 +339,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
 
         /** 所有添加了这个注解的字段 */
         public Stream<ProviderField> fieldWithAnnotated(Class<? extends Annotation> annotation) {
-            return fieldStream().filter(provider -> AnnUtil.ann(provider.getField(), annotation) != null);
+            return fieldStream().filter(provider -> provider.hasAnn(annotation));
         }
 
         @Override public String toString() {
@@ -326,6 +356,11 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         public ProviderField(Object bean, Field field) {
             this.bean = bean;
             this.field = field;
+        }
+
+        /** 是否添加了注解 */
+        public boolean hasAnn(Class<? extends Annotation> annotation) {
+            return AnnUtil.hasAnn(field, annotation);
         }
 
         public void invoke(Object arg) {
@@ -373,6 +408,11 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         public ProviderMethod(Object bean, Method method) {
             this.bean = bean;
             this.method = method;
+        }
+
+        /** 是否添加了注解 */
+        public boolean hasAnn(Class<? extends Annotation> annotation) {
+            return AnnUtil.hasAnn(method, annotation);
         }
 
         public Object invoke(Object... args) {

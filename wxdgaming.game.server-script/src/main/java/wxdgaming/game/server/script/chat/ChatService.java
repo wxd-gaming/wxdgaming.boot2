@@ -4,10 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.message.chat.ChatType;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 聊天模块
@@ -19,17 +19,11 @@ import java.util.HashMap;
 @Service
 public class ChatService extends HoldApplicationContext {
 
-    HashMap<ChatType, AbstractChatAction> chatHandlerMap = new HashMap<>();
+    Map<ChatType, AbstractChatAction> chatHandlerMap = new HashMap<>();
 
     @Init
     public void init() {
-        HashMap<ChatType, AbstractChatAction> tmpChatHandlerMap = new HashMap<>();
-        applicationContextProvider.classWithSuper(AbstractChatAction.class)
-                .forEach(abstractChatAction -> {
-                    AbstractChatAction put = tmpChatHandlerMap.put(abstractChatAction.chatType(), abstractChatAction);
-                    AssertUtil.assertTrue(put == null, "重复注册类型：" + abstractChatAction.chatType());
-                });
-        this.chatHandlerMap = tmpChatHandlerMap;
+        this.chatHandlerMap = applicationContextProvider.toMap(AbstractChatAction.class, AbstractChatAction::chatType);
     }
 
     public AbstractChatAction chatHandler(ChatType chatType) {
