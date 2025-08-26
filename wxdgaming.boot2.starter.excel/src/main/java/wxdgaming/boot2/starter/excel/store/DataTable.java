@@ -72,15 +72,15 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
                 Keys keys = AnnUtil.ann(DataTable.this.getClass(), Keys.class);
                 if (keys != null) {
                     for (String s : keys.value()) {
-                        String index = "";
+                        StringBuilder index = new StringBuilder();
                         String[] split = s.split(keys.split());
                         for (String filedName : split) {
                             Object fv = fieldMap.get(filedName).get(dbModel);
-                            if (!index.isEmpty()) index += keys.split();
-                            index += fv;
+                            if (!index.isEmpty()) index.append(keys.split());
+                            index.append(fv);
                         }
                         /*添加自定义索引*/
-                        if (modeMap.put(index, dbModel) != null) {
+                        if (modeMap.put(index.toString(), dbModel) != null) {
                             throw new AssertException("数据 自定义索引 【" + s + "】 【" + keyValue + "】 重复 ");
                         }
                     }
@@ -139,19 +139,19 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
     }
 
     public void toDataString(StreamWriter streamWriter, int len) {
-        streamWriter.write("解析：").write(tClass.getName()).write("\n");
-        streamWriter.write("表名：").write(dataMapping.name()).write("\n");
+        streamWriter.write("解析：").write(tClass.getName()).writeLn();
+        streamWriter.write("表名：").write(dataMapping.name()).writeLn();
 
-        streamWriter.writeRight("-", len * fieldMap.size(), '-').write("\n");
+        streamWriter.writeRight("-", len * fieldMap.size(), '-').writeLn();
         for (String columnName : fieldMap.keySet()) {
             streamWriter.write("|").writeRight(columnName, len, ' ');
         }
 
-        streamWriter.write("\n");
+        streamWriter.writeLn();
 
-        streamWriter.writeRight("-", len * fieldMap.size(), '-').write("\n");
+        streamWriter.writeRight("-", len * fieldMap.size(), '-').writeLn();
         for (E row : dataList) {
-            streamWriter.write("\n");
+            streamWriter.writeLn();
             for (Field entityField : fieldMap.values()) {
                 entityField.setAccessible(true);
                 Object value = null;
@@ -169,7 +169,7 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
                 }
             }
         }
-        streamWriter.write("\n");
+        streamWriter.writeLn();
     }
 
 }

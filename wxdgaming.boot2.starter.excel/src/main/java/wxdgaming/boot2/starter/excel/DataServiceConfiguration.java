@@ -11,7 +11,7 @@ import wxdgaming.boot2.starter.excel.store.DataRepository;
  * @version 2025-05-09 14:00
  **/
 @Configuration
-public class DataServiceGuiceModule {
+public class DataServiceConfiguration {
 
     @Bean
     public DataRepository dataRepository() {
