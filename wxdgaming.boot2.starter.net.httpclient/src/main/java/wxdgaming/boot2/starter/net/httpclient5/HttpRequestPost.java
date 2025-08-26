@@ -13,6 +13,7 @@ import org.apache.hc.client5.http.entity.GzipCompressingEntity;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.StringEntity;
+import wxdgaming.boot2.core.Const;
 import wxdgaming.boot2.starter.net.http.HttpDataAction;
 
 import java.util.Map;
@@ -107,7 +108,7 @@ public class HttpRequestPost extends AbstractHttpRequest {
         HttpPost httpPost = new HttpPost(this.uriPath());
         if (this.params != null) {
             HttpEntity httpEntity = new StringEntity(params, contentType);
-            if (useGzip && httpEntity.getContentLength() > HttpDataAction.USE_GZIP_MIN_LENGTH) {
+            if (useGzip && httpEntity.getContentLength() > Const.USE_GZIP_MIN_LENGTH) {
                 httpEntity = new GzipCompressingEntity(httpEntity);
             }
             httpPost.setEntity(httpEntity);

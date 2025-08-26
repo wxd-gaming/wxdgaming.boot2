@@ -16,9 +16,6 @@ import java.util.stream.Collectors;
  **/
 public class HttpDataAction {
 
-    /** 使用 gzip 的最小值 */
-    public static final int USE_GZIP_MIN_LENGTH = 1024 * 8;
-
     public static String urlEncoder(Object text) {
         final String valueOf = String.valueOf(text);
         return URLEncoder.encode(valueOf, StandardCharsets.UTF_8);

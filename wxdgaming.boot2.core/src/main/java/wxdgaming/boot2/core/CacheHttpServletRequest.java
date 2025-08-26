@@ -10,7 +10,6 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -44,12 +43,12 @@ public class CacheHttpServletRequest extends ContentCachingRequestWrapper {
         return new ServletInputStreamNew(getContentAsByteArray());
     }
 
-    public byte[] body() {
-        return getContentAsByteArray();
+    @Override public byte[] getContentAsByteArray() {
+        return super.getContentAsByteArray();
     }
 
-    public String bodyString() {
-        return new String(getContentAsByteArray(), Charset.forName(getCharacterEncoding()));
+    @Override public String getContentAsString() {
+        return super.getContentAsString();
     }
 
     @Override public BufferedReader getReader() throws IOException {
@@ -72,13 +71,6 @@ public class CacheHttpServletRequest extends ContentCachingRequestWrapper {
         return super.getParameterValues(name);
     }
 
-    @Override public byte[] getContentAsByteArray() {
-        return super.getContentAsByteArray();
-    }
-
-    @Override public String getContentAsString() {
-        return super.getContentAsString();
-    }
 
     //参考自 DelegatingServletInputStream
     static class ServletInputStreamNew extends ServletInputStream {

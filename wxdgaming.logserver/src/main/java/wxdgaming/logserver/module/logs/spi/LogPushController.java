@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.CacheHttpServletRequest;
+import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.RunResult;
@@ -19,6 +20,7 @@ import wxdgaming.logserver.LogServerProperties;
 import wxdgaming.logserver.bean.LogEntity;
 import wxdgaming.logserver.module.logs.LogService;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -44,15 +46,9 @@ public class LogPushController {
     }
 
     @RequestMapping("/push")
-    public RunResult pushList(HttpServletRequest request, @RequestBody byte[] bytes) {
+    public RunResult pushList(HttpServletRequest request) throws IOException {
 
-        String json = null;
-        String header = request.getHeader(HttpHeaderNames.CONTENT_ENCODING.toString());
-        if (header != null && header.equalsIgnoreCase("gzip")) {
-            json = GzipUtil.unGzip2String(bytes);
-        } else {
-            json = new String(bytes, StandardCharsets.UTF_8);
-        }
+        String json = SpringUtil.readBody(request);
 
         TreeMap<String, String> map = JSON.parseObject(json, new TypeReference<TreeMap<String, String>>() {});
         String sign = map.remove("sign");

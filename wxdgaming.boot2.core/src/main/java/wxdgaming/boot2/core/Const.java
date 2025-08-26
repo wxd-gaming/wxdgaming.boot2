@@ -8,7 +8,9 @@ package wxdgaming.boot2.core;
  **/
 public interface Const {
 
-    String PACKAGE_NAME = "wxdgaming.boot2.core";
     int SORT_DEFAULT = 99999;
+
+    /** 使用 gzip 的最小值 */
+    int USE_GZIP_MIN_LENGTH = 1024 * 8;
 
 }

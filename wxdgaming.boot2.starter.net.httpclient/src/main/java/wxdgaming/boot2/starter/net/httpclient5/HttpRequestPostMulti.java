@@ -11,6 +11,7 @@ import org.apache.hc.client5.http.entity.GzipCompressingEntity;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
+import wxdgaming.boot2.core.Const;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.net.http.HttpDataAction;
 
@@ -117,7 +118,7 @@ public class HttpRequestPostMulti extends AbstractHttpRequest {
     @Override protected HttpUriRequestBase buildRequest() {
         HttpPost httpRequest = new HttpPost(this.uriPath());
         HttpEntity httpEntity = multipartEntityBuilder.build();
-        if (useGzip && httpEntity.getContentLength() > HttpDataAction.USE_GZIP_MIN_LENGTH) {
+        if (useGzip && httpEntity.getContentLength() > Const.USE_GZIP_MIN_LENGTH) {
             httpEntity = new GzipCompressingEntity(httpEntity);
         }
         httpRequest.setEntity(httpEntity);

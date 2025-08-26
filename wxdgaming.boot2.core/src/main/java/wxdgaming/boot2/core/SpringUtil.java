@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
@@ -26,6 +27,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
+import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.util.ChildApplicationContextProvider;
 
 import java.io.IOException;
@@ -86,10 +88,17 @@ public class SpringUtil implements InitPrint {
     }
 
     public static String readBody(HttpServletRequest request) throws IOException {
+        byte[] bytes;
         if (request instanceof CacheHttpServletRequest wrapper) {
-            return wrapper.bodyString();
+            bytes = wrapper.getContentAsByteArray();
+        } else {
+            bytes = IOUtils.toByteArray(request.getInputStream());
         }
-        return IOUtils.toString(request.getInputStream(), request.getCharacterEncoding());
+        String header = request.getHeader(HttpHeaders.CONTENT_ENCODING);
+        if (header != null && header.equalsIgnoreCase("gzip")) {
+            bytes = GzipUtil.unGZip(bytes);
+        }
+        return new String(bytes, request.getCharacterEncoding());
     }
 
     public static JSONObject readBodyJson(HttpServletRequest request) throws IOException {
