@@ -15,12 +15,12 @@ import wxdgaming.game.server.bean.task.TaskInfo;
 import wxdgaming.game.server.bean.task.TaskPack;
 import wxdgaming.game.server.event.OnLogin;
 import wxdgaming.game.server.event.OnTask;
-import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.task.init.ConditionInitValueHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 任务模块
@@ -32,33 +32,21 @@ import java.util.List;
 @Service
 public class TaskService extends HoldApplicationContext {
 
-    private final DataCenterService dataCenterService;
-    private HashMap<TaskType, ITaskScript> taskScriptImplHashMap = new HashMap<>();
-    private HashMap<Condition, ConditionInitValueHandler> conditionInitValueHandlerMap = new HashMap<>();
+    private Map<TaskType, ITaskScript> taskScriptImplHashMap = new HashMap<>();
+    private Map<Condition, ConditionInitValueHandler> conditionInitValueHandlerMap = new HashMap<>();
 
-    public TaskService(DataCenterService dataCenterService) {
-        this.dataCenterService = dataCenterService;
+    public TaskService() {
     }
 
     @Init
     public void init() {
-        HashMap<Condition, ConditionInitValueHandler> tmpConditionInitValueHandlerMap = new HashMap<>();
-        getApplicationContextProvider().classWithSuper(ConditionInitValueHandler.class)
-                .forEach(conditionInitValueHandler -> {
-                    if (tmpConditionInitValueHandlerMap.put(conditionInitValueHandler.condition(), conditionInitValueHandler) != null) {
-                        throw new RuntimeException("重复的任务条件处理器：" + conditionInitValueHandler.condition());
-                    }
-                });
-        conditionInitValueHandlerMap = tmpConditionInitValueHandlerMap;
 
-        HashMap<TaskType, ITaskScript> tmpTaskScriptImplHashMap = new HashMap<>();
-        getApplicationContextProvider().classWithSuper(ITaskScript.class)
-                .forEach(taskScript -> {
-                    if (tmpTaskScriptImplHashMap.put(taskScript.type(), taskScript) != null) {
-                        throw new RuntimeException("任务类型处理重复：" + taskScript.type());
-                    }
-                });
-        taskScriptImplHashMap = tmpTaskScriptImplHashMap;
+        conditionInitValueHandlerMap = applicationContextProvider.toMap(
+                ConditionInitValueHandler.class,
+                ConditionInitValueHandler::condition
+        );
+
+        taskScriptImplHashMap = applicationContextProvider.toMap(ITaskScript.class, ITaskScript::type);
     }
 
     public ITaskScript getTaskScript(TaskType taskType) {
