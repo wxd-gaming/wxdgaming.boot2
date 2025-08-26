@@ -3,7 +3,7 @@ package wxdgaming.game.server.script.role.slog;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.bean.slog.AbstractRoleLog;
+import wxdgaming.game.server.bean.slog.AbstractRoleSlog;
 
 /**
  * 角色详情
@@ -13,7 +13,7 @@ import wxdgaming.game.server.bean.slog.AbstractRoleLog;
  **/
 @Getter
 @Setter
-public class RoleInfoSlog extends AbstractRoleLog {
+public class RoleInfoSlog extends AbstractRoleSlog {
 
     public RoleInfoSlog(Player player) {
         super(player);

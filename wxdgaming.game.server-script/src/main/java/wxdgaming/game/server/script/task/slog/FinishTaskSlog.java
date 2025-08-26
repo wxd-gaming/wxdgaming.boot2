@@ -3,7 +3,7 @@ package wxdgaming.game.server.script.task.slog;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.bean.slog.AbstractRoleLog;
+import wxdgaming.game.server.bean.slog.AbstractRoleSlog;
 
 /**
  * 接受任务
@@ -13,7 +13,7 @@ import wxdgaming.game.server.bean.slog.AbstractRoleLog;
  */
 @Getter
 @Setter
-public class FinishTaskSlog extends AbstractRoleLog {
+public class FinishTaskSlog extends AbstractRoleSlog {
 
     private int taskId;
     private String taskName;

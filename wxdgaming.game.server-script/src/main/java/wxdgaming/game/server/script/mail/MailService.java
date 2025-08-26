@@ -3,7 +3,9 @@ package wxdgaming.game.server.script.mail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.collection.ListOf;
 import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.game.basic.slog.SlogService;
 import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.bean.mail.MailInfo;
 import wxdgaming.game.bean.mail.MailPack;
@@ -14,6 +16,7 @@ import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnHeartMinute;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.module.data.GlobalDataService;
+import wxdgaming.game.server.script.mail.slog.MailSlog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +33,12 @@ public class MailService extends HoldApplicationContext {
 
     final GlobalDataService globalDataService;
     final DataCenterService dataCenterService;
+    final SlogService slogService;
 
-    public MailService(GlobalDataService globalDataService, DataCenterService dataCenterService) {
+    public MailService(GlobalDataService globalDataService, DataCenterService dataCenterService, SlogService slogService) {
         this.globalDataService = globalDataService;
         this.dataCenterService = dataCenterService;
+        this.slogService = slogService;
     }
 
     @OnHeartMinute
@@ -85,6 +90,23 @@ public class MailService extends HoldApplicationContext {
         MailPack mailPack = player.getMailPack();
         mailPack.getMailInfoList().add(mailInfo);
         log.info("获得邮件：{}, {}", player, mailInfo);
+
+        StringBuilder itemString = new StringBuilder();
+        if (!ListOf.isEmpty(mailInfo.getItems())) {
+            for (Item item : mailInfo.getItems()) {
+                if (!itemString.isEmpty())
+                    itemString.append(", ");
+                itemString.append(item.qItem().getToName()).append("*").append(item.getCount());
+            }
+        }
+
+        MailSlog mailSlog = new MailSlog(player, mailInfo.getUid(), mailInfo.getSender(),
+                mailInfo.getTitle(), mailInfo.getContent(), mailInfo.getContentParams(),
+                itemString.toString(),
+                mailInfo.getSourceLog()
+        );
+
+        slogService.pushLog(mailSlog);
     }
 
 }

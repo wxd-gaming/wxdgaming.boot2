@@ -15,7 +15,7 @@ import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnLevelUp;
 import wxdgaming.game.server.event.OnTask;
 import wxdgaming.game.server.module.data.DataCenterService;
-import wxdgaming.game.server.script.role.slog.RoleLvLog;
+import wxdgaming.game.server.script.role.slog.RoleLvSlog;
 
 import java.util.HashSet;
 
@@ -78,7 +78,7 @@ public class PlayerService extends HoldApplicationContext {
         player.setLevel(player.getLevel() + lv);
         log.info("{} 等级变更: oldLv={} change={} newLv={}, {}", player, oldLevel, lv, player.getLevel(), reasonDTO);
 
-        RoleLvLog roleLvLog = new RoleLvLog(player, reasonDTO.getReasonText());
+        RoleLvSlog roleLvLog = new RoleLvSlog(player, reasonDTO.getReasonText());
         slogService.pushLog(roleLvLog);
 
         ResUpdateLevel resUpdateLevel = new ResUpdateLevel()

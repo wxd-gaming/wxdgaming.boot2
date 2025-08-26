@@ -20,7 +20,7 @@ import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.module.data.GlobalDbDataCenterService;
 import wxdgaming.game.server.module.drive.PlayerDriveService;
 import wxdgaming.game.server.script.role.slog.RoleInfoSlog;
-import wxdgaming.game.server.script.role.slog.RoleLoginLog;
+import wxdgaming.game.server.script.role.slog.RoleLoginSlog;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -93,7 +93,7 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
             applicationContextProvider.executeMethodWithAnnotatedException(OnLogin.class, player, 1, 1);
             log.info("sid={}, {} 选择角色成功", sid, player);
 
-            RoleLoginLog roleLoginLog = new RoleLoginLog(player, userMapping.getClientIp(), JSON.toJSONString(userMapping.getClientParams()));
+            RoleLoginSlog roleLoginLog = new RoleLoginSlog(player, userMapping.getClientIp(), JSON.toJSONString(userMapping.getClientParams()));
             slogService.pushLog(roleLoginLog);
 
             RoleInfoSlog roleInfoSlog = new RoleInfoSlog(player);

@@ -1,0 +1,35 @@
+{
+  "logName": "mailslog",
+  "logComment": "邮件日志",
+  "routing": "/log-table.html",
+  "sort": "1-6",
+  "partition": true,
+  "fieldList": [
+    {
+      "fieldName": "sid",
+      "fieldComment": "区服",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:38px;"
+    },
+    {
+      "fieldName": "account",
+      "fieldComment": "账号",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "roleId",
+      "fieldComment": "角色ID",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "roleName",
+      "fieldComment": "角色名字",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "lv",
+      "fieldComment": "角色等级",
+      "fieldType": "int"
+    }
+  ]
+}

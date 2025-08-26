@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.bean.slog.AbstractRoleLog;
+import wxdgaming.game.server.bean.slog.AbstractRoleSlog;
 
 /**
  * 背包日志
@@ -15,7 +15,7 @@ import wxdgaming.game.server.bean.slog.AbstractRoleLog;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ItemLog extends AbstractRoleLog {
+public class ItemSlog extends AbstractRoleSlog {
 
     private String bagType;
     private String changeType;
@@ -29,7 +29,7 @@ public class ItemLog extends AbstractRoleLog {
     /** 详情 */
     private String reasonStr;
 
-    public ItemLog(Player player, String bagType, String changeType, int itemCfgId, String itemName, long oldNum, long change, long newNum, String reason, String reasonStr) {
+    public ItemSlog(Player player, String bagType, String changeType, int itemCfgId, String itemName, long oldNum, long change, long newNum, String reason, String reasonStr) {
         super(player);
         this.bagType = bagType;
         this.changeType = changeType;

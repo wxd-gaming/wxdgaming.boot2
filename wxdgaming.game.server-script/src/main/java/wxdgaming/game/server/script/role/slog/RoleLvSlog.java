@@ -3,7 +3,7 @@ package wxdgaming.game.server.script.role.slog;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.bean.slog.AbstractRoleLog;
+import wxdgaming.game.server.bean.slog.AbstractRoleSlog;
 
 /**
  * 角色登录日志
@@ -13,19 +13,17 @@ import wxdgaming.game.server.bean.slog.AbstractRoleLog;
  **/
 @Getter
 @Setter
-public class RoleLoginLog extends AbstractRoleLog {
+public class RoleLvSlog extends AbstractRoleSlog {
 
-    private String ip;
-    private String clientData;
+    private String reason;
 
-    public RoleLoginLog(Player player, String ip, String clientData) {
+    public RoleLvSlog(Player player, String reason) {
         super(player);
-        this.ip = ip;
-        this.clientData = clientData;
+        this.reason = reason;
     }
 
     @Override public String logType() {
-        return "roleloginlog";
+        return "rolelvlog";
     }
 
 }

@@ -24,12 +24,11 @@ public class BagScriptProvider<T extends IBagScript> {
 
     public void init(ApplicationContextProvider runApplication) {
         Table<Integer, Integer, T> scriptTable = new Table<>();
-        runApplication.classWithSuper(cls)
-                .forEach(script -> {
-                    ItemTypeConst itemTypeConst = script.type();
-                    T old = scriptTable.put(itemTypeConst.getType(), itemTypeConst.getSubType(), script);
-                    AssertUtil.assertTrue(old == null, "重复注册类型：" + itemTypeConst);
-                });
+        runApplication.classWithSuper(cls).forEach(script -> {
+            ItemTypeConst itemTypeConst = script.type();
+            T old = scriptTable.put(itemTypeConst.getType(), itemTypeConst.getSubType(), script);
+            AssertUtil.assertTrue(old == null, "重复注册类型：" + itemTypeConst);
+        });
         this.implTable = scriptTable;
     }
 

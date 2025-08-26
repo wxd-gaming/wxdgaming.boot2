@@ -23,7 +23,7 @@ import wxdgaming.game.server.event.OnLoginBefore;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.bag.cost.CostScript;
 import wxdgaming.game.server.script.bag.gain.GainScript;
-import wxdgaming.game.server.script.bag.log.ItemLog;
+import wxdgaming.game.server.script.bag.log.ItemSlog;
 import wxdgaming.game.server.script.bag.use.UseItemAction;
 import wxdgaming.game.server.script.mail.MailService;
 import wxdgaming.game.server.script.tips.TipsService;
@@ -51,7 +51,11 @@ public class BagService extends HoldApplicationContext implements InitPrint {
     final MailService mailService;
     final SlogService slogService;
 
-    public BagService(DataCenterService dataCenterService, TipsService tipsService, DataRepository dataRepository, MailService mailService, SlogService slogService) {
+    public BagService(DataCenterService dataCenterService,
+                      TipsService tipsService,
+                      DataRepository dataRepository,
+                      MailService mailService,
+                      SlogService slogService) {
         this.dataCenterService = dataCenterService;
         this.tipsService = tipsService;
         this.dataRepository = dataRepository;
@@ -186,7 +190,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
                 }
                 log.info("获得道具：{}, {}, {} {}+{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeDTO);
 
-                ItemLog itemLog = new ItemLog(player, bagType.name(),
+                ItemSlog itemLog = new ItemSlog(player, bagType.name(),
                         "获得",
                         cfgId, qItem.getName(),
                         oldCount, change, newCount,
@@ -267,7 +271,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
 
             log.info("消耗道具：{}, {}, {} {}-{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeDTO.getReasonDTO());
 
-            ItemLog itemLog = new ItemLog(player, bagType.name(),
+            ItemSlog itemLog = new ItemSlog(player, bagType.name(),
                     "消耗",
                     cfgId, qItem.getName(),
                     oldCount, change, newCount,

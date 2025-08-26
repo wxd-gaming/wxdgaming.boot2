@@ -15,7 +15,7 @@ import wxdgaming.game.basic.slog.AbstractSlog;
 @Getter
 @Setter
 @NoArgsConstructor
-public abstract class AbstractRoleLog extends AbstractSlog {
+public abstract class AbstractRoleSlog extends AbstractSlog {
 
     private String account;
     private String platform;
@@ -24,7 +24,7 @@ public abstract class AbstractRoleLog extends AbstractSlog {
     private String roleName;
     private int lv;
 
-    public AbstractRoleLog(Player player) {
+    public AbstractRoleSlog(Player player) {
         this.account = player.getAccount();
         this.platform = player.getPlatform();
         this.setSid(player.getSid());
