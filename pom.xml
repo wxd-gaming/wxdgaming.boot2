@@ -20,7 +20,6 @@
         <module>wxdgaming.boot2.core</module>
         <module>wxdgaming.boot2.starter.batis</module>
         <module>wxdgaming.boot2.starter.batis.mapdb</module>
-        <module>wxdgaming.boot2.starter.batis.rdb</module>
         <module>wxdgaming.boot2.starter.batis.sql</module>
         <module>wxdgaming.boot2.starter.batis.sql.mysql</module>
         <module>wxdgaming.boot2.starter.batis.sql.pgsql</module>
