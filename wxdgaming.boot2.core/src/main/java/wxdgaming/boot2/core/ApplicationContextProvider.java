@@ -6,7 +6,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Stop;
@@ -38,35 +37,26 @@ import java.util.stream.Stream;
 @Getter
 public abstract class ApplicationContextProvider implements InitPrint, ApplicationContextAware {
 
-    public static final Comparator<Object> OBJECT_COMPARATOR = (o1, o2) -> {
-        int o1Annotation = Optional.ofNullable(o1.getClass().getAnnotation(org.springframework.core.annotation.Order.class)).map(org.springframework.core.annotation.Order::value).orElse(999999);
-        int o2Annotation = Optional.ofNullable(o2.getClass().getAnnotation(org.springframework.core.annotation.Order.class)).map(org.springframework.core.annotation.Order::value).orElse(999999);
-        if (o1Annotation != o2Annotation) {
-            return Integer.compare(o1Annotation, o2Annotation);
-        }
-        return o1.getClass().getName().compareTo(o2.getClass().getName());
-    };
-
     private ApplicationContext applicationContext;
     /** 所有的类 */
-    private List<Provider<Object>> beanList;
+    private List<ProviderBean> beanList;
     /** 实现了某个注解的类 */
-    private final ConcurrentHashMap<Class<? extends Annotation>, List<Provider<Object>>> annotationCacheMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Class<? extends Annotation>, List<ProviderBean>> annotationCacheMap = new ConcurrentHashMap<>();
     /** 实现了某个注解的类 */
     private final ConcurrentHashMap<Class<? extends Annotation>, List<ProviderField>> annotationFieldContentCacheMap = new ConcurrentHashMap<>();
     /** 实现了某个注解的类 */
     private final ConcurrentHashMap<Class<? extends Annotation>, List<ProviderMethod>> annotationMethodContentCacheMap = new ConcurrentHashMap<>();
     /** 继承某个类接口或者实现某个接口 */
-    private final ConcurrentHashMap<Class<?>, List<Provider<Object>>> superCacheMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Class<?>, List<ProviderBean>> superCacheMap = new ConcurrentHashMap<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
-    public synchronized List<Provider<Object>> getBeanList() {
+    public synchronized List<ProviderBean> getBeanList() {
         if (beanList == null) {
-            beanList = buildBeans(applicationContext).map(Provider::new).toList();
+            beanList = buildBeans(applicationContext).map(ProviderBean::new).sorted().toList();
         }
         return beanList;
     }
@@ -79,16 +69,16 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         }
         String[] beanDefinitionNames = __applicationContext.getBeanDefinitionNames();
         Stream<Object> objectStream = Arrays.stream(beanDefinitionNames).map(__applicationContext::getBean);
-        return Stream.concat(parent, objectStream).sorted(OBJECT_COMPARATOR);
+        return Stream.concat(parent, objectStream);
     }
 
     /** 所有的类 */
-    public Stream<Provider<Object>> stream() {
+    public Stream<ProviderBean> stream() {
         return getBeanList().stream();
     }
 
     /** 继承某个类接口或者实现某个接口 */
-    Collection<Provider<Object>> classWithSuperStream(Class<?> cls) {
+    Collection<ProviderBean> classWithSuperCache(Class<?> cls) {
         return superCacheMap.computeIfAbsent(cls, k ->
                 getBeanList().stream()
                         .filter(provider -> provider.withSuper(cls))
@@ -97,7 +87,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     }
 
     /** 实现了某个注解的类 */
-    Collection<Provider<Object>> classWithAnnotatedStream(Class<? extends Annotation> annotation) {
+    Collection<ProviderBean> classWithAnnotatedCache(Class<? extends Annotation> annotation) {
         return annotationCacheMap.computeIfAbsent(annotation, k ->
                 getBeanList().stream()
                         .filter(provider -> provider.hasAnn(annotation))
@@ -106,28 +96,17 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     }
 
     /** 父类或者接口 */
-    public <U> Stream<U> classWithSuper(Class<U> cls) {
-        return classWithSuperStream(cls).stream().map(provider -> cls.cast(provider.bean));
-    }
-
-    /** 所有添加了这个注解的类 */
-    public Stream<Object> classWithAnnotated(Class<? extends Annotation> annotation) {
-        return classWithAnnotatedStream(annotation).stream().map(Provider::getBean);
+    public <U> U instance(Class<U> cls) {
+        return classWithSuperCache(cls).stream().findFirst().map(provider -> cls.cast(provider.bean)).orElse(null);
     }
 
     /** 父类或者接口 */
-    @SuppressWarnings("unchecked")
-    public <U> Stream<Provider<U>> withSuper(Class<U> cls) {
-        return classWithSuperStream(cls).stream().map(provider -> (Provider<U>) provider);
-    }
-
-    /** 所有添加了这个注解的类 */
-    public Collection<Provider<Object>> withAnnotated(Class<? extends Annotation> annotation) {
-        return classWithAnnotatedStream(annotation);
+    public <U> Stream<U> classWithSuperStream(Class<U> cls) {
+        return classWithSuperCache(cls).stream().map(provider -> cls.cast(provider.bean));
     }
 
     /** 所有bean里面的方法，添加了注解的 */
-    public Collection<ProviderField> withFieldAnnotated(Class<? extends Annotation> annotation) {
+    public Collection<ProviderField> withFieldAnnotatedCache(Class<? extends Annotation> annotation) {
         return annotationFieldContentCacheMap.computeIfAbsent(
                 annotation,
                 k -> stream()
@@ -138,7 +117,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     }
 
     /** 所有bean里面的方法，添加了注解的 */
-    public Collection<ProviderMethod> withMethodAnnotated(Class<? extends Annotation> annotation) {
+    public Collection<ProviderMethod> withMethodAnnotatedCache(Class<? extends Annotation> annotation) {
         return annotationMethodContentCacheMap.computeIfAbsent(
                 annotation,
                 k -> stream()
@@ -154,13 +133,13 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
 
     /** 将指定类或者接口的转换成map对象 */
     public <B, K, V> Map<K, V> toMap(Class<B> cls, Function<B, K> convertKey, Function<B, V> convertValue) {
-        return toMap4Collection(classWithSuper(cls).toList(), convertKey, convertValue);
+        return toMap4Collection(classWithSuperStream(cls).toList(), convertKey, convertValue);
     }
 
     /** 将添加了注解的类转换成map对象 */
     public <K, V> Map<K, V> toMapWithAnnotated(Class<? extends Annotation> cls, Function<Object, K> convertKey, Function<Object, V> convertValue) {
         return toMap4Collection(
-                withAnnotated(cls),
+                withFieldAnnotatedCache(cls),
                 pb -> convertKey.apply(pb.getBean()),
                 pb -> convertValue.apply(pb.getBean())
         );
@@ -170,7 +149,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     public <K, V> Map<K, V> toMapWithMethodAnnotated(Class<? extends Annotation> cls,
                                                      Function<ProviderMethod, K> convertKey,
                                                      Function<ProviderMethod, V> convertValue) {
-        Collection<ProviderMethod> providerMethods = withMethodAnnotated(cls);
+        Collection<ProviderMethod> providerMethods = withMethodAnnotatedCache(cls);
         return toMap4Collection(providerMethods, convertKey, convertValue);
     }
 
@@ -190,13 +169,13 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
 
     /** 执行循环过程中某一个函数执行失败中断执行 */
     public void executeMethodWithAnnotated(Class<? extends Annotation> annotation, Object... args) {
-        Collection<ProviderMethod> providerMethodStream = withMethodAnnotated(annotation);
+        Collection<ProviderMethod> providerMethodStream = withMethodAnnotatedCache(annotation);
         providerMethodStream.forEach(providerMethod -> providerMethod.invoke(args));
     }
 
     /** 执行循环过程中某一个函数执行失败会继续执行其它函数 */
     public void executeMethodWithAnnotatedException(Class<? extends Annotation> annotation, Object... args) {
-        Collection<ProviderMethod> providerMethodStream = withMethodAnnotated(annotation);
+        Collection<ProviderMethod> providerMethodStream = withMethodAnnotatedCache(annotation);
         providerMethodStream.forEach(providerMethod -> {
             try {
                 providerMethod.invoke(args);
@@ -264,7 +243,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     public ApplicationContextProvider executeMethodWithAnnotatedStop() {
         ExecutorFactory executorFactory = getBean(ExecutorFactory.class);
         executeMethodWithAnnotatedException(Stop.class);
-        classWithSuper(AutoCloseable.class).forEach(bean -> {
+        classWithSuperStream(AutoCloseable.class).forEach(bean -> {
             if (bean instanceof Closeable) {
                 try {
                     ((Closeable) bean).close();
@@ -285,16 +264,25 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     }
 
     @Getter
-    public class Provider<T> {
+    public class ProviderBean implements Comparable<ProviderBean> {
 
-        private final T bean;
+        private final Object bean;
         /** 所有的字段 */
         private Collection<ProviderField> fields;
         /** 所有的方法 */
         private Collection<ProviderMethod> methods;
 
-        Provider(T bean) {
+        ProviderBean(Object bean) {
             this.bean = bean;
+        }
+
+        @Override public int compareTo(ProviderBean o) {
+            int o1Annotation = AnnUtil.orderValue(this.bean.getClass());
+            int o2Annotation = AnnUtil.orderValue(o.bean.getClass());
+            if (o1Annotation != o2Annotation) {
+                return Integer.compare(o1Annotation, o2Annotation);
+            }
+            return this.bean.getClass().getName().compareTo(o.bean.getClass().getName());
         }
 
         public Collection<ProviderField> getFields() {
@@ -377,15 +365,9 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         }
 
         @Override public int compareTo(ProviderField o) {
-            int o1Sort = AnnUtil.annOpt(field, Order.class)
-                    .or(() -> AnnUtil.annOpt(bean.getClass(), Order.class))
-                    .map(Order::value)
-                    .orElse(Const.SORT_DEFAULT);
 
-            int o2Sort = AnnUtil.annOpt(o.getField(), Order.class)
-                    .or(() -> AnnUtil.annOpt(o.bean.getClass(), Order.class))
-                    .map(Order::value)
-                    .orElse(Const.SORT_DEFAULT);
+            int o1Sort = AnnUtil.orderValue(field, () -> AnnUtil.orderValue(bean.getClass()));
+            int o2Sort = AnnUtil.orderValue(o.field, () -> AnnUtil.orderValue(o.bean.getClass()));
 
             if (o1Sort == o2Sort) {
                 /*如果排序值相同，采用名字排序*/
@@ -430,16 +412,8 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         }
 
         @Override public int compareTo(ProviderMethod o) {
-
-            int o1Sort = AnnUtil.annOpt(method, Order.class)
-                    .or(() -> AnnUtil.annOpt(bean.getClass(), Order.class))
-                    .map(Order::value)
-                    .orElse(Const.SORT_DEFAULT);
-
-            int o2Sort = AnnUtil.annOpt(o.method, Order.class)
-                    .or(() -> AnnUtil.annOpt(o.bean.getClass(), Order.class))
-                    .map(Order::value)
-                    .orElse(Const.SORT_DEFAULT);
+            int o1Sort = AnnUtil.orderValue(method, () -> AnnUtil.orderValue(bean.getClass()));
+            int o2Sort = AnnUtil.orderValue(o.method, () -> AnnUtil.orderValue(o.bean.getClass()));
 
             if (o1Sort == o2Sort) {
                 /*如果排序值相同，采用名字排序*/

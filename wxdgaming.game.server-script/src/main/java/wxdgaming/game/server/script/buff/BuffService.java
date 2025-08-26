@@ -26,9 +26,8 @@ import wxdgaming.game.server.script.attribute.NpcAttributeService;
 import wxdgaming.game.server.script.attribute.PlayerAttributeService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.stream.Stream;
+import java.util.Map;
 
 /**
  * buff管理
@@ -43,7 +42,7 @@ public class BuffService extends HoldApplicationContext {
     final DataCenterService dataCenterService;
     final PlayerAttributeService playerAttributeService;
     final NpcAttributeService npcAttributeService;
-    HashMap<BuffType, AbstractBuffAction> actionMap = new HashMap<>();
+    Map<BuffType, AbstractBuffAction> actionMap = Map.of();
 
 
     public BuffService(DataCenterService dataCenterService, PlayerAttributeService playerAttributeService, NpcAttributeService npcAttributeService) {
@@ -54,13 +53,7 @@ public class BuffService extends HoldApplicationContext {
 
     @Init
     public void init() {
-        HashMap<BuffType, AbstractBuffAction> map = new HashMap<>();
-        Stream<AbstractBuffAction> abstractBuffActionStream = applicationContextProvider.classWithSuper(AbstractBuffAction.class);
-        abstractBuffActionStream.forEach(impl -> {
-            AbstractBuffAction old = map.put(impl.buffType(), impl);
-            AssertUtil.assertTrue(old == null, "重复的buff类型" + impl.buffType());
-        });
-        actionMap = map;
+        actionMap = applicationContextProvider.toMap(AbstractBuffAction.class, AbstractBuffAction::buffType);
     }
 
     @OnHeartMinute

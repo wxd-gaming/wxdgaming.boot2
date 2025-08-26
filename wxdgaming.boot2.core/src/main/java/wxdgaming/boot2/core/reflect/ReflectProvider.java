@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
+import wxdgaming.boot2.core.Const;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.io.FileReadUtil;
 
@@ -109,8 +110,8 @@ public class ReflectProvider {
     /** 根据 {@link Order} 注解排序，如果值相同使用类名值排序 */
     public static Comparator<Class<?>> ComparatorClassBySort = new Comparator<Class<?>>() {
         @Override public int compare(Class<?> o1, Class<?> o2) {
-            int o1Sort = AnnUtil.annOpt(o1, Order.class).map(Order::value).orElse(999999);
-            int o2Sort = AnnUtil.annOpt(o2, Order.class).map(Order::value).orElse(999999);
+            int o1Sort = AnnUtil.annOpt(o1, Order.class).map(Order::value).orElse(Const.SORT_DEFAULT);
+            int o2Sort = AnnUtil.annOpt(o2, Order.class).map(Order::value).orElse(Const.SORT_DEFAULT);
             if (o1Sort == o2Sort) {
                 /*如果排序值相同，采用名字排序*/
                 return o1.getName().compareTo(o2.getName());

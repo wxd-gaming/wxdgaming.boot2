@@ -1,10 +1,14 @@
 package wxdgaming.boot2.core.reflect;
 
 
+import org.springframework.core.annotation.Order;
+import wxdgaming.boot2.core.Const;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
+import java.util.function.IntSupplier;
 import java.util.stream.Stream;
 
 /**
@@ -14,6 +18,11 @@ import java.util.stream.Stream;
  * @version 2021-06-11 11:17
  **/
 public class AnnUtil {
+
+    public static int orderValue(Class<?> source) {
+        Order order = source.getAnnotation(Order.class);
+        return order != null ? order.value() : Const.SORT_DEFAULT;
+    }
 
     public static boolean hasAnn(Class<?> source, Class<? extends Annotation> annClass) {
         return ann(source, annClass) != null;
@@ -41,6 +50,16 @@ public class AnnUtil {
             }
         }
         return null;
+    }
+
+    public static int orderValue(Field source) {
+        Order order = source.getAnnotation(Order.class);
+        return order != null ? order.value() : Const.SORT_DEFAULT;
+    }
+
+    public static int orderValue(Field source, IntSupplier defaultOrder) {
+        Order order = source.getAnnotation(Order.class);
+        return order != null ? order.value() : defaultOrder.getAsInt();
     }
 
     public static boolean hasAnn(Field source, Class<? extends Annotation> annClass) {
@@ -72,6 +91,16 @@ public class AnnUtil {
         A[] annotationsByType = source.getAnnotationsByType(annClass);
         if (annotationsByType.length > 0) return annotationsByType[0];
         return null;
+    }
+
+    public static int orderValue(Method source) {
+        Order order = source.getAnnotation(Order.class);
+        return order != null ? order.value() : Const.SORT_DEFAULT;
+    }
+
+    public static int orderValue(Method source, IntSupplier defaultOrder) {
+        Order order = source.getAnnotation(Order.class);
+        return order != null ? order.value() : defaultOrder.getAsInt();
     }
 
     public static boolean hasAnn(Method source, Class<? extends Annotation> annClass) {

@@ -30,7 +30,7 @@ public class ProtoListenerContent {
 
     public ProtoListenerContent(ApplicationContextProvider applicationContextProvider) {
         applicationContextProvider
-                .withMethodAnnotated(ProtoRequest.class)
+                .withMethodAnnotatedCache(ProtoRequest.class)
                 .forEach(contentMethod -> {
                     Object ins = contentMethod.getBean();
                     Method method = contentMethod.getMethod();

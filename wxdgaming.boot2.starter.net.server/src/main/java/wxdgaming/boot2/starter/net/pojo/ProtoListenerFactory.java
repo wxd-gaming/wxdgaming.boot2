@@ -37,11 +37,11 @@ public class ProtoListenerFactory extends HoldApplicationContext {
     @Order(6)
     public void init() {
         protoListenerContent = new ProtoListenerContent(getApplicationContextProvider());
-        serverWebSocketStringListener = getApplicationContextProvider().classWithSuper(IServerWebSocketStringListener.class).findFirst().orElse(null);
-        clientWebSocketStringListener = getApplicationContextProvider().classWithSuper(IClientWebSocketStringListener.class).findFirst().orElse(null);
-        protoUnknownMessageEvent = getApplicationContextProvider().classWithSuper(ProtoUnknownMessageEvent.class).findFirst().orElse(null);
-        serverProtoFilters = getApplicationContextProvider().classWithSuper(ServerProtoFilter.class).toList();
-        clientProtoFilters = getApplicationContextProvider().classWithSuper(ClientProtoFilter.class).toList();
+        serverWebSocketStringListener = getApplicationContextProvider().instance(IServerWebSocketStringListener.class);
+        clientWebSocketStringListener = getApplicationContextProvider().instance(IClientWebSocketStringListener.class);
+        protoUnknownMessageEvent = getApplicationContextProvider().instance(ProtoUnknownMessageEvent.class);
+        serverProtoFilters = getApplicationContextProvider().classWithSuperStream(ServerProtoFilter.class).toList();
+        clientProtoFilters = getApplicationContextProvider().classWithSuperStream(ClientProtoFilter.class).toList();
     }
 
     public int messageId(Class<? extends PojoBase> pojoClass) {

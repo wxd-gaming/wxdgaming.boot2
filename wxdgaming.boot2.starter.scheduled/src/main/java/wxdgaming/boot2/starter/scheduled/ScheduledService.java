@@ -2,10 +2,8 @@ package wxdgaming.boot2.starter.scheduled;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
-import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Start;
@@ -47,7 +45,7 @@ public class ScheduledService extends HoldApplicationContext {
     public void init() {
         log.debug("------------------------------初始化定时任务调度器------------------------------");
         List<AbstractCronTrigger> tmpJobList = new ArrayList<>();
-        applicationContextProvider.withMethodAnnotated(Scheduled.class)
+        applicationContextProvider.withMethodAnnotatedCache(Scheduled.class)
                 .forEach(methodContent -> {
                     ScheduledInfo scheduledInfo = new ScheduledInfo(
                             methodContent.getBean(),

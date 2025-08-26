@@ -37,7 +37,7 @@ public class PlayerAttributeService extends HoldApplicationContext {
     public void init() {
 
         TreeMap<Integer, AbstractCalculatorAction> tmp = new TreeMap<>();
-        applicationContextProvider.classWithSuper(AbstractCalculatorAction.class)
+        applicationContextProvider.classWithSuperStream(AbstractCalculatorAction.class)
                 .forEach(calculatorAction -> {
                     MapObject.MapObjectType mapObjectType = calculatorAction.mapObjectType();
                     if (mapObjectType != null && mapObjectType != MapObject.MapObjectType.Player) {

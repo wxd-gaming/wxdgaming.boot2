@@ -30,9 +30,9 @@ public class RpcListenerContent {
 
     public RpcListenerContent(ApplicationContextProvider applicationContextProvider) {
         this.applicationContextProvider = applicationContextProvider;
-        this.rpcFilterList = applicationContextProvider.classWithSuper(RpcFilter.class).toList();
+        this.rpcFilterList = applicationContextProvider.classWithSuperStream(RpcFilter.class).toList();
         this.applicationContextProvider
-                .withMethodAnnotated(RpcRequest.class)
+                .withMethodAnnotatedCache(RpcRequest.class)
                 .forEach(contentMethod -> {
                     Object ins = contentMethod.getBean();
                     Method method = contentMethod.getMethod();

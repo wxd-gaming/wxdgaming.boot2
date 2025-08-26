@@ -24,7 +24,7 @@ public class PluginService extends HoldApplicationContext {
 
     @Start
     public void start() {
-        applicationContextProvider.classWithSuper(AbstractPlugin.class)
+        applicationContextProvider.classWithSuperStream(AbstractPlugin.class)
                 .forEach(abstractPlugin -> {
                     log.info("插件: {} 加载成功", abstractPlugin.getClass().getName());
                     PluginExecutor pluginExecutor = new PluginExecutor(this::getApplicationContextProvider, abstractPlugin);

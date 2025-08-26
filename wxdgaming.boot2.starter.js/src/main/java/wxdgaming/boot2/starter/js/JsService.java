@@ -37,7 +37,7 @@ public class JsService extends HoldApplicationContext {
             JSContext jsContext = JSContext.build();
             /*构建插件*/
             if (applicationContextProvider != null) {
-                applicationContextProvider.classWithSuper(IJSPlugin.class).forEach(jsContext::put);
+                applicationContextProvider.classWithSuperStream(IJSPlugin.class).forEach(jsContext::put);
             }
             onInitListener.forEach(jsPlugin -> jsPlugin.accept(jsContext));
             return jsContext;
