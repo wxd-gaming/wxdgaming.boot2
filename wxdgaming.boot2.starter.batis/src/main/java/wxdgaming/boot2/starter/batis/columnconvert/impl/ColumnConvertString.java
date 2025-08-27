@@ -28,6 +28,9 @@ public class ColumnConvertString implements IColumnConvert {
         }
         if (fieldValue instanceof Enum<?> enumObject) {
             return enumObject.name();
+        } else if (fieldValue instanceof BitSet bitSet) {
+            long[] longArray = bitSet.toLongArray();
+            return FastJsonUtil.toJSONString(longArray);
         } else if (fieldValue instanceof ConfigString configString) {
             return configString.getValue();
         } else if (!(fieldValue instanceof String)) {
