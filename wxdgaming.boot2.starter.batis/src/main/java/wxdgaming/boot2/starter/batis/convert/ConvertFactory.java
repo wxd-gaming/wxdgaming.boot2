@@ -12,9 +12,10 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 public class ConvertFactory {
 
-    public static final ConcurrentHashMap<Class<? extends Converter>, Converter<?, ?>> converterMap = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<Class<? extends AbstractConverter>, AbstractConverter<?, ?>> converterMap = new ConcurrentHashMap<>();
 
-    public static Converter getConverter(Class<? extends Converter> cls) {
+    @SuppressWarnings("rawtypes")
+    public static AbstractConverter getConverter(Class<? extends AbstractConverter> cls) {
         return converterMap.computeIfAbsent(cls, l -> ReflectProvider.newInstance(cls));
     }
 

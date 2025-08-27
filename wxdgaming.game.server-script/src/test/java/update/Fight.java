@@ -6,6 +6,12 @@ import wxdgaming.boot2.core.util.RandomUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 战斗简报测试，回合制或者休闲游戏服务器一次性计算所有战斗过程
+ *
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-08-26 21:03
+ */
 @Getter
 public class Fight {
 

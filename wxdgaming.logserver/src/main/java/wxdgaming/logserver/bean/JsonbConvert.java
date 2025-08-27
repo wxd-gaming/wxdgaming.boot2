@@ -2,7 +2,7 @@ package wxdgaming.logserver.bean;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
-import wxdgaming.boot2.starter.batis.convert.Converter;
+import wxdgaming.boot2.starter.batis.convert.AbstractConverter;
 
 import java.lang.reflect.Type;
 
@@ -12,7 +12,7 @@ import java.lang.reflect.Type;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-08-08 10:41
  **/
-public class JsonbConvert extends Converter<Object, String> {
+public class JsonbConvert extends AbstractConverter<Object, String> {
 
     @Override public String toDb(Object o) {
         return FastJsonUtil.toJSONString(o, SerializerFeature.SortField, SerializerFeature.MapSortField, SerializerFeature.WriteNonStringKeyAsString);

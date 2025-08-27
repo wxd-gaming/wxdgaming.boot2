@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.batis.convert.impl;
 
 import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
-import wxdgaming.boot2.starter.batis.convert.Converter;
+import wxdgaming.boot2.starter.batis.convert.AbstractConverter;
 
 import java.lang.reflect.Type;
 
@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-04-16 10:02
  **/
-public class Object2TypeJsonStringConverter extends Converter<Object, String> {
+public class Object2TypeJsonStringConverter extends AbstractConverter<Object, String> {
 
     @Override public String toDb(Object o) {
         return FastJsonUtil.toJSONStringAsWriteType(o);

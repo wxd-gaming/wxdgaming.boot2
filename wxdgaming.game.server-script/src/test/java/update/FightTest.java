@@ -8,7 +8,7 @@ import wxdgaming.boot2.core.util.RandomUtils;
 import java.util.List;
 
 /**
- * 战斗测试
+ * 战斗简报测试，回合制或者休闲游戏服务器一次性计算所有战斗过程
  *
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-06-25 16:51

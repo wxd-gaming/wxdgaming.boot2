@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.batis.convert.impl;
 
 import wxdgaming.boot2.core.lang.TimeValue;
-import wxdgaming.boot2.starter.batis.convert.Converter;
+import wxdgaming.boot2.starter.batis.convert.AbstractConverter;
 
 import java.lang.reflect.Type;
 
@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-04-16 10:02
  **/
-public class TimeValueConverter extends Converter<TimeValue, Long> {
+public class TimeValueConverter extends AbstractConverter<TimeValue, Long> {
 
     @Override public Long toDb(TimeValue o) {
         return o.longValue();

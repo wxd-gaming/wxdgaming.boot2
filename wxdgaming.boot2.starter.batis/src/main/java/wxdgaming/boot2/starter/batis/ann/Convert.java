@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.batis.ann;
 
-import wxdgaming.boot2.starter.batis.convert.Converter;
+import wxdgaming.boot2.starter.batis.convert.AbstractConverter;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -17,6 +17,6 @@ import java.lang.annotation.ElementType;
 @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE, ElementType.FIELD})
 public @interface Convert {
 
-    Class<? extends Converter> value();
+    Class<? extends AbstractConverter> value();
 
 }

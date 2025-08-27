@@ -12,12 +12,12 @@ import java.lang.reflect.Type;
  * @version 2025-04-16 09:20
  **/
 @Getter
-public abstract class Converter<X, Y> {
+public abstract class AbstractConverter<X, Y> {
 
     private final Class<X> clazzX;
     private final Class<Y> clazzY;
 
-    public Converter() {
+    public AbstractConverter() {
         this.clazzX = ReflectProvider.getTClass(this.getClass(), 0);
         this.clazzY = ReflectProvider.getTClass(this.getClass(), 1);
     }

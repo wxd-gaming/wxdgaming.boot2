@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.batis.convert.impl;
 
-import wxdgaming.boot2.starter.batis.convert.Converter;
+import wxdgaming.boot2.starter.batis.convert.AbstractConverter;
 
 import java.lang.reflect.Type;
 import java.util.concurrent.atomic.AtomicLong;
@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-04-16 10:02
  **/
-public class AtomicLongConverter extends Converter<AtomicLong, Long> {
+public class AtomicLongConverter extends AbstractConverter<AtomicLong, Long> {
 
     @Override public Long toDb(AtomicLong o) {
         return o.longValue();

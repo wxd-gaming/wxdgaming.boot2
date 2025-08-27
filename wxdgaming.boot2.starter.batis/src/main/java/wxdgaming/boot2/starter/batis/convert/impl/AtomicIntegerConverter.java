@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.batis.convert.impl;
 
-import wxdgaming.boot2.starter.batis.convert.Converter;
+import wxdgaming.boot2.starter.batis.convert.AbstractConverter;
 
 import java.lang.reflect.Type;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -11,14 +11,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-04-16 10:02
  **/
-public class AtomicIntegerConverter extends Converter<AtomicInteger, Integer> {
+public class AtomicIntegerConverter extends AbstractConverter<AtomicInteger, Integer> {
 
-    @Override public Integer toDb(AtomicInteger o) {
-        return o.intValue();
+    @Override public Integer toDb(AtomicInteger source) {
+        return source.intValue();
     }
 
-    @Override public AtomicInteger fromDb(Type type, Integer hold) {
-        return new AtomicInteger(hold);
+    @Override public AtomicInteger fromDb(Type type, Integer source) {
+        return new AtomicInteger(source);
     }
 
 }

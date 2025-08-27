@@ -29,7 +29,7 @@ public class MysqlTest {
         SqlConfig sqlConfig = new SqlConfig();
         sqlConfig.setDebug(true);
         sqlConfig.setDriverClassName(Driver.class.getName());
-        sqlConfig.setUrl("jdbc:mysql://127.0.0.1:3306/test2");
+        sqlConfig.setUrl("jdbc:mysql://10.28.0.26:3306/test2");
         sqlConfig.setUsername("root");
         sqlConfig.setPassword("test");
         dataHelper = new MysqlDataHelper(sqlConfig);

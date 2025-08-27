@@ -1,28 +1,20 @@
 package wxdgaming.boot2.starter.batis;
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson2.util.TypeUtils;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.chatset.json.ParameterizedTypeImpl;
-import wxdgaming.boot2.core.lang.ConfigString;
-import wxdgaming.boot2.core.lang.TimeValue;
-import wxdgaming.boot2.core.reflect.*;
-import wxdgaming.boot2.starter.batis.ann.Convert;
+import wxdgaming.boot2.core.reflect.AnnUtil;
+import wxdgaming.boot2.core.reflect.ReflectClassProvider;
+import wxdgaming.boot2.core.reflect.ReflectFieldProvider;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
-import wxdgaming.boot2.starter.batis.convert.ConvertFactory;
-import wxdgaming.boot2.starter.batis.convert.Converter;
+import wxdgaming.boot2.starter.batis.build.BuildColumnFactory;
 
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -109,7 +101,7 @@ public class TableMapping {
                 fieldMapping.comment = dbColumn.comment();
             }
             if (fieldMapping.columnType == null || fieldMapping.columnType == ColumnType.None) {
-                buildColumnType(fieldMapping);
+                BuildColumnFactory.getInstance().buildColumn(fieldMapping);
             }
 
             if (StringUtils.isBlank(fieldMapping.comment)) {
@@ -131,42 +123,6 @@ public class TableMapping {
             throw new RuntimeException(cls + " 类不存在主键 ");
         }
 
-    }
-
-
-    public void buildColumnType(FieldMapping fieldMapping) {
-        Class<?> type = fieldMapping.getField().getType();
-        if (AtomicReference.class.isAssignableFrom(type)) {
-            type = ReflectProvider.getTType(fieldMapping.getField().getGenericType(), 0);
-        }
-        if (boolean.class.isAssignableFrom(type) || Boolean.class.isAssignableFrom(type)) {
-            fieldMapping.columnType = ColumnType.Bool;
-        } else if (byte.class.isAssignableFrom(type) || Byte.class.isAssignableFrom(type)) {
-            fieldMapping.columnType = ColumnType.Byte;
-        } else if (short.class.isAssignableFrom(type) || Short.class.isAssignableFrom(type)) {
-            fieldMapping.columnType = ColumnType.Short;
-        } else if (int.class.isAssignableFrom(type)
-                   || Integer.class.isAssignableFrom(type)
-                   || AtomicInteger.class.isAssignableFrom(type)) {
-            fieldMapping.columnType = ColumnType.Int;
-        } else if (long.class.isAssignableFrom(type)
-                   || Long.class.isAssignableFrom(type)
-                   || AtomicLong.class.isAssignableFrom(type)
-                   || TimeValue.class.isAssignableFrom(type)) {
-            fieldMapping.columnType = ColumnType.Long;
-        } else if (float.class.isAssignableFrom(type) || Float.class.isAssignableFrom(type)) {
-            fieldMapping.columnType = ColumnType.Float;
-        } else if (double.class.isAssignableFrom(type) || Double.class.isAssignableFrom(type)) {
-            fieldMapping.columnType = ColumnType.Double;
-        } else if (byte[].class.isAssignableFrom(type)) {
-            if (fieldMapping.length == 0)
-                fieldMapping.length = 65535;
-            fieldMapping.columnType = ColumnType.Blob;
-        } else {
-            if (fieldMapping.length == 0)
-                fieldMapping.length = 255;
-            fieldMapping.columnType = ColumnType.String;
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -221,86 +177,12 @@ public class TableMapping {
             }
         }
 
-        /** 获取字段的值，转换成数据库可用 */
-        public Object toDbValue(Object bean) {
-            try {
-                Object object = getFieldValue(bean);
-
-                Convert ann = AnnUtil.ann(getField(), Convert.class);
-                if (ann != null) {
-                    Class<? extends Converter> cls = ann.value();
-                    Converter<Object, Object> converter = ConvertFactory.getConverter(cls);
-                    if (converter != null) {
-                        return converter.toDb(object);
-                    }
-                }
-
-                if (object != null) {
-                    if (object instanceof AtomicReference<?> atomicReference) {
-                        object = atomicReference.get();
-                    }
-                }
-                if (object != null) {
-                    switch (columnType) {
-                        case Bool -> {
-                            if (object instanceof AtomicBoolean atomicBoolean) {
-                                object = atomicBoolean.get();
-                            }
-                        }
-                        case Int -> {
-                            if (object instanceof AtomicInteger atomicInteger) {
-                                object = atomicInteger.get();
-                            }
-                        }
-                        case Long -> {
-                            if (object instanceof AtomicLong atomicLong) {
-                                object = atomicLong.get();
-                            } else if (object instanceof TimeValue timeValue) {
-                                object = timeValue.longValue();
-                            }
-                        }
-                        case String -> {
-                            if (object instanceof Enum<?> enumObject) {
-                                object = enumObject.name();
-                            } else if (object instanceof ConfigString configString) {
-                                object = configString.getValue();
-                            } else if (!(object instanceof String)) {
-                                object = FastJsonUtil.toJSONString(object, FastJsonUtil.Writer_Features_Type_Name);
-                            }
-                        }
-                        case Json , Jsonb-> {
-                            if (object instanceof BitSet bitSet) {
-                                long[] longArray = bitSet.toLongArray();
-                                object = FastJsonUtil.toJSONString(longArray);
-                            } else if (!(object instanceof String)) {
-                                object = FastJsonUtil.toJSONString(object, FastJsonUtil.Writer_Features_Type_Name);
-                            }
-                        }
-                        case Blob -> {
-                            if (!(object instanceof byte[])) {
-                                object = FastJsonUtil.toJSONBytes(object);
-                            }
-                        }
-                        case null, default -> {
-
-                        }
-                    }
-                }
-                return object;
-            } catch (Exception e) {
-                throw Throw.of(e);
-            }
-        }
-
         /**
-         * @param bean 需要赋值的实例
-         * @param data 数据库读取的行数据
-         * @author wxd-gaming(無心道, 15388152619)
-         * @version 2025-02-24 09:39
+         * @param bean     需要赋值的实例
+         * @param colValue 数据库读取的数据
          */
-        public void setValue(Object bean, JSONObject data) {
-            Object colValue = data.get(getColumnName());
-            colValue = fromDbValue(colValue);
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        public void setValue(Object bean, Object colValue) {
             if (colValue == null) return;
             try {
                 if (setMethod == null) {
@@ -346,119 +228,6 @@ public class TableMapping {
             }
         }
 
-        /** 从数据库加载转化成实体bean数据 */
-        protected Object fromDbValue(Object object) {
-            if (object == null) {
-                return null;
-            }
-
-            if (getFileType().isAssignableFrom(object.getClass())) {
-                return object;
-            }
-
-            Convert ann = AnnUtil.ann(getField(), Convert.class);
-            if (ann != null) {
-                Class<? extends Converter> cls = ann.value();
-                Converter<Object, Object> converter = ConvertFactory.getConverter(cls);
-                if (converter != null) {
-                    Object parsed = TypeUtils.cast(object.toString(), converter.getClazzY());
-                    return converter.fromDb(getJsonType(), parsed);
-                }
-            }
-
-            if (AtomicReference.class.isAssignableFrom(getFileType())) {
-                Class<?> tType = ReflectProvider.getTType(getField().getGenericType(), 0);
-                if (String.class.isAssignableFrom(tType)) {
-                    return new AtomicReference<>(object);
-                }
-                object = FastJsonUtil.parseSupportAutoType(object.toString(), tType);
-            }
-
-            switch (getColumnType()) {
-                case Blob -> {
-                    return FastJsonUtil.parseSupportAutoType((byte[]) object, getJsonType());
-                }
-                case Bool -> {
-                    if (AtomicBoolean.class.isAssignableFrom(getFileType())) {
-                        return new AtomicBoolean(Boolean.parseBoolean(object.toString()));
-                    }
-                    if (object instanceof Boolean b) {
-                        return b;
-                    }
-                    return Boolean.parseBoolean(object.toString());
-                }
-                case Byte -> {
-                    if (object instanceof Number b) {
-                        return b.byteValue();
-                    }
-                    return Byte.parseByte(object.toString());
-                }
-                case Short -> {
-                    if (object instanceof Number b) {
-                        return b.shortValue();
-                    }
-                    return Short.parseShort(object.toString());
-                }
-                case Int -> {
-                    if (AtomicInteger.class.isAssignableFrom(getFileType())) {
-                        if (object instanceof Number number) {
-                            return new AtomicInteger(number.intValue());
-                        } else {
-                            return new AtomicInteger(Integer.parseInt(object.toString()));
-                        }
-                    }
-                    if (object instanceof Number number) {
-                        return number.intValue();
-                    }
-                    return Integer.parseInt(object.toString());
-                }
-                case Long -> {
-                    if (AtomicLong.class.isAssignableFrom(getFileType())) {
-                        if (object instanceof Number number) {
-                            return new AtomicLong(number.longValue());
-                        } else {
-                            return new AtomicLong(Long.parseLong(object.toString()));
-                        }
-                    }
-                    if (TimeValue.class.isAssignableFrom(getFileType())) {
-                        if (object instanceof Number number) {
-                            return new TimeValue(number.longValue());
-                        } else {
-                            return new TimeValue(Long.parseLong(object.toString()));
-                        }
-                    }
-                    if (object instanceof Number number) {
-                        return number.longValue();
-                    }
-                    return Long.parseLong(object.toString());
-                }
-                case Double -> {
-                    if (object instanceof Number number) {
-                        return number.doubleValue();
-                    }
-                    return Double.parseDouble(object.toString());
-                }
-                case Float -> {
-                    if (object instanceof Number number) {
-                        return number.floatValue();
-                    }
-                    return Float.parseFloat(object.toString());
-                }
-                case null, default -> {
-                    if (BitSet.class.isAssignableFrom(getFileType())) {
-                        if (object instanceof String json) {
-                            long[] parse = FastJsonUtil.parseSupportAutoType(json, long[].class);
-                            return BitSet.valueOf(parse);
-                        }
-                    } else if (Enum.class.isAssignableFrom(getFileType())) {
-                        return Enum.valueOf((Class<Enum>) getFileType(), object.toString());
-                    } else if (ConfigString.class.isAssignableFrom(getFileType())) {
-                        return new ConfigString(object.toString());
-                    }
-                    return FastJsonUtil.parseSupportAutoType(object.toString(), getJsonType());
-                }
-            }
-        }
 
         @Override public String toString() {
             return "FieldMapping{name='%s'}".formatted(columnName);
