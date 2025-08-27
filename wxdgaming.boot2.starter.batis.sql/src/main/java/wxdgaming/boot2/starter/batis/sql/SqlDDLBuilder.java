@@ -6,7 +6,7 @@ import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.DDLBuilder;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
-import wxdgaming.boot2.starter.batis.columnconvert.ColumnConvertFactory;
+import wxdgaming.boot2.starter.batis.columnconvert.AbstractColumnConvertFactory;
 import wxdgaming.boot2.starter.batis.sql.ann.Partition;
 
 import java.util.ArrayList;
@@ -21,6 +21,10 @@ import java.util.Map;
  * @version 2025-02-15 17:38
  **/
 public abstract class SqlDDLBuilder extends DDLBuilder {
+
+    public SqlDDLBuilder(AbstractColumnConvertFactory abstractColumnConvertFactory) {
+        super(abstractColumnConvertFactory);
+    }
 
     @Override public TableMapping tableMapping(Class<? extends Entity> cls) {
         TableMapping tableMapping = super.tableMapping(cls);
@@ -220,7 +224,7 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
     @Override public Object[] buildKeyParams(TableMapping tableMapping, Entity entity) {
         List<Object> params = new ArrayList<>();
         for (TableMapping.FieldMapping fieldMapping : tableMapping.getKeyFields()) {
-            params.add(ColumnConvertFactory.getInstance().toDbValue(fieldMapping, entity));
+            params.add(abstractColumnConvertFactory.toDbValue(fieldMapping, entity));
         }
         return params.toArray();
     }
@@ -229,7 +233,7 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
         entity.saveRefresh();
         List<Object> params = new ArrayList<>();
         for (TableMapping.FieldMapping fieldMapping : tableMapping.getColumns().values()) {
-            params.add(ColumnConvertFactory.getInstance().toDbValue(fieldMapping, entity));
+            params.add(abstractColumnConvertFactory.toDbValue(fieldMapping, entity));
         }
         return params.toArray();
     }
@@ -239,10 +243,10 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
         List<Object> params = new ArrayList<>();
         for (TableMapping.FieldMapping fieldMapping : tableMapping.getColumns().values()) {
             if (fieldMapping.isKey()) continue;
-            params.add(ColumnConvertFactory.getInstance().toDbValue(fieldMapping, entity));
+            params.add(abstractColumnConvertFactory.toDbValue(fieldMapping, entity));
         }
         for (TableMapping.FieldMapping fieldMapping : tableMapping.getKeyFields()) {
-            params.add(ColumnConvertFactory.getInstance().toDbValue(fieldMapping, entity));
+            params.add(abstractColumnConvertFactory.toDbValue(fieldMapping, entity));
         }
         return params.toArray();
     }
@@ -260,7 +264,7 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
         for (Map.Entry<String, TableMapping.FieldMapping> entry : columns.entrySet()) {
             TableMapping.FieldMapping fieldMapping = entry.getValue();
             Object colValue = data.get(fieldMapping.getColumnName());
-            colValue = ColumnConvertFactory.getInstance().fromDbValue(fieldMapping, colValue);
+            colValue = abstractColumnConvertFactory.fromDbValue(fieldMapping, colValue);
             fieldMapping.setValue(bean, colValue);
         }
     }

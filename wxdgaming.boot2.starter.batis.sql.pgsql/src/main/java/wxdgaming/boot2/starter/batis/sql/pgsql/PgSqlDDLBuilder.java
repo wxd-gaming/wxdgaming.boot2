@@ -4,6 +4,7 @@ import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
+import wxdgaming.boot2.starter.batis.columnconvert.ColumnConvertFactory;
 import wxdgaming.boot2.starter.batis.sql.SqlDDLBuilder;
 import wxdgaming.boot2.starter.batis.sql.ann.Partition;
 
@@ -14,6 +15,10 @@ import wxdgaming.boot2.starter.batis.sql.ann.Partition;
  * @version 2025-02-15 17:51
  **/
 public class PgSqlDDLBuilder extends SqlDDLBuilder {
+
+    public PgSqlDDLBuilder() {
+        super(ColumnConvertFactory.getInstance());
+    }
 
     @Override public StringBuilder buildTableSqlString(TableMapping tableMapping, String tableName, boolean actionPartition) {
         StringBuilder table = super.buildTableSqlString(tableMapping, tableName, actionPartition);

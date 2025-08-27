@@ -3,6 +3,7 @@ package wxdgaming.boot2.starter.batis.sql.mysql;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.starter.batis.TableMapping;
+import wxdgaming.boot2.starter.batis.columnconvert.ColumnConvertFactory;
 import wxdgaming.boot2.starter.batis.sql.SqlDDLBuilder;
 import wxdgaming.boot2.starter.batis.sql.ann.Partition;
 
@@ -13,6 +14,10 @@ import wxdgaming.boot2.starter.batis.sql.ann.Partition;
  * @version 2025-02-15 17:51
  **/
 public class MySqlDDLBuilder extends SqlDDLBuilder {
+
+    public MySqlDDLBuilder() {
+        super(ColumnConvertFactory.getInstance());
+    }
 
     @Override public StringBuilder buildTableSqlString(TableMapping tableMapping, String tableName, boolean actionPartition) {
         StringBuilder tableSql = super.buildTableSqlString(tableMapping, tableName, actionPartition);

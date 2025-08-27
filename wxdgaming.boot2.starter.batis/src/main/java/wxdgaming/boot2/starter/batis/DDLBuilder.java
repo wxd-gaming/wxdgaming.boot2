@@ -1,6 +1,7 @@
 package wxdgaming.boot2.starter.batis;
 
 import lombok.Getter;
+import wxdgaming.boot2.starter.batis.columnconvert.AbstractColumnConvertFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,6 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class DDLBuilder {
 
     protected final Map<Class<? extends Entity>, TableMapping> tableMappings = new ConcurrentHashMap<>();
+    protected final AbstractColumnConvertFactory abstractColumnConvertFactory;
+
+    public DDLBuilder(AbstractColumnConvertFactory abstractColumnConvertFactory) {
+        this.abstractColumnConvertFactory = abstractColumnConvertFactory;
+    }
 
     public TableMapping tableMapping(Class<? extends Entity> cls) {
         if (!Entity.class.isAssignableFrom(cls)) throw new IllegalArgumentException("cls must be Entity");
