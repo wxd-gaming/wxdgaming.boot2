@@ -21,9 +21,9 @@ import java.util.function.Supplier;
 @ConfigurationProperties(prefix = "core.executor")
 public class ExecutorProperties extends ObjectBase implements InitPrint {
 
-    static final Supplier<ExecutorConfig> BASIC_INSTANCE = () -> new ExecutorConfig().setCoreSize(2).setMaxQueueSize(5000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
-    static final Supplier<ExecutorConfig> LOGIC_INSTANCE = () -> new ExecutorConfig().setCoreSize(8).setMaxQueueSize(5000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
-    static final Supplier<ExecutorConfig> VIRTUAL_INSTANCE = () -> new ExecutorConfig().setCoreSize(200).setMaxQueueSize(5000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
+    static final Supplier<ExecutorConfig> BASIC_INSTANCE = () -> new ExecutorConfig().setCoreSize(2).setMaxQueueSize(5000).setWarnSize(500).setQueuePolicy(QueuePolicyConst.AbortPolicy);
+    static final Supplier<ExecutorConfig> LOGIC_INSTANCE = () -> new ExecutorConfig().setCoreSize(8).setMaxQueueSize(5000).setWarnSize(500).setQueuePolicy(QueuePolicyConst.AbortPolicy);
+    static final Supplier<ExecutorConfig> VIRTUAL_INSTANCE = () -> new ExecutorConfig().setCoreSize(200).setMaxQueueSize(5000).setWarnSize(500).setQueuePolicy(QueuePolicyConst.AbortPolicy);
 
     private ExecutorConfig basic;
     private ExecutorConfig logic;

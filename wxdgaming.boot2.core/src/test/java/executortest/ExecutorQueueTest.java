@@ -24,7 +24,7 @@ public class ExecutorQueueTest {
     public void abortPolicy() {
         AtomicInteger count = new AtomicInteger(0);
         ExecutorServicePlatform executorServicePlatform = ExecutorFactory.create("t", 10);
-        ExecutorQueue executorQueue = new ExecutorQueue("t", executorServicePlatform, 10, QueuePolicyConst.AbortPolicy);
+        ExecutorQueue executorQueue = new ExecutorQueue("t", executorServicePlatform, 10, 5, QueuePolicyConst.AbortPolicy);
         for (int i = 0; i < 1000; i++) {
             int finalI = i;
             try {
@@ -42,7 +42,7 @@ public class ExecutorQueueTest {
     public void discardPolicy() {
         AtomicInteger count = new AtomicInteger(0);
         ExecutorServicePlatform executorServicePlatform = ExecutorFactory.create("t", 10);
-        ExecutorQueue executorQueue = new ExecutorQueue("t", executorServicePlatform, 10, QueuePolicyConst.DiscardPolicy);
+        ExecutorQueue executorQueue = new ExecutorQueue("t", executorServicePlatform, 10, 5, QueuePolicyConst.DiscardPolicy);
         for (int i = 0; i < 1000; i++) {
             int finalI = i;
             executorQueue.execute(() -> {
@@ -58,7 +58,7 @@ public class ExecutorQueueTest {
     public void waitPolicy() throws InterruptedException {
         AtomicInteger count = new AtomicInteger(0);
         ExecutorServicePlatform executorServicePlatform = ExecutorFactory.create("t", 10);
-        ExecutorQueue executorQueue = new ExecutorQueue("t", executorServicePlatform, 10, QueuePolicyConst.WaitPolicy);
+        ExecutorQueue executorQueue = new ExecutorQueue("t", executorServicePlatform, 10, 5, QueuePolicyConst.WaitPolicy);
         for (int i = 0; i < 1000; i++) {
             int finalI = i;
             executorQueue.execute(() -> {

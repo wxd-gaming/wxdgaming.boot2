@@ -14,7 +14,7 @@ public class ExecutorServiceVirtualTest {
 
     public static void main(String[] args) {
 
-        ExecutorServiceVirtual executorService = ExecutorFactory.createVirtual("4", 1, 5, QueuePolicyConst.AbortPolicy);
+        ExecutorServiceVirtual executorService = ExecutorFactory.createVirtual("4", 1, 5, 1, QueuePolicyConst.AbortPolicy);
         executorService.execute(new MyRunnable());
         executorService.execute(new MyRunnable());
         executorService.execute(new MyRunnable());

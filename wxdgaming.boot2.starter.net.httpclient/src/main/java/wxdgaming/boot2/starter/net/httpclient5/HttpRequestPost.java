@@ -60,6 +60,21 @@ public class HttpRequestPost extends AbstractHttpRequest {
         return this;
     }
 
+    @Override public HttpRequestPost connectionRequestTimeout(int connectionRequestTimeout) {
+        super.connectionRequestTimeout(connectionRequestTimeout);
+        return this;
+    }
+
+    @Override public HttpRequestPost connectionTimeout(int connectionTimeout) {
+        super.connectionTimeout(connectionTimeout);
+        return this;
+    }
+
+    @Override public HttpRequestPost readTimeout(int readTimeout) {
+        super.readTimeout(readTimeout);
+        return this;
+    }
+
     @Override public HttpRequestPost retry(int retry) {
         super.retry(retry);
         return this;

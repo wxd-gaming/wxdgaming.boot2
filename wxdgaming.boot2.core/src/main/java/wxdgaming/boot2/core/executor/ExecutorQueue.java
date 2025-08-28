@@ -19,15 +19,17 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ExecutorQueue extends ExecutorJob {
 
     private final String queueName;
+    private final int warnSize;
     private final Executor executor;
     private final ReentrantLock reentrantLock = new ReentrantLock();
     private final AtomicBoolean running = new AtomicBoolean(false);
     private final ArrayBlockingQueue<ExecutorJob> queue;
     private final QueuePolicy queuePolicy;
 
-    public ExecutorQueue(String queueName, Executor executor, int queueSize, QueuePolicy queuePolicy) {
+    public ExecutorQueue(String queueName, Executor executor, int queueSize, int warnSize, QueuePolicy queuePolicy) {
         super(null);
         this.queueName = queueName;
+        this.warnSize = warnSize;
         this.executor = executor;
         this.queue = new ArrayBlockingQueue<>(queueSize);
         this.queuePolicy = queuePolicy;
@@ -54,6 +56,9 @@ public class ExecutorQueue extends ExecutorJob {
      */
     public void execute(Runnable command) {
         queuePolicy.execute(queue, convert(command));
+        if (queue.size() > warnSize) {
+            log.warn("{} queue size: {}, {}", queueName, queue.size(), command);
+        }
         checkExecute(false);
     }
 

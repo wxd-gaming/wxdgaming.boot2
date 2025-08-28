@@ -8,10 +8,12 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.HttpHostConnectException;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.NoHttpResponseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.util.Timeout;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.util.AssertUtil;
 
@@ -19,6 +21,7 @@ import java.io.InterruptedIOException;
 import java.net.SocketTimeoutException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 请求
@@ -33,6 +36,9 @@ import java.util.Map;
 public abstract class AbstractHttpRequest {
 
     protected String uriPath;
+    private int connectionRequestTimeout = 0;
+    private int connectionTimeout = 0;
+    private int readTimeout = 0;
     /** 重试次数，最小值是1 */
     protected int retry;
     protected final Map<String, String> reqHeaderMap = new LinkedHashMap<>();
@@ -44,6 +50,20 @@ public abstract class AbstractHttpRequest {
         AssertUtil.assertNull(uriPath, "uriPath不能为空");
         AssertUtil.assertTrue(retry > 0, "重试次数不能小于1");
         HttpUriRequestBase httpUriRequestBase = buildRequest();
+
+        if (connectionRequestTimeout > 0 || connectionTimeout > 0 || readTimeout > 0) {
+            RequestConfig.Builder builder = RequestConfig.custom();
+            if (connectionTimeout > 0) {
+                builder.setConnectTimeout(Timeout.of(connectionTimeout, TimeUnit.MILLISECONDS));
+            }
+            if (readTimeout > 0) {
+                builder.setResponseTimeout(Timeout.of(readTimeout, TimeUnit.MILLISECONDS));
+            }
+            if (connectionRequestTimeout > 0) {
+                builder.setConnectionRequestTimeout(Timeout.of(connectionRequestTimeout, TimeUnit.MILLISECONDS));
+            }
+            httpUriRequestBase.setConfig(builder.build());
+        }
 
         for (Map.Entry<String, String> entry : reqHeaderMap.entrySet()) {
             httpUriRequestBase.setHeader(entry.getKey(), entry.getValue());

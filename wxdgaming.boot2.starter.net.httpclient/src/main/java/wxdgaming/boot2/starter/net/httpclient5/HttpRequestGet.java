@@ -26,6 +26,21 @@ public class HttpRequestGet extends AbstractHttpRequest {
         return this;
     }
 
+    @Override public HttpRequestGet connectionRequestTimeout(int connectionRequestTimeout) {
+        super.connectionRequestTimeout(connectionRequestTimeout);
+        return this;
+    }
+
+    @Override public HttpRequestGet connectionTimeout(int connectionTimeout) {
+        super.connectionTimeout(connectionTimeout);
+        return this;
+    }
+
+    @Override public HttpRequestGet readTimeout(int readTimeout) {
+        super.readTimeout(readTimeout);
+        return this;
+    }
+
     @Override public HttpRequestGet retry(int retry) {
         super.retry(retry);
         return this;

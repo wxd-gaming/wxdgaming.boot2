@@ -13,14 +13,18 @@ import java.util.concurrent.*;
 @Slf4j
 public class ExecutorServicePlatform extends ExecutorService {
 
+    private final String namePrefix;
     private final int queueSize;
+    private final int warnSize;
     private final QueuePolicy queuePolicy;
     protected ThreadPoolExecutor threadPoolExecutor;
     protected ConcurrentMap<String, ExecutorQueue> queueMap = new ConcurrentHashMap<>();
 
     /** 如果队列已经达到上限默认是拒绝添加任务的 */
-    ExecutorServicePlatform(String namePrefix, int threadSize, int queueSize, QueuePolicy queuePolicy) {
+    ExecutorServicePlatform(String namePrefix, int threadSize, int queueSize, int warnSize, QueuePolicy queuePolicy) {
+        this.namePrefix = namePrefix;
         this.queueSize = queueSize;
+        this.warnSize = warnSize;
         this.queuePolicy = queuePolicy;
         threadPoolExecutor = new ThreadPoolExecutor(
                 threadSize, threadSize,
@@ -50,13 +54,17 @@ public class ExecutorServicePlatform extends ExecutorService {
             if (executorJob instanceof IExecutorQueue iExecutorQueue) {
                 if (Utils.isNotBlank(iExecutorQueue.queueName())) {
                     queueMap
-                            .computeIfAbsent(iExecutorQueue.queueName(), k -> new ExecutorQueue(k, this, this.queueSize, this.queuePolicy))
+                            .computeIfAbsent(iExecutorQueue.queueName(), k -> new ExecutorQueue(k, this, this.queueSize, warnSize, this.queuePolicy))
                             .execute(executorJob);
                     return;
                 }
             }
         } else {
             executorJob = (ExecutorJob) command;
+        }
+        int size = threadPoolExecutor.getQueue().size();
+        if (size > warnSize) {
+            log.warn("ExecutorService {} queueSize:{}, {}", namePrefix, warnSize, command);
         }
         threadPoolExecutor.execute(executorJob);
     }

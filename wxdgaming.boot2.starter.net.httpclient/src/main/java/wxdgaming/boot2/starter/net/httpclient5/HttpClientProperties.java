@@ -29,9 +29,9 @@ public class HttpClientProperties extends ObjectBase implements InitPrint {
     @JSONField(ordinal = 3)
     private int resetTimeM = 30;
     @JSONField(ordinal = 4)
-    private int connectionRequestTimeout = 3000;
+    private int connectionRequestTimeout = 1000;
     @JSONField(ordinal = 5)
-    private int connectTimeOut = 3000;
+    private int connectTimeOut = 2000;
     @JSONField(ordinal = 6)
     private int readTimeout = 3000;
     @JSONField(ordinal = 7)

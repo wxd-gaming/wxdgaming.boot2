@@ -52,7 +52,7 @@ public class ExecutorFactory implements InitPrint {
     }
 
     public static ExecutorServicePlatform create(String name, ExecutorConfig executorConfig) {
-        return create(name, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getQueuePolicy());
+        return create(name, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getWarnSize(), executorConfig.getQueuePolicy());
     }
 
     /**
@@ -62,17 +62,17 @@ public class ExecutorFactory implements InitPrint {
      * @param corePoolSize 核心线程数
      */
     public static ExecutorServicePlatform create(String name, int corePoolSize) {
-        return create(name, corePoolSize, 5000, QueuePolicyConst.AbortPolicy);
+        return create(name, corePoolSize, 5000, 500, QueuePolicyConst.AbortPolicy);
     }
 
-    public static ExecutorServicePlatform create(String name, int corePoolSize, int queueSize, QueuePolicy queuePolicy) {
-        ExecutorServicePlatform executorServicePlatform = new ExecutorServicePlatform(name, corePoolSize, queueSize, queuePolicy);
+    public static ExecutorServicePlatform create(String name, int corePoolSize, int queueSize, int warnSize, QueuePolicy queuePolicy) {
+        ExecutorServicePlatform executorServicePlatform = new ExecutorServicePlatform(name, corePoolSize, queueSize, warnSize, queuePolicy);
         getExecutorMap().put(name, executorServicePlatform);
         return executorServicePlatform;
     }
 
     public static ExecutorServiceVirtual createVirtual(String name, ExecutorConfig executorConfig) {
-        return createVirtual(name, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getQueuePolicy());
+        return createVirtual(name, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getWarnSize(), executorConfig.getQueuePolicy());
     }
 
     /**
@@ -82,11 +82,11 @@ public class ExecutorFactory implements InitPrint {
      * @param corePoolSize 核心线程数
      */
     public static ExecutorServiceVirtual createVirtual(String name, int corePoolSize) {
-        return createVirtual(name, corePoolSize, 5000, QueuePolicyConst.AbortPolicy);
+        return createVirtual(name, corePoolSize, 5000, 500, QueuePolicyConst.AbortPolicy);
     }
 
-    public static ExecutorServiceVirtual createVirtual(String name, int corePoolSize, int queueSize, QueuePolicy queuePolicy) {
-        ExecutorServiceVirtual executorServiceVirtual = new ExecutorServiceVirtual(name, corePoolSize, queueSize, queuePolicy);
+    public static ExecutorServiceVirtual createVirtual(String name, int corePoolSize, int queueSize, int warnSize, QueuePolicy queuePolicy) {
+        ExecutorServiceVirtual executorServiceVirtual = new ExecutorServiceVirtual(name, corePoolSize, queueSize, warnSize, queuePolicy);
         getExecutorMap().put(name, executorServiceVirtual);
         return executorServiceVirtual;
     }

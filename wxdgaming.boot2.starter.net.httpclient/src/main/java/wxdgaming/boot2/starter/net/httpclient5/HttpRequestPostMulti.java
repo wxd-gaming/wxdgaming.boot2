@@ -44,13 +44,29 @@ public class HttpRequestPostMulti extends AbstractHttpRequest {
         multipartEntityBuilder.setCharset(StandardCharsets.UTF_8);
     }
 
-    @Override public HttpRequestPostMulti retry(int retry) {
-        super.retry(retry);
-        return this;
-    }
 
     @Override public HttpRequestPostMulti uriPath(String uriPath) {
         super.uriPath(uriPath);
+        return this;
+    }
+
+    @Override public HttpRequestPostMulti connectionRequestTimeout(int connectionRequestTimeout) {
+        super.connectionRequestTimeout(connectionRequestTimeout);
+        return this;
+    }
+
+    @Override public HttpRequestPostMulti connectionTimeout(int connectionTimeout) {
+        super.connectionTimeout(connectionTimeout);
+        return this;
+    }
+
+    @Override public HttpRequestPostMulti readTimeout(int readTimeout) {
+        super.readTimeout(readTimeout);
+        return this;
+    }
+
+    @Override public HttpRequestPostMulti retry(int retry) {
+        super.retry(retry);
         return this;
     }
 
