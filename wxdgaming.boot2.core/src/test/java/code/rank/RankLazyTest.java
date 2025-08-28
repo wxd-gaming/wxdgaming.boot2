@@ -1,6 +1,9 @@
 package code.rank;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
 import wxdgaming.boot2.core.lang.DiffTimeRecord;
@@ -18,16 +21,18 @@ import java.util.concurrent.locks.LockSupport;
  * @version 2025-05-20 21:08
  **/
 @Slf4j
+@SpringBootTest(classes = {CoreScan.class})
 public class RankLazyTest {
 
-    public static void main(String[] args) {
-        RankByLazyListSort rankMap = new RankByLazyListSort(10000);
+    @Test
+    public void l1() {
+        RankByLazyListSort rankMap = new RankByLazyListSort(1000);
         ExecutorServicePlatform executorService = ExecutorFactory.create("map", 2);
         for (int k = 0; k < 10; k++) {
             executorService.execute(() -> {
 
-                DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
-                int iCount = 1000;
+                DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.MS);
+                int iCount = 10000;
                 int maxRandom = 5;
                 for (int i = 0; i < iCount; i++) {
                     rankMap.updateScore(String.valueOf(i + 1), RandomUtils.random(1, maxRandom));
@@ -50,7 +55,7 @@ public class RankLazyTest {
                 }
                 rankMap.rankBySize(100);
                 diffTime.marker("返回前 100 名 ");
-                System.out.println(diffTime.toString());
+                System.out.println(diffTime.buildString4());
                 System.out.println("=========================================");
             });
         }
