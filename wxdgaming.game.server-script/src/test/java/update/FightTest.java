@@ -23,7 +23,7 @@ public class FightTest {
         Fight fight = new Fight(List.of(roleLeft), List.of(roleRight));
         DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
         fight.execute();
-        DiffTimeRecord.RecordTime recordTime = diffTime.totalInterval();
+        DiffTimeRecord.RecordTime recordTime = diffTime.interval();
         for (FightEvent fightEvent : fight.getFightResult().getFightEventList()) {
             System.out.println(fightEvent);
         }

@@ -25,8 +25,8 @@ public class SortTest {
     @Test
     public void arraySort() {
         ArrayList<SortBean> arrayList = null;
+        DiffTimeRecord diffTime = newDiffTimeRecord();
         for (int k = 0; k < 4; k++) {
-            DiffTimeRecord diffTime = newDiffTimeRecord();
             arrayList = new ArrayList<>(count);
             for (int i = 0; i < count; i++) {
                 SortBean sortBean = new SortBean();
@@ -35,38 +35,38 @@ public class SortTest {
                 arrayList.add(sortBean);
             }
             arrayList.sort(null);
-            DiffTimeRecord.RecordTime recordTime = diffTime.totalInterval();
-            System.out.println("array add Sort = " + recordTime.toString());
+            diffTime.marker("array add Sort");
         }
 
         for (int k = 0; k < 4; k++) {
             List<SortBean> sortBeans = List.copyOf(arrayList);
-            DiffTimeRecord diffTime = newDiffTimeRecord();
             for (SortBean sortBean : sortBeans) {
                 sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
                 arrayList.sort(null);
             }
-            DiffTimeRecord.RecordTime recordTime = diffTime.totalInterval();
-            System.out.println("array update all Sort = " + recordTime.toString());
+            diffTime.marker("array update all Sort");
         }
 
 
         for (int k = 0; k < 4; k++) {
-            DiffTimeRecord diffTime = newDiffTimeRecord();
             SortBean sortBean = RandomUtils.randomItem(arrayList);
             sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
             arrayList.sort(null);
-            DiffTimeRecord.RecordTime recordTime = diffTime.totalInterval();
-            System.out.println("array update one Sort = " + recordTime.toString());
+            diffTime.marker("array update one Sort");
         }
+
+        System.out.println(diffTime.buildString());
+        System.out.println("===================================");
+        System.out.println(diffTime.buildString4());
+
     }
 
 
     @Test
     public void setSort() {
         TreeSet<SortBean> treeSet = null;
+        DiffTimeRecord diffTime = newDiffTimeRecord();
         for (int k = 0; k < 4; k++) {
-            DiffTimeRecord diffTime = newDiffTimeRecord();
             treeSet = new TreeSet<>();
             for (int i = 0; i < count; i++) {
                 SortBean sortBean = new SortBean();
@@ -74,31 +74,27 @@ public class SortTest {
                 sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
                 treeSet.add(sortBean);
             }
-            DiffTimeRecord.RecordTime recordTime = diffTime.totalInterval();
-            System.out.println("set add Sort = " + recordTime.toString());
+            diffTime.marker("set add Sort");
         }
 
         for (int k = 0; k < 4; k++) {
             List<SortBean> sortBeans = List.copyOf(treeSet);
-            DiffTimeRecord diffTime = newDiffTimeRecord();
             for (SortBean sortBean : sortBeans) {
                 treeSet.remove(sortBean);
                 sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
                 treeSet.add(sortBean);
             }
-            DiffTimeRecord.RecordTime recordTime = diffTime.totalInterval();
-            System.out.println("set update all Sort = " + recordTime.toString());
+            diffTime.marker("set update all Sort");
         }
 
         for (int k = 0; k < 4; k++) {
-            DiffTimeRecord diffTime = newDiffTimeRecord();
             SortBean sortBean = RandomUtils.randomItem(treeSet);
             treeSet.remove(sortBean);
             sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
             treeSet.add(sortBean);
-            DiffTimeRecord.RecordTime recordTime = diffTime.totalInterval();
-            System.out.println("set update one Sort = " + recordTime.toString());
+            diffTime.marker("set update one Sort");
         }
+        System.out.println(diffTime.buildString4());
     }
 
     @Test

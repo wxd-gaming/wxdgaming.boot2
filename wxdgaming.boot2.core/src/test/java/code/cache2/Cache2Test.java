@@ -128,7 +128,7 @@ public class Cache2Test {
         }
         log.info(
                 "{} 单线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}, 耗时：{} ms",
-                cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string), diffTime.totalInterval()
+                cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string), diffTime.interval()
         );
         log.info("{} 缓存数量：{}, 内存 {}", cache.getCacheName(), cache.size(), ByteFormat.format(cache.memorySize()));
     }
@@ -147,7 +147,7 @@ public class Cache2Test {
         latch.await();
         log.info(
                 "{} 多线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}, 耗时：{} ms",
-                cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string.get()), diffTime.totalInterval()
+                cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string.get()), diffTime.interval()
         );
         log.info("{} 缓存数量：{}, 内存 {}", cache.getCacheName(), cache.size(), ByteFormat.format(cache.memorySize()));
     }

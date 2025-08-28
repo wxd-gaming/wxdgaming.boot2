@@ -20,6 +20,9 @@ public class DiffTimeRecord {
         /** 传入纳秒，返回自定义数据 */
         long apply(long diffNs);
 
+        /** 传入纳秒，返回自定义数据 */
+        float apply4(long diffNs);
+
         /** 时间单位 */
         String unit();
 
@@ -30,6 +33,10 @@ public class DiffTimeRecord {
         NS() {
             @Override
             public long apply(long diffNs) {
+                return diffNs;
+            }
+
+            @Override public float apply4(long diffNs) {
                 return diffNs;
             }
 
@@ -44,6 +51,10 @@ public class DiffTimeRecord {
                 return diffNs / 1000;
             }
 
+            @Override public float apply4(long diffNs) {
+                return diffNs / 1000f;
+            }
+
             @Override public String unit() {
                 return "us";
             }
@@ -52,7 +63,11 @@ public class DiffTimeRecord {
         MS() {
             @Override
             public long apply(long diffNs) {
-                return diffNs / 10000_00;
+                return diffNs / 100_0000;
+            }
+
+            @Override public float apply4(long diffNs) {
+                return diffNs / 100 / 10000f;
             }
 
             @Override public String unit() {
@@ -62,7 +77,11 @@ public class DiffTimeRecord {
         /** 秒 */
         S() {
             @Override public long apply(long diffNs) {
-                return diffNs / 1000000_000;
+                return diffNs / 10_0000_0000;
+            }
+
+            @Override public float apply4(long diffNs) {
+                return diffNs / 10_0000 / 10000f;
             }
 
             @Override public String unit() {
@@ -73,8 +92,12 @@ public class DiffTimeRecord {
 
     }
 
-    public static DiffTimeRecord start() {
-        return new DiffTimeRecord();
+    public static DiffTimeRecord start4Ms() {
+        return start(IntervalConvertConst.MS);
+    }
+
+    public static DiffTimeRecord start4Us() {
+        return start(IntervalConvertConst.US);
     }
 
     public static DiffTimeRecord start(IntervalConvert convert) {
@@ -86,7 +109,7 @@ public class DiffTimeRecord {
     @Setter private IntervalConvert convert = IntervalConvertConst.MS;
     private final List<RecordTime> recordTimes = new ArrayList<>();
     private final RecordTime totalTime;
-    private RecordTime recordTime = new RecordTime();
+    private final RecordTime recordTime = new RecordTime();
 
     public DiffTimeRecord() {
         totalTime = new RecordTime();
@@ -118,26 +141,43 @@ public class DiffTimeRecord {
     }
 
     public RecordTime interval() {
-        RecordTime clone = recordTime.clone();
-        clone.end();
-        return clone;
-    }
-
-    public RecordTime totalInterval() {
         RecordTime clone = totalTime.clone();
         clone.end();
         return clone;
     }
 
-    @Override public String toString() {
+    public void over() {
+        totalTime.end();
+    }
+
+    public String buildString() {
+        RecordTime end = interval();
         StringBuilder stringBuilder = new StringBuilder();
+        int nameLen = recordTimes.stream().mapToInt(v -> v.name.length()).max().orElse(-1);
         for (RecordTime recordTime : recordTimes) {
-            recordTime.toString(stringBuilder);
+            recordTime.toString(stringBuilder, nameLen);
             stringBuilder.append("\n");
         }
-        RecordTime obj = totalInterval();
-        stringBuilder.append(obj).append("\n");
+        stringBuilder.append(StringUtils.leftPad("-", nameLen + 10, "-")).append("\n");
+        end.toString(stringBuilder, nameLen);
         return stringBuilder.toString();
+    }
+
+    public String buildString4() {
+        RecordTime end = interval();
+        StringBuilder stringBuilder = new StringBuilder();
+        int nameLen = recordTimes.stream().mapToInt(v -> v.name.length()).max().orElse(-1);
+        for (RecordTime recordTime : recordTimes) {
+            recordTime.toString4(stringBuilder, nameLen);
+            stringBuilder.append("\n");
+        }
+        stringBuilder.append(StringUtils.leftPad("-", nameLen + 10, "-")).append("\n");
+        end.toString4(stringBuilder, nameLen);
+        return stringBuilder.toString();
+    }
+
+    @Override public String toString() {
+        return buildString();
     }
 
     public class RecordTime implements Cloneable {
@@ -152,6 +192,7 @@ public class DiffTimeRecord {
 
         private void init() {
             startTime = System.nanoTime();
+            endTime = 0;
         }
 
         @Override protected RecordTime clone() {
@@ -163,6 +204,7 @@ public class DiffTimeRecord {
         }
 
         private void end() {
+            if (endTime > 0) return;
             endTime = System.nanoTime();
         }
 
@@ -170,16 +212,39 @@ public class DiffTimeRecord {
             return DiffTimeRecord.this.convert.apply(endTime - startTime);
         }
 
-        private void toString(StringBuilder stringBuilder) {
+        public float interval4() {
+            return DiffTimeRecord.this.convert.apply4(endTime - startTime);
+        }
+
+        private void toStringB(StringBuilder stringBuilder, int nameLen) {
             if (StringUtils.isNotBlank(name)) {
-                stringBuilder.append(name).append(": ");
+                if (nameLen > 0) {
+                    stringBuilder.append(StringUtils.leftPad(name, nameLen, " "));
+                } else
+                    stringBuilder.append(name);
+                stringBuilder.append(": ");
             }
-            stringBuilder.append(interval()).append(" ").append(DiffTimeRecord.this.convert.unit());
+        }
+
+        private void toString(StringBuilder stringBuilder, int nameLen) {
+            toStringB(stringBuilder, nameLen);
+            stringBuilder.append(interval());
+            toStringA(stringBuilder);
+        }
+
+        private void toString4(StringBuilder stringBuilder, int nameLen) {
+            toStringB(stringBuilder, nameLen);
+            stringBuilder.append(interval4());
+            toStringA(stringBuilder);
+        }
+
+        private void toStringA(StringBuilder stringBuilder) {
+            stringBuilder.append(" ").append(DiffTimeRecord.this.convert.unit());
         }
 
         @Override public String toString() {
             StringBuilder stringBuilder = new StringBuilder();
-            toString(stringBuilder);
+            toString(stringBuilder, -1);
             return stringBuilder.toString();
         }
     }

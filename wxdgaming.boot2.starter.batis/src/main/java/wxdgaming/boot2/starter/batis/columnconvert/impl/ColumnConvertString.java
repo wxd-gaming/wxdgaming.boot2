@@ -39,6 +39,7 @@ public class ColumnConvertString implements IColumnConvert {
         return fieldValue;
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override public Object fromDb(TableMapping.FieldMapping fieldMapping, Object dbValue) {
         if (dbValue == null) return null;
         if (BitSet.class.isAssignableFrom(fieldMapping.getFileType())) {

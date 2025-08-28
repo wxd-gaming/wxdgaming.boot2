@@ -211,7 +211,7 @@ public abstract class SqlDataBatch extends DataBatch {
                         List<BatchParam> batchParams = splitCollection.removeFirst();
                         diffTimeRecord.reset();
                         int executeCount = executeUpdate(sql, batchParams);
-                        long diff = diffTimeRecord.totalInterval().interval() / 10000;
+                        long diff = diffTimeRecord.interval().interval() / 10000;
                         executeDiffTime += diff;
                         this.executeCount += executeCount;
                         if (sqlDataHelper.getSqlConfig().isDebug() || ticket.need() || closed.get() || GlobalUtil.Exiting.get()) {
