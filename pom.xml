@@ -466,46 +466,55 @@
         </resources>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-antrun-plugin</artifactId>
-                    <version>3.1.0</version>
-                    <executions>
-                        <execution>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <configuration>
-                                <target></target>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0</version>
-                    <executions>
-                        <execution>
-                            <id>enforce-rules</id>
-                            <goals>
-                                <goal>enforce</goal>
-                            </goals>
-                            <configuration>
-                                <rules>
-                                    <!-- 禁止项目循环依赖 -->
-                                    <banCircularDependencies/>
-                                    <!--禁止依赖项的 POM 文件中存在重复版本-->
-                                    <banDuplicatePomDependencyVersions/>
-                                </rules>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
+<!--                <plugin>-->
+<!--                    <groupId>org.apache.maven.plugins</groupId>-->
+<!--                    <artifactId>maven-antrun-plugin</artifactId>-->
+<!--                    <version>3.1.0</version>-->
+<!--                    <executions>-->
+<!--                        <execution>-->
+<!--                            <phase>package</phase>-->
+<!--                            <goals>-->
+<!--                                <goal>run</goal>-->
+<!--                            </goals>-->
+<!--                            <configuration>-->
+<!--                                <target></target>-->
+<!--                            </configuration>-->
+<!--                        </execution>-->
+<!--                    </executions>-->
+<!--                </plugin>-->
+<!--                <plugin>-->
+<!--                    <groupId>org.apache.maven.plugins</groupId>-->
+<!--                    <artifactId>maven-clean-plugin</artifactId>-->
+<!--                    <version>3.5.0</version>-->
+<!--                </plugin>-->
+<!--                <plugin>-->
+<!--                    <groupId>org.apache.maven.plugins</groupId>-->
+<!--                    <artifactId>maven-enforcer-plugin</artifactId>-->
+<!--                    <version>3.6.1</version>-->
+<!--                    <executions>-->
+<!--                        <execution>-->
+<!--                            <id>enforce-rules</id>-->
+<!--                            <goals>-->
+<!--                                <goal>enforce</goal>-->
+<!--                            </goals>-->
+<!--                            <configuration>-->
+<!--                                <rules>-->
+<!--                                    &lt;!&ndash; 禁止项目循环依赖 &ndash;&gt;-->
+<!--                                    <banCircularDependencies/>-->
+<!--                                    &lt;!&ndash;禁止依赖项的 POM 文件中存在重复版本&ndash;&gt;-->
+<!--                                    <banDuplicatePomDependencyVersions/>-->
+<!--                                </rules>-->
+<!--                            </configuration>-->
+<!--                        </execution>-->
+<!--                    </executions>-->
+<!--                </plugin>-->
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
