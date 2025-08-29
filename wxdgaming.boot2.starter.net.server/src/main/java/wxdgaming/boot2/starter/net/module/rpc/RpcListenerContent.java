@@ -42,8 +42,8 @@ public class RpcListenerContent {
 
                     String path = "";
 
-                    if (insRequestMapping != null) {
-                        path += insRequestMapping.value();
+                    if (insRequestMapping != null && insRequestMapping.value().length > 0) {
+                        path += insRequestMapping.value()[0];
                     } else {
                         String simpleName = ins.getClass().getSimpleName();
                         if (simpleName.endsWith("Spi")) {
