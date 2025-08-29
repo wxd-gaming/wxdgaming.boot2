@@ -10,4 +10,4 @@ echo %JAVA_HOME%
 :: 打印Java版本信息，确认配置成功
 call java -version
 
-mvnw.cmd --version
+mvnw.cmd -T 1C clean install
