@@ -65,18 +65,18 @@
         </repository>
     </repositories>
 
-<!--    <pluginRepositories>-->
-<!--        <pluginRepository>-->
-<!--            <id>public</id>-->
-<!--            <name>public</name>-->
-<!--            <url>https://maven.aliyun.com/repository/public</url>-->
-<!--        </pluginRepository>-->
-<!--        <pluginRepository>-->
-<!--            <id>central</id>-->
-<!--            <name>central</name>-->
-<!--            <url>https://maven.aliyun.com/repository/central</url>-->
-<!--        </pluginRepository>-->
-<!--    </pluginRepositories>-->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>public</id>
+            <name>public</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>central</id>
+            <name>central</name>
+            <url>https://maven.aliyun.com/repository/central</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <dependencyManagement>
         <dependencies>
