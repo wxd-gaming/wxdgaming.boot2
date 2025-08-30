@@ -6,11 +6,13 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.message.chat.ReqChatMessage;
+import wxdgaming.game.message.gm.ResGmList;
 import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.global.GlobalDataType;
 import wxdgaming.game.server.bean.global.impl.YunyingData;
 import wxdgaming.game.server.bean.role.Player;
+import wxdgaming.game.server.event.OnLogin;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.module.data.GlobalDataService;
 import wxdgaming.game.server.script.chat.ChatService;
@@ -52,10 +54,7 @@ public class ReqChatMessageHandler {
         String content = req.getContent();
         log.info("{} 聊天消息 {}", player, req);
         if (content.startsWith("@gm")) {
-            YunyingData yunyingData = globalDataService.get(GlobalDataType.YUNYINGDATA);
-            if (gameServerProperties.isDebug()
-                || yunyingData.getGmAccountSet().contains(player.getAccount())
-                || yunyingData.getGmPlayerIdSet().contains(player.getUid())) {
+            if (checkOpenGm(player)) {
                 gmService.doGm(player, content.substring(3).trim().split(" "));
                 return;
             }
@@ -74,6 +73,25 @@ public class ReqChatMessageHandler {
         req.setContent(replace);
 
         chatService.chatHandler(req.getType()).chat(player, req);
+    }
+
+    boolean checkOpenGm(Player player) {
+        YunyingData yunyingData = globalDataService.get(GlobalDataType.YUNYINGDATA);
+        if (gameServerProperties.isDebug()
+            || yunyingData.getGmAccountSet().contains(player.getAccount())
+            || yunyingData.getGmPlayerIdSet().contains(player.getUid())) {
+            return true;
+        }
+        return false;
+    }
+
+    /** 登录，推送gm命令 */
+    @OnLogin
+    public void onLoginSendGmList(Player player) {
+        if (checkOpenGm(player)) {
+            ResGmList resGmList = gmService.getResGmList();
+            player.write(resGmList);
+        }
     }
 
 }

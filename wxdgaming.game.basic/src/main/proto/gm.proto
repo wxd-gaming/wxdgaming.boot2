@@ -1,0 +1,27 @@
+syntax = "proto3";
+//把文件拆分
+option java_multiple_files = true;
+//导出包名
+option java_package = "wxdgaming.game.message";
+
+//gm命令列表
+message ReqGmList {
+}
+
+//gm命令列表
+message ResGmList {
+  repeated GmGroup gmGroupList = 1;
+}
+
+//gm命令分组
+message GmGroup {
+  string group       = 1;
+  repeated GMBean gmList = 2;
+}
+
+//gm命令
+message GMBean {
+  string cmd        = 1;//客户端用于请求的gm命令名字
+  string name       = 2;//客户端展示的gm命令名字
+  string params     = 3;//gm命令参数案例
+}

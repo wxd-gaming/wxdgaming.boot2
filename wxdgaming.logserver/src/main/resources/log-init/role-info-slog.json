@@ -17,6 +17,11 @@
       "fieldType": "string"
     },
     {
+      "fieldName": "online",
+      "fieldComment": "是否在线",
+      "fieldType": "string"
+    },
+    {
       "fieldName": "roleId",
       "fieldComment": "角色ID",
       "fieldType": "long"

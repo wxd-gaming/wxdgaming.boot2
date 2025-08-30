@@ -12,4 +12,10 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface GM {
+
+    String group() default "";
+
+    String name() default "";
+
+    String param() default "";
 }
