@@ -2,9 +2,9 @@ db:
   pgsql:
     debug: false                                                 #调试模式将会显示sql语句
     driverClassName: "org.postgresql.Driver"
-    url: "jdbc:postgresql://10.28.0.26:5432/game_log_10"
-    username: "postgres"
-    password: "test"
+    url: "jdbc:postgresql://@db.host@:5432/game_log_10"
+    username: "@db-user@"
+    password: "@db-pwd@"
     scanPackage: ""                   #扫描路径
     connectionTimeoutMs: 2000                                 #链接超时单位毫秒
     idleTimeoutM: 10                                          #空闲超时单位分钟

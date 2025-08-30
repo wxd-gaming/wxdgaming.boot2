@@ -2,9 +2,9 @@ db:
   mysql:
     debug: false                                                 #调试模式将会显示sql语句
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    url: "jdbc:mysql://10.28.0.26:3306/test_game"
-    username: "root"
-    password: "test"
+    url: "jdbc:mysql://@db.host@:3306/test_game"
+    username: "@db-user@"
+    password: "@db-pwd@"
     scanPackage: "wxdgaming.game.server.bean"                   #扫描路径
     connectionTimeoutMs: 2000                                 #链接超时单位毫秒
     idleTimeoutM: 10                                          #空闲超时单位分钟
@@ -15,9 +15,9 @@ db:
   mysql-second:
     debug: false                                                 #调试模式将会显示sql语句
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    url: "jdbc:mysql://10.28.0.26:3306/test_game_global"
-    username: "root"
-    password: "test"
+    url: "jdbc:mysql://@db.host@:3306/test_game_global"
+    username: "@db-user@"
+    password: "@db-pwd@"
     scanPackage: "wxdgaming.game.global.bean"                 #扫描路径
     connectionTimeoutMs: 2000                                 #链接超时单位毫秒
     idleTimeoutM: 10                                          #空闲超时单位分钟

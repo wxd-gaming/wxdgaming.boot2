@@ -442,74 +442,26 @@
     <build>
         <resources>
             <resource>
-                <directory>${project.basedir}/src/main/resources</directory>
-                <targetPath>${project.build.directory}/classes</targetPath>
+                <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <!-- 可选：指定包含的文件 -->
                 <includes>
                     <include>**/*.properties</include>
                     <include>**/*.xml</include>
+                    <include>**/*.json</include>
                     <include>**/*.yml</include>
                     <include>**/*.yaml</include>
                 </includes>
             </resource>
             <resource>
-                <directory>${project.basedir}/src/main/resources</directory>
-                <targetPath>${project.build.directory}/classes</targetPath>
+                <directory>src/main/resources</directory>
                 <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/*.properties</exclude>
-                    <exclude>**/*.xml</exclude>
-                    <exclude>**/*.yml</exclude>
-                    <exclude>**/*.yaml</exclude>
-                </excludes>
+                <!-- 可选：指定包含的文件 -->
+                <includes>
+                    <include>**/*.*</include>
+                </includes>
             </resource>
         </resources>
-        <pluginManagement>
-            <plugins>
-<!--                <plugin>-->
-<!--                    <groupId>org.apache.maven.plugins</groupId>-->
-<!--                    <artifactId>maven-antrun-plugin</artifactId>-->
-<!--                    <version>3.1.0</version>-->
-<!--                    <executions>-->
-<!--                        <execution>-->
-<!--                            <phase>package</phase>-->
-<!--                            <goals>-->
-<!--                                <goal>run</goal>-->
-<!--                            </goals>-->
-<!--                            <configuration>-->
-<!--                                <target></target>-->
-<!--                            </configuration>-->
-<!--                        </execution>-->
-<!--                    </executions>-->
-<!--                </plugin>-->
-<!--                <plugin>-->
-<!--                    <groupId>org.apache.maven.plugins</groupId>-->
-<!--                    <artifactId>maven-clean-plugin</artifactId>-->
-<!--                    <version>3.5.0</version>-->
-<!--                </plugin>-->
-<!--                <plugin>-->
-<!--                    <groupId>org.apache.maven.plugins</groupId>-->
-<!--                    <artifactId>maven-enforcer-plugin</artifactId>-->
-<!--                    <version>3.6.1</version>-->
-<!--                    <executions>-->
-<!--                        <execution>-->
-<!--                            <id>enforce-rules</id>-->
-<!--                            <goals>-->
-<!--                                <goal>enforce</goal>-->
-<!--                            </goals>-->
-<!--                            <configuration>-->
-<!--                                <rules>-->
-<!--                                    &lt;!&ndash; 禁止项目循环依赖 &ndash;&gt;-->
-<!--                                    <banCircularDependencies/>-->
-<!--                                    &lt;!&ndash;禁止依赖项的 POM 文件中存在重复版本&ndash;&gt;-->
-<!--                                    <banDuplicatePomDependencyVersions/>-->
-<!--                                </rules>-->
-<!--                            </configuration>-->
-<!--                        </execution>-->
-<!--                    </executions>-->
-<!--                </plugin>-->
-            </plugins>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -551,10 +503,23 @@
 
     <profiles>
         <profile>
-            <id>dev</id>
+            <id>dev10</id>
+            <properties>
+                <db.host>10.28.0.26</db.host>
+                <db-user>postgres</db-user>
+                <db-pwd>test</db-pwd>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev127</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <properties>
+                <db.host>127.0.0.1</db.host>
+                <db-user>postgres</db-user>
+                <db-pwd>test</db-pwd>
+            </properties>
         </profile>
     </profiles>
 
