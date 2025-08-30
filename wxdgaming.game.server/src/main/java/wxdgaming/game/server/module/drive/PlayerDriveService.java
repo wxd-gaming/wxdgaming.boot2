@@ -1,5 +1,6 @@
 package wxdgaming.game.server.module.drive;
 
+import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
@@ -10,7 +11,11 @@ import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorProperties;
 import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.boot2.starter.net.SocketSession;
+import wxdgaming.game.basic.slog.SlogService;
+import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
+import wxdgaming.game.server.bean.slog.RoleInfoSlog;
 import wxdgaming.game.server.event.*;
 
 import java.time.LocalDateTime;
@@ -33,9 +38,11 @@ public class PlayerDriveService extends HoldApplicationContext {
     private final ConcurrentHashMap<Integer, PlayerDriveContent> playerDriveContentMap = new ConcurrentHashMap<>();
     private final int logicCoreSize;
     private final AtomicInteger onlineSize = new AtomicInteger();
+    final SlogService slogService;
 
-    public PlayerDriveService(ExecutorProperties executorProperties) {
+    public PlayerDriveService(ExecutorProperties executorProperties, SlogService slogService) {
         logicCoreSize = executorProperties.getLogic().getCoreSize();
+        this.slogService = slogService;
     }
 
     @Start
@@ -94,6 +101,23 @@ public class PlayerDriveService extends HoldApplicationContext {
         if (log.isDebugEnabled()) {
             log.debug("PlayerHeartDrive add player {}", player);
         }
+        updateRoleInfoSlog(player);
+
+        UserMapping userMapping = player.getUserMapping();
+        Channel selfChannel = userMapping.getSocketSession().getChannel();
+        selfChannel.closeFuture().addListener(future -> {
+            SocketSession socketSession = userMapping.getSocketSession();
+            if (socketSession != null) {
+                if (selfChannel == socketSession.getChannel()) {
+                    log.info(
+                            "sid={}, account={} 角色下线 rid={} -> {}",
+                            userMapping.getSid(), userMapping.getAccount(), userMapping.getRid(), player.getUid()
+                    );
+                    applicationContextProvider.executeMethodWithAnnotatedException(OnLogout.class, player);
+                }
+            }
+        });
+
     }
 
     @OnLogout
@@ -107,6 +131,13 @@ public class PlayerDriveService extends HoldApplicationContext {
         if (log.isDebugEnabled()) {
             log.debug("PlayerHeartDrive add remove {}", player);
         }
+        updateRoleInfoSlog(player);
+    }
+
+    @OnHeartMinute
+    public void updateRoleInfoSlog(Player player) {
+        RoleInfoSlog roleInfoSlog = new RoleInfoSlog(player, String.valueOf(player.checkOnline()), 1);
+        slogService.updateLog(player.getUid(), player.getCreateTime(), roleInfoSlog);
     }
 
     public class PlayerDriveContent extends ExecutorEvent {

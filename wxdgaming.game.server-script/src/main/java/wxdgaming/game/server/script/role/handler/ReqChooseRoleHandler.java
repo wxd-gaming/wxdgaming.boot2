@@ -19,7 +19,6 @@ import wxdgaming.game.server.event.OnLogout;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.module.data.GlobalDbDataCenterService;
 import wxdgaming.game.server.module.drive.PlayerDriveService;
-import wxdgaming.game.server.script.role.slog.RoleInfoSlog;
 import wxdgaming.game.server.script.role.slog.RoleLoginSlog;
 
 import java.util.ArrayList;
@@ -68,6 +67,7 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
 
         Player player = dataCenterService.getPlayer(rid);
         playerDriveService.executor(player, () -> {
+
             if (userMapping.getRid() > 0 && userMapping.getRid() != player.getUid()) {
                 /*角色切换*/
                 log.info("sid={}, account={} 角色切换 rid={} -> {}", sid, account, userMapping.getRid(), player.getUid());
@@ -95,9 +95,6 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
 
             RoleLoginSlog roleLoginLog = new RoleLoginSlog(player, userMapping.getClientIp(), JSON.toJSONString(userMapping.getClientParams()));
             slogService.pushLog(roleLoginLog);
-
-            RoleInfoSlog roleInfoSlog = new RoleInfoSlog(player);
-            slogService.updateLog(player.getUid(), player.getCreateTime(), roleInfoSlog);
 
         });
     }

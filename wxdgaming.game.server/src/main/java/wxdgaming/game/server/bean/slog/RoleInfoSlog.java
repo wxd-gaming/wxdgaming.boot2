@@ -1,9 +1,8 @@
-package wxdgaming.game.server.script.role.slog;
+package wxdgaming.game.server.bean.slog;
 
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.bean.slog.AbstractRoleSlog;
 
 /**
  * 角色详情
@@ -15,8 +14,13 @@ import wxdgaming.game.server.bean.slog.AbstractRoleSlog;
 @Setter
 public class RoleInfoSlog extends AbstractRoleSlog {
 
-    public RoleInfoSlog(Player player) {
+    private String online;
+    private int vipLv;
+
+    public RoleInfoSlog(Player player, String online, int vipLv) {
         super(player);
+        this.online = online;
+        this.vipLv = vipLv;
     }
 
 }
