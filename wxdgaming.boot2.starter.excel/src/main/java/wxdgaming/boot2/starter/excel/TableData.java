@@ -192,17 +192,101 @@ public class TableData {
         return jsonObject.get(field);
     }
 
-    /**
-     * 把所有的数据，转化成json字符串
-     *
-     * @return
-     * @author wxd-gaming(無心道, 15388152619)
-     * @version 2024-08-10 14:05
-     */
+    /** 把所有的数据，转化成json字符串 */
     public String data2Json() {
         Object array = rows.values().stream().toList();
         return FastJsonUtil.toJSONStringAsFmt(array);
     }
+
+    /** 把所有的数据，转化成json字符串 */
+    public String data2Lua() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("""
+                --- %s %s
+                --- %s %s
+                
+                --- @class %s
+                """.formatted(tableName, tableComment, filePath, sheetName, getCodeClassName()));
+
+        for (CellInfo cellInfo : cellInfo4IndexMap.values()) {
+            builder.append("---@field ").append(cellInfo.getFieldName()).append(" any ").append(cellInfo.getFieldComment()).append("\n");
+        }
+
+        builder.append("""
+                %s = {}
+                %s.__index = %s
+                
+                ---@type table<string, %s>
+                %sTable = {
+                """.formatted(getCodeClassName(), getCodeClassName(), getCodeClassName(), getCodeClassName(), getCodeClassName())
+        );
+
+        boolean appendDouhao1 = false;
+        for (Map.Entry<Object, RowData> entry : rows.entrySet()) {
+            if (appendDouhao1) {
+                builder.append(",\n");
+            }
+            builder.append("[%s] = {".formatted(entry.getKey()));
+            boolean appendDouhao2 = false;
+            for (Map.Entry<String, Object> fieldEntry : entry.getValue().entrySet()) {
+                if (appendDouhao2) {
+                    builder.append(", ");
+                }
+                builder.append(fieldEntry.getKey()).append(" = ");
+                Object value = fieldEntry.getValue();
+                if (value == null) {
+                    builder.append("nil");
+                } else {
+                    if (value instanceof Number || value instanceof Boolean) {
+                        builder.append(value);
+                    } else {
+                        builder.append("\"").append(value.toString().replace("\"", "\\\"")).append("\"");
+                    }
+                }
+                appendDouhao2 = true;
+            }
+            builder.append(" } ");
+            appendDouhao1 = true;
+        }
+        builder.append("\n}");
+        builder.append("""
+                
+                
+                ---@param id string id
+                ---@return %s 道具配置
+                function %sTable.get(id)
+                    local cfg = %sTable[id]
+                    if (cfg == nil) then
+                        return nil
+                    end
+                    return setmetatable(cfg, %s)
+                end
+                
+                ---@param field string 字段名字
+                ---@param value any 字段值
+                ---@return %s 道具配置
+                function %sTable.find(field, value)
+                    for _, v in pairs(%sTable) do
+                        if (v[field] == value) then
+                            return setmetatable(v, %s)
+                        end
+                    end
+                    return nil
+                end
+                
+                """.formatted(
+                getCodeClassName(),
+                getCodeClassName(),
+                getCodeClassName(),
+                getCodeClassName(),
+                getCodeClassName(),
+                getCodeClassName(),
+                getCodeClassName(),
+                getCodeClassName()
+        ));
+        return builder.toString();
+    }
+
 
     public String showData() {
         StringBuilder stringBuilder = new StringBuilder();

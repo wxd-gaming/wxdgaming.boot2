@@ -18,7 +18,7 @@ public class ImportExcel {
     public void s1() {
         ExcelRepository excelReader = ExcelRepository.getIns();
         excelReader.readExcel(Paths.get("src/main/cfg/"), "");
-        excelReader.outJsonFile("../cfg_json");
+        excelReader.outJsonFile("../cfg_json").outLuaFile("../cfg_lua");
         excelReader.getTableInfoMap().values().forEach(tableInfo -> {
             // System.out.println(tableInfo.showData());
             CreateJavaCode.getIns().createCode(tableInfo, "src/main/java", "wxdgaming.game.cfg", "");

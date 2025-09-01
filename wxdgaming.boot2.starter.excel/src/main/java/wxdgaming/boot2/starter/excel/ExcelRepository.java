@@ -59,6 +59,13 @@ public class ExcelRepository {
         return this;
     }
 
+    public ExcelRepository outLuaFile(String outPath) {
+        tableInfoMap.values().forEach(tableData -> {
+            FileWriteUtil.writeString(outPath + "/" + tableData.getTableName() + ".lua", tableData.data2Lua());
+        });
+        return this;
+    }
+
     public ExcelRepository createCode(ICreateCode iCreateCode, String outPath, String packageName, String belong) {
         tableInfoMap.values().forEach(tableData -> {
             iCreateCode.createCode(tableData, outPath, packageName, belong);
