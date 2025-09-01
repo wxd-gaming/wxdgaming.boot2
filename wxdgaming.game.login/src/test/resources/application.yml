@@ -16,20 +16,7 @@ core:
       coreSize: 100                      #虚拟线程池
       maxQueueSize: 1500000              #队列超过就会打印异常
 
-
 scheduled:
   executor:
     coreSize: 1
     maxQueueSize: 50000
-
-data:
-  json:
-    path: "cfg_json"
-    scan: "wxdgaming.game.login.cfg"
-
-spring:
-  profiles:
-    active: [ pgsql,mapdb, httpclient,logbus ]
-
-server:
-  port: 19800

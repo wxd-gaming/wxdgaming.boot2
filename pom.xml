@@ -505,7 +505,7 @@
         <profile>
             <id>dev10</id>
             <properties>
-                <db.host>10.28.0.26</db.host>
+                <db-host>10.28.0.26</db-host>
                 <db-user>postgres</db-user>
                 <db-pwd>test</db-pwd>
             </properties>
@@ -516,7 +516,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <db.host>127.0.0.1</db.host>
+                <db-host>127.0.0.1</db-host>
                 <db-user>postgres</db-user>
                 <db-pwd>test</db-pwd>
             </properties>

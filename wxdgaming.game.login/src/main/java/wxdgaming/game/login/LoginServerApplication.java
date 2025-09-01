@@ -1,15 +1,16 @@
 package wxdgaming.game.login;
 
-import ch.qos.logback.core.LogbackUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import wxdgaming.boot2.core.CoreScan;
-import wxdgaming.boot2.core.util.JvmUtil;
-import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlConfiguration;
-import wxdgaming.boot2.starter.net.httpclient5.HttpClientConfiguration;
-import wxdgaming.boot2.starter.scheduled.ScheduledConfiguration;
 import wxdgaming.boot2.core.SpringUtil;
+import wxdgaming.boot2.core.util.JvmUtil;
+import wxdgaming.boot2.starter.batis.mapdb.MapDBScan;
+import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
+import wxdgaming.boot2.starter.excel.DataExcelScan;
+import wxdgaming.boot2.starter.net.httpclient5.HttpClientScan;
+import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 import wxdgaming.game.basic.slog.SlogService;
 import wxdgaming.logbus.LogBusService;
 
@@ -23,9 +24,11 @@ import wxdgaming.logbus.LogBusService;
 @SpringBootApplication(
         scanBasePackageClasses = {
                 CoreScan.class,
-                HttpClientConfiguration.class,
-                ScheduledConfiguration.class,
-                PgsqlConfiguration.class,
+                DataExcelScan.class,
+                HttpClientScan.class,
+                ScheduledScan.class,
+                PgsqlScan.class,
+                MapDBScan.class,
                 SlogService.class,
                 LogBusService.class,
                 LoginServerApplication.class

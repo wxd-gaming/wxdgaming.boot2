@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="启动服务" type="CompoundRunConfigurationType">
+    <toRun name="GameServerApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="LogServerApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="LoginServerApplication" type="SpringBootApplicationConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -2,7 +2,7 @@ db:
   pgsql:
     debug: false                                                 #调试模式将会显示sql语句
     driverClassName: "org.postgresql.Driver"
-    url: "jdbc:postgresql://@db.host@:5432/test_game"
+    url: "jdbc:postgresql://@db-host@:5432/test_game"
     username: "@db-user@"
     password: "@db-pwd@"
     scanPackage: "wxdgaming.game.server.bean"                   #扫描路径
@@ -15,7 +15,7 @@ db:
   pgsql-second:
     debug: false                                                 #调试模式将会显示sql语句
     driverClassName: "org.postgresql.Driver"
-    url: "jdbc:postgresql://@db.host@:5432/test_game_global"
+    url: "jdbc:postgresql://@db-host@:5432/test_game_global"
     username: "@db-user@"
     password: "@db-pwd@"
     scanPackage: "wxdgaming.game.global.bean"                 #扫描路径

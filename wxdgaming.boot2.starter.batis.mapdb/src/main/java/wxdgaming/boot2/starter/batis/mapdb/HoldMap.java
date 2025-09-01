@@ -39,6 +39,10 @@ public class HoldMap {
         return hold.size();
     }
 
+    public Collection<String> keys() {
+        return hold.keySet();
+    }
+
     public Collection<Object> values() {
         return hold.values();
     }

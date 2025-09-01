@@ -5,12 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.game.server.GameServerProperties;
-import wxdgaming.game.server.bean.BackendConfig;
 import wxdgaming.game.server.bean.global.DataBase;
 import wxdgaming.game.server.bean.global.GlobalDataEntity;
 import wxdgaming.game.server.bean.global.GlobalDataType;
@@ -29,14 +28,12 @@ import java.util.List;
 public class GlobalDataService extends HoldApplicationContext {
 
     final GameServerProperties gameServerProperties;
-    private final BackendConfig backendConfig;
     private SqlDataHelper sqlDataHelper;
     /** key: sid, key: type, value: 数据 */
     private final ConcurrentTable<Integer, GlobalDataType, GlobalDataEntity> globalDataTable = new ConcurrentTable<>();
 
-    public GlobalDataService(GameServerProperties gameServerProperties, BackendConfig backendConfig) {
+    public GlobalDataService(GameServerProperties gameServerProperties) {
         this.gameServerProperties = gameServerProperties;
-        this.backendConfig = backendConfig;
     }
 
     @Start

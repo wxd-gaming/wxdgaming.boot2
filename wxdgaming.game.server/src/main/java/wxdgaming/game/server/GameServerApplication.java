@@ -15,14 +15,14 @@ import wxdgaming.boot2.core.lang.DiffTimeRecord;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
 import wxdgaming.boot2.core.util.JvmUtil;
-import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlConfiguration;
+import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
 import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
-import wxdgaming.boot2.starter.net.SocketConfiguration;
+import wxdgaming.boot2.starter.net.SocketScan;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.SocketClient;
 import wxdgaming.boot2.starter.net.module.rpc.RpcService;
-import wxdgaming.boot2.starter.scheduled.ScheduledConfiguration;
+import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 import wxdgaming.boot2.util.ChildApplicationContextProvider;
 import wxdgaming.game.basic.login.LoginProperties;
 import wxdgaming.game.basic.slog.SlogService;
@@ -38,9 +38,9 @@ import java.util.concurrent.TimeUnit;
 @SpringBootApplication(scanBasePackageClasses = {
         CoreScan.class,
         DataExcelScan.class,
-        ScheduledConfiguration.class,
-        SocketConfiguration.class,
-        PgsqlConfiguration.class,
+        ScheduledScan.class,
+        SocketScan.class,
+        PgsqlScan.class,
         LogBusService.class,
         SlogService.class,
         LoginProperties.class,

@@ -13,12 +13,10 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 @Getter
 @Setter
 public class CDKeyReward extends ObjectBase {
-    /** 道具id */
-    private int itemId;
-    /** 道具数量 */
-    private long count;
-    /** 0非绑定, 1绑定 */
-    private int bind;
-    /** 过期时间 */
-    private long expireTime;
+
+    private int cfgId;
+    private long num;
+    private boolean bind;
+    private long expirationTime;
+
 }

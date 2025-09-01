@@ -5,17 +5,17 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.game.basic.core.Reason;
 import wxdgaming.game.basic.core.ReasonDTO;
+import wxdgaming.game.basic.login.LoginProperties;
 import wxdgaming.game.bean.goods.BagChangeDTO4Item;
 import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.bean.goods.ItemCfg;
 import wxdgaming.game.message.cdkey.ResUseCdKey;
-import wxdgaming.game.server.bean.BackendConfig;
+import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.bag.BagService;
@@ -40,29 +40,33 @@ public class CDKeyService implements InitPrint {
     private final DataCenterService dataCenterService;
     private final TipsService tipsService;
     private final BagService bagService;
-    private final BackendConfig backendConfig;
+    private final LoginProperties loginProperties;
+    final GameServerProperties gameServerProperties;
 
 
-    public CDKeyService(DataCenterService dataCenterService, TipsService tipsService, BagService bagService, BackendConfig backendConfig) {
+    public CDKeyService(DataCenterService dataCenterService,
+                        TipsService tipsService,
+                        BagService bagService,
+                        LoginProperties loginProperties, GameServerProperties gameServerProperties) {
         this.dataCenterService = dataCenterService;
         this.tipsService = tipsService;
         this.bagService = bagService;
-        this.backendConfig = backendConfig;
+        this.loginProperties = loginProperties;
+        this.gameServerProperties = gameServerProperties;
     }
 
     public void use(Player player, String cdKey) {
 
-        String url = backendConfig.getUrl();
+        String url = loginProperties.getUrl();
         url = url + "/cdkey/use";
 
         HashMap<String, Object> params = new HashMap<>();
-        params.put("gameId", backendConfig.getGameId());
-        params.put("appToken", backendConfig.getAppToken());
         params.put("key", cdKey);
+        params.put("sid", gameServerProperties.getSid());
         params.put("account", player.getAccount());
         params.put("rid", player.getUid());
 
-        HttpResponse execute = HttpRequestPost.ofJson(url, FastJsonUtil.toJSONString(params)).execute();
+        HttpResponse execute = HttpRequestPost.of(url, params).execute();
         RunResult runResult = execute.bodyRunResult();
 
         if (runResult.isFail()) {
@@ -75,10 +79,10 @@ public class CDKeyService implements InitPrint {
         List<ItemCfg> rewards = new ArrayList<>();
         for (CDKeyReward reward : rewardCfgList) {
             ItemCfg itemCfg = ItemCfg.builder()
-                    .cfgId(reward.getItemId())
-                    .num(reward.getCount())
-                    .bind(reward.getBind() == 1)
-                    .expirationTime(reward.getExpireTime())
+                    .cfgId(reward.getCfgId())
+                    .num(reward.getNum())
+                    .bind(reward.isBind())
+                    .expirationTime(reward.getExpirationTime())
                     .build();
             rewards.add(itemCfg);
         }

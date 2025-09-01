@@ -9,7 +9,7 @@ import java.util.HashSet;
 
 public class CDKeyUtil {
 
-    private static final int[] AES_KEY_ENCODE = {1, 2, 5, 3, 2};
+    private static final int[] AES_KEY_ENCODE = {1, 4, 3, 6, 2};
     private static final int[] AES_KEY_DECODE = Objects.reverse(AES_KEY_ENCODE);
 
 

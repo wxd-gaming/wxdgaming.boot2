@@ -2,7 +2,7 @@ db:
   mysql:
     debug: false                                                 #调试模式将会显示sql语句
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    url: "jdbc:mysql://@db.host@:3306/test_game"
+    url: "jdbc:mysql://@db-host@:3306/test_game"
     username: "@db-user@"
     password: "@db-pwd@"
     scanPackage: "wxdgaming.game.server.bean"                   #扫描路径
@@ -15,7 +15,7 @@ db:
   mysql-second:
     debug: false                                                 #调试模式将会显示sql语句
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    url: "jdbc:mysql://@db.host@:3306/test_game_global"
+    url: "jdbc:mysql://@db-host@:3306/test_game_global"
     username: "@db-user@"
     password: "@db-pwd@"
     scanPackage: "wxdgaming.game.global.bean"                 #扫描路径

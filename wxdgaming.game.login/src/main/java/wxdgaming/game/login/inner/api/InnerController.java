@@ -14,6 +14,7 @@ import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.game.basic.login.bean.info.InnerServerInfoBean;
+import wxdgaming.game.login.cdkey.CDKeyService;
 import wxdgaming.game.login.inner.InnerService;
 
 import java.util.ArrayList;
@@ -31,9 +32,11 @@ import java.util.List;
 public class InnerController extends HoldApplicationContext {
 
     final InnerService innerService;
+    final CDKeyService cdKeyService;
 
-    public InnerController(InnerService innerService) {
+    public InnerController(InnerService innerService, CDKeyService cdKeyService) {
         this.innerService = innerService;
+        this.cdKeyService = cdKeyService;
     }
 
     @RequestMapping(value = "/registerGame")
@@ -58,6 +61,19 @@ public class InnerController extends HoldApplicationContext {
                 .stream()
                 .toList();
         return RunResult.ok().data(list);
+    }
+
+    @RequestMapping("/gainCDKey")
+    public RunResult gainCDKey(CacheHttpServletRequest request, @RequestBody JSONObject data) {
+        int cdKeyId = data.getIntValue("cdKeyId");
+        int num = data.getIntValue("num");
+        return cdKeyService.gain(cdKeyId, num);
+    }
+
+    @RequestMapping("/queryCDKey")
+    public RunResult queryCDKey(CacheHttpServletRequest request, @RequestBody JSONObject data) {
+        int cdKeyId = data.getIntValue("cdKeyId");
+        return cdKeyService.queryByUid(cdKeyId);
     }
 
 }
