@@ -226,7 +226,8 @@ public class TableData {
             if (appendDouhao1) {
                 builder.append(",\n");
             }
-            builder.append("[%s] = {".formatted(entry.getKey()));
+            Object uid = entry.getKey();
+            builder.append("[%s] = {".formatted((uid instanceof Number) ? uid.toString() : "\"" + uid.toString() + "\""));
             boolean appendDouhao2 = false;
             for (Map.Entry<String, Object> fieldEntry : entry.getValue().entrySet()) {
                 if (appendDouhao2) {
