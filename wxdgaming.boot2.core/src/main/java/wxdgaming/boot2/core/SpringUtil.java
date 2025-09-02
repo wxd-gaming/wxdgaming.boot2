@@ -27,13 +27,16 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
+import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.util.ChildApplicationContextProvider;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * spring 工具
@@ -167,7 +170,10 @@ public class SpringUtil implements InitPrint {
     }
 
     public static ChildApplicationContextProvider newChild(ConfigurableApplicationContext parent, Class<?> scan, ClassDirLoader classLoader) {
-        Collection<Class<?>> values = classLoader.getLoadClassMap().values();
+        ComponentScan annotation = scan.getAnnotation(ComponentScan.class);
+        String[] packageNames = Stream.concat(Arrays.stream(annotation.value()), Arrays.stream(annotation.basePackages())).distinct().toArray(String[]::new);
+        ReflectProvider reflectProvider = ReflectProvider.Builder.of(classLoader, packageNames).build();
+        Collection<Class<?>> classList = reflectProvider.getClassList();
         // 创建子容器
         AnnotationConfigServletWebApplicationContext childContext = new AnnotationConfigServletWebApplicationContext();
         childContext.setParent(parent);
@@ -187,7 +193,7 @@ public class SpringUtil implements InitPrint {
         String[] beanDefinitionNames = childContext.getBeanDefinitionNames();
         for (String beanDefinitionName : beanDefinitionNames) {
             Object bean1 = childContext.getBean(beanDefinitionName);
-            if (!values.contains(bean1.getClass())) {
+            if (!classList.contains(bean1.getClass())) {
                 continue;
             }
             /*把请求注入到主容器*/
