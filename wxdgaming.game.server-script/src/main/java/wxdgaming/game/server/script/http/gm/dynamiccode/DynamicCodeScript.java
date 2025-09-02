@@ -51,4 +51,9 @@ public class DynamicCodeScript extends HoldApplicationContext {
         return RunResult.fail("没有找到对应的动态脚本");
     }
 
+    @RequestMapping(value = "/v1")
+    public String v1() {
+        return "v4";
+    }
+
 }

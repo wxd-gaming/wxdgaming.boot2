@@ -1,0 +1,5 @@
+###
+GET http://localhost:18801/game/reloadScript
+
+###
+GET http://localhost:18801/888/v1

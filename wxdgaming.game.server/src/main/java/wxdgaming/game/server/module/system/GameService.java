@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class GameService implements InitPrint {
 
     /** 控制一下，5分钟才能加载一次 */
-    private final Tick loadScriptTick = new Tick(5, TimeUnit.MINUTES);
+    private final Tick loadScriptTick = new Tick(5, TimeUnit.SECONDS);
 
     public GameService() {
     }
