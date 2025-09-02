@@ -8,12 +8,11 @@ import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.io.Objects;
+import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.game.message.gm.GMBean;
 import wxdgaming.game.message.gm.GmGroup;
 import wxdgaming.game.message.gm.ResGmList;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.event.OnLogin;
 import wxdgaming.game.server.script.gm.ann.GM;
 import wxdgaming.game.server.script.tips.TipsService;
 
@@ -78,6 +77,9 @@ public class GmService extends HoldApplicationContext {
             method.invoke(providerMethod.getBean(), player, jsonArray);
         } catch (Exception e) {
             log.error("执行gm命令失败: {}", cmd, e);
+            if (e instanceof AssertException assertException) {
+                cmd = cmd + ", " + assertException.getMessage();
+            }
             tipsService.tips(player, "执行gm命令失败: " + cmd);
         }
     }

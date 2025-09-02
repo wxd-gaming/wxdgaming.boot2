@@ -11,6 +11,7 @@ import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.collection.ListOf;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.RandomUtils;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.SocketClient;
@@ -30,6 +31,8 @@ import wxdgaming.game.robot.bean.Robot;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * socket
@@ -178,6 +181,23 @@ public class RobotMainService {
                 reqChatMessage.setType(ChatType.Chat_TYPE_World);
                 reqChatMessage.setContent("@gm addexp " + RandomUtils.random(20, 100));
                 robot.getSocketSession().write(reqChatMessage);
+            }
+        }
+    }
+
+    AtomicBoolean resetTime = new AtomicBoolean();
+
+    /** 设置时间 */
+    @Scheduled(value = "0", async = true)
+    public void timer61() {
+        for (Robot robot : robotMap.values()) {
+            if (robot.isLoginEnd()) {
+                if (resetTime.compareAndSet(false, true)) {
+                    ReqChatMessage reqChatMessage = new ReqChatMessage();
+                    reqChatMessage.setType(ChatType.Chat_TYPE_World);
+                    reqChatMessage.setContent("@gm time " + MyClock.formatDate("yyyy-MM-dd HH:mm:ss", MyClock.millis() + TimeUnit.MINUTES.toMillis(60)));
+                    robot.getSocketSession().write(reqChatMessage);
+                }
             }
         }
     }
