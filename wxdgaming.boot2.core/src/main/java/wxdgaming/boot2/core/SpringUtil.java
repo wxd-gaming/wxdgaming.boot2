@@ -170,10 +170,6 @@ public class SpringUtil implements InitPrint {
     }
 
     public static ChildApplicationContextProvider newChild(ConfigurableApplicationContext parent, Class<?> scan, ClassDirLoader classLoader) {
-        ComponentScan annotation = scan.getAnnotation(ComponentScan.class);
-        String[] packageNames = Stream.concat(Arrays.stream(annotation.value()), Arrays.stream(annotation.basePackages())).distinct().toArray(String[]::new);
-        ReflectProvider reflectProvider = ReflectProvider.Builder.of(classLoader, packageNames).build();
-        Collection<Class<?>> classList = reflectProvider.getClassList();
         // 创建子容器
         AnnotationConfigServletWebApplicationContext childContext = new AnnotationConfigServletWebApplicationContext();
         childContext.setParent(parent);
@@ -189,7 +185,14 @@ public class SpringUtil implements InitPrint {
         ChildApplicationContextProvider childApplicationContextProvider = new ChildApplicationContextProvider();
         childApplicationContextProvider.setApplicationContext(childContext);
         SpringUtil.registerInstance(childContext, childApplicationContextProvider.getClass().getSimpleName(), childApplicationContextProvider, true);
+        return childApplicationContextProvider;
+    }
 
+    public static void newChildAfter(ConfigurableApplicationContext parent, ConfigurableApplicationContext childContext, Class<?> scan, ClassDirLoader classLoader) {
+        ComponentScan annotation = scan.getAnnotation(ComponentScan.class);
+        String[] packageNames = Stream.concat(Arrays.stream(annotation.value()), Arrays.stream(annotation.basePackages())).distinct().toArray(String[]::new);
+        ReflectProvider reflectProvider = ReflectProvider.Builder.of(classLoader, packageNames).build();
+        Collection<Class<?>> classList = reflectProvider.getClassList();
         String[] beanDefinitionNames = childContext.getBeanDefinitionNames();
         for (String beanDefinitionName : beanDefinitionNames) {
             Object bean1 = childContext.getBean(beanDefinitionName);
@@ -207,7 +210,6 @@ public class SpringUtil implements InitPrint {
                 SpringUtil.registerController(parent, beanDefinitionName);
             }
         }
-        return childApplicationContextProvider;
     }
 
 

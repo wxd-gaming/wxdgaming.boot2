@@ -59,7 +59,7 @@ public class DynamicCodeScript extends HoldApplicationContext {
     public String v1() {
         DynamicCodeScript bean = getApplicationContextProvider().getBean(DynamicCodeScript.class);
 
-        return "v5 " + this.equals(bean) + " - " + this.hashCode();
+        return "v6 " + this.equals(bean) + " - " + this.hashCode();
     }
 
 }

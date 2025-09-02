@@ -3,6 +3,7 @@ package wxdgaming.game.server;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import reactor.core.publisher.Mono;
@@ -144,6 +145,15 @@ public class GameServerApplication {
 
         ChildApplicationContextProvider childApplicationContextProvider = SpringUtil.newChild((ConfigurableApplicationContext) SpringUtil.mainApplicationContextProvider.getApplicationContext(), ScriptScan.class, classDirLoader);
         childApplicationContextProvider.executeMethodWithAnnotatedInit();
+        SpringUtil.newChildAfter(
+                (ConfigurableApplicationContext) SpringUtil.mainApplicationContextProvider.getApplicationContext(),
+                (ConfigurableApplicationContext) childApplicationContextProvider.getApplicationContext(),
+                ScriptScan.class,
+                classDirLoader
+        );
+        if (SpringUtil.childApplicationContextProvider != null) {
+            ((AnnotationConfigServletWebApplicationContext) SpringUtil.childApplicationContextProvider.getApplicationContext()).close();
+        }
         SpringUtil.childApplicationContextProvider = childApplicationContextProvider;
         log.info("加载脚本模块完成");
     }
