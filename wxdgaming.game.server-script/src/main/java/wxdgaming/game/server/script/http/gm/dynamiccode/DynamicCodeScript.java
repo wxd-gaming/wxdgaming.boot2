@@ -57,7 +57,9 @@ public class DynamicCodeScript extends HoldApplicationContext {
 
     @RequestMapping(value = "/v1")
     public String v1() {
-        return "v4";
+        DynamicCodeScript bean = getApplicationContextProvider().getBean(DynamicCodeScript.class);
+
+        return "v5 " + this.equals(bean) + " - " + this.hashCode();
     }
 
 }

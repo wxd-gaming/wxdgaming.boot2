@@ -198,6 +198,11 @@ public class SpringUtil implements InitPrint {
             }
             /*把请求注入到主容器*/
             if (bean1.getClass().isAnnotationPresent(Controller.class) || bean1.getClass().isAnnotationPresent(RestController.class)) {
+                try {
+                    unregisterController(parent, beanDefinitionName);
+                } catch (Throwable e) {
+                    log.debug("unregister controllerBeanName={}", beanDefinitionName, e);
+                }
                 SpringUtil.registerInstance(parent, beanDefinitionName, bean1, true);
                 SpringUtil.registerController(parent, beanDefinitionName);
             }
@@ -287,16 +292,11 @@ public class SpringUtil implements InitPrint {
         }
         defaultListableBeanFactory.registerSingleton(name, instance);
 
-        log.debug("register instance {}, {}", name, instance.getClass().getName());
+        log.debug("register instance {}, {} {}", name, instance.hashCode(), instance.getClass().getName());
     }
 
     public static void registerController(ApplicationContext context, String controllerBeanName) {
         final RequestMappingHandlerMapping requestMappingHandlerMapping = context.getBean(RequestMappingHandlerMapping.class);
-        try {
-            unregisterController(context, controllerBeanName);
-        } catch (Throwable e) {
-            log.debug("unregister controllerBeanName={}", controllerBeanName, e);
-        }
         try {
             // 注册Controller
             Method method = requestMappingHandlerMapping
@@ -307,7 +307,8 @@ public class SpringUtil implements InitPrint {
             // 将private改为可使用
             method.setAccessible(true);
             method.invoke(requestMappingHandlerMapping, controllerBeanName);
-            log.debug("register Controller {}", controllerBeanName);
+            Object bean = context.getBean(controllerBeanName);
+            log.debug("register controllerBeanName {} {}", controllerBeanName, bean.hashCode());
         } catch (Throwable e) {
             log.debug("register controllerBeanName={}", controllerBeanName, e);
         }
@@ -337,6 +338,7 @@ public class SpringUtil implements InitPrint {
                                 createMappingMethod.invoke(requestMappingHandlerMapping, specificMethod, targetClass);
                         if (requestMappingInfo != null) {
                             requestMappingHandlerMapping.unregisterMapping(requestMappingInfo);
+                            log.debug("unregister controllerBeanName={} {}", controllerBeanName, controller.hashCode());
                         }
                     } catch (Throwable e) {
                         log.error("unregister controllerBeanName={}", controllerBeanName, e);
