@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.http.gm.dynamiccode;
 
 
+import com.alibaba.fastjson.JSONObject;
 import wxdgaming.boot2.core.ApplicationContextProvider;
 
 /**
@@ -11,6 +12,6 @@ import wxdgaming.boot2.core.ApplicationContextProvider;
  **/
 public interface IGmDynamic {
 
-    Object execute(ApplicationContextProvider runApplication) throws Exception;
+    Object execute(ApplicationContextProvider runApplication, JSONObject jsonObject) throws Exception;
 
 }

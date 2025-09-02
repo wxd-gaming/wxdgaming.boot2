@@ -1,5 +1,7 @@
 package wxdgaming.game.server.script.http.gm.dynamiccode;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,12 +30,14 @@ public class DynamicCodeScript extends HoldApplicationContext {
     @RequestMapping(value = "/dynamic")
     public RunResult dynamic(HttpServletRequest httpContext,
                              @RequestParam(value = "sign") String sign,
+                             @RequestParam(value = "data") String dataString,
                              @RequestParam(value = "code") String codeBase64) throws Exception {
         if (!SIGN.equals(sign)) return RunResult.fail("签名错误");
         System.out.println(codeBase64);
         String zipJson = Base64Util.decode(codeBase64);
         String json = GzipUtil.unGzip2String(zipJson);
         Map<String, byte[]> parseMap = FastJsonUtil.parseMap(json, String.class, byte[].class);
+        JSONObject data = JSON.parseObject(dataString);
         /*map 内容 写入某个文件夹，比如 target/dynamic/ */
         // new URLClassLoader(new URL[]{new URL("file:///target/dynamic/")});
         try (ClassBytesLoader classBytesLoader = new ClassBytesLoader(parseMap, DynamicCodeScript.class.getClassLoader())) {
@@ -42,7 +46,7 @@ public class DynamicCodeScript extends HoldApplicationContext {
             for (Class<?> cls : loadClassMap.values()) {
                 if (IGmDynamic.class.isAssignableFrom(cls)) {
                     IGmDynamic gmDynamic = (IGmDynamic) cls.getDeclaredConstructor().newInstance();
-                    Object result = gmDynamic.execute(applicationContextProvider);
+                    Object result = gmDynamic.execute(applicationContextProvider, data);
                     System.out.println(result);
                     return RunResult.ok().data(result);
                 }
