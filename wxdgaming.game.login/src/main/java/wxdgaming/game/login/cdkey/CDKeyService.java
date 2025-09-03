@@ -28,7 +28,7 @@ import java.util.List;
 public class CDKeyService implements InitPrint {
 
     final MapDBDataHelper mapDBDataHelper;
-    private final DataRepository dataRepository;
+    final DataRepository dataRepository;
 
     public CDKeyService(DataRepository dataRepository, MapDBDataHelper mapDBDataHelper) {
         this.dataRepository = dataRepository;

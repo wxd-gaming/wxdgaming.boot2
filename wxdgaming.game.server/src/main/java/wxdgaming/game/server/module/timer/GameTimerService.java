@@ -1,20 +1,22 @@
 package wxdgaming.game.server.module.timer;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import wxdgaming.boot2.core.BootstrapProperties;
+import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.executor.ExecutorWith;
-import wxdgaming.boot2.core.util.Md5Util;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.server.SocketServer;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.basic.login.LoginProperties;
 import wxdgaming.game.basic.login.bean.info.InnerServerInfoBean;
+import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.module.drive.PlayerDriveService;
+import wxdgaming.game.server.module.inner.InnerService;
 
 import java.util.List;
 
@@ -25,19 +27,26 @@ import java.util.List;
  * @version 2025-06-11 20:22
  **/
 @Slf4j
+@Getter
 @Service
-public class GameTimerService {
+public class GameTimerService extends HoldApplicationContext {
 
+    @Value("${server.port}")
+    int webPort;
     final SocketServer socketServer;
-    final BootstrapProperties bootstrapProperties;
+    final GameServerProperties gameServerProperties;
     final LoginProperties loginProperties;
     final PlayerDriveService playerDriveService;
+    final InnerService innerService;
 
-    public GameTimerService(SocketServer socketServer, BootstrapProperties bootstrapProperties, LoginProperties loginProperties, PlayerDriveService playerDriveService) {
+    public GameTimerService(SocketServer socketServer,
+                            GameServerProperties gameServerProperties, LoginProperties loginProperties,
+                            PlayerDriveService playerDriveService, InnerService innerService) {
         this.socketServer = socketServer;
-        this.bootstrapProperties = bootstrapProperties;
+        this.gameServerProperties = gameServerProperties;
         this.loginProperties = loginProperties;
         this.playerDriveService = playerDriveService;
+        this.innerService = innerService;
     }
 
 
@@ -47,27 +56,30 @@ public class GameTimerService {
     public void registerLoginServer() {
 
         InnerServerInfoBean serverInfoBean = new InnerServerInfoBean();
-        serverInfoBean.setServerId(bootstrapProperties.getSid());
-        serverInfoBean.setMainId(bootstrapProperties.getSid());
-        serverInfoBean.setGid(bootstrapProperties.getGid());
-        serverInfoBean.setName(bootstrapProperties.getName());
+        serverInfoBean.setServerId(gameServerProperties.getSid());
+        serverInfoBean.setMainId(gameServerProperties.getSid());
+        serverInfoBean.setGid(gameServerProperties.getGid());
+        serverInfoBean.setName(gameServerProperties.getName());
         serverInfoBean.setPort(socketServer.getConfig().getPort());
-        serverInfoBean.setHttpPort(socketServer.getConfig().getPort());
+        serverInfoBean.setHttpPort(webPort);
 
         serverInfoBean.setMaxOnlineSize(loginProperties.getMaxOnlineSize());
         serverInfoBean.setOnlineSize(playerDriveService.onlineSize());
 
 
         JSONObject jsonObject = MapOf.newJSONObject();
-        jsonObject.put("sidList", List.of(bootstrapProperties.getSid()));
-        jsonObject.put("sid", bootstrapProperties.getSid());
+        jsonObject.put("sidList", List.of(gameServerProperties.getSid()));
+        jsonObject.put("sid", gameServerProperties.getSid());
         jsonObject.put("serverBean", serverInfoBean.toJSONString());
 
-        String json = jsonObject.toString(SerializerFeature.MapSortField, SerializerFeature.SortField);
-        String md5DigestEncode = Md5Util.md5DigestEncode0("#", json, loginProperties.getJwtKey());
-        jsonObject.put("sign", md5DigestEncode);
+        innerService.sign(jsonObject);
 
-        HttpResponse execute = HttpRequestPost.ofJson(loginProperties.getUrl() + "/inner/registerGame", jsonObject.toString()).execute();
+        String url = loginProperties.getUrl() + "/inner/registerGame";
+        HttpResponse execute = HttpRequestPost.ofJson(url, jsonObject.toString()).execute();
+        if (!execute.isSuccess()) {
+            log.error("访问登陆服务器失败{}", url);
+            return;
+        }
         log.info("向登陆服务器注册: {}", execute.bodyString());
     }
 

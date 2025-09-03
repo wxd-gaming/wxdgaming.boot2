@@ -39,6 +39,14 @@ public class InnerController extends HoldApplicationContext {
         this.cdKeyService = cdKeyService;
     }
 
+    @RequestMapping("/cdkey/use")
+    public RunResult use(CacheHttpServletRequest request, @RequestBody JSONObject data) {
+        int sid = data.getIntValue("sid");
+        String account = data.getString("account");
+        long rid = data.getLongValue("rid");
+        return cdKeyService.use(request.getParameter("key"), sid, account, rid);
+    }
+
     @RequestMapping(value = "/registerGame")
     public RunResult registerGame(CacheHttpServletRequest request, @RequestBody JSONObject data) {
         ArrayList<Integer> sidList = data.getObject("sidList", new TypeReference<ArrayList<Integer>>() {});
@@ -61,19 +69,6 @@ public class InnerController extends HoldApplicationContext {
                 .stream()
                 .toList();
         return RunResult.ok().data(list);
-    }
-
-    @RequestMapping("/gainCDKey")
-    public RunResult gainCDKey(CacheHttpServletRequest request, @RequestBody JSONObject data) {
-        int cdKeyId = data.getIntValue("cdKeyId");
-        int num = data.getIntValue("num");
-        return cdKeyService.gain(cdKeyId, num);
-    }
-
-    @RequestMapping("/queryCDKey")
-    public RunResult queryCDKey(CacheHttpServletRequest request, @RequestBody JSONObject data) {
-        int cdKeyId = data.getIntValue("cdKeyId");
-        return cdKeyService.queryByUid(cdKeyId);
     }
 
 }

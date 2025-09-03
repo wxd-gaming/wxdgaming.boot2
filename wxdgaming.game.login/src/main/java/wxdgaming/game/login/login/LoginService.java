@@ -1,4 +1,4 @@
-package wxdgaming.game.login.service;
+package wxdgaming.game.login.login;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

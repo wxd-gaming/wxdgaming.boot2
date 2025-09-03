@@ -1,4 +1,4 @@
-package wxdgaming.game.login.sdk;
+package wxdgaming.game.login.login.sdk;
 
 import com.alibaba.fastjson.JSONObject;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +12,7 @@ import wxdgaming.game.basic.slog.SlogService;
 import wxdgaming.game.login.LoginServerProperties;
 import wxdgaming.game.login.bean.UserData;
 import wxdgaming.game.login.inner.InnerService;
-import wxdgaming.game.login.service.LoginService;
+import wxdgaming.game.login.login.LoginService;
 import wxdgaming.game.login.slog.AccountLoginLog;
 import wxdgaming.game.login.slog.AccountRegisterLog;
 

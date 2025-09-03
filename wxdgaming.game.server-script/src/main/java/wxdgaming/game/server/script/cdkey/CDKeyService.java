@@ -1,5 +1,6 @@
 package wxdgaming.game.server.script.cdkey;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -18,12 +19,12 @@ import wxdgaming.game.message.cdkey.ResUseCdKey;
 import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
+import wxdgaming.game.server.module.inner.InnerService;
 import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.cdkey.bean.CDKeyReward;
 import wxdgaming.game.server.script.tips.TipsService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -37,36 +38,40 @@ import java.util.List;
 @Service
 public class CDKeyService implements InitPrint {
 
+    final LoginProperties loginProperties;
+    final GameServerProperties gameServerProperties;
     private final DataCenterService dataCenterService;
     private final TipsService tipsService;
     private final BagService bagService;
-    private final LoginProperties loginProperties;
-    final GameServerProperties gameServerProperties;
+    final InnerService innerService;
 
 
-    public CDKeyService(DataCenterService dataCenterService,
-                        TipsService tipsService,
-                        BagService bagService,
-                        LoginProperties loginProperties, GameServerProperties gameServerProperties) {
+    public CDKeyService(LoginProperties loginProperties, GameServerProperties gameServerProperties,
+                        DataCenterService dataCenterService,
+                        TipsService tipsService, BagService bagService,
+                        InnerService innerService) {
         this.dataCenterService = dataCenterService;
         this.tipsService = tipsService;
         this.bagService = bagService;
         this.loginProperties = loginProperties;
         this.gameServerProperties = gameServerProperties;
+        this.innerService = innerService;
     }
 
     public void use(Player player, String cdKey) {
 
         String url = loginProperties.getUrl();
-        url = url + "/cdkey/use";
+        url = url + "/inner/cdkey/use";
 
-        HashMap<String, Object> params = new HashMap<>();
+        JSONObject params = new JSONObject();
         params.put("key", cdKey);
         params.put("sid", gameServerProperties.getSid());
         params.put("account", player.getAccount());
         params.put("rid", player.getUid());
 
-        HttpResponse execute = HttpRequestPost.of(url, params).execute();
+        innerService.sign(params);
+
+        HttpResponse execute = HttpRequestPost.ofJson(url, params).execute();
         RunResult runResult = execute.bodyRunResult();
 
         if (runResult.isFail()) {

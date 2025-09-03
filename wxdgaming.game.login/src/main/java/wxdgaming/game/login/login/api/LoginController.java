@@ -1,4 +1,4 @@
-package wxdgaming.game.login.service.api;
+package wxdgaming.game.login.login.api;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +7,7 @@ import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.game.basic.login.AppPlatformParams;
-import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
+import wxdgaming.game.login.login.sdk.AbstractSdkLoginApi;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package wxdgaming.game.login.sdk.local;
+package wxdgaming.game.login.login.sdk.local;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +9,7 @@ import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.game.basic.login.AppPlatformParams;
 import wxdgaming.game.login.bean.UserData;
-import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
+import wxdgaming.game.login.login.sdk.AbstractSdkLoginApi;
 
 /**
  * 本地服

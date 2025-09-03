@@ -176,12 +176,12 @@ public class MyClock {
         return formatDate(SDF_YYYYMMDD, millis());
     }
 
-    /** yyyy/MM/dd HH:mm:ss */
+    /** yyyy-MM-dd HH:mm:ss */
     public static String nowString() {
         return formatDate(SDF_YYYYMMDDHHMMSS_2, millis());
     }
 
-    /** 获取日期的时间格式 yyyy/MM/dd HH:mm:ss */
+    /** 获取日期的时间格式 yyyy-MM-dd HH:mm:ss */
     public static String formatDate(long date) {
         return formatDate(SDF_YYYYMMDDHHMMSS_2, date);
     }

@@ -1,4 +1,4 @@
-package wxdgaming.game.login.sdk.quick;
+package wxdgaming.game.login.login.sdk.quick;
 
 import com.alibaba.fastjson.JSONObject;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,7 +10,7 @@ import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.game.basic.login.AppPlatformParams;
 import wxdgaming.game.login.bean.UserData;
-import wxdgaming.game.login.sdk.AbstractSdkLoginApi;
+import wxdgaming.game.login.login.sdk.AbstractSdkLoginApi;
 
 /**
  * Quick
