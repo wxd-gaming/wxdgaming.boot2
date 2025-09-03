@@ -49,7 +49,7 @@ public class CDKeyController implements InitPrint {
     }
 
     @RequestMapping(value = "/queryList")
-    public RunResult queryCDKeyList(HttpServletRequest context,
+    public RunResult queryCDKeyList(CacheHttpServletRequest context,
                                     @RequestParam("pageIndex") int pageIndex,
                                     @RequestParam("pageSize") int pageSize,
                                     @RequestParam("where") String where,

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @version 2025-08-08 11:35
  **/
 @Slf4j
-@RestController
+@RestController("coreSystemController")
 @RequestMapping("/system/spi")
 public class SystemController {
 
