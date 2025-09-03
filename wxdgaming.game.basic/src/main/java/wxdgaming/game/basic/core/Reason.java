@@ -20,6 +20,8 @@ public enum Reason {
     USE_ITEM,
     /** 使用激活码 */
     USE_CDKEY,
+    /** 成就 */
+    Achieve,
     /** 任务接受 */
     TASK_ACCEPT,
     /** 任务完成 */

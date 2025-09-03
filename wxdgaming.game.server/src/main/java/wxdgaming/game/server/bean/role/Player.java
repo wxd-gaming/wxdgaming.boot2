@@ -16,6 +16,7 @@ import wxdgaming.game.server.bean.MapKey;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.StatusConst;
 import wxdgaming.game.server.bean.UserMapping;
+import wxdgaming.game.server.bean.achieve.AchievePack;
 import wxdgaming.game.server.bean.bag.BagPack;
 import wxdgaming.game.server.bean.equip.EquipPack;
 import wxdgaming.game.server.bean.task.TaskPack;
@@ -54,6 +55,7 @@ public class Player extends MapNpc {
     private OnlineInfo onlineInfo = new OnlineInfo();
     private VipInfo vipInfo = new VipInfo();
     private BagPack bagPack = new BagPack();
+    private AchievePack achievePack = new AchievePack();
     private TaskPack taskPack = new TaskPack();
     private MailPack mailPack = new MailPack();
     private EquipPack equipPack = new EquipPack();

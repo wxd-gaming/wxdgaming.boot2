@@ -216,9 +216,6 @@ public class ExcelRepository {
      * @param rowNumber   所在行
      * @param entityField 单元格
      * @param cellData    单元格数据
-     * @return
-     * @author wxd-gaming(無心道, 15388152619)
-     * @version 2024-08-10 10:02
      */
     private Object readCellValue(TableData tableData, int rowNumber, CellInfo entityField, Cell cellData) {
         /*空白的话，根据传入的类型返回默认值*/
@@ -266,28 +263,28 @@ public class ExcelRepository {
                         return String2ByteArray2.parse(trim);
                     }
                     case "int[]": {
-                        return String2IntArray.parse(trim);
+                        return String2IntArray.parse.apply(trim);
                     }
                     case "int[][]": {
-                        return String2IntArray2.parse(trim);
+                        return String2IntArray2.parse.apply(trim);
                     }
                     case "long[]": {
-                        return String2LongArray.parse(trim);
+                        return String2LongArray.parse.apply(trim);
                     }
                     case "long[][]": {
-                        return String2LongArray2.parse(trim);
+                        return String2LongArray2.parse.apply(trim);
                     }
                     case "float[]": {
-                        return String2FloatArray.parse(trim);
+                        return String2FloatArray.parse.apply(trim);
                     }
                     case "float[][]": {
-                        return String2FloatArray2.parse(trim);
+                        return String2FloatArray2.parse.apply(trim);
                     }
                     case "string[]": {
-                        return String2StringArray.parse(trim);
+                        return String2StringArray.parse.apply(trim);
                     }
                     case "string[][]": {
-                        return String2StringArray2.parse(trim);
+                        return String2StringArray2.parse.apply(trim);
                     }
                     case "list<bool>":
                     case "list<boolean>":
@@ -302,41 +299,41 @@ public class ExcelRepository {
                     case "list<integer>":
                     case "arraylist<int>":
                     case "arraylist<integer>": {
-                        return String2IntList.parse(trim);
+                        return String2IntList.parse.apply(trim);
                     }
                     case "list<int[]>":
                     case "list<integer[]>":
                     case "arraylist<int[]>":
                     case "arraylist<integer[]>": {
-                        return String2IntArrayList.parse(trim);
+                        return String2IntArrayList.parse.apply(trim);
                     }
                     case "list<long>":
                     case "arraylist<long>": {
-                        return String2LongList.parse(trim);
+                        return String2LongList.parse.apply(trim);
                     }
                     case "list<long[]>":
                     case "arraylist<long[]>": {
-                        return String2LongArrayList.parse(trim);
+                        return String2LongArrayList.parse.apply(trim);
                     }
                     case "list<string>":
                     case "arraylist<string>": {
-                        return String2StringList.parse(trim);
+                        return String2StringList.parse.apply(trim);
                     }
                     case "list<string[]>":
                     case "arraylist<string[]>": {
-                        return String2StringArrayList.parse(trim);
+                        return String2StringArrayList.parse.apply(trim);
                     }
                     case "set<byte>": {
                         return new LinkedHashSet<>(String2ByteList.parse(trim));
                     }
                     case "set<int>": {
-                        return new LinkedHashSet<>(String2IntList.parse(trim));
+                        return new LinkedHashSet<>(String2IntList.parse.apply(trim));
                     }
                     case "set<long>": {
-                        return new LinkedHashSet<>(String2LongList.parse(trim));
+                        return new LinkedHashSet<>(String2LongList.parse.apply(trim));
                     }
                     case "set<string>": {
-                        return new LinkedHashSet<>(String2StringList.parse(trim));
+                        return new LinkedHashSet<>(String2StringList.parse.apply(trim));
                     }
                     default: {
                         try {

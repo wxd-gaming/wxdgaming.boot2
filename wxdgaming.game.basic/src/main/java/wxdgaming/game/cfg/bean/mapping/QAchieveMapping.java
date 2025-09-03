@@ -35,7 +35,7 @@ public abstract class QAchieveMapping extends ObjectBase implements Serializable
     /** 任务条件 */
     protected wxdgaming.boot2.core.lang.condition.Condition condition;
     /** 任务奖励 */
-    protected final List<wxdgaming.game.bean.goods.ItemCfg> rewards = new ArrayList<>();
+    protected wxdgaming.boot2.core.lang.ConfigString rewards;
 
     public Object key() {
         return id;

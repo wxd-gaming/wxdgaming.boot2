@@ -2,10 +2,12 @@ package wxdgaming.game.cfg;
 
 
 import lombok.Getter;
+import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.excel.store.DataTable;
 import wxdgaming.game.cfg.bean.QAchieve;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -18,9 +20,13 @@ import java.util.Map;
 @Getter
 public class QAchieveTable extends DataTable<QAchieve> implements Serializable {
 
+    private HashMap<Integer, Condition> typeMap = new HashMap<>();
+
     @Override public void initDb() {
         /*todo 实现一些数据分组*/
-
+        for (QAchieve qAchieve : getDataList()) {
+            typeMap.put(qAchieve.getType(), qAchieve.getCondition());
+        }
     }
 
     @Override public void checkData(Map<Class<?>, DataTable<?>> store) {
