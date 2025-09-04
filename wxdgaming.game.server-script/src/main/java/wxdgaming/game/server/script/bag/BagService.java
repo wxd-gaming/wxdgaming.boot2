@@ -24,7 +24,7 @@ import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.bag.cost.CostScript;
 import wxdgaming.game.server.script.bag.gain.GainScript;
 import wxdgaming.game.server.script.bag.log.ItemSlog;
-import wxdgaming.game.server.script.bag.use.UseItemAction;
+import wxdgaming.game.server.script.bag.use.AbstractUseItemAction;
 import wxdgaming.game.server.script.mail.MailService;
 import wxdgaming.game.server.script.tips.TipsService;
 import wxdgaming.game.basic.slog.SlogService;
@@ -43,7 +43,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
 
     final BagScriptProvider<GainScript> gainScriptProvider = new BagScriptProvider<>(GainScript.class);
     final BagScriptProvider<CostScript> costScriptProvider = new BagScriptProvider<>(CostScript.class);
-    final BagScriptProvider<UseItemAction> useItemScriptProvider = new BagScriptProvider<>(UseItemAction.class);
+    final BagScriptProvider<AbstractUseItemAction> useItemScriptProvider = new BagScriptProvider<>(AbstractUseItemAction.class);
 
     final DataCenterService dataCenterService;
     final TipsService tipsService;

@@ -1,5 +1,6 @@
 package code;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import org.junit.jupiter.api.Test;
 import wxdgaming.boot2.core.json.FastJsonUtil;
@@ -7,6 +8,7 @@ import wxdgaming.boot2.core.json.FastJsonUtil;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 接口
@@ -45,6 +47,13 @@ public class FastJsonTest {
 
     public void setPop(String key, Object value) {
         popMap.put(key, value);
+    }
+
+    @Test
+    public void m1() {
+        Map<String, Integer> k1 = Map.of("k1", 1);
+        System.out.println(k1);
+        System.out.println(JSON.toJSONString(k1));
     }
 
 }

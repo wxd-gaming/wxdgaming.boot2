@@ -15,7 +15,7 @@ import wxdgaming.game.server.script.role.PlayerService;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-04-22 17:27
  **/
-public abstract class UseItemAction extends HoldApplicationContext implements IBagScript {
+public abstract class AbstractUseItemAction extends HoldApplicationContext implements IBagScript {
 
     @Autowired protected PlayerService playerService;
     @Autowired protected FightService fightService;

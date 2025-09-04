@@ -1,5 +1,6 @@
 package wxdgaming.game.server.script.bag.use.impl.equip;
 
+import org.springframework.stereotype.Component;
 import wxdgaming.game.bean.goods.Equipment;
 import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.bean.goods.ItemTypeConst;
@@ -7,7 +8,7 @@ import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.equip.EquipPack;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.script.bag.use.UseItemAction;
+import wxdgaming.game.server.script.bag.use.AbstractUseItemAction;
 
 /**
  * 血量增加
@@ -15,7 +16,8 @@ import wxdgaming.game.server.script.bag.use.UseItemAction;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-07-02 11:12
  */
-public class EquipUseItemActionImpl extends UseItemAction {
+@Component
+public class EquipUseItemActionImpl extends AbstractUseItemAction {
 
     @Override public ItemTypeConst type() {
         return ItemTypeConst.EquipType;
