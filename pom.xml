@@ -36,6 +36,7 @@
         <module>wxdgaming.game.server-script</module>
         <module>wxdgaming.logbus</module>
         <module>wxdgaming.logserver</module>
+        <module>wxdgaming.boot2.starter.event</module>
     </modules>
 
     <properties>

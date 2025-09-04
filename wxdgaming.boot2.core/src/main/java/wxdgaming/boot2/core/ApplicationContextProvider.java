@@ -127,6 +127,16 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         );
     }
 
+    /** 所有的bean，函数的参数是指定类型 */
+    public Stream<ProviderMethod> withMethodParameters(Class<?>... args) {
+        return stream().flatMap(provider -> provider.methodStream().filter(providerMethod -> providerMethod.equalsParameters(args)));
+    }
+
+    /** 所有的bean，函数的参数是指定类型继承关系 */
+    public Stream<ProviderMethod> withMethodAssignableFrom(Class<?>... args) {
+        return stream().flatMap(provider -> provider.methodStream().filter(providerMethod -> providerMethod.isAssignableFrom(args)));
+    }
+
     public <K, B> Map<K, B> toMap(Class<B> cls, Function<B, K> convertKey) {
         return toMap(cls, convertKey, bean -> bean);
     }
@@ -395,6 +405,27 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         /** 是否添加了注解 */
         public boolean hasAnn(Class<? extends Annotation> annotation) {
             return AnnUtil.hasAnn(method, annotation);
+        }
+
+        /** 参数类型强制匹配关系 */
+        public boolean equalsParameters(Class<?>... args) {
+            AssertUtil.assertTrue(args.length < 1, "参数的类型不允许空");
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            return parameterTypes.length == args.length && Arrays.equals(parameterTypes, args);
+        }
+
+        /** 参数类型继承关系 */
+        public boolean isAssignableFrom(Class<?>... args) {
+            AssertUtil.assertTrue(args.length > 0, "参数的类型不允许空");
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            if (parameterTypes.length != args.length)
+                return false;
+            for (int i = 0; i < args.length; i++) {
+                if (!args[i].isAssignableFrom(parameterTypes[i])) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public Object invoke(Object... args) {
