@@ -15,46 +15,6 @@ public class NumberUtil {
         return parseInt(PatternUtil.retainNumbers(source), 0);
     }
 
-    public static boolean isNumber(Object source) {
-        if (source == null) return false;
-        if (source instanceof Number) return true;
-
-        String str = String.valueOf(source).trim();
-        if (str.isEmpty()) return false;
-
-        // 处理负数
-        if (str.startsWith("-")) {
-            str = str.substring(1);
-        }
-
-        // 处理科学计数法
-        int eIndex = str.indexOf('e');
-        if (eIndex > 0) {
-            String base = str.substring(0, eIndex);
-            String exponent = str.substring(eIndex + 1);
-            return isDecimalNumber(base) && isInteger(exponent);
-        }
-
-        return isDecimalNumber(str);
-    }
-
-    /** double float */
-    private static boolean isDecimalNumber(String str) {
-        if (str.isEmpty()) return false;
-
-        int dotCount = 0;
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            if (c == '.') {
-                dotCount++;
-                if (dotCount > 1) return false; // 多个小数点
-                if (i == 0 || i == str.length() - 1) return false; // 小数点不能在开头或结尾
-            } else if (!Character.isDigit(c)) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     /** 整数 */
     private static boolean isInteger(String str) {
