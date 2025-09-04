@@ -2,6 +2,7 @@ package run;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import run.event.B1Event;
 import run.event.StartEvent;
 import run.event.StopEvent;
 import wxdgaming.boot2.core.InitPrint;
@@ -19,6 +20,10 @@ public class TestServer implements InitPrint {
 
     public void start(StartEvent startEvent) {
         log.info("启动成功");
+    }
+
+    public void b1(B1Event event) {
+        log.info("B1Event {}", event.i());
     }
 
     public void stop(StopEvent stopEvent) {

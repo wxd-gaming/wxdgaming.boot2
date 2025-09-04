@@ -12,7 +12,7 @@ import wxdgaming.game.bean.attr.AttrType;
 import wxdgaming.game.message.role.ResUpdateFightValue;
 import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.event.OnLevelUp;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.event.OnLoginBefore;
 import wxdgaming.game.server.event.OnPlayerAttributeCalculator;
 
@@ -145,10 +145,10 @@ public class PlayerAttributeService extends HoldApplicationContext {
 
     }
 
-    @OnLevelUp
-    public void onLevel(Player player) {
-        calculator(player, CalculatorType.BASE);
-        finalCalculator(player, false, ReasonDTO.of(Reason.Level));
+
+    public void onLevelUp(EventConst.LevelUpEvent event) {
+        calculator(event.player(), CalculatorType.BASE);
+        finalCalculator(event.player(), false, ReasonDTO.of(Reason.Level));
     }
 
     @OnPlayerAttributeCalculator

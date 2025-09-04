@@ -29,6 +29,11 @@
         </dependency>
         <dependency>
             <groupId>wxdgaming.boot2</groupId>
+            <artifactId>wxdgaming.boot2.starter.event</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>wxdgaming.boot2</groupId>
             <artifactId>wxdgaming.boot2.starter.excel</artifactId>
             <version>${project.version}</version>
         </dependency>

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.lang.condition.Condition;
+import wxdgaming.boot2.starter.event.EventService;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.basic.slog.SlogService;
@@ -12,7 +13,7 @@ import wxdgaming.game.message.role.ResUpdateExp;
 import wxdgaming.game.message.role.ResUpdateLevel;
 import wxdgaming.game.message.role.RoleBean;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.event.OnLevelUp;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.event.OnTask;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.role.slog.RoleLvSlog;
@@ -29,10 +30,12 @@ public class PlayerService extends HoldApplicationContext {
 
     final DataCenterService dataCenterService;
     final SlogService slogService;
+    final EventService eventService;
 
-    public PlayerService(DataCenterService dataCenterService, SlogService slogService) {
+    public PlayerService(DataCenterService dataCenterService, SlogService slogService, EventService eventService) {
         this.dataCenterService = dataCenterService;
         this.slogService = slogService;
+        this.eventService = eventService;
     }
 
 
@@ -73,10 +76,10 @@ public class PlayerService extends HoldApplicationContext {
     }
 
 
-    public void addLevel(Player player, int lv, ReasonDTO reasonDTO) {
+    public void addLevel(Player player, int changeLv, ReasonDTO reasonDTO) {
         int oldLevel = player.getLevel();
-        player.setLevel(player.getLevel() + lv);
-        log.info("{} 等级变更: oldLv={} change={} newLv={}, {}", player, oldLevel, lv, player.getLevel(), reasonDTO);
+        player.setLevel(player.getLevel() + changeLv);
+        log.info("{} 等级变更: oldLv={} change={} newLv={}, {}", player, oldLevel, changeLv, player.getLevel(), reasonDTO);
 
         RoleLvSlog roleLvLog = new RoleLvSlog(player, reasonDTO.getReasonText());
         slogService.pushLog(roleLvLog);
@@ -87,11 +90,11 @@ public class PlayerService extends HoldApplicationContext {
 
         player.write(resUpdateLevel);
         /*触发升级, 比如功能开放监听需要*/
-        applicationContextProvider.executeMethodWithAnnotatedException(OnLevelUp.class, player, lv);
+        eventService.postEventIgnoreException(new EventConst.LevelUpEvent(player, changeLv));
         /*触发当前等级*/
         applicationContextProvider.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("level", player.getLevel()));
         /*触发提升等级*/
-        applicationContextProvider.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("levelup", lv));
+        applicationContextProvider.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("levelup", changeLv));
     }
 
 }

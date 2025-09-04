@@ -17,6 +17,7 @@ import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
 import wxdgaming.boot2.core.util.JvmUtil;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
+import wxdgaming.boot2.starter.event.EventScan;
 import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.boot2.starter.net.SocketScan;
@@ -38,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @SpringBootApplication(scanBasePackageClasses = {
         CoreScan.class,
+        EventScan.class,
         DataExcelScan.class,
         ScheduledScan.class,
         SocketScan.class,
