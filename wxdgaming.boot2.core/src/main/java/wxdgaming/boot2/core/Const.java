@@ -17,6 +17,8 @@ public interface Const {
 
     Charset GB2313 = Charset.forName("GB2312");
     String EMPTY_STRING = "";
+    byte[] EMPTY_BYTE_ARRAY = new byte[0];
+    int[] EMPTY_INT_ARRAY = new int[0];
     int ZERO = 0;
     /** null 字符串 */
     String nullStr = "null";
@@ -26,7 +28,6 @@ public interface Const {
     String Line = "\n";
     /** 换行符{@code \n} */
     byte[] LineBytes = "\n".getBytes();
-
     char[] NUMBER_CHARS = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '9'};
 
 }

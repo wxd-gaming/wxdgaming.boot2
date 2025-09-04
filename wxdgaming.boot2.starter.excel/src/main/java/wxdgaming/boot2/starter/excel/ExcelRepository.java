@@ -2,17 +2,17 @@ package wxdgaming.boot2.starter.excel;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import wxdgaming.boot2.core.Throw;
-import org.apache.commons.lang3.StringUtils;
-import wxdgaming.boot2.core.util.PatternUtil;
 import wxdgaming.boot2.core.format.string.*;
 import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.boot2.core.util.ConvertUtil;
+import wxdgaming.boot2.core.util.PatternUtil;
 import wxdgaming.boot2.starter.excel.store.ICreateCode;
 
 import java.io.InputStream;
@@ -258,10 +258,10 @@ public class ExcelRepository {
 
                 switch (entityField.getFieldTypeString().toLowerCase()) {
                     case "byte[]": {
-                        return String2ByteArray.parse(trim);
+                        return String2ByteArray.parse.apply(trim);
                     }
                     case "byte[][]": {
-                        return String2ByteArray2.parse(trim);
+                        return String2ByteArray2.parse.apply(trim);
                     }
                     case "int[]": {
                         return String2IntArray.parse.apply(trim);
@@ -290,11 +290,11 @@ public class ExcelRepository {
                     case "list<bool>":
                     case "list<boolean>":
                     case "arraylist<boolean>": {
-                        return String2BoolList.parse(trim);
+                        return String2BoolList.parse.apply(trim);
                     }
                     case "list<byte>":
                     case "arraylist<byte>": {
-                        return String2ByteList.parse(trim);
+                        return String2ByteList.parse.apply(trim);
                     }
                     case "list<int>":
                     case "list<integer>":
@@ -325,7 +325,7 @@ public class ExcelRepository {
                         return String2StringArrayList.parse.apply(trim);
                     }
                     case "set<byte>": {
-                        return new LinkedHashSet<>(String2ByteList.parse(trim));
+                        return new LinkedHashSet<>(String2ByteList.parse.apply(trim));
                     }
                     case "set<int>": {
                         return new LinkedHashSet<>(String2IntList.parse.apply(trim));

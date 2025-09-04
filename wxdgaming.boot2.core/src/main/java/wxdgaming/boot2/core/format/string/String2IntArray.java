@@ -1,13 +1,13 @@
 package wxdgaming.boot2.core.format.string;
 
 import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.Const;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
 import java.util.function.Function;
 
 public class String2IntArray {
 
-    public static final int[] EMPTY = new int[0];
 
     public static final Function<String, int[]> parse = new Function<String, int[]>() {
         @Override
@@ -25,7 +25,7 @@ public class String2IntArray {
                     }
                 }
             } else {
-                arrays = EMPTY;
+                arrays = Const.EMPTY_INT_ARRAY;
             }
             return arrays;
         }
