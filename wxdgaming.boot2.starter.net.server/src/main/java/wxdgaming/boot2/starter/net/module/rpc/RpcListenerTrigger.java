@@ -2,6 +2,7 @@ package wxdgaming.boot2.starter.net.module.rpc;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,10 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.ThreadParam;
-import org.apache.commons.lang3.StringUtils;
-import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.SocketSession;
 
@@ -53,15 +53,15 @@ public class RpcListenerTrigger extends ExecutorEvent {
     @Override public String getStack() {
         return "RpcListenerTrigger: %s; %s.%s()".formatted(
                 rpcMapping.path(),
-                rpcMapping.javassistProxy().getInstance().getClass().getName(),
-                rpcMapping.javassistProxy().getMethod().getName()
+                rpcMapping.providerMethod().getBean().getClass().getName(),
+                rpcMapping.providerMethod().getMethod().getName()
         );
     }
 
     @Override public void onEvent() {
         try {
-            Object invoke = rpcMapping.javassistProxy().proxyInvoke(injectorParameters());
-            if (rpcMapping.javassistProxy().getMethod().getReturnType() == void.class) {
+            Object invoke = rpcMapping.providerMethod().invoke(injectorParameters());
+            if (rpcMapping.providerMethod().getMethod().getReturnType() == void.class) {
                 invoke = null;
             }
             if (rpcId > 0) {
@@ -88,7 +88,7 @@ public class RpcListenerTrigger extends ExecutorEvent {
     }
 
     public Object[] injectorParameters() {
-        Parameter[] parameters = rpcMapping.javassistProxy().getMethod().getParameters();
+        Parameter[] parameters = rpcMapping.providerMethod().getMethod().getParameters();
         Object[] params = new Object[parameters.length];
         for (int i = 0; i < params.length; i++) {
             Parameter parameter = parameters[i];

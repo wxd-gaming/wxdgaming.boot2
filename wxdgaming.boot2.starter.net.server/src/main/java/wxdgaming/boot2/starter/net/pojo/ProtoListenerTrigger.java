@@ -21,12 +21,13 @@ public class ProtoListenerTrigger extends ExecutorEvent {
     }
 
     @Override public String getStack() {
-        return "ProtoListenerTrigger %s messageId=%s, %s".formatted(protoEvent.getSocketSession(), protoEvent.getMessageId(), protoEvent.buildMessage());
+        return "ProtoListenerTrigger %s messageId=%s, %s"
+                .formatted(protoEvent.getSocketSession(), protoEvent.getMessageId(), protoEvent.buildMessage());
     }
 
     @Override public void onEvent() throws Exception {
         try {
-            protoEvent.getProtoMapping().javassistProxy().proxyInvoke(new Object[]{protoEvent});
+            protoEvent.getProtoMapping().providerMethod().invoke(protoEvent);
         } catch (Throwable e) {
             log.error("{}", getStack(), e);
         }

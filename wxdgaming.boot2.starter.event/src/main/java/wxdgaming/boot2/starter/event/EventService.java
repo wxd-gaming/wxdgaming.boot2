@@ -31,12 +31,11 @@ public class EventService extends HoldApplicationContext {
     public void init() {
         log.info("EventService init");
         Map<String, List<ApplicationContextProvider.ProviderMethod>> tmpEventMap = new HashMap<>();
-        getApplicationContextProvider().withMethodAssignableFrom(Event.class)
-                .forEach(method -> {
-                    Class<?> parameterType = method.getMethod().getParameterTypes()[0];
-                    String parameterTypeName = parameterType.getName();
-                    tmpEventMap.computeIfAbsent(parameterTypeName, k -> new ArrayList<>()).add(method);
-                });
+        getApplicationContextProvider().withMethodAssignableFrom(Event.class).forEach(method -> {
+            Class<?> parameterType = method.getMethod().getParameterTypes()[0];
+            String parameterTypeName = parameterType.getName();
+            tmpEventMap.computeIfAbsent(parameterTypeName, k -> new ArrayList<>()).add(method);
+        });
         eventMap = tmpEventMap;
     }
 

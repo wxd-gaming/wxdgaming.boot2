@@ -3,11 +3,10 @@ package wxdgaming.boot2.starter.net.pojo;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ApplicationContextProvider;
-import wxdgaming.boot2.core.assist.JavassistProxy;
-import wxdgaming.boot2.core.util.PatternUtil;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.MethodUtil;
+import wxdgaming.boot2.core.util.PatternUtil;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 
 import java.lang.reflect.Method;
@@ -31,9 +30,9 @@ public class ProtoListenerContent {
     public ProtoListenerContent(ApplicationContextProvider applicationContextProvider) {
         applicationContextProvider
                 .withMethodAnnotatedCache(ProtoRequest.class)
-                .forEach(contentMethod -> {
-                    Object ins = contentMethod.getBean();
-                    Method method = contentMethod.getMethod();
+                .forEach(providerMethod -> {
+                    Object ins = providerMethod.getBean();
+                    Method method = providerMethod.getMethod();
 
                     ProtoRequest methodRequestMapping = AnnUtil.ann(method, ProtoRequest.class);
 
@@ -43,16 +42,14 @@ public class ProtoListenerContent {
                     }
                     int messageId = messageId(pojoClass);
 
-                    JavassistProxy javassistProxy = JavassistProxy.of(ins, method);
-
-                    ProtoMapping mapping = new ProtoMapping(methodRequestMapping, messageId, pojoClass, javassistProxy);
+                    ProtoMapping mapping = new ProtoMapping(methodRequestMapping, messageId, pojoClass, providerMethod);
 
                     ProtoMapping old = mappingMap.put(messageId, mapping);
-                    if (old != null && !Objects.equals(old.javassistProxy().getInstance().getClass().getName(), ins.getClass().getName())) {
+                    if (old != null && !Objects.equals(old.providerMethod().getBean().getClass().getName(), ins.getClass().getName())) {
                         String formatted = "重复路由监听 %s, old = %s - new = %s"
                                 .formatted(
                                         messageId,
-                                        old.javassistProxy().getInstance().getClass().getName(),
+                                        old.providerMethod().getBean().getClass().getName(),
                                         ins.getClass().getName()
                                 );
                         throw new RuntimeException(formatted);

@@ -188,7 +188,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     /** 执行循环过程中某一个函数执行失败中断执行 */
     public void executeMethodWithAnnotated(Class<? extends Annotation> annotation, Object... args) {
         Collection<ProviderMethod> providerMethodStream = withMethodAnnotatedCache(annotation);
-        providerMethodStream.forEach(providerMethod -> providerMethod.invoke(args));
+        providerMethodStream.forEach(providerMethod -> providerMethod.invokeInjectorParameters(args));
     }
 
     /** 执行循环过程中某一个函数执行失败会继续执行其它函数 */
@@ -196,7 +196,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         Collection<ProviderMethod> providerMethodStream = withMethodAnnotatedCache(annotation);
         providerMethodStream.forEach(providerMethod -> {
             try {
-                providerMethod.invoke(args);
+                providerMethod.invokeInjectorParameters(args);
             } catch (Exception e) {
                 log.error("执行方法异常：{}-{}", providerMethod.getMethod(), providerMethod.getMethod().getName(), e);
             }
@@ -448,6 +448,13 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
             return true;
         }
 
+        /** 会重新组件参数列表 */
+        public Object invokeInjectorParameters(Object... args) {
+            Object[] objects = ApplicationContextProvider.this.injectorParameters(bean, method, args);
+            return invoke(objects);
+        }
+
+        /** 直接调用 */
         public Object invoke(Object... args) {
             if (proxy == null && invokeCount++ > 5) {
                 proxy = JavassistProxy.of(bean, method);
@@ -455,9 +462,8 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
             try {
                 if (log.isTraceEnabled())
                     log.trace("{}.{}", bean.getClass().getSimpleName(), this.method.getName());
-                Object[] objects = ApplicationContextProvider.this.injectorParameters(bean, method, args);
-                if (proxy != null) return proxy.proxyInvoke(objects);
-                else return method.invoke(bean, objects);
+                if (proxy != null) return proxy.proxyInvoke(args);
+                else return method.invoke(bean, args);
             } catch (Throwable throwable) {
                 if (throwable instanceof InvocationTargetException) {
                     throwable = throwable.getCause();

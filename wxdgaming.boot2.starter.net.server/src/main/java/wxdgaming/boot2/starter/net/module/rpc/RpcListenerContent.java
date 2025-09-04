@@ -2,10 +2,9 @@ package wxdgaming.boot2.starter.net.module.rpc;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import wxdgaming.boot2.core.ApplicationContextProvider;
-import wxdgaming.boot2.core.assist.JavassistProxy;
-import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;
@@ -31,11 +30,10 @@ public class RpcListenerContent {
     public RpcListenerContent(ApplicationContextProvider applicationContextProvider) {
         this.applicationContextProvider = applicationContextProvider;
         this.rpcFilterList = applicationContextProvider.classWithSuperStream(RpcFilter.class).toList();
-        this.applicationContextProvider
-                .withMethodAnnotatedCache(RpcRequest.class)
-                .forEach(contentMethod -> {
-                    Object ins = contentMethod.getBean();
-                    Method method = contentMethod.getMethod();
+        this.applicationContextProvider.withMethodAnnotatedCache(RpcRequest.class)
+                .forEach(providerMethod -> {
+                    Object ins = providerMethod.getBean();
+                    Method method = providerMethod.getMethod();
 
                     RequestMapping insRequestMapping = AnnUtil.ann(ins.getClass(), RequestMapping.class);
                     RpcRequest methodRequestMapping = AnnUtil.ann(method, RpcRequest.class);
@@ -69,15 +67,14 @@ public class RpcListenerContent {
                     }
 
                     String lowerCase = path.toLowerCase();
-                    JavassistProxy javassistProxy = JavassistProxy.of(ins, method);
-                    RpcMapping rpcMapping = new RpcMapping(methodRequestMapping, lowerCase, javassistProxy);
+                    RpcMapping rpcMapping = new RpcMapping(methodRequestMapping, lowerCase, providerMethod);
 
                     RpcMapping old = rpcMappingMap.put(lowerCase, rpcMapping);
-                    if (old != null && !Objects.equals(old.javassistProxy().getInstance().getClass().getName(), ins.getClass().getName())) {
+                    if (old != null && !Objects.equals(old.providerMethod().getBean().getClass().getName(), ins.getClass().getName())) {
                         String formatted = "重复路由监听 %s old = %s - new = %s"
                                 .formatted(
                                         lowerCase,
-                                        old.javassistProxy().getInstance().getClass().getName(),
+                                        old.providerMethod().getBean().getClass().getName(),
                                         ins.getClass().getName()
                                 );
                         throw new RuntimeException(formatted);
