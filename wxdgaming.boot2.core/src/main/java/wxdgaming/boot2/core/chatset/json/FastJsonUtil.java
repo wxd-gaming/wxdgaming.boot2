@@ -8,8 +8,8 @@ import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.apache.commons.lang3.ArrayUtils;
 import wxdgaming.boot2.core.function.SLFunction1;
-import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.boot2.core.lang.TimeValue;
 import wxdgaming.boot2.core.lang.bit.BitFlag;
@@ -83,23 +83,23 @@ public class FastJsonUtil {
 
         Reader_Features = new Feature[]{Feature.IgnoreAutoType};
 
-        Writer_Features_Fmt = Objects.merge(Writer_Features, SerializerFeature.PrettyFormat);
+        Writer_Features_Fmt = ArrayUtils.add(Writer_Features, SerializerFeature.PrettyFormat);
 
-        Writer_Features_Type_Name = Objects.merge(Writer_Features, SerializerFeature.WriteClassName);
+        Writer_Features_Type_Name = ArrayUtils.add(Writer_Features, SerializerFeature.WriteClassName);
 
-        Writer_Features_Type_Name_NOT_ROOT = Objects.merge(Writer_Features_Type_Name, SerializerFeature.NotWriteRootClassName);
+        Writer_Features_Type_Name_NOT_ROOT = ArrayUtils.add(Writer_Features_Type_Name, SerializerFeature.NotWriteRootClassName);
 
-        Writer_Features_Type_Name_Fmt = Objects.merge(Writer_Features_Type_Name, SerializerFeature.PrettyFormat);
+        Writer_Features_Type_Name_Fmt = ArrayUtils.add(Writer_Features_Type_Name, SerializerFeature.PrettyFormat);
 
-        Writer_Features_Key_String = Objects.merge(Writer_Features, SerializerFeature.WriteNonStringKeyAsString);/*所有的 key 都用引号*/
-        Writer_Features_K_V_String = Objects.merge(Writer_Features_Key_String, SerializerFeature.WriteNonStringValueAsString);/*所有的 value 都用引号*/
+        Writer_Features_Key_String = ArrayUtils.add(Writer_Features, SerializerFeature.WriteNonStringKeyAsString);/*所有的 key 都用引号*/
+        Writer_Features_K_V_String = ArrayUtils.add(Writer_Features_Key_String, SerializerFeature.WriteNonStringValueAsString);/*所有的 value 都用引号*/
 
-        Writer_Type_Name_Features_Key_String = Objects.merge(Writer_Features_Type_Name, SerializerFeature.WriteNonStringKeyAsString);/*所有的 key 都用引号*/
-        Writer_Type_Name_Features_Value_String = Objects.merge(Writer_Features_Type_Name, SerializerFeature.WriteNonStringValueAsString);/*所有的 key 都用引号*/
-        Writer_Type_Name_Features_K_V_String = Objects.merge(Writer_Features_Type_Name, SerializerFeature.WriteNonStringKeyAsString, SerializerFeature.WriteNonStringValueAsString);/*所有的 value 都用引号*/
+        Writer_Type_Name_Features_Key_String = ArrayUtils.add(Writer_Features_Type_Name, SerializerFeature.WriteNonStringKeyAsString);/*所有的 key 都用引号*/
+        Writer_Type_Name_Features_Value_String = ArrayUtils.add(Writer_Features_Type_Name, SerializerFeature.WriteNonStringValueAsString);/*所有的 key 都用引号*/
+        Writer_Type_Name_Features_K_V_String = ArrayUtils.addAll(Writer_Features_Type_Name, SerializerFeature.WriteNonStringKeyAsString, SerializerFeature.WriteNonStringValueAsString);/*所有的 value 都用引号*/
 
-        Writer_Features_Fmt_Key_String = Objects.merge(Writer_Features_Key_String, SerializerFeature.PrettyFormat);/*所有的 key 都用引号*/
-        Writer_Features_Fmt_K_V_String = Objects.merge(Writer_Features_K_V_String, SerializerFeature.PrettyFormat);/*所有的 value 都用引号*/
+        Writer_Features_Fmt_Key_String = ArrayUtils.add(Writer_Features_Key_String, SerializerFeature.PrettyFormat);/*所有的 key 都用引号*/
+        Writer_Features_Fmt_K_V_String = ArrayUtils.add(Writer_Features_K_V_String, SerializerFeature.PrettyFormat);/*所有的 value 都用引号*/
 
         ParserConfig.getGlobalInstance().setAutoTypeSupport(false);
 

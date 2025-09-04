@@ -4,6 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.ArrayUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.ObjectBase;
 
@@ -53,7 +54,7 @@ public class ReasonDTO extends ObjectBase {
         ReasonDTO reasonDTO = new ReasonDTO();
         reasonDTO.setSerialNumber(serialNumber);
         reasonDTO.setReason(reason);
-        reasonDTO.setArgs(Objects.merge(args, appendArgs, appendArgs.length));
+        reasonDTO.setArgs(ArrayUtils.addAll(args, appendArgs));
         return reasonDTO;
     }
 

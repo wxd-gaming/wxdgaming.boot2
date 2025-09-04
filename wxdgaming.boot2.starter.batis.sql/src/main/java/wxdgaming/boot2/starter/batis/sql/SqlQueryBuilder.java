@@ -3,6 +3,7 @@ package wxdgaming.boot2.starter.batis.sql;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.ArrayUtils;
 import wxdgaming.boot2.core.chatset.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.starter.batis.Entity;
@@ -132,7 +133,7 @@ public abstract class SqlQueryBuilder {
     }
 
     protected void pushParameter(Object... parameters) {
-        this.parameters = Objects.merge(this.parameters, parameters);
+        this.parameters = ArrayUtils.addAll(this.parameters, parameters);
     }
 
     protected void buildSkip(StringBuilder builder) {

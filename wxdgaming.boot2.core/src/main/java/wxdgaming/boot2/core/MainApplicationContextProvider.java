@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.io.Objects;
@@ -17,7 +18,7 @@ import wxdgaming.boot2.core.util.JvmUtil;
 public final class MainApplicationContextProvider extends ApplicationContextProvider {
 
     public static SpringApplicationBuilder builder(Class<?>... sources) {
-        Class<?>[] merge = Objects.merge(sources, MainApplicationContextProvider.class);
+        Class<?>[] merge = ArrayUtils.add(sources, MainApplicationContextProvider.class);
         return new SpringApplicationBuilder(merge);
     }
 
