@@ -36,6 +36,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 /**
@@ -47,6 +48,7 @@ import java.util.stream.Stream;
 @Slf4j
 public class SpringUtil implements InitPrint {
 
+    public static final AtomicBoolean exiting = new AtomicBoolean(false);
     /** sd */
     public static MainApplicationContextProvider mainApplicationContextProvider;
     public static ChildApplicationContextProvider childApplicationContextProvider;

@@ -208,6 +208,7 @@ public class LambdaFactory implements Serializable {
      * @param method             需要代理的对象
      * @param serializableLambda 代理映射接口
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public static <M> Mapping<M> createDelegate(Object object, Method method, SerializableLambda serializableLambda) {
         Class inClass = serializableLambda.ofClass();
         Method inMethod = serializableLambda.ofMethod();
@@ -244,36 +245,6 @@ public class LambdaFactory implements Serializable {
     }
 
     @Getter
-    public static final class MappingFactory<M> {
-
-        private final List<Mapping<M>> mappings = new ArrayList<>();
-
-        public void put(Class<M> clsProxy, Object ins, Class<? extends Annotation> annotation) {
-            List<Mapping<M>> lambdaMappings = mappings(clsProxy, ins, annotation);
-            mappings.addAll(lambdaMappings);
-        }
-
-        /** 不会捕获异常，有问题终止 */
-        public void forEach(Consumer<M> fn) {
-            for (Mapping<M> mapping : mappings) {
-                fn.accept(mapping.getMapping());
-            }
-        }
-
-        /** 捕获异常，有问题会继续 */
-        public void forEachTry(ConsumerE1<M> fn) {
-            for (Mapping<M> mapping : mappings) {
-                try {
-                    fn.accept(mapping.getMapping());
-                } catch (Throwable e) {
-                    GlobalUtil.exception(mapping.getMethod().toString(), e);
-                }
-            }
-        }
-
-    }
-
-    @Getter
     public static final class Mapping<M> {
 
         private final Object instance;
@@ -288,6 +259,7 @@ public class LambdaFactory implements Serializable {
         }
 
         /** 原始对象 */
+        @SuppressWarnings("unchecked")
         public <R> R instance() {
             return (R) instance;
         }
@@ -301,9 +273,6 @@ public class LambdaFactory implements Serializable {
      * @param ins        需要查找代理的对象原始类
      * @param annotation 需要查找的注解
      * @param <M>        接口约束
-     * @return
-     * @author wxd-gaming(無心道, 15388152619)
-     * @version 2024-06-26 11:06
      */
     public static <M> List<Mapping<M>> mappings(Class<M> clsProxy, Object ins, Class<? extends Annotation> annotation) {
         Set<Method> methods = MethodUtil.allMethods(clsProxy);
@@ -319,9 +288,6 @@ public class LambdaFactory implements Serializable {
      * @param ins         需要查找代理的对象原始类
      * @param annotation  需要查找的注解
      * @param <M>         接口约束
-     * @return
-     * @author wxd-gaming(無心道, 15388152619)
-     * @version 2024-06-26 11:06
      */
     public static <M> List<Mapping<M>> mappings(Class<M> clsProxy, Method proxyMethod, Object ins, Class<? extends Annotation> annotation) {
         Class<?> cls = ins.getClass();

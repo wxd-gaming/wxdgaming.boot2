@@ -4,10 +4,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
-import io.netty.util.internal.OutOfDirectMemoryError;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.util.GlobalUtil;
 
 import java.util.Optional;
 
@@ -78,9 +76,6 @@ public abstract class SocketDeviceHandler extends ChannelInboundHandlerAdapter {
             }
         } else {
             log.warn("内部异常：{}", ctxName, cause);
-            if (cause instanceof OutOfDirectMemoryError) {
-                GlobalUtil.exception(ctxName, cause);
-            }
         }
     }
 

@@ -3,15 +3,15 @@ package wxdgaming.boot2.starter.batis.sql;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.ann.Stop;
-import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.collection.ConvertCollection;
 import wxdgaming.boot2.core.collection.SplitCollection;
 import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.core.io.FileWriteUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.DiffTimeRecord;
 import wxdgaming.boot2.core.lang.Tick;
-import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.starter.batis.DataBatch;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
@@ -176,7 +176,7 @@ public abstract class SqlDataBatch extends DataBatch {
 
             while (true) {
                 try {
-                    if (!closed.get() && !GlobalUtil.Exiting.get()) {
+                    if (!closed.get() && !SpringUtil.exiting.get()) {
                         LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(200));
                     }
                     insertBach();
@@ -236,7 +236,7 @@ public abstract class SqlDataBatch extends DataBatch {
                         long diff = diffTimeRecord.interval().interval() / 10000;
                         executeDiffTime += diff;
                         this.executeCount += executeCount;
-                        if (sqlDataHelper.getSqlConfig().isDebug() || ticket.need() || closed.get() || GlobalUtil.Exiting.get()) {
+                        if (sqlDataHelper.getSqlConfig().isDebug() || ticket.need() || closed.get() || SpringUtil.exiting.get()) {
                             log.info(
                                     """
                                             

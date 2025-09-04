@@ -4,16 +4,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.Const;
 import wxdgaming.boot2.core.assist.JavassistProxy;
-import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.executor.IExecutorQueue;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.MethodUtil;
 import wxdgaming.boot2.core.timer.CronExpress;
-import wxdgaming.boot2.core.util.GlobalUtil;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 
 import java.lang.reflect.Method;
@@ -80,7 +79,7 @@ public class ScheduledInfo extends AbstractCronTrigger implements Runnable, IExe
             }
         } catch (Throwable throwable) {
             String msg = "执行：" + this.name;
-            GlobalUtil.exception(msg, throwable);
+            log.error(msg, throwable);
         } finally {
             lock.lock();
             try {
