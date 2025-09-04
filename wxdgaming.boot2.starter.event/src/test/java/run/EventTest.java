@@ -1,13 +1,12 @@
 package run;
 
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import run.event.B1Event;
 import run.event.StartEvent;
 import run.event.StopEvent;
 import wxdgaming.boot2.core.MainApplicationContextProvider;
 import wxdgaming.boot2.core.SpringUtil;
-import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.starter.event.EventScan;
 import wxdgaming.boot2.starter.event.EventService;
 
@@ -24,7 +23,9 @@ import wxdgaming.boot2.starter.event.EventService;
 public class EventTest {
 
     public static void main(String[] args) {
-        MainApplicationContextProvider.builder(EventTest.class).run(args);
+        MainApplicationContextProvider.builder(EventTest.class)
+                .web(WebApplicationType.NONE)
+                .run(args);
         SpringUtil.mainApplicationContextProvider.executeMethodWithAnnotatedInit();
         EventService eventService = SpringUtil.mainApplicationContextProvider.getBean(EventService.class);
         eventService.postEvent(new StartEvent());
