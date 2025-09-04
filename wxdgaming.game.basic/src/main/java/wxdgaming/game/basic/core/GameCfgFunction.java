@@ -19,7 +19,7 @@ public class GameCfgFunction {
     public static final Function<ConfigString, List<ItemCfg>> ConfigString2ItemCfgList = new Function<ConfigString, List<ItemCfg>>() {
         @Override public List<ItemCfg> apply(ConfigString configString) {
             if (configString == null) return List.of();
-            return configString.getObjectByFunction(ItemCfgFunction);
+            return configString.get(ItemCfgFunction);
         }
     };
 

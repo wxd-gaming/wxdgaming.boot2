@@ -154,7 +154,7 @@ public abstract class ITaskScript extends HoldApplicationContext {
         QTask qTask = taskInfo.qTask();
         ReasonDTO reasonDTO = ReasonDTO.of(Reason.TASK_SUBMIT, "taskCfg=" + taskId);
 
-        List<ItemCfg> submitCost = qTask.getSubmitCost().getObjectByFunction(GameCfgFunction.ItemCfgFunction);
+        List<ItemCfg> submitCost = qTask.getSubmitCost().get(GameCfgFunction.ItemCfgFunction);
         if (!ListOf.isEmpty(submitCost)) {
             BagChangeDTO4ItemCfg changeArgs4ItemCfg = BagChangeDTO4ItemCfg.builder()
                     .setItemCfgList(submitCost)
@@ -166,7 +166,7 @@ public abstract class ITaskScript extends HoldApplicationContext {
             bagService.cost(player, changeArgs4ItemCfg);
         }
 
-        List<ItemCfg> rewards = qTask.getRewards().getObjectByFunction(GameCfgFunction.ItemCfgFunction);
+        List<ItemCfg> rewards = qTask.getRewards().get(GameCfgFunction.ItemCfgFunction);
 
         BagChangeDTO4ItemCfg rewardArgs4ItemCfg = BagChangeDTO4ItemCfg.builder()
                 .setItemCfgList(rewards)

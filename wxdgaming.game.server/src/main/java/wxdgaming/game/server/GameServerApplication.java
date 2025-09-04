@@ -65,58 +65,6 @@ public class GameServerApplication {
             QPlayer qPlayer = qPlayerTable.get(1);
             log.info("{}", qPlayer);
 
-            ExecutorFactory.getExecutorServiceBasic().schedule(
-                    () -> {
-                        RpcService rpcService = applicationContext.getBean(RpcService.class);
-                        SocketClient client = applicationContext.getBean(SocketClient.class);
-                        SocketSession socketSession = client.idleNullException();
-                        for (int k = 0; k < 5; k++) {
-                            DiffTimeRecord diffTime = new DiffTimeRecord();
-                            int rcount = 1;
-                            CountDownLatch countDownLatch = new CountDownLatch(rcount);
-                            for (int i = 0; i < rcount; i++) {
-                                Mono<JSONObject> request = rpcService.request(socketSession, "rpcIndex", MapOf.newJSONObject().fluentPut("a", "1"));
-                                request
-                                        .subscribe((jsonObject) -> {
-                                            countDownLatch.countDown();
-                                            log.debug("rpcIndex response {}", jsonObject);
-                                        }, throwable -> {
-                                            countDownLatch.countDown();
-                                            log.error("rpcIndex", throwable);
-                                        });
-                            }
-                            try {
-                                countDownLatch.await();
-                            } catch (InterruptedException e) {
-                                throw new RuntimeException(e);
-                            }
-                            float diff = diffTime.interval().interval4();
-                            log.info("总耗时:{}ms", diff);
-                        }
-                        rpcService.request(socketSession, "rpcIndex2", MapOf.newJSONObject().fluentPut("a", "2"))
-                                .subscribe((jsonObject) -> {
-                                    log.info("rpcIndex2 response {}", jsonObject);
-                                }, throwable -> {
-                                    log.error("rpcIndex2", throwable);
-                                });
-
-                        rpcService.request(socketSession, "script/rpcIndex", MapOf.newJSONObject().fluentPut("a", "3"))
-                                .subscribe((jsonObject) -> {
-                                    log.info("script/rpcIndex response {}", jsonObject);
-                                }, throwable -> {
-                                    log.error("script/rpcIndex", throwable);
-                                });
-
-                        JSONObject block = rpcService.request(socketSession, "script/rpcIndex2", MapOf.newJSONObject().fluentPut("a", "4")).block();
-                        log.info("script/rpcIndex2 同步回调结果 {}", block);
-
-                        socketSession.write("我是文本消息");
-                        // Thread.ofPlatform().start(()-> System.exit(0));
-                    },
-                    10,
-                    TimeUnit.SECONDS
-            );
-
         } catch (Throwable throwable) {
             log.error("启动失败", throwable);
             System.exit(99);

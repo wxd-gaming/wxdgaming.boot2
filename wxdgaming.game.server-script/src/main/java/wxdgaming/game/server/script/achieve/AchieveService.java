@@ -55,7 +55,7 @@ public class AchieveService implements InitPrint {
             achievePack.getAchieveMap().computeIfAbsent(conditionEntry.getKey(), k -> new AchieveProgress());
         }
 
-        List<ItemCfg> rewards = qAchieveTable.getDataMap().get(1).getRewards().getObjectByFunction(GameCfgFunction.ItemCfgFunction);
+        List<ItemCfg> rewards = qAchieveTable.getDataMap().get(1).getRewards().get(GameCfgFunction.ItemCfgFunction);
 
     }
 
@@ -99,7 +99,7 @@ public class AchieveService implements InitPrint {
             return;
         }
 
-        List<ItemCfg> itemCfgs = qAchieve.getRewards().getObjectByFunction(GameCfgFunction.ItemCfgFunction);
+        List<ItemCfg> itemCfgs = qAchieve.getRewards().get(GameCfgFunction.ItemCfgFunction);
         ReasonDTO reasonDTO = ReasonDTO.of(Reason.Achieve, "achieveId=" + achieveId);
         BagChangeDTO4ItemCfg bagChangeDTO4ItemCfg = BagChangeDTO4ItemCfg.builder()
                 .setReasonDTO(reasonDTO)

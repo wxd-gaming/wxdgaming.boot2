@@ -31,7 +31,7 @@ public class ChangeHpMpBuffAction extends AbstractBuffAction {
 
     @Override public void doAction(MapNpc mapNpc, Buff buff, QBuff qBuff) {
         ConfigString paramString1 = qBuff.getParamString1();
-        AttrInfo objectByFunction = paramString1.getObjectByFunction(json -> FastJsonUtil.parse(json, AttrInfo.class));
+        AttrInfo objectByFunction = paramString1.get(json -> FastJsonUtil.parse(json, AttrInfo.class));
         ReasonDTO reasonDTO = ReasonDTO.of(Reason.Buff, "buff", qBuff.getId(), "sendUid", buff.getSendUid());
         if (qBuff.getParamInt1() == 0/*TODO 固定值*/) {
             Long hp = objectByFunction.get(AttrType.HP);

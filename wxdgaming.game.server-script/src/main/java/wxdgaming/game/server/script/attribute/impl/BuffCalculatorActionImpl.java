@@ -39,7 +39,7 @@ public class BuffCalculatorActionImpl extends AbstractCalculatorAction {
             Buff buff = buffs.get(i);
             QBuff qBuff = buff.qBuff();
             if (qBuff.getBuffType() == BuffTypeConst.ChangeAttr) {
-                AttrInfo objectByFunction = qBuff.getParamString1().getObjectByFunction(json -> FastJsonUtil.parse(json, AttrInfo.class));
+                AttrInfo objectByFunction = qBuff.getParamString1().get(json -> FastJsonUtil.parse(json, AttrInfo.class));
                 attrInfo.append(objectByFunction);
             }
         }
@@ -53,7 +53,7 @@ public class BuffCalculatorActionImpl extends AbstractCalculatorAction {
             Buff buff = buffs.get(i);
             QBuff qBuff = buff.qBuff();
             if (qBuff.getBuffType() == BuffTypeConst.ChangeAttr) {
-                AttrInfo objectByFunction = qBuff.getParamString2().getObjectByFunction(json -> FastJsonUtil.parse(json, AttrInfo.class));
+                AttrInfo objectByFunction = qBuff.getParamString2().get(json -> FastJsonUtil.parse(json, AttrInfo.class));
                 attrInfo.append(objectByFunction);
             }
         }
