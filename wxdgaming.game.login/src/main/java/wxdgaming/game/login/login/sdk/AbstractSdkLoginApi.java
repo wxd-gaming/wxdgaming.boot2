@@ -2,6 +2,7 @@ package wxdgaming.game.login.login.sdk;
 
 import com.alibaba.fastjson.JSONObject;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.token.JsonTokenBuilder;
@@ -17,6 +18,7 @@ import wxdgaming.game.login.slog.AccountLoginLog;
 import wxdgaming.game.login.slog.AccountRegisterLog;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -39,7 +41,18 @@ public abstract class AbstractSdkLoginApi {
 
     public abstract RunResult login(HttpServletRequest context, AppPlatformParams appPlatformParams) throws Exception;
 
+    private static final Set<String> ILLEGAL_USERNAMES = Set.of("null", "undefined", "\t", "\n", "admin", "root");
+
+    public void validateUsername(String username) {
+        if (StringUtils.isBlank(username) || ILLEGAL_USERNAMES.contains(username.trim().toLowerCase())) {
+            throw new IllegalArgumentException("用户名非法！");
+        }
+    }
+
     protected UserData createUserData(String ip, String account, AppPlatformParams appPlatformParams, String platformUserId) {
+
+        validateUsername(account);/*TODO 检查合法性*/
+
         UserData userData = new UserData();
         userData.setAccount(account);
         userData.setAppId(appPlatformParams.getAppId());

@@ -6,6 +6,7 @@ import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.collection.ListOf;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
+import wxdgaming.game.basic.core.GameCfgFunction;
 import wxdgaming.game.basic.core.Reason;
 import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.basic.slog.SlogService;
@@ -108,9 +109,10 @@ public abstract class ITaskScript extends HoldApplicationContext {
             return;
         }
         ReasonDTO reasonDTO = ReasonDTO.of(Reason.TASK_ACCEPT, "taskCfg=" + taskId);
-        if (!ListOf.isEmpty(qTask.getAcceptCost())) {
+        List<ItemCfg> objectByFunction = qTask.getAcceptCost().getObjectByFunction(GameCfgFunction.ItemCfgFunction);
+        if (!ListOf.isEmpty(objectByFunction)) {
             BagChangeDTO4ItemCfg changeArgs4ItemCfg = BagChangeDTO4ItemCfg.builder()
-                    .setItemCfgList(qTask.getAcceptCost())
+                    .setItemCfgList(objectByFunction)
                     .setReasonDTO(reasonDTO)
                     .build();
             if (!bagService.checkCost(player, changeArgs4ItemCfg)) {
@@ -151,9 +153,10 @@ public abstract class ITaskScript extends HoldApplicationContext {
         QTask qTask = taskInfo.qTask();
         ReasonDTO reasonDTO = ReasonDTO.of(Reason.TASK_SUBMIT, "taskCfg=" + taskId);
 
-        if (!ListOf.isEmpty(qTask.getSubmitCost())) {
+        List<ItemCfg> submitCost = qTask.getSubmitCost().getObjectByFunction(GameCfgFunction.ItemCfgFunction);
+        if (!ListOf.isEmpty(submitCost)) {
             BagChangeDTO4ItemCfg changeArgs4ItemCfg = BagChangeDTO4ItemCfg.builder()
-                    .setItemCfgList(qTask.getSubmitCost())
+                    .setItemCfgList(submitCost)
                     .setReasonDTO(reasonDTO)
                     .build();
             if (!bagService.checkCost(player, changeArgs4ItemCfg)) {
@@ -162,7 +165,7 @@ public abstract class ITaskScript extends HoldApplicationContext {
             bagService.cost(player, changeArgs4ItemCfg);
         }
 
-        List<ItemCfg> rewards = qTask.getRewards();
+        List<ItemCfg> rewards = qTask.getRewards().getObjectByFunction(GameCfgFunction.ItemCfgFunction);
 
         BagChangeDTO4ItemCfg rewardArgs4ItemCfg = BagChangeDTO4ItemCfg.builder()
                 .setItemCfgList(rewards)
