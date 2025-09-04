@@ -19,7 +19,7 @@ QTask.__index = QTask
 
 ---@type table<string, QTask>
 QTaskTable = {
-[1] = {id = 1, taskType = "Main", before = 0, after = 2, name = "杀怪", description = "击杀 {} 只怪物", min_lv = 1, max_lv = 100, conditionList = "[{\"k1\":\"KillMonster\",\"update\":\"Add\",\"target\":10}]", acceptCost = nil, rewards = "1|10,3|10,5|10", submitCost = nil } ,
+[1] = {id = 1, taskType = "Main", before = 0, after = 2, name = "杀怪", description = "击杀 {} 只怪物", min_lv = 1, max_lv = 100, conditionList = "[{\"k1\":\"KillMonster\",\"update\":\"Add\",\"target\":10}]", acceptCost = "", rewards = "1|10,3|10,5|10", submitCost = "" } ,
 [2] = {id = 2, taskType = "Main", before = 1, after = 3, name = "杀怪", description = "击杀 {} 只怪物", min_lv = 1, max_lv = 100, conditionList = "[{\"k1\":\"KillMonster\",\"update\":\"Add\",\"target\":20}]", acceptCost = "1|1", rewards = "1|10,3|10,5|11", submitCost = "1|1" } ,
 [3] = {id = 3, taskType = "Main", before = 2, after = 4, name = "杀怪", description = "击杀 {} 只怪物", min_lv = 1, max_lv = 100, conditionList = "[{\"k1\":\"KillMonster\",\"update\":\"Add\",\"target\":30}]", acceptCost = "1|2", rewards = "1|10,3|10,5|12", submitCost = "1|2" } ,
 [4] = {id = 4, taskType = "Main", before = 3, after = 5, name = "杀怪", description = "击杀 {} 只怪物", min_lv = 1, max_lv = 100, conditionList = "[{\"k1\":\"KillMonster\",\"update\":\"Add\",\"target\":40}]", acceptCost = "1|3", rewards = "1|10,3|10,5|13", submitCost = "1|3" } ,

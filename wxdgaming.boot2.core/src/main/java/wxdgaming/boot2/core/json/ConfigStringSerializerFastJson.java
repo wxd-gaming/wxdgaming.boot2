@@ -5,7 +5,6 @@ import com.alibaba.fastjson.parser.DefaultJSONParser;
 import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
 import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.ObjectSerializer;
-import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.lang.ConfigString;
 
 import java.io.IOException;
@@ -36,12 +35,10 @@ public class ConfigStringSerializerFastJson implements ObjectSerializer, ObjectD
         if (parse instanceof ConfigString configString) return configString;
         if (parse instanceof JSONObject jsonObject) {
             String value = jsonObject.getString("value");
-            if (StringUtils.isNotBlank(value)) {
-                return new ConfigString(value);
-            }
+            return new ConfigString(value);
         }
 
-        return new ConfigString(parse.toString());
+        return new ConfigString("");
     }
 
     @Override

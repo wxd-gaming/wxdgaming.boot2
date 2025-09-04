@@ -188,7 +188,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
                     /*表示叠加之后，剩余的东西没办法入包，需要发邮件*/
                     change -= newItem.getCount();
                 }
-                log.info("获得道具：{}, {}, {} {}+{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeDTO);
+                log.info("获得道具：{}, {}, {} {}+{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeDTO.getReasonDTO());
 
                 ItemSlog itemLog = new ItemSlog(player, bagType.name(),
                         "获得",

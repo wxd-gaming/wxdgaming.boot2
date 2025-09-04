@@ -17,8 +17,7 @@ import java.util.function.Function;
  **/
 public class ConfigString {
 
-    @Getter @JSONField(ordinal = 1)
-    String value;
+    @Getter @JSONField(ordinal = 1) final String value;
     private transient Object object = null;
 
     @JSONCreator()
@@ -113,6 +112,11 @@ public class ConfigString {
 
     public <T> void initObjectByFunction(Function<String, T> function) {
         object = function.apply(value);
+    }
+
+    public ConfigString setObject(Object object) {
+        this.object = object;
+        return this;
     }
 
     @SuppressWarnings({"unchecked"})

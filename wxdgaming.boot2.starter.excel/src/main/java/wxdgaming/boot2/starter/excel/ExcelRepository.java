@@ -348,6 +348,8 @@ public class ExcelRepository {
                     }
                 }
             }
+            if (ConfigString.class.equals(entityField.getFieldType()))
+                return new ConfigString(trim);
             return ConvertUtil.defaultValue(entityField.getFieldType());
         } catch (Exception ex) {
             final RuntimeException runtimeException = new RuntimeException(

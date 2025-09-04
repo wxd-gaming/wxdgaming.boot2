@@ -109,7 +109,8 @@ public abstract class ITaskScript extends HoldApplicationContext {
             return;
         }
         ReasonDTO reasonDTO = ReasonDTO.of(Reason.TASK_ACCEPT, "taskCfg=" + taskId);
-        List<ItemCfg> objectByFunction = qTask.getAcceptCost().getObjectByFunction(GameCfgFunction.ItemCfgFunction);
+
+        List<ItemCfg> objectByFunction = GameCfgFunction.ConfigString2ItemCfgList.apply(qTask.getAcceptCost());
         if (!ListOf.isEmpty(objectByFunction)) {
             BagChangeDTO4ItemCfg changeArgs4ItemCfg = BagChangeDTO4ItemCfg.builder()
                     .setItemCfgList(objectByFunction)
@@ -192,6 +193,7 @@ public abstract class ITaskScript extends HoldApplicationContext {
         resSubmitTask.setTaskId(taskId);
         QTask nextQTask = qTask.getQTaskAfter();
         if (nextQTask != null) {
+            /*TODO 有下一个任务删除当前*/
             resSubmitTask.setRemove(true);
             taskInfoMap.remove(taskId);
         }

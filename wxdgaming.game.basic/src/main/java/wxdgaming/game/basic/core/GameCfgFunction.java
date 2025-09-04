@@ -1,6 +1,7 @@
 package wxdgaming.game.basic.core;
 
 import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.game.bean.goods.ItemCfg;
 
 import java.util.ArrayList;
@@ -14,6 +15,14 @@ import java.util.function.Function;
  * @version 2025-09-03 15:04
  **/
 public class GameCfgFunction {
+
+    public static final Function<ConfigString, List<ItemCfg>> ConfigString2ItemCfgList = new Function<ConfigString, List<ItemCfg>>() {
+        @Override public List<ItemCfg> apply(ConfigString configString) {
+            if (configString == null) return List.of();
+            String value = configString.getValue();
+            return ItemCfgFunction.apply(value);
+        }
+    };
 
     public static final Function<String, List<ItemCfg>> ItemCfgFunction = new Function<String, List<ItemCfg>>() {
         @Override public List<ItemCfg> apply(String value) {

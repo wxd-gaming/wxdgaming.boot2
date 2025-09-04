@@ -1,9 +1,10 @@
 package wxdgaming.boot2.core.util;
 
 
-import wxdgaming.boot2.core.Throw;
 import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.json.FastJsonUtil;
+import wxdgaming.boot2.core.lang.ConfigString;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -132,13 +133,7 @@ public class ConvertUtil {
 
     }
 
-    /**
-     * 类型转换
-     *
-     * @param obj
-     * @param clazz
-     * @return
-     */
+    /** 类型转换 */
     public static Object changeType(Object obj, Class<?> clazz) {
         if (obj == null) {
             return null;
@@ -148,6 +143,9 @@ public class ConvertUtil {
         }
         if (clazz.isInstance(obj) || clazz.isAssignableFrom(obj.getClass())) {
             return obj;
+        }
+        if (ConfigString.class.equals(clazz)) {
+            return new ConfigString(String.valueOf(obj));
         }
         final TypeCode typeCode = TypeCode.getTypeCode(clazz);
         /*如果等于，或者所与继承关系*/
@@ -197,13 +195,12 @@ public class ConvertUtil {
         }
     }
 
-    /**
-     * 类型转换
-     *
-     * @param clazz
-     * @return
-     */
+    /** 类型转换 */
+    @SuppressWarnings("unchecked")
     public static <R> R defaultValue(Class<?> clazz) {
+        if (ConfigString.class.equals(clazz)) {
+            return (R) new ConfigString("");
+        }
         final TypeCode typeCode = TypeCode.getTypeCode(clazz);
         /*如果等于，或者所与继承关系*/
         switch (typeCode) {
