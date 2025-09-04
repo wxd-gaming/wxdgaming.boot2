@@ -2,9 +2,9 @@ package wxdgaming.boot2.starter.batis.sql;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.ann.Stop;
-import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.collection.ConvertCollection;
 import wxdgaming.boot2.core.collection.SplitCollection;
 import wxdgaming.boot2.core.collection.Table;
@@ -249,12 +249,12 @@ public abstract class SqlDataBatch extends DataBatch {
                                                     sqlDataHelper.getDbName(),
                                                     sqlType, sql,
                                                     batchSubmitSize, splitCollection.size(),
-                                                    StringUtils.padLeft(executeCount, 19, ' '),
-                                                    StringUtils.padLeft(diff / 100f, 19, ' '),
-                                                    StringUtils.padLeft(executeCount / (diff / 100f) * 1000, 19, ' '),
-                                                    StringUtils.padLeft(this.executeCount, 19, ' '),
-                                                    StringUtils.padLeft(executeDiffTime / 100f, 19, ' '),
-                                                    StringUtils.padLeft(this.executeCount / (executeDiffTime / 100f) * 1000, 19, ' ')
+                                                    StringUtils.leftPad(String.valueOf(executeCount), 19, ' '),
+                                                    StringUtils.leftPad(String.valueOf(diff / 100f), 19, ' '),
+                                                    StringUtils.leftPad(String.valueOf(executeCount / (diff / 100f) * 1000), 19, ' '),
+                                                    StringUtils.leftPad(String.valueOf(this.executeCount), 19, ' '),
+                                                    StringUtils.leftPad(String.valueOf(this.executeDiffTime / 100f), 19, ' '),
+                                                    StringUtils.leftPad(String.valueOf(this.executeCount / (this.executeDiffTime / 100f) * 1000), 19, ' ')
                                             )
                             );
                         }

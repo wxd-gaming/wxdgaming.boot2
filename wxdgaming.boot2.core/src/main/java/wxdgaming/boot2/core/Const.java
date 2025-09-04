@@ -1,5 +1,7 @@
 package wxdgaming.boot2.core;
 
+import java.nio.charset.Charset;
+
 /**
  * 常量
  *
@@ -12,5 +14,19 @@ public interface Const {
 
     /** 使用 gzip 的最小值 */
     int USE_GZIP_MIN_LENGTH = 1024 * 8;
+
+    Charset GB2313 = Charset.forName("GB2312");
+    String EMPTY_STRING = "";
+    int ZERO = 0;
+    /** null 字符串 */
+    String nullStr = "null";
+    /** null 字符串的字节数组 */
+    byte[] nullBytes = "null".getBytes();
+    /** 换行符{@code \n} */
+    String Line = "\n";
+    /** 换行符{@code \n} */
+    byte[] LineBytes = "\n".getBytes();
+
+    char[] NUMBER_CHARS = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '9'};
 
 }

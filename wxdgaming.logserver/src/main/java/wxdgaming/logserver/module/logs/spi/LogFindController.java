@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.logserver.module.logs.LogService;

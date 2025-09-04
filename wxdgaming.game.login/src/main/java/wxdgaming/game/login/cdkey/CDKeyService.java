@@ -3,7 +3,7 @@ package wxdgaming.game.login.cdkey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.CDKeyUtil;
 import wxdgaming.boot2.core.util.SingletonLockUtil;

@@ -1,7 +1,7 @@
 package wxdgaming.boot2.core.lang.bit;
 
 import lombok.Getter;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.io.Serializable;
@@ -278,7 +278,7 @@ public class BitFlag implements Serializable {
         String show = "";
         if (longs != null) {
             for (Long aLong : longs) {
-                show = toBinaryString("", StringUtils.padLeft(Long.toBinaryString(aLong), 64, '0'))
+                show = toBinaryString("", StringUtils.leftPad(Long.toBinaryString(aLong), 64, '0'))
                        + (StringUtils.isBlank(show) ? "" : "_")
                        + show;
             }
@@ -295,17 +295,17 @@ public class BitFlag implements Serializable {
     }
 
     public static String toString(short i) {
-        String string = StringUtils.padLeft(Integer.toBinaryString(i), 16, '0');
+        String string = StringUtils.leftPad(Integer.toBinaryString(i), 16, '0');
         return toBinaryString("0b", string);
     }
 
     public static String toString(int i) {
-        String string = StringUtils.padLeft(Integer.toBinaryString(i), 32, '0');
+        String string = StringUtils.leftPad(Integer.toBinaryString(i), 32, '0');
         return toBinaryString("0b", string);
     }
 
     public static String toString(long l) {
-        String string = StringUtils.padLeft(Long.toBinaryString(l), 64, '0');
+        String string = StringUtils.leftPad(Long.toBinaryString(l), 64, '0');
         return toBinaryString("0b", string);
     }
 

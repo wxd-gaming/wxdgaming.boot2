@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.net.pojo;
 
 
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.ObjectBase;
 
 import java.io.Serial;

@@ -3,7 +3,7 @@ package wxdgaming.boot2.starter.net.module.inner.handler;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.zip.GzipUtil;

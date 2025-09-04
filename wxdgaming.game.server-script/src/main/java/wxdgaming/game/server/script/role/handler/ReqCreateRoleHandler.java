@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;

@@ -1,8 +1,8 @@
 package wxdgaming.boot2.core.token;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import wxdgaming.boot2.core.chatset.Base64Util;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.util.Base64Util;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.util.AesUtil;
 import wxdgaming.boot2.core.util.Md5Util;
 

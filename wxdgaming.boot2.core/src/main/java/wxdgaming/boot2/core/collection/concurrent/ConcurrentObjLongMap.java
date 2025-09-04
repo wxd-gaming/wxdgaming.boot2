@@ -2,9 +2,8 @@ package wxdgaming.boot2.core.collection.concurrent;
 
 
 import com.alibaba.fastjson.annotation.JSONType;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;

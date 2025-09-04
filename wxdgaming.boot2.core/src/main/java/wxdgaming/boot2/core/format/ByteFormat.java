@@ -4,7 +4,7 @@ package wxdgaming.boot2.core.format;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.util.ConvertUtil;
 
 import java.io.Serial;
@@ -68,13 +68,13 @@ public class ByteFormat implements Serializable {
         long g = m / 1024;
         m = m % 1024;
         if (g > 0)
-            stringBuilder.append(StringUtils.padLeft(g, 4, ' ')).append(" G, ");
+            stringBuilder.append(StringUtils.leftPad(String.valueOf(g), 4, ' ')).append(" G, ");
         if (m > 0)
-            stringBuilder.append(StringUtils.padLeft(m, 4, ' ')).append(" M, ");
+            stringBuilder.append(StringUtils.leftPad(String.valueOf(m), 4, ' ')).append(" M, ");
         if (k > 0)
-            stringBuilder.append(StringUtils.padLeft(k, 4, ' ')).append(" K, ");
+            stringBuilder.append(StringUtils.leftPad(String.valueOf(k), 4, ' ')).append(" K, ");
         if (b > 0)
-            stringBuilder.append(StringUtils.padLeft(b, 4, ' ') + " B");
+            stringBuilder.append(StringUtils.leftPad(String.valueOf(b), 4, ' ')).append(" B");
     }
 
     private void formatInfo(FormatInfo formatInfo, StringBuilder stringBuilder) {
@@ -82,7 +82,7 @@ public class ByteFormat implements Serializable {
         if (formatInfo != FormatInfo.B) {
             obj = ConvertUtil.float2(allBytes / formatInfo.getCode());
         }
-        stringBuilder.append(StringUtils.padLeft(obj, 12, ' ')).append(" ").append(formatInfo.getComment());
+        stringBuilder.append(StringUtils.leftPad(String.valueOf(obj), 12, ' ')).append(" ").append(formatInfo.getComment());
     }
 
     public void toString(FormatInfo formatInfo, StringBuilder stringBuilder) {

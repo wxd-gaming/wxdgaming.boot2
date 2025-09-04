@@ -5,7 +5,7 @@ import lombok.Setter;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import wxdgaming.boot2.core.CoreScan;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.format.data.Data2Size;
 import wxdgaming.boot2.core.util.SingletonUtil;
 

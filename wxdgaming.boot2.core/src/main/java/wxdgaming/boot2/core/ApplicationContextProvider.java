@@ -10,7 +10,7 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.ann.ThreadParam;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.reflect.AnnUtil;

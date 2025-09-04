@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.batis.columnconvert;
 
 import com.alibaba.fastjson2.util.TypeUtils;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.util.AssertUtil;

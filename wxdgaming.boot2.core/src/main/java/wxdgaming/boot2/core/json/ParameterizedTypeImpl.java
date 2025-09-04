@@ -1,4 +1,4 @@
-package wxdgaming.boot2.core.chatset.json;
+package wxdgaming.boot2.core.json;
 
 import wxdgaming.boot2.core.function.SLFunction1;
 import wxdgaming.boot2.core.util.LambdaFactory;

@@ -9,7 +9,7 @@ import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Stop;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.util.AssertUtil;

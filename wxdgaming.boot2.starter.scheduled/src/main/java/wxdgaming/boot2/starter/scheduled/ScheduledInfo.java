@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.Const;
 import wxdgaming.boot2.core.assist.JavassistProxy;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.executor.IExecutorQueue;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.AnnUtil;

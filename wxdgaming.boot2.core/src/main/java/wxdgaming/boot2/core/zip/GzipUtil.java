@@ -2,7 +2,7 @@ package wxdgaming.boot2.core.zip;
 
 
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.chatset.Base64Util;
+import wxdgaming.boot2.core.util.Base64Util;
 import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.io.Objects;

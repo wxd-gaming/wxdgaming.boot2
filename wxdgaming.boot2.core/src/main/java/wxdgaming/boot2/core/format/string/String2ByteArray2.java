@@ -1,7 +1,7 @@
 package wxdgaming.boot2.core.format.string;
 
-import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 
 /**
  * 把 string 转化成 byte[][]

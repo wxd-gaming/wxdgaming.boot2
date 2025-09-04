@@ -3,7 +3,7 @@ package wxdgaming.boot2.core.lang;
 import com.alibaba.fastjson.annotation.JSONCreator;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.format.string.*;
 
 import java.util.List;

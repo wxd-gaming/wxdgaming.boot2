@@ -4,8 +4,8 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.util.PatternUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 
@@ -33,7 +33,7 @@ public abstract class Entity extends ObjectBase {
                 SerializerFeature.SortField,   /*排序*/
                 SerializerFeature.MapSortField
         );
-        int hashcode = StringUtils.hashcode(jsonString);
+        int hashcode = PatternUtil.hashcode(jsonString);
         if (hashcode != oldHashCode) {
             oldHashCode = hashcode;
             return true;

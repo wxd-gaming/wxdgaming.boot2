@@ -1,16 +1,8 @@
 package wxdgaming.boot2.starter.batis.columnconvert;
 
-import com.alibaba.fastjson2.util.TypeUtils;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
-import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
-import wxdgaming.boot2.starter.batis.TableMapping;
-import wxdgaming.boot2.starter.batis.ann.Convert;
-import wxdgaming.boot2.starter.batis.convert.AbstractConverter;
-import wxdgaming.boot2.starter.batis.convert.ConvertFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 字段转换工厂

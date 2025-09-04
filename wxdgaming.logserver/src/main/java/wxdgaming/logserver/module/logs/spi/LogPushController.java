@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.CacheHttpServletRequest;
 import wxdgaming.boot2.core.SpringUtil;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.Md5Util;

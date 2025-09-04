@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.assist.JavassistProxy;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;

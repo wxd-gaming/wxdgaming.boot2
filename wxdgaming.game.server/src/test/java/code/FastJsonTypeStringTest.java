@@ -8,7 +8,7 @@ import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
 import org.junit.jupiter.api.Test;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.game.message.task.TaskType;
 import wxdgaming.game.server.bean.global.GlobalDataEntity;

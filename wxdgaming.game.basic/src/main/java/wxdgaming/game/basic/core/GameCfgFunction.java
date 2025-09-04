@@ -1,6 +1,6 @@
 package wxdgaming.game.basic.core;
 
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.game.bean.goods.ItemCfg;
 
 import java.util.ArrayList;

@@ -2,7 +2,7 @@ package wxdgaming.boot2.starter.js.plugin;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.starter.js.IJSPlugin;
 
 import java.util.Arrays;

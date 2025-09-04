@@ -1,8 +1,10 @@
 package wxdgaming.boot2.core.format;
 
 
+import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.Const;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.util.PatternUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -93,8 +95,8 @@ public class StreamWriter implements Closeable, AutoCloseable {
     }
 
     public StreamWriter write(Object append, Charset charsetName) {
-        if (append == null || StringUtils.nullStr.equals(append)) {
-            write(StringUtils.nullBytes);
+        if (append == null || Const.nullStr.equals(append)) {
+            write(Const.nullBytes);
         } else if (append instanceof byte[]) {
             write((byte[]) append);
         } else {
@@ -148,7 +150,7 @@ public class StreamWriter implements Closeable, AutoCloseable {
      * @return
      */
     public StreamWriter writeLeft(Object src, int len, char ch) {
-        return write(StringUtils.padLeft(String.valueOf(src), len, ch));
+        return write(StringUtils.leftPad(String.valueOf(src), len, ch));
     }
 
     /**
@@ -160,14 +162,14 @@ public class StreamWriter implements Closeable, AutoCloseable {
      * @return
      */
     public StreamWriter writeRight(Object src, int len, char ch) {
-        return write(StringUtils.padRight(String.valueOf(src), len, ch));
+        return write(StringUtils.leftPad(String.valueOf(src), len, ch));
     }
 
     /**
      * 增加换行符
      */
     public StreamWriter writeLn() {
-        return write(StringUtils.LineBytes);
+        return write(Const.LineBytes);
     }
 
     public StreamWriter clear() {

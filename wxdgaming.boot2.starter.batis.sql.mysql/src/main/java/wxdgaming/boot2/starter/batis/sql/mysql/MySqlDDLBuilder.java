@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.batis.sql.mysql;
 
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.columnconvert.ColumnConvertFactory;

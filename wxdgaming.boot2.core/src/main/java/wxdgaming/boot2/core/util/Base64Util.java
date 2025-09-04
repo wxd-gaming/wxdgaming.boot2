@@ -1,4 +1,4 @@
-package wxdgaming.boot2.core.chatset;
+package wxdgaming.boot2.core.util;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;

@@ -1,7 +1,7 @@
 package wxdgaming.boot2.core.keywords;
 
 import lombok.Getter;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.DiffTimeRecord;
 
 import java.util.*;

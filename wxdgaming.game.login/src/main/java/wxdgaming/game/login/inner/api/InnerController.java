@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.CacheHttpServletRequest;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.SpringUtil;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.game.basic.login.bean.info.InnerServerInfoBean;

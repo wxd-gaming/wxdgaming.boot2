@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.batis.columnconvert.impl;
 
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.columnconvert.AbstractColumnConvertFactory;

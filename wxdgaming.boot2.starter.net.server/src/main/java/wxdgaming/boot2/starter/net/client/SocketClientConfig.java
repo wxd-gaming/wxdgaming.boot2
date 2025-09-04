@@ -4,7 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.net.ssl.SslContextByJks;
 import wxdgaming.boot2.starter.net.ssl.SslContextNoFile;

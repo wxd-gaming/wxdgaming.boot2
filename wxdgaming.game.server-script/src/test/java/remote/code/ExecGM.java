@@ -2,7 +2,7 @@ package remote.code;
 
 import com.alibaba.fastjson.JSONObject;
 import wxdgaming.boot2.core.ApplicationContextProvider;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.game.server.api.TestApi;
 import wxdgaming.game.server.script.http.gm.dynamiccode.IGmDynamic;
 

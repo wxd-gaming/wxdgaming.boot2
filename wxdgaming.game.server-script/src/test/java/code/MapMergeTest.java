@@ -2,7 +2,7 @@ package code;
 
 import com.alibaba.fastjson.JSONObject;
 import org.junit.jupiter.api.Test;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.io.Objects;
 
 import java.util.HashMap;

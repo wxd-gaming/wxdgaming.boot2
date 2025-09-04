@@ -8,7 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Comment;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.util.PatternUtil;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.io.FileUtil;
@@ -16,7 +17,6 @@ import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 
 import java.io.File;
@@ -102,7 +102,7 @@ public class ProtoBuf2Pojo {
                             start.set(true);
                         } else if (line.contains("}")) {
                             String p1 = filePath.getFileName().toString().replace(".proto", "").replace("Message", "");
-                            p1 = StringUtils.lowerFirst(p1);
+                            p1 = PatternUtil.lowerFirst(p1);
                             comment.get().packageName = " %s.%s".formatted(packageName.get(), p1);
                             String to = "package %s;".formatted(comment.get().packageName);
                             to += "\n";
@@ -181,7 +181,7 @@ public class ProtoBuf2Pojo {
                         """.formatted(filedInfo.comment, filedInfo.tag, filedInfo.field);
             }
             String formatted = "%s.%s".formatted(packageName, className).trim();
-            int hashcode = StringUtils.hashcode(formatted);
+            int hashcode = PatternUtil.hashcode(formatted);
             System.out.println(formatted + " = " + hashcode);
             return """                        
                     /** %s */
@@ -466,7 +466,7 @@ public class ProtoBuf2Pojo {
                 className,
                 comment,
                 cls.getSimpleName(),
-                StringUtils.lowerFirst(cls.getSimpleName()), eventCls.getSimpleName(), methodParams,
+                PatternUtil.lowerFirst(cls.getSimpleName()), eventCls.getSimpleName(), methodParams,
                 cls.getSimpleName(),
                 methodContent
         );

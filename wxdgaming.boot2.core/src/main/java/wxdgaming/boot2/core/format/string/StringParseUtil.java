@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.format.string;
 
-import wxdgaming.boot2.core.chatset.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.Function;
 

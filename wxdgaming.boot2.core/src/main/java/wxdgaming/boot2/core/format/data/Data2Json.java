@@ -1,6 +1,6 @@
 package wxdgaming.boot2.core.format.data;
 
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 
 /**
  * 序列化处理

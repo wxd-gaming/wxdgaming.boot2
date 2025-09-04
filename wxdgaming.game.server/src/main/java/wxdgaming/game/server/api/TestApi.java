@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;

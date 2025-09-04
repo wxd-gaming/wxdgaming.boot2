@@ -7,7 +7,7 @@ import run.event.StartEvent;
 import run.event.StopEvent;
 import wxdgaming.boot2.core.MainApplicationContextProvider;
 import wxdgaming.boot2.core.SpringUtil;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.starter.event.EventScan;
 import wxdgaming.boot2.starter.event.EventService;
 

@@ -1,7 +1,7 @@
 package wxdgaming.logserver.bean;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.starter.batis.convert.AbstractConverter;
 
 import java.lang.reflect.Type;

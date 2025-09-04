@@ -2,7 +2,7 @@ package wxdgaming.game.login.cfg;
 
 
 import lombok.Getter;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.starter.excel.store.DataTable;
 import wxdgaming.game.login.cfg.bean.QCdkey;
 

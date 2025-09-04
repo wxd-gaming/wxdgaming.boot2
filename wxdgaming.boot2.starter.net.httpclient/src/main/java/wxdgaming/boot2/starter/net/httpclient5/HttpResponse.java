@@ -5,8 +5,8 @@ import org.apache.hc.client5.http.cookie.Cookie;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.Header;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.util.PatternUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 
 import java.nio.charset.StandardCharsets;
@@ -80,7 +80,7 @@ public class HttpResponse {
 
     public String bodyUnicodeDecodeString() {
         check();
-        return StringUtils.unicodeDecode(bodyString0());
+        return PatternUtil.unicodeDecode(bodyString0());
     }
 
     @Override public String toString() {

@@ -4,7 +4,7 @@ package wxdgaming.boot2.core.format;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.util.ConvertUtil;
 
 import java.io.Serial;
@@ -79,7 +79,7 @@ public class TimeFormat implements Serializable {
         } else if (h > 0) {
             String format = "%02d:%02d:%02d.%03d";
             stringBuilder.append(String.format(format, h, m, s, ms));
-        } else  {
+        } else {
             String format = "%02d:%02d.%03d";
             stringBuilder.append(String.format(format, m, s, ms));
         }
@@ -90,7 +90,7 @@ public class TimeFormat implements Serializable {
         if (formatInfo != FormatInfo.MS) {
             obj = ConvertUtil.float2(allTime / 100 / formatInfo.getCode());
         }
-        stringBuilder.append(StringUtils.padLeft(obj, 12, ' ')).append(" ").append(formatInfo.getComment());
+        stringBuilder.append(StringUtils.leftPad(String.valueOf(obj), 12, ' ')).append(" ").append(formatInfo.getComment());
     }
 
     public void toString(FormatInfo formatInfo, StringBuilder stringBuilder) {

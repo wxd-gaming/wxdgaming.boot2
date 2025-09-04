@@ -1,7 +1,7 @@
 package wxdgaming.boot2.core.format.string;
 
-import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 
 import java.util.List;
 import java.util.function.Function;

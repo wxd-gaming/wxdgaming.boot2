@@ -1,6 +1,6 @@
 package wxdgaming.boot2.core.util;
 
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import wxdgaming.boot2.core.io.Objects;
 
 import java.math.BigInteger;
@@ -23,7 +23,7 @@ public class CDKeyUtil {
         AssertUtil.assertTrue(cdKeyId < 4095, "cdKeyId 最大 4095");
         HashSet<String> list = new HashSet<>();
         while (num > 0) {
-            long random = Long.parseLong("1" + StringUtils.randomString(StringUtils.NUMBER_CHARS, 14));
+            long random = Long.parseLong("1" + RandomStringUtils.secure().next(14, false, true));
             AssertUtil.assertTrue(random < randomMax, "random 错误");
             long randomKey = random << 12 | cdKeyId;
             BigInteger bigInteger = new BigInteger(String.valueOf(randomKey));

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.game.message.gm.GMBean;
 import wxdgaming.game.message.gm.GmGroup;

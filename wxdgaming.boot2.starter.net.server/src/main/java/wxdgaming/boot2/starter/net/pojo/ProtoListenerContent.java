@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.assist.JavassistProxy;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.util.PatternUtil;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.MethodUtil;
@@ -65,12 +65,12 @@ public class ProtoListenerContent {
         Method method = MethodUtil.findMethod(true, pojoClass, "_msgId");
         int hashcode;
         if (method == null) {
-            hashcode = StringUtils.hashcode(pojoClass.getName());
+            hashcode = PatternUtil.hashcode(pojoClass.getName());
         } else {
             try {
                 hashcode = (int) method.invoke(null);
             } catch (Exception e) {
-                hashcode = StringUtils.hashcode(pojoClass.getName());
+                hashcode = PatternUtil.hashcode(pojoClass.getName());
             }
         }
         message2MappingMap.put(pojoClass, hashcode);

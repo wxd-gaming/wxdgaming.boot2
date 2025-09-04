@@ -2,7 +2,7 @@ package wxdgaming.game.server.script.buff.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.game.basic.core.Reason;
 import wxdgaming.game.basic.core.ReasonDTO;

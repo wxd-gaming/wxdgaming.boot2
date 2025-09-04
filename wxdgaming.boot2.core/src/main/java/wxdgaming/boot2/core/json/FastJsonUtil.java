@@ -1,4 +1,4 @@
-package wxdgaming.boot2.core.chatset.json;
+package wxdgaming.boot2.core.json;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;

@@ -6,7 +6,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.util.PatternUtil;
 import wxdgaming.boot2.core.format.string.*;
 import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.io.FileWriteUtil;
@@ -393,7 +394,7 @@ public class ExcelRepository {
                     .replace("class", "clazz")
                     .replace("-", "_");
             if (isColumnName) {
-                trim = StringUtils.lowerFirst(trim);
+                trim = PatternUtil.lowerFirst(trim);
             }
         }
         return trim.trim();

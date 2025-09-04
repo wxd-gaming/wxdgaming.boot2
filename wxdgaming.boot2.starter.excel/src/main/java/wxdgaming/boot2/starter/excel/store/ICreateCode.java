@@ -3,7 +3,8 @@ package wxdgaming.boot2.starter.excel.store;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.util.PatternUtil;
 import wxdgaming.boot2.core.format.TemplatePack;
 import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.starter.excel.CellInfo;
@@ -55,7 +56,7 @@ public abstract class ICreateCode {
         for (CellInfo cellInfo : tableData.getCellInfo4IndexMap().values()) {
             if (!StringUtils.isBlank(belong) && !cellInfo.getFieldBelong().equals(belong)) continue;
             Map<String, Object> column = new JSONObject();
-            column.put("fieldNameLower", StringUtils.lowerFirst(cellInfo.getFieldName()));
+            column.put("fieldNameLower", PatternUtil.lowerFirst(cellInfo.getFieldName()));
             column.put("columnComment", cellInfo.getFieldComment());
             column.put("fieldTypeString", cellInfo.getFieldTypeString());
             column.put("fieldBelong", cellInfo.getFieldBelong());

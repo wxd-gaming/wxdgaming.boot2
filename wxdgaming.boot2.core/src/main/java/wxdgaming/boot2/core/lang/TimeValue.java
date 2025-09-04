@@ -2,7 +2,7 @@ package wxdgaming.boot2.core.lang;
 
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.chatset.StringUtils;
+import wxdgaming.boot2.core.util.PatternUtil;
 import wxdgaming.boot2.core.timer.MyClock;
 
 /**
@@ -30,14 +30,14 @@ public class TimeValue {
             format += "yyyy-MM-dd";
         else
             format += "yyyy/MM/dd";
-        int hasLength = StringUtils.hasLength(source, ':');
+        int hasLength = PatternUtil.hasLength(source, ':');
         if (hasLength == 3)
             format += " HH:mm:ss:SSS";
         else if (hasLength == 2)
             format += " HH:mm:ss";
         else if (hasLength == 1)
             format += " HH:mm";
-        else if (StringUtils.hasLength(source, ' ') > 0) {
+        else if (PatternUtil.hasLength(source, ' ') > 0) {
             format += " HH";
         }
         this.hold = MyClock.parseDate(format, source).getTime();

@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import wxdgaming.boot2.core.chatset.StringUtils;
-import wxdgaming.boot2.core.chatset.json.FastJsonUtil;
+import wxdgaming.boot2.core.util.PatternUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.boot2.core.util.ConvertUtil;
 
@@ -57,11 +57,11 @@ public class TableData {
         String[] split = tableName.split("_|-");
         if (split.length > 1) {
             for (int i = 1; i < split.length; i++) {
-                split[i] = StringUtils.upperFirst(split[i]);
+                split[i] = PatternUtil.upperFirst(split[i]);
             }
         }
         String codeName = String.join("", split);
-        return StringUtils.upperFirst(codeName);
+        return PatternUtil.upperFirst(codeName);
     }
 
     @JSONField(serialize = false, deserialize = false)

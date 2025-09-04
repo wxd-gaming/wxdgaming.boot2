@@ -1,6 +1,6 @@
 package wxdgaming.boot2.core.util;
 
-import wxdgaming.boot2.core.chatset.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 数字辅助
@@ -12,7 +12,7 @@ public class NumberUtil {
 
     /** 去掉其它符号保留数字 */
     public static int retainNumber(String source) {
-        return parseInt(StringUtils.retainNumbers(source), 0);
+        return parseInt(PatternUtil.retainNumbers(source), 0);
     }
 
     public static boolean isNumber(Object source) {
