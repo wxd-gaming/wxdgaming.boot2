@@ -46,13 +46,12 @@ public class ScheduledService extends HoldApplicationContext {
         log.debug("------------------------------初始化定时任务调度器------------------------------");
         List<AbstractCronTrigger> tmpJobList = new ArrayList<>();
         applicationContextProvider.withMethodAnnotatedCache(Scheduled.class)
-                .forEach(methodContent -> {
+                .forEach(providerMethod -> {
                     ScheduledInfo scheduledInfo = new ScheduledInfo(
-                            methodContent.getBean(),
-                            methodContent.getMethod(),
-                            methodContent.getMethod().getAnnotation(Scheduled.class)
+                            providerMethod,
+                            providerMethod.getMethod().getAnnotation(Scheduled.class)
                     );
-                    log.debug("Scheduled job {}", methodContent.getMethod());
+                    log.debug("Scheduled job {}", providerMethod.getMethod());
                     tmpJobList.add(scheduledInfo);
                 });
         sort(tmpJobList);

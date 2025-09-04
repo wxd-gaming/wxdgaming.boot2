@@ -2,6 +2,7 @@ package wxdgaming.boot2.core;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -10,7 +11,7 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.ann.ThreadParam;
-import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.reflect.AnnUtil;
@@ -413,6 +414,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
 
         private final Object bean;
         private final Method method;
+        private JavassistProxy proxy = null;
 
         public ProviderMethod(Object bean, Method method) {
             this.bean = bean;
@@ -446,11 +448,14 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         }
 
         public Object invoke(Object... args) {
+            if (proxy == null) {
+                proxy = JavassistProxy.of(bean, method);
+            }
             try {
                 if (log.isTraceEnabled())
                     log.trace("{}.{}", bean.getClass().getSimpleName(), this.method.getName());
                 Object[] objects = ApplicationContextProvider.this.injectorParameters(bean, method, args);
-                return method.invoke(bean, objects);
+                return proxy.proxyInvoke(objects);
             } catch (Throwable throwable) {
                 if (throwable instanceof InvocationTargetException) {
                     throwable = throwable.getCause();

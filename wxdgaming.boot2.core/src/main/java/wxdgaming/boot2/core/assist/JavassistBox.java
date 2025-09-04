@@ -225,15 +225,10 @@ public class JavassistBox {
     }
 
     /** 继承某个类的实现 */
-    public JavaAssist extendSuperclass(Class<?> superclass) {
-        return extendSuperclass(superclass, superclass.getClassLoader());
-    }
-
-    /** 继承某个类的实现 */
-    public JavaAssist extendSuperclass(Class<?> superclass, ClassLoader classLoader) {
+    public JavaAssist extendSuperclass(Class<?> superclass, ClassLoader classLoader, String className) {
         try {
             ClassPool classPool = build(classLoader);
-            CtClass tmp = classPool.makeClass(superclass.getName() + "Impl" + ATOMIC_INTEGER.incrementAndGet());
+            CtClass tmp = classPool.makeClass(className + "Impl" + ATOMIC_INTEGER.incrementAndGet());
             tmp.setSuperclass(classPool.get(superclass.getName()));
             return new JavaAssist(classPool, tmp, classLoader);
         } catch (Exception e) {

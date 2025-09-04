@@ -18,9 +18,7 @@ public class JavassistProxy {
     /** 创建代理对象 */
     public static JavassistProxy of(Object invokeInstance, Method method) {
         Class<?> invokeClass = invokeInstance.getClass();
-        StringBuilder stringBuilder = new StringBuilder();
         StringBuilder stringBuilderArgs = new StringBuilder();
-        stringBuilder.append("public Object proxyInvoke(Object[] args) {\n");
         Class<?>[] parameterTypes = method.getParameterTypes();
         for (int i = 0; i < parameterTypes.length; i++) {
             Class<?> parameterType = parameterTypes[i];
@@ -28,55 +26,75 @@ public class JavassistProxy {
             if (!stringBuilderArgs.isEmpty()) stringBuilderArgs.append(",\n");
 
             if (parameterType == int.class) {
-                stringBuilderArgs.append("((Integer)args[").append(i).append("]).intValue()");
+                stringBuilderArgs.append("((Integer)args[%d]).intValue()".formatted(i));
             } else if (parameterType == long.class) {
-                stringBuilderArgs.append("((Long)args[").append(i).append("]).longValue()");
+                stringBuilderArgs.append("((Long)args[%d]).longValue()".formatted(i));
             } else if (parameterType == double.class) {
-                stringBuilderArgs.append("((Double)args[").append(i).append("]).doubleValue()");
+                stringBuilderArgs.append("((Double)args[%d]).doubleValue()".formatted(i));
             } else if (parameterType == float.class) {
-                stringBuilderArgs.append("((Float)args[").append(i).append("]).floatValue()");
+                stringBuilderArgs.append("((Float)args[%d]).floatValue()".formatted(i));
             } else if (parameterType == short.class) {
-                stringBuilderArgs.append("((Short)args[").append(i).append("]).shortValue()");
+                stringBuilderArgs.append("((Short)args[%d]).shortValue()".formatted(i));
             } else if (parameterType == byte.class) {
-                stringBuilderArgs.append("((Byte)args[").append(i).append("]).byteValue()");
+                stringBuilderArgs.append("((Byte)args[%d]).byteValue()".formatted(i));
             } else if (parameterType == boolean.class) {
-                stringBuilderArgs.append("((Boolean)args[").append(i).append("]).booleanValue()");
+                stringBuilderArgs.append("((Boolean)args[%d]).booleanValue()".formatted(i));
             } else {
-                stringBuilderArgs.append("(" + parameterType.getName() + ")args[").append(i).append("]");
+                stringBuilderArgs.append("(%s)args[%d]".formatted(parameterType.getName(), i));
             }
         }
-        stringBuilder.append("    ").append(invokeClass.getName()).append(" proxy = ").append("(").append(invokeClass.getName()).append(")instance;").append("\n");
-        stringBuilder.append("    ").append("Object result = ").append("null").append(";").append("\n");
+        String methodBody = null;
         if (method.getReturnType() != void.class) {
-            stringBuilder.append("    ").append("result = proxy.").append(method.getName()).append("(").append(stringBuilderArgs).append(");").append("\n");
+            methodBody = JavassistProxy.buildReturn(invokeClass.getName(), method.getName(), stringBuilderArgs.toString());
         } else {
-            stringBuilder.append("    ").append("proxy.").append(method.getName()).append("(\n").append(stringBuilderArgs).append("\n);").append("\n");
+            methodBody = JavassistProxy.buildVoid(invokeClass.getName(), method.getName(), stringBuilderArgs.toString());
         }
-        stringBuilder.append("    ").append("return result;").append("\n");
-        stringBuilder.append("}");
-        String methodBody = stringBuilder.toString();
-        if (log.isDebugEnabled()) {
-            log.info("\n{}", methodBody);
+        if (log.isTraceEnabled()) {
+            log.trace("\n{}", methodBody);
         }
-        JavassistBox.JavaAssist javaAssist = JavassistBox.defaultJavassistBox.extendSuperclass(JavassistProxy.class, invokeClass.getClassLoader());
+        JavassistBox.JavaAssist javaAssist = JavassistBox.defaultJavassistBox.extendSuperclass(
+                JavassistProxy.class,
+                invokeClass.getClassLoader(),
+                invokeClass.getName() + "$" + method.getName()
+        );
         javaAssist.createMethod(methodBody);
         if (log.isDebugEnabled()) {
             javaAssist.writeFile("target/bin");
         }
-        // try {
-        //     ClassDirLoader classDirLoader = new ClassDirLoader("target/bin");
-        //     Class<?> aClass = classDirLoader.loadClass(javaAssist.getCtClass().getName());
-        //     JavassistInvoke newInstance = (JavassistInvoke) aClass.getDeclaredConstructor().newInstance();
-        //     newInstance.init(invokeInstance, method);
-        //     return newInstance;
-        // } catch (Exception e) {
-        //     throw new RuntimeException(e);
-        // }
+
         JavassistProxy javassistProxy = javaAssist.toInstance();
         javassistProxy.init(invokeInstance, method);
         javaAssist.getCtClass().defrost();
         javaAssist.getCtClass().detach();
         return javassistProxy;
+    }
+
+
+    private static String buildVoid(String className, String methodName, String parameter) {
+        return """
+                
+                public Object proxyInvoke(Object[] args) {
+                    %s proxy = (%s)instance;
+                    proxy.%s(
+                    %s
+                    );
+                    return null;
+                }
+                
+                """.formatted(className, className, methodName, parameter);
+    }
+
+    private static String buildReturn(String className, String methodName, String parameter) {
+        return """
+                
+                public Object proxyInvoke(Object[] args) {
+                    %s proxy = (%s)instance;
+                    return proxy.%s(
+                    %s
+                    );
+                }
+                
+                """.formatted(className, className, methodName, parameter);
     }
 
 

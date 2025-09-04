@@ -3,11 +3,11 @@ package wxdgaming.game.server.script.gm;
 import com.alibaba.fastjson.JSONArray;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
-import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.game.message.gm.GMBean;
 import wxdgaming.game.message.gm.GmGroup;
@@ -72,9 +72,8 @@ public class GmService extends HoldApplicationContext {
             tipsService.tips(player, "不存在的gm命令: " + cmd);
             return;
         }
-        Method method = providerMethod.getMethod();
         try {
-            method.invoke(providerMethod.getBean(), player, jsonArray);
+            providerMethod.invoke(player, jsonArray);
         } catch (Exception e) {
             log.error("执行gm命令失败: {}", cmd, e);
             if (e instanceof AssertException assertException) {

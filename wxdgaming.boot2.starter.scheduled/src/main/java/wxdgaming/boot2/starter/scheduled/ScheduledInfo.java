@@ -6,8 +6,8 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
+import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.Const;
-import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.executor.IExecutorQueue;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.AnnUtil;
@@ -15,7 +15,6 @@ import wxdgaming.boot2.core.reflect.MethodUtil;
 import wxdgaming.boot2.core.timer.CronExpress;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 
-import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -31,27 +30,21 @@ import java.util.concurrent.TimeUnit;
 public class ScheduledInfo extends AbstractCronTrigger implements Runnable, IExecutorQueue {
 
     protected String name;
-    protected final Object instance;
-    protected final Method method;
-    protected JavassistProxy scheduledProxy;
+    final ApplicationContextProvider.ProviderMethod providerMethod;
     protected int index;
     /** 上一次执行尚未完成是否持续执行 默认false 不执行 */
     protected final boolean scheduleAtFixedRate;
 
-    public ScheduledInfo(Object instance, Method method, Scheduled scheduled) {
-        super(method, new CronExpress(scheduled.value(), TimeUnit.SECONDS, 0));
-        this.instance = instance;
-        this.method = method;
-
-        scheduledProxy = JavassistProxy.of(instance, method);
-
+    public ScheduledInfo(ApplicationContextProvider.ProviderMethod providerMethod, Scheduled scheduled) {
+        super(providerMethod.getMethod(), new CronExpress(scheduled.value(), TimeUnit.SECONDS, 0));
+        this.providerMethod = providerMethod;
         if (StringUtils.isNotBlank(scheduled.name())) {
             this.name = "[scheduled-job] " + scheduled.name();
         } else {
-            this.name = "[scheduled-job] " + instance.getClass().getName() + "." + method.getName();
+            this.name = "[scheduled-job] " + providerMethod.toString();
         }
 
-        final Order orderAnn = AnnUtil.ann(method, Order.class);
+        final Order orderAnn = AnnUtil.ann(providerMethod.getMethod(), Order.class);
         this.index = orderAnn == null ? Const.SORT_DEFAULT : orderAnn.value();
         this.scheduleAtFixedRate = scheduled.scheduleAtFixedRate();
     }
@@ -74,9 +67,7 @@ public class ScheduledInfo extends AbstractCronTrigger implements Runnable, IExe
 
     @Override public void onEvent() throws Exception {
         try {
-            if (scheduledProxy != null) {
-                scheduledProxy.proxyInvoke(Objects.ZERO_ARRAY);
-            }
+            providerMethod.invoke(Objects.ZERO_ARRAY);
         } catch (Throwable throwable) {
             String msg = "执行：" + this.name;
             log.error(msg, throwable);
@@ -95,13 +86,13 @@ public class ScheduledInfo extends AbstractCronTrigger implements Runnable, IExe
         if (o == null || getClass() != o.getClass()) return false;
 
         ScheduledInfo that = (ScheduledInfo) o;
-        return getInstance().getClass().getName().equals(that.getInstance().getClass().getName())
-               && MethodUtil.methodFullName(getMethod()).equals(MethodUtil.methodFullName(that.getMethod()));
+        return providerMethod.getBean().getClass().getName().equals(that.providerMethod.getBean().getClass().getName())
+               && MethodUtil.methodFullName(providerMethod.getMethod()).equals(MethodUtil.methodFullName(that.providerMethod.getMethod()));
     }
 
     @Override public int hashCode() {
-        int result = getInstance().hashCode();
-        result = 31 * result + getMethod().hashCode();
+        int result = providerMethod.getBean().hashCode();
+        result = 31 * result + providerMethod.getMethod().hashCode();
         return result;
     }
 
