@@ -97,7 +97,10 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
 
     /** 父类或者接口 */
     public <U> U instance(Class<U> cls) {
-        return classWithSuperCache(cls).stream().findFirst().map(provider -> cls.cast(provider.bean)).orElse(null);
+        return classWithSuperCache(cls).stream()
+                .findFirst()
+                .map(provider -> cls.cast(provider.bean))
+                .orElse(null);
     }
 
     /** 父类或者接口 */
@@ -111,7 +114,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
                 annotation,
                 k -> stream()
                         .flatMap(provider -> provider.fieldWithAnnotated(annotation))
-                        .sorted(ProviderField::compareTo)
+                        .sorted()
                         .toList()
         );
     }
@@ -122,19 +125,23 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
                 annotation,
                 k -> stream()
                         .flatMap(provider -> provider.methodsWithAnnotated(annotation))
-                        .sorted(ProviderMethod::compareTo)
+                        .sorted()
                         .toList()
         );
     }
 
     /** 所有的bean，函数的参数是指定类型 */
     public Stream<ProviderMethod> withMethodParameters(Class<?>... args) {
-        return stream().flatMap(provider -> provider.methodStream().filter(providerMethod -> providerMethod.equalsParameters(args)));
+        return stream()
+                .flatMap(provider -> provider.methodsEqualsParameters(args))
+                .sorted();
     }
 
     /** 所有的bean，函数的参数是指定类型继承关系 */
     public Stream<ProviderMethod> withMethodAssignableFrom(Class<?>... args) {
-        return stream().flatMap(provider -> provider.methodStream().filter(providerMethod -> providerMethod.isAssignableFrom(args)));
+        return stream()
+                .flatMap(provider -> provider.methodsAssignableFrom(args))
+                .sorted();
     }
 
     public <K, B> Map<K, B> toMap(Class<B> cls, Function<B, K> convertKey) {
@@ -328,6 +335,16 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         /** 所有添加了这个注解的方法 */
         public Stream<ProviderMethod> methodsWithAnnotated(Class<? extends Annotation> annotation) {
             return methodStream().filter(provider -> provider.hasAnn(annotation));
+        }
+
+        /** 所有添加了这个注解的方法 */
+        public Stream<ProviderMethod> methodsEqualsParameters(Class<?>... args) {
+            return methodStream().filter(provider -> provider.equalsParameters(args));
+        }
+
+        /** 所有添加了这个注解的方法 */
+        public Stream<ProviderMethod> methodsAssignableFrom(Class<?>... args) {
+            return methodStream().filter(provider -> provider.isAssignableFrom(args));
         }
 
         /** 所有的字段 */

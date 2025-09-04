@@ -40,6 +40,10 @@ public class EventService extends HoldApplicationContext {
         eventMap = tmpEventMap;
     }
 
+    /**
+     * 抛出事件，但是如果执行遇到异常会中断
+     * <p>如果事件执行需要先后顺序 {@link org.springframework.core.annotation.Order}
+     */
     public void postEvent(Event event) {
         List<ApplicationContextProvider.ProviderMethod> providerMethods = eventMap.get(event.getClass().getName());
         if (providerMethods != null) {
@@ -49,6 +53,10 @@ public class EventService extends HoldApplicationContext {
         }
     }
 
+    /**
+     * 抛出事件，如果遇到异常会继续执行
+     * <p>如果事件执行需要先后顺序 {@link org.springframework.core.annotation.Order}
+     */
     public void postEventIgnoreException(Event event) {
         List<ApplicationContextProvider.ProviderMethod> providerMethods = eventMap.get(event.getClass().getName());
         if (providerMethods != null) {
