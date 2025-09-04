@@ -10,7 +10,7 @@ import wxdgaming.boot2.core.CoreScan;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-08-22 09:55
  **/
-@ComponentScan(basePackageClasses = {CoreScan.class, SocketProperties.class})
+@ComponentScan(basePackageClasses = {CoreScan.class, SocketProperties.class, SocketConfiguration.class})
 @Component
 public class SocketScan {
 }

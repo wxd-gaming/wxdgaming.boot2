@@ -1,0 +1,25 @@
+boot:
+  debug: true
+  gid: 1
+  sid: 1
+  name: "游戏一服"
+  serverType: 1
+
+core:
+  executor:
+    basic:
+      coreSize: 2                        #默认线程池的核心线程数
+      maxQueueSize: 10000                #队列超过就会打印异常
+    logic:
+      coreSize: 32                       #逻辑线程池
+      maxQueueSize: 50000                #队列超过就会打印异常
+    virtual:
+      coreSize: 100                      #虚拟线程池
+      maxQueueSize: 1500000              #队列超过就会打印异常
+
+spring:
+  profiles:
+    active: [ socket ]
+
+server:
+  port: 19000

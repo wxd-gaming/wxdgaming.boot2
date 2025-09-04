@@ -59,26 +59,18 @@ public class RpcService {
         return rpcCache.getIfPresent(rpcId);
     }
 
-    public Mono<JSONObject> request(SocketSession socketSession, String cmd, Object params) {
+    public Mono<JSONObject> request(SocketSession socketSession, String cmd, JSONObject params) {
         return request(socketSession, cmd, params, !socketSession.isEnabledScheduledFlush());
     }
 
-    public Mono<JSONObject> request(SocketSession socketSession, String cmd, Object params, boolean immediate) {
-        return request(socketSession, cmd, JSONObject.toJSONString(params), immediate);
-    }
-
-    public Mono<JSONObject> request(SocketSession socketSession, String cmd, String params) {
-        return request(socketSession, cmd, params, !socketSession.isEnabledScheduledFlush());
-    }
-
-    public Mono<JSONObject> request(SocketSession socketSession, String cmd, String params, boolean immediate) {
+    public Mono<JSONObject> request(SocketSession socketSession, String cmd, JSONObject params, boolean immediate) {
         ReqRemote reqRemote = new ReqRemote();
         long rpcId = hexId.newId();
         reqRemote
                 .setUid(rpcId)
                 .setToken(sign(rpcId))
                 .setCmd(cmd)
-                .setParams(params);
+                .setParams(params.toJSONString());
         if (reqRemote.getParams().length() > 1024) {
             reqRemote.setGzip(1);
             reqRemote.setParams(GzipUtil.gzip2String(reqRemote.getParams()));
