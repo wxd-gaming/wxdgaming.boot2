@@ -35,8 +35,9 @@ public class SqlDataCacheService {
      * @param <K> 主键类型
      * @return 缓存集合
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public <E extends Entity, K> SqlDataCache<E, K> cache(Class<E> cls) {
-        SqlDataCache sqlDataCache = jdbcCacheMap.computeIfAbsent(
+        return (SqlDataCache) jdbcCacheMap.computeIfAbsent(
                 cls,
                 l -> new SqlDataCache<>(
                         cls,
@@ -45,7 +46,6 @@ public class SqlDataCacheService {
                         this.sqlDataHelper.getSqlConfig().getCacheExpireAfterAccessM()
                 )
         );
-        return sqlDataCache;
     }
 
     /**

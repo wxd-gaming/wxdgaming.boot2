@@ -19,10 +19,7 @@ import wxdgaming.boot2.starter.batis.TableMapping;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.LockSupport;
@@ -120,9 +117,22 @@ public abstract class SqlDataBatch extends DataBatch {
             TableMapping tableMapping = sqlDataHelper.tableMapping(entity.getClass());
             String insertSql = sqlDataHelper.ddlBuilder().buildInsertSql(tableMapping, tableName);
 
-            Object[] keyParams = sqlDataHelper.ddlBuilder().buildKeyParams(tableMapping, entity);
-            Object[] insertParams = sqlDataHelper.ddlBuilder().buildInsertParams(tableMapping, entity);
-            BatchParam batchParam = new BatchParam(entity, keyParams, insertParams);
+            BatchParam batchParam = null;
+
+            for (int i = 0; i < 3; i++) {
+                try {
+                    Object[] keyParams = sqlDataHelper.ddlBuilder().buildKeyParams(tableMapping, entity);
+                    Object[] insertParams = sqlDataHelper.ddlBuilder().buildInsertParams(tableMapping, entity);
+                    batchParam = new BatchParam(entity, keyParams, insertParams);
+                    break;
+                } catch (ConcurrentModificationException ignore) {}
+            }
+
+            if (batchParam == null) {
+                log.info("insert ConcurrentModificationException {}", entity.getClass());
+                return;
+            }
+
             lock.lock();
             try {
                 ConvertCollection<BatchParam> collection = batchInsertMap.computeIfAbsent(tableName, insertSql, k -> new ConvertCollection<>());
@@ -137,10 +147,22 @@ public abstract class SqlDataBatch extends DataBatch {
             String tableName = TableMapping.beanTableName(entity);
             TableMapping tableMapping = sqlDataHelper.tableMapping(entity.getClass());
             String updateSql = sqlDataHelper.ddlBuilder().buildUpdateSql(tableMapping, tableName);
+            BatchParam batchParam = null;
 
-            Object[] keyParams = sqlDataHelper.ddlBuilder().buildKeyParams(tableMapping, entity);
-            Object[] updateParams = sqlDataHelper.ddlBuilder().builderUpdateParams(tableMapping, entity);
-            BatchParam batchParam = new BatchParam(entity, keyParams, updateParams);
+            for (int i = 0; i < 3; i++) {
+                try {
+                    Object[] keyParams = sqlDataHelper.ddlBuilder().buildKeyParams(tableMapping, entity);
+                    Object[] updateParams = sqlDataHelper.ddlBuilder().builderUpdateParams(tableMapping, entity);
+                    batchParam = new BatchParam(entity, keyParams, updateParams);
+                    break;
+                } catch (ConcurrentModificationException ignore) {}
+            }
+
+            if (batchParam == null) {
+                log.info("update ConcurrentModificationException {}", entity.getClass());
+                return;
+            }
+
             lock.lock();
             try {
                 ConvertCollection<BatchParam> collection = batchUpdateMap.computeIfAbsent(tableName, updateSql, k -> new ConvertCollection<>());
