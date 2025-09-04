@@ -6,10 +6,7 @@ import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 事件服务
@@ -21,7 +18,7 @@ import java.util.Map;
 @Service
 public class EventService extends HoldApplicationContext {
 
-    Map<String, List<ApplicationContextProvider.ProviderMethod>> eventMap = Map.of();
+    Map<String, List<ApplicationContextProvider.ProviderMethod>> eventMap = Collections.emptyMap();
 
     public EventService() {
 

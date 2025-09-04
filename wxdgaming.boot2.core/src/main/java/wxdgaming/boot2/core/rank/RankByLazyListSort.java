@@ -202,7 +202,7 @@ public class RankByLazyListSort {
                 return Collections.emptyList();
             }
             if (map.isEmpty()) {
-                return List.of();
+                return Collections.emptyList();
             }
             ArrayList<RankScore> rankScores = new ArrayList<>(n);
             RankScore[] cache = rankCache.get(0);

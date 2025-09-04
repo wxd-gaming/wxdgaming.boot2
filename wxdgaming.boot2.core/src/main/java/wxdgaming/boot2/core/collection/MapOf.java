@@ -17,7 +17,7 @@ import java.util.function.Function;
 public class MapOf implements Serializable {
 
     public static <K, V> Map<K, V> of() {
-        return Map.of();
+        return Collections.emptyMap();
     }
 
     public static <K, V> boolean isEmpty(final Map<K, V> map) {

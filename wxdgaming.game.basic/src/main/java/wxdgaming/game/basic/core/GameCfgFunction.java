@@ -5,6 +5,7 @@ import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.game.bean.goods.ItemCfg;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -18,7 +19,7 @@ public class GameCfgFunction {
 
     public static final Function<ConfigString, List<ItemCfg>> ConfigString2ItemCfgList = new Function<ConfigString, List<ItemCfg>>() {
         @Override public List<ItemCfg> apply(ConfigString configString) {
-            if (configString == null) return List.of();
+            if (configString == null) return Collections.emptyList();
             return configString.get(ItemCfgFunction);
         }
     };
@@ -26,7 +27,7 @@ public class GameCfgFunction {
     public static final Function<String, List<ItemCfg>> ItemCfgFunction = new Function<String, List<ItemCfg>>() {
         @Override public List<ItemCfg> apply(String value) {
             if (StringUtils.isBlank(value)) {
-                return List.of();
+                return Collections.emptyList();
             } else {
                 List<ItemCfg> itemCfgs = new ArrayList<>();
                 String[] split = value.split(",");

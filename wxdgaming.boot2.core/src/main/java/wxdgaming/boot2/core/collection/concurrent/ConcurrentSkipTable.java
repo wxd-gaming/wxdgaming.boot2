@@ -23,7 +23,7 @@ import java.util.function.Predicate;
 @JSONType(seeAlso = {ConcurrentSkipListMap.class})
 public class ConcurrentSkipTable<K1 extends Comparable<K1>, K2 extends Comparable<K2>, V> implements Serializable, Data2Json {
 
-    private static final Map EMPTY_MAP = Map.of();
+    private static final Map EMPTY_MAP = Collections.emptyMap();
 
     private ConcurrentSkipListMap<K1, ConcurrentSkipListMap<K2, V>> nodes = new ConcurrentSkipListMap<>();
 

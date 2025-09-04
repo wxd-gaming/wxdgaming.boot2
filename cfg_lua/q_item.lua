@@ -13,25 +13,26 @@
 ---@field param2 any 附加参数
 ---@field param3 any 附加参数
 ---@field param4 any 附加参数如果是装备这个位置是穿戴部位
----@field attr any 属性
+---@field paramString1 any 参数
+---@field paramString2 any 参数
 QItem = {}
 QItem.__index = QItem
 
 ---@type table<string, QItem>
 QItemTable = {
-[1] = {id = 1, itemType = 1, itemSubType = 1, name = "钻石", description = "钻石", lv = 0, maxCount = 0, param1 = 0, param2 = 0, param3 = 0, param4 = 0, attr = nil } ,
-[2] = {id = 2, itemType = 1, itemSubType = 2, name = "绑定钻石", description = "绑定钻石", lv = 0, maxCount = 0, param1 = 0, param2 = 0, param3 = 0, param4 = 0, attr = nil } ,
-[3] = {id = 3, itemType = 1, itemSubType = 3, name = "金币", description = "金币", lv = 0, maxCount = 0, param1 = 0, param2 = 0, param3 = 0, param4 = 0, attr = nil } ,
-[4] = {id = 4, itemType = 1, itemSubType = 4, name = "绑定金币", description = "绑定金币", lv = 0, maxCount = 0, param1 = 0, param2 = 0, param3 = 0, param4 = 0, attr = nil } ,
-[5] = {id = 5, itemType = 1, itemSubType = 5, name = "经验值", description = "经验值", lv = 0, maxCount = 0, param1 = 0, param2 = 0, param3 = 0, param4 = 0, attr = nil } ,
-[10001] = {id = 10001, itemType = 2, itemSubType = 0, name = "武器", description = "武器", lv = 1, maxCount = 1, param1 = 0, param2 = 0, param3 = 0, param4 = 1, attr = "{MAXHP=106, 防御=100, 体力=100, 攻击=100}" } ,
-[10002] = {id = 10002, itemType = 2, itemSubType = 0, name = "武器", description = "武器", lv = 2, maxCount = 1, param1 = 0, param2 = 0, param3 = 0, param4 = 1, attr = "{MAXHP=106, 防御=101, 体力=100, 攻击=100}" } ,
-[10003] = {id = 10003, itemType = 2, itemSubType = 0, name = "武器", description = "武器", lv = 3, maxCount = 1, param1 = 0, param2 = 0, param3 = 0, param4 = 1, attr = "{MAXHP=106, 防御=102, 体力=100, 攻击=100}" } ,
-[10004] = {id = 10004, itemType = 2, itemSubType = 0, name = "武器", description = "武器", lv = 4, maxCount = 1, param1 = 0, param2 = 0, param3 = 0, param4 = 1, attr = "{MAXHP=106, 防御=103, 体力=100, 攻击=100}" } ,
-[10005] = {id = 10005, itemType = 2, itemSubType = 0, name = "武器", description = "武器", lv = 5, maxCount = 1, param1 = 0, param2 = 0, param3 = 0, param4 = 1, attr = "{MAXHP=106, 防御=104, 体力=100, 攻击=100}" } ,
-[10006] = {id = 10006, itemType = 2, itemSubType = 0, name = "武器", description = "武器", lv = 6, maxCount = 1, param1 = 0, param2 = 0, param3 = 0, param4 = 1, attr = "{MAXHP=106, 防御=105, 体力=100, 攻击=100}" } ,
-[10007] = {id = 10007, itemType = 2, itemSubType = 0, name = "武器", description = "武器", lv = 7, maxCount = 1, param1 = 0, param2 = 0, param3 = 0, param4 = 1, attr = "{MAXHP=106, 防御=10666, 体力=100, 攻击=10609}" } ,
-[100001] = {id = 100001, itemType = 10, itemSubType = 0, name = "强化石", description = "强化石", lv = 0, maxCount = 99, param1 = 0, param2 = 0, param3 = 0, param4 = 0, attr = nil } 
+[1] = {id = 1, itemType = 1, itemSubType = 1, name = "钻石", description = "钻石", lv = 0, maxCount = 0, param1 = 0, param2 = 0, param3 = 0, param4 = 0, paramString1 = "", paramString2 = "" } ,
+[2] = {id = 2, itemType = 1, itemSubType = 2, name = "绑定钻石", description = "绑定钻石", lv = 0, maxCount = 0, param1 = 0, param2 = 0, param3 = 0, param4 = 0, paramString1 = "", paramString2 = "" } ,
+[3] = {id = 3, itemType = 1, itemSubType = 3, name = "金币", description = "金币", lv = 0, maxCount = 0, param1 = 0, param2 = 0, param3 = 0, param4 = 0, paramString1 = "", paramString2 = "" } ,
+[4] = {id = 4, itemType = 1, itemSubType = 4, name = "绑定金币", description = "绑定金币", lv = 0, maxCount = 0, param1 = 0, param2 = 0, param3 = 0, param4 = 0, paramString1 = "", paramString2 = "" } ,
+[5] = {id = 5, itemType = 1, itemSubType = 5, name = "经验值", description = "经验值", lv = 0, maxCount = 0, param1 = 0, param2 = 0, param3 = 0, param4 = 0, paramString1 = "", paramString2 = "" } ,
+[10001] = {id = 10001, itemType = 2, itemSubType = 0, name = "武器", description = "武器", lv = 1, maxCount = 1, param1 = 0, param2 = 0, param3 = 0, param4 = 1, paramString1 = "{\"MAXHP\":106,\"体力\":100,\"攻击\":100,\"防御\":100}", paramString2 = "" } ,
+[10002] = {id = 10002, itemType = 2, itemSubType = 0, name = "武器", description = "武器", lv = 2, maxCount = 1, param1 = 0, param2 = 0, param3 = 0, param4 = 1, paramString1 = "{\"MAXHP\":106,\"体力\":100,\"攻击\":100,\"防御\":101}", paramString2 = "" } ,
+[10003] = {id = 10003, itemType = 2, itemSubType = 0, name = "武器", description = "武器", lv = 3, maxCount = 1, param1 = 0, param2 = 0, param3 = 0, param4 = 1, paramString1 = "{\"MAXHP\":106,\"体力\":100,\"攻击\":100,\"防御\":102}", paramString2 = "" } ,
+[10004] = {id = 10004, itemType = 2, itemSubType = 0, name = "武器", description = "武器", lv = 4, maxCount = 1, param1 = 0, param2 = 0, param3 = 0, param4 = 1, paramString1 = "{\"MAXHP\":106,\"体力\":100,\"攻击\":100,\"防御\":103}", paramString2 = "" } ,
+[10005] = {id = 10005, itemType = 2, itemSubType = 0, name = "武器", description = "武器", lv = 5, maxCount = 1, param1 = 0, param2 = 0, param3 = 0, param4 = 1, paramString1 = "{\"MAXHP\":106,\"体力\":100,\"攻击\":100,\"防御\":104}", paramString2 = "" } ,
+[10006] = {id = 10006, itemType = 2, itemSubType = 0, name = "武器", description = "武器", lv = 6, maxCount = 1, param1 = 0, param2 = 0, param3 = 0, param4 = 1, paramString1 = "{\"MAXHP\":106,\"体力\":100,\"攻击\":100,\"防御\":105}", paramString2 = "" } ,
+[10007] = {id = 10007, itemType = 2, itemSubType = 0, name = "武器", description = "武器", lv = 7, maxCount = 1, param1 = 0, param2 = 0, param3 = 0, param4 = 1, paramString1 = "{\"MAXHP\":106,\"体力\":100,\"攻击\":10609,\"防御\":10666}", paramString2 = "" } ,
+[100001] = {id = 100001, itemType = 10, itemSubType = 0, name = "强化石", description = "强化石", lv = 0, maxCount = 99, param1 = 0, param2 = 0, param3 = 0, param4 = 0, paramString1 = "", paramString2 = "" } 
 }
 
 ---@param id string id

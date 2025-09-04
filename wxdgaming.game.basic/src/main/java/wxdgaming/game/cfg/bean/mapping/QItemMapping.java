@@ -42,8 +42,10 @@ public abstract class QItemMapping extends ObjectBase implements Serializable, D
     protected int param3;
     /** 附加参数如果是装备这个位置是穿戴部位 */
     protected int param4;
-    /** 属性 */
-    protected wxdgaming.game.bean.attr.AttrInfo attr;
+    /** 参数 */
+    protected wxdgaming.boot2.core.lang.ConfigString paramString1;
+    /** 参数 */
+    protected wxdgaming.boot2.core.lang.ConfigString paramString2;
 
     public Object key() {
         return id;

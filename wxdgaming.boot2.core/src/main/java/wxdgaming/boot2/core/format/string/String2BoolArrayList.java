@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class String2BoolArrayList {
@@ -27,7 +28,7 @@ public class String2BoolArrayList {
                 }
             }
         } else {
-            arrays = List.of();
+            arrays = Collections.emptyList();
         }
         return arrays;
     }

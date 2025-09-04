@@ -212,7 +212,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
 
         /* TODO 发送邮件 */
         if (!items.isEmpty()) {
-            mailService.sendMail(player, "系统", "背包已满", "背包已满", List.of(), items, bagChangeDTO.toString());
+            mailService.sendMail(player, "系统", "背包已满", "背包已满", Collections.emptyList(), items, bagChangeDTO.toString());
         }
         return true;
     }

@@ -182,7 +182,7 @@ public class RankByTreeSet {
                 return Collections.emptyList();
             }
             if (map.isEmpty()) {
-                return List.of();
+                return Collections.emptyList();
             }
             ArrayList<RankScore> rankScores = new ArrayList<>(n);
             for (RankScore rankScore : rankTreeSet) {

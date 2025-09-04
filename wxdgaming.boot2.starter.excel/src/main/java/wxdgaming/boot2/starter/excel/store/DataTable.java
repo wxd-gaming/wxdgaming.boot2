@@ -57,8 +57,8 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
 
     public void setModelList(List<E> modelList) {
         if (modelList == null || modelList.isEmpty()) {
-            dataList = List.of();
-            dataMap = Map.of();
+            dataList = Collections.emptyList();
+            dataMap = Collections.emptyMap();
             return;
         }
         /*不可变列表*/

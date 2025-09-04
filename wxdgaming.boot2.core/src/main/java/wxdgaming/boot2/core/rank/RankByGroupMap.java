@@ -206,7 +206,7 @@ public class RankByGroupMap {
                 return Collections.emptyList();
             }
             if (map.isEmpty()) {
-                return List.of();
+                return Collections.emptyList();
             }
             ArrayList<RankScore> rankScores = new ArrayList<>(n);
             for (Map.Entry<Long, TreeSet<RankScore>> entry : rankScoreMap.entrySet()) {

@@ -106,7 +106,7 @@ public class KeywordsMapping {
 
     public List<String> words(String str) {
         if (str == null || str.isBlank()) {
-            return List.of();
+            return Collections.emptyList();
         }
         char[] charArray = str.toCharArray();
         List<String> strings = new ArrayList<>();

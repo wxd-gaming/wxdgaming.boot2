@@ -23,7 +23,7 @@ import java.util.function.Predicate;
 @JSONType(seeAlso = {ConcurrentHashMap.class})
 public class ConcurrentTable<K1, K2, V> implements Serializable, Data2Json {
 
-    private static final Map EMPTY_MAP = Map.of();
+    private static final Map EMPTY_MAP = Collections.emptyMap();
 
     private ConcurrentHashMap<K1, ConcurrentHashMap<K2, V>> nodes;
 

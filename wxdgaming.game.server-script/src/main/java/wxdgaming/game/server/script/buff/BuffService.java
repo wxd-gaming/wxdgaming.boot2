@@ -26,6 +26,7 @@ import wxdgaming.game.server.script.attribute.NpcAttributeService;
 import wxdgaming.game.server.script.attribute.PlayerAttributeService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class BuffService extends HoldApplicationContext {
     final DataCenterService dataCenterService;
     final PlayerAttributeService playerAttributeService;
     final NpcAttributeService npcAttributeService;
-    Map<BuffType, AbstractBuffAction> actionMap = Map.of();
+    Map<BuffType, AbstractBuffAction> actionMap = Collections.emptyMap();
 
 
     public BuffService(DataCenterService dataCenterService, PlayerAttributeService playerAttributeService, NpcAttributeService npcAttributeService) {

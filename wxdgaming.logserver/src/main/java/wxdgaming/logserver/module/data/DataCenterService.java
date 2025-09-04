@@ -20,10 +20,7 @@ import wxdgaming.logserver.bean.LogMappingInfo;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -38,8 +35,8 @@ import java.util.stream.Stream;
 public class DataCenterService implements InitPrint {
 
     final PgsqlDataHelper sqlDataHelper;
-    Map<String, LogMappingInfo> logMappingInfoMap = Map.of();
-    List<LogMappingInfo> logMappingInfoList = List.of();
+    Map<String, LogMappingInfo> logMappingInfoMap = Collections.emptyMap();
+    List<LogMappingInfo> logMappingInfoList = Collections.emptyList();
 
     public DataCenterService(PgsqlDataHelper sqlDataHelper) {
         this.sqlDataHelper = sqlDataHelper;

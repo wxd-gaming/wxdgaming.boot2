@@ -2,7 +2,6 @@ package wxdgaming.game.server.script.buff.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.game.basic.core.Reason;
 import wxdgaming.game.basic.core.ReasonDTO;
@@ -31,7 +30,7 @@ public class ChangeHpMpBuffAction extends AbstractBuffAction {
 
     @Override public void doAction(MapNpc mapNpc, Buff buff, QBuff qBuff) {
         ConfigString paramString1 = qBuff.getParamString1();
-        AttrInfo objectByFunction = paramString1.get(json -> FastJsonUtil.parse(json, AttrInfo.class));
+        AttrInfo objectByFunction = paramString1.get(AttrInfo.JsonParse);
         ReasonDTO reasonDTO = ReasonDTO.of(Reason.Buff, "buff", qBuff.getId(), "sendUid", buff.getSendUid());
         if (qBuff.getParamInt1() == 0/*TODO 固定值*/) {
             Long hp = objectByFunction.get(AttrType.HP);

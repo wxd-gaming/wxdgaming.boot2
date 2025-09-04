@@ -3,6 +3,7 @@ package wxdgaming.boot2.core.format.string;
 import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -21,7 +22,7 @@ public class String2StringList {
                     arrays = List.of(split);
                 }
             } else {
-                arrays = List.of();
+                arrays = Collections.emptyList();
             }
             return arrays;
         }

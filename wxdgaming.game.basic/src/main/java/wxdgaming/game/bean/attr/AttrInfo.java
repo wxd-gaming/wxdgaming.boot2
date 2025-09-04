@@ -2,8 +2,10 @@ package wxdgaming.game.bean.attr;
 
 
 import com.alibaba.fastjson.annotation.JSONType;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 
 import java.util.HashMap;
+import java.util.function.Function;
 
 /**
  * 属性计算器
@@ -13,6 +15,8 @@ import java.util.HashMap;
  **/
 @JSONType(seeAlso = {HashMap.class})
 public class AttrInfo extends HashMap<AttrType, Long> {
+
+    public static final Function<String, AttrInfo> JsonParse = json -> FastJsonUtil.parse(json, AttrInfo.class);
 
     public AttrInfo() {
     }
