@@ -414,6 +414,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
 
         private final Object bean;
         private final Method method;
+        private int invokeCount = 0;
         private JavassistProxy proxy = null;
 
         public ProviderMethod(Object bean, Method method) {
@@ -448,14 +449,15 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         }
 
         public Object invoke(Object... args) {
-            if (proxy == null) {
+            if (proxy == null && invokeCount++ > 5) {
                 proxy = JavassistProxy.of(bean, method);
             }
             try {
                 if (log.isTraceEnabled())
                     log.trace("{}.{}", bean.getClass().getSimpleName(), this.method.getName());
                 Object[] objects = ApplicationContextProvider.this.injectorParameters(bean, method, args);
-                return proxy.proxyInvoke(objects);
+                if (proxy != null) return proxy.proxyInvoke(objects);
+                else return method.invoke(bean, objects);
             } catch (Throwable throwable) {
                 if (throwable instanceof InvocationTargetException) {
                     throwable = throwable.getCause();
