@@ -323,7 +323,10 @@ public class SpringUtil implements InitPrint {
      *
      * @param controllerBeanName 需要卸载的服务
      */
-    public static void unregisterController(ApplicationContext context, String controllerBeanName) {
+    public static void unregisterController(ConfigurableApplicationContext context, String controllerBeanName) {
+        if (!context.getBeanFactory().containsBeanDefinition(controllerBeanName)) {
+            return;
+        }
         final RequestMappingHandlerMapping requestMappingHandlerMapping = (RequestMappingHandlerMapping) context.getBean("requestMappingHandlerMapping");
         final Object controller = context.getBean(controllerBeanName);
         final Class<?> targetClass = controller.getClass();

@@ -33,8 +33,7 @@ public class RobotApplication {
 
         SpringUtil.mainApplicationContextProvider
                 .executeMethodWithAnnotatedInit()
-                .executeMethodWithAnnotatedStart()
-                .addShutdownHook();
+                .executeMethodWithAnnotatedStart();
 
     }
 

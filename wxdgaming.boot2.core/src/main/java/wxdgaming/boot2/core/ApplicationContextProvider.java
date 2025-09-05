@@ -9,18 +9,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.assist.JavassistProxy;
-import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.FieldUtil;
 import wxdgaming.boot2.core.reflect.MethodUtil;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.boot2.core.util.JvmUtil;
 
-import java.io.Closeable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
@@ -53,6 +49,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+        log.info("{} setApplicationContext", this.getClass().getSimpleName());
     }
 
     public synchronized List<ProviderBean> getBeanList() {
@@ -70,7 +67,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         }
         String[] beanDefinitionNames = __applicationContext.getBeanDefinitionNames();
         Stream<Object> objectStream = Arrays.stream(beanDefinitionNames).map(__applicationContext::getBean);
-        return Stream.concat(parent, objectStream);
+        return Stream.concat(parent, objectStream).filter(obj -> !obj.getClass().getPackageName().startsWith("org.springframework"));
     }
 
     /** 所有的类 */
@@ -194,13 +191,13 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     /** 执行循环过程中某一个函数执行失败会继续执行其它函数 */
     public void executeMethodWithAnnotatedException(Class<? extends Annotation> annotation, Object... args) {
         Collection<ProviderMethod> providerMethodStream = withMethodAnnotatedCache(annotation);
-        providerMethodStream.forEach(providerMethod -> {
+        for (ProviderMethod providerMethod : providerMethodStream) {
             try {
                 providerMethod.invokeInjectorParameters(args);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 log.error("执行方法异常：{}-{}", providerMethod.getMethod(), providerMethod.getMethod().getName(), e);
             }
-        });
+        }
     }
 
     public Object[] injectorParameters(Object bean, Method method, Object... args) {
@@ -255,29 +252,6 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
 
     public ApplicationContextProvider executeMethodWithAnnotatedStart() {
         executeMethodWithAnnotated(Start.class);
-        return this;
-    }
-
-    public ApplicationContextProvider executeMethodWithAnnotatedStop() {
-        ExecutorFactory executorFactory = getBean(ExecutorFactory.class);
-        executeMethodWithAnnotatedException(Stop.class);
-        classWithSuperStream(AutoCloseable.class).forEach(bean -> {
-            if (bean instanceof Closeable) {
-                try {
-                    ((Closeable) bean).close();
-                    log.debug("关闭bean：{}", bean);
-                } catch (Exception e) {
-                    log.error("关闭bean异常...", e);
-                }
-            }
-        });
-        executorFactory.getEXECUTOR_MONITOR().getExit().set(true);
-        JvmUtil.halt(0);
-        return this;
-    }
-
-    public ApplicationContextProvider addShutdownHook() {
-        JvmUtil.addShutdownHook(this::executeMethodWithAnnotatedStop);
         return this;
     }
 
@@ -359,7 +333,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         }
 
         @Override public String toString() {
-            return "Provider{instance=%s}".formatted(bean);
+            return "ProviderBean{instance=%s}".formatted(bean);
         }
     }
 
@@ -405,7 +379,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         }
 
         @Override public String toString() {
-            return "FieldProvider{ins=%s, method=%s}".formatted(bean, field);
+            return "ProviderField{ins=%s, method=%s}".formatted(bean, field);
         }
     }
 
@@ -462,8 +436,10 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
             try {
                 if (log.isTraceEnabled())
                     log.trace("{}.{}", bean.getClass().getSimpleName(), this.method.getName());
-                if (proxy != null) return proxy.proxyInvoke(args);
-                else return method.invoke(bean, args);
+                if (proxy != null)
+                    return proxy.proxyInvoke(args);
+                else
+                    return method.invoke(bean, args);
             } catch (Throwable throwable) {
                 if (throwable instanceof InvocationTargetException) {
                     throwable = throwable.getCause();
@@ -484,7 +460,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         }
 
         @Override public String toString() {
-            return "MethodProvider{ins=%s, method=%s}".formatted(bean, method);
+            return "ProviderMethod{bean=%s, method=%s}".formatted(bean, method);
         }
     }
 

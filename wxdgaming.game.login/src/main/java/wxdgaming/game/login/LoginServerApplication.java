@@ -41,8 +41,7 @@ public class LoginServerApplication {
             new SpringApplicationBuilder(LoginServerApplication.class).run(args);
             SpringUtil.mainApplicationContextProvider
                     .executeMethodWithAnnotatedInit()
-                    .startBootstrap()
-                    .addShutdownHook();
+                    .startBootstrap();
         } catch (Exception e) {
             log.error("登录服务启动异常...", e);
             JvmUtil.halt(99);

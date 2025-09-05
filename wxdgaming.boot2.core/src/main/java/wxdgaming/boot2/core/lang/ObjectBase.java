@@ -42,6 +42,6 @@ public abstract class ObjectBase implements Serializable, Cloneable {
     }
 
     @Override public String toString() {
-        return FastJsonUtil.toJSONString(this);
+        return this.getClass().getSimpleName() + FastJsonUtil.toJSONString(this);
     }
 }
