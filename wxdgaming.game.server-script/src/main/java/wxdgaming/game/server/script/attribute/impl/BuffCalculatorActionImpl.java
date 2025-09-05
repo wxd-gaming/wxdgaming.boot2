@@ -3,6 +3,7 @@ package wxdgaming.game.server.script.attribute.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.json.FastJsonUtil;
+import wxdgaming.boot2.starter.event.Event;
 import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.bean.buff.BuffTypeConst;
 import wxdgaming.game.cfg.bean.QBuff;
@@ -10,7 +11,7 @@ import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.server.bean.buff.Buff;
 import wxdgaming.game.server.script.attribute.AbstractCalculatorAction;
-import wxdgaming.game.server.script.attribute.CalculatorType;
+import wxdgaming.game.server.bean.attribute.CalculatorType;
 
 import java.util.ArrayList;
 
@@ -32,7 +33,7 @@ public class BuffCalculatorActionImpl extends AbstractCalculatorAction {
         return CalculatorType.BUFF;
     }
 
-    @Override public AttrInfo calculate(MapNpc mapNpc, Object... args) {
+    @Override public AttrInfo calculate(MapNpc mapNpc, Event event) {
         AttrInfo attrInfo = new AttrInfo();
         ArrayList<Buff> buffs = mapNpc.getBuffs();
         for (int i = 0; i < buffs.size(); i++) {
@@ -46,7 +47,7 @@ public class BuffCalculatorActionImpl extends AbstractCalculatorAction {
         return attrInfo;
     }
 
-    @Override public AttrInfo calculatePro(MapNpc mapNpc, Object... args) {
+    @Override public AttrInfo calculatePro(MapNpc mapNpc, Event event) {
         AttrInfo attrInfo = new AttrInfo();
         ArrayList<Buff> buffs = mapNpc.getBuffs();
         for (int i = 0; i < buffs.size(); i++) {

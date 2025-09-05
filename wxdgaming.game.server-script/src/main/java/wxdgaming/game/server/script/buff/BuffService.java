@@ -16,12 +16,13 @@ import wxdgaming.game.bean.buff.BuffTypeConst;
 import wxdgaming.game.cfg.QBuffTable;
 import wxdgaming.game.cfg.bean.QBuff;
 import wxdgaming.game.server.bean.MapNpc;
+import wxdgaming.game.server.bean.attribute.CalculatorType;
 import wxdgaming.game.server.bean.buff.Buff;
 import wxdgaming.game.server.bean.role.Player;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.event.OnHeart;
 import wxdgaming.game.server.event.OnHeartMinute;
 import wxdgaming.game.server.module.data.DataCenterService;
-import wxdgaming.game.server.script.attribute.CalculatorType;
 import wxdgaming.game.server.script.attribute.NpcAttributeService;
 import wxdgaming.game.server.script.attribute.PlayerAttributeService;
 
@@ -114,9 +115,19 @@ public class BuffService extends HoldApplicationContext {
         CalculatorType[] calculatorTypes = {CalculatorType.BUFF};
         ReasonDTO reasonDTO = ReasonDTO.of(Reason.Buff);
         if (mapNpc instanceof Player player) {
-            playerAttributeService.onPlayerAttributeCalculator(player, calculatorTypes, reasonDTO);
+            EventConst.PlayerAttributeCalculatorEvent event = new EventConst.PlayerAttributeCalculatorEvent(
+                    player,
+                    calculatorTypes,
+                    reasonDTO
+            );
+            playerAttributeService.onPlayerAttributeCalculator(event);
         } else {
-            npcAttributeService.onNpcAttributeCalculator(mapNpc, calculatorTypes, reasonDTO);
+            EventConst.NpcAttributeCalculatorEvent event = new EventConst.NpcAttributeCalculatorEvent(
+                    mapNpc,
+                    calculatorTypes,
+                    reasonDTO
+            );
+            npcAttributeService.onNpcAttributeCalculator(event);
         }
     }
 

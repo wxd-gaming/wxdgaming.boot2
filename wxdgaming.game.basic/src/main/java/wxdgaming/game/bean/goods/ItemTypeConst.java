@@ -1,6 +1,7 @@
 package wxdgaming.game.bean.goods;
 
 import lombok.Getter;
+import wxdgaming.boot2.core.lang.ObjectBase;
 
 /**
  * 道具类型
@@ -9,7 +10,7 @@ import lombok.Getter;
  * @version 2025-05-09 14:40
  **/
 @Getter
-public abstract class ItemTypeConst {
+public abstract class ItemTypeConst extends ObjectBase {
 
     /** 默认处理 */
     public static final ItemTypeConst NONE = new ItemTypeConst(0, 0, 0) {};

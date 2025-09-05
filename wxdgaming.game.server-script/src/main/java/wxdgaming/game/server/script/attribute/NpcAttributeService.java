@@ -5,13 +5,15 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.util.AssertUtil;
+import wxdgaming.game.basic.core.Reason;
 import wxdgaming.game.basic.core.ReasonDTO;
 import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.bean.attr.AttrType;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.MapObject;
+import wxdgaming.game.server.bean.attribute.CalculatorType;
+import wxdgaming.game.server.event.EventConst;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -26,61 +28,55 @@ import java.util.TreeMap;
 public class NpcAttributeService extends HoldApplicationContext {
 
     /** 属性计算器 */
-    TreeMap<Integer, AbstractCalculatorAction> calculatorImplMap = new TreeMap<>();
+    TreeMap<CalculatorType, AbstractCalculatorAction> calculatorImplMap = new TreeMap<>();
+    CalculatorType[] calculatorTypes;
 
     @Init
     public void init() {
-
-        TreeMap<Integer, AbstractCalculatorAction> tmp = new TreeMap<>();
+        TreeMap<CalculatorType, AbstractCalculatorAction> tmp = new TreeMap<>();
         applicationContextProvider.classWithSuperStream(AbstractCalculatorAction.class)
                 .forEach(calculatorAction -> {
                     MapObject.MapObjectType mapObjectType = calculatorAction.mapObjectType();
                     if (mapObjectType == MapObject.MapObjectType.Player) {
                         return;
                     }
-                    AbstractCalculatorAction old = tmp.put(calculatorAction.calculatorType().getCode(), calculatorAction);
+                    AbstractCalculatorAction old = tmp.put(calculatorAction.calculatorType(), calculatorAction);
                     AssertUtil.assertTrue(old == null, "重复的属性计算器类型 " + calculatorAction.calculatorType().getCode() + " " + old + ", " + calculatorAction);
                 });
         calculatorImplMap = tmp;
+        calculatorTypes = calculatorImplMap.keySet().toArray(new CalculatorType[calculatorImplMap.size()]);
     }
 
 
     public void calculatorAll(MapNpc mapNpc) {
-        HashMap<Integer, AttrInfo> attrMap = new HashMap<>();
-        HashMap<Integer, AttrInfo> attrProMap = new HashMap<>();
-        for (AbstractCalculatorAction calculatorAction : calculatorImplMap.values()) {
-            AttrInfo calculate = calculatorAction.calculate(mapNpc);
-            attrMap.put(calculatorAction.calculatorType().getCode(), calculate);
-            AttrInfo calculatePro = calculatorAction.calculatePro(mapNpc);
-            attrProMap.put(calculatorAction.calculatorType().getCode(), calculatePro);
-        }
-
-        mapNpc.setAttrMap(attrMap);
-        mapNpc.setAttrProMap(attrProMap);
-
-        finalCalculator(mapNpc);
+        EventConst.NpcAttributeCalculatorEvent playerAttributeCalculatorEvent = new EventConst.NpcAttributeCalculatorEvent(
+                mapNpc,
+                calculatorTypes,
+                ReasonDTO.of(Reason.Level)
+        );
+        finalCalculator(playerAttributeCalculatorEvent);
     }
 
-    public void onNpcAttributeCalculator(MapNpc mapNpc, CalculatorType[] calculatorTypes, ReasonDTO msg) {
-        for (CalculatorType calculatorType : calculatorTypes) {
-            calculator(mapNpc, calculatorType, msg);
+    public void onNpcAttributeCalculator(EventConst.NpcAttributeCalculatorEvent event) {
+        for (CalculatorType calculatorType : event.calculatorTypes()) {
+            calculator(calculatorType, event);
         }
-        finalCalculator(mapNpc);
+        finalCalculator(event);
     }
 
-    public void calculator(MapNpc mapNpc, CalculatorType calculatorType, ReasonDTO msg) {
+    public void calculator(CalculatorType calculatorType, EventConst.NpcAttributeCalculatorEvent event) {
+        MapNpc mapNpc = event.npc();
+        AbstractCalculatorAction calculatorAction = calculatorImplMap.get(calculatorType);
 
-        AbstractCalculatorAction calculatorAction = calculatorImplMap.get(calculatorType.getCode());
-
-        AttrInfo calculate = calculatorAction.calculate(mapNpc);
+        AttrInfo calculate = calculatorAction.calculate(mapNpc, event);
         mapNpc.getAttrMap().put(calculatorAction.calculatorType().getCode(), calculate);
-        AttrInfo calculatePro = calculatorAction.calculatePro(mapNpc);
+        AttrInfo calculatePro = calculatorAction.calculatePro(mapNpc, event);
         mapNpc.getAttrProMap().put(calculatorAction.calculatorType().getCode(), calculatePro);
 
     }
 
-    public void finalCalculator(MapNpc mapNpc) {
-
+    public void finalCalculator(EventConst.NpcAttributeCalculatorEvent event) {
+        MapNpc mapNpc = event.npc();
         /*累计基础属性*/
         AttrInfo finalAttrInfo = new AttrInfo();
         for (AttrInfo attrInfo : mapNpc.getAttrMap().values()) {

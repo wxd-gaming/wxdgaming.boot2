@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.attribute;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
@@ -11,12 +12,11 @@ import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.bean.attr.AttrType;
 import wxdgaming.game.message.role.ResUpdateFightValue;
 import wxdgaming.game.server.bean.MapObject;
+import wxdgaming.game.server.bean.attribute.CalculatorType;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.event.OnLoginBefore;
-import wxdgaming.game.server.event.OnPlayerAttributeCalculator;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -31,67 +31,48 @@ import java.util.TreeMap;
 public class PlayerAttributeService extends HoldApplicationContext {
 
     /** 属性计算器 */
-    TreeMap<Integer, AbstractCalculatorAction> calculatorImplMap = new TreeMap<>();
+    TreeMap<CalculatorType, AbstractCalculatorAction> calculatorImplMap = new TreeMap<>();
+    CalculatorType[] calculatorTypes;
 
     @Init
     public void init() {
 
-        TreeMap<Integer, AbstractCalculatorAction> tmp = new TreeMap<>();
+        TreeMap<CalculatorType, AbstractCalculatorAction> tmp = new TreeMap<>();
         applicationContextProvider.classWithSuperStream(AbstractCalculatorAction.class)
                 .forEach(calculatorAction -> {
                     MapObject.MapObjectType mapObjectType = calculatorAction.mapObjectType();
                     if (mapObjectType != null && mapObjectType != MapObject.MapObjectType.Player) {
                         return;
                     }
-                    AbstractCalculatorAction old = tmp.put(calculatorAction.calculatorType().getCode(), calculatorAction);
-                    AssertUtil.assertTrue(old == null, "重复的属性计算器类型 " + calculatorAction.calculatorType().getCode() + " " + old + ", " + calculatorAction);
+                    AbstractCalculatorAction old = tmp.put(calculatorAction.calculatorType(), calculatorAction);
+                    AssertUtil.assertTrue(old == null, "重复的属性计算器类型 " + calculatorAction.calculatorType() + " " + old + ", " + calculatorAction);
                 });
         calculatorImplMap = tmp;
+        calculatorTypes = calculatorImplMap.keySet().toArray(new CalculatorType[calculatorImplMap.size()]);
     }
 
-    @OnLoginBefore
-    public void onLoginBefore(Player player) {
-        calculatorAll(player);
-    }
+    public void calculator(CalculatorType calculatorType, EventConst.PlayerAttributeCalculatorEvent event) {
+        Player player = event.player();
+        AbstractCalculatorAction calculatorAction = calculatorImplMap.get(calculatorType);
 
-    public void calculatorAll(Player player) {
-        HashMap<Integer, AttrInfo> attrMap = new HashMap<>();
-        HashMap<Integer, AttrInfo> attrProMap = new HashMap<>();
-        for (AbstractCalculatorAction calculatorAction : calculatorImplMap.values()) {
-            AttrInfo calculate = calculatorAction.calculate(player);
-            attrMap.put(calculatorAction.calculatorType().getCode(), calculate);
-            AttrInfo calculatePro = calculatorAction.calculatePro(player);
-            attrProMap.put(calculatorAction.calculatorType().getCode(), calculatePro);
-        }
-
-        player.setAttrMap(attrMap);
-        player.setAttrProMap(attrProMap);
-
-        finalCalculator(player, true, ReasonDTO.of(Reason.Level));
-    }
-
-    public void calculator(Player player, CalculatorType calculatorType) {
-
-        AbstractCalculatorAction calculatorAction = calculatorImplMap.get(calculatorType.getCode());
-
-        AttrInfo calculate = calculatorAction.calculate(player);
+        AttrInfo calculate = calculatorAction.calculate(player, event);
         player.getAttrMap().put(calculatorAction.calculatorType().getCode(), calculate);
-        AttrInfo calculatePro = calculatorAction.calculatePro(player);
+        AttrInfo calculatePro = calculatorAction.calculatePro(player, event);
         player.getAttrProMap().put(calculatorAction.calculatorType().getCode(), calculatePro);
 
     }
 
-    public void finalCalculator(Player player, boolean isLogin, ReasonDTO msg) {
+    public void finalCalculator(EventConst.PlayerAttributeCalculatorEvent event) {
 
         /*累计基础属性*/
         AttrInfo finalAttrInfo = new AttrInfo();
-        for (AttrInfo attrInfo : player.getAttrMap().values()) {
+        for (AttrInfo attrInfo : event.player().getAttrMap().values()) {
             finalAttrInfo.append(attrInfo);
         }
 
         /*累计百分比属性*/
         AttrInfo finalAttrInfoPro = new AttrInfo();
-        for (AttrInfo attrInfo : player.getAttrProMap().values()) {
+        for (AttrInfo attrInfo : event.player().getAttrProMap().values()) {
             finalAttrInfoPro.append(attrInfo);
         }
         for (Map.Entry<AttrType, Long> entry : finalAttrInfoPro.entrySet()) {
@@ -103,8 +84,8 @@ public class PlayerAttributeService extends HoldApplicationContext {
             finalAttrInfo.put(attrType, baseValue);
         }
         /*历史战斗力*/
-        long oldFightValue = player.getFightValue();
-        AttrInfo oldFinalAttrInfo = player.getFinalAttrInfo();
+        long oldFightValue = event.player().getFightValue();
+        AttrInfo oldFinalAttrInfo = event.player().getFinalAttrInfo();
 
         long fightValue = 0;
         for (Map.Entry<AttrType, Long> entry : finalAttrInfo.entrySet()) {
@@ -113,50 +94,69 @@ public class PlayerAttributeService extends HoldApplicationContext {
             fightValue += attrType.getCode() * value * 100;
         }
 
-        player.setFightValue(fightValue);
-        player.setFinalAttrInfo(finalAttrInfo);
+        event.player().setFightValue(fightValue);
+        event.player().setFinalAttrInfo(finalAttrInfo);
 
         if (oldFightValue != fightValue) {
-            log.info("{} 战斗力变化 {} -> {}, 触发: {}", player, oldFightValue, fightValue, msg);
-            if (!isLogin) {
+            log.info("{} 战斗力变化 {} -> {}, 触发: {}", event.player(), oldFightValue, fightValue, event.reasonDTO());
+            if (event.reasonDTO().getReason() != Reason.Login) {
                 ResUpdateFightValue resUpdateFightValue = new ResUpdateFightValue();
                 resUpdateFightValue.setFightValue(fightValue);
-                player.write(resUpdateFightValue);
+                event.player().write(resUpdateFightValue);
             }
         }
 
         if (!oldFinalAttrInfo.get(AttrType.MAXHP).equals(finalAttrInfo.get(AttrType.MAXHP))) {
             long maxHp = finalAttrInfo.get(AttrType.MAXHP);
-            if (player.getHp() > maxHp) {
-                player.setHp(maxHp);
-                log.info("{} 生命值超出上限，自动修正为 {}, 触发: {}", player, maxHp, msg);
+            if (event.player().getHp() > maxHp) {
+                event.player().setHp(maxHp);
+                log.info("{} 生命值超出上限，自动修正为 {}, 触发: {}", event.player(), maxHp, event.reasonDTO());
             }
-            player.sendHp();
+            event.player().sendHp();
         }
 
         if (!oldFinalAttrInfo.get(AttrType.MAXMP).equals(finalAttrInfo.get(AttrType.MAXMP))) {
             long maxMp = finalAttrInfo.get(AttrType.MAXMP);
-            if (player.getMp() > maxMp) {
-                player.setMp(maxMp);
-                log.info("{} 魔法值超出上限，自动修正为 {}, 触发: {}", player, maxMp, msg);
+            if (event.player().getMp() > maxMp) {
+                event.player().setMp(maxMp);
+                log.info("{} 魔法值超出上限，自动修正为 {}, 触发: {}", event.player(), maxMp, event.reasonDTO());
             }
-            player.sendMp();
+            event.player().sendMp();
         }
 
     }
 
+    @OnLoginBefore
+    public void onLoginBefore(Player player) {
+        EventConst.PlayerAttributeCalculatorEvent playerAttributeCalculatorEvent = new EventConst.PlayerAttributeCalculatorEvent(
+                player,
+                calculatorTypes,
+                ReasonDTO.of(Reason.Login)
+        );
 
+        finalCalculator(playerAttributeCalculatorEvent);
+    }
+
+    final CalculatorType[] calculatorBASE = {CalculatorType.BASE};
+
+    /** 提升等级后触发属性计算 */
+    @Order(Integer.MAX_VALUE)
     public void onLevelUp(EventConst.LevelUpEvent event) {
-        calculator(event.player(), CalculatorType.BASE);
-        finalCalculator(event.player(), false, ReasonDTO.of(Reason.Level));
+        EventConst.PlayerAttributeCalculatorEvent playerAttributeCalculatorEvent = new EventConst.PlayerAttributeCalculatorEvent(
+                event.player(),
+                calculatorBASE,
+                ReasonDTO.of(Reason.Level)
+        );
+        onPlayerAttributeCalculator(playerAttributeCalculatorEvent);
     }
 
-    @OnPlayerAttributeCalculator
-    public void onPlayerAttributeCalculator(Player player, CalculatorType[] calculatorTypes, ReasonDTO msg) {
-        for (CalculatorType calculatorType : calculatorTypes) {
-            calculator(player, calculatorType);
+    /** 触发属性计算事件监听 */
+    @Order(Integer.MAX_VALUE)
+    public void onPlayerAttributeCalculator(EventConst.PlayerAttributeCalculatorEvent event) {
+        for (CalculatorType calculatorType : event.calculatorTypes()) {
+            calculator(calculatorType, event);
         }
-        finalCalculator(player, false, msg);
+        finalCalculator(event);
     }
 
 }

@@ -80,7 +80,7 @@ public class GameTimerService extends HoldApplicationContext {
             log.error("访问登陆服务器失败{}", url);
             return;
         }
-        log.info("向登陆服务器注册: {}", execute.bodyString());
+        log.debug("向登陆服务器注册: {}", execute.bodyString());
     }
 
 }

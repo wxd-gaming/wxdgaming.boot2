@@ -18,7 +18,7 @@ import wxdgaming.game.server.script.bag.use.AbstractUseItemAction;
 public class LvUpUseItemActionImpl extends AbstractUseItemAction {
 
     @Override public ItemTypeConst type() {
-        return ItemTypeConst.HPADD;
+        return ItemTypeConst.LVUP;
     }
 
     @Override public boolean canUse(Player player, BagChangesContext bagChangesContext, Item item) {

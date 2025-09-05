@@ -78,7 +78,7 @@ public class ScheduledService extends HoldApplicationContext {
     }
 
     @Stop
-    @Order(1000)
+    @Order(10)
     public void stop() {
         log.info("线程 Scheduled 调度器 退出");
         if (future != null) {

@@ -2,13 +2,14 @@ package wxdgaming.game.server.script.attribute.impl.monster;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import wxdgaming.boot2.starter.event.Event;
 import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.cfg.QPlayerTable;
 import wxdgaming.game.cfg.bean.QPlayer;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.MapObject;
+import wxdgaming.game.server.bean.attribute.CalculatorType;
 import wxdgaming.game.server.script.attribute.AbstractCalculatorAction;
-import wxdgaming.game.server.script.attribute.CalculatorType;
 
 /**
  * 基础属性
@@ -28,13 +29,13 @@ public class MonsterBaseCalculatorActionImpl extends AbstractCalculatorAction {
         return CalculatorType.BASE;
     }
 
-    @Override public AttrInfo calculate(MapNpc mapNpc, Object... args) {
+    @Override public AttrInfo calculate(MapNpc mapNpc, Event event) {
         QPlayer qPlayer = dataRepository.dataTable(QPlayerTable.class, mapNpc.getLevel());
         AttrInfo attr = qPlayer.getAttr();
         return new AttrInfo(attr);
     }
 
-    @Override public AttrInfo calculatePro(MapNpc mapNpc, Object... args) {
+    @Override public AttrInfo calculatePro(MapNpc mapNpc, Event event) {
         QPlayer qPlayer = dataRepository.dataTable(QPlayerTable.class, mapNpc.getLevel());
 
         AttrInfo attrPro = qPlayer.getAttrPro();

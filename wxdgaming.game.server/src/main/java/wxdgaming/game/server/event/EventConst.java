@@ -1,6 +1,9 @@
 package wxdgaming.game.server.event;
 
 import wxdgaming.boot2.starter.event.Event;
+import wxdgaming.game.basic.core.ReasonDTO;
+import wxdgaming.game.server.bean.MapNpc;
+import wxdgaming.game.server.bean.attribute.CalculatorType;
 import wxdgaming.game.server.bean.role.Player;
 
 /**
@@ -10,6 +13,24 @@ import wxdgaming.game.server.bean.role.Player;
 public interface EventConst {
 
     public record LevelUpEvent(Player player, int changeLv) implements Event {
+    }
+
+    /**
+     * 玩家属性计算
+     *
+     * @author wxd-gaming(無心道, 15388152619)
+     * @version 2025-05-09 20:38
+     */
+    public record PlayerAttributeCalculatorEvent(
+            Player player,
+            CalculatorType[] calculatorTypes,
+            ReasonDTO reasonDTO) implements Event {
+    }
+
+    public record NpcAttributeCalculatorEvent(
+            MapNpc npc,
+            CalculatorType[] calculatorTypes,
+            ReasonDTO msg) implements Event {
     }
 
 }

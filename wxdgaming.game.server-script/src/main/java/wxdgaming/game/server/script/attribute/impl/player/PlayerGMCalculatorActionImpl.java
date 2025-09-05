@@ -2,11 +2,12 @@ package wxdgaming.game.server.script.attribute.impl.player;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import wxdgaming.boot2.starter.event.Event;
 import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.server.script.attribute.AbstractCalculatorAction;
-import wxdgaming.game.server.script.attribute.CalculatorType;
+import wxdgaming.game.server.bean.attribute.CalculatorType;
 
 /**
  * 一些特殊属性的计算
@@ -26,13 +27,13 @@ public class PlayerGMCalculatorActionImpl extends AbstractCalculatorAction {
         return CalculatorType.GM;
     }
 
-    @Override public AttrInfo calculate(MapNpc mapNpc, Object... args) {
+    @Override public AttrInfo calculate(MapNpc mapNpc, Event event) {
         AttrInfo attrInfo = new AttrInfo(mapNpc.getGmAttrInfo());
         attrInfo.append(mapNpc.getTmpAttrInfo());
         return attrInfo;
     }
 
-    @Override public AttrInfo calculatePro(MapNpc mapNpc, Object... args) {
+    @Override public AttrInfo calculatePro(MapNpc mapNpc, Event event) {
         AttrInfo attrInfo = new AttrInfo(mapNpc.getGmAttrProInfo());
         attrInfo.append(mapNpc.getTmpAttrProInfo());
         return attrInfo;

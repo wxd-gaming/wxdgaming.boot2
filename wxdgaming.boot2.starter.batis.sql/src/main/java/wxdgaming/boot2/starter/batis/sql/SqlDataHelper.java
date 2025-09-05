@@ -5,11 +5,11 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Stop;
-import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
@@ -538,4 +538,9 @@ public abstract class SqlDataHelper extends DataHelper {
         String string = ddlBuilder().buildSql$$(sqlStr);
         executeUpdate(string);
     }
+
+    @Override public String toString() {
+        return "%s{url=%s}".formatted(this.getClass().getSimpleName(), this.getSqlConfig().getUrl());
+    }
+
 }

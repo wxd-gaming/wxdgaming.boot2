@@ -1,4 +1,4 @@
-package wxdgaming.game.server.script.attribute;
+package wxdgaming.game.server.bean.attribute;
 
 import lombok.Getter;
 import wxdgaming.boot2.core.collection.MapOf;

@@ -2,11 +2,12 @@ package wxdgaming.game.server.script.attribute.impl.monster;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import wxdgaming.boot2.starter.event.Event;
 import wxdgaming.game.bean.attr.AttrInfo;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.server.script.attribute.AbstractCalculatorAction;
-import wxdgaming.game.server.script.attribute.CalculatorType;
+import wxdgaming.game.server.bean.attribute.CalculatorType;
 
 /**
  * 一些特殊属性添加到怪物身上的计算方式
@@ -26,11 +27,11 @@ public class MonsterGMCalculatorActionImpl extends AbstractCalculatorAction {
         return CalculatorType.GM;
     }
 
-    @Override public AttrInfo calculate(MapNpc mapNpc, Object... args) {
+    @Override public AttrInfo calculate(MapNpc mapNpc, Event event) {
         return new AttrInfo(mapNpc.getGmAttrInfo());
     }
 
-    @Override public AttrInfo calculatePro(MapNpc mapNpc, Object... args) {
+    @Override public AttrInfo calculatePro(MapNpc mapNpc, Event event) {
         return new AttrInfo(mapNpc.getGmAttrProInfo());
     }
 
