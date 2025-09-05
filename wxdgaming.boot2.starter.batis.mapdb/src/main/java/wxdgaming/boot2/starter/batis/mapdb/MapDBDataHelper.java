@@ -4,8 +4,10 @@ import kotlin.jvm.functions.Function1;
 import lombok.extern.slf4j.Slf4j;
 import org.mapdb.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
+import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.io.FileUtil;
 
 import java.io.File;
@@ -21,7 +23,7 @@ import java.util.function.Function;
  **/
 @Slf4j
 @Service
-public class MapDBDataHelper implements AutoCloseable, InitPrint {
+public class MapDBDataHelper implements InitPrint {
 
     final DB db;
     final ConcurrentHashMap<String, Object> openCacheMap = new ConcurrentHashMap<>();
@@ -56,7 +58,9 @@ public class MapDBDataHelper implements AutoCloseable, InitPrint {
         return db;
     }
 
-    @Override public void close() {
+    @Stop
+    @Order(Integer.MAX_VALUE)
+    public void stop() {
         db.close();
         log.info("关闭 map db {}", this.dbFile);
     }
@@ -145,5 +149,7 @@ public class MapDBDataHelper implements AutoCloseable, InitPrint {
         );
     }
 
-
+    @Override public String toString() {
+        return "MapDBDataHelper{dbFile=%s}".formatted(dbFile);
+    }
 }

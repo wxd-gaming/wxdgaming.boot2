@@ -92,7 +92,8 @@ public class MapDbTest {
     @Test
     public void putFileDBSize() {
         File file = new File("target/file444.db");
-        try (MapDBDataHelper db = new MapDBDataHelper(file)) {
+        MapDBDataHelper db = new MapDBDataHelper(file);
+        try {
             System.out.println("start");
             //            for (int i = 0; i < 1000; i++) {
             //                DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
@@ -117,6 +118,8 @@ public class MapDbTest {
             System.out.println(stringBuilder.toString());
             Set<Object> set1 = db.hashSet("set1");
             set1.add("something " + RandomUtils.random(10));
+        } finally {
+            db.stop();
         }
     }
 
