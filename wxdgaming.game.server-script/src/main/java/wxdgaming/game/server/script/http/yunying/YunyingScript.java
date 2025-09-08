@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.game.server.module.data.GlobalDataService;
+import wxdgaming.game.common.global.GlobalDataService;
 
 /**
  * 运营接口

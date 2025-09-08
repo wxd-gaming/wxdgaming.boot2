@@ -5,14 +5,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
-import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.MainApplicationContextProvider;
 import wxdgaming.boot2.core.SpringUtil;
-import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
-import wxdgaming.boot2.core.util.JvmUtil;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
 import wxdgaming.boot2.starter.event.EventScan;
 import wxdgaming.boot2.starter.excel.DataExcelScan;
@@ -21,10 +18,10 @@ import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 import wxdgaming.boot2.util.ChildApplicationContextProvider;
 import wxdgaming.game.basic.login.LoginProperties;
 import wxdgaming.game.basic.slog.SlogService;
+import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.logbus.LogBusService;
 
 import java.io.File;
-import java.util.Collection;
 
 @Slf4j
 @SpringBootApplication(scanBasePackageClasses = {
@@ -36,6 +33,7 @@ import java.util.Collection;
         PgsqlScan.class,
         LogBusService.class,
         SlogService.class,
+        GlobalDataService.class,
         LoginProperties.class,
         GameServerApplication.class
 })

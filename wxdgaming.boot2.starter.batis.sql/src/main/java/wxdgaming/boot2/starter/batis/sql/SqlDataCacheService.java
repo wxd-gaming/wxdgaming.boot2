@@ -74,4 +74,8 @@ public class SqlDataCacheService {
         return cache(cls).getIfPresent(k);
     }
 
+    public <E extends Entity, K> void cachePut(Class<E> cls, K k, E e) {
+        cache(cls).put(k, e);
+    }
+
 }

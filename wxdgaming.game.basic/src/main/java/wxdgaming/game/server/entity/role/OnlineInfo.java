@@ -1,4 +1,4 @@
-package wxdgaming.game.global.bean.role;
+package wxdgaming.game.server.entity.role;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;

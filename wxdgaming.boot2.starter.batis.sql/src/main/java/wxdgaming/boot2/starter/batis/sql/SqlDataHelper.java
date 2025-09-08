@@ -63,7 +63,7 @@ public abstract class SqlDataHelper extends DataHelper {
     @Start()
     @Order(-1)
     public void start() {
-        if (StringUtils.isNotBlank(sqlConfig.getScanPackage())) {
+        if (sqlConfig.getScanPackage() != null && sqlConfig.getScanPackage().length > 0) {
             Map<String, LinkedHashMap<String, JSONObject>> tableStructMap = findTableStructMap();
             ReflectProvider.Builder.of(sqlConfig.getScanPackage()).build()
                     .classWithAnnotated(DbTable.class)

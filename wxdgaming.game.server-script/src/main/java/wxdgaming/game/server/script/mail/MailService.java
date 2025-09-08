@@ -10,12 +10,12 @@ import wxdgaming.game.bean.goods.Item;
 import wxdgaming.game.bean.mail.MailInfo;
 import wxdgaming.game.bean.mail.MailPack;
 import wxdgaming.game.bean.mail.ServerMailInfo;
-import wxdgaming.game.server.bean.global.GlobalDataType;
+import wxdgaming.game.common.global.GlobalDataService;
+import wxdgaming.game.server.bean.global.GlobalDataConst;
 import wxdgaming.game.server.bean.global.impl.ServerMailData;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnHeartMinute;
 import wxdgaming.game.server.module.data.DataCenterService;
-import wxdgaming.game.server.module.data.GlobalDataService;
 import wxdgaming.game.server.script.mail.slog.MailSlog;
 
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ public class MailService extends HoldApplicationContext {
             return false;
         });
 
-        ServerMailData serverMailData = globalDataService.get(GlobalDataType.SERVER_MAIL_DATA);
+        ServerMailData serverMailData = globalDataService.get(GlobalDataConst.SERVER_MAIL_DATA);
         ArrayList<ServerMailInfo> mailInfoList = serverMailData.getMailInfoList();
         for (ServerMailInfo mailInfo : mailInfoList) {
             if (!mailInfo.checkValidity())

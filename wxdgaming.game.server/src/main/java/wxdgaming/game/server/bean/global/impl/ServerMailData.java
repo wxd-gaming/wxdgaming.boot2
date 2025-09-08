@@ -2,7 +2,7 @@ package wxdgaming.game.server.bean.global.impl;
 
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.game.server.bean.global.DataBase;
+import wxdgaming.game.bean.global.AbstractGlobalData;
 import wxdgaming.game.bean.mail.ServerMailInfo;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
  **/
 @Getter
 @Setter
-public class ServerMailData extends DataBase {
+public class ServerMailData extends AbstractGlobalData {
 
     private ArrayList<ServerMailInfo> mailInfoList = new ArrayList<>();
 

@@ -1,4 +1,4 @@
-package wxdgaming.game.global.bean.role;
+package wxdgaming.game.server.entity.role;
 
 import lombok.Getter;
 import lombok.Setter;

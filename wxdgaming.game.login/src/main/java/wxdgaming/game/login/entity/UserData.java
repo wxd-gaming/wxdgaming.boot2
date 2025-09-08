@@ -1,4 +1,4 @@
-package wxdgaming.game.login.bean;
+package wxdgaming.game.login.entity;
 
 import lombok.Getter;
 import lombok.Setter;

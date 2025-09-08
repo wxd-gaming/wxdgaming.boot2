@@ -12,6 +12,7 @@ import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.net.httpclient5.HttpClientScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 import wxdgaming.game.basic.slog.SlogService;
+import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.logbus.LogBusService;
 
 /**
@@ -30,6 +31,7 @@ import wxdgaming.logbus.LogBusService;
                 PgsqlScan.class,
                 MapDBScan.class,
                 SlogService.class,
+                GlobalDataService.class,
                 LogBusService.class,
                 LoginServerApplication.class
         }

@@ -8,7 +8,7 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.basic.slog.SlogService;
-import wxdgaming.game.global.bean.role.PlayerSnap;
+import wxdgaming.game.server.entity.role.PlayerSnap;
 import wxdgaming.game.message.role.ReqChooseRole;
 import wxdgaming.game.message.role.ResChooseRole;
 import wxdgaming.game.server.bean.UserMapping;

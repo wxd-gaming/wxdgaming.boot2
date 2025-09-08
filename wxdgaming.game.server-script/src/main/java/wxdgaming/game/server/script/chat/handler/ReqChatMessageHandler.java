@@ -2,19 +2,18 @@ package wxdgaming.game.server.script.chat.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
+import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.message.chat.ReqChatMessage;
 import wxdgaming.game.message.gm.ResGmList;
 import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.bean.UserMapping;
-import wxdgaming.game.server.bean.global.GlobalDataType;
+import wxdgaming.game.server.bean.global.GlobalDataConst;
 import wxdgaming.game.server.bean.global.impl.YunyingData;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnLogin;
 import wxdgaming.game.server.module.data.DataCenterService;
-import wxdgaming.game.server.module.data.GlobalDataService;
 import wxdgaming.game.server.script.chat.ChatService;
 import wxdgaming.game.server.script.gm.GmService;
 import wxdgaming.game.server.script.tips.TipsService;
@@ -76,7 +75,7 @@ public class ReqChatMessageHandler {
     }
 
     boolean checkOpenGm(Player player) {
-        YunyingData yunyingData = globalDataService.get(GlobalDataType.YUNYINGDATA);
+        YunyingData yunyingData = globalDataService.get(GlobalDataConst.YUNYINGDATA);
         if (gameServerProperties.isDebug()
             || yunyingData.getGmAccountSet().contains(player.getAccount())
             || yunyingData.getGmPlayerIdSet().contains(player.getUid())) {

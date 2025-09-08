@@ -9,7 +9,7 @@ import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.game.basic.login.AppPlatformParams;
-import wxdgaming.game.login.bean.UserData;
+import wxdgaming.game.login.entity.UserData;
 import wxdgaming.game.login.login.sdk.AbstractSdkLoginApi;
 
 /**

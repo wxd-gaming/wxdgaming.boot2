@@ -7,7 +7,7 @@ import wxdgaming.boot2.core.format.HexId;
 import wxdgaming.boot2.starter.batis.sql.SqlDataCache;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.game.login.LoginServerProperties;
-import wxdgaming.game.login.bean.UserData;
+import wxdgaming.game.login.entity.UserData;
 
 /**
  * 登录服务

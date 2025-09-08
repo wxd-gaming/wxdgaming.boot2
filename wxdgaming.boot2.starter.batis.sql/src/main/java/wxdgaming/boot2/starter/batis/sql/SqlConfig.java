@@ -47,7 +47,7 @@ public class SqlConfig extends ObjectBase {
     @JSONField(ordinal = 9)
     private int idleTimeoutM = 10;
     @JSONField(ordinal = 11)
-    private String scanPackage = "";
+    private String[] scanPackage = new String[0];
     /** 默认异步批处理线程数量 */
     @JSONField(ordinal = 12)
     private int batchThreadSize = 1;

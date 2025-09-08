@@ -2,7 +2,7 @@ package wxdgaming.game.server.bean.global.impl;
 
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.game.server.bean.global.DataBase;
+import wxdgaming.game.bean.global.AbstractGlobalData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import java.util.HashMap;
  **/
 @Getter
 @Setter
-public class YunyingData extends DataBase {
+public class YunyingData extends AbstractGlobalData {
 
     /** 拥有gm权限的账号 */
     private ArrayList<String> gmAccountSet = new ArrayList<>();
@@ -25,5 +25,6 @@ public class YunyingData extends DataBase {
     private HashMap<String, Long> banLogin4AccountMap = new HashMap<>();
     /** 禁止登录 */
     private HashMap<Long, Long> banLogin4RidMap = new HashMap<>();
+
 
 }

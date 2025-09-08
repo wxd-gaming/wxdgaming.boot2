@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
-import wxdgaming.game.global.bean.role.PlayerSnap;
+import wxdgaming.game.server.entity.role.PlayerSnap;
 import wxdgaming.game.server.bean.role.Player;
 
 /**

@@ -1,8 +1,8 @@
 package run;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 import run.entity.EntityTest;
 import run.entity.Table2;
 import wxdgaming.boot2.core.timer.MyClock;
@@ -32,7 +32,7 @@ public class PgsqlTest {
         sqlConfig.setUrl("jdbc:postgresql://127.0.0.1:5432/test2");
         sqlConfig.setUsername("postgres");
         sqlConfig.setPassword("test");
-        sqlConfig.setScanPackage(EntityTest.class.getPackageName());
+        sqlConfig.setScanPackage(new String[]{EntityTest.class.getPackageName()});
         dataHelper = new PgsqlDataHelper(sqlConfig);
         dataHelper.start();
         TableMapping tableMapping = dataHelper.tableMapping(EntityTest.class);

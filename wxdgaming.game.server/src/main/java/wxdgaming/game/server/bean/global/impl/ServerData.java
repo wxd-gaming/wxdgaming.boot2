@@ -2,7 +2,7 @@ package wxdgaming.game.server.bean.global.impl;
 
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.game.server.bean.global.DataBase;
+import wxdgaming.game.bean.global.AbstractGlobalData;
 
 /**
  * 全服数据
@@ -12,6 +12,6 @@ import wxdgaming.game.server.bean.global.DataBase;
  **/
 @Getter
 @Setter
-public class ServerData extends DataBase {
+public class ServerData extends AbstractGlobalData {
 
 }
