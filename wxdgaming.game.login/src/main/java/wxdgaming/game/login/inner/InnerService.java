@@ -51,18 +51,18 @@ public class InnerService {
         ConcurrentHashMap<Integer, ServerShowName> serverNameMap = showNameGlobalData.getServerNameMap();
         return getInnerGameServerInfoMap().values().stream()
                 .map(bean -> {
-                    JSONObject jsonObject = bean.toJSONObject();
-                    jsonObject.put("id", bean.getServerId());
-                    jsonObject.put("name", bean.getName());
+                    JSONObject map = bean.toJSONObject();
+                    map.put("id", bean.getServerId());
+                    map.put("name", bean.getName());
                     ServerShowName serverShowName = serverNameMap.get(bean.getServerId());
                     if (serverShowName != null && StringUtils.isNotBlank(serverShowName.getName())
                         && System.currentTimeMillis() < serverShowName.getExpireTime()) {
                         /*TODO 服务器冠名有效期*/
-                        jsonObject.put("name", serverShowName.getName());
+                        map.put("name", serverShowName.getName());
                     }
-                    jsonObject.put("host", bean.getHost());
-                    jsonObject.put("port", bean.getPort());
-                    return jsonObject;
+                    map.put("host", bean.getHost());
+                    map.put("port", bean.getPort());
+                    return map;
                 })
                 .toList();
     }
