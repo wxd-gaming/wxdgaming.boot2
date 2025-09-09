@@ -9,13 +9,14 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
-import wxdgaming.game.login.entity.server.InnerServerInfoBean;
 import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.login.bean.global.GlobalDataConst;
 import wxdgaming.game.login.bean.global.ServerShowName;
 import wxdgaming.game.login.bean.global.ServerShowNameGlobalData;
+import wxdgaming.game.login.entity.server.ServerInfoEntity;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
@@ -30,15 +31,15 @@ import java.util.concurrent.ConcurrentSkipListMap;
 public class InnerService {
 
     final SqlDataHelper sqlDataHelper;
-    final ConcurrentSkipListMap<Integer, InnerServerInfoBean> innerGameServerInfoMap = new ConcurrentSkipListMap<>();
+    final ConcurrentSkipListMap<Integer, ServerInfoEntity> innerGameServerInfoMap = new ConcurrentSkipListMap<>();
     final GlobalDataService globalDataService;
 
     public InnerService(PgsqlDataHelper sqlDataHelper, GlobalDataService globalDataService) {
         this.sqlDataHelper = sqlDataHelper;
         this.globalDataService = globalDataService;
-        this.sqlDataHelper.checkTable(InnerServerInfoBean.class);
+        this.sqlDataHelper.checkTable(ServerInfoEntity.class);
 
-        sqlDataHelper.findList(InnerServerInfoBean.class).forEach(bean -> {
+        sqlDataHelper.findList(ServerInfoEntity.class).forEach(bean -> {
             log.info("InnerService: {}", bean);
             innerGameServerInfoMap.put(bean.getServerId(), bean);
         });
@@ -46,13 +47,14 @@ public class InnerService {
     }
 
     public List<JSONObject> gameServerList() {
+        ServerShowNameGlobalData showNameGlobalData = globalDataService.get(GlobalDataConst.ServerNameGlobalData);
+        ConcurrentHashMap<Integer, ServerShowName> serverNameMap = showNameGlobalData.getServerNameMap();
         return getInnerGameServerInfoMap().values().stream()
                 .map(bean -> {
                     JSONObject jsonObject = bean.toJSONObject();
                     jsonObject.put("id", bean.getServerId());
-                    ServerShowNameGlobalData showNameGlobalData = globalDataService.get(GlobalDataConst.ServerNameGlobalData);
                     jsonObject.put("name", bean.getName());
-                    ServerShowName serverShowName = showNameGlobalData.getServerNameMap().get(bean.getServerId());
+                    ServerShowName serverShowName = serverNameMap.get(bean.getServerId());
                     if (serverShowName != null && StringUtils.isNotBlank(serverShowName.getName())
                         && System.currentTimeMillis() < serverShowName.getExpireTime()) {
                         /*TODO 服务器冠名有效期*/
@@ -68,9 +70,9 @@ public class InnerService {
     @Order(10)
     @Stop
     public void stop() {
-        innerGameServerInfoMap.values().forEach(bean -> {
+        for (ServerInfoEntity bean : innerGameServerInfoMap.values()) {
             sqlDataHelper.getDataBatch().save(bean);
-        });
+        }
     }
 
 }

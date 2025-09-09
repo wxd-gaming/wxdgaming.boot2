@@ -13,7 +13,7 @@ import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.server.SocketServer;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
-import wxdgaming.game.login.entity.server.InnerServerInfoBean;
+import wxdgaming.game.login.entity.server.ServerInfoEntity;
 import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.module.drive.PlayerDriveService;
 import wxdgaming.game.server.module.inner.InnerService;
@@ -55,7 +55,7 @@ public class GameTimerService extends HoldApplicationContext {
     @ExecutorWith(useVirtualThread = true)
     public void registerLoginServer() {
 
-        InnerServerInfoBean serverInfoBean = new InnerServerInfoBean();
+        ServerInfoEntity serverInfoBean = new ServerInfoEntity();
         serverInfoBean.setServerId(gameServerProperties.getSid());
         serverInfoBean.setMainId(gameServerProperties.getSid());
         serverInfoBean.setGid(gameServerProperties.getGid());

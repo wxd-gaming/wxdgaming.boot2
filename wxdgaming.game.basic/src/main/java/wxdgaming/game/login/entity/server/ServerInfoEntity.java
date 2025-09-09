@@ -15,7 +15,7 @@ import wxdgaming.boot2.starter.batis.ann.DbTable;
 @Getter
 @Setter
 @DbTable
-public class InnerServerInfoBean extends Entity implements Cloneable {
+public class ServerInfoEntity extends Entity implements Cloneable {
 
     @DbColumn(key = true)
     private int serverId;
@@ -25,6 +25,10 @@ public class InnerServerInfoBean extends Entity implements Cloneable {
     private String host;
     private int port;
     private int httpPort;
+    /** 开启时间 */
+    private long openTime;
+    /** 维护时间 */
+    private long maintenanceTime;
     private long lastSyncTime;
     private int status;
     private int maxOnlineSize = 1000;
@@ -37,7 +41,7 @@ public class InnerServerInfoBean extends Entity implements Cloneable {
     @Override public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
-        InnerServerInfoBean that = (InnerServerInfoBean) o;
+        ServerInfoEntity that = (ServerInfoEntity) o;
         return getGid() == that.getGid() && getServerId() == that.getServerId();
     }
 
@@ -47,7 +51,7 @@ public class InnerServerInfoBean extends Entity implements Cloneable {
         return result;
     }
 
-    @Override public InnerServerInfoBean clone() {
-        return (InnerServerInfoBean) super.clone();
+    @Override public ServerInfoEntity clone() {
+        return (ServerInfoEntity) super.clone();
     }
 }

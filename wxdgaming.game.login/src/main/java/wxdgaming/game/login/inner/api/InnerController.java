@@ -13,8 +13,8 @@ import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.game.login.entity.server.InnerServerInfoBean;
 import wxdgaming.game.login.cdkey.CDKeyService;
+import wxdgaming.game.login.entity.server.ServerInfoEntity;
 import wxdgaming.game.login.inner.InnerService;
 
 import java.util.ArrayList;
@@ -51,13 +51,20 @@ public class InnerController extends HoldApplicationContext {
     public RunResult registerGame(CacheHttpServletRequest request, @RequestBody JSONObject data) {
         ArrayList<Integer> sidList = data.getObject("sidList", new TypeReference<ArrayList<Integer>>() {});
         String jsonBean = data.getString("serverBean");
-        InnerServerInfoBean serverBean = FastJsonUtil.parse(jsonBean, InnerServerInfoBean.class);
+        ServerInfoEntity serverBean = FastJsonUtil.parse(jsonBean, ServerInfoEntity.class);
         for (Integer sid : sidList) {
-            InnerServerInfoBean clone = serverBean.clone();
+            ServerInfoEntity clone = innerService.getInnerGameServerInfoMap().computeIfAbsent(sid, k -> serverBean.clone());
             clone.setServerId(sid);
             clone.setHost(SpringUtil.getClientIp(request));
+            clone.setPort(serverBean.getPort());
+            clone.setHttpPort(serverBean.getHttpPort());
+            clone.setStatus(serverBean.getStatus());
+            clone.setMainId(serverBean.getMainId());
+            clone.setGid(serverBean.getGid());
+            clone.setName(serverBean.getName());
+            clone.setMaxOnlineSize(serverBean.getMaxOnlineSize());
+            clone.setOnlineSize(serverBean.getOnlineSize());
             clone.setLastSyncTime(MyClock.millis());
-            innerService.getInnerGameServerInfoMap().put(sid, clone);
             innerService.getSqlDataHelper().getDataBatch().save(clone);
         }
         return RunResult.ok();
@@ -65,7 +72,7 @@ public class InnerController extends HoldApplicationContext {
 
     @RequestMapping(value = "/gameServerList")
     public RunResult gameServerList(HttpServletRequest context, @RequestBody JSONObject data) {
-        List<InnerServerInfoBean> list = innerService.getInnerGameServerInfoMap().values()
+        List<ServerInfoEntity> list = innerService.getInnerGameServerInfoMap().values()
                 .stream()
                 .toList();
         return RunResult.ok().data(list);
