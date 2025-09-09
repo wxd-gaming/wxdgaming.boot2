@@ -3,10 +3,9 @@ package wxdgaming.game.server.bean.bag;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.game.bean.goods.Item;
+import wxdgaming.game.server.bean.goods.Item;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * 道具背包

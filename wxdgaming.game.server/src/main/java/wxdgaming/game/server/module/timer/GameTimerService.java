@@ -12,8 +12,8 @@ import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.server.SocketServer;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
-import wxdgaming.game.basic.login.LoginProperties;
-import wxdgaming.game.basic.login.bean.info.InnerServerInfoBean;
+import wxdgaming.game.common.bean.login.ConnectLoginProperties;
+import wxdgaming.game.login.entity.server.InnerServerInfoBean;
 import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.module.drive.PlayerDriveService;
 import wxdgaming.game.server.module.inner.InnerService;
@@ -35,16 +35,16 @@ public class GameTimerService extends HoldApplicationContext {
     int webPort;
     final SocketServer socketServer;
     final GameServerProperties gameServerProperties;
-    final LoginProperties loginProperties;
+    final ConnectLoginProperties connectLoginProperties;
     final PlayerDriveService playerDriveService;
     final InnerService innerService;
 
     public GameTimerService(SocketServer socketServer,
-                            GameServerProperties gameServerProperties, LoginProperties loginProperties,
+                            GameServerProperties gameServerProperties, ConnectLoginProperties connectLoginProperties,
                             PlayerDriveService playerDriveService, InnerService innerService) {
         this.socketServer = socketServer;
         this.gameServerProperties = gameServerProperties;
-        this.loginProperties = loginProperties;
+        this.connectLoginProperties = connectLoginProperties;
         this.playerDriveService = playerDriveService;
         this.innerService = innerService;
     }
@@ -63,7 +63,7 @@ public class GameTimerService extends HoldApplicationContext {
         serverInfoBean.setPort(socketServer.getConfig().getPort());
         serverInfoBean.setHttpPort(webPort);
 
-        serverInfoBean.setMaxOnlineSize(loginProperties.getMaxOnlineSize());
+        serverInfoBean.setMaxOnlineSize(connectLoginProperties.getMaxOnlineSize());
         serverInfoBean.setOnlineSize(playerDriveService.onlineSize());
 
 
@@ -74,7 +74,7 @@ public class GameTimerService extends HoldApplicationContext {
 
         innerService.sign(jsonObject);
 
-        String url = loginProperties.getUrl() + "/inner/registerGame";
+        String url = connectLoginProperties.getUrl() + "/inner/registerGame";
         HttpResponse execute = HttpRequestPost.ofJson(url, jsonObject.toString()).execute();
         if (!execute.isSuccess()) {
             log.error("访问登陆服务器失败{}", url);

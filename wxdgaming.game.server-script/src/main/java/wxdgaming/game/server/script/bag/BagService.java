@@ -8,7 +8,6 @@ import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
-import wxdgaming.game.bean.goods.*;
 import wxdgaming.game.cfg.QItemTable;
 import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.message.bag.BagType;
@@ -16,6 +15,7 @@ import wxdgaming.game.message.bag.ResBagInfo;
 import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.bag.BagPack;
 import wxdgaming.game.server.bean.bag.ItemBag;
+import wxdgaming.game.server.bean.goods.*;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnCreateRole;
 import wxdgaming.game.server.event.OnLogin;
@@ -27,7 +27,7 @@ import wxdgaming.game.server.script.bag.log.ItemSlog;
 import wxdgaming.game.server.script.bag.use.AbstractUseItemAction;
 import wxdgaming.game.server.script.mail.MailService;
 import wxdgaming.game.server.script.tips.TipsService;
-import wxdgaming.game.basic.slog.SlogService;
+import wxdgaming.game.common.slog.SlogService;
 
 import java.util.*;
 
@@ -194,7 +194,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
                         "获得",
                         cfgId, qItem.getName(),
                         oldCount, change, newCount,
-                        bagChangeDTO.getReasonDTO().getReason().name(),
+                        bagChangeDTO.getReasonDTO().getReasonConst().name(),
                         bagChangeDTO.getReasonDTO().getReasonText()
                 );
                 slogService.pushLog(itemLog);
@@ -238,7 +238,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
             long oldCount = gainScript.getCount(player, itemBag, cfgId);
             if (oldCount < change) {
                 if (bagChangeArgs.isBagErrorNoticeClient()) {
-                    tipsService.tips(player, qItem.getToName() + "道具不足", bagChangeArgs.getReasonDTO().getReason());
+                    tipsService.tips(player, qItem.getToName() + "道具不足", bagChangeArgs.getReasonDTO().getReasonConst());
                 }
                 return false;
             }
@@ -275,7 +275,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
                     "消耗",
                     cfgId, qItem.getName(),
                     oldCount, change, newCount,
-                    bagChangeDTO.getReasonDTO().getReason().name(),
+                    bagChangeDTO.getReasonDTO().getReasonConst().name(),
                     bagChangeDTO.getReasonDTO().getReasonText()
             );
             slogService.pushLog(itemLog);

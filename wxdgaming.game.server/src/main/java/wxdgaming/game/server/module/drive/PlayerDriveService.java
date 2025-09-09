@@ -12,7 +12,7 @@ import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorProperties;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.net.SocketSession;
-import wxdgaming.game.basic.slog.SlogService;
+import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.slog.RoleInfoSlog;

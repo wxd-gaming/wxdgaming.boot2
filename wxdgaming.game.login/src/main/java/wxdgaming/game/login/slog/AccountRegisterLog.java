@@ -2,7 +2,7 @@ package wxdgaming.game.login.slog;
 
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.game.basic.slog.AbstractLog;
+import wxdgaming.game.common.bean.slog.AbstractLog;
 
 /**
  * 账号日志

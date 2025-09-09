@@ -8,7 +8,7 @@ import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.net.SocketConfiguration;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
-import wxdgaming.game.basic.login.LoginProperties;
+import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 
 /**
  * 启动器
@@ -19,7 +19,7 @@ import wxdgaming.game.basic.login.LoginProperties;
 @SpringBootApplication(
         scanBasePackageClasses = {
                 CoreScan.class,
-                LoginProperties.class,
+                ConnectLoginProperties.class,
                 SocketConfiguration.class,
                 DataExcelScan.class,
                 ScheduledScan.class,

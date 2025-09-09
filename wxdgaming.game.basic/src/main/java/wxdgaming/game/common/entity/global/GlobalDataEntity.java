@@ -6,7 +6,7 @@ import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.EntityIntegerUID;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
-import wxdgaming.game.bean.global.AbstractGlobalData;
+import wxdgaming.game.common.bean.global.AbstractGlobalData;
 
 /**
  * 全局数据

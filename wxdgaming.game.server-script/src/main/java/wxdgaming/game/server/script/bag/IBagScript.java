@@ -1,6 +1,6 @@
 package wxdgaming.game.server.script.bag;
 
-import wxdgaming.game.bean.goods.ItemTypeConst;
+import wxdgaming.game.server.bean.goods.ItemTypeConst;
 
 /**
  * 背包脚本

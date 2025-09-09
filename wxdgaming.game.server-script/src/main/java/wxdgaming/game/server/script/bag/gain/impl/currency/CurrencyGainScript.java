@@ -2,9 +2,9 @@ package wxdgaming.game.server.script.bag.gain.impl.currency;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.game.bean.goods.Item;
-import wxdgaming.game.bean.goods.ItemCfg;
-import wxdgaming.game.bean.goods.ItemTypeConst;
+import wxdgaming.game.server.bean.goods.Item;
+import wxdgaming.game.server.bean.goods.ItemCfg;
+import wxdgaming.game.server.bean.goods.ItemTypeConst;
 import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.bag.ItemBag;
 import wxdgaming.game.server.bean.role.Player;

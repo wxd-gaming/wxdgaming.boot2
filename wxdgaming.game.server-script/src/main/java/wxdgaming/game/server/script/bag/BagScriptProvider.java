@@ -4,7 +4,7 @@ import lombok.Getter;
 import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.game.bean.goods.ItemTypeConst;
+import wxdgaming.game.server.bean.goods.ItemTypeConst;
 
 /**
  * 背包相关的脚本持有

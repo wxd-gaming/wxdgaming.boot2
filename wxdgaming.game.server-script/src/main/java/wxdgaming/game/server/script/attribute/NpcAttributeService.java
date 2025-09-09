@@ -5,10 +5,10 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.game.basic.core.Reason;
-import wxdgaming.game.basic.core.ReasonDTO;
-import wxdgaming.game.bean.attr.AttrInfo;
-import wxdgaming.game.bean.attr.AttrType;
+import wxdgaming.game.server.bean.reason.ReasonConst;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
+import wxdgaming.game.server.bean.attr.AttrInfo;
+import wxdgaming.game.server.bean.attr.AttrType;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.server.bean.attribute.CalculatorType;
@@ -52,7 +52,7 @@ public class NpcAttributeService extends HoldApplicationContext {
         EventConst.NpcAttributeCalculatorEvent playerAttributeCalculatorEvent = new EventConst.NpcAttributeCalculatorEvent(
                 mapNpc,
                 calculatorTypes,
-                ReasonDTO.of(Reason.Level)
+                ReasonDTO.of(ReasonConst.Level)
         );
         finalCalculator(playerAttributeCalculatorEvent);
     }

@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.basic.slog.AbstractSlog;
+import wxdgaming.game.common.bean.slog.AbstractSlog;
 
 /**
  * 角色日志

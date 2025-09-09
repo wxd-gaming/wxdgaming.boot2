@@ -6,9 +6,9 @@ import lombok.Setter;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.excel.store.DataKey;
 import wxdgaming.boot2.starter.excel.store.DataMapping;
+import wxdgaming.game.server.bean.attr.AttrInfo;
 
 import java.io.Serializable;
-import java.util.*;
 
 /**
  * excel 构建 怪物表, src/main/cfg/玩家信息.xlsx, q_player,
@@ -25,9 +25,9 @@ public abstract class QPlayerMapping extends ObjectBase implements Serializable,
     /** 升级所需要的经验值 */
     protected int exp;
     /** 属性 */
-    protected wxdgaming.game.bean.attr.AttrInfo attr;
+    protected AttrInfo attr;
     /** 属性 */
-    protected wxdgaming.game.bean.attr.AttrInfo attrPro;
+    protected AttrInfo attrPro;
 
     public Object key() {
         return id;

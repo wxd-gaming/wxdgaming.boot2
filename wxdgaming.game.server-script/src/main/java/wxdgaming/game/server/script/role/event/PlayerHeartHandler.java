@@ -6,8 +6,8 @@ import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.game.basic.core.Reason;
-import wxdgaming.game.basic.core.ReasonDTO;
+import wxdgaming.game.server.bean.reason.ReasonConst;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.*;
 import wxdgaming.game.server.script.fight.FightService;
@@ -46,7 +46,7 @@ public class PlayerHeartHandler extends HoldApplicationContext {
         }
     }
 
-    final ReasonDTO reasonDTO = ReasonDTO.of(Reason.Heart, "心跳回血");
+    final ReasonDTO reasonDTO = ReasonDTO.of(ReasonConst.Heart, "心跳回血");
 
     @OnHeartSecond
     public void onHeartSecond(Player player, int second) {

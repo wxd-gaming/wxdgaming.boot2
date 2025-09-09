@@ -7,7 +7,7 @@ import wxdgaming.boot2.core.BootstrapProperties;
 import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.SpringUtil;
-import wxdgaming.game.basic.login.AppPlatformParams;
+import wxdgaming.game.common.bean.login.AppPlatformParams;
 import wxdgaming.game.login.entity.UserData;
 import wxdgaming.game.login.login.sdk.AbstractSdkLoginApi;
 

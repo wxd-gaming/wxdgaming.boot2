@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.game.basic.core.Reason;
-import wxdgaming.game.basic.core.ReasonDTO;
-import wxdgaming.game.bean.attr.AttrInfo;
-import wxdgaming.game.bean.attr.AttrType;
+import wxdgaming.game.server.bean.reason.ReasonConst;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
+import wxdgaming.game.server.bean.attr.AttrInfo;
+import wxdgaming.game.server.bean.attr.AttrType;
 import wxdgaming.game.message.role.ResUpdateFightValue;
 import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.server.bean.attribute.CalculatorType;
@@ -99,7 +99,7 @@ public class PlayerAttributeService extends HoldApplicationContext {
 
         if (oldFightValue != fightValue) {
             log.info("{} 战斗力变化 {} -> {}, 触发: {}", event.player(), oldFightValue, fightValue, event.reasonDTO());
-            if (event.reasonDTO().getReason() != Reason.Login) {
+            if (event.reasonDTO().getReasonConst() != ReasonConst.Login) {
                 ResUpdateFightValue resUpdateFightValue = new ResUpdateFightValue();
                 resUpdateFightValue.setFightValue(fightValue);
                 event.player().write(resUpdateFightValue);
@@ -131,7 +131,7 @@ public class PlayerAttributeService extends HoldApplicationContext {
         EventConst.PlayerAttributeCalculatorEvent playerAttributeCalculatorEvent = new EventConst.PlayerAttributeCalculatorEvent(
                 player,
                 calculatorTypes,
-                ReasonDTO.of(Reason.Login)
+                ReasonDTO.of(ReasonConst.Login)
         );
 
         finalCalculator(playerAttributeCalculatorEvent);
@@ -145,7 +145,7 @@ public class PlayerAttributeService extends HoldApplicationContext {
         EventConst.PlayerAttributeCalculatorEvent playerAttributeCalculatorEvent = new EventConst.PlayerAttributeCalculatorEvent(
                 event.player(),
                 calculatorBASE,
-                ReasonDTO.of(Reason.Level)
+                ReasonDTO.of(ReasonConst.Level)
         );
         onPlayerAttributeCalculator(playerAttributeCalculatorEvent);
     }

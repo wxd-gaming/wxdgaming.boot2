@@ -3,7 +3,7 @@ package wxdgaming.game.server.script.attribute.impl.monster;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.event.Event;
-import wxdgaming.game.bean.attr.AttrInfo;
+import wxdgaming.game.server.bean.attr.AttrInfo;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.server.script.attribute.AbstractCalculatorAction;

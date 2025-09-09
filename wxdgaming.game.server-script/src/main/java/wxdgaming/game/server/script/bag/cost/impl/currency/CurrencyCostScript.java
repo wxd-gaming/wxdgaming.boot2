@@ -2,7 +2,7 @@ package wxdgaming.game.server.script.bag.cost.impl.currency;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.game.bean.goods.ItemTypeConst;
+import wxdgaming.game.server.bean.goods.ItemTypeConst;
 import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.server.bean.bag.ItemGrid;
 import wxdgaming.game.server.bean.role.Player;

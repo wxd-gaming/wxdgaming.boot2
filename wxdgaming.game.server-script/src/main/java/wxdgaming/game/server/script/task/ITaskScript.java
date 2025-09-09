@@ -6,12 +6,12 @@ import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.collection.ListOf;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
-import wxdgaming.game.basic.core.GameCfgFunction;
-import wxdgaming.game.basic.core.Reason;
-import wxdgaming.game.basic.core.ReasonDTO;
-import wxdgaming.game.basic.slog.SlogService;
-import wxdgaming.game.bean.goods.BagChangeDTO4ItemCfg;
-import wxdgaming.game.bean.goods.ItemCfg;
+import wxdgaming.game.server.bean.GameCfgFunction;
+import wxdgaming.game.server.bean.reason.ReasonConst;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
+import wxdgaming.game.common.slog.SlogService;
+import wxdgaming.game.server.bean.goods.BagChangeDTO4ItemCfg;
+import wxdgaming.game.server.bean.goods.ItemCfg;
 import wxdgaming.game.cfg.QTaskTable;
 import wxdgaming.game.cfg.bean.QTask;
 import wxdgaming.game.message.task.*;
@@ -108,7 +108,7 @@ public abstract class ITaskScript extends HoldApplicationContext {
             tipsService.tips(player, "已经接取");
             return;
         }
-        ReasonDTO reasonDTO = ReasonDTO.of(Reason.TASK_ACCEPT, "taskCfg=" + taskId);
+        ReasonDTO reasonDTO = ReasonDTO.of(ReasonConst.TASK_ACCEPT, "taskCfg=" + taskId);
 
         List<ItemCfg> objectByFunction = GameCfgFunction.ConfigString2ItemCfgList.apply(qTask.getAcceptCost());
         if (!ListOf.isEmpty(objectByFunction)) {
@@ -152,7 +152,7 @@ public abstract class ITaskScript extends HoldApplicationContext {
         }
 
         QTask qTask = taskInfo.qTask();
-        ReasonDTO reasonDTO = ReasonDTO.of(Reason.TASK_SUBMIT, "taskCfg=" + taskId);
+        ReasonDTO reasonDTO = ReasonDTO.of(ReasonConst.TASK_SUBMIT, "taskCfg=" + taskId);
 
         List<ItemCfg> submitCost = qTask.getSubmitCost().get(GameCfgFunction.ItemCfgFunction);
         if (!ListOf.isEmpty(submitCost)) {

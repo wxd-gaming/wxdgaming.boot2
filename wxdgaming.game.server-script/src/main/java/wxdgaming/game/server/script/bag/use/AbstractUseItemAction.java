@@ -2,7 +2,7 @@ package wxdgaming.game.server.script.bag.use;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.game.bean.goods.Item;
+import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.bag.IBagScript;

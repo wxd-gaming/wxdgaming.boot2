@@ -8,7 +8,7 @@ import wxdgaming.boot2.core.token.JsonTokenParse;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
-import wxdgaming.game.basic.login.LoginProperties;
+import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 import wxdgaming.game.message.role.ReqLogin;
 import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.module.data.DataCenterService;
@@ -26,16 +26,16 @@ public class ReqLoginHandler extends HoldApplicationContext {
     private final DataCenterService dataCenterService;
     private final PlayerService playerService;
     private final TipsService tipsService;
-    private final LoginProperties loginProperties;
+    private final ConnectLoginProperties connectLoginProperties;
 
     public ReqLoginHandler(DataCenterService dataCenterService,
                            PlayerService playerService,
                            TipsService tipsService,
-                           LoginProperties loginProperties) {
+                           ConnectLoginProperties connectLoginProperties) {
         this.dataCenterService = dataCenterService;
         this.playerService = playerService;
         this.tipsService = tipsService;
-        this.loginProperties = loginProperties;
+        this.connectLoginProperties = connectLoginProperties;
     }
 
     @ProtoRequest(ReqLogin.class)
@@ -47,7 +47,7 @@ public class ReqLoginHandler extends HoldApplicationContext {
         try {
             int sid = req.getSid();
             String token = req.getToken();
-            JsonToken jsonToken = JsonTokenParse.parse(loginProperties.getJwtKey(), token);
+            JsonToken jsonToken = JsonTokenParse.parse(connectLoginProperties.getJwtKey(), token);
             int appId = jsonToken.getIntValue("appId");
             String account = jsonToken.getString("account");
             String platform = jsonToken.getString("platform");

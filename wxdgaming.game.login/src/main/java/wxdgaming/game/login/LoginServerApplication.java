@@ -11,7 +11,7 @@ import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
 import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.net.httpclient5.HttpClientScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
-import wxdgaming.game.basic.slog.SlogService;
+import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.logbus.LogBusService;
 

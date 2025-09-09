@@ -5,11 +5,11 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
-import wxdgaming.game.basic.core.Reason;
-import wxdgaming.game.basic.core.ReasonDTO;
-import wxdgaming.game.basic.core.GameCfgFunction;
-import wxdgaming.game.bean.goods.BagChangeDTO4ItemCfg;
-import wxdgaming.game.bean.goods.ItemCfg;
+import wxdgaming.game.server.bean.reason.ReasonConst;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
+import wxdgaming.game.server.bean.GameCfgFunction;
+import wxdgaming.game.server.bean.goods.BagChangeDTO4ItemCfg;
+import wxdgaming.game.server.bean.goods.ItemCfg;
 import wxdgaming.game.cfg.QAchieveTable;
 import wxdgaming.game.cfg.bean.QAchieve;
 import wxdgaming.game.server.bean.achieve.AchievePack;
@@ -100,7 +100,7 @@ public class AchieveService implements InitPrint {
         }
 
         List<ItemCfg> itemCfgs = qAchieve.getRewards().get(GameCfgFunction.ItemCfgFunction);
-        ReasonDTO reasonDTO = ReasonDTO.of(Reason.Achieve, "achieveId=" + achieveId);
+        ReasonDTO reasonDTO = ReasonDTO.of(ReasonConst.Achieve, "achieveId=" + achieveId);
         BagChangeDTO4ItemCfg bagChangeDTO4ItemCfg = BagChangeDTO4ItemCfg.builder()
                 .setReasonDTO(reasonDTO)
                 .setItemCfgList(itemCfgs)

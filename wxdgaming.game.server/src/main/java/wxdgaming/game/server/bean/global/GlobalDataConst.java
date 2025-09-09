@@ -3,8 +3,8 @@ package wxdgaming.game.server.bean.global;
 
 import lombok.Getter;
 import wxdgaming.boot2.core.collection.MapOf;
-import wxdgaming.game.bean.global.AbstractGlobalData;
-import wxdgaming.game.common.global.IGlobalDataConst;
+import wxdgaming.game.common.bean.global.AbstractGlobalData;
+import wxdgaming.game.common.bean.global.IGlobalDataConst;
 import wxdgaming.game.server.bean.global.impl.ServerData;
 import wxdgaming.game.server.bean.global.impl.ServerMailData;
 import wxdgaming.game.server.bean.global.impl.YunyingData;

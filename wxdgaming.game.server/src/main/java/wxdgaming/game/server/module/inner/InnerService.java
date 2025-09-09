@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.util.Md5Util;
-import wxdgaming.game.basic.login.LoginProperties;
+import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 
 /**
  * 内部服务
@@ -18,16 +18,16 @@ import wxdgaming.game.basic.login.LoginProperties;
 @Service
 public class InnerService implements InitPrint {
 
-    final LoginProperties loginProperties;
+    final ConnectLoginProperties connectLoginProperties;
 
-    public InnerService(LoginProperties loginProperties) {
+    public InnerService(ConnectLoginProperties connectLoginProperties) {
 
-        this.loginProperties = loginProperties;
+        this.connectLoginProperties = connectLoginProperties;
     }
 
     public void sign(JSONObject jsonData) {
         String json = jsonData.toString(SerializerFeature.MapSortField, SerializerFeature.SortField);
-        String md5DigestEncode = Md5Util.md5DigestEncode0("#", json, loginProperties.getJwtKey());
+        String md5DigestEncode = Md5Util.md5DigestEncode0("#", json, connectLoginProperties.getJwtKey());
         jsonData.put("sign", md5DigestEncode);
     }
 

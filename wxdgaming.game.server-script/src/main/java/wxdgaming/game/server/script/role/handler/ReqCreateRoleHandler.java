@@ -9,7 +9,7 @@ import wxdgaming.boot2.core.util.SingletonLockUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
-import wxdgaming.game.basic.slog.SlogService;
+import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.message.role.ReqCreateRole;
 import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;

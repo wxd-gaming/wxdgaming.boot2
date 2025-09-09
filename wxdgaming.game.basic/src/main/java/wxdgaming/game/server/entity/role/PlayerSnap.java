@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.starter.batis.EntityLongUID;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
-import wxdgaming.game.bean.Vector3D;
+import wxdgaming.game.server.bean.Vector3D;
 
 /**
  * 玩家快照

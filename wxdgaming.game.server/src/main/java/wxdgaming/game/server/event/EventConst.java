@@ -1,7 +1,7 @@
 package wxdgaming.game.server.event;
 
 import wxdgaming.boot2.starter.event.Event;
-import wxdgaming.game.basic.core.ReasonDTO;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.attribute.CalculatorType;
 import wxdgaming.game.server.bean.role.Player;

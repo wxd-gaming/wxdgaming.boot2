@@ -9,12 +9,12 @@ import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
-import wxdgaming.game.basic.core.Reason;
-import wxdgaming.game.basic.core.ReasonDTO;
-import wxdgaming.game.basic.login.LoginProperties;
-import wxdgaming.game.bean.goods.BagChangeDTO4Item;
-import wxdgaming.game.bean.goods.Item;
-import wxdgaming.game.bean.goods.ItemCfg;
+import wxdgaming.game.server.bean.reason.ReasonConst;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
+import wxdgaming.game.common.bean.login.ConnectLoginProperties;
+import wxdgaming.game.server.bean.goods.BagChangeDTO4Item;
+import wxdgaming.game.server.bean.goods.Item;
+import wxdgaming.game.server.bean.goods.ItemCfg;
 import wxdgaming.game.message.cdkey.ResUseCdKey;
 import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.bean.role.Player;
@@ -38,7 +38,7 @@ import java.util.List;
 @Service
 public class CDKeyService implements InitPrint {
 
-    final LoginProperties loginProperties;
+    final ConnectLoginProperties connectLoginProperties;
     final GameServerProperties gameServerProperties;
     private final DataCenterService dataCenterService;
     private final TipsService tipsService;
@@ -46,21 +46,21 @@ public class CDKeyService implements InitPrint {
     final InnerService innerService;
 
 
-    public CDKeyService(LoginProperties loginProperties, GameServerProperties gameServerProperties,
+    public CDKeyService(ConnectLoginProperties connectLoginProperties, GameServerProperties gameServerProperties,
                         DataCenterService dataCenterService,
                         TipsService tipsService, BagService bagService,
                         InnerService innerService) {
         this.dataCenterService = dataCenterService;
         this.tipsService = tipsService;
         this.bagService = bagService;
-        this.loginProperties = loginProperties;
+        this.connectLoginProperties = connectLoginProperties;
         this.gameServerProperties = gameServerProperties;
         this.innerService = innerService;
     }
 
     public void use(Player player, String cdKey) {
 
-        String url = loginProperties.getUrl();
+        String url = connectLoginProperties.getUrl();
         url = url + "/inner/cdkey/use";
 
         JSONObject params = new JSONObject();
@@ -93,7 +93,7 @@ public class CDKeyService implements InitPrint {
         }
 
         ReasonDTO reasonDTO = ReasonDTO.of(
-                Reason.USE_CDKEY,
+                ReasonConst.USE_CDKEY,
                 "cdkey=", cdKey, "cid=%d(%s)".formatted(runResult.getIntValue("cid"), runResult.getString("comment"))
         );
 

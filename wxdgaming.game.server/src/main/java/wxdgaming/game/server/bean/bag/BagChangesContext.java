@@ -3,7 +3,7 @@ package wxdgaming.game.server.bean.bag;
 import lombok.AccessLevel;
 import lombok.Getter;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.game.basic.core.ReasonDTO;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.message.bag.ResUpdateBagInfo;
 import wxdgaming.game.server.bean.role.Player;
@@ -33,7 +33,7 @@ public class BagChangesContext {
         this.reasonDTO = reasonDTO;
         this.resUpdateBagInfo = new ResUpdateBagInfo();
         this.resUpdateBagInfo.setBagType(bagType);
-        this.resUpdateBagInfo.setReason(reasonDTO.getReason().name());
+        this.resUpdateBagInfo.setReason(reasonDTO.getReasonConst().name());
     }
 
     /** 添加货币 */

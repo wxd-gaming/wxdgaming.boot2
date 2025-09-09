@@ -7,7 +7,8 @@ import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.starter.batis.sql.SqlDataCache;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
-import wxdgaming.game.bean.global.AbstractGlobalData;
+import wxdgaming.game.common.bean.global.AbstractGlobalData;
+import wxdgaming.game.common.bean.global.IGlobalDataConst;
 import wxdgaming.game.common.entity.global.GlobalDataEntity;
 
 /**

@@ -2,7 +2,7 @@ package wxdgaming.game.login.bean.global;
 
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.game.bean.global.AbstractGlobalData;
+import wxdgaming.game.common.bean.global.AbstractGlobalData;
 
 import java.util.concurrent.ConcurrentHashMap;
 

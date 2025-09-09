@@ -2,10 +2,10 @@ package wxdgaming.game.server.script.role.event;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.game.basic.core.Reason;
-import wxdgaming.game.basic.core.ReasonDTO;
-import wxdgaming.game.bean.goods.BagChangeDTO4ItemCfg;
-import wxdgaming.game.bean.goods.ItemCfg;
+import wxdgaming.game.server.bean.reason.ReasonConst;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
+import wxdgaming.game.server.bean.goods.BagChangeDTO4ItemCfg;
+import wxdgaming.game.server.bean.goods.ItemCfg;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.OnCreateRole;
 import wxdgaming.game.server.script.bag.BagService;
@@ -40,7 +40,7 @@ public class PlayerCreateHandler {
         rewards.add(builder.cfgId(3).num(100000).build());
         rewards.add(builder.cfgId(4).num(100000).build());
         rewards.add(builder.cfgId(5).num(1).build());
-        ReasonDTO reasonDTO = ReasonDTO.of(Reason.CreateRole);
+        ReasonDTO reasonDTO = ReasonDTO.of(ReasonConst.CreateRole);
         BagChangeDTO4ItemCfg rewardArgs4ItemCfg = BagChangeDTO4ItemCfg.builder()
                 .setItemCfgList(rewards)
                 .setReasonDTO(reasonDTO)

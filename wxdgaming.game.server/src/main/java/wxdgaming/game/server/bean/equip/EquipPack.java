@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.core.lang.ObjectBase;
-import wxdgaming.game.bean.goods.Equipment;
+import wxdgaming.game.server.bean.goods.Equipment;
 
 /**
  * 装备拦

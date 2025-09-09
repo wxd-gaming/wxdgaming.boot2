@@ -1,9 +1,9 @@
 package wxdgaming.game.server.script.bag.use.impl.equip;
 
 import org.springframework.stereotype.Component;
-import wxdgaming.game.bean.goods.Equipment;
-import wxdgaming.game.bean.goods.Item;
-import wxdgaming.game.bean.goods.ItemTypeConst;
+import wxdgaming.game.server.bean.goods.Equipment;
+import wxdgaming.game.server.bean.goods.Item;
+import wxdgaming.game.server.bean.goods.ItemTypeConst;
 import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.equip.EquipPack;

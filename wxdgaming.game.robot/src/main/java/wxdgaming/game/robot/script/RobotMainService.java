@@ -18,7 +18,7 @@ import wxdgaming.boot2.starter.net.client.SocketClient;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
-import wxdgaming.game.basic.login.LoginProperties;
+import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 import wxdgaming.game.message.chat.ChatType;
 import wxdgaming.game.message.chat.ReqChatMessage;
 import wxdgaming.game.message.role.ReqHeartbeat;
@@ -45,12 +45,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Service
 public class RobotMainService {
 
-    final LoginProperties loginProperties;
+    final ConnectLoginProperties connectLoginProperties;
     final SocketClient socketClient;
     final ConcurrentHashMap<String, Robot> robotMap = new ConcurrentHashMap<>();
 
-    public RobotMainService(LoginProperties loginProperties, SocketClient socketClient) {
-        this.loginProperties = loginProperties;
+    public RobotMainService(ConnectLoginProperties connectLoginProperties, SocketClient socketClient) {
+        this.connectLoginProperties = connectLoginProperties;
         this.socketClient = socketClient;
     }
 
@@ -69,7 +69,7 @@ public class RobotMainService {
         jsonObject.put("account", robot.getAccount());
         jsonObject.put("token", robot.getAccount());
 
-        String uriPath = getLoginProperties().getUrl() + "/login/check";
+        String uriPath = getConnectLoginProperties().getUrl() + "/login/check";
         HttpResponse httpResponse = HttpRequestPost.of(uriPath, jsonObject).execute();
         RunResult runResult = httpResponse.bodyRunResult();
         if (runResult.isFail()) {

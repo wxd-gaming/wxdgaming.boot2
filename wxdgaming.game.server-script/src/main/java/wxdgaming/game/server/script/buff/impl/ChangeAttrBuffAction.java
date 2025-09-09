@@ -2,8 +2,8 @@ package wxdgaming.game.server.script.buff.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.game.bean.buff.BuffType;
-import wxdgaming.game.bean.buff.BuffTypeConst;
+import wxdgaming.game.server.bean.buff.BuffType;
+import wxdgaming.game.server.bean.buff.BuffTypeConst;
 import wxdgaming.game.cfg.bean.QBuff;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.buff.Buff;

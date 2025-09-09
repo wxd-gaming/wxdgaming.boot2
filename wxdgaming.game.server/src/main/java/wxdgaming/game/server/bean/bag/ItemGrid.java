@@ -2,7 +2,7 @@ package wxdgaming.game.server.bean.bag;
 
 import lombok.Getter;
 import wxdgaming.boot2.core.lang.ObjectBase;
-import wxdgaming.game.bean.goods.Item;
+import wxdgaming.game.server.bean.goods.Item;
 
 /**
  * 格子，

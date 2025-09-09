@@ -3,12 +3,12 @@ package wxdgaming.game.server.script.buff.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.lang.ConfigString;
-import wxdgaming.game.basic.core.Reason;
-import wxdgaming.game.basic.core.ReasonDTO;
-import wxdgaming.game.bean.attr.AttrInfo;
-import wxdgaming.game.bean.attr.AttrType;
-import wxdgaming.game.bean.buff.BuffType;
-import wxdgaming.game.bean.buff.BuffTypeConst;
+import wxdgaming.game.server.bean.reason.ReasonConst;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
+import wxdgaming.game.server.bean.attr.AttrInfo;
+import wxdgaming.game.server.bean.attr.AttrType;
+import wxdgaming.game.server.bean.buff.BuffType;
+import wxdgaming.game.server.bean.buff.BuffTypeConst;
 import wxdgaming.game.cfg.bean.QBuff;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.buff.Buff;
@@ -31,7 +31,7 @@ public class ChangeHpMpBuffAction extends AbstractBuffAction {
     @Override public void doAction(MapNpc mapNpc, Buff buff, QBuff qBuff) {
         ConfigString paramString1 = qBuff.getParamString1();
         AttrInfo objectByFunction = paramString1.get(AttrInfo.JsonParse);
-        ReasonDTO reasonDTO = ReasonDTO.of(Reason.Buff, "buff", qBuff.getId(), "sendUid", buff.getSendUid());
+        ReasonDTO reasonDTO = ReasonDTO.of(ReasonConst.Buff, "buff", qBuff.getId(), "sendUid", buff.getSendUid());
         if (qBuff.getParamInt1() == 0/*TODO 固定值*/) {
             Long hp = objectByFunction.get(AttrType.HP);
             if (hp != null) {

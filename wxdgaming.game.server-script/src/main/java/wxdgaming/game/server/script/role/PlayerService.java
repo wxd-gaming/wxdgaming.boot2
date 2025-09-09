@@ -6,8 +6,8 @@ import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.event.EventService;
 import wxdgaming.boot2.starter.net.SocketSession;
-import wxdgaming.game.basic.core.ReasonDTO;
-import wxdgaming.game.basic.slog.SlogService;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
+import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.message.role.ResLogin;
 import wxdgaming.game.message.role.ResUpdateExp;
 import wxdgaming.game.message.role.ResUpdateLevel;
@@ -71,7 +71,7 @@ public class PlayerService extends HoldApplicationContext {
         player.setExp(exp);
         ResUpdateExp resUpdateLevel = new ResUpdateExp()
                 .setExp(player.getExp())
-                .setReason(reasonDTO.getReason().name());
+                .setReason(reasonDTO.getReasonConst().name());
         player.write(resUpdateLevel);
     }
 
@@ -86,7 +86,7 @@ public class PlayerService extends HoldApplicationContext {
 
         ResUpdateLevel resUpdateLevel = new ResUpdateLevel()
                 .setLevel(player.getLevel())
-                .setReason(reasonDTO.getReason().name());
+                .setReason(reasonDTO.getReasonConst().name());
 
         player.write(resUpdateLevel);
         /*触发升级, 比如功能开放监听需要*/

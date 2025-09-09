@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.game.bean.goods.Item;
+import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.server.bean.bag.BagChangesContext;

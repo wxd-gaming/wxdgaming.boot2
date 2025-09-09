@@ -9,10 +9,10 @@ import wxdgaming.boot2.core.lang.bit.BitFlagGroup;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
-import wxdgaming.game.basic.core.Reason;
-import wxdgaming.game.basic.core.ReasonDTO;
-import wxdgaming.game.bean.buff.BuffType;
-import wxdgaming.game.bean.buff.BuffTypeConst;
+import wxdgaming.game.server.bean.reason.ReasonConst;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
+import wxdgaming.game.server.bean.buff.BuffType;
+import wxdgaming.game.server.bean.buff.BuffTypeConst;
 import wxdgaming.game.cfg.QBuffTable;
 import wxdgaming.game.cfg.bean.QBuff;
 import wxdgaming.game.server.bean.MapNpc;
@@ -61,8 +61,8 @@ public class BuffService extends HoldApplicationContext {
     @OnHeartMinute
     public void onHeartMinuteBuffActionTest(MapNpc mapNpc, long mill) {
 
-        addBuff(mapNpc, mapNpc, 2, 1, ReasonDTO.of(Reason.GM));
-        addBuff(mapNpc, mapNpc, 3, 1, ReasonDTO.of(Reason.GM));
+        addBuff(mapNpc, mapNpc, 2, 1, ReasonDTO.of(ReasonConst.GM));
+        addBuff(mapNpc, mapNpc, 3, 1, ReasonDTO.of(ReasonConst.GM));
     }
 
     @OnHeart
@@ -113,7 +113,7 @@ public class BuffService extends HoldApplicationContext {
     /** 触发属性计算 */
     public void executeAttrCalculator(MapNpc mapNpc) {
         CalculatorType[] calculatorTypes = {CalculatorType.BUFF};
-        ReasonDTO reasonDTO = ReasonDTO.of(Reason.Buff);
+        ReasonDTO reasonDTO = ReasonDTO.of(ReasonConst.Buff);
         if (mapNpc instanceof Player player) {
             EventConst.PlayerAttributeCalculatorEvent event = new EventConst.PlayerAttributeCalculatorEvent(
                     player,

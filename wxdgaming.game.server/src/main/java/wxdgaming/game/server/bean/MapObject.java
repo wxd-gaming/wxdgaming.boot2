@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.lang.bit.BitFlag;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
-import wxdgaming.game.bean.Vector3D;
 
 /**
  * 场景对象

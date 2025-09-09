@@ -13,7 +13,7 @@ import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.game.basic.login.bean.info.InnerServerInfoBean;
+import wxdgaming.game.login.entity.server.InnerServerInfoBean;
 import wxdgaming.game.login.cdkey.CDKeyService;
 import wxdgaming.game.login.inner.InnerService;
 

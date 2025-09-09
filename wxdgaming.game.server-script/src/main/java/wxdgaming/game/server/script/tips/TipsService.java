@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
-import wxdgaming.game.basic.core.Reason;
+import wxdgaming.game.server.bean.reason.ReasonConst;
 import wxdgaming.game.message.tips.ResTips;
 import wxdgaming.game.message.tips.TipsType;
 import wxdgaming.game.server.bean.role.Player;
@@ -29,29 +29,29 @@ public class TipsService {
     }
 
     public void tips(Player player, String tips) {
-        this.tips(player, tips, Reason.SYSTEM);
+        this.tips(player, tips, ReasonConst.SYSTEM);
     }
 
-    public void tips(Player player, String tips, Reason reason) {
+    public void tips(Player player, String tips, ReasonConst reason) {
         tips(player.getUserMapping().getSocketSession(), TipsType.TIP_TYPE_NONE, tips, null, null, reason);
     }
 
     public void tips(SocketSession socketSession, String tips) {
-        tips(socketSession, TipsType.TIP_TYPE_NONE, tips, null, null, Reason.SYSTEM);
+        tips(socketSession, TipsType.TIP_TYPE_NONE, tips, null, null, ReasonConst.SYSTEM);
     }
 
     public void tips(SocketSession socketSession, String tips, List<String> params) {
-        tips(socketSession, TipsType.TIP_TYPE_NONE, tips, params, null, Reason.SYSTEM);
+        tips(socketSession, TipsType.TIP_TYPE_NONE, tips, params, null, ReasonConst.SYSTEM);
     }
 
     public void tips(SocketSession socketSession, String tips, List<String> params, Class<? extends PojoBase> responseClass) {
-        tips(socketSession, TipsType.TIP_TYPE_NONE, tips, params, responseClass, Reason.SYSTEM);
+        tips(socketSession, TipsType.TIP_TYPE_NONE, tips, params, responseClass, ReasonConst.SYSTEM);
     }
 
     public void tips(SocketSession socketSession, TipsType tipsType,
                      String tips, List<String> params,
                      Class<? extends PojoBase> responseClass,
-                     Reason reason) {
+                     ReasonConst reason) {
         log.info("提示: {}", tips);
         if (socketSession == null) {
             return;

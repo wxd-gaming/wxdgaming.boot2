@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.game.basic.login.AppPlatformParams;
+import wxdgaming.game.common.bean.login.AppPlatformParams;
 import wxdgaming.game.login.login.sdk.AbstractSdkLoginApi;
 
 import java.util.HashMap;

@@ -4,8 +4,8 @@ package wxdgaming.game.cfg.bean;
 import lombok.Getter;
 import wxdgaming.boot2.starter.excel.store.DataChecked;
 import wxdgaming.boot2.starter.excel.store.DataTable;
-import wxdgaming.game.bean.buff.BuffType;
-import wxdgaming.game.bean.buff.BuffTypeConst;
+import wxdgaming.game.server.bean.buff.BuffType;
+import wxdgaming.game.server.bean.buff.BuffTypeConst;
 import wxdgaming.game.cfg.bean.mapping.QBuffMapping;
 
 import java.io.Serializable;

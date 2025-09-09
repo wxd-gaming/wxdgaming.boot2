@@ -2,7 +2,7 @@ package wxdgaming.game.server.bean.global.impl;
 
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.game.bean.global.AbstractGlobalData;
+import wxdgaming.game.common.bean.global.AbstractGlobalData;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -3,8 +3,8 @@ package wxdgaming.game.server.script.gm.impl;
 import com.alibaba.fastjson.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.game.basic.core.Reason;
-import wxdgaming.game.basic.core.ReasonDTO;
+import wxdgaming.game.server.bean.reason.ReasonConst;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.gm.ann.GM;
 import wxdgaming.game.server.script.role.PlayerService;
@@ -36,7 +36,7 @@ public class PlayerGmScript {
     @GM
     public Object addExp(Player player, JSONArray args) {
         long exp = args.getLongValue(1);
-        this.playerService.addExp(player, exp, ReasonDTO.of(Reason.GM));
+        this.playerService.addExp(player, exp, ReasonDTO.of(ReasonConst.GM));
         return null;
     }
 

@@ -1,8 +1,8 @@
 package wxdgaming.game.login.bean.global;
 
 import lombok.Getter;
-import wxdgaming.game.bean.global.AbstractGlobalData;
-import wxdgaming.game.common.global.IGlobalDataConst;
+import wxdgaming.game.common.bean.global.AbstractGlobalData;
+import wxdgaming.game.common.bean.global.IGlobalDataConst;
 
 import java.util.function.Supplier;
 

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
-import wxdgaming.game.basic.login.bean.info.InnerServerInfoBean;
+import wxdgaming.game.login.entity.server.InnerServerInfoBean;
 import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.login.bean.global.GlobalDataConst;
 import wxdgaming.game.login.bean.global.ServerShowName;
