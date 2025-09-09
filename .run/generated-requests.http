@@ -3,3 +3,7 @@ GET http://localhost:18801/game/reloadScript
 
 ### v1
 GET http://localhost:18801/888/v1
+
+
+### gameServer/list
+GET http://localhost:19800/gameServer/list
