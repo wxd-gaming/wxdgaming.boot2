@@ -1,7 +1,7 @@
 package wxdgaming.game.server.script.cdkey;
 
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -9,20 +9,22 @@ import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
-import wxdgaming.game.server.bean.reason.ReasonConst;
-import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
+import wxdgaming.game.login.bean.UseCDKeyDTO;
+import wxdgaming.game.message.cdkey.ResUseCdKey;
+import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.bean.goods.BagChangeDTO4Item;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.goods.ItemCfg;
-import wxdgaming.game.message.cdkey.ResUseCdKey;
-import wxdgaming.game.server.GameServerProperties;
+import wxdgaming.game.server.bean.reason.ReasonConst;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
-import wxdgaming.game.server.module.inner.InnerService;
+import wxdgaming.game.server.module.inner.ConnectLoginService;
 import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.cdkey.bean.CDKeyReward;
 import wxdgaming.game.server.script.tips.TipsService;
+import wxdgaming.game.util.SignUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,35 +45,37 @@ public class CDKeyService implements InitPrint {
     private final DataCenterService dataCenterService;
     private final TipsService tipsService;
     private final BagService bagService;
-    final InnerService innerService;
+    final ConnectLoginService connectLoginService;
 
 
     public CDKeyService(ConnectLoginProperties connectLoginProperties, GameServerProperties gameServerProperties,
                         DataCenterService dataCenterService,
                         TipsService tipsService, BagService bagService,
-                        InnerService innerService) {
+                        ConnectLoginService connectLoginService) {
         this.dataCenterService = dataCenterService;
         this.tipsService = tipsService;
         this.bagService = bagService;
         this.connectLoginProperties = connectLoginProperties;
         this.gameServerProperties = gameServerProperties;
-        this.innerService = innerService;
+        this.connectLoginService = connectLoginService;
     }
 
     public void use(Player player, String cdKey) {
 
         String url = connectLoginProperties.getUrl();
-        url = url + "/inner/cdkey/use";
+        url = url + "/inner/game/cdkey/use";
 
-        JSONObject params = new JSONObject();
-        params.put("key", cdKey);
-        params.put("sid", gameServerProperties.getSid());
-        params.put("account", player.getAccount());
-        params.put("rid", player.getUid());
+        UseCDKeyDTO cdKeyDTO = new UseCDKeyDTO();
+        cdKeyDTO.setCdKey(cdKey);
+        cdKeyDTO.setSid(gameServerProperties.getSid());
+        cdKeyDTO.setRoleId(player.getUid());
+        cdKeyDTO.setRoleName(player.getName());
+        cdKeyDTO.setAccount(player.getAccount());
 
-        innerService.sign(params);
-
-        HttpResponse execute = HttpRequestPost.ofJson(url, params).execute();
+        String sign = SignUtil.signByJsonKey(cdKeyDTO, connectLoginProperties.getJwtKey());
+        HttpResponse execute = HttpRequestPost.ofJson(url, cdKeyDTO.toJSONString())
+                .addHeader(HttpHeaderNames.AUTHORIZATION.toString(), sign)
+                .execute();
         RunResult runResult = execute.bodyRunResult();
 
         if (runResult.isFail()) {

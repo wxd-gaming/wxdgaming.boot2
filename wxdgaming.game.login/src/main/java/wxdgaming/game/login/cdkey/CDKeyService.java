@@ -1,9 +1,9 @@
 package wxdgaming.game.login.cdkey;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
-import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.CDKeyUtil;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
@@ -57,7 +57,7 @@ public class CDKeyService implements InitPrint {
         }
     }
 
-    public RunResult use(String key, int sid, String account, long rid) {
+    public RunResult use(String key, int sid, String account, long roleId, String roleName) {
         key = key.toUpperCase();
         int cdKeyId = CDKeyUtil.getCdKeyId(key);
         final String lockKey = "cdkey:" + cdKeyId;
@@ -90,7 +90,7 @@ public class CDKeyService implements InitPrint {
                     .fluentPut("cid", cdKeyEntity.getId())
                     .fluentPut("comment", cdKeyEntity.getComment())
                     .fluentPut("rewards", cdKeyEntity.getRewards());
-            log.info("使用cdkey {}, sid={}, account={}, rid={}, info={}", key, sid, account, rid, runResult.toJSONString());
+            log.info("使用cdkey {}, sid={}, account={}, roleId={}, roleName={}, info={}", key, sid, account, roleId, roleName, runResult.toJSONString());
             return runResult;
         } finally {
             SingletonLockUtil.unlock(lockKey);

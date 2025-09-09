@@ -1,24 +1,22 @@
 package wxdgaming.game.server.module.timer;
 
-import com.alibaba.fastjson.JSONObject;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.server.SocketServer;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
-import wxdgaming.game.login.entity.server.ServerInfoEntity;
+import wxdgaming.game.login.bean.ServerInfoDTO;
 import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.module.drive.PlayerDriveService;
-import wxdgaming.game.server.module.inner.InnerService;
-
-import java.util.List;
+import wxdgaming.game.server.module.inner.ConnectLoginService;
+import wxdgaming.game.util.SignUtil;
 
 /**
  * 游戏进程的定时器服务
@@ -37,16 +35,16 @@ public class GameTimerService extends HoldApplicationContext {
     final GameServerProperties gameServerProperties;
     final ConnectLoginProperties connectLoginProperties;
     final PlayerDriveService playerDriveService;
-    final InnerService innerService;
+    final ConnectLoginService connectLoginService;
 
     public GameTimerService(SocketServer socketServer,
                             GameServerProperties gameServerProperties, ConnectLoginProperties connectLoginProperties,
-                            PlayerDriveService playerDriveService, InnerService innerService) {
+                            PlayerDriveService playerDriveService, ConnectLoginService connectLoginService) {
         this.socketServer = socketServer;
         this.gameServerProperties = gameServerProperties;
         this.connectLoginProperties = connectLoginProperties;
         this.playerDriveService = playerDriveService;
-        this.innerService = innerService;
+        this.connectLoginService = connectLoginService;
     }
 
 
@@ -55,27 +53,18 @@ public class GameTimerService extends HoldApplicationContext {
     @ExecutorWith(useVirtualThread = true)
     public void registerLoginServer() {
 
-        ServerInfoEntity serverInfoBean = new ServerInfoEntity();
-        serverInfoBean.setServerId(gameServerProperties.getSid());
-        serverInfoBean.setMainId(gameServerProperties.getSid());
-        serverInfoBean.setGid(gameServerProperties.getGid());
-        serverInfoBean.setName(gameServerProperties.getName());
-        serverInfoBean.setPort(socketServer.getConfig().getPort());
-        serverInfoBean.setHttpPort(webPort);
+        ServerInfoDTO serverInfoDTO = new ServerInfoDTO();
+        serverInfoDTO.setSid(gameServerProperties.getSid());
+        serverInfoDTO.setPort(socketServer.getConfig().getPort());
+        serverInfoDTO.setHttpPort(webPort);
+        serverInfoDTO.setOnlineSize(playerDriveService.onlineSize());
 
-        serverInfoBean.setMaxOnlineSize(connectLoginProperties.getMaxOnlineSize());
-        serverInfoBean.setOnlineSize(playerDriveService.onlineSize());
+        String sign = SignUtil.signByJsonKey(serverInfoDTO, connectLoginProperties.getJwtKey());
 
-
-        JSONObject jsonObject = MapOf.newJSONObject();
-        jsonObject.put("sidList", List.of(gameServerProperties.getSid()));
-        jsonObject.put("sid", gameServerProperties.getSid());
-        jsonObject.put("serverBean", serverInfoBean.toJSONString());
-
-        innerService.sign(jsonObject);
-
-        String url = connectLoginProperties.getUrl() + "/inner/registerGame";
-        HttpResponse execute = HttpRequestPost.ofJson(url, jsonObject.toString()).execute();
+        String url = connectLoginProperties.getUrl() + "/inner/game/sync";
+        HttpResponse execute = HttpRequestPost.ofJson(url, serverInfoDTO.toJSONString())
+                .addHeader(HttpHeaderNames.AUTHORIZATION.toString(), sign)
+                .execute();
         if (!execute.isSuccess()) {
             log.error("访问登陆服务器失败{}", url);
             return;

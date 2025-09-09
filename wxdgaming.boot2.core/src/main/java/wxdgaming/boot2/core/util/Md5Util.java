@@ -62,18 +62,20 @@ public class Md5Util {
      * @return
      */
     public static String md5DigestEncode0(String joinStr, String... origins) {
-        String resultString = null;
+        if (joinStr == null) {
+            joinStr = Md5Util.Null;
+        }
+        String join = String.join(joinStr, origins);
+        return md5(join);
+    }
+
+    public static String md5(String string) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            if (joinStr == null) {
-                joinStr = Md5Util.Null;
-            }
-            String join = String.join(joinStr, origins);
-            resultString = byteArrayToHexString(md.digest(join.getBytes(StandardCharsets.UTF_8)));
+            return byteArrayToHexString(md.digest(string.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception ex) {
             throw new UnsupportedOperationException(ex);
         }
-        return resultString;
     }
 
     /**

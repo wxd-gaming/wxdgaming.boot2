@@ -23,11 +23,11 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/gameServer")
-public class GameServerController implements InitPrint {
+public class ExternalGameController implements InitPrint {
 
     final InnerService innerService;
 
-    public GameServerController(InnerService innerService) {
+    public ExternalGameController(InnerService innerService) {
         this.innerService = innerService;
     }
 

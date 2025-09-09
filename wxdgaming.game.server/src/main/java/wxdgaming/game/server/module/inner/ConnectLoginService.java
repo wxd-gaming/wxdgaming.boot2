@@ -1,10 +1,10 @@
 package wxdgaming.game.server.module.inner;
 
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.util.Md5Util;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 
@@ -16,19 +16,13 @@ import wxdgaming.game.common.bean.login.ConnectLoginProperties;
  **/
 @Slf4j
 @Service
-public class InnerService implements InitPrint {
+public class ConnectLoginService implements InitPrint {
 
     final ConnectLoginProperties connectLoginProperties;
 
-    public InnerService(ConnectLoginProperties connectLoginProperties) {
+    public ConnectLoginService(ConnectLoginProperties connectLoginProperties) {
 
         this.connectLoginProperties = connectLoginProperties;
-    }
-
-    public void sign(JSONObject jsonData) {
-        String json = jsonData.toString(SerializerFeature.MapSortField, SerializerFeature.SortField);
-        String md5DigestEncode = Md5Util.md5DigestEncode0("#", json, connectLoginProperties.getJwtKey());
-        jsonData.put("sign", md5DigestEncode);
     }
 
 }

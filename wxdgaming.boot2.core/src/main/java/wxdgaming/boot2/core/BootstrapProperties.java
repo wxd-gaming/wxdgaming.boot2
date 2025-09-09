@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * 启动配置
  *
@@ -20,6 +23,7 @@ public abstract class BootstrapProperties implements InitPrint {
     boolean debug;
     int gid;
     int sid;
+    List<Integer> mergedSidList = Collections.emptyList();
     String name;
     String rpcToken = "9w283rn123r90cszh$#%^%^*&#$csf0892354";
 

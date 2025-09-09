@@ -13,7 +13,7 @@ import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.login.bean.global.GlobalDataConst;
 import wxdgaming.game.login.bean.global.ServerShowName;
 import wxdgaming.game.login.bean.global.ServerShowNameGlobalData;
-import wxdgaming.game.login.entity.server.ServerInfoEntity;
+import wxdgaming.game.login.entity.ServerInfoEntity;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,7 +51,7 @@ public class InnerService {
         ConcurrentHashMap<Integer, ServerShowName> serverNameMap = showNameGlobalData.getServerNameMap();
         return getInnerGameServerInfoMap().values().stream()
                 .map(bean -> {
-                    JSONObject map = bean.toJSONObject();
+                    JSONObject map = new JSONObject();
                     map.put("id", bean.getServerId());
                     map.put("name", bean.getName());
                     ServerShowName serverShowName = serverNameMap.get(bean.getServerId());

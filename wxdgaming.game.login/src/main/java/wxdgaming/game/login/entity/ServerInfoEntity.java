@@ -1,4 +1,4 @@
-package wxdgaming.game.login.entity.server;
+package wxdgaming.game.login.entity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +22,10 @@ public class ServerInfoEntity extends Entity implements Cloneable {
     private int mainId;
     private int gid;
     private String name;
+    /** 外网同步地址 */
     private String host;
+    /** 内外同步的地址 */
+    private String innerHost;
     private int port;
     private int httpPort;
     /** 开启时间 */
@@ -32,6 +35,7 @@ public class ServerInfoEntity extends Entity implements Cloneable {
     private long lastSyncTime;
     private int status;
     private int maxOnlineSize = 1000;
+    @DbColumn(ignore = true)
     private int onlineSize = 0;
 
     public int free() {
