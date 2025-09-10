@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.ann.Stop;
+import wxdgaming.boot2.core.ann.StopBefore;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
 import wxdgaming.game.common.global.GlobalDataService;
@@ -68,8 +69,8 @@ public class InnerService {
     }
 
     @Order(10)
-    @Stop
-    public void stop() {
+    @StopBefore
+    public void stopBefore() {
         for (ServerInfoEntity bean : innerGameServerInfoMap.values()) {
             sqlDataHelper.getDataBatch().save(bean);
         }

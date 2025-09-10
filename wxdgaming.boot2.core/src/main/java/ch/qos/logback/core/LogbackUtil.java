@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wxdgaming.boot2.core.io.FileUtil;
@@ -26,7 +27,7 @@ public class LogbackUtil {
 
     public static void resetLogback(ClassLoader classLoader, String userDir) throws JoranException {
 
-        if (userDir != null && !userDir.isBlank() && !userDir.isEmpty()) {
+        if (StringUtils.isNotBlank(userDir)) {
             if (!userDir.endsWith("/")) {
                 userDir += "/";
             }
@@ -61,38 +62,28 @@ public class LogbackUtil {
         }
     }
 
+    public static ch.qos.logback.classic.Logger rootLogger() {
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        return loggerContext.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+    }
+
     /** 重设日志级别 */
     public static String refreshLoggerLevel() {
         Level lv;
-        Logger root = LoggerFactory.getLogger("root");
-        if (root.isDebugEnabled()) {
+        ch.qos.logback.classic.Logger rootLogger = rootLogger();
+        if (rootLogger.isDebugEnabled()) {
             lv = Level.INFO;
         } else {
             lv = Level.DEBUG;
         }
-        refreshLoggerLevel("", lv);
+        refreshLoggerLevel(lv);
         return lv.toString();
     }
 
     /** 重设日志级别 */
     public static void refreshLoggerLevel(Level loggerLevel) {
-        refreshLoggerLevel("", loggerLevel);
-    }
-
-    /**
-     * 重设日志级别
-     *
-     * @param loggerPackage
-     * @param loggerLevel
-     */
-    public static void refreshLoggerLevel(String loggerPackage, Level loggerLevel) {
-        // #1.get logger context
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        // #2.filter the Logger object
-        loggerContext.getLoggerList()
-                .stream()
-                .filter(a -> loggerPackage == null || loggerPackage.isEmpty() || loggerPackage.isBlank() || a.getName().startsWith(loggerPackage))
-                .forEach((logger) -> logger.setLevel(loggerLevel));
+        ch.qos.logback.classic.Logger rootLogger = rootLogger();
+        rootLogger.setLevel(loggerLevel);
     }
 
     public static void info(String str) {
@@ -111,8 +102,6 @@ public class LogbackUtil {
         StackTraceElement stackTraceElement = stackTrace[stack];
         return LoggerFactory.getLogger(stackTraceElement.getClassName());
     }
-
-
 
 
 }

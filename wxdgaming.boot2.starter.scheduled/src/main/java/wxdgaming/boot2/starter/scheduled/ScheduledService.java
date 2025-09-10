@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.Stop;
+import wxdgaming.boot2.core.ann.StopBefore;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
@@ -77,9 +77,9 @@ public class ScheduledService extends HoldApplicationContext {
         );
     }
 
-    @Stop
+    @StopBefore
     @Order(10)
-    public void stop() {
+    public void stopBefore() {
         log.info("线程 Scheduled 调度器 退出");
         if (future != null) {
             future.cancel(true);

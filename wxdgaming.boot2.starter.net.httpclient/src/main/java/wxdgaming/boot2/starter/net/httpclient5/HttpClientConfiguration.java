@@ -52,7 +52,6 @@ public class HttpClientConfiguration implements InitPrint {
         Lazy.instance = this;
     }
 
-    @Stop
     public void stop() {
         try {
             if (this.connPoolMng != null) {

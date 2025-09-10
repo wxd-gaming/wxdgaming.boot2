@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.Stop;
+import wxdgaming.boot2.core.ann.StopBefore;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.ChannelUtil;
@@ -158,8 +158,8 @@ public class SocketClient {
     protected void addChanelHandler(SocketChannel socketChannel, ChannelPipeline pipeline) {}
 
     @Order(100)
-    @Stop
-    public void stop() {
+    @StopBefore
+    public void stopBefore() {
         closed = true;
         sessionGroup.getChannelGroup().disconnect();
         log.info("stop tcp client：{}:{}", config.getHost(), config.getPort());

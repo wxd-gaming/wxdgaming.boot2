@@ -12,6 +12,7 @@ import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Stop;
+import wxdgaming.boot2.core.ann.StopBefore;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.SessionGroup;
@@ -121,9 +122,9 @@ public class SocketServer {
         }
     }
 
-    @Stop
     @Order(100)
-    public void stop() {
+    @StopBefore
+    public void stopBefore() {
         if (scheduledFuture != null) {
             scheduledFuture.cancel(false);
         }

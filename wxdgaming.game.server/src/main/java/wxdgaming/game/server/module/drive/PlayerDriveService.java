@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Stop;
+import wxdgaming.boot2.core.ann.StopBefore;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorProperties;
@@ -56,8 +57,8 @@ public class PlayerDriveService extends HoldApplicationContext {
     }
 
     @Order(1)
-    @Stop()
-    public void stop() {
+    @StopBefore
+    public void stopBefore() {
         playerDriveContentMap.values().forEach(v -> v.timerJob.cancel(true));
     }
 

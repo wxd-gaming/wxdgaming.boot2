@@ -10,6 +10,7 @@ import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Stop;
+import wxdgaming.boot2.core.ann.StopBefore;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
@@ -77,8 +78,8 @@ public abstract class SqlDataHelper extends DataHelper {
         }
     }
 
-    @Stop
     @Order(100/*优先清空缓存*/)
+    @StopBefore
     public void stopCache() {
         log.info("关闭数据库缓存：{}", this.getSqlConfig().getUrl());
         if (this.cacheService != null)

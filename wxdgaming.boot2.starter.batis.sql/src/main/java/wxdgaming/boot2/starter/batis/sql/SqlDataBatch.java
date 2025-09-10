@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.SpringUtil;
-import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.collection.ConvertCollection;
 import wxdgaming.boot2.core.collection.SplitCollection;
 import wxdgaming.boot2.core.collection.Table;
@@ -46,7 +45,7 @@ public abstract class SqlDataBatch extends DataBatch {
         }
     }
 
-    @Stop @Override public void stop() {
+    @Override public void stop() {
         for (BatchThread batchThread : batchThreads) {
             log.info("准备关闭线程 {}", batchThread);
             batchThread.closed.set(true);
