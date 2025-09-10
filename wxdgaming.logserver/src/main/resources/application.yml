@@ -3,6 +3,7 @@ boot:
   gid: 1
   sid: 1
   name: "日志服"
+  adminKey: "eeeeeeeeeeeeeeeee"
   jwtKey: "dwe"
 
 core:

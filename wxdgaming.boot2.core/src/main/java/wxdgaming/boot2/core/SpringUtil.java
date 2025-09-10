@@ -2,6 +2,7 @@ package wxdgaming.boot2.core;
 
 import com.alibaba.fastjson.JSONObject;
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -90,6 +91,18 @@ public class SpringUtil implements InitPrint {
             log.error("出现异常：{}", e.getMessage());
         }
         return false;
+    }
+
+    public static String getCookieValue(HttpServletRequest request, String cookieName) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookieName.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 
     public static String readBody(HttpServletRequest request) throws IOException {

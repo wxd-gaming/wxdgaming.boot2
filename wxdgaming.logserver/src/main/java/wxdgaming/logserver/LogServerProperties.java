@@ -21,6 +21,8 @@ import wxdgaming.boot2.core.ann.Comment;
 @ConfigurationProperties(prefix = "boot")
 public class LogServerProperties extends BootstrapProperties {
 
+    @Comment("管理密钥")
+    private String adminKey;
     @Comment("JWT密钥")
     private String jwtKey;
 

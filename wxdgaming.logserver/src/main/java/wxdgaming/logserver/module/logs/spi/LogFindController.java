@@ -21,7 +21,7 @@ import java.util.List;
  **/
 @Slf4j
 @RestController
-@RequestMapping("/log/find")
+@RequestMapping("/web/find")
 public class LogFindController implements InitPrint {
 
     final LogService logService;

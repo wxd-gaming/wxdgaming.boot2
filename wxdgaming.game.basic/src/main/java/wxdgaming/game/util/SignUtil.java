@@ -23,8 +23,13 @@ public class SignUtil {
      * @return 签名
      */
     public static String signByJsonKey(Object data, String key) {
-        String json = FastJsonUtil.toJSONString(data, SerializerFeature.MapSortField, SerializerFeature.SortField);
-        String string = json + key;
+        String dataString;
+        if (data instanceof String s) {
+            dataString = s;
+        } else {
+            dataString = FastJsonUtil.toJSONString(data, SerializerFeature.MapSortField, SerializerFeature.SortField);
+        }
+        String string = dataString + key;
         String sign = Md5Util.md5(string);
         if (log.isDebugEnabled()) {
             log.debug("source: {}, sign: {}", string, sign);
