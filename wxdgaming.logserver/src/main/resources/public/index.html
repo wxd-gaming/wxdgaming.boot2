@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script charset="utf-8" type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script charset="utf-8" type="text/javascript" src="/js/com.wxd.js"></script>
     <title>index</title>
     <style>
         html, body, table, tbody, tr, td, object {border: 0;margin: 0;padding: 0;box-sizing: border-box;}
@@ -35,6 +36,18 @@
             let obj = `<object id="content_body" data="${url}"></object>`;
             $('.content').html(obj);
         }
+
+        $(() => {
+            wxd.netty.post("/web/account/check", "", (data) => {
+                if (data.code === 1) {
+                    $(".nav").append(`<object data="nav.html"></object>`);
+                } else {
+                    window.top.location.href = "/login.html";
+                }
+            });
+
+        });
+
     </script>
 </head>
 <body>
@@ -42,7 +55,7 @@
     <tbody>
     <tr>
         <td class="nav">
-            <object data="nav.html">1</object>
+
         </td>
         <td class="content">
         <td>

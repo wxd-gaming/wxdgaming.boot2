@@ -1,4 +1,4 @@
-package wxdgaming.logserver.module.logs.spi;
+package wxdgaming.logserver.module.admin.api;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import java.util.List;
  **/
 @Slf4j
 @RestController
-@RequestMapping("/web/find")
+@RequestMapping("/web/log")
 public class LogFindController implements InitPrint {
 
     final LogService logService;

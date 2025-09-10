@@ -1,9 +1,8 @@
-package wxdgaming.game.util;
+package wxdgaming.boot2.core.util;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.json.FastJsonUtil;
-import wxdgaming.boot2.core.util.Md5Util;
 
 /**
  * 签名

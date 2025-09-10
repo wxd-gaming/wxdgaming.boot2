@@ -24,7 +24,7 @@ import wxdgaming.game.server.module.inner.ConnectLoginService;
 import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.cdkey.bean.CDKeyReward;
 import wxdgaming.game.server.script.tips.TipsService;
-import wxdgaming.game.util.SignUtil;
+import wxdgaming.boot2.core.util.SignUtil;
 
 import java.util.ArrayList;
 import java.util.List;

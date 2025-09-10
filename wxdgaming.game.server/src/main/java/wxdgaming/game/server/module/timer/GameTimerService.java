@@ -16,7 +16,7 @@ import wxdgaming.game.login.bean.ServerInfoDTO;
 import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.module.drive.PlayerDriveService;
 import wxdgaming.game.server.module.inner.ConnectLoginService;
-import wxdgaming.game.util.SignUtil;
+import wxdgaming.boot2.core.util.SignUtil;
 
 /**
  * 游戏进程的定时器服务

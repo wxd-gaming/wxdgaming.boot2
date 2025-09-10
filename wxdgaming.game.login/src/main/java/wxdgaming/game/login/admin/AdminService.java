@@ -15,7 +15,7 @@ import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
 import wxdgaming.game.login.LoginServerProperties;
 import wxdgaming.game.login.bean.AdminUserToken;
 import wxdgaming.game.login.entity.AdminUser;
-import wxdgaming.game.util.SignUtil;
+import wxdgaming.boot2.core.util.SignUtil;
 
 import java.util.concurrent.TimeUnit;
 

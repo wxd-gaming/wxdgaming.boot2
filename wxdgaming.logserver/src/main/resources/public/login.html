@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>無心道-日志系统</title>
+
+    <script charset="utf-8" type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script charset="utf-8" type="text/javascript" src="/js/com.wxd.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
+
+    <script>
+
+        function login() {
+            let map = new wxd.Map();
+            map.put("userName", $("#accountName").val());
+            map.put("password", $("#password").val());
+            wxd.netty.post("/web/account/login", map.toString(),
+                function (responseText) {
+                    if (responseText.code === 1) {
+                        window.top.location.href = "/index.html";
+                    } else {
+                        wxd.message.alert(responseText.msg);
+                    }
+                }, function (error) {
+                    wxd.message.alert(error);
+                }
+            );
+
+        }
+    </script>
+
+</head>
+<style>
+
+    .all { width: 800px; box-shadow: -10px 10px 25px rgba(210, 210, 210, 0.9);
+        margin: auto; margin-top: 12%; display: flex; border-radius: 35px;
+        background-color: #ffffff; height: 550px;
+    }
+
+    .log { width: 50%; margin: auto; }
+
+    .reg {
+        width: 50%;
+        height: 100%;
+        margin: auto;
+        background-color: #20b2aa;
+        border-radius: 35px;
+        color: #ffffff;
+    }
+
+    .reg_1 {
+        text-align: center;
+        margin: auto;
+        margin-top: 50%;
+    }
+
+    .reg_1 h2 { font-weight: 700; }
+
+    .reg_1 p { margin: 15px 0px 25px 0px; }
+
+    .sig { width: 70px; height: 30px; border-radius: 12px; background-color: #20b2aa; border-color: #fff; color: #ffffff; }
+
+    #tiao { padding: 0em 0; }
+
+    .reg_1 a { color: #ffffff; }
+
+    h3 {
+        font-size: 3em;
+        color: black;
+        padding-bottom: 1em;
+        margin: 0;
+        text-align: center;
+        font-family: "Marvel-Regular";
+    }
+
+    .input { margin: 10px 50px; width: 300px; height: 70px; }
+
+    span {
+        color: #999;
+        font-size: 0.85em;
+        padding-bottom: 0.2em;
+        display: block;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .input-text {
+        border: 1px solid #555;
+        outline-color: #fd9f3e;
+        width: 90%;
+        font-size: 1em;
+        padding: 0.5em;
+        line-height: inherit;
+    }
+
+    .register-top-grid { color: black; padding-bottom: 1em; font-family: "Marvel-Regular"; margin: 10px 0; }
+
+    .text-center { text-align: center; }
+
+    .tijiao { width: 80px; height: 35px; color: rgb(255, 253, 253); background-color: rgb(241, 52, 10); border: none; }
+</style>
+<body>
+<div class="all">
+    <div class="log">
+        <div class="register">
+            <form>
+                <div class="register-top-grid">
+                    <h3>用户登录</h3>
+                    <div class="input">
+                        <label for="accountName">用户名 <span style="color: red">* </span></label>
+                        <input id="accountName" type="text" v-model="name" placeholder="请输入用户名" class="input-text" value="admin"/>
+                    </div>
+                    <div class="input">
+                        <label for="password">密码 <span style="color: red">*</span></label>
+                        <input id="password" type="password" v-model="password" placeholder="请输入密码" class="input-text" value="admin"/>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <input type="button" value="提交" class="tijiao" onclick="login()"/>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="reg">
+        <div class="reg_1">
+            <h2>没有账号？</h2>
+            <p>立即注册加入我们吧，和我们一起开启旅程吧</p>
+            <a href="#">
+                <button type="primary" class="sig">注册</button>
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

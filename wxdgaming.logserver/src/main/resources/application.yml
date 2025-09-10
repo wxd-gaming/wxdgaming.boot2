@@ -5,6 +5,8 @@ boot:
   name: "日志服"
   adminKey: "eeeeeeeeeeeeeeeee"
   jwtKey: "dwe"
+  adminName: "admin"
+  adminPwd: "admin"
 
 core:
   executor:

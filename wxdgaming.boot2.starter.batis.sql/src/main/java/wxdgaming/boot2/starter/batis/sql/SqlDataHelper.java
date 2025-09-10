@@ -62,7 +62,7 @@ public abstract class SqlDataHelper extends DataHelper {
     }
 
     @Start()
-    @Order(-1)
+    @Order(-100)
     public void start() {
         if (sqlConfig.getScanPackage() != null && sqlConfig.getScanPackage().length > 0) {
             Map<String, LinkedHashMap<String, JSONObject>> tableStructMap = findTableStructMap();
