@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.MainApplicationContextProvider;
 import wxdgaming.boot2.core.lang.ConfigString;
@@ -12,17 +14,18 @@ import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.tips.TipsService;
 import wxdgaming.game.server.script.validation.Validation;
 import wxdgaming.game.server.script.validation.ValidationService;
-import wxdgaming.game.server.script.validation.impl.LevelValidationHandler;
 
 import java.util.List;
 
+
+@Component
+@ComponentScan(basePackageClasses = {ValidationService.class})
 @SpringBootTest(classes = {
         CoreScan.class,
         MainApplicationContextProvider.class,
         TipsService.class,
         ProtoListenerFactory.class,
-        LevelValidationHandler.class,
-        ValidationService.class
+        ValidationTest.class,
 })
 public class ValidationTest {
 
