@@ -26,6 +26,8 @@ public abstract class QActivityMapping extends ObjectBase implements Serializabl
     protected int type;
     /** 名称 */
     protected String name;
+    /** 限制条件 */
+    protected wxdgaming.boot2.core.lang.ConfigString validation;
     /** 开启时间 */
     protected wxdgaming.boot2.core.timer.CronExpress openTime;
 

@@ -5,6 +5,7 @@ import lombok.Getter;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.game.common.bean.global.AbstractGlobalData;
 import wxdgaming.game.common.bean.global.IGlobalDataConst;
+import wxdgaming.game.server.bean.global.impl.ServerActivityData;
 import wxdgaming.game.server.bean.global.impl.ServerData;
 import wxdgaming.game.server.bean.global.impl.ServerMailData;
 import wxdgaming.game.server.bean.global.impl.YunyingData;
@@ -23,6 +24,7 @@ public enum GlobalDataConst implements IGlobalDataConst {
     None(0, "默认值", null, null),
     SERVERDATA(1, "全服数据", ServerData.class, ServerData::new),
     SERVER_MAIL_DATA(2, "全服邮件数据", ServerMailData.class, ServerMailData::new),
+    ActivityData(3, "活动数据", ServerActivityData.class, ServerActivityData::new),
     YUNYINGDATA(11, "运营数据", YunyingData.class, YunyingData::new),
     ;
 

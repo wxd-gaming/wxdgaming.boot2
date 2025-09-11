@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.format.string.*;
 import wxdgaming.boot2.core.io.FileUtil;
@@ -32,10 +33,11 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 @Slf4j
 @Getter
+@Service
 public class ExcelRepository {
 
     private static final class Lazy {
-        private static final ExcelRepository ins = new ExcelRepository();
+        private static ExcelRepository ins = new ExcelRepository();
     }
 
     public static ExcelRepository getIns() {
@@ -46,7 +48,8 @@ public class ExcelRepository {
 
     private final Map<String, TableData> tableInfoMap = new ConcurrentHashMap<>();
 
-    private ExcelRepository() {
+    public ExcelRepository() {
+        ExcelRepository.Lazy.ins = this;
     }
 
     public Optional<TableData> tableData(String tableName) {
@@ -179,6 +182,7 @@ public class ExcelRepository {
                 int lastRowNum = sheet.getLastRowNum();
                 for (int rowIndex = 5; rowIndex <= lastRowNum; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
+                    if (row == null) continue;
                     RowData rowData = new RowData(true);
                     for (int cellIndex = 0; cellIndex < lastCellNum; cellIndex++) {
                         CellInfo cellInfo = tableData.getCellInfo4IndexMap().get(cellIndex);

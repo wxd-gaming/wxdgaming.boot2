@@ -2,6 +2,7 @@ package wxdgaming.game.server.script.validation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
@@ -32,6 +33,7 @@ public class ValidationService extends HoldApplicationContext {
     }
 
     @Init
+    @Order(1)
     public void init() {
         validationHandlerMap = getApplicationContextProvider().toMap(AbstractValidationHandler.class, AbstractValidationHandler::conditionType);
     }

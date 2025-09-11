@@ -217,16 +217,17 @@ public class CronExpress extends ObjectBase {
         return validateTime.getEnd();
     }
 
-    /** 获取开启时间 */
+    /** 查找一个可以的时间，会先向过去时间查询，如果时间戳符合范围条件，如果不合法会向未来时间查询 */
     public CronDuration findValidateTime() {
         long now = MyClock.millis();
         return findValidateTime(now);
     }
 
+    /** 查找一个可以的时间，会先向过去时间查询，如果时间戳符合范围条件，如果不合法会向未来时间查询 */
     public CronDuration findValidateTime(long now) {
         CronDuration validateTime = findValidateTime(now, ChangeAbs.Before);
         if (validateTime != null) {
-            if (validateTime.getStart() <= now && now <= validateTime.getEnd()) {
+            if (validateTime.valid(now)) {
                 return validateTime;
             }
         }

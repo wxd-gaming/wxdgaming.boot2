@@ -21,6 +21,15 @@ public class CronDuration {
         this.end = end;
     }
 
+    public boolean valid() {
+        long now = MyClock.millis();
+        return start <= now && now <= end;
+    }
+
+    public boolean valid(long now) {
+        return start <= now && now <= end;
+    }
+
     public String formatStartTime() {
         return MyClock.formatDate(start);
     }

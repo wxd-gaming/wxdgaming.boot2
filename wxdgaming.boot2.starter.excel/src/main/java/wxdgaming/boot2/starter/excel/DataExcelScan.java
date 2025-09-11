@@ -4,6 +4,7 @@ package wxdgaming.boot2.starter.excel;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.CoreScan;
+import wxdgaming.boot2.starter.excel.store.DataRepositoryProperties;
 
 /**
  * 扫描器
@@ -13,7 +14,8 @@ import wxdgaming.boot2.core.CoreScan;
  **/
 @ComponentScan(basePackageClasses = {
         CoreScan.class,
-        DataServiceConfiguration.class
+        DataRepositoryProperties.class,
+        DataServiceConfiguration.class,
 })
 @Component
 public class DataExcelScan {

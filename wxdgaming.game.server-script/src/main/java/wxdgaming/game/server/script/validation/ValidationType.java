@@ -16,6 +16,7 @@ public enum ValidationType {
     None(0, "默认值"),
     Level(1, "等级"),
     Job(2, "职业"),
+    OpenDay(3, "开服天数"),
     ;
 
     private static final Map<Integer, ValidationType> static_map = MapOf.ofMap(ValidationType::getCode, ValidationType.values());

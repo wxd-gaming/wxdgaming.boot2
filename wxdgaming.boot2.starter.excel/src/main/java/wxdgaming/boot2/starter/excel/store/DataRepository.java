@@ -5,10 +5,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 import java.util.Map;
@@ -23,10 +21,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Getter
 @Accessors(chain = true)
+@Service
 public class DataRepository {
 
     private static final class Lazy {
-        private static final DataRepository ins = new DataRepository();
+        private static DataRepository ins = null;
     }
 
     public static DataRepository getIns() {
@@ -36,9 +35,12 @@ public class DataRepository {
     @Setter private ClassLoader classLoader;
     /** 存储数据表 */
     private Map<Class<?>, DataTable<?>> dataTableMap = new ConcurrentHashMap<>();
-    private DataRepositoryProperties dataRepositoryProperties;
+    private final DataRepositoryProperties dataRepositoryProperties;
 
-    private DataRepository() {
+    public DataRepository(DataRepositoryProperties dataRepositoryProperties) {
+        this.dataRepositoryProperties = dataRepositoryProperties;
+        loadAll();
+        Lazy.ins = this;
     }
 
     @SuppressWarnings("unchecked")
@@ -48,13 +50,6 @@ public class DataRepository {
 
     public <E extends DataKey, T extends DataTable<E>> E dataTable(Class<T> dataTableClass, Object key) {
         return dataTable(dataTableClass).get(key);
-    }
-
-    @Start
-    @Order(1)
-    public void start(@Qualifier DataRepositoryProperties dataRepositoryProperties) {
-        this.dataRepositoryProperties = dataRepositoryProperties;
-        loadAll();
     }
 
     public void loadAll() {
