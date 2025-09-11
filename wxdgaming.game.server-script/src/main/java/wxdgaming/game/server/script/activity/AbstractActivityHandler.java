@@ -15,6 +15,8 @@ public abstract class AbstractActivityHandler<T extends ActivityData> extends Ho
 
     public abstract T newData();
 
+    public abstract void start(T activityData);
+
     public abstract void heart(T activityData);
 
     public abstract void heartMinute(T activityData);

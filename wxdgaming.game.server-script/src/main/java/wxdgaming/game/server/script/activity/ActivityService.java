@@ -7,6 +7,7 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.timer.CronDuration;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
+import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.cfg.QActivityTable;
 import wxdgaming.game.cfg.bean.QActivity;
 import wxdgaming.game.common.global.GlobalDataService;
@@ -54,24 +55,32 @@ public class ActivityService extends HoldApplicationContext {
         for (Map.Entry<Integer, ActivityData> entry : activityDataMap.entrySet()) {
             activityType2IdMap.put(entry.getValue().getActivityType(), entry.getValue().getActivityId());
         }
-
+        /*上一轮活动已经结束，判断下一轮是否开*/
+        long nowMillis = MyClock.millis();
         QActivityTable qActivityTable = dataRepository.dataTable(QActivityTable.class);
         Map<Integer, Map<Integer, QActivity>> activityType2IdCfgMap = qActivityTable.getActivityType2IdMap();
         for (Map.Entry<Integer, Map<Integer, QActivity>> mapEntry : activityType2IdCfgMap.entrySet()) {
             Integer type = mapEntry.getKey();
             /*当前id*/
             int selfActivityId = activityType2IdMap.getOrDefault(type, 0);
-            boolean over = true;
             ActivityData selfActivityData = activityDataMap.get(type);
             if (selfActivityData != null) {
-                over = selfActivityData.getEndTime() < System.currentTimeMillis();
+                boolean over = selfActivityData.getEndTime() < nowMillis;
+                if (!over) {
+                    QActivity qActivity = qActivityTable.get(selfActivityData.getActivityId());
+                    log.info("{}",
+                            "活动继续：activityType=%5s, activityId=%10s, activityName=%15s, startTime=%s, endTime=%s"
+                                    .formatted(
+                                            selfActivityData.getActivityType(), selfActivityData.getActivityId(), qActivity.getName(),
+                                            MyClock.formatDate(selfActivityData.getStartTime()),
+                                            MyClock.formatDate(selfActivityData.getEndTime())
+                                    )
+                    );
+                    /*TODO 当前活动未结束，跳过*/
+                    continue;
+                }
             }
-            if (!over) {
-                /*TODO 当前活动未结束，跳过*/
-                continue;
-            }
-            /*上一轮活动已经结束，判断下一轮是否开*/
-            long nowMillis = MyClock.millis();
+
             for (Map.Entry<Integer, QActivity> integerQActivityEntry : mapEntry.getValue().entrySet()) {
                 QActivity qActivity = integerQActivityEntry.getValue();
                 if (qActivity.getId() <= selfActivityId) {
@@ -79,7 +88,7 @@ public class ActivityService extends HoldApplicationContext {
                     continue;
                 }
                 if (validationService.validateAll(null, qActivity.getValidation(), false)) {
-                    AbstractActivityHandler<?> abstractActivityHandler = activityHandlerMap.get(qActivity.getType());
+                    AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(qActivity.getType());
                     if (abstractActivityHandler != null) {
                         ActivityData activityData = abstractActivityHandler.newData();
                         activityData.setActivityId(qActivity.getId());
@@ -92,6 +101,7 @@ public class ActivityService extends HoldApplicationContext {
                             activityData.setStartTime(start);
                             activityData.setEndTime(end);
                             activityDataMap.put(qActivity.getType(), activityData);
+                            abstractActivityHandler.start(activityData);
                             log.info("{}",
                                     "活动开启：activityType=%5s, activityId=%10s, activityName=%15s, startTime=%s, endTime=%s"
                                             .formatted(
@@ -109,6 +119,7 @@ public class ActivityService extends HoldApplicationContext {
         }
     }
 
+    @Scheduled("* * *")
     @SuppressWarnings("unchecked")
     public void heart() {
         ServerActivityData serverActivityData = globalDataService.get(GlobalDataConst.ActivityData);

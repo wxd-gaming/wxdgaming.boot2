@@ -24,4 +24,5 @@ public class ActivityData extends ObjectBase {
         return "ActivityData{activityId=%10d, activityType=%5d, startTime=%s, endTime=%s}"
                 .formatted(activityId, activityType, MyClock.formatDate(startTime), MyClock.formatDate(endTime));
     }
+
 }

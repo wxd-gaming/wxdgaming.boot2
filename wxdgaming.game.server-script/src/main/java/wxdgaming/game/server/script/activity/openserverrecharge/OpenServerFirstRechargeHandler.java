@@ -27,12 +27,16 @@ public class OpenServerFirstRechargeHandler extends AbstractActivityHandler<Acti
         return new ActivityData();
     }
 
-    @Override public void heart(ActivityData activityData) {
+    @Override public void start(ActivityData activityData) {
 
     }
 
-    @Override public void heartMinute(ActivityData activityData) {
+    @Override public void heart(ActivityData activityData) {
+        log.info("OpenServerFirstRechargeHandler.heart");
+    }
 
+    @Override public void heartMinute(ActivityData activityData) {
+        log.info("OpenServerFirstRechargeHandler.heartMinute");
     }
 
     @Override public void heartHour(ActivityData activityData) {
