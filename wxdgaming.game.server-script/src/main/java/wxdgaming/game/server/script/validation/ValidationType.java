@@ -12,19 +12,20 @@ import java.util.Map;
  * @version 2025-09-11 11:19
  **/
 @Getter
-public enum ConditionType {
+public enum ValidationType {
     None(0, "默认值"),
     Level(1, "等级"),
+    Job(2, "职业"),
     ;
 
-    private static final Map<Integer, ConditionType> static_map = MapOf.ofMap(ConditionType::getCode, ConditionType.values());
+    private static final Map<Integer, ValidationType> static_map = MapOf.ofMap(ValidationType::getCode, ValidationType.values());
 
-    public static ConditionType of(int value) {
+    public static ValidationType of(int value) {
         return static_map.get(value);
     }
 
-    public static ConditionType ofOrException(int value) {
-        ConditionType tmp = static_map.get(value);
+    public static ValidationType ofOrException(int value) {
+        ValidationType tmp = static_map.get(value);
         if (tmp == null) throw new RuntimeException("查找失败 " + value);
         return tmp;
     }
@@ -32,7 +33,7 @@ public enum ConditionType {
     private final int code;
     private final String comment;
 
-    ConditionType(int code, String comment) {
+    ValidationType(int code, String comment) {
         this.code = code;
         this.comment = comment;
     }

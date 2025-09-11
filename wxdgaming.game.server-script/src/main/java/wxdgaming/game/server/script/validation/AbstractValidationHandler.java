@@ -10,10 +10,10 @@ import wxdgaming.game.server.bean.role.Player;
  **/
 public abstract class AbstractValidationHandler {
 
-    public abstract ConditionType conditionType();
+    public abstract ValidationType conditionType();
 
     public abstract String tips();
 
-    public abstract boolean validate(Player player, long[] conditions);
+    public abstract boolean validate(Player player, Validation validation);
 
 }

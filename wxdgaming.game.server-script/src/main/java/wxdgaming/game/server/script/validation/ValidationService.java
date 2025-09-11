@@ -12,6 +12,7 @@ import wxdgaming.game.server.script.tips.TipsService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * 验证 validation
@@ -23,7 +24,7 @@ import java.util.Map;
 @Service
 public class ValidationService extends HoldApplicationContext {
 
-    Map<ConditionType, AbstractValidationHandler> validationHandlerMap;
+    Map<ValidationType, AbstractValidationHandler> validationHandlerMap;
     final TipsService tipsService;
 
     public ValidationService(TipsService tipsService) {
@@ -36,22 +37,17 @@ public class ValidationService extends HoldApplicationContext {
     }
 
     public boolean validate(Player player, ConfigString configString, boolean sendTips) {
+        return validate(player, configString, Validation.Parse, sendTips);
+    }
+
+    public boolean validate(Player player, ConfigString configString, Function<String, List<Validation>> parse, boolean sendTips) {
         if (configString == null || StringUtils.isBlank(configString.getValue())) {
             return true;
         }
         /*TODO 参考格式 1,1,1;2,1,1*/
-        List<long[]> longList = configString.longArrayList();
-        for (long[] longs : longList) {
-            int ct = (int) longs[0];
-            ConditionType conditionType = ConditionType.of(ct);
-            if (conditionType == null) {
-                log.warn("验证条件类型不存在: {}, {}", ct, StackUtils.stackAll());
-                if (sendTips) {
-                    tipsService.tips(player, "服务器异常");
-                }
-                return false;
-            }
-            AbstractValidationHandler validationHandler = validationHandlerMap.get(conditionType);
+        List<Validation> validations = configString.get(parse);
+        for (Validation validation : validations) {
+            AbstractValidationHandler validationHandler = validationHandlerMap.get(validation.getValidationType());
             if (validationHandler == null) {
                 log.warn("验证条件为实现: {}, {}", configString.getValue(), StackUtils.stackAll());
                 if (sendTips) {
@@ -59,8 +55,8 @@ public class ValidationService extends HoldApplicationContext {
                 }
                 return false;
             }
-            if (!validationHandler.validate(player, longs)) {
-                log.debug("{} 验证条件失败: {} - {}", player, conditionType, configString.getValue());
+            if (!validationHandler.validate(player, validation)) {
+                log.debug("{} 验证条件失败: {}", player, validation);
                 if (sendTips) {
                     tipsService.tips(player, validationHandler.tips());
                 }

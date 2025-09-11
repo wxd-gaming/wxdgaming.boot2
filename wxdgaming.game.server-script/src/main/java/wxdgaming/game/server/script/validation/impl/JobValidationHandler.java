@@ -13,18 +13,18 @@ import wxdgaming.game.server.script.validation.ValidationType;
  * @version 2025-09-11 10:55
  **/
 @Component
-public class LevelValidationHandler extends AbstractValidationHandler {
+public class JobValidationHandler extends AbstractValidationHandler {
 
     @Override public ValidationType conditionType() {
-        return ValidationType.Level;
+        return ValidationType.Job;
     }
 
     @Override public String tips() {
-        return "等级不足";
+        return "职业不匹配";
     }
 
     @Override public boolean validate(Player player, Validation validation) {
-        return validation.test(player.getLevel());
+        return validation.test(player.getJob());
     }
 
 }
