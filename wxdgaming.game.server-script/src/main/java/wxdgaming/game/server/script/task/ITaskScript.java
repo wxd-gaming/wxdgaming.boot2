@@ -108,7 +108,7 @@ public abstract class ITaskScript extends HoldApplicationContext {
             return;
         }
 
-        if (!validationService.validate(player, qTask.getValidation(), true)) {
+        if (!validationService.validateAll(player, qTask.getValidation(), true)) {
             return;
         }
 

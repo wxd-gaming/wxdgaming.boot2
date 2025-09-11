@@ -46,7 +46,7 @@ public class ValidationTest {
         ConfigString configString = new ConfigString("Level|gte|1;Level|lte|999");
         Player player = new Player();
         player.setLevel(100);
-        System.out.println(validationService.validate(player, configString, Validation.Parse, false));
+        System.out.println(validationService.validateAll(player, configString, Validation.Parse, false));
     }
 
     @Test
@@ -58,7 +58,7 @@ public class ValidationTest {
         ConfigString configString = new ConfigString("Level|>=|1;Level|<=|999");
         Player player = new Player();
         player.setLevel(100);
-        System.out.println(validationService.validate(player, configString, Validation.Parse2, false));
+        System.out.println(validationService.validateAll(player, configString, Validation.Parse2, false));
     }
 
 }

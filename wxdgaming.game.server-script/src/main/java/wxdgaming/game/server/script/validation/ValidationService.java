@@ -36,11 +36,13 @@ public class ValidationService extends HoldApplicationContext {
         validationHandlerMap = getApplicationContextProvider().toMap(AbstractValidationHandler.class, AbstractValidationHandler::conditionType);
     }
 
-    public boolean validate(Player player, ConfigString configString, boolean sendTips) {
-        return validate(player, configString, Validation.Parse, sendTips);
+    /** 完全满足条件 */
+    public boolean validateAll(Player player, ConfigString configString, boolean sendTips) {
+        return validateAll(player, configString, Validation.Parse, sendTips);
     }
 
-    public boolean validate(Player player, ConfigString configString, Function<String, List<Validation>> parse, boolean sendTips) {
+    /** 完全满足条件 */
+    public boolean validateAll(Player player, ConfigString configString, Function<String, List<Validation>> parse, boolean sendTips) {
         if (configString == null || StringUtils.isBlank(configString.getValue())) {
             return true;
         }
@@ -65,5 +67,34 @@ public class ValidationService extends HoldApplicationContext {
         }
         return true;
     }
+
+    /** 完全满足条件 */
+    public boolean validateAny(Player player, ConfigString configString, boolean sendTips) {
+        return validateAny(player, configString, Validation.Parse, sendTips);
+    }
+
+    /** 任意一个条件满足就行 */
+    public boolean validateAny(Player player, ConfigString configString, Function<String, List<Validation>> parse, boolean sendTips) {
+        if (configString == null || StringUtils.isBlank(configString.getValue())) {
+            return true;
+        }
+        /*TODO 参考格式 1,1,1;2,1,1*/
+        List<Validation> validations = configString.get(parse);
+        for (Validation validation : validations) {
+            AbstractValidationHandler validationHandler = validationHandlerMap.get(validation.getValidationType());
+            if (validationHandler == null) {
+                log.warn("验证条件为实现: {}, {}", configString.getValue(), StackUtils.stackAll());
+                if (sendTips) {
+                    tipsService.tips(player, "服务器异常");
+                }
+                return false;
+            }
+            if (validationHandler.validate(player, validation)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }
