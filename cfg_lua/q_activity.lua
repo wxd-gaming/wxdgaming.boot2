@@ -11,13 +11,13 @@ QActivity.__index = QActivity
 
 ---@type table<string, QActivity>
 QActivityTable = {
-[1001] = {id = 1001, type = 1, name = "活动1", openTime = "{\"cron\":\"0 0 8 ? * ? ?\",\"timeUnit\":\"MINUTES\",\"duration\":800}" } ,
-[1002] = {id = 1002, type = 1, name = "活动2", openTime = "{\"cron\":\"0 0 8 ? * ? ?\",\"timeUnit\":\"MINUTES\",\"duration\":800}" } ,
-[1003] = {id = 1003, type = 1, name = "活动3", openTime = "{\"cron\":\"0 0 8 ? * ? ?\",\"timeUnit\":\"MINUTES\",\"duration\":800}" } ,
-[1004] = {id = 1004, type = 1, name = "活动4", openTime = "{\"cron\":\"0 0 8 ? * ? ?\",\"timeUnit\":\"MINUTES\",\"duration\":800}" } ,
-[1005] = {id = 1005, type = 1, name = "活动5", openTime = "{\"cron\":\"0 0 8 ? * ? ?\",\"timeUnit\":\"MINUTES\",\"duration\":800}" } ,
-[1006] = {id = 1006, type = 1, name = "活动6", openTime = "{\"cron\":\"0 0 8 ? * ? ?\",\"timeUnit\":\"MINUTES\",\"duration\":800}" } ,
-[1007] = {id = 1007, type = 1, name = "活动7", openTime = "{\"cron\":\"0 0 8 ? * ? ?\",\"timeUnit\":\"MINUTES\",\"duration\":800}" } 
+[1001] = {id = 1001, type = 1, name = "活动1", openTime = "CronExpress{\"cron\":\"0 0 8 ? * ? ?\",\"timeUnit\":\"MINUTES\",\"duration\":800}" } ,
+[1002] = {id = 1002, type = 1, name = "活动2", openTime = "CronExpress{\"cron\":\"0 0 8 ? * ? ?\",\"timeUnit\":\"MINUTES\",\"duration\":800}" } ,
+[1003] = {id = 1003, type = 1, name = "活动3", openTime = "CronExpress{\"cron\":\"0 0 8 ? * ? ?\",\"timeUnit\":\"MINUTES\",\"duration\":800}" } ,
+[1004] = {id = 1004, type = 1, name = "活动4", openTime = "CronExpress{\"cron\":\"0 0 8 ? * ? ?\",\"timeUnit\":\"MINUTES\",\"duration\":800}" } ,
+[1005] = {id = 1005, type = 1, name = "活动5", openTime = "CronExpress{\"cron\":\"0 0 8 ? * ? ?\",\"timeUnit\":\"MINUTES\",\"duration\":800}" } ,
+[1006] = {id = 1006, type = 1, name = "活动6", openTime = "CronExpress{\"cron\":\"0 0 8 ? * ? ?\",\"timeUnit\":\"MINUTES\",\"duration\":800}" } ,
+[1007] = {id = 1007, type = 1, name = "活动7", openTime = "CronExpress{\"cron\":\"0 0 8 ? * ? ?\",\"timeUnit\":\"MINUTES\",\"duration\":800}" } 
 }
 
 ---@param id string id
