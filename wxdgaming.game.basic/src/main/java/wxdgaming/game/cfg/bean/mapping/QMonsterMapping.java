@@ -6,8 +6,6 @@ import lombok.Setter;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.excel.store.DataKey;
 import wxdgaming.boot2.starter.excel.store.DataMapping;
-import wxdgaming.game.server.bean.attr.AttrInfo;
-import wxdgaming.game.server.bean.goods.ItemCfg;
 
 import java.io.Serializable;
 import java.util.*;
@@ -33,11 +31,11 @@ public abstract class QMonsterMapping extends ObjectBase implements Serializable
     /** 获得经验 */
     protected long exp;
     /** 属性 */
-    protected AttrInfo attr;
+    protected wxdgaming.game.server.bean.attr.AttrInfo attr;
     /** 属性 */
-    protected AttrInfo attrPro;
+    protected wxdgaming.game.server.bean.attr.AttrInfo attrPro;
     /** 击杀奖励 */
-    protected final List<ItemCfg> rewards = new ArrayList<>();
+    protected wxdgaming.boot2.core.lang.ConfigString rewards;
 
     public Object key() {
         return id;

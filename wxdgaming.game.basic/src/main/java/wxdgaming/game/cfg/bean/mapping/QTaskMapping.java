@@ -36,6 +36,8 @@ public abstract class QTaskMapping extends ObjectBase implements Serializable, D
     protected int min_lv;
     /** 等级 */
     protected int max_lv;
+    /** 限制条件 */
+    protected wxdgaming.boot2.core.lang.ConfigString validation;
     /** 任务条件 */
     protected final List<wxdgaming.boot2.core.lang.condition.Condition> conditionList = new ArrayList<>();
     /** 任务接取的时候需要扣除的道具 */
