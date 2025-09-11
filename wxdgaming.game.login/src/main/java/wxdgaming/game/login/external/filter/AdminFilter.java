@@ -1,4 +1,4 @@
-package wxdgaming.logserver.module.admin.filter;
+package wxdgaming.game.login.external.filter;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -8,8 +8,8 @@ import wxdgaming.boot2.core.WebFilter;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.authority.AdminUserToken;
-import wxdgaming.logserver.LogServerProperties;
-import wxdgaming.logserver.module.admin.AdminService;
+import wxdgaming.game.login.LoginServerProperties;
+import wxdgaming.game.login.admin.AdminService;
 
 /**
  * 拦截器
@@ -19,23 +19,23 @@ import wxdgaming.logserver.module.admin.AdminService;
  **/
 @Slf4j
 @Component
-public class AdminLogFilter implements WebFilter {
+public class AdminFilter implements WebFilter {
 
-    final LogServerProperties logServerProperties;
+    final LoginServerProperties loginServerProperties;
     final AdminService adminService;
 
-    public AdminLogFilter(LogServerProperties logServerProperties, AdminService adminService) {
-        this.logServerProperties = logServerProperties;
+    public AdminFilter(LoginServerProperties loginServerProperties, AdminService adminService) {
+        this.loginServerProperties = loginServerProperties;
         this.adminService = adminService;
     }
 
 
     @Override public String filterPath() {
-        return "/admin/log/**";
+        return "/admin/**";
     }
 
     @Override public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        AdminUserToken adminUserToken = AdminUserToken.parse(request, logServerProperties.getAdminKey());
+        AdminUserToken adminUserToken = AdminUserToken.parse(request, loginServerProperties.getAdminKey());
         AssertUtil.assertTrue(adminUserToken != null, "token过期");
         ThreadContext.putContent("adminUserToken", adminUserToken);
         return true;

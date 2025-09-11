@@ -1,4 +1,4 @@
-package wxdgaming.logserver.entity;
+package wxdgaming.game.login.entity;
 
 import lombok.Getter;
 import lombok.Setter;

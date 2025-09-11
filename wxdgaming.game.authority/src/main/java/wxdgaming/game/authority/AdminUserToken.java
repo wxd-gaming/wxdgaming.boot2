@@ -1,6 +1,5 @@
-package wxdgaming.logserver.bean;
+package wxdgaming.game.authority;
 
-import io.netty.handler.codec.http.HttpHeaderNames;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 用于网页传递的token信息
+ * 用于网页传递的token信息 权限 wxdgaming.game.authority
  *
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-09-10 15:18
@@ -31,7 +30,7 @@ public class AdminUserToken extends ObjectBase {
     }
 
     public static AdminUserToken parse(HttpServletRequest request, String jwtKey) {
-        String token = SpringUtil.getCookieValue(request, HttpHeaderNames.AUTHORIZATION.toString());
+        String token = SpringUtil.getCookieValue(request, "authorization");
         if (StringUtils.isBlank(token)) {
             token = request.getParameter("token");
         }
@@ -48,7 +47,10 @@ public class AdminUserToken extends ObjectBase {
     }
 
     private String userName;
+    /** 过期时间 */
+    private long expireTime;
     /** 路由权限 */
     private List<String> routes = Collections.emptyList();
+
 
 }

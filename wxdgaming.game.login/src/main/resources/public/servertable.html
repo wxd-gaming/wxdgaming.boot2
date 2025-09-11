@@ -95,7 +95,7 @@
         $(() => {
             wxd.loading();
             let urlQuery = new wxd.Map().loadSearch();
-            pageView = new PageView("/gameserver/queryList", search, createRow);
+            pageView = new PageView("/admin/gameserver/queryList", search, createRow);
             pageView.gameId = urlQuery.get("gameId");
 
             search();

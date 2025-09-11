@@ -113,7 +113,7 @@ const wxd = {
     getCookie: function (name) {
         let arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
         if (arr = document.cookie.match(reg)) {
-            return unescape(arr[2]);
+            return decodeURIComponent(arr[2]);
         } else {
             return null;
         }
@@ -125,7 +125,7 @@ const wxd = {
         if (keys) {
             for (let i = keys.length; i--;) {
                 document.cookie = keys[i] + '=0;path=/;expires=' + new Date(0).toUTCString();//清除当前域名下的,例如：m.kevis.com
-                document.cookie = keys[i] + '=0;path=/;domain=' + document.domain + ';expires=' + new Date(0).toUTCString();//清除当前域名下的，例如 .m.kevis.com
+                document.cookie = keys[i] + '=0;path=/;domain=' + location.hostname + ';expires=' + new Date(0).toUTCString();//清除当前域名下的，例如 .m.kevis.com
             }
         }
     },

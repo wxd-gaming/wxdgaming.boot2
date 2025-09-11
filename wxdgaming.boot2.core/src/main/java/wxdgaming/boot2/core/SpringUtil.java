@@ -97,7 +97,7 @@ public class SpringUtil implements InitPrint {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (cookieName.equals(cookie.getName())) {
+                if (cookieName.equalsIgnoreCase(cookie.getName())) {
                     return cookie.getValue();
                 }
             }

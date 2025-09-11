@@ -1,9 +1,9 @@
 package wxdgaming.boot2.core.token;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import wxdgaming.boot2.core.util.Base64Util;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.util.AesUtil;
+import wxdgaming.boot2.core.util.Base64Util;
 import wxdgaming.boot2.core.util.Md5Util;
 
 import java.util.concurrent.TimeUnit;
@@ -39,6 +39,16 @@ public class JsonTokenBuilder {
         return new JsonTokenBuilder(key).expire(timeUnit, expire);
     }
 
+    /**
+     * 构建器
+     *
+     * @param key        加密私钥
+     * @param expireTime 过期时间,未来时间戳
+     */
+    public static JsonTokenBuilder of(String key, long expireTime) {
+        return new JsonTokenBuilder(key).expire(expireTime);
+    }
+
     private final String key;
     private final JsonToken jsonToken = new JsonToken();
 
@@ -48,7 +58,16 @@ public class JsonTokenBuilder {
 
     /** 设置过期时间 */
     public JsonTokenBuilder expire(TimeUnit timeUnit, long duration) {
-        jsonToken.setExpire(System.currentTimeMillis() + timeUnit.toMillis(duration));
+        return expire(System.currentTimeMillis() + timeUnit.toMillis(duration));
+    }
+
+    /**
+     * 设置过期时间
+     *
+     * @param expireTime 过期时间,未来时间戳
+     */
+    public JsonTokenBuilder expire(long expireTime) {
+        jsonToken.setExpire(expireTime);
         return this;
     }
 

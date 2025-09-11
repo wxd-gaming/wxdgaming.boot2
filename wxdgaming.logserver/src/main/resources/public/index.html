@@ -38,7 +38,9 @@
         }
 
         $(() => {
-            wxd.netty.post("/web/account/check", "", (data) => {
+
+            let map = new wxd.Map().loadSearch();
+            wxd.netty.post("/web/account/check", map.toString(), (data) => {
                 if (data.code === 1) {
                     $(".nav").append(`<object data="nav.html"></object>`);
                 } else {

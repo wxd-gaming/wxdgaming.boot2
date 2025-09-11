@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.CacheHttpServletRequest;
 import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.io.Objects;
+import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.Md5Util;
 import wxdgaming.boot2.starter.net.http.HttpDataAction;
@@ -17,7 +18,6 @@ import wxdgaming.logserver.LogServerProperties;
 import wxdgaming.logserver.bean.LogEntity;
 import wxdgaming.logserver.module.logs.LogService;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -41,9 +41,7 @@ public class LogPushController {
         this.logService = logService;
     }
 
-    @RequestMapping("/push")
-    public RunResult pushList(HttpServletRequest request) throws IOException {
-
+    List<LogEntity> checkSign(HttpServletRequest request) throws Exception {
         String json = SpringUtil.readBody(request);
 
         TreeMap<String, String> map = JSON.parseObject(json, new TypeReference<TreeMap<String, String>>() {});
@@ -54,11 +52,14 @@ public class LogPushController {
         if (!Objects.equals(sign, selfSign)) {
             log.warn("LogPushController sign={} signBefore={}", sign, signBefore);
             logService.saveErrorLog("sign 签名错误", json, "pushList");
-            return RunResult.fail("sign 签名错误");
+            throw new AssertException("sign 签名错误");
         }
-        List<LogEntity> logEntityList = JSON.parseArray(map.get("data"), LogEntity.class);
+        return JSON.parseArray(map.get("data"), LogEntity.class);
+    }
 
-
+    @RequestMapping("/push")
+    public RunResult pushList(HttpServletRequest request) throws Exception {
+        List<LogEntity> logEntityList = checkSign(request);
         for (LogEntity logEntity : logEntityList) {
             if (StringUtils.isBlank(logEntity.getLogType())) {
                 logService.saveErrorLog("logType 空", logEntity.toJSONString(), "pushList");
@@ -76,22 +77,9 @@ public class LogPushController {
     }
 
     @RequestMapping("/update")
-    public RunResult updateList(HttpServletRequest request) throws IOException {
+    public RunResult updateList(HttpServletRequest request) throws Exception {
 
-        String json = SpringUtil.readBody(request);
-
-        TreeMap<String, String> map = JSON.parseObject(json, new TypeReference<TreeMap<String, String>>() {});
-        String sign = map.remove("sign");
-
-        String signBefore = HttpDataAction.httpData(map) + logServerProperties.getJwtKey();
-        String selfSign = Md5Util.md5(signBefore);
-        if (!Objects.equals(sign, selfSign)) {
-            log.warn("LogPushController sign={} signBefore={}", sign, signBefore);
-            logService.saveErrorLog("sign 签名错误", json, "updateList");
-            return RunResult.fail("sign 签名错误");
-        }
-
-        List<LogEntity> logEntityList = JSON.parseArray(map.get("data"), LogEntity.class);
+        List<LogEntity> logEntityList = checkSign(request);
 
         for (LogEntity logEntity : logEntityList) {
             if (StringUtils.isBlank(logEntity.getLogType())) {

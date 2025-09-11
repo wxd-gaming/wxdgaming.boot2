@@ -91,11 +91,11 @@
         $(() => {
             wxd.loading();
             let urlQuery = new wxd.Map().loadSearch();
-            pageView = new PageView("/web/log/page", search, createRow);
+            pageView = new PageView("/admin/log/page", search, createRow);
             pageView.gameId = urlQuery.get("gameId");
 
 
-            let url = "/web/log/title";
+            let url = "/admin/log/title";
             let map = new wxd.Map();
             map.loadSearch();
             wxd.netty.post(url, map.toString(), (response) => {

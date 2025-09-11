@@ -22,7 +22,7 @@ import java.util.List;
  **/
 @Slf4j
 @RestController
-@RequestMapping("/gameServer")
+@RequestMapping("/admin/gameServer")
 public class ExternalGameController implements InitPrint {
 
     final InnerService innerService;

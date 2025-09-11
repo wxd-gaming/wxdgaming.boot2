@@ -37,6 +37,7 @@
         <module>wxdgaming.logbus</module>
         <module>wxdgaming.logserver</module>
         <module>wxdgaming.boot2.starter.event</module>
+        <module>wxdgaming.game.authority</module>
     </modules>
 
     <properties>

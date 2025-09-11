@@ -25,7 +25,7 @@ import java.util.List;
  **/
 @Slf4j
 @RestController
-@RequestMapping("/cdkey")
+@RequestMapping("/admin/cdkey")
 public class CDKeyController implements InitPrint {
 
     final CDKeyService cdKeyService;

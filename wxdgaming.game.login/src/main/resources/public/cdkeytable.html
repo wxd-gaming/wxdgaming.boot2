@@ -95,7 +95,7 @@
         $(() => {
             wxd.loading();
             let urlQuery = new wxd.Map().loadSearch();
-            pageView = new PageView("/cdkey/queryList", search, createRow);
+            pageView = new PageView("/admin/cdkey/queryList", search, createRow);
             pageView.gameId = urlQuery.get("gameId");
 
             search();
@@ -136,7 +136,7 @@
 
         function gainCode(cdKeyId, num) {
             let param = "cdKeyId=" + cdKeyId + "&num=" + num;
-            wxd.netty.post("/cdkey/gainCode", param, function (data) {
+            wxd.netty.post("/admin/cdkey/gainCode", param, function (data) {
                 if (data.code === 1) {
                     wxd.message.alert(formatForDisplay(data.data), "提示")
                 } else {
@@ -148,7 +148,7 @@
 
         function queryCode(cdKeyId) {
             let param = "cdKeyId=" + cdKeyId;
-            wxd.netty.post("/cdkey/queryCode", param, function (data) {
+            wxd.netty.post("/admin/cdkey/queryCode", param, function (data) {
                 if (data.code === 1) {
                     wxd.message.alert(formatForDisplay(data.data), "提示")
                 } else {
