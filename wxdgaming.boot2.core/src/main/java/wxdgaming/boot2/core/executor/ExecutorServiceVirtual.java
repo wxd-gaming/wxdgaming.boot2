@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.executor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,7 +66,7 @@ public class ExecutorServiceVirtual extends ExecutorService {
             }
 
             if (executorJob instanceof IExecutorQueue iExecutorQueue) {
-                if (Utils.isNotBlank(iExecutorQueue.queueName())) {
+                if (StringUtils.isNotBlank(iExecutorQueue.queueName())) {
                     queueMap
                             .computeIfAbsent(iExecutorQueue.queueName(), k -> new ExecutorQueue(k, this, this.queueSize, warnSize, this.queuePolicy))
                             .execute(executorJob);

@@ -12,6 +12,7 @@ import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.FieldUtil;
 import wxdgaming.boot2.core.reflect.MethodUtil;
@@ -441,6 +442,9 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
                 else
                     return method.invoke(bean, args);
             } catch (Throwable throwable) {
+                if (throwable instanceof AssertException assertException) {
+                    throw assertException;
+                }
                 if (throwable instanceof InvocationTargetException) {
                     throwable = throwable.getCause();
                 }

@@ -17,7 +17,7 @@ class ExecutorJob implements Runnable {
 
     public ExecutorJob(Runnable runnable) {
         this.runnable = runnable;
-        this.stack = Utils.stack();
+        this.stack = StackUtils.stack();
     }
 
     @Override public void run() {

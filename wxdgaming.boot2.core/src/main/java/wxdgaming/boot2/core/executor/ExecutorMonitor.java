@@ -56,7 +56,7 @@ public final class ExecutorMonitor extends Thread {
                         log.warn(
                                 "线程执行器监视, 线程: {}, 执行器: {}, 执行时间: {}ms\n{}",
                                 thread.getName(), jobContent.executorJob().getStack(), diff,
-                                Utils.stack(thread.getStackTrace())
+                                StackUtils.stack(thread.getStackTrace())
                         );
                     }
                 }

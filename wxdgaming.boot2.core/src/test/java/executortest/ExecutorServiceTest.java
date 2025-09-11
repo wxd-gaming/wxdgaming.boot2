@@ -72,7 +72,7 @@ public class ExecutorServiceTest {
         }
 
         @Override public void onEvent() throws Exception {
-            log.info("1 {} {}", Utils.stack(), ThreadContext.context().get("test"));
+            log.info("1 {} {}", StackUtils.stack(), ThreadContext.context().get("test"));
             throw new RuntimeException("1");
         }
     }

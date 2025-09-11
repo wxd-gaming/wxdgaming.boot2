@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.executor;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 
 import java.lang.reflect.Method;
@@ -59,7 +60,7 @@ public abstract class ExecutorEvent extends ExecutorJob implements IExecutorQueu
         ExecutorService executorService = ExecutorFactory.getExecutorServiceLogic();
         if (executorWith != null) {
             String threadName = executorWith.threadName();
-            if (Utils.isNotBlank(threadName)) {
+            if (StringUtils.isNotBlank(threadName)) {
                 executorService = ExecutorFactory.getExecutor(threadName);
             }else if(executorWith.useVirtualThread()){
                 executorService = ExecutorFactory.getExecutorServiceVirtual();
