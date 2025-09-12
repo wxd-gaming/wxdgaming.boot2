@@ -1,9 +1,11 @@
 package wxdgaming.game.server.script.activity;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.executor.ThreadDriveHandler;
 import wxdgaming.boot2.core.timer.CronDuration;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
@@ -14,9 +16,7 @@ import wxdgaming.game.server.bean.activity.ActivityData;
 import wxdgaming.game.server.bean.activity.HeartConst;
 import wxdgaming.game.server.bean.global.GlobalDataConst;
 import wxdgaming.game.server.bean.global.impl.ServerActivityData;
-import wxdgaming.game.server.event.OnServerHeart;
-import wxdgaming.game.server.event.OnServerHeartMinute;
-import wxdgaming.game.server.event.OnServerHeartSecond;
+import wxdgaming.game.server.module.system.GameService;
 import wxdgaming.game.server.script.validation.ValidationService;
 
 import java.util.*;
@@ -30,24 +30,28 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 @Slf4j
 @Service
-public class ActivityService extends HoldApplicationContext {
+public class ActivityService extends HoldApplicationContext implements ThreadDriveHandler {
 
+    final GameService gameService;
     final GlobalDataService globalDataService;
     final DataRepository dataRepository;
     final ValidationService validationService;
     Map<Integer, AbstractActivityHandler> activityHandlerMap;
     Map<HeartConst, List<ActivityData>> heartHandlerMap;
 
-    public ActivityService(GlobalDataService globalDataService, DataRepository dataRepository, ValidationService validationService) {
+    public ActivityService(GameService gameService, GlobalDataService globalDataService, DataRepository dataRepository, ValidationService validationService) {
+        this.gameService = gameService;
         this.globalDataService = globalDataService;
         this.dataRepository = dataRepository;
         this.validationService = validationService;
     }
 
     @Init
+    @Order(Integer.MAX_VALUE)
     public void init() {
         activityHandlerMap = getApplicationContextProvider().toMap(AbstractActivityHandler.class, AbstractActivityHandler::activityType);
         check();
+        gameService.getActivityThreadDrive().setDriveHandler(this);
     }
 
     public void check() {
@@ -130,9 +134,8 @@ public class ActivityService extends HoldApplicationContext {
         heartHandlerMap = tmp;
     }
 
-    @OnServerHeart
     @SuppressWarnings("unchecked")
-    public void heart() {
+    @Override public void heart() {
         List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.Heart, Collections.emptyList());
         for (ActivityData activityData : activityDataList) {
             AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());
@@ -140,9 +143,8 @@ public class ActivityService extends HoldApplicationContext {
         }
     }
 
-    @OnServerHeartSecond
     @SuppressWarnings("unchecked")
-    public void heartSecond() {
+    @Override public void heartSecond(int second) {
         List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.Second, Collections.emptyList());
         for (ActivityData activityData : activityDataList) {
             AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());
@@ -150,9 +152,8 @@ public class ActivityService extends HoldApplicationContext {
         }
     }
 
-    @OnServerHeartMinute
     @SuppressWarnings("unchecked")
-    public void heartMinute() {
+    @Override public void heartMinute(int minute) {
         List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.Minute, Collections.emptyList());
         for (ActivityData activityData : activityDataList) {
             AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());
@@ -161,7 +162,7 @@ public class ActivityService extends HoldApplicationContext {
     }
 
     @SuppressWarnings("unchecked")
-    public void heartHour() {
+    @Override public void heartHour(int hour) {
         List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.Hour, Collections.emptyList());
         for (ActivityData activityData : activityDataList) {
             AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());
@@ -170,7 +171,7 @@ public class ActivityService extends HoldApplicationContext {
     }
 
     @SuppressWarnings("unchecked")
-    public void heartDayEnd() {
+    @Override public void heartDayEnd() {
         List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.DayEnd, Collections.emptyList());
         for (ActivityData activityData : activityDataList) {
             AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());

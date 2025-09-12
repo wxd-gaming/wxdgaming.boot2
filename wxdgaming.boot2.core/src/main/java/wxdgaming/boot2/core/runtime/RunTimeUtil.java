@@ -92,7 +92,7 @@ public class RunTimeUtil extends ExecutorEvent {
             DecimalFormat df = new DecimalFormat("0.00");
             for (RunTimeRecord runTimeRecord : list) {
                 String line = format.formatted(
-                        runTimeRecord.getName(),
+                        subName(runTimeRecord.getName()),
                         df.format((runTimeRecord.getTotalRunTime().get() / 10000 / 100f)),
                         runTimeRecord.getCount().get(),
                         df.format((runTimeRecord.getAvgMsRunTime())),
@@ -113,6 +113,20 @@ public class RunTimeUtil extends ExecutorEvent {
             writeLock.unlock();
         }
         throw new RuntimeException("测试");
+    }
+
+    static String subName(String name) {
+        if (name.length() > 60) {
+            return name.substring(name.length() - 58);
+        }
+        return name;
+    }
+
+    public static void main(String[] args) {
+        String number = "123456789012345678901234567890123456789012345678901234567890123456789012345678";
+        System.out.println(number);
+        String x = subName(number);
+        System.out.println(x);
     }
 
 }

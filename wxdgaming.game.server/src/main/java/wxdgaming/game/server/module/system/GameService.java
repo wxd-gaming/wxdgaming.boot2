@@ -1,8 +1,11 @@
 package wxdgaming.game.server.module.system;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
+import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.executor.ThreadDrive;
 import wxdgaming.boot2.core.lang.Tick;
 import wxdgaming.game.server.GameServerApplication;
 
@@ -15,13 +18,22 @@ import java.util.concurrent.TimeUnit;
  * @version 2025-09-02 10:57
  **/
 @Slf4j
+@Getter
 @Service
 public class GameService implements InitPrint {
 
     /** 控制一下，5分钟才能加载一次 */
     private final Tick loadScriptTick = new Tick(5, TimeUnit.SECONDS);
+    final ThreadDrive mainThreadDrive = new ThreadDrive("MainThread");
+    final ThreadDrive activityThreadDrive = new ThreadDrive("ActivityThread");
 
     public GameService() {
+    }
+
+    @Start
+    public void start() {
+        mainThreadDrive.start();
+        activityThreadDrive.start();
     }
 
     public String reloadScript() {
