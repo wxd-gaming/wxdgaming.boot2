@@ -7,7 +7,6 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.web.servlet.filter.OrderedFilter;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.core.lang.DiffTimeRecord;
 
 import java.io.IOException;
 
@@ -34,14 +33,13 @@ public class WebRunTimeRecordHandler implements OrderedFilter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        DiffTimeRecord diffTimeRecord = DiffTimeRecord.start4Ns();
+        long start = RunTimeUtil.start();
         try {
             chain.doFilter(request, response);
         } finally {
             if (request instanceof HttpServletRequest httpRequest) {
-                DiffTimeRecord.RecordTime interval = diffTimeRecord.interval();
                 String uri = httpRequest.getRequestURI();
-                RunTimeUtil.record(uri, interval.interval());
+                RunTimeUtil.record(uri, start);
             }
         }
     }

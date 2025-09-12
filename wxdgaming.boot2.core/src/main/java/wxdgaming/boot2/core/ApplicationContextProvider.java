@@ -13,7 +13,6 @@ import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.AssertException;
-import wxdgaming.boot2.core.lang.DiffTimeRecord;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.FieldUtil;
 import wxdgaming.boot2.core.reflect.MethodUtil;
@@ -440,7 +439,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
             try {
                 if (log.isTraceEnabled())
                     log.trace("{}.{}", bean.getClass().getSimpleName(), this.method.getName());
-                DiffTimeRecord timeRecord = DiffTimeRecord.start4Ns();
+                long startTime = RunTimeUtil.start();
                 try {
                     if (proxy != null)
                         return proxy.proxyInvoke(args);
@@ -448,9 +447,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
                         return method.invoke(bean, args);
                 } finally {
                     if (!AnnUtil.hasAnn(method, IgnoreRunTimeRecord.class)) {
-                        DiffTimeRecord.RecordTime recordTime = timeRecord.interval();
-                        long diffNs = recordTime.interval();
-                        RunTimeUtil.record(bean.getClass().getSimpleName() + "#" + method.getName(), diffNs);
+                        RunTimeUtil.record(bean.getClass().getSimpleName() + "#" + method.getName(), startTime);
                     }
                 }
             } catch (Throwable throwable) {

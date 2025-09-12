@@ -2,7 +2,6 @@ package wxdgaming.boot2.core.executor;
 
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.lang.DiffTimeRecord;
 import wxdgaming.boot2.core.runtime.RunTimeUtil;
 
 /**
@@ -18,64 +17,57 @@ class ThreadDriveHandlerProxy implements ThreadDriveHandler {
     private ThreadDriveHandler driveHandler;
 
     @Override public void heart() {
-        DiffTimeRecord diffTimeRecord = DiffTimeRecord.start4Ns();
+        long start = RunTimeUtil.start();
         try {
             driveHandler.heart();
         } finally {
-            long interval = diffTimeRecord.interval().interval();
-            RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heart()", interval);
+            RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heart()", start);
         }
     }
 
     @Override public void heartSecond(int second) {
-        DiffTimeRecord diffTimeRecord = DiffTimeRecord.start4Ns();
+        long start = RunTimeUtil.start();
         try {
             driveHandler.heartSecond(second);
         } finally {
-            long interval = diffTimeRecord.interval().interval();
-            RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartSecond()", interval);
+            RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartSecond()", start);
         }
     }
 
     @Override public void heartMinute(int minute) {
-        DiffTimeRecord diffTimeRecord = DiffTimeRecord.start4Ns();
+        long start = RunTimeUtil.start();
         try {
 
             driveHandler.heartMinute(minute);
         } finally {
-            long interval = diffTimeRecord.interval().interval();
-            RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartMinute()", interval);
+            RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartMinute()", start);
         }
     }
 
     @Override public void heartHour(int hour) {
-
-        DiffTimeRecord diffTimeRecord = DiffTimeRecord.start4Ns();
+        long start = RunTimeUtil.start();
         try {
             driveHandler.heartHour(hour);
         } finally {
-            long interval = diffTimeRecord.interval().interval();
-            RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartHour()", interval);
+            RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartHour()", start);
         }
     }
 
     @Override public void heartDayEnd() {
-        DiffTimeRecord diffTimeRecord = DiffTimeRecord.start4Ns();
+        long start = RunTimeUtil.start();
         try {
             driveHandler.heartDayEnd();
         } finally {
-            long interval = diffTimeRecord.interval().interval();
-            RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartDayEnd()", interval);
+            RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartDayEnd()", start);
         }
     }
 
     @Override public void heartWeek(long weekFirstDayStartTime) {
-        DiffTimeRecord diffTimeRecord = DiffTimeRecord.start4Ns();
+        long start = RunTimeUtil.start();
         try {
             driveHandler.heartWeek(weekFirstDayStartTime);
         } finally {
-            long interval = diffTimeRecord.interval().interval();
-            RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartWeek()", interval);
+            RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartWeek()", start);
         }
     }
 }

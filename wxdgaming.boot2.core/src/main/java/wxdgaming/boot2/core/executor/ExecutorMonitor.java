@@ -33,7 +33,7 @@ public final class ExecutorMonitor extends Thread {
         ExecutorJob executorJob = jobContent.executorJob();
         String stack = executorJob.getStack();
         if (!executorJob.isIgnoreRunTimeRecord()) {
-            RunTimeUtil.record(stack, diffNs);
+            RunTimeUtil.record(stack, jobContent.start());
         }
         long diffMs = TimeUnit.NANOSECONDS.toMillis(diffNs);
         if (diffMs > 150) {

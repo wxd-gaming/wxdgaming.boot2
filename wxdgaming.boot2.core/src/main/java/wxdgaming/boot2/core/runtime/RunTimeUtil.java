@@ -42,7 +42,12 @@ public class RunTimeUtil extends ExecutorEvent {
         }
     }
 
-    public static void record(String name, long costTimeNs) {
+    public static long start() {
+        return System.nanoTime();
+    }
+
+    public static void record(String name, long start) {
+        long costTimeNs = System.nanoTime() - start;
         if (!Open.get()) return;
         readLock.lock();
         try {
