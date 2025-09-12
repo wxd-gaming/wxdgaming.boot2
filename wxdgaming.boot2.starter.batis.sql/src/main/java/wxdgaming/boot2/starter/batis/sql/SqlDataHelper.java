@@ -13,6 +13,7 @@ import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.ann.StopBefore;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
+import wxdgaming.boot2.core.runtime.IgnoreRunTimeRecord;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.batis.DataHelper;
 import wxdgaming.boot2.starter.batis.Entity;
@@ -63,6 +64,7 @@ public abstract class SqlDataHelper extends DataHelper {
 
     @Start()
     @Order(-100)
+    @IgnoreRunTimeRecord
     public void start() {
         if (sqlConfig.getScanPackage() != null && sqlConfig.getScanPackage().length > 0) {
             Map<String, LinkedHashMap<String, JSONObject>> tableStructMap = findTableStructMap();

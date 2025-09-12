@@ -3,6 +3,7 @@ package wxdgaming.boot2.core;
 import lombok.Getter;
 import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.runtime.IgnoreRunTimeRecord;
 
 /**
  * 持有RunApplication
@@ -17,6 +18,7 @@ public abstract class HoldApplicationContext implements InitPrint {
 
     @Init
     @Order(Integer.MIN_VALUE)
+    @IgnoreRunTimeRecord
     public void ___initHold(ApplicationContextProvider runApplication) {
         this.applicationContextProvider = runApplication;
     }

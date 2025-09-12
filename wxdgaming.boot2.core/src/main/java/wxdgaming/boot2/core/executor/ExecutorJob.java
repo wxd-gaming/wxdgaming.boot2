@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 class ExecutorJob implements Runnable {
 
-    protected final String stack;
+    protected String stack;
     @Getter(AccessLevel.PROTECTED) protected ThreadContext threadContext;
     @Getter(AccessLevel.PROTECTED) private final Runnable runnable;
 

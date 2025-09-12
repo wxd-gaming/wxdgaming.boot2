@@ -18,12 +18,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Getter
 class ExecutorJobScheduled implements Runnable {
 
-    private final Executor executor;
-    private final ScheduledExecutorJob targetRunnable;
+    protected final Executor executor;
+    protected final ScheduledExecutorJob targetRunnable;
     /** 如果true 如果当前正在运行不执行下一次 */
-    private final boolean atFixedRate;
-    private final AtomicBoolean running = new AtomicBoolean(false);
-    @Setter private ScheduledFuture<?> scheduledFuture;
+    protected final boolean atFixedRate;
+    protected final AtomicBoolean running = new AtomicBoolean(false);
+    @Setter protected ScheduledFuture<?> scheduledFuture;
 
     /**
      * 定时器任务
@@ -34,6 +34,7 @@ class ExecutorJobScheduled implements Runnable {
     public ExecutorJobScheduled(Executor executor, Runnable targetRunnable, boolean atFixedRate) {
         this.executor = executor;
         this.targetRunnable = new ScheduledExecutorJob(targetRunnable);
+        this.targetRunnable.stack = StackUtils.stack();
         this.atFixedRate = atFixedRate;
     }
 
@@ -44,6 +45,7 @@ class ExecutorJobScheduled implements Runnable {
 
         public ScheduledExecutorJob(Runnable runnable) {
             super(runnable);
+            this.stack = StackUtils.stack();
             iExecutorQueue = getRunnable() instanceof IExecutorQueue ? ((IExecutorQueue) getRunnable()) : null;
         }
 

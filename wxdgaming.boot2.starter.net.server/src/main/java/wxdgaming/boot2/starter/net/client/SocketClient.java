@@ -17,6 +17,7 @@ import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.StopBefore;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
+import wxdgaming.boot2.core.runtime.IgnoreRunTimeRecord;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.ChannelUtil;
 import wxdgaming.boot2.starter.net.NioFactory;
@@ -148,6 +149,7 @@ public class SocketClient {
 
     @Start
     @Order(2000)
+    @IgnoreRunTimeRecord
     public void start(@Qualifier ProtoListenerFactory protoListenerFactory) {
         init(protoListenerFactory);
         for (int i = 0; i < config.getMaxConnectionCount(); i++) {

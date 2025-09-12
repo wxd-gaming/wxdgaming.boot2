@@ -13,6 +13,7 @@ import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.ann.StopBefore;
+import wxdgaming.boot2.core.runtime.IgnoreRunTimeRecord;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.NioFactory;
 import wxdgaming.boot2.starter.net.SessionGroup;
@@ -49,6 +50,7 @@ public class SocketServer {
 
     @Start
     @Order(1000)
+    @IgnoreRunTimeRecord
     public void start(@Qualifier ProtoListenerFactory protoListenerFactory) {
 
         SocketServerDeviceHandler socketServerDeviceHandler = new SocketServerDeviceHandler(config, sessionGroup);

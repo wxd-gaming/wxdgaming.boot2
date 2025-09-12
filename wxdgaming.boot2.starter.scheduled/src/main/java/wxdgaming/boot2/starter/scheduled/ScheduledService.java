@@ -11,6 +11,7 @@ import wxdgaming.boot2.core.ann.StopBefore;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
+import wxdgaming.boot2.core.runtime.IgnoreRunTimeRecord;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 
@@ -67,6 +68,7 @@ public class ScheduledService extends HoldApplicationContext {
 
     @Start
     @Order(99999998)
+    @IgnoreRunTimeRecord
     public void start() {
         ScheduleTrigger scheduleTrigger = new ScheduleTrigger();
         future = executorServicePlatform.scheduleAtFixedRate(

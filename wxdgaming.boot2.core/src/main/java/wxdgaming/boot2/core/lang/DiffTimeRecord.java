@@ -92,6 +92,10 @@ public class DiffTimeRecord {
 
     }
 
+    public static DiffTimeRecord start4Ns() {
+        return start(IntervalConvertConst.NS);
+    }
+
     public static DiffTimeRecord start4Ms() {
         return start(IntervalConvertConst.MS);
     }

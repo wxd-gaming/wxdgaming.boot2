@@ -15,11 +15,11 @@ public class StackUtils {
 
     /** 追踪到上一次链路 */
     public static String stack() {
-        return stack(1, 0);
+        return stack(1, 2);
     }
 
     public static String stack2() {
-        return stack(1, 1);
+        return stack(1, 3);
     }
 
     public static String stack(int initSkip, int skip) {

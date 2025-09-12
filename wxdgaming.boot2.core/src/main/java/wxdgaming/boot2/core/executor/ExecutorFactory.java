@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.InitPrint;
+import wxdgaming.boot2.core.runtime.RunTimeUtil;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,6 +42,7 @@ public class ExecutorFactory implements InitPrint {
         EXECUTOR_SERVICE_BASIC = create("basic", executorProperties.getBasic());
         EXECUTOR_SERVICE_LOGIC = create("logic", executorProperties.getLogic());
         EXECUTOR_SERVICE_VIRTUAL = createVirtual("virtual", executorProperties.getVirtual());
+        RunTimeUtil.openRecord();
     }
 
     public static ExecutorService getExecutor(String name) {

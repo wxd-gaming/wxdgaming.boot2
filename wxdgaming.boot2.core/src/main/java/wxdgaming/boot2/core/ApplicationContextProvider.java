@@ -13,9 +13,12 @@ import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.AssertException;
+import wxdgaming.boot2.core.lang.DiffTimeRecord;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.FieldUtil;
 import wxdgaming.boot2.core.reflect.MethodUtil;
+import wxdgaming.boot2.core.runtime.IgnoreRunTimeRecord;
+import wxdgaming.boot2.core.runtime.RunTimeUtil;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.lang.annotation.Annotation;
@@ -437,10 +440,19 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
             try {
                 if (log.isTraceEnabled())
                     log.trace("{}.{}", bean.getClass().getSimpleName(), this.method.getName());
-                if (proxy != null)
-                    return proxy.proxyInvoke(args);
-                else
-                    return method.invoke(bean, args);
+                DiffTimeRecord timeRecord = DiffTimeRecord.start4Ns();
+                try {
+                    if (proxy != null)
+                        return proxy.proxyInvoke(args);
+                    else
+                        return method.invoke(bean, args);
+                } finally {
+                    if (!AnnUtil.hasAnn(method, IgnoreRunTimeRecord.class)) {
+                        DiffTimeRecord.RecordTime recordTime = timeRecord.interval();
+                        long diffNs = recordTime.interval();
+                        RunTimeUtil.record(bean.getClass().getSimpleName() + "#" + method.getName(), diffNs);
+                    }
+                }
             } catch (Throwable throwable) {
                 if (throwable instanceof AssertException assertException) {
                     throw assertException;
