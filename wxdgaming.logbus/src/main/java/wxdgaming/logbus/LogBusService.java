@@ -114,6 +114,10 @@ public class LogBusService implements InitPrint {
             this.type = type;
         }
 
+        @Override public String getStack() {
+            return "logbus-post";
+        }
+
         private SplitCollection<LogEntity> logEntities = null;
 
         private synchronized SplitCollection<LogEntity> reset() {
@@ -147,6 +151,10 @@ public class LogBusService implements InitPrint {
 
         public PostLog2FileEvent(String type) {
             this.type = type;
+        }
+
+        @Override public String getStack() {
+            return "logbus-post";
         }
 
         @Override public void onEvent() throws Exception {

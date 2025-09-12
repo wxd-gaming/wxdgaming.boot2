@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Const;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.IExecutorQueue;
+import wxdgaming.boot2.core.executor.StackUtils;
 import wxdgaming.boot2.core.timer.CronExpress;
 
 import java.lang.reflect.Method;
@@ -35,6 +36,7 @@ public abstract class AbstractCronTrigger extends ExecutorEvent implements Runna
 
     public AbstractCronTrigger(Method method, CronExpress cronExpress) {
         super(method);
+        this.stack = StackUtils.stack();
         this.cronExpress = cronExpress;
     }
 

@@ -75,6 +75,10 @@ public class LRUIntCache<V> extends Cache<Integer, V> {
                     return "cache-heart-event";
                 }
 
+                @Override public String getStack() {
+                    return queueName();
+                }
+
                 @Override public void onEvent() throws Exception {
                     CacheLock cacheLock = reentrantLocks.get(hashIndex);
                     cacheLock.writeLock.lock();

@@ -476,7 +476,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         }
 
         @Override public String toString() {
-            return "ProviderMethod{bean=%s, method=%s}".formatted(bean, method);
+            return bean.getClass().getSimpleName() + "#" + method.getName();
         }
     }
 

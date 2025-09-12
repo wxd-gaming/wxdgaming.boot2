@@ -61,6 +61,10 @@ public class ScheduledInfo extends AbstractCronTrigger implements Runnable, IExe
         return executorWith != null;
     }
 
+    @Override public boolean isIgnoreRunTimeRecord() {
+        return true;
+    }
+
     @Override public String getStack() {
         return this.name;
     }

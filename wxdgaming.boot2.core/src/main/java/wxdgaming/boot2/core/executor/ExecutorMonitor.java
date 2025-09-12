@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.executor;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.runtime.RunTimeUtil;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,18 +22,24 @@ public final class ExecutorMonitor extends Thread {
     public static ConcurrentHashMap<Thread, JobContent> executorJobConcurrentHashMap = new ConcurrentHashMap<>();
 
     public static void put(ExecutorJob executorJob) {
-        executorJobConcurrentHashMap.put(Thread.currentThread(), new JobContent(executorJob, System.currentTimeMillis()));
+        executorJobConcurrentHashMap.put(Thread.currentThread(), new JobContent(executorJob, System.nanoTime()));
     }
 
     public static void release() {
         Thread thread = Thread.currentThread();
         JobContent jobContent = executorJobConcurrentHashMap.remove(thread);
         if (jobContent == null) return;
-        long diff = System.currentTimeMillis() - jobContent.start();
-        if (diff > 150) {
+        long diffNs = System.nanoTime() - jobContent.start();
+        ExecutorJob executorJob = jobContent.executorJob();
+        String stack = executorJob.getStack();
+        if (!executorJob.isIgnoreRunTimeRecord()) {
+            RunTimeUtil.record(stack, diffNs);
+        }
+        long diffMs = TimeUnit.NANOSECONDS.toMillis(diffNs);
+        if (diffMs > 150) {
             log.warn(
                     "线程: {}, 执行器: {}, 执行时间: {}ms",
-                    thread.getName(), jobContent.executorJob().getStack(), diff
+                    thread.getName(), stack, diffMs
             );
         }
     }

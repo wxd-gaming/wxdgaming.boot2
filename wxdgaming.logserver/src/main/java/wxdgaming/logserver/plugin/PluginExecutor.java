@@ -26,4 +26,7 @@ public class PluginExecutor extends AbstractCronTrigger {
         abstractPlugin.trigger(applicationProvider.get());
     }
 
+    @Override public String getStack() {
+        return abstractPlugin.getClass().getSimpleName() + "#trigger()";
+    }
 }

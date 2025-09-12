@@ -1,6 +1,5 @@
 package wxdgaming.boot2.core.executor;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -9,11 +8,13 @@ import lombok.extern.slf4j.Slf4j;
  * @version 2025-05-15 09:39
  **/
 @Slf4j
+@Getter
 class ExecutorJob implements Runnable {
 
+    /** 堆栈，也是任务名称，日志记录关键 */
     protected String stack;
-    @Getter(AccessLevel.PROTECTED) protected ThreadContext threadContext;
-    @Getter(AccessLevel.PROTECTED) private final Runnable runnable;
+    protected ThreadContext threadContext;
+    private final Runnable runnable;
 
     public ExecutorJob(Runnable runnable) {
         this.runnable = runnable;
@@ -37,11 +38,17 @@ class ExecutorJob implements Runnable {
         }
     }
 
+    /** 堆栈，也是任务名称，日志记录关键 */
     public String getStack() {
         if (getRunnable() instanceof ExecutorJob executorJob) {
             return executorJob.getStack();
         }
         return stack;
+    }
+
+    /** 当等于true时不需要记录任务的执行耗时统计 */
+    public boolean isIgnoreRunTimeRecord() {
+        return false;
     }
 
     protected void runAfter() {

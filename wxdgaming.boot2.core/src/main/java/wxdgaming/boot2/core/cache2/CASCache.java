@@ -68,6 +68,10 @@ public class CASCache<K, V> extends Cache<K, V> {
                     return "cache-heart-event";
                 }
 
+                @Override public String getStack() {
+                    return queueName();
+                }
+
                 @Override public void onEvent() throws Exception {
                     Iterator<Map.Entry<K, CacheHolder<V>>> iterator = nodes.get(a).entrySet().iterator();
                     long millis = MyClock.millis();

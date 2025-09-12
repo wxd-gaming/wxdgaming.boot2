@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.runtime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 
 import java.text.DecimalFormat;
@@ -18,7 +19,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-09-12 09:34
  **/
-public class RunTimeUtil {
+public class RunTimeUtil extends ExecutorEvent {
 
     private static final Logger log = LoggerFactory.getLogger("RunTimeRecord");
 
@@ -31,7 +32,7 @@ public class RunTimeUtil {
 
     public static void openRecord() {
         Open.set(true);
-        scheduledFuture = ExecutorFactory.getExecutorServiceBasic().scheduleAtFixedRate(RunTimeUtil::print, 1, 1, TimeUnit.MINUTES);
+        scheduledFuture = ExecutorFactory.getExecutorServiceBasic().scheduleAtFixedRate(new RunTimeUtil(), 1, 1, TimeUnit.MINUTES);
     }
 
     public static void closeRecord() {
@@ -51,7 +52,11 @@ public class RunTimeUtil {
         }
     }
 
-    public static void print() {
+    @Override public boolean isIgnoreRunTimeRecord() {
+        return true;
+    }
+
+    @Override public void onEvent() throws Exception {
         writeLock.lock();
         try {
             List<RunTimeRecord> list = runTimeRecordMap.values().stream()

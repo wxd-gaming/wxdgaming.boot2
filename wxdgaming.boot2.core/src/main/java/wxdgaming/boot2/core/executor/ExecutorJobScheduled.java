@@ -49,7 +49,7 @@ class ExecutorJobScheduled implements Runnable {
             iExecutorQueue = getRunnable() instanceof IExecutorQueue ? ((IExecutorQueue) getRunnable()) : null;
         }
 
-        @Override protected ThreadContext getThreadContext() {
+        @Override public ThreadContext getThreadContext() {
             return null;
         }
 

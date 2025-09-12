@@ -29,6 +29,7 @@ public abstract class ExecutorEvent extends ExecutorJob implements IExecutorQueu
         this.queueName = this.executorWith == null ? null : this.executorWith.queueName();
     }
 
+    /** 堆栈，也是任务名称，日志记录关键 */
     @Override public String getStack() {
         return super.getStack();
     }

@@ -12,6 +12,7 @@ import wxdgaming.game.cfg.QActivityTable;
 import wxdgaming.game.cfg.bean.QActivity;
 import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.server.bean.activity.ActivityData;
+import wxdgaming.game.server.bean.activity.HeartConst;
 import wxdgaming.game.server.bean.global.GlobalDataConst;
 import wxdgaming.game.server.bean.global.impl.ServerActivityData;
 import wxdgaming.game.server.script.validation.ValidationService;
@@ -125,9 +126,11 @@ public class ActivityService extends HoldApplicationContext {
         ServerActivityData serverActivityData = globalDataService.get(GlobalDataConst.ActivityData);
         ConcurrentHashMap<Integer, ActivityData> activityDataMap = serverActivityData.getActivityDataMap();
         for (Map.Entry<Integer, ActivityData> entry : activityDataMap.entrySet()) {
-            ActivityData value = entry.getValue();
-            AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(value.getActivityType());
-            abstractActivityHandler.heart(value);
+            ActivityData activityData = entry.getValue();
+            AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());
+            if (activityData.getHeartConstSet().contains(HeartConst.Heart)) {/*TODO 判断一下需要监听的心跳类型，避免浪费*/
+                abstractActivityHandler.heart(activityData);
+            }
         }
     }
 

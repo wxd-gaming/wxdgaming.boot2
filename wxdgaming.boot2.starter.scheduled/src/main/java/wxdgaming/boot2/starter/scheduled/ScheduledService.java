@@ -105,6 +105,14 @@ public class ScheduledService extends HoldApplicationContext {
             return "scheduled-timer";
         }
 
+        @Override public boolean isIgnoreRunTimeRecord() {
+            return true;
+        }
+
+        @Override public String getStack() {
+            return queueName();
+        }
+
         int curSecond = -1;
 
         @Override public void onEvent() {

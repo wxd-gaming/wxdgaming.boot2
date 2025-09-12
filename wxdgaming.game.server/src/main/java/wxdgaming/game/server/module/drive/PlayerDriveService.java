@@ -6,7 +6,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.ann.StopBefore;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
@@ -152,6 +151,10 @@ public class PlayerDriveService extends HoldApplicationContext {
 
         public PlayerDriveContent(String queueName) {
             this.queueName = queueName;
+        }
+
+        @Override public String getStack() {
+            return "PlayerDriveContent";
         }
 
         @Override public void onEvent() throws Exception {

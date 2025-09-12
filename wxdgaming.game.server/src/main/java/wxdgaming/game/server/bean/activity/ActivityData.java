@@ -5,6 +5,8 @@ import lombok.Setter;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.core.timer.MyClock;
 
+import java.util.HashSet;
+
 /**
  * 活动数据
  *
@@ -19,6 +21,7 @@ public class ActivityData extends ObjectBase {
     private int activityType;
     private long startTime;
     private long endTime;
+    private HashSet<HeartConst> heartConstSet = new HashSet<>();
 
     @Override public String toString() {
         return "ActivityData{activityId=%10d, activityType=%5d, startTime=%s, endTime=%s}"
