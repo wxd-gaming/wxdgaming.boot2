@@ -60,7 +60,7 @@ public class RunTimeUtil extends ExecutorEvent {
         writeLock.lock();
         try {
             List<RunTimeRecord> list = runTimeRecordMap.values().stream()
-                    .filter(r -> r.getCount().get() > 0)
+                    .filter(r -> r.getCount().get() > 1)
                     .peek(r -> {
                         long totalTime = r.getTotalRunTime().get() / 10000;
                         long totalCount = r.getCount().get();

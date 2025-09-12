@@ -6,6 +6,9 @@ import wxdgaming.game.server.bean.activity.ActivityData;
 import wxdgaming.game.server.bean.activity.HeartConst;
 import wxdgaming.game.server.script.activity.AbstractActivityHandler;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * 开服首充
  *
@@ -24,16 +27,23 @@ public class OpenServerFirstRechargeHandler extends AbstractActivityHandler<Acti
         return 1;
     }
 
+    @Override public Collection<HeartConst> heartConst() {
+        return List.of(HeartConst.Heart, HeartConst.Second, HeartConst.Minute);
+    }
+
     @Override public ActivityData newData() {
         return new ActivityData();
     }
 
     @Override public void start(ActivityData activityData) {
-        activityData.getHeartConstSet().add(HeartConst.Heart);
     }
 
     @Override public void heart(ActivityData activityData) {
-        log.info("OpenServerFirstRechargeHandler.heart");
+
+    }
+
+    @Override public void heartSecond(ActivityData activityData) {
+        log.info("OpenServerFirstRechargeHandler.heartSecond");
     }
 
     @Override public void heartMinute(ActivityData activityData) {

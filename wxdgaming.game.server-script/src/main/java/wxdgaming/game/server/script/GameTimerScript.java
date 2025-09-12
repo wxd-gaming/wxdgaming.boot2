@@ -1,4 +1,4 @@
-package wxdgaming.game.server.module.timer;
+package wxdgaming.game.server.script;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.Getter;
@@ -27,7 +27,7 @@ import wxdgaming.boot2.core.util.SignUtil;
 @Slf4j
 @Getter
 @Service
-public class GameTimerService extends HoldApplicationContext {
+public class GameTimerScript extends HoldApplicationContext {
 
     @Value("${server.port}")
     int webPort;
@@ -37,9 +37,9 @@ public class GameTimerService extends HoldApplicationContext {
     final PlayerDriveService playerDriveService;
     final ConnectLoginService connectLoginService;
 
-    public GameTimerService(SocketServer socketServer,
-                            GameServerProperties gameServerProperties, ConnectLoginProperties connectLoginProperties,
-                            PlayerDriveService playerDriveService, ConnectLoginService connectLoginService) {
+    public GameTimerScript(SocketServer socketServer,
+                           GameServerProperties gameServerProperties, ConnectLoginProperties connectLoginProperties,
+                           PlayerDriveService playerDriveService, ConnectLoginService connectLoginService) {
         this.socketServer = socketServer;
         this.gameServerProperties = gameServerProperties;
         this.connectLoginProperties = connectLoginProperties;

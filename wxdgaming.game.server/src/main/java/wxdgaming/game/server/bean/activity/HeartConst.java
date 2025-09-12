@@ -13,11 +13,12 @@ import java.util.Map;
  **/
 @Getter
 public enum HeartConst {
-    Heart(0, "每秒"),
-    Minute(1, "每分钟"),
-    Hour(2, "每小时"),
-    DayEnd(3, "每天结束"),
-    Week(4, "每周"),
+    Heart(0, "心跳"),
+    Second(1, "每秒"),
+    Minute(2, "每分钟"),
+    Hour(3, "每小时"),
+    DayEnd(4, "每天结束"),
+    Week(5, "每周"),
     ;
 
     private static final Map<Integer, HeartConst> static_map = MapOf.ofMap(HeartConst::getCode, HeartConst.values());

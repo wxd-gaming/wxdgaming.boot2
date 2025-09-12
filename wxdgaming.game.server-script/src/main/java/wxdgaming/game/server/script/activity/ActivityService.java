@@ -7,7 +7,6 @@ import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.timer.CronDuration;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
-import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.cfg.QActivityTable;
 import wxdgaming.game.cfg.bean.QActivity;
 import wxdgaming.game.common.global.GlobalDataService;
@@ -15,10 +14,12 @@ import wxdgaming.game.server.bean.activity.ActivityData;
 import wxdgaming.game.server.bean.activity.HeartConst;
 import wxdgaming.game.server.bean.global.GlobalDataConst;
 import wxdgaming.game.server.bean.global.impl.ServerActivityData;
+import wxdgaming.game.server.event.OnServerHeart;
+import wxdgaming.game.server.event.OnServerHeartMinute;
+import wxdgaming.game.server.event.OnServerHeartSecond;
 import wxdgaming.game.server.script.validation.ValidationService;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -35,6 +36,7 @@ public class ActivityService extends HoldApplicationContext {
     final DataRepository dataRepository;
     final ValidationService validationService;
     Map<Integer, AbstractActivityHandler> activityHandlerMap;
+    Map<HeartConst, List<ActivityData>> heartHandlerMap;
 
     public ActivityService(GlobalDataService globalDataService, DataRepository dataRepository, ValidationService validationService) {
         this.globalDataService = globalDataService;
@@ -116,21 +118,63 @@ public class ActivityService extends HoldApplicationContext {
                 }
                 break;
             }
+        }
+        Map<HeartConst, List<ActivityData>> tmp = new HashMap<>();
+        for (ActivityData activityData : activityDataMap.values()) {
+            Collection<HeartConst> heartConsts = activityHandlerMap.get(activityData.getActivityType()).heartConst();
+            for (HeartConst heartConst : heartConsts) {
+                List<ActivityData> handlers = tmp.computeIfAbsent(heartConst, l -> new ArrayList<>());
+                handlers.add(activityData);
+            }
+        }
+        heartHandlerMap = tmp;
+    }
 
+    @OnServerHeart
+    @SuppressWarnings("unchecked")
+    public void heart() {
+        List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.Heart, Collections.emptyList());
+        for (ActivityData activityData : activityDataList) {
+            AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());
+            abstractActivityHandler.heart(activityData);
         }
     }
 
-    @Scheduled("* * *")
+    @OnServerHeartSecond
     @SuppressWarnings("unchecked")
-    public void heart() {
-        ServerActivityData serverActivityData = globalDataService.get(GlobalDataConst.ActivityData);
-        ConcurrentHashMap<Integer, ActivityData> activityDataMap = serverActivityData.getActivityDataMap();
-        for (Map.Entry<Integer, ActivityData> entry : activityDataMap.entrySet()) {
-            ActivityData activityData = entry.getValue();
+    public void heartSecond() {
+        List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.Second, Collections.emptyList());
+        for (ActivityData activityData : activityDataList) {
             AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());
-            if (activityData.getHeartConstSet().contains(HeartConst.Heart)) {/*TODO 判断一下需要监听的心跳类型，避免浪费*/
-                abstractActivityHandler.heart(activityData);
-            }
+            abstractActivityHandler.heartSecond(activityData);
+        }
+    }
+
+    @OnServerHeartMinute
+    @SuppressWarnings("unchecked")
+    public void heartMinute() {
+        List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.Minute, Collections.emptyList());
+        for (ActivityData activityData : activityDataList) {
+            AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());
+            abstractActivityHandler.heartMinute(activityData);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void heartHour() {
+        List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.Hour, Collections.emptyList());
+        for (ActivityData activityData : activityDataList) {
+            AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());
+            abstractActivityHandler.heartHour(activityData);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void heartDayEnd() {
+        List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.DayEnd, Collections.emptyList());
+        for (ActivityData activityData : activityDataList) {
+            AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());
+            abstractActivityHandler.heartDayEnd(activityData);
         }
     }
 
