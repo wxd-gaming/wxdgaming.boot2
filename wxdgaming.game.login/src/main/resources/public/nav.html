@@ -8,27 +8,33 @@
     <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
     <title>nav</title>
     <style>
-        html, body, ul, li, label, span {border: 0;margin: 0;padding: 0;box-sizing: border-box;}
-
         html, body {
             display: block;overflow: hidden;width: 100%;height: 100%;
+            background-color: rgba(2, 82, 115, 0.82);
             font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
-            color: #535252;
+            color: #ffffff;
         }
 
         ul, li {width: 100%;}
 
-        li {cursor: pointer;}
 
-        .title_one {height: 32px;line-height: 28px;padding-left: 3px;}
+        .title_box {border: 1px solid #888888;border-right: 0;}
 
-        .title_one.check {background-color: #1a78d6;}
+        .title_box li {cursor: pointer;}
+
+        .title_box.ul_left {border-left: #01d390 3px solid;}
+
+        .title_one {height: 34px;line-height: 32px;padding-left: 3px; font-size: 14px;font-weight: bold;}
+
+        .title_one strong {float: right;margin-right: 5px;}
+
+        .title_one.check {background-color: rgba(2, 82, 115, 0.7);}
 
         .title_one:hover {background-color: #1a78d6;}
 
         /*.title_one {border-bottom: 1px solid #888888;}*/
 
-        .title_sub_box {border: 1px solid #888888;border-right: 0;}
+        .title_sub_box {}
 
         .title_sub {font-size: 12px;}
 
@@ -36,13 +42,15 @@
 
         .title_sub li.check {background-color: #cf7e47;height: 32px;line-height: 32px;}
 
-        .title_sub li:hover {background-color: #cf7e47;height: 32px;line-height: 32px;}
+        .title_sub li:hover {background-color: #0f7e77;height: 32px;line-height: 32px;}
     </style>
     <script>
         function selectNav(self) {
             // 移除所有 title_one 的 check 类，然后给当前元素添加 check 类
             $(".title_one").removeClass("check");
+            $(".title_one").parent("ul").removeClass("check");
             $(self).addClass("check");
+            $(self).parent("ul").addClass("ul_left");
             let next = $(self).next("li");
             $(".title_sub_box").each(function () {
                 if (this === next[0]) {
@@ -83,7 +91,7 @@
         Admin
     </li>
 </ul>
-<ul>
+<ul class="title_box ul_left">
     <li class="title_one check" onclick="selectNav(this)">管理</li>
     <li class="title_sub_box">
         <ul class="title_sub">
