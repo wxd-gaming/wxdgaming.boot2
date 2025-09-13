@@ -9,13 +9,13 @@
     <title>nav</title>
     <style>
         html, body {
-            display: block;overflow: hidden;width: 100%;height: 100%;
+            display: block;overflow: hidden;width: 180px;height: 100%;
             background-color: rgba(2, 82, 115, 0.82);
             font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
             color: #ffffff;
         }
 
-        ul, li {width: 100%;}
+        ul, li {width: 180px;box-sizing: border-box;margin: 0;padding: 0;}
 
 
         .title_box {border: 1px solid #888888;border-right: 0;}
@@ -24,9 +24,9 @@
 
         .title_box.ul_left {border-left: #01d390 3px solid;}
 
-        .title_one {height: 34px;line-height: 32px;padding-left: 3px; font-size: 14px;font-weight: bold;}
+        .title_one {height: 34px;line-height: 32px;padding-left: 3px; font-size: 14px;font-weight: bold;position: relative;}
 
-        .title_one strong {float: right;margin-right: 5px;}
+        .title_one strong {position: absolute;right: 8px;font-weight: bold;font-size: 16px;}
 
         .title_one.check {background-color: rgba(2, 82, 115, 0.7);}
 
@@ -92,9 +92,10 @@
     </li>
 </ul>
 <ul class="title_box ul_left">
-    <li class="title_one check" onclick="selectNav(this)">管理</li>
+    <li class="title_one check" onclick="selectNav(this)">导航<strong>↓</strong></li>
     <li class="title_sub_box">
         <ul class="title_sub">
+            <li onclick="selectNav2(this, '/admin-table.html')">账户列表</li>
             <li onclick="selectNav2(this, '/servertable.html')">服务器列表</li>
             <li onclick="selectNav2(this, '/cdkeytable.html')">礼包码</li>
             <li onclick="selectNav2(this, 'http://127.0.0.1:18888/index.html')">日志查询</li>

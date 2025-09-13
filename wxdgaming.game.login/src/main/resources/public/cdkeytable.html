@@ -79,7 +79,7 @@
             <td>${row.id}</td>
             <td>${row.code}</td>
             <td>${row.comment}</td>
-            <td>${row.rewards}</td>
+            <td ondblclick="alertShow(this,'奖励');">${row.rewards}</td>
             </tr>
             `;
             return tr;
@@ -165,9 +165,10 @@
     <label for="maxDay">结束日期: </label><input id="maxDay" type="date"/>
     <br>
     <label for="where">查询条件:</label>
-
     <select id="where">
-
+        <option value="id">id</option>
+        <option value="code">code</option>
+        <option value="comment">备注</option>
     </select>
 
     <select id="and" style="width: 60px;">
@@ -187,7 +188,9 @@
     <label for="orderField">排序条件:</label>
 
     <select id="orderField">
-
+        <option value="id">id</option>
+        <option value="code">code</option>
+        <option value="comment">备注</option>
     </select>
 
     <select id="orderOption" style="width: 60px;">

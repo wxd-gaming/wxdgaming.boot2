@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script charset="utf-8" type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script charset="utf-8" type="text/javascript" src="/js/com.wxd.js"></script>
+    <script charset="utf-8" type="text/javascript" src="/js/pageview.js"></script>
+    <title>账号列表</title>
+    <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
+    <link rel="stylesheet" type="text/css" href="/style/table.css"/>
+    <style>
+
+        html, body {
+            display: block;overflow: auto;width: 100%;height: 100%;
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            color: #535252;
+            min-width: 1400px;
+        }
+
+        a:link {color: #0866b4;}
+
+        a:visited { color: #0866b4;}
+
+        label {padding-left: 5px;padding-right: 5px;}
+    </style>
+    <script>
+
+        let pageView = null;
+
+        function search() {
+            wxd.loading();
+            let urlQuery = new wxd.Map().loadSearch();
+            pageView.remoteGetData(urlQuery);
+        }
+
+        // 用于显示的格式化版本
+        function formatForDisplay(str) {
+            if (typeof str === "string") {
+                return str;
+            }
+            return JSON.stringify(str, null, 2); // 会保留换行和缩进
+        }
+
+        function formatJsonWithNewlines(obj) {
+            if (typeof obj === 'string') {
+                try {
+                    obj = JSON.parse(obj);
+                } catch (e) {
+                    // 如果解析失败，直接格式化字符串
+                    return obj;
+                }
+            }
+            // 使用2个空格进行缩进，自动包含换行符
+            return JSON.stringify(obj, null, 2);
+        }
+
+        function escapeJSString(str) {
+            return formatForDisplay(str).replace(/\\/g, "\\\\")
+                .replace(/'/g, "\\'")
+                .replace(/"/g, "\\\"")
+                .replace(/\n/g, "\\n")
+                .replace(/\r/g, "\\r")
+                .replace(/\t/g, "\\t");
+        }
+
+        function createRow(index, row) {
+            let tr = `
+<tr>
+            <td>
+                <a href="#">删除</a>
+                <a href="#" onclick="editUser('${row.userName}');">修改</a>
+            </td>
+            <td>${index}</td>
+            <td>${row.userName}</td>
+            <td>${row.admin}</td>
+            <td>${row.phone}</td>
+            <td>${row.host}</td>
+            </tr>
+            `;
+            return tr;
+        }
+
+        function alertShow(self, title) {
+            let content = $(self).text();
+            content = formatJsonWithNewlines(content);
+            console.log(typeof content, content);
+            wxd.message.alert(`<pre>${content}</pre>`, title);
+        }
+
+        $(() => {
+            wxd.loading();
+            let urlQuery = new wxd.Map().loadSearch();
+            pageView = new PageView("/admin/account/queryList", search, createRow);
+            search();
+        });
+
+        function editUser(userName) {
+            wxd.loadHtml("/admin-edit.html?userName=" + userName);
+        }
+
+        function addUser() {
+            wxd.loadHtml("/admin-add.html");
+        }
+
+    </script>
+</head>
+<body>
+<div class="btn_box" style="width: 100%;height: 70px;padding-left: 20px; padding-top: 8px; text-align: left;vertical-align: center;">
+    <button onclick="search();">查询</button>
+    <button onclick="addUser();">新增</button>
+</div>
+<div class="tableDom" style="position: absolute;left: 20px;top: 72px;right: 20px;bottom: 40px;padding-right: 10px;border-radius: 0;">
+    <table>
+        <thead>
+        <tr>
+            <th>操作</th>
+            <th>序号</th>
+            <th>用户名</th>
+            <th>管理员</th>
+            <th>电话</th>
+            <th>权限</th>
+        </tr>
+        </thead>
+        <tbody class="tbody">
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -46,7 +46,10 @@ public class AdminUserToken extends ObjectBase {
         }
     }
 
+    private long loginCount;
+    private boolean admin;
     private String userName;
+    private String phone;
     /** 过期时间 */
     private long expireTime;
     /** 路由权限 */
