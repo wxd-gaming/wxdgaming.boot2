@@ -47,12 +47,12 @@ public class LogFindController implements InitPrint {
             @RequestParam("tableName") String tableName,
             @RequestParam("pageIndex") int pageIndex,
             @RequestParam("pageSize") int pageSize,
-            @RequestParam("minDay") String minDay,
-            @RequestParam("maxDay") String maxDay,
+            @RequestParam("minTime") String minTime,
+            @RequestParam("maxTime") String maxTime,
             @RequestParam("where") String where,
             @RequestParam("order") String orderJson
     ) {
-        return logService.logPage(tableName, pageIndex, pageSize, minDay, maxDay, where, orderJson);
+        return logService.logPage(tableName, pageIndex, pageSize, minTime, maxTime, where, orderJson);
     }
 
 }

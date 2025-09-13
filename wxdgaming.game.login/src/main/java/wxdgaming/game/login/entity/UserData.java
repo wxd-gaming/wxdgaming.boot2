@@ -34,6 +34,11 @@ public class UserData extends Entity {
     /** 平台返回的userid */
     @DbColumn(index = true, length = 64)
     private String platformUserId;
-
+    private long loginCount;
+    private long lastLoginTime;
+    /** 禁止登录的过期时间 */
+    private long banExpireTime;
+    /** 是不是白名单 */
+    private boolean white;
 
 }

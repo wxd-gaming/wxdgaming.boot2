@@ -55,17 +55,7 @@ public abstract class SqlDataHelper extends DataHelper {
             initDataBatch();
         }
         cacheService = new SqlDataCacheService(this);
-    }
 
-    @SuppressWarnings("unchecked")
-    @Override public SqlDDLBuilder ddlBuilder() {
-        return super.ddlBuilder();
-    }
-
-    @Start()
-    @Order(-100)
-    @IgnoreRunTimeRecord
-    public void start() {
         if (sqlConfig.getScanPackage() != null && sqlConfig.getScanPackage().length > 0) {
             Map<String, LinkedHashMap<String, JSONObject>> tableStructMap = findTableStructMap();
             ReflectProvider.Builder.of(sqlConfig.getScanPackage()).build()
@@ -74,10 +64,15 @@ public abstract class SqlDataHelper extends DataHelper {
                         if (!Entity.class.isAssignableFrom(cls)) {
                             throw new RuntimeException(cls + " not super " + Entity.class);
                         }
-
                         checkTable(tableStructMap, (Class<? extends Entity>) cls, true);
                     });
         }
+
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override public SqlDDLBuilder ddlBuilder() {
+        return super.ddlBuilder();
     }
 
     @Order(100/*优先清空缓存*/)

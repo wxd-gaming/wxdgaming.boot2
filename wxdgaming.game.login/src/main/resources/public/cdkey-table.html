@@ -69,15 +69,19 @@
         }
 
         function createRow(index, row) {
-            let tr = `<tr>`;
-            for (const key in pageView.columns) {
-                let column = pageView.columns[key];
-                let columnName = column.name;
-                let columnComment = column.comment;
-                let columnStyle = column.style;
-                tr += `<td ondblclick="alertShow(this,'${columnComment}');" style="${columnStyle}">${row[columnName]}</td>`;
-            }
-            tr += `</tr>`;
+            let tr = `
+<tr>
+            <td>
+            <a href="#" onclick="gainCode(${row.id}, 100)">生成100</a>
+            <a href="#" onclick="gainCode(${row.id}, 1000)">生成1000</a>
+            <a href="#" onclick="queryCode(${row.id})">获取</a>
+            </td>
+            <td>${row.id}</td>
+            <td>${row.code}</td>
+            <td>${row.comment}</td>
+            <td ondblclick="alertShow(this,'奖励');">${row.rewards}</td>
+            </tr>
+            `;
             return tr;
         }
 
@@ -91,30 +95,10 @@
         $(() => {
             wxd.loading();
             let urlQuery = new wxd.Map().loadSearch();
-            pageView = new PageView("/admin/log/page", search, createRow);
+            pageView = new PageView("/admin/cdkey/queryList", search, createRow);
             pageView.gameId = urlQuery.get("gameId");
 
-
-            let url = "/admin/log/title";
-            let map = new wxd.Map();
-            map.loadSearch();
-            wxd.netty.post(url, map.toString(), (response) => {
-                if (response.code === 1) {
-                    document.title = response.comment;
-                    $(".tableDom").attr("style", $(".tableDom").attr("style") + "" + response.style);
-                    let data = response.data;
-                    for (let i = 0; i < data.length; i++) {
-                        let item = data[i];
-                        pageView.columns[item.name] = item;
-                        $("#where").append(`<option value="${item.name}">${item.comment}</option>`);
-                        $("#orderField").append(`<option value="${item.name}">${item.comment}</option>`);
-                        let l = `<th class="${item.name}" style="${item.style}">${item.comment}</th>`;
-                        $(".table_head").append(l);
-                    }
-                    search();
-                }
-            });
-
+            search();
         });
 
         let whereJsonArray = [];
@@ -150,6 +134,29 @@
             $("#labOrderBy").text("");
         }
 
+        function gainCode(cdKeyId, num) {
+            let param = "cdKeyId=" + cdKeyId + "&num=" + num;
+            wxd.netty.post("/admin/cdkey/gainCode", param, function (data) {
+                if (data.code === 1) {
+                    wxd.message.alert(formatForDisplay(data.data), "提示")
+                } else {
+                    wxd.message.alert(formatForDisplay(data.msg), "提示")
+                }
+            });
+        }
+
+
+        function queryCode(cdKeyId) {
+            let param = "cdKeyId=" + cdKeyId;
+            wxd.netty.post("/admin/cdkey/queryCode", param, function (data) {
+                if (data.code === 1) {
+                    wxd.message.alert(formatForDisplay(data.data), "提示")
+                } else {
+                    wxd.message.alert(formatForDisplay(data.msg), "提示")
+                }
+            });
+        }
+
     </script>
 </head>
 <body>
@@ -158,9 +165,10 @@
     <label for="maxTime">结束日期: </label><input id="maxTime" type="date"/>
     <br>
     <label for="where">查询条件:</label>
-
     <select id="where">
-
+        <option value="id">id</option>
+        <option value="code">code</option>
+        <option value="comment">备注</option>
     </select>
 
     <select id="and" style="width: 60px;">
@@ -180,7 +188,9 @@
     <label for="orderField">排序条件:</label>
 
     <select id="orderField">
-
+        <option value="id">id</option>
+        <option value="code">code</option>
+        <option value="comment">备注</option>
     </select>
 
     <select id="orderOption" style="width: 60px;">
@@ -199,7 +209,12 @@
 <div class="tableDom" style="position: absolute;left: 20px;top: 200px;right: 20px;bottom: 40px;padding-right: 10px;border-radius: 0;">
     <table>
         <thead>
-        <tr class="table_head">
+        <tr>
+            <th>操作</th>
+            <th>ID</th>
+            <th>通用码</th>
+            <th>备注</th>
+            <th>奖励</th>
         </tr>
         </thead>
         <tbody class="tbody">

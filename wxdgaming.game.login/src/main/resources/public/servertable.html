@@ -31,8 +31,8 @@
         function search() {
             wxd.loading();
             let urlQuery = new wxd.Map().loadSearch();
-            urlQuery.put("minDay", $("#minDay").val());
-            urlQuery.put("maxDay", $("#maxDay").val());
+            urlQuery.put("minTime", $("#minTime").val());
+            urlQuery.put("maxTime", $("#maxTime").val());
             urlQuery.put("where", $("#labWhere").text());
             urlQuery.put("order", $("#labOrderBy").text());
             pageView.remoteGetData(urlQuery);
@@ -137,9 +137,9 @@
     </script>
 </head>
 <body>
-<div class="btn_box" style="width: 100%;height: 180px;padding-left: 10px; padding-top: 8px; text-align: left;vertical-align: center;">
-    <label for="minDay">开始日期: </label><input id="minDay" type="date"/>
-    <label for="maxDay">结束日期: </label><input id="maxDay" type="date"/>
+<div class="btn_box" style="width: 100%;height: 180px;padding-left: 20px; padding-top: 8px; text-align: left;vertical-align: center;">
+    <label for="minTime">开始日期: </label><input id="minTime" type="date"/>
+    <label for="maxTime">结束日期: </label><input id="maxTime" type="date"/>
     <br>
     <label for="where">查询条件:</label>
 
