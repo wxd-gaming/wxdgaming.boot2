@@ -34,7 +34,6 @@ public class PgsqlTest {
         sqlConfig.setPassword("test");
         sqlConfig.setScanPackage(new String[]{EntityTest.class.getPackageName()});
         dataHelper = new PgsqlDataHelper(sqlConfig);
-        dataHelper.start();
         TableMapping tableMapping = dataHelper.tableMapping(EntityTest.class);
         /*TODO 处理分区表 */
         LocalDateTime localDate = LocalDateTime.now();
@@ -47,7 +46,6 @@ public class PgsqlTest {
         }
     }
 
-    @Test
     @RepeatedTest(10)
     public void t1() {
         long uid = System.nanoTime();
@@ -65,7 +63,6 @@ public class PgsqlTest {
         System.out.println(byKey);
     }
 
-    @Test
     @RepeatedTest(10)
     public void t2() {
         long uid = System.nanoTime();
@@ -79,7 +76,6 @@ public class PgsqlTest {
         System.out.println(byKey);
     }
 
-    @Test
     @RepeatedTest(10)
     public void selectAll() {
         List<EntityTest> all = dataHelper.findList(EntityTest.class);

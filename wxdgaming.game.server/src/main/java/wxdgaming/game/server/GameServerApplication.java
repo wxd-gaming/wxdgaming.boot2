@@ -15,6 +15,7 @@ import wxdgaming.boot2.starter.event.EventScan;
 import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.net.SocketScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
+import wxdgaming.boot2.starter.validation.ValidationScan;
 import wxdgaming.boot2.util.ChildApplicationContextProvider;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 import wxdgaming.game.common.slog.SlogService;
@@ -34,6 +35,7 @@ import java.io.File;
         LogBusService.class,
         SlogService.class,
         GlobalDataService.class,
+        ValidationScan.class,
         ConnectLoginProperties.class,
         GameServerApplication.class
 })
