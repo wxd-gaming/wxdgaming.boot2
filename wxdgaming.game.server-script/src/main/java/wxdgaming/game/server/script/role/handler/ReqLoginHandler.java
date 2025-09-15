@@ -9,8 +9,12 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
+import wxdgaming.game.common.global.GlobalDataService;
+import wxdgaming.game.login.bean.UserDataVo;
 import wxdgaming.game.message.role.ReqLogin;
 import wxdgaming.game.server.bean.UserMapping;
+import wxdgaming.game.server.bean.global.GlobalDataConst;
+import wxdgaming.game.server.bean.global.impl.YunyingData;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.role.PlayerService;
 import wxdgaming.game.server.script.tips.TipsService;
@@ -24,15 +28,17 @@ import wxdgaming.game.server.script.tips.TipsService;
 public class ReqLoginHandler extends HoldApplicationContext {
 
     private final DataCenterService dataCenterService;
+    final GlobalDataService globalDataService;
     private final PlayerService playerService;
     private final TipsService tipsService;
     private final ConnectLoginProperties connectLoginProperties;
 
-    public ReqLoginHandler(DataCenterService dataCenterService,
+    public ReqLoginHandler(DataCenterService dataCenterService, GlobalDataService globalDataService,
                            PlayerService playerService,
                            TipsService tipsService,
                            ConnectLoginProperties connectLoginProperties) {
         this.dataCenterService = dataCenterService;
+        this.globalDataService = globalDataService;
         this.playerService = playerService;
         this.tipsService = tipsService;
         this.connectLoginProperties = connectLoginProperties;
@@ -48,26 +54,20 @@ public class ReqLoginHandler extends HoldApplicationContext {
             int sid = req.getSid();
             String token = req.getToken();
             JsonToken jsonToken = JsonTokenParse.parse(connectLoginProperties.getJwtKey(), token);
-            int appId = jsonToken.getIntValue("appId");
-            String account = jsonToken.getString("account");
-            String platform = jsonToken.getString("platform");
-            /*平台返回的userid*/
-            String platformUserId = jsonToken.getString("platformUserId");
+            UserDataVo userDataVo = jsonToken.getObject("user", UserDataVo.class);
 
-
-            UserMapping userMapping = dataCenterService.getUserMapping(account);
+            YunyingData yunyingData = globalDataService.get(GlobalDataConst.YUNYINGDATA);
+            UserMapping userMapping = dataCenterService.getUserMapping(userDataVo.getAccount());
 
             userMapping.setSid(sid);
-            userMapping.setAppId(appId);
             userMapping.setClientIp(clientIp);
-            userMapping.setPlatform(platform);
-            userMapping.setPlatformUserId(platformUserId);
+            userMapping.setUserDataVo(userDataVo);
             userMapping.setSocketSession(socketSession);
             userMapping.setClientParams(req.getClientParams());
 
             socketSession.bindData("userMapping", userMapping);
 
-            playerService.sendPlayerList(socketSession, sid, account);
+            playerService.sendPlayerList(socketSession, sid, userDataVo.getAccount());
 
             log.info("登录完成:{}", userMapping);
         } catch (Exception e) {

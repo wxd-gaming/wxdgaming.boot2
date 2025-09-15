@@ -30,8 +30,8 @@ import java.util.*;
 @Service
 public class GmService extends HoldApplicationContext {
 
-    Map<String, ApplicationContextProvider.ProviderMethod> gmMap = new HashMap<>();
     private final TipsService tipsService;
+    Map<String, ApplicationContextProvider.ProviderMethod> gmMap = new HashMap<>();
     ResGmList resGmList = new ResGmList();
 
     public GmService(TipsService tipsService) {
@@ -70,6 +70,11 @@ public class GmService extends HoldApplicationContext {
         ApplicationContextProvider.ProviderMethod providerMethod = gmMap.get(cmd);
         if (providerMethod == null) {
             tipsService.tips(player, "不存在的gm命令: " + cmd);
+            return;
+        }
+        GM annotation = providerMethod.getMethod().getAnnotation(GM.class);
+        if (annotation.level() > player.getUserMapping().getUserDataVo().getGmLevel()) {
+            tipsService.tips(player, "权限不足: " + cmd);
             return;
         }
         try {

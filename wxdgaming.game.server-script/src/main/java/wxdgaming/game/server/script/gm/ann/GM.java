@@ -18,4 +18,8 @@ public @interface GM {
     String name() default "";
 
     String param() default "";
+
+    /** 等级权限。默认1. 特殊权限可以设置999， */
+    int level() default 1;
+
 }

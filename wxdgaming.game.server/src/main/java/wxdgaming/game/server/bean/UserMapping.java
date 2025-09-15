@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
+import wxdgaming.game.login.bean.UserDataVo;
 import wxdgaming.game.message.global.MapBean;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
@@ -21,9 +22,7 @@ import java.util.List;
 public class UserMapping {
 
     private final String account;
-    private String platform;
-    private String platformUserId;
-    private int appId;
+    private UserDataVo userDataVo;
     private String clientIp;
     private List<MapBean> clientParams;
 

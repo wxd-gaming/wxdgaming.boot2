@@ -4,9 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.game.common.bean.global.AbstractGlobalData;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 /**
  * 运营数据
  *
@@ -16,15 +13,6 @@ import java.util.HashMap;
 @Getter
 @Setter
 public class YunyingData extends AbstractGlobalData {
-
-    /** 拥有gm权限的账号 */
-    private ArrayList<String> gmAccountSet = new ArrayList<>();
-    /** 拥有gm权限的角色id */
-    private ArrayList<Long> gmPlayerIdSet = new ArrayList<>();
-    /** 禁止登录 */
-    private HashMap<String, Long> banLogin4AccountMap = new HashMap<>();
-    /** 禁止登录 */
-    private HashMap<Long, Long> banLogin4RidMap = new HashMap<>();
 
 
 }

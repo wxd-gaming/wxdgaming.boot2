@@ -10,6 +10,7 @@ import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.game.common.bean.login.AppPlatformParams;
 import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.login.LoginServerProperties;
+import wxdgaming.game.login.bean.UserDataVo;
 import wxdgaming.game.login.entity.UserData;
 import wxdgaming.game.login.inner.InnerService;
 import wxdgaming.game.login.login.LoginService;
@@ -87,19 +88,26 @@ public abstract class AbstractSdkLoginApi {
     public RunResult loginSuccess(UserData userData, String loginIp) {
 
         if (userData.getBanExpireTime() > System.currentTimeMillis()) {
-            return RunResult.fail("账号被封禁！");
+            return RunResult.fail("账号被封禁！").fluentPut("banExpireTime", userData.getBanExpireTime());
         }
 
         userData.setLoginCount(userData.getLoginCount() + 1);
         userData.setLastLoginTime(System.currentTimeMillis());
-        JsonTokenBuilder jwtBuilder = JsonTokenBuilder.of(loginServerProperties.getJwtKey(), TimeUnit.MINUTES, 5);
-        jwtBuilder.put("appId", userData.getAppId());
-        jwtBuilder.put("platform", userData.getPlatform());
-        jwtBuilder.put("account", userData.getAccount());
-        jwtBuilder.put("platformUserId", userData.getPlatformUserId());
-        jwtBuilder.put("banExpireTime", userData.getBanExpireTime());
-        jwtBuilder.put("white", userData.isWhite());
-        jwtBuilder.put("loginCount", userData.getLoginCount());
+
+        /*token 有效期保留10分钟，在游戏服登录可以续签*/
+        JsonTokenBuilder jwtBuilder = JsonTokenBuilder.of(loginServerProperties.getJwtKey(), TimeUnit.MINUTES, 10);
+        UserDataVo userDataVo = new UserDataVo();
+        userDataVo.setAccount(userData.getAccount());
+        userDataVo.setCreateTime(userData.getCreateTime());
+        userDataVo.setAppId(userData.getAppId());
+        userDataVo.setPlatform(userData.getPlatform());
+        userDataVo.setPlatformChannelId(userData.getPlatformChannelId());
+        userDataVo.setPlatformUserId(userData.getPlatformUserId());
+        userDataVo.setWhite(userData.isWhite());
+        userDataVo.setGmLevel(userData.getGmLevel());
+        userDataVo.setLoginCount(userData.getLoginCount());
+
+        jwtBuilder.put("user", userDataVo);
         String token = jwtBuilder.compact();
 
         AccountLoginLog accountLoginLog = new AccountLoginLog(

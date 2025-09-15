@@ -76,9 +76,7 @@ public class ReqChatMessageHandler {
 
     boolean checkOpenGm(Player player) {
         YunyingData yunyingData = globalDataService.get(GlobalDataConst.YUNYINGDATA);
-        if (gameServerProperties.isDebug()
-            || yunyingData.getGmAccountSet().contains(player.getAccount())
-            || yunyingData.getGmPlayerIdSet().contains(player.getUid())) {
+        if (gameServerProperties.isDebug() || player.getUserMapping().getUserDataVo().getGmLevel() > 0) {
             return true;
         }
         return false;

@@ -40,5 +40,6 @@ public class UserData extends Entity {
     private long banExpireTime;
     /** 是不是白名单 */
     private boolean white;
+    private int gmLevel;
 
 }

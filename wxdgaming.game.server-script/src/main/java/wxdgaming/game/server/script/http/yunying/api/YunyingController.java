@@ -1,12 +1,15 @@
-package wxdgaming.game.server.script.http.yunying;
+package wxdgaming.game.server.script.http.yunying.api;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.game.common.global.GlobalDataService;
+import wxdgaming.game.server.bean.global.GlobalDataConst;
+import wxdgaming.game.server.bean.global.impl.YunyingData;
 
 /**
  * 运营接口
@@ -17,19 +20,14 @@ import wxdgaming.game.common.global.GlobalDataService;
 @Slf4j
 @RestController
 @RequestMapping(value = "/yunying")
-public class YunyingScript extends HoldApplicationContext {
+public class YunyingController extends HoldApplicationContext {
 
     private final GlobalDataService globalDataService;
 
-    public YunyingScript(GlobalDataService globalDataService) {
+    public YunyingController(GlobalDataService globalDataService) {
         this.globalDataService = globalDataService;
     }
 
-    @RequestMapping(value = "/cdKeyList")
-    public Object cdKeyList(HttpServletRequest httpContext) {
-
-        return RunResult.ok();
-    }
 
     @RequestMapping(value = "/mail")
     public Object mail(HttpServletRequest httpContext) {
@@ -38,8 +36,8 @@ public class YunyingScript extends HoldApplicationContext {
     }
 
     @RequestMapping(value = "/banLogin")
-    public Object banLogin(HttpServletRequest httpContext) {
-
+    public Object banLogin(HttpServletRequest httpContext, @RequestParam("account") String account, @RequestParam("banTime") long banTime) {
+        YunyingData yunyingData = globalDataService.get(GlobalDataConst.YUNYINGDATA);
         return RunResult.ok();
     }
 
@@ -51,18 +49,6 @@ public class YunyingScript extends HoldApplicationContext {
 
     @RequestMapping(value = "/queryRole")
     public Object queryRole(HttpServletRequest httpContext) {
-
-        return RunResult.ok();
-    }
-
-    @RequestMapping(value = "/addPlayerGm")
-    public Object addPlayerGm(HttpServletRequest httpContext) {
-
-        return RunResult.ok();
-    }
-
-    @RequestMapping(value = "/addAccountGm")
-    public Object addAccountGm(HttpServletRequest httpContext) {
 
         return RunResult.ok();
     }
