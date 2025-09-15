@@ -10,9 +10,9 @@ import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.MainApplicationContextProvider;
 import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
+import wxdgaming.boot2.starter.validation.Validation;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.tips.TipsService;
-import wxdgaming.game.server.script.validation.Validation;
 import wxdgaming.game.server.script.validation.ValidationService;
 
 import java.util.List;

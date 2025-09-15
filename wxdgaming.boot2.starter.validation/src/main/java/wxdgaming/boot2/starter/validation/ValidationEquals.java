@@ -1,4 +1,4 @@
-package wxdgaming.game.server.script.validation;
+package wxdgaming.boot2.starter.validation;
 
 import lombok.Getter;
 import wxdgaming.boot2.core.collection.MapOf;

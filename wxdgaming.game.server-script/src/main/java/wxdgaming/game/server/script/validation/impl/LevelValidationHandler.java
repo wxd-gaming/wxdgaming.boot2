@@ -1,10 +1,10 @@
 package wxdgaming.game.server.script.validation.impl;
 
 import org.springframework.stereotype.Component;
+import wxdgaming.boot2.starter.validation.AbstractValidationHandler;
+import wxdgaming.boot2.starter.validation.Validation;
+import wxdgaming.boot2.starter.validation.ValidationType;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.script.validation.AbstractValidationHandler;
-import wxdgaming.game.server.script.validation.Validation;
-import wxdgaming.game.server.script.validation.ValidationType;
 
 /**
  * 等级验证 条件
@@ -13,7 +13,7 @@ import wxdgaming.game.server.script.validation.ValidationType;
  * @version 2025-09-11 10:55
  **/
 @Component
-public class LevelValidationHandler extends AbstractValidationHandler {
+public class LevelValidationHandler extends AbstractValidationHandler<Player> {
 
     @Override public ValidationType conditionType() {
         return ValidationType.Level;

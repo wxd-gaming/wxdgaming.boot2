@@ -8,6 +8,9 @@ import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
 import wxdgaming.boot2.core.executor.StackUtils;
 import wxdgaming.boot2.core.lang.ConfigString;
+import wxdgaming.boot2.starter.validation.AbstractValidationHandler;
+import wxdgaming.boot2.starter.validation.Validation;
+import wxdgaming.boot2.starter.validation.ValidationType;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.tips.TipsService;
 
@@ -39,29 +42,29 @@ public class ValidationService extends HoldApplicationContext {
     }
 
     /** 完全满足条件 */
-    public boolean validateAll(Player player, ConfigString configString, boolean sendTips) {
-        return validateAll(player, configString, Validation.Parse, sendTips);
+    public boolean validateAll(Object object, ConfigString configString, boolean sendTips) {
+        return validateAll(object, configString, Validation.Parse, sendTips);
     }
 
     /** 完全满足条件 */
-    public boolean validateAll(Player player, ConfigString configString, Function<String, List<Validation>> parse, boolean sendTips) {
+    public boolean validateAll(Object object, ConfigString configString, Function<String, List<Validation>> parse, boolean sendTips) {
         if (configString == null || StringUtils.isBlank(configString.getValue())) {
             return true;
         }
         /*TODO 参考格式 1,1,1;2,1,1*/
         List<Validation> validations = configString.get(parse);
         for (Validation validation : validations) {
-            AbstractValidationHandler validationHandler = validationHandlerMap.get(validation.getValidationType());
+            AbstractValidationHandler<Object> validationHandler = validationHandlerMap.get(validation.getValidationType());
             if (validationHandler == null) {
                 log.warn("验证条件为实现: {}, {}", configString.getValue(), StackUtils.stackAll());
-                if (sendTips) {
+                if (sendTips && object instanceof Player player) {
                     tipsService.tips(player, "服务器异常");
                 }
                 return false;
             }
-            if (!validationHandler.validate(player, validation)) {
-                log.debug("{} 验证条件失败: {}", player, validation);
-                if (sendTips) {
+            if (!validationHandler.validate(object, validation)) {
+                log.debug("{} 验证条件失败: {}", object, validation);
+                if (sendTips && object instanceof Player player) {
                     tipsService.tips(player, validationHandler.tips());
                 }
                 return false;
@@ -71,27 +74,27 @@ public class ValidationService extends HoldApplicationContext {
     }
 
     /** 完全满足条件 */
-    public boolean validateAny(Player player, ConfigString configString, boolean sendTips) {
+    public boolean validateAny(Object player, ConfigString configString, boolean sendTips) {
         return validateAny(player, configString, Validation.Parse, sendTips);
     }
 
     /** 任意一个条件满足就行 */
-    public boolean validateAny(Player player, ConfigString configString, Function<String, List<Validation>> parse, boolean sendTips) {
+    public boolean validateAny(Object object, ConfigString configString, Function<String, List<Validation>> parse, boolean sendTips) {
         if (configString == null || StringUtils.isBlank(configString.getValue())) {
             return true;
         }
         /*TODO 参考格式 1,1,1;2,1,1*/
         List<Validation> validations = configString.get(parse);
         for (Validation validation : validations) {
-            AbstractValidationHandler validationHandler = validationHandlerMap.get(validation.getValidationType());
+            AbstractValidationHandler<Object> validationHandler = validationHandlerMap.get(validation.getValidationType());
             if (validationHandler == null) {
                 log.warn("验证条件为实现: {}, {}", configString.getValue(), StackUtils.stackAll());
-                if (sendTips) {
+                if (sendTips && object instanceof Player player) {
                     tipsService.tips(player, "服务器异常");
                 }
                 return false;
             }
-            if (validationHandler.validate(player, validation)) {
+            if (validationHandler.validate(object, validation)) {
                 return true;
             }
         }

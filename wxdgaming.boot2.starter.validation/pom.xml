@@ -9,12 +9,12 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>wxdgaming.game.server-script</artifactId>
+    <artifactId>wxdgaming.boot2.starter.validation</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>wxdgaming.boot2</groupId>
-            <artifactId>wxdgaming.game.server</artifactId>
+            <artifactId>wxdgaming.boot2.core</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

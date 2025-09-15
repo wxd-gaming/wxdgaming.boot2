@@ -1,11 +1,11 @@
 package wxdgaming.game.server.script.validation.impl;
 
 import org.springframework.stereotype.Component;
+import wxdgaming.boot2.starter.validation.AbstractValidationHandler;
+import wxdgaming.boot2.starter.validation.Validation;
+import wxdgaming.boot2.starter.validation.ValidationType;
 import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.script.validation.AbstractValidationHandler;
-import wxdgaming.game.server.script.validation.Validation;
-import wxdgaming.game.server.script.validation.ValidationType;
 
 /**
  * 开服第几天
@@ -14,7 +14,7 @@ import wxdgaming.game.server.script.validation.ValidationType;
  * @version 2025-09-11 10:55
  **/
 @Component
-public class OpenDayValidationHandler extends AbstractValidationHandler {
+public class OpenDayValidationHandler extends AbstractValidationHandler<Player> {
 
     final GameServerProperties gameServerProperties;
 

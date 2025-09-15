@@ -38,6 +38,7 @@
         <module>wxdgaming.logserver</module>
         <module>wxdgaming.boot2.starter.event</module>
         <module>wxdgaming.game.authority</module>
+        <module>wxdgaming.boot2.starter.validation</module>
     </modules>
 
     <properties>
