@@ -85,11 +85,16 @@ public abstract class AbstractSdkLoginApi {
 
     /** 登录成功 */
     public RunResult loginSuccess(UserData userData, String loginIp) {
+        userData.setLoginCount(userData.getLoginCount() + 1);
+        userData.setLastLoginTime(System.currentTimeMillis());
         JsonTokenBuilder jwtBuilder = JsonTokenBuilder.of(loginServerProperties.getJwtKey(), TimeUnit.MINUTES, 5);
         jwtBuilder.put("appId", userData.getAppId());
         jwtBuilder.put("platform", userData.getPlatform());
         jwtBuilder.put("account", userData.getAccount());
         jwtBuilder.put("platformUserId", userData.getPlatformUserId());
+        jwtBuilder.put("banExpireTime", userData.getBanExpireTime());
+        jwtBuilder.put("white", userData.isWhite());
+        jwtBuilder.put("loginCount", userData.getLoginCount());
         String token = jwtBuilder.compact();
 
         AccountLoginLog accountLoginLog = new AccountLoginLog(

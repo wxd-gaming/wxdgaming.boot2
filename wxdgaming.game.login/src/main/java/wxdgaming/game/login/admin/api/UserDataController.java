@@ -1,0 +1,101 @@
+package wxdgaming.game.login.admin.api;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import wxdgaming.boot2.core.InitPrint;
+import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
+import wxdgaming.boot2.starter.batis.sql.SqlQueryBuilder;
+import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
+import wxdgaming.game.login.entity.UserData;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * 角色账号
+ *
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-09-13 20:37
+ **/
+@Slf4j
+@RestController
+@RequestMapping("/admin/userData")
+public class UserDataController implements InitPrint {
+
+    final SqlDataHelper sqlDataHelper;
+
+    public UserDataController(PgsqlDataHelper sqlDataHelper) {
+        this.sqlDataHelper = sqlDataHelper;
+    }
+
+    @RequestMapping("/queryList")
+    public RunResult queryList(@RequestParam("pageIndex") int pageIndex,
+                               @RequestParam("pageSize") int pageSize,
+                               @RequestParam("minTime") String minTime,
+                               @RequestParam("maxTime") String maxTime,
+                               @RequestParam("where") String whereJson,
+                               @RequestParam("order") String orderJson) {
+        SqlQueryBuilder queryBuilder = sqlDataHelper.queryBuilder();
+        queryBuilder.sqlByEntity(UserData.class);
+
+
+        if (StringUtils.isNotBlank(whereJson)) {
+            List<JSONObject> jsonObjects = JSON.parseArray(whereJson, JSONObject.class);
+            for (JSONObject jsonObject : jsonObjects) {
+                String whereFiled = jsonObject.getString("where");
+                String and = jsonObject.getString("and");
+                String where = whereFiled + " " + and + " ?";
+                queryBuilder.pushWhereAnd(where, jsonObject.getString("whereValue"));
+            }
+        }
+        if (StringUtils.isNotBlank(minTime)) {
+            Date minDate = MyClock.parseDate("yyyy-MM-dd'T'HH:mm", minTime);
+            queryBuilder.pushWhereAnd("createtime >= ?::int8", minDate.getTime());
+        }
+
+        if (StringUtils.isNotBlank(maxTime)) {
+            Date maxDate = MyClock.parseDate("yyyy-MM-dd'T'HH:mm", maxTime);
+            queryBuilder.pushWhereAnd("createtime <= ?::int8", maxDate.getTime());
+        }
+
+        if (StringUtils.isNotBlank(orderJson)) {
+            StringBuilder stringBuilder = new StringBuilder();
+            List<JSONObject> jsonObjects = JSON.parseArray(orderJson, JSONObject.class);
+            for (JSONObject jsonObject : jsonObjects) {
+                String orderField = jsonObject.getString("orderField");
+                String orderOption = jsonObject.getString("orderOption");
+                if (!stringBuilder.isEmpty()) {
+                    stringBuilder.append(",");
+                }
+                stringBuilder.append(orderField);
+                stringBuilder.append(" ").append(orderOption);
+            }
+            queryBuilder.setOrderBy(stringBuilder.toString());
+        } else {
+            queryBuilder.setOrderBy("createtime desc");
+        }
+        queryBuilder.page(pageIndex, pageSize, 1, 1000);
+        long rowCount = queryBuilder.findCount();
+        List<UserData> list2Entity = queryBuilder.findList2Entity(UserData.class);
+
+        List<JSONObject> list = new ArrayList<>();
+        for (UserData userData : list2Entity) {
+            JSONObject jsonObject = userData.toJSONObject();
+            jsonObject.remove("token");
+            jsonObject.put("createTime", MyClock.formatDate("yyyy-MM-dd HH:mm:ss.SSS", userData.getCreateTime()));
+            jsonObject.put("banExpireTime", MyClock.formatDate("yyyy-MM-dd HH:mm:ss.SSS", userData.getBanExpireTime()));
+            jsonObject.put("lastLoginTime", MyClock.formatDate("yyyy-MM-dd HH:mm:ss.SSS", userData.getLastLoginTime()));
+            list.add(jsonObject);
+        }
+        return RunResult.ok().fluentPut("rowCount", rowCount).data(list);
+    }
+
+}

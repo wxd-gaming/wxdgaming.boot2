@@ -67,7 +67,7 @@ public class CDKeyController implements InitPrint {
                 .limit(pageSize)
                 .peek(jsonObject -> jsonObject.put("rewards", jsonObject.getString("rewards")))
                 .toList();
-        return RunResult.ok().data(list);
+        return RunResult.ok().fluentPut("rowCount", qCdkeyTable.getDataList().size()).data(list);
     }
 
 }

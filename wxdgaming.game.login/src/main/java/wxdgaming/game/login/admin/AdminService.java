@@ -41,18 +41,42 @@ public class AdminService extends HoldApplicationContext {
     @Start
     public void start() {
         String adminName = loginServerProperties.getAdminName();
-        AdminUserEntity admin = this.sqlDataHelper.getCacheService().cacheIfPresent(AdminUserEntity.class, adminName);
+        AdminUserEntity admin = findByName(adminName);
         if (admin == null) {
-            AdminUserEntity adminUserEntity = new AdminUserEntity();
-            adminUserEntity.setUserName(adminName);
-            adminUserEntity.setPassword(SignUtil.signByJsonKey(loginServerProperties.getAdminPwd(), loginServerProperties.getAdminKey()));
-            this.sqlDataHelper.insert(adminUserEntity);
+            add(true, loginServerProperties.getAdminName(), loginServerProperties.getAdminPwd(), "13000000000");
         }
     }
 
-    ResponseEntity<RunResult> buildResponse(AdminUserEntity adminUser) {
+    public AdminUserEntity add(boolean admin, String userName, String password, String phone) {
+        AdminUserEntity adminUserEntity = new AdminUserEntity();
+        adminUserEntity.setUid(userName.toUpperCase());
+        adminUserEntity.setUserName(userName);
+        save(adminUserEntity, admin, password, phone);
+        return adminUserEntity;
+    }
+
+    public void save(AdminUserEntity adminUserEntity, boolean admin, String password, String phone) {
+        setPassword(adminUserEntity, password);
+        adminUserEntity.setAdmin(admin);
+        adminUserEntity.setPhone(phone);
+        this.sqlDataHelper.save(adminUserEntity);
+    }
+
+    public void setPassword(AdminUserEntity adminUserEntity, String password) {
+        adminUserEntity.setPassword(SignUtil.signByJsonKey(password, loginServerProperties.getAdminKey()));
+    }
+
+    public void delete(String userName) {
+        this.sqlDataHelper.deleteByKey(AdminUserEntity.class, userName.toUpperCase());
+    }
+
+    public ResponseEntity<RunResult> buildResponse(AdminUserEntity adminUser) {
         AdminUserToken adminUserToken = new AdminUserToken();
+        adminUserToken.setAdmin(adminUser.isAdmin());
         adminUserToken.setUserName(adminUser.getUserName());
+        adminUserToken.setLoginCount(adminUser.getLoginCount());
+        adminUserToken.setPhone(adminUser.getPhone());
+        adminUserToken.setRoutes(adminUser.getRoutes());
         adminUserToken.setExpireTime(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(12));
         return buildResponse(adminUserToken);
     }
@@ -74,8 +98,12 @@ public class AdminService extends HoldApplicationContext {
                 .body(RunResult.ok().data(jsonToken));
     }
 
+    public AdminUserEntity findByName(String userName) {
+        return sqlDataHelper.getCacheService().cacheIfPresent(AdminUserEntity.class, userName.toUpperCase());
+    }
+
     public ResponseEntity<RunResult> login(String userName, String password) {
-        AdminUserEntity adminUserEntity = sqlDataHelper.getCacheService().cacheIfPresent(AdminUserEntity.class, userName);
+        AdminUserEntity adminUserEntity = findByName(userName);
         if (adminUserEntity == null) {
             return ResponseEntity.ok(RunResult.fail("用户不存在"));
         }
@@ -84,7 +112,7 @@ public class AdminService extends HoldApplicationContext {
         if (!adminUserEntity.getPassword().equals(string)) {
             return ResponseEntity.ok(RunResult.fail("密码错误"));
         }
-
+        adminUserEntity.setLoginCount(adminUserEntity.getLoginCount() + 1);
         return buildResponse(adminUserEntity);
     }
 
@@ -94,7 +122,7 @@ public class AdminService extends HoldApplicationContext {
             if (adminUserToken == null) {
                 return ResponseEntity.ok(RunResult.fail("token过期"));
             }
-            AdminUserEntity adminUserEntity = sqlDataHelper.getCacheService().cacheIfPresent(AdminUserEntity.class, adminUserToken.getUserName());
+            AdminUserEntity adminUserEntity = findByName(adminUserToken.getUserName());
             if (adminUserEntity == null) {
                 return ResponseEntity.ok(RunResult.fail("token过期"));
             }

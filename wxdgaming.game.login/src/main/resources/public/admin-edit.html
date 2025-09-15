@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script charset="utf-8" type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script charset="utf-8" type="text/javascript" src="/js/com.wxd.js"></script>
+    <script charset="utf-8" type="text/javascript" src="/js/pageview.js"></script>
+    <title>账号列表</title>
+    <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
+    <style>
+
+        html, body {
+            display: block;overflow: auto;width: 100%;height: 100%;
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            color: #535252;
+        }
+
+        a:link {color: #0866b4;}
+
+        a:visited { color: #0866b4;}
+
+        label {padding-left: 5px;padding-right: 5px;}
+    </style>
+    <script>
+        function submit() {
+            let userName = $("#userName").val();
+            let password = $("#password").val();
+            let phone = $("#phone").val();
+            let admin = $("#admin").val();
+            if (userName === "" || password === "" || phone === "") {
+                wxd.message.alert("请填写完整信息");
+                return;
+            }
+            wxd.loading();
+            wxd.netty.post("/admin/account/edit", {
+                    userName: userName,
+                    password: password,
+                    admin: admin,
+                    phone: phone
+                }, function (data) {
+                    if (data.code === 1) {
+                        wxd.message.alert("添加成功");
+                        window.parent.location.reload();
+                    } else {
+                        wxd.message.alert(data.msg);
+                    }
+                }
+            )
+        }
+
+        $(() => {
+            let userName = new wxd.Map().loadSearch().get("userName");
+            wxd.netty.post("/admin/account/query", {
+                userName: userName
+            }, function (data) {
+                if (data.code === 1) {
+                    $("#userName").val(data.data.userName);
+                    $("#phone").val(data.data.phone);
+                    $("#admin").val(data.data.admin);
+                } else {
+                    wxd.message.alert(data.msg);
+                }
+            })
+        });
+
+    </script>
+</head>
+<body>
+<div style="width: 380px;height: 180px;position: absolute;left: 50%;top: 50%;transform: translate(-50%,-50%);)">
+    <table>
+        <tr>
+            <td>管理员：</td>
+            <td>
+                <select id="admin">
+                    <option value="0">否</option>
+                    <option value="1">是</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>用户名：</td>
+            <td>
+                <input id="userName" type="text">
+            </td>
+        </tr>
+        <tr>
+            <td>密码：</td>
+            <td>
+                <input id="password" type="password">
+            </td>
+        </tr>
+        <tr>
+            <td>电话：</td>
+            <td>
+                <input id="phone" type="text">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button onclick="submit()">提 交</button>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

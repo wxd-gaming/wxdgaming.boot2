@@ -12,7 +12,7 @@ import wxdgaming.game.login.LoginServerProperties;
 import wxdgaming.game.login.admin.AdminService;
 
 /**
- * 拦截器
+ * 拦截器, 通过参数或者cookie的 authorization 值获取授权信息
  *
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-06-11 15:20

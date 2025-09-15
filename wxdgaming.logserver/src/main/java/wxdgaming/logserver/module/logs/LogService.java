@@ -128,16 +128,16 @@ public class LogService implements InitPrint {
 
     public RunResult logPage(String tableName,
                              int pageIndex, int pageSize,
-                             String minDay, String maxDay, String whereJson, String orderJson) {
+                             String minTime, String maxTime, String whereJson, String orderJson) {
         SqlQueryBuilder queryBuilder = pgsqlDataHelper.queryBuilder();
         queryBuilder.setTableName(tableName);
 
-        if (StringUtils.isNotBlank(minDay)) {
-            queryBuilder.pushWhereByValueNotNull("daykey>=?", NumberUtil.retainNumber(minDay));
+        if (StringUtils.isNotBlank(minTime)) {
+            queryBuilder.pushWhereByValueNotNull("daykey>=?", NumberUtil.retainNumber(minTime));
         }
 
-        if (StringUtils.isNotBlank(maxDay)) {
-            queryBuilder.pushWhereByValueNotNull("daykey<=?", NumberUtil.retainNumber(maxDay));
+        if (StringUtils.isNotBlank(maxTime)) {
+            queryBuilder.pushWhereByValueNotNull("daykey<=?", NumberUtil.retainNumber(maxTime));
         }
 
         LogMappingInfo logMappingInfo = dataCenterService.getLogMappingInfoMap().get(tableName);
