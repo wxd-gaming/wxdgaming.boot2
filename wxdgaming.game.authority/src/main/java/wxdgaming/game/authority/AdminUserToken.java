@@ -25,12 +25,14 @@ import java.util.List;
 @Setter
 public class AdminUserToken extends ObjectBase {
 
+    public static final String authorization = "authorization";
+
     public static AdminUserToken threadContext() {
         return ThreadContext.context("adminUserToken");
     }
 
     public static AdminUserToken parse(HttpServletRequest request, String jwtKey) {
-        String token = SpringUtil.getCookieValue(request, "authorization");
+        String token = SpringUtil.getCookieValue(request, authorization);
         if (StringUtils.isBlank(token)) {
             token = request.getParameter("token");
         }

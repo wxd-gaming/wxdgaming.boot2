@@ -1,7 +1,7 @@
-package wxdgaming.logserver.module.admin.api;
+package wxdgaming.game.authority;
 
-import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -11,30 +11,28 @@ import wxdgaming.boot2.core.CacheHttpServletRequest;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.token.JsonTokenBuilder;
-import wxdgaming.game.authority.AdminUserToken;
-import wxdgaming.logserver.LogServerProperties;
 
 /**
- * 账户
+ * 验证接口
  *
  * @author wxd-gaming(無心道, 15388152619)
- * @version 2025-09-10 19:57
+ * @version 2025-09-15 09:23
  **/
 @Slf4j
 @RestController
-@RequestMapping("/web/account")
-public class AccountController implements InitPrint {
+@RequestMapping("/author")
+public class AuthorController implements InitPrint {
 
-    final LogServerProperties logServerProperties;
+    @Value("${boot.adminKey}")
+    private String adminKey;
 
-    public AccountController(LogServerProperties logServerProperties) {
-        this.logServerProperties = logServerProperties;
+    public AuthorController() {
     }
 
     @RequestMapping("/check")
     public ResponseEntity<RunResult> check(CacheHttpServletRequest request) {
         try {
-            AdminUserToken adminUserToken = AdminUserToken.parse(request, logServerProperties.getAdminKey());
+            AdminUserToken adminUserToken = AdminUserToken.parse(request, adminKey);
             if (adminUserToken == null) {
                 return ResponseEntity.ok(RunResult.fail("token过期"));
             }
@@ -45,11 +43,11 @@ public class AccountController implements InitPrint {
     }
 
     public ResponseEntity<RunResult> buildResponse(AdminUserToken adminUserToken) {
-        String jsonToken = JsonTokenBuilder.of(logServerProperties.getAdminKey(), adminUserToken.getExpireTime())
+        String jsonToken = JsonTokenBuilder.of(adminKey, adminUserToken.getExpireTime())
                 .put("user", adminUserToken)
                 .compact();
 
-        ResponseCookie cookie = ResponseCookie.from(HttpHeaderNames.AUTHORIZATION.toString(), jsonToken)
+        ResponseCookie cookie = ResponseCookie.from(AdminUserToken.authorization, jsonToken)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")

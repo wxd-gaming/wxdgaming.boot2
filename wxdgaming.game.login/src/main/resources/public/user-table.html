@@ -72,8 +72,8 @@
             let tr = `
 <tr>
             <td>
-                <a href="#" onclick="">禁止/解封</a>
-                <a href="#" onclick="">白名单</a>
+                <a href="#" onclick="banLogin('${row.account}')">禁止/解封</a>
+                <a href="#" onclick="whiteLogin('${row.account}')">白名单</a>
             </td>
             <td>${row.white}</td>
             <td>${row.banExpireTime}</td>
@@ -116,6 +116,42 @@
         function clearWhere() {
             whereJsonArray = [];
             $("#labWhere").text("");
+        }
+
+        function whiteLogin(account) {
+            let urlQuery = new wxd.Map().loadSearch();
+            urlQuery.put("account", account);
+            wxd.netty.post("/admin/userData/whiteLogin", urlQuery.toString(), (data) => {
+                wxd.message.alert(data.msg, "设置白名单结果");
+                if (data.code === 1) {
+                    search();
+                }
+            });
+        }
+
+        function banLogin(account) {
+            let html = `
+<ul>
+    <li><label>账号名字称: </label><label id="labAccount">${account}</label></li>
+    <li><label>账号ID: </label><input id="banTime" type="datetime-local"></li>
+</ul>
+            `;
+            wxd.message.alert(
+                html,
+                "禁止登录设置",
+                "确定", () => {
+                    let urlQuery = new wxd.Map().loadSearch();
+                    urlQuery.put("account", $("#labAccount").text());
+                    urlQuery.put("banTime", $("#banTime").val());
+                    wxd.netty.post("/admin/userData/banLogin", urlQuery.toString(), (data) => {
+                        wxd.message.alert(data.msg, "禁止登录设置结果");
+                        if (data.code === 1) {
+                            search();
+                        }
+                    });
+                },
+                "取消"
+            )
         }
 
     </script>

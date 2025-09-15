@@ -14,6 +14,7 @@ import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryBuilder;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
 import wxdgaming.game.login.entity.UserData;
+import wxdgaming.game.login.login.LoginService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,9 +32,40 @@ import java.util.List;
 public class UserDataController implements InitPrint {
 
     final SqlDataHelper sqlDataHelper;
+    final LoginService loginService;
 
-    public UserDataController(PgsqlDataHelper sqlDataHelper) {
+    public UserDataController(PgsqlDataHelper sqlDataHelper, LoginService loginService) {
         this.sqlDataHelper = sqlDataHelper;
+        this.loginService = loginService;
+    }
+
+    @RequestMapping("/banLogin")
+    public RunResult banLogin(@RequestParam("account") String account, @RequestParam("banTime") String banTime) {
+        UserData userData = loginService.userData(account);
+        if (userData == null) {
+            return RunResult.fail("用户不存在");
+        }
+        long time = 0;
+        if (StringUtils.isNotBlank(banTime)) {
+            time = MyClock.parseDate("yyyy-MM-dd'T'HH:mm", banTime).getTime();
+        }
+
+        if (time < System.currentTimeMillis())
+            time = 0;
+        userData.setBanExpireTime(time);
+        sqlDataHelper.getCacheService().cache(UserData.class).put(account, userData);
+        return RunResult.ok().msg("设置成功");
+    }
+
+    @RequestMapping("/whiteLogin")
+    public RunResult banLogin(@RequestParam("account") String account) {
+        UserData userData = loginService.userData(account);
+        if (userData == null) {
+            return RunResult.fail("用户不存在");
+        }
+        userData.setWhite(!userData.isWhite());
+        sqlDataHelper.getCacheService().cache(UserData.class).put(account, userData);
+        return RunResult.ok().msg(userData.isWhite() ? "设置白名单成功" : "取消白名单成功");
     }
 
     @RequestMapping("/queryList")
@@ -90,12 +122,19 @@ public class UserDataController implements InitPrint {
         for (UserData userData : list2Entity) {
             JSONObject jsonObject = userData.toJSONObject();
             jsonObject.remove("token");
-            jsonObject.put("createTime", MyClock.formatDate("yyyy-MM-dd HH:mm:ss.SSS", userData.getCreateTime()));
-            jsonObject.put("banExpireTime", MyClock.formatDate("yyyy-MM-dd HH:mm:ss.SSS", userData.getBanExpireTime()));
-            jsonObject.put("lastLoginTime", MyClock.formatDate("yyyy-MM-dd HH:mm:ss.SSS", userData.getLastLoginTime()));
+            jsonObject.put("createTime", formatDate(userData.getCreateTime()));
+            jsonObject.put("banExpireTime", formatDate(userData.getBanExpireTime()));
+            jsonObject.put("lastLoginTime", formatDate(userData.getLastLoginTime()));
             list.add(jsonObject);
         }
         return RunResult.ok().fluentPut("rowCount", rowCount).data(list);
+    }
+
+    private String formatDate(long time) {
+        if (time < System.currentTimeMillis()) {
+            return "";
+        }
+        return MyClock.formatDate("yyyy-MM-dd HH:mm:ss", time);
     }
 
 }
