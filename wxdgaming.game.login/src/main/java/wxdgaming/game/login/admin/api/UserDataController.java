@@ -58,7 +58,7 @@ public class UserDataController implements InitPrint {
     }
 
     @RequestMapping("/whiteLogin")
-    public RunResult banLogin(@RequestParam("account") String account) {
+    public RunResult whiteLogin(@RequestParam("account") String account) {
         UserData userData = loginService.userData(account);
         if (userData == null) {
             return RunResult.fail("用户不存在");

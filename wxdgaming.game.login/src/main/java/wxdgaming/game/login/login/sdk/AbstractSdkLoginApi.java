@@ -85,6 +85,11 @@ public abstract class AbstractSdkLoginApi {
 
     /** 登录成功 */
     public RunResult loginSuccess(UserData userData, String loginIp) {
+
+        if (userData.getBanExpireTime() > System.currentTimeMillis()) {
+            return RunResult.fail("账号被封禁！");
+        }
+
         userData.setLoginCount(userData.getLoginCount() + 1);
         userData.setLastLoginTime(System.currentTimeMillis());
         JsonTokenBuilder jwtBuilder = JsonTokenBuilder.of(loginServerProperties.getJwtKey(), TimeUnit.MINUTES, 5);
