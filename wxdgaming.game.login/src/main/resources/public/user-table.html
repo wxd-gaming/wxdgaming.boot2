@@ -75,11 +75,13 @@
                 <a href="#" onclick="banLogin('${row.account}')">禁止/解封</a>
                 <a href="#" onclick="whiteLogin('${row.account}')">白名单</a>
             </td>
+            <td>${row.account}</td>
+            <td>${row.gmLevel}</td>
             <td>${row.white}</td>
             <td>${row.banExpireTime}</td>
-            <td>${row.account}</td>
             <td>${row.platform}</td>
             <td>${row.createTime}</td>
+            <td>${row.loginCount}</td>
             <td>${row.lastLoginTime}</td>
             <td>${row.loginCount}</td>
             </tr>
@@ -132,8 +134,8 @@
         function banLogin(account) {
             let html = `
 <ul>
-    <li><label>账号名字称: </label><label id="labAccount">${account}</label></li>
-    <li><label>账号ID: </label><input id="banTime" type="datetime-local"></li>
+    <li><label>账号: </label><label id="labAccount">${account}</label></li>
+    <li><label>时间: </label><input id="banTime" type="datetime-local"></li>
 </ul>
             `;
             wxd.message.alert(
@@ -144,6 +146,31 @@
                     urlQuery.put("account", $("#labAccount").text());
                     urlQuery.put("banTime", $("#banTime").val());
                     wxd.netty.post("/admin/userData/banLogin", urlQuery.toString(), (data) => {
+                        wxd.message.alert(data.msg, "禁止登录设置结果");
+                        if (data.code === 1) {
+                            search();
+                        }
+                    });
+                },
+                "取消"
+            )
+        }
+
+        function gmLevel(account) {
+            let html = `
+<ul>
+    <li><label>账号: </label><label id="labAccount">${account}</label></li>
+    <li><label>时间: </label><input id="gmLevel" type="number"></li>
+</ul>
+            `;
+            wxd.message.alert(
+                html,
+                "禁止登录设置",
+                "确定", () => {
+                    let urlQuery = new wxd.Map().loadSearch();
+                    urlQuery.put("account", $("#labAccount").text());
+                    urlQuery.put("gmLevel", $("#gmLevel").val());
+                    wxd.netty.post("/admin/userData/gmLevel", urlQuery.toString(), (data) => {
                         wxd.message.alert(data.msg, "禁止登录设置结果");
                         if (data.code === 1) {
                             search();
@@ -208,11 +235,13 @@
         <thead>
         <tr>
             <th>操作</th>
+            <th>账号</th>
+            <th>GM等级</th>
             <th>白名单</th>
             <th>禁止登录</th>
-            <th>账号</th>
             <th>平台</th>
             <th>注册时间</th>
+            <th>登录次数</th>
             <th>最后登录时间</th>
             <th>登录次数</th>
         </tr>

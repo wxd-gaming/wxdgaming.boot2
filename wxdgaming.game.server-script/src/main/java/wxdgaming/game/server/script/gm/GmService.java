@@ -48,15 +48,21 @@ public class GmService extends HoldApplicationContext {
 
         TreeMap<String, List<GMBean>> gmList = new TreeMap<>();
 
-        gmMap.forEach((cmd, providerMethod) -> {
-            Method method = providerMethod.getMethod();
-            GM annotation = method.getAnnotation(GM.class);
-            GMBean gmBean = new GMBean();
-            gmBean.setCmd(cmd);
-            gmBean.setName(StringUtils.isBlank(annotation.name()) ? cmd : annotation.name());
-            gmBean.setParams(annotation.param());
-            gmList.computeIfAbsent(annotation.group(), k -> new ArrayList<>()).add(gmBean);
-        });
+        gmMap.entrySet()
+                .stream()
+                .sorted(Comparator.comparing(Map.Entry::getValue))
+                .forEach((entry) -> {
+                    String cmd = entry.getKey();
+                    ApplicationContextProvider.ProviderMethod providerMethod = entry.getValue();
+                    Method method = providerMethod.getMethod();
+                    GM annotation = method.getAnnotation(GM.class);
+                    GMBean gmBean = new GMBean();
+                    gmBean.setCmd(cmd);
+                    gmBean.setName(StringUtils.isBlank(annotation.name()) ? cmd : annotation.name());
+                    gmBean.setParams(annotation.param());
+                    gmList.computeIfAbsent(annotation.group(), k -> new ArrayList<>()).add(gmBean);
+                });
+
         ResGmList tmpResGmList = new ResGmList();
         for (Map.Entry<String, List<GMBean>> entry : gmList.entrySet()) {
             tmpResGmList.getGmGroupList().add(new GmGroup().setGroup(entry.getKey()).setGmList(entry.getValue()));

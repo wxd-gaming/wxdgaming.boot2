@@ -13,6 +13,7 @@ import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryBuilder;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
+import wxdgaming.game.authority.AdminUserToken;
 import wxdgaming.game.login.entity.UserData;
 import wxdgaming.game.login.login.LoginService;
 
@@ -54,6 +55,20 @@ public class UserDataController implements InitPrint {
             time = 0;
         userData.setBanExpireTime(time);
         sqlDataHelper.getCacheService().cache(UserData.class).put(account, userData);
+        log.info("管理：{} 设置：{} 禁止登录：{}", AdminUserToken.threadContext().getUserName(), account, banTime);
+        return RunResult.ok().msg("设置成功");
+    }
+
+    @RequestMapping("/gmLevel")
+    public RunResult gmLevel(@RequestParam("account") String account, @RequestParam("gmLevel") int gmLevel) {
+        UserData userData = loginService.userData(account);
+        if (userData == null) {
+            return RunResult.fail("用户不存在");
+        }
+        if (gmLevel < 0) gmLevel = 0;
+        userData.setGmLevel(gmLevel);
+        sqlDataHelper.getCacheService().cache(UserData.class).put(account, userData);
+        log.info("管理：{} 设置：{} GM等级为：{}", AdminUserToken.threadContext().getUserName(), account, gmLevel);
         return RunResult.ok().msg("设置成功");
     }
 
@@ -65,6 +80,7 @@ public class UserDataController implements InitPrint {
         }
         userData.setWhite(!userData.isWhite());
         sqlDataHelper.getCacheService().cache(UserData.class).put(account, userData);
+        log.info("管理：{} 设置：{} 白名单：{}", AdminUserToken.threadContext().getUserName(), account, userData.isWhite());
         return RunResult.ok().msg(userData.isWhite() ? "设置白名单成功" : "取消白名单成功");
     }
 

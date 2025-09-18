@@ -25,7 +25,7 @@ public class PlayerGmScript {
         this.playerService = playerService;
     }
 
-    @GM
+    @GM(group = "角色", name = "修改等级", level = 2, param = "具体数字")
     public Object lv(Player player, JSONArray args) {
         int oldLv = player.getLevel();
         player.setLevel(args.getInteger(1));
@@ -33,7 +33,7 @@ public class PlayerGmScript {
         return null;
     }
 
-    @GM
+    @GM(group = "角色", name = "添加经验", level = 2, param = "具体数字, 最大long")
     public Object addExp(Player player, JSONArray args) {
         long exp = args.getLongValue(1);
         this.playerService.addExp(player, exp, ReasonDTO.of(ReasonConst.GM));

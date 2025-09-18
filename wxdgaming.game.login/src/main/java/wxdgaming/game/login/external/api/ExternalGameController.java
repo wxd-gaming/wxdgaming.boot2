@@ -31,12 +31,6 @@ public class ExternalGameController implements InitPrint {
         this.innerService = innerService;
     }
 
-    @RequestMapping(value = "/list")
-    public RunResult list(HttpServletRequest context) {
-        List<JSONObject> list = innerService.gameServerList();
-        return RunResult.ok().data(list);
-    }
-
     @RequestMapping(value = "/queryList")
     public RunResult queryGameServerList(HttpServletRequest context,
                                          @RequestParam("pageIndex") int pageIndex,
