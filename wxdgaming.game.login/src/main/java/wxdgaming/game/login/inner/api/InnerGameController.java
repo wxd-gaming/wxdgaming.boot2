@@ -43,15 +43,17 @@ public class InnerGameController extends HoldApplicationContext {
     public RunResult registerGame(CacheHttpServletRequest request, @RequestBody ServerInfoDTO serverInfoDTO) {
         int sid = serverInfoDTO.getSid();
         int onlineSize = serverInfoDTO.getOnlineSize();
-        ServerInfoEntity clone = innerService.getInnerGameServerInfoMap().computeIfAbsent(sid, k -> new ServerInfoEntity());
-        clone.setServerId(sid);
-        clone.setHost(SpringUtil.getClientIp(request));
-        clone.setInnerHost(SpringUtil.getClientIp(request));
-        clone.setPort(serverInfoDTO.getPort());
-        clone.setHttpPort(serverInfoDTO.getHttpPort());
-        clone.setOnlineSize(onlineSize);
-        clone.setLastSyncTime(MyClock.millis());
-        innerService.getSqlDataHelper().getDataBatch().save(clone);
+        ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(sid);
+        if (entity == null) {
+            return RunResult.fail("服务器不存在");
+        }
+        entity.setHost(SpringUtil.getClientIp(request));
+        entity.setInnerHost(SpringUtil.getClientIp(request));
+        entity.setPort(serverInfoDTO.getPort());
+        entity.setHttpPort(serverInfoDTO.getHttpPort());
+        entity.setOnlineSize(onlineSize);
+        entity.setLastSyncTime(MyClock.millis());
+        innerService.getSqlDataHelper().getDataBatch().save(entity);
         return RunResult.ok();
     }
 

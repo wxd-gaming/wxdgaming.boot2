@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
-import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.ann.StopBefore;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
@@ -51,6 +50,7 @@ public class InnerService {
         ServerShowNameGlobalData showNameGlobalData = globalDataService.get(GlobalDataConst.ServerNameGlobalData);
         ConcurrentHashMap<Integer, ServerShowName> serverNameMap = showNameGlobalData.getServerNameMap();
         return getInnerGameServerInfoMap().values().stream()
+                .filter(bean -> System.currentTimeMillis() > bean.getOpenTime())
                 .map(bean -> {
                     JSONObject map = new JSONObject();
                     map.put("id", bean.getServerId());

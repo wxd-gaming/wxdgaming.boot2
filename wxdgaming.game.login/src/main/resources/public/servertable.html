@@ -22,7 +22,7 @@
 
         a:visited { color: #0866b4;}
 
-        label {padding-left: 5px;padding-right: 5px;}
+        label {padding-left: 5px;padding-right: 5px;text-align: right;}
     </style>
     <script>
 
@@ -71,16 +71,21 @@
         function createRow(index, row) {
             let tr = `
 <tr>
-            <td>${index}</td>
-            <td>${row.serverId}</td>
-            <td>${row.mainId}</td>
-            <td>${row.name}</td>
-            <td>${row.host}</td>
-            <td>${row.port}</td>
-            <td>${row.httpPort}</td>
-            <td>${row.onlineSize}</td>
-            <td>${row.lastSyncTime}</td>
-            </tr>
+        <td>
+            <a href="#">删除</a>
+            <a href="#" onclick="editServer(${row.serverId},'${row.name}','${row.openTime}')">修改</a>
+        </td>
+        <td>${index}</td>
+        <td>${row.serverId}</td>
+        <td>${row.mainId}</td>
+        <td>${row.name}</td>
+        <td>${row.openTime}</td>
+        <td>${row.host}</td>
+        <td>${row.port}</td>
+        <td>${row.httpPort}</td>
+        <td>${row.onlineSize}</td>
+        <td>${row.lastSyncTime}</td>
+</tr>
             `;
             return tr;
         }
@@ -132,6 +137,64 @@
         function clearOrder() {
             orderByJsonArray = [];
             $("#labOrderBy").text("");
+        }
+
+        function editServer(serverId, serverName, openTime) {
+            // language=HTML
+            let content = `
+                <div>
+                    <ul>
+                        <li><label>服务ID:</label><span>${serverId}</span></li>
+                        <li>
+                            <label for="updateServerName">服务名字:</label><input id="updateServerName" type="text" value="${serverName}">
+                        </li>
+                        <li>
+                            <label for="updateOpenTime">开服时间:</label><input id="updateOpenTime" type="datetime-local" value="${openTime}"/>
+                        </li>
+                    </ul>
+                </div>
+            `;
+            wxd.message.alert(content, "修改开服时间", "修改", (result) => {
+                wxd.netty.post("/admin/gameserver/editServer", {
+                    serverId: serverId,
+                    serverName: $("#updateServerName").val(),
+                    openTime: $("#updateOpenTime").val()
+                }, (data) => {
+                    wxd.message.alert(data.msg);
+                    if (data.code === 1) {
+                        search();
+                    }
+                });
+            }, "取消");
+        }
+
+        function addServer() {
+            // language=HTML
+            let content = `
+                <div>
+                    <ul>
+                        <li><label for="addServerId">服务ID:</label><input id="addServerId" type="text"></li>
+                        <li><label for="addServerName">服务名字:</label><input id="addServerName" type="text"></li>
+                        <li><label for="addOpenTime">开服时间:</label><input id="addOpenTime" type="datetime-local"/>
+                        </li>
+                    </ul>
+                </div>
+            `;
+
+            wxd.message.alert(content, "新增区服", "确定", () => {
+                console.log("addServer");
+                wxd.netty.post("/admin/gameserver/addServer", {
+                    serverId: $("#addServerId").val(),
+                    serverName: $("#addServerName").val(),
+                    openTime: $("#addOpenTime").val()
+                }, (data) => {
+                    wxd.message.alert(data.msg);
+                    if (data.code === 1) {
+                        search();
+                    }
+                });
+            }, "取消");
+
         }
 
     </script>
@@ -191,15 +254,18 @@
     <br>
     <br>
     <button onclick="search();">查询</button>
+    <button onclick="addServer()">新增</button>
 </div>
 <div class="tableDom" style="position: absolute;left: 20px;top: 200px;right: 20px;bottom: 40px;padding-right: 10px;border-radius: 0;">
     <table>
         <thead>
         <tr>
+            <th>操作</th>
             <th>序号</th>
             <th>区分ID</th>
             <th>主服ID</th>
             <th>名称</th>
+            <th>开服时间</th>
             <th>IP</th>
             <th>port</th>
             <th>webPort</th>

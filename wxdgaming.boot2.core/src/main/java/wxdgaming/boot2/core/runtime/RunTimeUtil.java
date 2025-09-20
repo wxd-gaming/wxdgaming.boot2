@@ -32,7 +32,7 @@ public class RunTimeUtil extends ExecutorEvent {
 
     public static void openRecord() {
         Open.set(true);
-        scheduledFuture = ExecutorFactory.getExecutorServiceBasic().scheduleAtFixedRate(new RunTimeUtil(), 1, 1, TimeUnit.MINUTES);
+        scheduledFuture = ExecutorFactory.getExecutorServiceBasic().scheduleAtFixedRate(new RunTimeUtil(), 15, 15, TimeUnit.MINUTES);
     }
 
     public static void closeRecord() {
