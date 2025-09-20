@@ -21,6 +21,8 @@ public class ServerInfoEntity extends Entity implements Cloneable {
     private int serverId;
     private int mainId;
     private int gid;
+    /** 0 无限制, 1 白名单显示, 2 永久隐藏 */
+    private int showLevel;
     private String name;
     /** 外网同步地址 */
     private String host;

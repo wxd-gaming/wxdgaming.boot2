@@ -22,7 +22,11 @@
 
         a:visited { color: #0866b4;}
 
-        label {padding-left: 5px;padding-right: 5px;text-align: right;}
+        .message_alert_c_1 li {height: 23px;line-height: 20px;}
+
+        .message_alert_c_1 label {padding-left: 5px;padding-right: 5px;text-align: right;width: 80px;display: inline-block;}
+
+        .message_alert_c_1 input {width: 180px;border: #8c8c8c 1px solid;}
     </style>
     <script>
 
@@ -73,17 +77,19 @@
 <tr>
         <td>
             <a href="#">删除</a>
-            <a href="#" onclick="editServer(${row.serverId},'${row.name}','${row.openTime}')">修改</a>
+            <a href="#" onclick="editServer(${row.serverId},'${row.name}','${row.openTime}','${maintenanceTime}')">修改</a>
         </td>
         <td>${index}</td>
         <td>${row.serverId}</td>
         <td>${row.mainId}</td>
         <td>${row.name}</td>
         <td>${row.openTime}</td>
+        <td>${row.maintenanceTime}</td>
         <td>${row.host}</td>
         <td>${row.port}</td>
         <td>${row.httpPort}</td>
         <td>${row.onlineSize}</td>
+        <td>${row.showLevel}</td>
         <td>${row.lastSyncTime}</td>
 </tr>
             `;
@@ -139,7 +145,7 @@
             $("#labOrderBy").text("");
         }
 
-        function editServer(serverId, serverName, openTime) {
+        function editServer(serverId, serverName, openTime, maintenanceTime) {
             // language=HTML
             let content = `
                 <div>
@@ -151,6 +157,9 @@
                         <li>
                             <label for="updateOpenTime">开服时间:</label><input id="updateOpenTime" type="datetime-local" value="${openTime}"/>
                         </li>
+                        <li>
+                            <label for="updateMaintenanceTime">维护时间:</label><input id="updateMaintenanceTime" type="datetime-local" value="${maintenanceTime}"/>
+                        </li>
                     </ul>
                 </div>
             `;
@@ -158,9 +167,10 @@
                 wxd.netty.post("/admin/gameserver/editServer", {
                     serverId: serverId,
                     serverName: $("#updateServerName").val(),
-                    openTime: $("#updateOpenTime").val()
+                    openTime: $("#updateOpenTime").val(),
+                    maintenanceTime: $("#updateMaintenanceTime").val()
                 }, (data) => {
-                    wxd.message.alert(data.msg);
+                    wxd.message.notice(data.msg);
                     if (data.code === 1) {
                         search();
                     }
@@ -266,10 +276,12 @@
             <th>主服ID</th>
             <th>名称</th>
             <th>开服时间</th>
+            <th>维护时间</th>
             <th>IP</th>
             <th>port</th>
             <th>webPort</th>
             <th>在线</th>
+            <th>显示等级</th>
             <th>更新时间</th>
         </tr>
         </thead>

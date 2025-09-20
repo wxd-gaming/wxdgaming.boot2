@@ -59,8 +59,10 @@ class PageView {
     remoteGetData(postQuery) {
         postQuery.put("pageIndex", this.pageIndex());
         postQuery.put("pageSize", this.pageSize());
-        wxd.netty.post(this.url, postQuery.toString(),
-            (responseText) => {
+        wxd.netty.post({
+            url: this.url,
+            params: postQuery.toString(),
+            onload: (responseText) => {
                 if (responseText.code !== 1) {
                     wxd.message.alert("异常：" + responseText.msg);
                     return
@@ -71,12 +73,12 @@ class PageView {
                 this.pageMaxIndex();
                 this.showData();
             },
-            (errorMsg) => {
+            onerror: (errorMsg) => {
                 wxd.message.alert("异常：" + errorMsg);
             },
-            true,
-            30_000
-        );
+            async: true,
+            time_out: 30_000
+        });
     }
 
     pageSize() {

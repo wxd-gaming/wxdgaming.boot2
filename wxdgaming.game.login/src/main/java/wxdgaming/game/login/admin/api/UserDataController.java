@@ -10,12 +10,14 @@ import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryBuilder;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
 import wxdgaming.game.authority.AdminUserToken;
 import wxdgaming.game.login.entity.UserData;
 import wxdgaming.game.login.login.LoginService;
+import wxdgaming.game.util.Util;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -94,6 +96,7 @@ public class UserDataController implements InitPrint {
         SqlQueryBuilder queryBuilder = sqlDataHelper.queryBuilder();
         queryBuilder.sqlByEntity(UserData.class);
 
+        TableMapping userDataMapping = sqlDataHelper.tableMapping(UserData.class);
 
         if (StringUtils.isNotBlank(whereJson)) {
             List<JSONObject> jsonObjects = JSON.parseArray(whereJson, JSONObject.class);
@@ -101,7 +104,8 @@ public class UserDataController implements InitPrint {
                 String whereFiled = jsonObject.getString("where");
                 String and = jsonObject.getString("and");
                 String where = whereFiled + " " + and + " ?";
-                queryBuilder.pushWhereAnd(where, jsonObject.getString("whereValue"));
+                Object whereValue = jsonObject.getObject("whereValue", userDataMapping.getColumns().get(whereFiled).getFileType());
+                queryBuilder.pushWhereAnd(where, whereValue);
             }
         }
         if (StringUtils.isNotBlank(minTime)) {
@@ -138,19 +142,12 @@ public class UserDataController implements InitPrint {
         for (UserData userData : list2Entity) {
             JSONObject jsonObject = userData.toJSONObject();
             jsonObject.remove("token");
-            jsonObject.put("createTime", formatDate(userData.getCreateTime()));
-            jsonObject.put("banExpireTime", formatDate(userData.getBanExpireTime()));
-            jsonObject.put("lastLoginTime", formatDate(userData.getLastLoginTime()));
+            jsonObject.put("createTime", Util.formatWebDate(userData.getCreateTime()));
+            jsonObject.put("banExpireTime", Util.formatWebDate(userData.getBanExpireTime()));
+            jsonObject.put("lastLoginTime", Util.formatWebDate(userData.getLastLoginTime()));
             list.add(jsonObject);
         }
         return RunResult.ok().fluentPut("rowCount", rowCount).data(list);
-    }
-
-    private String formatDate(long time) {
-        if (time < System.currentTimeMillis()) {
-            return "";
-        }
-        return MyClock.formatDate("yyyy-MM-dd HH:mm:ss", time);
     }
 
 }

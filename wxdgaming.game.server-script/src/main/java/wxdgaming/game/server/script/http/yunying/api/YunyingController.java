@@ -35,6 +35,10 @@ public class YunyingController extends HoldApplicationContext {
         return RunResult.ok();
     }
 
+    public Object kickAccount(HttpServletRequest httpContext, @RequestParam("account") String account) {
+        return RunResult.ok();
+    }
+
     @RequestMapping(value = "/banLogin")
     public Object banLogin(HttpServletRequest httpContext, @RequestParam("account") String account, @RequestParam("banTime") long banTime) {
         YunyingData yunyingData = globalDataService.get(GlobalDataConst.YUNYINGDATA);

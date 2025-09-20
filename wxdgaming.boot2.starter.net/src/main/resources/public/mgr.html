@@ -34,8 +34,7 @@
         function getMenu() {
             wxd.loading();
 
-            let urlQuery = new wxd.Map()
-                .loadTopSearch()
+            let urlQuery = new wxd.Map().loadTopSearch()
                 .put("content", "1");
 
             wxd.netty.post("/menu/list", urlQuery.toString(),

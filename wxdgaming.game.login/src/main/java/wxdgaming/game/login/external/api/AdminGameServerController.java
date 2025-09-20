@@ -55,15 +55,17 @@ public class AdminGameServerController implements InitPrint {
         entity.setServerId(serverId);
         entity.setName(serverName);
         entity.setOpenTime(Util.parseWebDate(openTime));
+        innerService.getInnerGameServerInfoMap().put(serverId, entity);
         sqlDataHelper.insert(entity);
-        return RunResult.OK;
+        return RunResult.ok().msg("添加成功");
     }
 
     @RequestMapping(value = "/editServer")
     public RunResult editServer(HttpServletRequest context,
                                 @RequestParam("serverId") int serverId,
                                 @RequestParam("serverName") String serverName,
-                                @RequestParam("openTime") String openTime) {
+                                @RequestParam("openTime") String openTime,
+                                @RequestParam("showLevel") int showLevel) {
         ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(serverId);
         AssertUtil.assertTrue(entity != null, "服务器不存在");
         long time = Util.parseWebDate(openTime);
@@ -74,8 +76,49 @@ public class AdminGameServerController implements InitPrint {
         }
         entity.setName(serverName);
         entity.setOpenTime(time);
+        entity.setShowLevel(showLevel);
         sqlDataHelper.update(entity);
-        return RunResult.OK;
+        return RunResult.ok().msg("修改成功");
+    }
+
+    @RequestMapping(value = "/editServerOpenTime")
+    public RunResult editServerOpenTime(@RequestParam("serverId") int serverId,
+                                        @RequestParam("openTime") String openTime) {
+        ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(serverId);
+        AssertUtil.assertTrue(entity != null, "服务器不存在");
+        long time = Util.parseWebDate(openTime);
+        if (time < System.currentTimeMillis() && time < entity.getOpenTime()) {
+            if (!loginServerProperties.isDebug()) {
+                return RunResult.fail("正式环境已经开服不允许修改服务器时间");
+            }
+        }
+        entity.setOpenTime(time);
+        sqlDataHelper.update(entity);
+        return RunResult.ok().msg("修改成功");
+    }
+
+    @RequestMapping(value = "/editServerMaintenanceTime")
+    public RunResult editServerMaintenanceTime(@RequestParam("serverId") int serverId,
+                                               @RequestParam("maintenanceTime") String maintenanceTime) {
+        ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(serverId);
+        AssertUtil.assertTrue(entity != null, "服务器不存在");
+        long time = Util.parseWebDate(maintenanceTime);
+        if (time < System.currentTimeMillis()) {
+            return RunResult.fail("维护时间小于当前时间");
+        }
+        entity.setMaintenanceTime(time);
+        sqlDataHelper.update(entity);
+        return RunResult.ok().msg("修改成功");
+    }
+
+    @RequestMapping(value = "/editServerShowLevel")
+    public RunResult editServerShowLevel(@RequestParam("serverId") int serverId,
+                                         @RequestParam("showLevel") int showLevel) {
+        ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(serverId);
+        AssertUtil.assertTrue(entity != null, "服务器不存在");
+        entity.setShowLevel(showLevel);
+        sqlDataHelper.update(entity);
+        return RunResult.ok().msg("修改成功");
     }
 
     @RequestMapping(value = "/queryList")
@@ -135,6 +178,7 @@ public class AdminGameServerController implements InitPrint {
             JSONObject jsonObject = entity.toJSONObject();
             jsonObject.remove("token");
             jsonObject.put("openTime", Util.formatWebDate(entity.getOpenTime()));
+            jsonObject.put("maintenanceTime", Util.formatWebDate(entity.getMaintenanceTime()));
             jsonObject.put("lastSyncTime", Util.formatWebDate(entity.getLastSyncTime()));
             list.add(jsonObject);
         }

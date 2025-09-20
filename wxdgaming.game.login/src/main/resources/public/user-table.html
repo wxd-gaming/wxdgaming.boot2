@@ -22,7 +22,11 @@
 
         a:visited { color: #0866b4;}
 
-        label {padding-left: 5px;padding-right: 5px;}
+        .message_alert_c_1 li {height: 23px;line-height: 20px;}
+
+        .message_alert_c_1 label {padding-left: 5px;padding-right: 5px;text-align: right;width: 80px;display: inline-block;}
+
+        .message_alert_c_1 input {width: 180px;border: #8c8c8c 1px solid;}
     </style>
     <script>
 
@@ -69,22 +73,23 @@
         }
 
         function createRow(index, row) {
+            // language=HTML
             let tr = `
-<tr>
-            <td>
-                <a href="#" onclick="banLogin('${row.account}')">禁止/解封</a>
-                <a href="#" onclick="whiteLogin('${row.account}')">白名单</a>
-            </td>
-            <td>${row.account}</td>
-            <td>${row.gmLevel}</td>
-            <td>${row.white}</td>
-            <td>${row.banExpireTime}</td>
-            <td>${row.platform}</td>
-            <td>${row.createTime}</td>
-            <td>${row.loginCount}</td>
-            <td>${row.lastLoginTime}</td>
-            <td>${row.loginCount}</td>
-            </tr>
+                <tr>
+                    <td>
+                        <a href="#" onclick="banLogin('${row.account}','${row.banExpireTime}')">禁止/解封</a>
+                        <a href="#" onclick="whiteLogin('${row.account}')">白名单</a>
+                        <a href="#" onclick="gmLevel('${row.account}',${row.gmLevel})">GM</a>
+                    </td>
+                    <td>${row.account}</td>
+                    <td style="width: 60px;">${row.gmLevel}</td>
+                    <td style="width: 60px;">${row.white}</td>
+                    <td>${row.banExpireTime}</td>
+                    <td>${row.platform}</td>
+                    <td>${row.createTime}</td>
+                    <td style="width: 60px;">${row.loginCount}</td>
+                    <td>${row.lastLoginTime}</td>
+                </tr>
             `;
             return tr;
         }
@@ -124,19 +129,20 @@
             let urlQuery = new wxd.Map().loadSearch();
             urlQuery.put("account", account);
             wxd.netty.post("/admin/userData/whiteLogin", urlQuery.toString(), (data) => {
-                wxd.message.alert(data.msg, "设置白名单结果");
+                wxd.message.notice(data.msg);
                 if (data.code === 1) {
                     search();
                 }
             });
         }
 
-        function banLogin(account) {
+        function banLogin(account, banTime) {
+            // language=HTML
             let html = `
-<ul>
-    <li><label>账号: </label><label id="labAccount">${account}</label></li>
-    <li><label>时间: </label><input id="banTime" type="datetime-local"></li>
-</ul>
+                <ul>
+                    <li><label>账号: </label><span id="labAccount">${account}</span></li>
+                    <li><label>时间: </label><input id="banTime" type="datetime-local" value="${banTime}"></li>
+                </ul>
             `;
             wxd.message.alert(
                 html,
@@ -146,7 +152,7 @@
                     urlQuery.put("account", $("#labAccount").text());
                     urlQuery.put("banTime", $("#banTime").val());
                     wxd.netty.post("/admin/userData/banLogin", urlQuery.toString(), (data) => {
-                        wxd.message.alert(data.msg, "禁止登录设置结果");
+                        wxd.message.notice(data.msg);
                         if (data.code === 1) {
                             search();
                         }
@@ -156,29 +162,40 @@
             )
         }
 
-        function gmLevel(account) {
+        function gmLevel(account, gmLevel) {
+
+            // language=HTML
             let html = `
-<ul>
-    <li><label>账号: </label><label id="labAccount">${account}</label></li>
-    <li><label>时间: </label><input id="gmLevel" type="number"></li>
-</ul>
+                <ul>
+                    <li><label>账号: </label><label id="labAccount">${account}</label></li>
+                    <li><label>GM等级: </label><input id="gmLevel" type="number" value="${gmLevel}"></li>
+                </ul>
             `;
             wxd.message.alert(
                 html,
                 "禁止登录设置",
                 "确定", () => {
-                    let urlQuery = new wxd.Map().loadSearch();
-                    urlQuery.put("account", $("#labAccount").text());
-                    urlQuery.put("gmLevel", $("#gmLevel").val());
-                    wxd.netty.post("/admin/userData/gmLevel", urlQuery.toString(), (data) => {
-                        wxd.message.alert(data.msg, "禁止登录设置结果");
-                        if (data.code === 1) {
-                            search();
-                        }
-                    });
+                    let formData = {
+                        account: $("#labAccount").text(),
+                        gmLevel: $("#gmLevel").val(),
+                    }
+                    let needHide = true;
+                    new wxd.PostRequest("/admin/userData/gmLevel")
+                        .params(formData)
+                        .async(false)
+                        .onLoad(function (data) {
+                            wxd.message.notice(data.msg);
+                            if (data.code === 1) {
+                                needHide = true;
+                                search();
+                            }
+                        })
+                        .send();
+                    return needHide;
                 },
-                "取消"
-            )
+                "取消", null,
+                false
+            );
         }
 
     </script>
@@ -190,8 +207,8 @@
     <br>
     <label for="where">查询条件:</label>
     <select id="where">
-        <option value="white">白名单</option>
         <option value="account">账号</option>
+        <option value="white">白名单</option>
         <option value="平台">平台</option>
     </select>
 
@@ -212,8 +229,8 @@
     <label for="orderField">排序条件:</label>
 
     <select id="orderField">
-        <option value="white">白名单</option>
         <option value="account">账号</option>
+        <option value="white">白名单</option>
         <option value="平台">平台</option>
     </select>
 
@@ -236,14 +253,13 @@
         <tr>
             <th>操作</th>
             <th>账号</th>
-            <th>GM等级</th>
-            <th>白名单</th>
+            <th style="width: 60px;">GM等级</th>
+            <th style="width: 60px;">白名单</th>
             <th>禁止登录</th>
             <th>平台</th>
             <th>注册时间</th>
-            <th>登录次数</th>
+            <th style="width: 60px;">登录次数</th>
             <th>最后登录时间</th>
-            <th>登录次数</th>
         </tr>
         </thead>
         <tbody class="tbody">

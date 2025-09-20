@@ -74,6 +74,7 @@ class PageView {
             (errorMsg) => {
                 wxd.message.alert("异常：" + errorMsg);
             },
+            null,
             true,
             30_000
         );

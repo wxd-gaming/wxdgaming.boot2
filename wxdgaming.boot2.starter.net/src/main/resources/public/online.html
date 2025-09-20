@@ -31,8 +31,10 @@
         function ban(url, uid) {
             let urlQuery = new wxd.Map().loadSearch();
             urlQuery.put("uid", uid);
-            wxd.netty.post(url, urlQuery.toString(),
-                function (responseText) {
+            wxd.netty.post({
+                url: url,
+                params: urlQuery.toString(),
+                onload: function (responseText) {
                     wxd.message.alert(
                         JSON.stringify(responseText),
                         "提示：",
@@ -44,11 +46,11 @@
                         }
                     );
                 },
-                (errorMsg) => {
+                onerror: (errorMsg) => {
                     wxd.message.alert("异常：" + errorMsg);
                 },
-                false
-            );
+                async: false
+            });
         }
 
         function searchName() {
@@ -56,8 +58,9 @@
             let urlQuery = new wxd.Map().loadSearch();
             urlQuery.put("search", $("#search").val());
             let url = "/gm/001/002/003/onlineBody";
-            wxd.netty.post(url, urlQuery.toString(),
-                function (responseText) {
+            wxd.netty.post({
+                url: url, params: urlQuery.toString(),
+                onload: function (responseText) {
                     let parse = JSON.parse(responseText);
                     $("tbody:first").html("");
                     var index = 0;
@@ -68,12 +71,12 @@
                     wxd.message.tips_init_bind(); //初始化
                     colse_loading();
                 },
-                (errorMsg) => {
+                onerror: (errorMsg) => {
                     colse_loading();
                     wxd.message.alert("异常：" + errorMsg);
                 },
-                false
-            );
+                async: false
+            });
         }
 
         function createRow(index, row) {
@@ -125,35 +128,38 @@
 
         $(() => {
             let url = "/gm/001/002/003/onlineBase";
-            wxd.netty.post(url, "",
-                function (responseText) {
+            wxd.netty.post({
+                url: url,
+                params: "",
+                onload: function (responseText) {
                     let parse = JSON.parse(responseText);
                     $("#base").html("");
+                    // language=HTML
                     let base = `
-                            <br>
-                            ${parse.showMemoryString}
-                            <br>
-                            ${parse.showDiskInfo}
-                            <br>
-                            tcp连接数：${parse.tcpSize}
-                            <br>
-                            玩家数据 ->
-                            <label>账号数：${parse.accountAllNum},</label>
-                            <label>角色数：${parse.roleAllNum},</label>
-                            <label>充值：${parse.rechargeMoney},</label>
-                            <label>代金券：${parse.replaceMoneyCount},</label>
-                            <label>QQ缓存：${parse.qqCacheNum},</label>
-                            <label>缓存：${parse.cacheNum},</label>
-                            <label>在线：${parse.onlineSize},</label>
-                            <label>跨服用户：${parse.crossSize}</label>
-                        `;
+                        <br>
+                        ${parse.showMemoryString}
+                        <br>
+                        ${parse.showDiskInfo}
+                        <br>
+                        tcp连接数：${parse.tcpSize}
+                        <br>
+                        玩家数据 ->
+                        <label>账号数：${parse.accountAllNum},</label>
+                        <label>角色数：${parse.roleAllNum},</label>
+                        <label>充值：${parse.rechargeMoney},</label>
+                        <label>代金券：${parse.replaceMoneyCount},</label>
+                        <label>QQ缓存：${parse.qqCacheNum},</label>
+                        <label>缓存：${parse.cacheNum},</label>
+                        <label>在线：${parse.onlineSize},</label>
+                        <label>跨服用户：${parse.crossSize}</label>
+                    `;
                     $("#base").append(base);
                 },
-                (errorMsg) => {
+                onerror: (errorMsg) => {
                     wxd.message.alert("异常：" + errorMsg);
                 },
-                false
-            );
+                async: false
+            });
             searchName();
         });
 

@@ -322,11 +322,12 @@ const wxd = {
             if (wxd.isNull(w)) w = "54px";
             if (wxd.isNull(h)) h = "54px";
 
+            // language=HTML
             let load_div = `
                 <div class="full_loading_bg">
                     <img style="width: ${w};height: ${h};" src="${img}">
                 </div>
-                `;
+            `;
             if (wxd.isNull(parent)) parent = document.body;
             $(parent).append(load_div);
         });
@@ -472,26 +473,27 @@ const wxd = {
             let bodyHeight = ($("body").height() * 0.4).toFixed(0);
             console.log("alert-max-height " + bodyHeight);
 
+            // language=HTML
             let box = `
-<div class="upload_file_box">
-    <strong>文件上传</strong>
-    <span class="span_close" title="关闭" onclick="$('.upload_file_bg').remove()"></span>
-    <div class="upload_file_c">
-        <div class="upload_file_c_1" style="max-height: ${bodyHeight}px;">
-            <br>
-            <input id="wxd_upload_file" type="file" style="width: 280px;" value="上传配置" multiple/>
-            <br>
-            <br>
-            <div id="wxd_upload_progress_box">       
-                
-            </div>
-        </div>
-        <div class="upload_file_c_b">
-            <button onclick="wxd.netty.upFile()">上传</button>
-            <button onclick="$('.upload_file_bg').remove()">关闭</button>
-        </div>
-    </div>
-</div>
+                <div class="upload_file_box">
+                    <strong>文件上传</strong>
+                    <span class="span_close" title="关闭" onclick="$('.upload_file_bg').remove()"></span>
+                    <div class="upload_file_c">
+                        <div class="upload_file_c_1" style="max-height: ${bodyHeight}px;">
+                            <br>
+                            <input id="wxd_upload_file" type="file" style="width: 280px;" value="上传配置" multiple/>
+                            <br>
+                            <br>
+                            <div id="wxd_upload_progress_box">
+
+                            </div>
+                        </div>
+                        <div class="upload_file_c_b">
+                            <button onclick="wxd.netty.upFile()">上传</button>
+                            <button onclick="$('.upload_file_bg').remove()">关闭</button>
+                        </div>
+                    </div>
+                </div>
             `;
 
             upload_file_bg.innerHTML = box;
@@ -542,15 +544,18 @@ const wxd = {
                 tmpFormData.set(file.name + "_lastModified", file.lastModified);
                 tmpFormData.set("file", file); // 文件对象
 
+                // language=HTML
                 let box = `
-<span id="wxd_upload_progress_name_${i}">文件：${fileName}</span>
-<br>
-<progress id="wxd_upload_progress_bar_${i}" value="0" max="100" style="width: 280px;"></progress>&nbsp;&nbsp;<span id="wxd_p_b_v_${i}">0</span>%
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;大小：<span id="wxd_p_b_cur_${i}"></span> / <span id="wxd_p_b_max_${i}"></span>,&nbsp;&nbsp;&nbsp;&nbsp;速度：<span id="wxd_p_b_s_${i}"></span>
-<br>
-<br>
-`;
+                    <span id="wxd_upload_progress_name_${i}">文件：${fileName}</span>
+                    <br>
+                    <progress id="wxd_upload_progress_bar_${i}" value="0" max="100" style="width: 280px;"></progress>&nbsp;&nbsp;
+                    <span id="wxd_p_b_v_${i}">0</span>%
+                    <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;大小：<span id="wxd_p_b_cur_${i}"></span> /
+                    <span id="wxd_p_b_max_${i}"></span>,&nbsp;&nbsp;&nbsp;&nbsp;速度：<span id="wxd_p_b_s_${i}"></span>
+                    <br>
+                    <br>
+                `;
                 /*追加文件进度 容器*/
                 $("#wxd_upload_progress_box").append(box);
                 /*设置文件总大小*/
@@ -620,52 +625,26 @@ const wxd = {
          * @param params 参数
          * @param onLoad 接收消息回调
          * @param onError 异常回调
-         * @param sync true 表示同步请求
-         * @param time_out 超时时间
-         */
-        post: function (url, params, onLoad, onError, sync, time_out) {
-            this.post0(url, "application/x-www-form-urlencoded; charset=UTF-8", params, onLoad, onError, sync, time_out);
-        },
-
-        /**
-         * post 请求
-         * @param url 地址
-         * @param params 参数
-         * @param onLoad 接收消息回调
-         * @param onError 异常回调
-         * @param sync true 表示同步请求
-         * @param time_out 超时时间
-         */
-        postJson: function (url, params, onLoad, onError, sync, time_out) {
-            this.post0(url, "application/json; charset=UTF-8", params, onLoad, onError, sync, time_out);
-        },
-
-        ajax_timeout: 3000,//超时时间设置，单位毫秒
-
-        /**
-         * post 请求
-         * @param url 地址
          * @param contentType 数据格式类型
-         * @param params 参数
-         * @param onLoad 接收消息回调
-         * @param onError 异常回调
-         * @param sync true 表示同步请求
+         * @param async false 表示同步请求
          * @param time_out 超时时间
          */
-        post0: function (url, contentType, params, onLoad, onError, sync, time_out) {
-            if (wxd.isNull(sync)) {
-                sync = true;
+        post: function (url, params, onLoad, onError, contentType, async, time_out) {
+            if (wxd.isNull(async)) {
+                async = true;
             }
             if (wxd.isNull(time_out)) {
-                time_out = this.ajax_timeout;
+                time_out = 3000;
             }
+            if (wxd.isNull(contentType))
+                contentType = "application/x-www-form-urlencoded; charset=UTF-8";
             $.ajax({
                 type: "post",
                 url: url,
                 timeout: time_out, //超时时间设置，单位毫秒
                 contentType: contentType,
                 data: params,
-                async: sync,
+                async: async,
                 beforeSend: function (xhr) {
                     let token = localStorage.getItem("token");
                     if (wxd.notNull(token)) {
@@ -708,13 +687,14 @@ const wxd = {
         console: function (text) {
             let box_content = document.createElement("div");
             box_content.setAttribute("id", "message_console_bg");
+            // language=HTML
             let box_c = `
-    <div class="message_console">
-        <div style="width: 100%;height: 100%; overflow: auto;">
-            <pre id="message_console_c">${text}</pre>
-        </div>
-    </div>
-    <strong onclick="$('#message_console_bg').remove();">点击这里关闭</strong>
+                <div class="message_console">
+                    <div style="width: 100%;height: 100%; overflow: auto;">
+                        <pre id="message_console_c">${text}</pre>
+                    </div>
+                </div>
+                <strong onclick="$('#message_console_bg').remove();">点击这里关闭</strong>
             `;
             box_content.innerHTML = box_c;
             $(document.body).append(box_content);
@@ -729,13 +709,14 @@ const wxd = {
         box: function (text) {
             let box_content = document.createElement("div");
             box_content.setAttribute("class", "message_box_bg");
+            // language=HTML
             let box_c = `
-    <div class="message_box">
-        <div id="message_box_c" style="width: 100%;height: 100%; overflow: auto;word-wrap: break-word;">
-${text}
-        </div>
-    </div>
-    <strong onclick="$('.message_box_bg').remove();">点击这里关闭</strong>
+                <div class="message_box">
+                    <div id="message_box_c" style="width: 100%;height: 100%; overflow: auto;word-wrap: break-word;">
+                        ${text}
+                    </div>
+                </div>
+                <strong onclick="$('.message_box_bg').remove();">点击这里关闭</strong>
             `;
             box_content.innerHTML = box_c;
             $(document.body).append(box_content);
@@ -781,6 +762,7 @@ ${text}
 
         alert_init_end: false,
         alert_ok_call: null,
+        okCallAsync: true,
         alert_cancel_call: null,
         alert_init: function () {
             if (this.alert_init_end) return;
@@ -794,15 +776,17 @@ ${text}
          * @param content 内容，支持html
          * @param title 标题
          * @param ok 确认按钮显示内容
-         * @param okCall 确认按钮回调
+         * @param okCall 确认按钮回调, 如果return false 不会隐藏面板
          * @param cancel 取消显示的内容
          * @param cancelCall 取消按钮回调
+         * @param okCallAsync true 异步执行，false 同步执行
          */
-        alert: function (content, title, ok, okCall, cancel, cancelCall) {
+        alert: function (content, title, ok, okCall, cancel, cancelCall, okCallAsync) {
             this.alert_init();
             $('.message_alert_bg').show();
             if (wxd.isNull(title)) title = "提示：";
             if (wxd.isNull(ok)) ok = "OK";
+            if (wxd.isNull(okCallAsync)) okCallAsync = true;
             let btn_c = "";
             if (!wxd.isNull(cancel) || !wxd.isNull(cancelCall)) {
                 if (wxd.isNull(cancel)) cancel = "Cancel";
@@ -811,23 +795,25 @@ ${text}
             /*根据当前页面设置最大高度*/
             let bodyHeight = ($("body").height() * 0.4).toFixed(0);
             console.log("alert-max-height " + bodyHeight);
+            // language=HTML
             let a_c = `
-<div class="message_alert_box">
-    <strong class="ban_select">${title}</strong>
-    <span class="span_close ban_select" title="关闭" onclick="wxd.message.alert_cancel()"></span>
-    <div class="message_alert_c">
-        <div class="message_alert_c_1" style="max-height: ${bodyHeight}px;">
-            ${content}
-        </div>
-        <div class="message_alert_c_b">
-            <button onclick="wxd.message.alert_ok()">${ok}</button>
-            ${btn_c}
-        </div>
-    </div>
-</div>
-`;
+                <div class="message_alert_box">
+                    <strong class="ban_select">${title}</strong>
+                    <span class="span_close ban_select" title="关闭" onclick="wxd.message.alert_cancel()"></span>
+                    <div class="message_alert_c">
+                        <div class="message_alert_c_1" style="max-height: ${bodyHeight}px;">
+                            ${content}
+                        </div>
+                        <div class="message_alert_c_b">
+                            <button onclick="wxd.message.alert_ok()">${ok}</button>
+                            ${btn_c}
+                        </div>
+                    </div>
+                </div>
+            `;
             this.alert_ok_call = okCall;
             this.alert_cancel_call = cancelCall;
+            this.okCallAsync = okCallAsync;
             $(".message_alert_bg").html(a_c);
             var $messageAlertBox = $(".message_alert_box strong:first");
             console.log($messageAlertBox);
@@ -835,10 +821,20 @@ ${text}
         },
 
         alert_ok: function () {
+            if (this.okCallAsync) {
+                setTimeout(() => {
+                    if (!wxd.isNull(this.alert_ok_call)) this.alert_ok_call();
+                }, 1);
+            } else {
+                if (!wxd.isNull(this.alert_ok_call)) {
+                    let alertOkCall = this.alert_ok_call();
+                    if (!wxd.isNull(alertOkCall) && alertOkCall === false) {
+                        return
+                    }
+                }
+
+            }
             $('.message_alert_bg').hide();
-            setTimeout(() => {
-                if (!wxd.isNull(this.alert_ok_call)) this.alert_ok_call();
-            }, 1);
         },
 
         alert_cancel: function () {
@@ -957,15 +953,16 @@ ${text}
             offsetTop = "-0px";
         }
 
+        // language=HTML
         let load = `
-<div style="position: absolute;width: 100%;height: 100%;left: 0;top: 0;background: rgba(28,28,28,0.31);z-index: 99;">
-    <div id="div_load_box" style="position: relative;width: ${width};height: ${height};left: 50%;top: 50%;transform: translate(-50%, -50%) translateX(${offsetLeft}) translateY(${offsetTop});background: whitesmoke;border-radius: 10px;display: block;box-sizing: border-box;">
-        <object data="${url}" style="width: 100%;height: 100%;border-radius: 15px;display: block;box-sizing: border-box;"></object>
-        <span title="关闭" onclick="$(this).parent().parent().remove();"
-              style="position: absolute;top:5px;right: 5px;width: 15px;height: 15px; background: #f85802;border-radius: 15px;z-index: 999;cursor: pointer;">
+            <div style="position: absolute;width: 100%;height: 100%;left: 0;top: 0;background: rgba(28,28,28,0.31);z-index: 99;">
+                <div id="div_load_box" style="position: relative;width: ${width};height: ${height};left: 50%;top: 50%;transform: translate(-50%, -50%) translateX(${offsetLeft}) translateY(${offsetTop});background: whitesmoke;border-radius: 10px;display: block;box-sizing: border-box;">
+                    <object data="${url}" style="width: 100%;height: 100%;border-radius: 15px;display: block;box-sizing: border-box;"></object>
+                    <span title="关闭" onclick="$(this).parent().parent().remove();"
+                          style="position: absolute;top:5px;right: 5px;width: 15px;height: 15px; background: #f85802;border-radius: 15px;z-index: 999;cursor: pointer;">
         </span>
-    </div>
-</div>
+                </div>
+            </div>
         `;
 
         if (wxd.isNull(parent)) parent = document.body;

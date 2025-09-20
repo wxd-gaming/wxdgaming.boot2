@@ -8,6 +8,8 @@ html, body, div, table, thead, tbody, tr, th, td, a, object, iframe, h1, h3, ul,
     padding: 0;margin: 0;border: 0;box-sizing: border-box;border-collapse: collapse;border-spacing: 0;
 }
 
+button {border-radius: 4px;border: 1px solid #bbb;padding: 5px 15px;margin-right: 15px;color: #444;cursor: pointer;}
+
 div.body {width: 100%;height: 100%;overflow: auto;}
 
 a { color: #969696; }
@@ -18,7 +20,7 @@ a:hover, a:active { color: #33be85; }
 ::-webkit-scrollbar { width: 8px;height: 8px; background-color: transparent; }
 
 /* 滚动条颜色 */
-::-webkit-scrollbar-thumb { background-color: #A8A8A8; }
+::-webkit-scrollbar-thumb { background-color: #0588df; }
 
 .ban_select { /*禁止选择*/-webkit-user-select: none; /* webkit浏览器 */ -moz-user-select: none; /* Firefox */ -ms-user-select: none; /* IE10+ */ user-select: none; /* 标准语法 */}
 

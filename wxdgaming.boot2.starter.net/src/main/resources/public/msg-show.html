@@ -32,8 +32,10 @@
             $("#div_loading").show();
             let urlQuery = new wxd.Map().loadSearch();
             urlQuery.put("content", "1");
-            wxd.netty.post(location.href, urlQuery.toString(),
-                function (responseText) {
+            wxd.netty.post({
+                url: location.href,
+                params: urlQuery.toString(),
+                onload: function (responseText) {
                     let parse = JSON.parse(responseText);
                     $("tbody:first").html("");
                     parse.forEach((row) => {
@@ -42,12 +44,12 @@
                     wxd.message.tips_init_bind(); //初始化
                     colse_loading();
                 },
-                (errorMsg) => {
+                onerror: (errorMsg) => {
                     colse_loading();
                     wxd.message.alert("异常：" + errorMsg);
                 },
-                false
-            );
+                async: false
+            });
         }
 
         function createRow(row) {

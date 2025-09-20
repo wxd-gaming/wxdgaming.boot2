@@ -10,17 +10,15 @@
     <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
     <style>
 
-        html, body {
-            display: block;overflow: auto;width: 100%;height: 100%;
-            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
-            color: #535252;
-        }
-
         a:link {color: #0866b4;}
 
         a:visited { color: #0866b4;}
 
-        label {padding-left: 5px;padding-right: 5px;}
+        td {height: 23px;line-height: 20px;}
+
+        label {padding-left: 5px;padding-right: 5px;text-align: right;width: 80px;display: inline-block;}
+
+        input, select {width: 180px;border: #8c8c8c 1px solid;}
     </style>
     <script>
         function submit() {
@@ -51,15 +49,17 @@
 
         $(() => {
             let userName = new wxd.Map().loadSearch().get("userName");
-            wxd.netty.post("/admin/account/query", {
-                userName: userName
-            }, function (data) {
-                if (data.code === 1) {
-                    $("#userName").val(data.data.userName);
-                    $("#phone").val(data.data.phone);
-                    $("#admin").val(data.data.admin);
-                } else {
-                    wxd.message.alert(data.msg);
+            wxd.netty.post({
+                url: "/admin/account/query",
+                params: {userName: userName},
+                onload: function (data) {
+                    if (data.code === 1) {
+                        $("#userName").val(data.data.userName);
+                        $("#phone").val(data.data.phone);
+                        $("#admin").val(data.data.admin);
+                    } else {
+                        wxd.message.alert(data.msg);
+                    }
                 }
             })
         });
@@ -97,7 +97,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan="2">
+            <td colspan="2" style="text-align: center;">
                 <button onclick="submit()">提 交</button>
             </td>
         </tr>

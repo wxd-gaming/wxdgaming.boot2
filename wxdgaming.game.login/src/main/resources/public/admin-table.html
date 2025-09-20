@@ -22,7 +22,11 @@
 
         a:visited { color: #0866b4;}
 
-        label {padding-left: 5px;padding-right: 5px;}
+        .message_alert_c_1 li {height: 23px;line-height: 20px;}
+
+        .message_alert_c_1 label {padding-left: 5px;padding-right: 5px;text-align: right;width: 80px;display: inline-block;}
+
+        .message_alert_c_1 input, .message_alert_c_1 select {width: 180px;border: #8c8c8c 1px solid;}
     </style>
     <script>
 
@@ -100,7 +104,58 @@
         }
 
         function addUser() {
-            wxd.loadHtml("/admin-add.html");
+            // language=HTML
+            let content = `
+                <ul>
+                    <li>
+                        <label for="admin">管理员：</label>
+                        <select id="admin">
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+                    </li>
+                    <li><label for="userName">用户名：</label> <input id="userName" type="text"></li>
+                    <li><label for="password">密码：</label> <input id="password" type="password"></li>
+                    <li>
+                        <label for="phone">电话：</label> <input id="phone" type="text">
+                    </li>
+                </ul>
+            `;
+
+            wxd.message.alert(content, "账号管理",
+                "新增", function () {
+                    let userName = $("#userName").val();
+                    let password = $("#password").val();
+                    let admin = $("#admin").val();
+                    let phone = $("#phone").val();
+                    if (userName === "" || password === "" || phone === "") {
+                        wxd.message.alert("请填写完整信息");
+                        return;
+                    }
+                    let needHide = true;
+                    wxd.netty.post({
+                        url: "/admin/account/add",
+                        params: {
+                            userName: userName,
+                            password: password,
+                            admin: admin,
+                            phone: phone
+                        }, onload: function (data) {
+                            if (data.code === 1) {
+                                wxd.message.notice("添加成功");
+                                search();
+                            } else {
+                                wxd.message.notice(data.msg);
+                                needHide = false;
+                            }
+                        },
+                        async: false
+                    });
+                    return needHide;
+                },
+                "取消", null,
+                false
+            );
         }
 
     </script>
