@@ -73,25 +73,26 @@
         }
 
         function createRow(index, row) {
+            // language=HTML
             let tr = `
-<tr>
-        <td>
-            <a href="#">删除</a>
-            <a href="#" onclick="editServer(${row.serverId},'${row.name}','${row.openTime}','${maintenanceTime}')">修改</a>
-        </td>
-        <td>${index}</td>
-        <td>${row.serverId}</td>
-        <td>${row.mainId}</td>
-        <td>${row.name}</td>
-        <td>${row.openTime}</td>
-        <td>${row.maintenanceTime}</td>
-        <td>${row.host}</td>
-        <td>${row.port}</td>
-        <td>${row.httpPort}</td>
-        <td>${row.onlineSize}</td>
-        <td>${row.showLevel}</td>
-        <td>${row.lastSyncTime}</td>
-</tr>
+                <tr>
+                    <td>
+                        <a href="#">删除</a>
+                        <a href="#" onclick="editServer(${row.serverId},'${row.name}','${row.openTime}','${maintenanceTime}')">修改</a>
+                    </td>
+                    <td>${index}</td>
+                    <td>${row.serverId}</td>
+                    <td>${row.mainId}</td>
+                    <td>${row.name}</td>
+                    <td>${row.openTime}</td>
+                    <td>${row.maintenanceTime}</td>
+                    <td>${row.host}</td>
+                    <td>${row.port}</td>
+                    <td>${row.httpPort}</td>
+                    <td>${row.onlineSize}</td>
+                    <td>${row.showLevel}</td>
+                    <td>${row.lastSyncTime}</td>
+                </tr>
             `;
             return tr;
         }
@@ -164,18 +165,27 @@
                 </div>
             `;
             wxd.message.alert(content, "修改开服时间", "修改", (result) => {
-                wxd.netty.post("/admin/gameserver/editServer", {
-                    serverId: serverId,
-                    serverName: $("#updateServerName").val(),
-                    openTime: $("#updateOpenTime").val(),
-                    maintenanceTime: $("#updateMaintenanceTime").val()
-                }, (data) => {
-                    wxd.message.notice(data.msg);
-                    if (data.code === 1) {
-                        search();
-                    }
+                let needHide = true;
+                wxd.netty.post({
+                    url: "/admin/gameserver/editServer",
+                    params: {
+                        serverId: serverId,
+                        serverName: $("#updateServerName").val(),
+                        openTime: $("#updateOpenTime").val(),
+                        maintenanceTime: $("#updateMaintenanceTime").val()
+                    },
+                    onload: (data) => {
+                        wxd.message.notice(data.msg);
+                        if (data.code === 1) {
+                            search();
+                        } else {
+                            needHide = false;
+                        }
+                    },
+                    async: false
                 });
-            }, "取消");
+                return needHide;
+            }, "取消", null, false);
         }
 
         function addServer() {
@@ -191,19 +201,35 @@
                 </div>
             `;
 
-            wxd.message.alert(content, "新增区服", "确定", () => {
-                console.log("addServer");
-                wxd.netty.post("/admin/gameserver/addServer", {
-                    serverId: $("#addServerId").val(),
-                    serverName: $("#addServerName").val(),
-                    openTime: $("#addOpenTime").val()
-                }, (data) => {
-                    wxd.message.alert(data.msg);
-                    if (data.code === 1) {
-                        search();
-                    }
-                });
-            }, "取消");
+            wxd.message.alert({
+                content: content,
+                title: "新增区服",
+                ok: "确定",
+                okCall: () => {
+                    console.log("addServer");
+                    let needHide = true;
+                    wxd.netty.post({
+                        url: "/admin/gameserver/addServer",
+                        params: {
+                            serverId: $("#addServerId").val(),
+                            serverName: $("#addServerName").val(),
+                            openTime: $("#addOpenTime").val()
+                        },
+                        onload: (data) => {
+                            wxd.message.notice(data.msg);
+                            if (data.code === 1) {
+                                search();
+                            } else {
+                                needHide = false;
+                            }
+                        },
+                        async: false
+                    });
+                    return needHide;
+                },
+                cancel: "取消",
+                okCallAsync: false
+            });
 
         }
 
