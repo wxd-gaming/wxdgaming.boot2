@@ -14,21 +14,24 @@
     <script>
 
         function login() {
-            let map = new wxd.Map();
-            map.put("userName", $("#accountName").val());
-            map.put("password", $("#password").val());
-            wxd.netty.post("/web/account/login", map.toString(),
-                function (responseText) {
+            wxd.netty.post({
+                url: "/web/account/login",
+                params: {
+                    userName: $("#accountName").val(),
+                    password: $("#password").val()
+                },
+                onload: (responseText) => {
                     if (responseText.code === 1) {
                         window.top.location.href = "/index.html";
                     } else {
                         wxd.message.alert(responseText.msg);
                     }
-                }, function (error) {
+                },
+                onerror: (error) => {
                     wxd.message.alert(error);
-                }
-            );
-
+                },
+                async: true
+            });
         }
     </script>
 

@@ -548,7 +548,8 @@ const wxd = {
                 let box = `
                     <span id="wxd_upload_progress_name_${i}">文件：${fileName}</span>
                     <br>
-                    <progress id="wxd_upload_progress_bar_${i}" value="0" max="100" style="width: 280px;"></progress>&nbsp;&nbsp;
+                    <progress id="wxd_upload_progress_bar_${i}" value="0" max="100"
+                              style="width: 280px;"></progress>&nbsp;&nbsp;
                     <span id="wxd_p_b_v_${i}">0</span>%
                     <br>
                     &nbsp;&nbsp;&nbsp;&nbsp;大小：<span id="wxd_p_b_cur_${i}"></span> /
@@ -760,88 +761,79 @@ const wxd = {
             }, 5000 + closeTime);
         },
 
-        alert_init_end: false,
-        alert_ok_call: null,
-        okCallAsync: true,
-        alert_cancel_call: null,
-        alert_init: function () {
-            if (this.alert_init_end) return;
-            let box = `<div class="message_alert_bg"></div>`;
-            $(document.body).append(box);
-            this.alert_init_end = true;
-        },
-        /**
-         *
-         * 弹出提示框
-         * @param content 内容，支持html
-         * @param title 标题
-         * @param ok 确认按钮显示内容
-         * @param okCall 确认按钮回调, 如果return false 不会隐藏面板
-         * @param cancel 取消显示的内容
-         * @param cancelCall 取消按钮回调
-         * @param okCallAsync true 异步执行，false 同步执行
-         */
-        alert: function (content, title, ok, okCall, cancel, cancelCall, okCallAsync) {
-            this.alert_init();
-            $('.message_alert_bg').show();
-            if (wxd.isNull(title)) title = "提示：";
-            if (wxd.isNull(ok)) ok = "OK";
-            if (wxd.isNull(okCallAsync)) okCallAsync = true;
-            let btn_c = "";
-            if (!wxd.isNull(cancel) || !wxd.isNull(cancelCall)) {
-                if (wxd.isNull(cancel)) cancel = "Cancel";
-                btn_c = `<button onclick="wxd.message.alert_cancel()">${cancel}</button>`;
-            }
-            /*根据当前页面设置最大高度*/
-            let bodyHeight = ($("body").height() * 0.4).toFixed(0);
-            console.log("alert-max-height " + bodyHeight);
-            // language=HTML
-            let a_c = `
-                <div class="message_alert_box">
-                    <strong class="ban_select">${title}</strong>
-                    <span class="span_close ban_select" title="关闭" onclick="wxd.message.alert_cancel()"></span>
-                    <div class="message_alert_c">
-                        <div class="message_alert_c_1" style="max-height: ${bodyHeight}px;">
-                            ${content}
-                        </div>
-                        <div class="message_alert_c_b">
-                            <button onclick="wxd.message.alert_ok()">${ok}</button>
-                            ${btn_c}
-                        </div>
-                    </div>
-                </div>
-            `;
-            this.alert_ok_call = okCall;
-            this.alert_cancel_call = cancelCall;
-            this.okCallAsync = okCallAsync;
-            $(".message_alert_bg").html(a_c);
-            var $messageAlertBox = $(".message_alert_box strong:first");
-            console.log($messageAlertBox);
-            wxd.draggable($messageAlertBox);
-        },
+        alertNumber: 0,
+        alertMap: {},
 
-        alert_ok: function () {
-            if (this.okCallAsync) {
-                setTimeout(() => {
-                    if (!wxd.isNull(this.alert_ok_call)) this.alert_ok_call();
-                }, 1);
-            } else {
-                if (!wxd.isNull(this.alert_ok_call)) {
-                    let alertOkCall = this.alert_ok_call();
-                    if (!wxd.isNull(alertOkCall) && alertOkCall === false) {
-                        return
+        Alert: class {
+            uid = 0;
+            title = null;
+            content = null;
+            okShow = "确认";
+            cancelShow = "";
+            okCallback = null;
+            cancelCallback = null;
+            bgBoxElement = null;
+
+            constructor(content, title) {
+                this.content = content;
+                this.title = title;
+                if (wxd.isNull(title)) {
+                    this.title = "提示";
+                }
+            }
+
+            show = () => {
+                this.uid = wxd.message.alertNumber++;
+                let cancelElement = "";
+
+                if (wxd.notNull(this.cancelShow) || wxd.notNull(this.cancelCallback)) {
+                    if (wxd.isNull(this.cancelShow)) {
+                        this.cancelShow = "取消";
                     }
+                    cancelElement = `<button onclick="wxd.message.alertMap[${this.uid}].alertCancel()">${this.cancelShow}</button>`;
                 }
 
-            }
-            $('.message_alert_bg').hide();
-        },
+                /*根据当前页面设置最大高度*/
+                let bodyHeight = ($("body").height() * 0.4).toFixed(0);
 
-        alert_cancel: function () {
-            $('.message_alert_bg').hide();
-            setTimeout(() => {
-                if (!wxd.isNull(this.alert_cancel_call)) this.alert_cancel_call();
-            }, 1);
+                let boxElement = document.createElement("div");
+                // language=HTML
+                let html = `
+                    <strong class="titleBox">xxxx</strong>
+                    <span class="closeBox" onclick="wxd.message.alertMap[${this.uid}].alertCancel()"></span>
+                    <div class="contentBox" style="max-height: ${bodyHeight}px;">
+                        ${this.content}
+                    </div>
+                    <div class="btnBox">
+                        <button onclick="wxd.message.alertMap[${this.uid}].alertOk()">${this.okShow}</button>
+                        ${cancelElement}
+                    </div>
+                `;
+                boxElement.className = "alertBox";
+                boxElement.innerHTML = html;
+                this.bgBoxElement = document.createElement("div");
+                this.bgBoxElement.className = "alertBoxBg";
+                this.bgBoxElement.appendChild(boxElement);
+                document.body.appendChild(this.bgBoxElement);
+                wxd.message.alertMap[this.uid] = this;
+            }
+
+            alertOk = () => {
+                if (this.okCallback != null && (this.okCallback != undefined)) {
+                    this.okCallback();
+                }
+                document.body.removeChild(this.bgBoxElement);
+                delete wxd.message.alertMap[this.uid];
+            }
+
+            alertCancel = () => {
+                if (this.cancelCallback != null && (this.cancelCallback != undefined)) {
+                    this.cancelCallback();
+                }
+                document.body.removeChild(this.bgBoxElement);
+                delete wxd.message.alertMap[this.uid];
+            }
+
         },
 
         tips_x: 10,
@@ -956,8 +948,10 @@ const wxd = {
         // language=HTML
         let load = `
             <div style="position: absolute;width: 100%;height: 100%;left: 0;top: 0;background: rgba(28,28,28,0.31);z-index: 99;">
-                <div id="div_load_box" style="position: relative;width: ${width};height: ${height};left: 50%;top: 50%;transform: translate(-50%, -50%) translateX(${offsetLeft}) translateY(${offsetTop});background: whitesmoke;border-radius: 10px;display: block;box-sizing: border-box;">
-                    <object data="${url}" style="width: 100%;height: 100%;border-radius: 15px;display: block;box-sizing: border-box;"></object>
+                <div id="div_load_box"
+                     style="position: relative;width: ${width};height: ${height};left: 50%;top: 50%;transform: translate(-50%, -50%) translateX(${offsetLeft}) translateY(${offsetTop});background: whitesmoke;border-radius: 10px;display: block;box-sizing: border-box;">
+                    <object data="${url}"
+                            style="width: 100%;height: 100%;border-radius: 15px;display: block;box-sizing: border-box;"></object>
                     <span title="关闭" onclick="$(this).parent().parent().remove();"
                           style="position: absolute;top:5px;right: 5px;width: 15px;height: 15px; background: #f85802;border-radius: 15px;z-index: 999;cursor: pointer;">
         </span>

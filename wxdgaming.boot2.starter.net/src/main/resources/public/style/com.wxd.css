@@ -1,16 +1,16 @@
+html, body, div, table, thead, tbody, tr, th, td, a, object, iframe, h1, h3, ul, li, dt, dl, label, span, strong, select, input, button {
+    padding: 0;margin: 0;border: 0;box-sizing: border-box;border-collapse: collapse;border-spacing: 0;
+}
+
 html, body {
     width: 100%;height: 100%;overflow: hidden;font-size: 12px;
     font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
     min-width: 1400px;
 }
 
-html, body, div, table, thead, tbody, tr, th, td, a, object, iframe, h1, h3, ul, li, dt, dl, label, span, strong, select, input, button {
-    padding: 0;margin: 0;border: 0;box-sizing: border-box;border-collapse: collapse;border-spacing: 0;
-}
+.root {display: block; margin: 0; padding: 0; width: 100%; height: 100%; overflow: auto;}
 
 button {border-radius: 4px;border: 1px solid #bbb;padding: 5px 15px;margin-right: 15px;color: #444;cursor: pointer;}
-
-div.body {width: 100%;height: 100%;overflow: auto;}
 
 a { color: #969696; }
 
@@ -42,28 +42,47 @@ a:hover, a:active { color: #33be85; }
 
 #message_console_bg strong {position: relative;bottom: 20px;left: 50%; transform: translate(-50%, 0);}
 
-.message_alert_bg { display: none; position: absolute;background: rgba(69, 68, 68, 0.2); width: 100%;height: 100%;left: 0px;top: 0px; z-index: 999999; }
+.alertBoxBg { position: absolute; width: 100%; height: 100%; left: 0; top: 0; background-color: rgba(69, 68, 68, 0.2); }
 
-.message_alert_bg .message_alert_box {display: block;position: absolute; padding: 10px 3px 3px;
-    left: 50%;top: 28%; transform: translate(-50%, 0);max-width: 55%;min-width: 320px;
+.alertBoxBg .alertBox {
+    display: block;
+    position: absolute; left: 50%; top: 20%; transform: translate(-50%, -20%);max-width: 55%;max-height: 55%; min-width: 360px;min-height: 230px;
     border-radius: 6px 6px 3px 3px;border: #95B8E7 1px solid;color: rgba(0, 0, 0, 1);background: linear-gradient(to bottom, #EFF5FF 0, #E0ECFF 20%);
     text-align: left;vertical-align: center; word-wrap: break-word;white-space: normal;box-shadow: 0 0 20px 10px rgba(110, 54, 54, 0.2); /*毛玻璃*/
 }
 
-.message_alert_bg .message_alert_box strong {display: block;width: calc(100% - 20px);height: 20px;color: #0E2D5F;}
+.alertBoxBg .alertBox strong { display: block;width: 100%; height: 35px;line-height: 30px; padding-left: 5px; color: #0E2D5F; }
 
-.message_alert_bg .message_alert_box div button {border-radius: 4px;border: 1px solid #bbb;padding: 5px 15px;margin-right: 15px;color: #444;cursor: pointer;}
+.alertBoxBg .alertBox .closeBox {
+    position: absolute; width: 15px; height: 15px; top: 8px; right: 8px;
+    cursor: pointer; border-radius: 10px; background-color: #8a1f11;
+}
 
-.message_alert_bg .message_alert_box .message_alert_c {
-    display: block;padding: 8px 8px 60px;margin-top: 10px;
+.alertBoxBg .alertBox .contentBox {
+    display: block;position: relative;
+    padding: 5px; margin: 0 3px;
     border: #95B8E7 1px solid;color: #000000;background-color: #ffffff;
-    min-width: 300px; min-height: 140px; overflow: hidden;text-align: left;vertical-align: center;
+    min-width: 352px;
+    min-height: 150px;
+    overflow: scroll; /* 允许内容溢出 */
+    text-align: left;vertical-align: center;
     word-wrap: break-word;white-space: normal;
 }
 
-.message_alert_bg .message_alert_box .message_alert_c .message_alert_c_1 {display: block;overflow: auto;}
+.alertBoxBg .alertBox .btnBox {
+    display: block;
+    line-height: 45px; height: 45px;
+    overflow: hidden; text-align: right;
+}
 
-.message_alert_bg .message_alert_box .message_alert_c .message_alert_c_b { position: absolute;bottom: 15px;right: 30px; }
+.alertBoxBg .alertBox .btnBox button {
+    border-radius: 4px;border: 1px solid #bbb;
+    padding: 5px 15px;
+    margin-right: 15px;
+    color: #444;
+    cursor: pointer;
+    margin-left: 10px;min-width: 60px;
+}
 
 .message_notice_bg {
     display: block; position: absolute;padding-top: 100px;left: 50%;top: 0px;

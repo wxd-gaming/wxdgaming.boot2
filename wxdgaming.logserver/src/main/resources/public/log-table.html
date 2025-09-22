@@ -85,7 +85,7 @@
             let content = $(self).text();
             content = formatJsonWithNewlines(content);
             console.log(typeof content, content);
-            wxd.message.alert(`<pre>${content}</pre>`, title);
+            new wxd.message.Alert(`<pre>${content}</pre>`, title).show();
         }
 
         $(() => {

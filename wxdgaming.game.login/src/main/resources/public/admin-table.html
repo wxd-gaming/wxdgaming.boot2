@@ -69,27 +69,21 @@
         }
 
         function createRow(index, row) {
+            // language=HTML
             let tr = `
-<tr>
-            <td>
-                <a href="#">删除</a>
-                <a href="#" onclick="editUser('${row.userName}');">修改</a>
-            </td>
-            <td>${index}</td>
-            <td>${row.userName}</td>
-            <td>${row.admin}</td>
-            <td>${row.phone}</td>
-            <td>${row.host}</td>
-            </tr>
+                <tr>
+                    <td>
+                        <a href="#">删除</a>
+                        <a href="#" onclick="editUser('${row.userName}','${row.admin}','${row.phone}');">修改</a>
+                    </td>
+                    <td>${index}</td>
+                    <td>${row.userName}</td>
+                    <td>${row.admin}</td>
+                    <td>${row.phone}</td>
+                    <td>${row.host}</td>
+                </tr>
             `;
             return tr;
-        }
-
-        function alertShow(self, title) {
-            let content = $(self).text();
-            content = formatJsonWithNewlines(content);
-            console.log(typeof content, content);
-            wxd.message.alert(`<pre>${content}</pre>`, title);
         }
 
         $(() => {
@@ -99,8 +93,72 @@
             search();
         });
 
-        function editUser(userName) {
-            wxd.loadHtml("/admin-edit.html?userName=" + userName);
+        function editUser(userName, admin, phone) {
+            // language=HTML
+            let content = `
+                <ul>
+                    <li>
+                        <label for="admin">管理员：</label>
+                        <select id="admin">
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+                    </li>
+                    <li>
+                        <label for="userName">用户名：</label>
+                        <span id="userName">${userName}</span>
+                    </li>
+                    <li>
+                        <label for="password">密码：</label>
+                        <input id="password" type="password">
+                    </li>
+                    <li>
+                        <label for="phone">电话：</label>
+                        <input id="phone" type="text" value="${userName}">
+                    </li>
+                </ul>
+            `;
+
+            // 在创建 content 后，设置 admin 的选中值
+            setTimeout(() => {
+                $("#admin").val(admin);
+            }, 200);
+
+            let alertBox = new wxd.message.Alert(content, "账号管理");
+            alertBox.okShow = "提 交";
+            alertBox.okCallback = () => {
+                let userName = $("#userName").val();
+                let password = $("#password").val();
+                let admin = $("#admin").val();
+                let phone = $("#phone").val();
+                if (userName === "" || password === "" || phone === "") {
+                    wxd.message.notice("请填写完整信息");
+                    return;
+                }
+                let needHide = true;
+                wxd.netty.post({
+                    url: "/admin/account/edit",
+                    params: {
+                        userName: userName,
+                        password: password,
+                        admin: admin,
+                        phone: phone
+                    },
+                    onload: function (data) {
+                        if (data.code === 1) {
+                            wxd.message.notice("添加成功");
+                            search();
+                        } else {
+                            wxd.message.notice(data.msg);
+                            needHide = false;
+                        }
+                    },
+                    async: false
+                });
+                return needHide;
+            };
+            alertBox.cancelShow = "取消";
+            alertBox.show();
         }
 
         function addUser() {
@@ -122,40 +180,41 @@
                 </ul>
             `;
 
-            wxd.message.alert(content, "账号管理",
-                "新增", function () {
-                    let userName = $("#userName").val();
-                    let password = $("#password").val();
-                    let admin = $("#admin").val();
-                    let phone = $("#phone").val();
-                    if (userName === "" || password === "" || phone === "") {
-                        wxd.message.alert("请填写完整信息");
-                        return;
-                    }
-                    let needHide = true;
-                    wxd.netty.post({
-                        url: "/admin/account/add",
-                        params: {
-                            userName: userName,
-                            password: password,
-                            admin: admin,
-                            phone: phone
-                        }, onload: function (data) {
-                            if (data.code === 1) {
-                                wxd.message.notice("添加成功");
-                                search();
-                            } else {
-                                wxd.message.notice(data.msg);
-                                needHide = false;
-                            }
-                        },
-                        async: false
-                    });
-                    return needHide;
-                },
-                "取消", null,
-                false
-            );
+            let alertBox = new wxd.message.Alert(content, "账号管理");
+            alertBox.okShow = "新增";
+            alertBox.okCallback = () => {
+                let userName = $("#userName").val();
+                let password = $("#password").val();
+                let admin = $("#admin").val();
+                let phone = $("#phone").val();
+                if (userName === "" || password === "" || phone === "") {
+                    wxd.message.alert("请填写完整信息");
+                    return;
+                }
+                let needHide = true;
+                wxd.netty.post({
+                    url: "/admin/account/add",
+                    params: {
+                        userName: userName,
+                        password: password,
+                        admin: admin,
+                        phone: phone
+                    },
+                    onload: function (data) {
+                        if (data.code === 1) {
+                            wxd.message.notice("添加成功");
+                            search();
+                        } else {
+                            wxd.message.notice(data.msg);
+                            needHide = false;
+                        }
+                    },
+                    async: false
+                });
+                return needHide;
+            };
+            alertBox.cancelShow = "取消";
+            alertBox.show();
         }
 
     </script>
