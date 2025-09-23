@@ -1,4 +1,4 @@
-package wxdgaming.game.login.admin.api;
+package wxdgaming.game.login.external.api;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;

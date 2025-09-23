@@ -6,7 +6,6 @@ import lombok.Setter;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.starter.excel.store.DataKey;
 import wxdgaming.boot2.starter.excel.store.DataMapping;
-import wxdgaming.game.server.bean.goods.ItemCfg;
 
 import java.io.Serializable;
 import java.util.*;
@@ -28,7 +27,7 @@ public abstract class QCdkeyMapping extends ObjectBase implements Serializable, 
     /** 备注说明 */
     protected String comment;
     /** 奖励 */
-    protected final List<ItemCfg> rewards = new ArrayList<>();
+    protected final List<wxdgaming.game.server.bean.goods.ItemCfg> rewards = new ArrayList<>();
 
     public Object key() {
         return id;

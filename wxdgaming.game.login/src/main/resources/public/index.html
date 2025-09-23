@@ -45,7 +45,7 @@
                     $(".nav").append(`<object data="nav.html"></object>`);
                 } else {
                     let alertBox = new wxd.message.Alert("请重新登录", "提示");
-                    alertBox.onload = () => {
+                    alertBox.okCallback = () => {
                         window.top.location.href = "/login.html";
                     };
                     alertBox.show();

@@ -45,14 +45,15 @@ public class StatsPlugin extends AbstractPlugin {
             jsonObject.put("orderCount", 0);
             jsonObject.put("orderMoneyCount", 0);
             JSONObject loginAccountDay = MapOf.newJSONObject();
-            {
+            if (registerAccountCount > 0) {
                 for (int j = 0; j <= beforeDay; j++) {
                     LocalDate loginDate = localDate.plusDays(j);
                     if (loginDate.isAfter(now))
                         break;
                     int loginDataKey = loginDate.getYear() * 10000 + loginDate.getMonthValue() * 100 + loginDate.getDayOfMonth();
                     int loginAccountCount = loginAccountCount(sqlDataHelper, dataKey, loginDataKey);
-                    loginAccountDay.put(String.valueOf(j + 1), loginAccountCount);
+                    float v = loginAccountCount * 10000 / loginAccountCount / 100f;
+                    loginAccountDay.put(String.valueOf(j + 1), String.format("%.2f", v) + "%");
                 }
             }
             jsonObject.put("loginAccountDay", loginAccountDay);

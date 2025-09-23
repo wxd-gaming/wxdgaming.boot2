@@ -121,7 +121,7 @@ public abstract class AbstractSdkLoginApi {
         return RunResult.ok()
                 .fluentPut("userId", userData.getPlatformUserId())
                 .fluentPut("token", token)
-                .fluentPut("serverList", innerService.gameServerList());
+                .fluentPut("serverList", innerService.gameServerList(userData.isWhite(), userData.getGmLevel()));
     }
 
 }

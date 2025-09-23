@@ -46,7 +46,7 @@ public class InnerService {
 
     }
 
-    public List<JSONObject> gameServerList() {
+    public List<JSONObject> gameServerList(boolean white, int gmLevel) {
         ServerShowNameGlobalData showNameGlobalData = globalDataService.get(GlobalDataConst.ServerNameGlobalData);
         ConcurrentHashMap<Integer, ServerShowName> serverNameMap = showNameGlobalData.getServerNameMap();
         return getInnerGameServerInfoMap().values().stream()
