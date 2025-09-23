@@ -35,19 +35,17 @@
                 url: url,
                 params: urlQuery.toString(),
                 onload: function (responseText) {
-                    wxd.message.alert(
-                        JSON.stringify(responseText),
-                        "提示：",
-                        "关闭",
-                        () => {
-                            setTimeout(() => {
-                                searchName();
-                            }, 1);
-                        }
-                    );
+                    let alertBox = new wxd.message.Alert(JSON.stringify(responseText), "提示：");
+                    alertBox.okShow = "关闭";
+                    alertBox.onload = () => {
+                        setTimeout(() => {
+                            searchName();
+                        }, 1);
+                    };
+                    alertBox.show();
                 },
                 onerror: (errorMsg) => {
-                    wxd.message.alert("异常：" + errorMsg);
+                    new wxd.message.Alert("异常：" + errorMsg).show();
                 },
                 async: false
             });
@@ -73,50 +71,51 @@
                 },
                 onerror: (errorMsg) => {
                     colse_loading();
-                    wxd.message.alert("异常：" + errorMsg);
+                    new wxd.message.Alert("异常：" + errorMsg).show();
                 },
                 async: false
             });
         }
 
         function createRow(index, row) {
+            // language=HTML
             let tr = `
-    <tr>
-        <td style="width: 140px;">
-            <a href="#" onclick="ban('/gm/001/002/003/banLogin', '${row.id}');return false;" title="封号和解封">封号</a>
-            <a href="#" onclick="ban('/gm/001/002/003/banChat', '${row.id}');return false;" title="禁言和解禁">禁言</a>
-            <a href="#" onclick="ban('/gm/001/002/003/clearRank', '${row.id}');return false;" title="清理排行榜">排行榜</a>
-            <a href="#" onclick="ban('/gm/001/002/003/kickout', '${row.id}');return false;" title="踢出下线并且清理内存">踢人</a>
-        </td>
-        <td tips="true" style="width: 40px;">${index}</td>
-        <td tips="true" style="width: 80px;">${row.banLogin} / ${row.banChat}</td>
-        <td tips="true" style="width: 80px;">${row.online} / ${row.share}</td>
-        <td style="width: 100px;" title="<label>${row.platform}</label><br><label>${row.subPlatform}</label><br>主服：<label>${row.mainServer}</label>">
-            ${row.skey}<br><label>${row.platformId}</label>/<label>${row.server}</label>
-        </td>
-        <td tips="true" style="width: 180px;">${row.aid}<br>${row.account}</td>
-        <td tips="true" style="width: 180px;">${row.id}<br>${row.name}</td>
-        <td tips="true" style="width: 120px;">${row.guildName}</td>
-        <td tips="true" style="width: 85px;">${row.zs} / ${row.lv}</td>
-        <td tips="true" style="width: 30px;">${row.viplv}</td>
-        <td tips="true">
-            <label>累：${row.recharge}</label>
-            <label>代：${row.replaceRecharge}</label>
-            <label>红：${row.redBagRecharge}</label>
-            /
-            <label>今：${row.rechargeToday}</label>
-            <label>代：${row.replaceRechargeToday}</label>
-            <label>红：${row.redBagRechargeToday}</label>
-            <br>
-            <label>钻石：${row.gold}</label>
-            /
-            <label>绑钻：${row.innerGold}</label>
-        </td>
-        <td tips="true" style="width: 140px;">${row.createTime}</td>
-        <td tips="true" style="width: 140px;">${row.loginTime}<br>${row.logoutTime}</td>
-        <td tips="true" style="width: 100px;">${row.onlineTime}<br>${row.loginDays}</td>
-    </tr>
-`;
+                <tr>
+                    <td style="width: 140px;">
+                        <a href="#" onclick="ban('/gm/001/002/003/banLogin', '${row.id}');return false;" title="封号和解封">封号</a>
+                        <a href="#" onclick="ban('/gm/001/002/003/banChat', '${row.id}');return false;" title="禁言和解禁">禁言</a>
+                        <a href="#" onclick="ban('/gm/001/002/003/clearRank', '${row.id}');return false;" title="清理排行榜">排行榜</a>
+                        <a href="#" onclick="ban('/gm/001/002/003/kickout', '${row.id}');return false;" title="踢出下线并且清理内存">踢人</a>
+                    </td>
+                    <td tips="true" style="width: 40px;">${index}</td>
+                    <td tips="true" style="width: 80px;">${row.banLogin} / ${row.banChat}</td>
+                    <td tips="true" style="width: 80px;">${row.online} / ${row.share}</td>
+                    <td style="width: 100px;" title="<label>${row.platform}</label><br><label>${row.subPlatform}</label><br>主服：<label>${row.mainServer}</label>">
+                        ${row.skey}<br><label>${row.platformId}</label>/<label>${row.server}</label>
+                    </td>
+                    <td tips="true" style="width: 180px;">${row.aid}<br>${row.account}</td>
+                    <td tips="true" style="width: 180px;">${row.id}<br>${row.name}</td>
+                    <td tips="true" style="width: 120px;">${row.guildName}</td>
+                    <td tips="true" style="width: 85px;">${row.zs} / ${row.lv}</td>
+                    <td tips="true" style="width: 30px;">${row.viplv}</td>
+                    <td tips="true">
+                        <label>累：${row.recharge}</label>
+                        <label>代：${row.replaceRecharge}</label>
+                        <label>红：${row.redBagRecharge}</label>
+                        /
+                        <label>今：${row.rechargeToday}</label>
+                        <label>代：${row.replaceRechargeToday}</label>
+                        <label>红：${row.redBagRechargeToday}</label>
+                        <br>
+                        <label>钻石：${row.gold}</label>
+                        /
+                        <label>绑钻：${row.innerGold}</label>
+                    </td>
+                    <td tips="true" style="width: 140px;">${row.createTime}</td>
+                    <td tips="true" style="width: 140px;">${row.loginTime}<br>${row.logoutTime}</td>
+                    <td tips="true" style="width: 100px;">${row.onlineTime}<br>${row.loginDays}</td>
+                </tr>
+            `;
             return tr;
         }
 
@@ -156,7 +155,7 @@
                     $("#base").append(base);
                 },
                 onerror: (errorMsg) => {
-                    wxd.message.alert("异常：" + errorMsg);
+                    new wxd.message.Alert("异常：" + errorMsg).show();
                 },
                 async: false
             });

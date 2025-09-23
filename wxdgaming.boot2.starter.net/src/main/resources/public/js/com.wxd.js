@@ -741,12 +741,11 @@ const wxd = {
         notice: function (content, isError, closeTime) {
             this.notice_init();
             let box_content = document.createElement("div");
-            box_content.setAttribute("class", "message_notice_box");
+            box_content.classList.add("message_notice_box");
             if (isError === true) {
                 box_content.setAttribute("style", "color: brown;");
             }
-            let n_c = `<div class="message_notice_c">${content}</div>`;
-            box_content.innerHTML = n_c;
+            box_content.innerHTML = `<div class="message_notice_c">${content}</div>`;
             /*追加在最上面*/
             $(".message_notice_bg").prepend(box_content);
 
@@ -816,18 +815,26 @@ const wxd = {
                 this.bgBoxElement.appendChild(boxElement);
                 document.body.appendChild(this.bgBoxElement);
                 wxd.message.alertMap[this.uid] = this;
+
+                let $messageAlertBox = $(this.bgBoxElement).find("strong:first");
+                console.log($messageAlertBox);
+                wxd.draggable($messageAlertBox);
+
             }
 
             alertOk = () => {
-                if (this.okCallback != null && (this.okCallback != undefined)) {
-                    this.okCallback();
+                if (this.okCallback != null) {
+                    let oc = this.okCallback();
+                    if (oc === false) {
+                        return;
+                    }
                 }
                 document.body.removeChild(this.bgBoxElement);
                 delete wxd.message.alertMap[this.uid];
             }
 
             alertCancel = () => {
-                if (this.cancelCallback != null && (this.cancelCallback != undefined)) {
+                if (this.cancelCallback != null) {
                     this.cancelCallback();
                 }
                 document.body.removeChild(this.bgBoxElement);

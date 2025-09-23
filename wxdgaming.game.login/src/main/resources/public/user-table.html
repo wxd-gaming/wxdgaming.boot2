@@ -98,7 +98,7 @@
             let content = $(self).text();
             content = formatJsonWithNewlines(content);
             console.log(typeof content, content);
-            wxd.message.alert(`<pre>${content}</pre>`, title);
+            new wxd.message.Alert(`<pre>${content}</pre>`, title).show();
         }
 
         $(() => {
@@ -144,22 +144,28 @@
                     <li><label>时间: </label><input id="banTime" type="datetime-local" value="${banTime}"></li>
                 </ul>
             `;
-            wxd.message.alert(
-                html,
-                "禁止登录设置",
-                "确定", () => {
-                    let urlQuery = new wxd.Map().loadSearch();
-                    urlQuery.put("account", $("#labAccount").text());
-                    urlQuery.put("banTime", $("#banTime").val());
-                    wxd.netty.post("/admin/userData/banLogin", urlQuery.toString(), (data) => {
+            let alertBox = new wxd.message.Alert(html, "禁止登录设置");
+            alertBox.okShow = "确定";
+            alertBox.okCallback = () => {
+                let urlQuery = new wxd.Map().loadSearch();
+                urlQuery.put("account", $("#labAccount").text());
+                urlQuery.put("banTime", $("#banTime").val());
+                let needHide = true;
+                wxd.netty.post({
+                    url: "/admin/userData/banLogin",
+                    params: urlQuery.toString(),
+                    onload: (data) => {
                         wxd.message.notice(data.msg);
                         if (data.code === 1) {
                             search();
+                        } else {
+                            needHide = false;
                         }
-                    });
-                },
-                "取消"
-            )
+                    },
+                    async: false
+                });
+            };
+            alertBox.show();
         }
 
         function gmLevel(account, gmLevel) {
@@ -171,31 +177,28 @@
                     <li><label>GM等级: </label><input id="gmLevel" type="number" value="${gmLevel}"></li>
                 </ul>
             `;
-            wxd.message.alert(
-                html,
-                "禁止登录设置",
-                "确定", () => {
-                    let formData = {
-                        account: $("#labAccount").text(),
-                        gmLevel: $("#gmLevel").val(),
+            let alertBox = new wxd.message.Alert(html, "新增区服");
+            alertBox.okShow = "确定";
+            alertBox.okCallback = () => {
+                let formData = {
+                    account: $("#labAccount").text(),
+                    gmLevel: $("#gmLevel").val(),
+                }
+                let needHide = true;
+                wxd.netty.post({
+                    url: "/admin/userData/gmLevel", params: formData,
+                    async: false,
+                    onload: (data) => {
+                        wxd.message.notice(data.msg);
+                        if (data.code === 1) {
+                            needHide = true;
+                            search();
+                        }
                     }
-                    let needHide = true;
-                    new wxd.PostRequest("/admin/userData/gmLevel")
-                        .params(formData)
-                        .async(false)
-                        .onLoad(function (data) {
-                            wxd.message.notice(data.msg);
-                            if (data.code === 1) {
-                                needHide = true;
-                                search();
-                            }
-                        })
-                        .send();
-                    return needHide;
-                },
-                "取消", null,
-                false
-            );
+                });
+                return needHide;
+            };
+            alertBox.show();
         }
 
     </script>

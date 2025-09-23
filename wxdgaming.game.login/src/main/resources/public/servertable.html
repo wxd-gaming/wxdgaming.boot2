@@ -101,7 +101,7 @@
             let content = $(self).text();
             content = formatJsonWithNewlines(content);
             console.log(typeof content, content);
-            wxd.message.alert(`<pre>${content}</pre>`, title);
+            new wxd.message.Alert(`<pre>${content}</pre>`, title).show();
         }
 
         $(() => {
@@ -164,7 +164,9 @@
                     </ul>
                 </div>
             `;
-            wxd.message.alert(content, "修改开服时间", "修改", (result) => {
+            let alertBox = new wxd.message.Alert(content, "编辑区服");
+            alertBox.okShow = "确认";
+            alertBox.okCallback = () => {
                 let needHide = true;
                 wxd.netty.post({
                     url: "/admin/gameserver/editServer",
@@ -185,7 +187,8 @@
                     async: false
                 });
                 return needHide;
-            }, "取消", null, false);
+            };
+            alertBox.show();
         }
 
         function addServer() {
@@ -201,36 +204,31 @@
                 </div>
             `;
 
-            wxd.message.alert({
-                content: content,
-                title: "新增区服",
-                ok: "确定",
-                okCall: () => {
-                    console.log("addServer");
-                    let needHide = true;
-                    wxd.netty.post({
-                        url: "/admin/gameserver/addServer",
-                        params: {
-                            serverId: $("#addServerId").val(),
-                            serverName: $("#addServerName").val(),
-                            openTime: $("#addOpenTime").val()
-                        },
-                        onload: (data) => {
-                            wxd.message.notice(data.msg);
-                            if (data.code === 1) {
-                                search();
-                            } else {
-                                needHide = false;
-                            }
-                        },
-                        async: false
-                    });
-                    return needHide;
-                },
-                cancel: "取消",
-                okCallAsync: false
-            });
-
+            let alertBox = new wxd.message.Alert(content, "新增区服");
+            alertBox.okShow = "新增";
+            alertBox.okCallback = () => {
+                console.log("addServer");
+                let needHide = true;
+                wxd.netty.post({
+                    url: "/admin/gameserver/addServer",
+                    params: {
+                        serverId: $("#addServerId").val(),
+                        serverName: $("#addServerName").val(),
+                        openTime: $("#addOpenTime").val()
+                    },
+                    onload: (data) => {
+                        wxd.message.notice(data.msg);
+                        if (data.code === 1) {
+                            search();
+                        } else {
+                            needHide = false;
+                        }
+                    },
+                    async: false
+                });
+                return needHide;
+            };
+            alertBox.show();
         }
 
     </script>

@@ -44,9 +44,11 @@
                 if (data.code === 1) {
                     $(".nav").append(`<object data="nav.html"></object>`);
                 } else {
-                    wxd.message.alert("请重新登录", "提示", "OK", () => {
+                    let alertBox = new wxd.message.Alert("请重新登录", "提示");
+                    alertBox.onload = () => {
                         window.top.location.href = "/login.html";
-                    });
+                    };
+                    alertBox.show();
                 }
             });
         });

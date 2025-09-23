@@ -24,11 +24,11 @@
                     if (responseText.code === 1) {
                         window.top.location.href = "/index.html";
                     } else {
-                        wxd.message.alert(responseText.msg);
+                        new wxd.message.Alert(responseText.msg).show();
                     }
                 },
                 onerror: (error) => {
-                    wxd.message.alert(error);
+                    new wxd.message.Alert(error).show();
                 },
                 async: true
             });

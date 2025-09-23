@@ -46,7 +46,7 @@
                 },
                 onerror: (errorMsg) => {
                     colse_loading();
-                    wxd.message.alert("异常：" + errorMsg);
+                    new wxd.message.Alert("异常：" + errorMsg).show();
                 },
                 async: false
             });

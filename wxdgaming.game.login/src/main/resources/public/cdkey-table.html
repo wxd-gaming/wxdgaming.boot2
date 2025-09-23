@@ -69,18 +69,19 @@
         }
 
         function createRow(index, row) {
+            // language=HTML
             let tr = `
-<tr>
-            <td>
-            <a href="#" onclick="gainCode(${row.id}, 100)">生成100</a>
-            <a href="#" onclick="gainCode(${row.id}, 1000)">生成1000</a>
-            <a href="#" onclick="queryCode(${row.id})">获取</a>
-            </td>
-            <td>${row.id}</td>
-            <td>${row.code}</td>
-            <td>${row.comment}</td>
-            <td ondblclick="alertShow(this,'奖励');">${row.rewards}</td>
-            </tr>
+                <tr>
+                    <td>
+                        <a href="#" onclick="gainCode(${row.id}, 100)">生成100</a>
+                        <a href="#" onclick="gainCode(${row.id}, 1000)">生成1000</a>
+                        <a href="#" onclick="queryCode(${row.id})">获取</a>
+                    </td>
+                    <td>${row.id}</td>
+                    <td>${row.code}</td>
+                    <td>${row.comment}</td>
+                    <td ondblclick="alertShow(this,'奖励');">${row.rewards}</td>
+                </tr>
             `;
             return tr;
         }
@@ -89,7 +90,7 @@
             let content = $(self).text();
             content = formatJsonWithNewlines(content);
             console.log(typeof content, content);
-            wxd.message.alert(`<pre>${content}</pre>`, title);
+            new wxd.message.Alert(`<pre>${content}</pre>`, title).show();
         }
 
         $(() => {
@@ -138,9 +139,9 @@
             let param = "cdKeyId=" + cdKeyId + "&num=" + num;
             wxd.netty.post("/admin/cdkey/gainCode", param, function (data) {
                 if (data.code === 1) {
-                    wxd.message.alert(formatForDisplay(data.data), "提示")
+                    new wxd.message.Alert(formatForDisplay(data.data), "提示").show();
                 } else {
-                    wxd.message.alert(formatForDisplay(data.msg), "提示")
+                    new wxd.message.notice(data.msg);
                 }
             });
         }
@@ -150,9 +151,9 @@
             let param = "cdKeyId=" + cdKeyId;
             wxd.netty.post("/admin/cdkey/queryCode", param, function (data) {
                 if (data.code === 1) {
-                    wxd.message.alert(formatForDisplay(data.data), "提示")
+                    new wxd.message.Alert(formatForDisplay(data.data), "提示").show();
                 } else {
-                    wxd.message.alert(formatForDisplay(data.msg), "提示")
+                    new wxd.message.notice(data.msg);
                 }
             });
         }

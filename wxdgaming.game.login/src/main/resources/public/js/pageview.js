@@ -62,7 +62,7 @@ class PageView {
         wxd.netty.post(this.url, postQuery.toString(),
             (responseText) => {
                 if (responseText.code !== 1) {
-                    wxd.message.alert("异常：" + responseText.msg);
+                    new wxd.message.Alert("异常：" + responseText.msg).show();
                     return
                 }
                 this.items = responseText.data;
@@ -72,7 +72,7 @@ class PageView {
                 this.showData();
             },
             (errorMsg) => {
-                wxd.message.alert("异常：" + errorMsg);
+                new wxd.message.Alert("异常：" + errorMsg).show();
             },
             null,
             true,

@@ -125,7 +125,7 @@
             }, 200);
 
             let alertBox = new wxd.message.Alert(content, "账号管理");
-            alertBox.okShow = "提 交";
+            alertBox.okShow = "修改";
             alertBox.okCallback = () => {
                 let userName = $("#userName").val();
                 let password = $("#password").val();
@@ -157,7 +157,6 @@
                 });
                 return needHide;
             };
-            alertBox.cancelShow = "取消";
             alertBox.show();
         }
 
@@ -188,7 +187,7 @@
                 let admin = $("#admin").val();
                 let phone = $("#phone").val();
                 if (userName === "" || password === "" || phone === "") {
-                    wxd.message.alert("请填写完整信息");
+                    wxd.message.notice("请填写完整信息");
                     return;
                 }
                 let needHide = true;
@@ -213,7 +212,6 @@
                 });
                 return needHide;
             };
-            alertBox.cancelShow = "取消";
             alertBox.show();
         }
 
