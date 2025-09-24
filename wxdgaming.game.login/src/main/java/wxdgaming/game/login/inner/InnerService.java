@@ -1,21 +1,26 @@
 package wxdgaming.game.login.inner;
 
 import com.alibaba.fastjson.JSONObject;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.ann.StopBefore;
+import wxdgaming.boot2.core.util.SignUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
+import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.game.common.global.GlobalDataService;
+import wxdgaming.game.login.LoginServerProperties;
 import wxdgaming.game.login.bean.global.GlobalDataConst;
 import wxdgaming.game.login.bean.global.ServerShowName;
 import wxdgaming.game.login.bean.global.ServerShowNameGlobalData;
 import wxdgaming.game.login.entity.ServerInfoEntity;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -30,11 +35,13 @@ import java.util.concurrent.ConcurrentSkipListMap;
 @Service
 public class InnerService {
 
+    final LoginServerProperties loginServerProperties;
     final SqlDataHelper sqlDataHelper;
     final ConcurrentSkipListMap<Integer, ServerInfoEntity> innerGameServerInfoMap = new ConcurrentSkipListMap<>();
     final GlobalDataService globalDataService;
 
-    public InnerService(PgsqlDataHelper sqlDataHelper, GlobalDataService globalDataService) {
+    public InnerService(LoginServerProperties loginServerProperties, PgsqlDataHelper sqlDataHelper, GlobalDataService globalDataService) {
+        this.loginServerProperties = loginServerProperties;
         this.sqlDataHelper = sqlDataHelper;
         this.globalDataService = globalDataService;
         this.sqlDataHelper.checkTable(ServerInfoEntity.class);
@@ -66,6 +73,29 @@ public class InnerService {
                     return map;
                 })
                 .toList();
+    }
+
+    public void executeAll(String flag, String url, Map<String, ?> params) {
+        String sign = SignUtil.signByFormData(params, loginServerProperties.getJwtKey());
+        getInnerGameServerInfoMap().values().forEach(serverInfo -> {
+            String host = serverInfo.getHost();
+            int httpPort = serverInfo.getHttpPort();
+            if (StringUtils.isBlank(host) || httpPort < 1000) {
+                return;
+            }
+            String formatted = "http://%s:%s/%s".formatted(host, httpPort, url);
+            HttpRequestPost.of(formatted, params)
+                    .addHeader(HttpHeaderNames.AUTHORIZATION.toString(), sign)
+                    .executeAsync()
+                    .subscribe(
+                            httpResponse -> {
+                                log.info("远程调用：{}-{} {}：{}, {}", serverInfo.getServerId(), serverInfo.getName(), flag, params, httpResponse);
+                            },
+                            throwable -> {
+                                log.info("远程调用：{}-{} {}: {} 请求异常", serverInfo.getServerId(), serverInfo.getName(), flag, params, throwable);
+                            }
+                    );
+        });
     }
 
     @Order(10)

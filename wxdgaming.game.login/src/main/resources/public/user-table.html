@@ -76,10 +76,11 @@
             // language=HTML
             let tr = `
                 <tr>
-                    <td>
+                    <td style="width: 180px;">
                         <a href="#" onclick="banLogin('${row.account}','${row.banExpireTime}')">禁止/解封</a>
                         <a href="#" onclick="whiteLogin('${row.account}')">白名单</a>
                         <a href="#" onclick="gmLevel('${row.account}',${row.gmLevel})">GM</a>
+                        <a href="#" onclick="kick('${row.account}')">踢下线</a>
                     </td>
                     <td>${row.account}</td>
                     <td style="width: 60px;">${row.gmLevel}</td>
@@ -129,6 +130,17 @@
             let urlQuery = new wxd.Map().loadSearch();
             urlQuery.put("account", account);
             new wxd.netty.PostRequest("/admin/userData/whiteLogin", urlQuery.toString(), (data) => {
+                wxd.message.notice(data.msg);
+                if (data.code === 1) {
+                    search();
+                }
+            }).send();
+        }
+
+        function kick(account) {
+            let urlQuery = new wxd.Map().loadSearch();
+            urlQuery.put("account", account);
+            new wxd.netty.PostRequest("/admin/userData/kick", urlQuery.toString(), (data) => {
                 wxd.message.notice(data.msg);
                 if (data.code === 1) {
                     search();
@@ -249,7 +261,7 @@
     <table>
         <thead>
         <tr>
-            <th>操作</th>
+            <th style="width: 180px;">操作</th>
             <th>账号</th>
             <th style="width: 60px;">GM等级</th>
             <th style="width: 60px;">白名单</th>

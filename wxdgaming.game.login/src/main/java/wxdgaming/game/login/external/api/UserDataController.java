@@ -2,7 +2,6 @@ package wxdgaming.game.login.external.api;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,12 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.boot2.core.util.SignUtil;
 import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryBuilder;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
-import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.game.authority.AdminUserToken;
 import wxdgaming.game.login.LoginServerProperties;
 import wxdgaming.game.login.entity.UserData;
@@ -73,29 +70,22 @@ public class UserDataController implements InitPrint {
             TreeMap<String, Object> params = new TreeMap<>();
             params.put("account", account);
             params.put("banTime", userData.getBanExpireTime());
-            String sign = SignUtil.signByFormData(params, loginServerProperties.getJwtKey());
-
-            innerService.getInnerGameServerInfoMap().values().forEach(serverInfo -> {
-                String host = serverInfo.getHost();
-                int httpPort = serverInfo.getHttpPort();
-                if (StringUtils.isBlank(host) || httpPort < 1000) {
-                    return;
-                }
-                String formatted = "http://%s:%s/yunying/banLogin".formatted(host, httpPort);
-                HttpRequestPost.of(formatted, params)
-                        .addHeader(HttpHeaderNames.AUTHORIZATION.toString(), sign)
-                        .executeAsync()
-                        .subscribe(
-                                httpResponse -> {
-                                    log.info("管理：{}-{} 禁止登录：{}, {}", serverInfo.getServerId(), serverInfo.getName(), params, httpResponse);
-                                },
-                                throwable -> {
-                                    log.info("管理：{}-{} 禁止登录: {} 请求异常", serverInfo.getServerId(), serverInfo.getName(), params, throwable);
-                                }
-                        );
-            });
+            innerService.executeAll("banLogin", "yunying/banLogin", params);
         }
-        return RunResult.ok().msg("设置成功");
+        return RunResult.ok().msg(userData.getBanExpireTime() == 0 ? "解封成功" : "封禁成功");
+    }
+
+    @RequestMapping("/kick")
+    public RunResult kick(@RequestParam("account") String account) {
+        UserData userData = loginService.userData(account);
+        if (userData == null) {
+            return RunResult.fail("用户不存在");
+        }
+        log.info("管理：{} 设置：{} 踢下线", AdminUserToken.threadContext().getUserName(), account);
+        TreeMap<String, Object> params = new TreeMap<>();
+        params.put("account", account);
+        innerService.executeAll("banLogin", "yunying/kick", params);
+        return RunResult.ok().msg("成功");
     }
 
     @RequestMapping("/gmLevel")

@@ -42,7 +42,8 @@ public class YunyingController extends HoldApplicationContext {
         return RunResult.ok();
     }
 
-    public Object kickAccount(HttpServletRequest httpContext, @RequestParam("account") String account) {
+    @RequestMapping(value = "/kick")
+    public Object kick(HttpServletRequest httpContext, @RequestParam("account") String account) {
         UserMapping userMapping = dataCenterService.getUserMapping(account);
         if (userMapping == null) {
             return RunResult.fail("用户不存在");
@@ -68,7 +69,7 @@ public class YunyingController extends HoldApplicationContext {
             yunyingData.getAccountBanLoginTime().remove(account);
         } else {
             yunyingData.getAccountBanLoginTime().put(account, banTime);
-            kickAccount(httpContext, account);
+            kick(httpContext, account);
         }
         log.info("运营后台 禁止登录：{}, {}", account, MyClock.formatDate(banTime));
         return RunResult.ok();
