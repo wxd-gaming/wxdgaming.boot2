@@ -87,10 +87,10 @@ public class UserDataController implements InitPrint {
                         .executeAsync()
                         .subscribe(
                                 httpResponse -> {
-                                    log.info("管理：{}-{} 禁止登录：{}", serverInfo.getServerId(), serverInfo.getName(), httpResponse);
+                                    log.info("管理：{}-{} 禁止登录：{}, {}", serverInfo.getServerId(), serverInfo.getName(), params, httpResponse);
                                 },
                                 throwable -> {
-                                    log.info("管理：{}-{} 禁止登录请求异常", serverInfo.getServerId(), serverInfo.getName(), throwable);
+                                    log.info("管理：{}-{} 禁止登录: {} 请求异常", serverInfo.getServerId(), serverInfo.getName(), params, throwable);
                                 }
                         );
             });
