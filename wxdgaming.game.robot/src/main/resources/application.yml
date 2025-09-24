@@ -43,7 +43,7 @@ socket:
     scheduledFlushMs: 10                                    #定时调用flush的频率单位是ms
     enabledWebSocket: false                                    #是否启用websocket
     webSocketPrefix: "/ws"                                    #websocket前缀
-    enabledReconnection: true                                  #是否启用重连
+    enabledReconnection: false                                  #是否启用重连
     enabledSSL: false
     maxAggregatorLength: 64                                    #聚合器最大长度
     maxConnectionCount: 0                                      #最大连接数 需要手动控制

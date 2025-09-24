@@ -65,7 +65,7 @@ public class AdminGameServerController implements InitPrint {
                                 @RequestParam("serverId") int serverId,
                                 @RequestParam("serverName") String serverName,
                                 @RequestParam("openTime") String openTime,
-                                @RequestParam("showLevel") int showLevel) {
+                                @RequestParam(value = "showLevel") int showLevel) {
         ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(serverId);
         AssertUtil.assertTrue(entity != null, "服务器不存在");
         long time = Util.parseWebDate(openTime);

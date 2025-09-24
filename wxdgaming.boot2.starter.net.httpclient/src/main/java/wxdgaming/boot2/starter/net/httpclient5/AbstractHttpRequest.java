@@ -14,13 +14,16 @@ import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.NoHttpResponseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.util.Timeout;
+import reactor.core.publisher.Mono;
 import wxdgaming.boot2.core.Throw;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.io.InterruptedIOException;
 import java.net.SocketTimeoutException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -44,6 +47,11 @@ public abstract class AbstractHttpRequest {
     protected final Map<String, String> reqHeaderMap = new LinkedHashMap<>();
 
     protected abstract HttpUriRequestBase buildRequest();
+
+    public Mono<HttpResponse> executeAsync() {
+        CompletableFuture<HttpResponse> future = ExecutorFactory.getExecutorServiceVirtual().future(this::execute);
+        return Mono.fromFuture(future);
+    }
 
     public HttpResponse execute() {
         retry++;

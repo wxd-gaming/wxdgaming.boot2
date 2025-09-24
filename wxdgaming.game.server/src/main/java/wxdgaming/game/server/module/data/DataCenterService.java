@@ -101,11 +101,7 @@ public class DataCenterService extends HoldApplicationContext implements GetPlay
     }
 
     public UserMapping getUserMapping(String account) {
-        return userMappingMap.computeIfAbsent(account, k -> {
-            UserMapping userMapping = new UserMapping(account);
-            userMapping.setDataCenterService(this);
-            return userMapping;
-        });
+        return userMappingMap.computeIfAbsent(account, k -> new UserMapping(account, this));
     }
 
 }

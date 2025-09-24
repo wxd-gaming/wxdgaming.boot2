@@ -1,5 +1,6 @@
 package wxdgaming.game.server.bean;
 
+import io.netty.channel.ChannelFuture;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -22,6 +23,7 @@ import java.util.List;
 public class UserMapping {
 
     private final String account;
+    private transient final DataCenterService dataCenterService;
     private UserDataVo userDataVo;
     private String clientIp;
     private List<MapBean> clientParams;
@@ -29,23 +31,24 @@ public class UserMapping {
     private int sid;
     private long rid;
 
-    private transient DataCenterService dataCenterService;
     private transient SocketSession socketSession;
 
-    public UserMapping(String account) {
+    public UserMapping(String account, DataCenterService dataCenterService) {
         this.account = account;
+        this.dataCenterService = dataCenterService;
     }
 
     public Player player() {
+        if (rid == 0) return null;
         return dataCenterService.getPlayer(rid);
     }
 
-    public void write(PojoBase message) {
-        socketSession.write(message);
+    public ChannelFuture write(PojoBase message) {
+        return socketSession.write(message);
     }
 
-    public void writeAndFlush(PojoBase message) {
-        socketSession.writeAndFlush(message);
+    public ChannelFuture writeAndFlush(PojoBase message) {
+        return socketSession.writeAndFlush(message);
     }
 
     @Override public String toString() {

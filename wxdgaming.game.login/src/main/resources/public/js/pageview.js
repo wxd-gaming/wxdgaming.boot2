@@ -71,6 +71,7 @@ class PageView {
                 this.pageMaxIndex();
                 this.showData();
             })
+            .async(false)
             .send();
     }
 

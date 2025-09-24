@@ -19,6 +19,8 @@ import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.role.PlayerService;
 import wxdgaming.game.server.script.tips.TipsService;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * @author wxd-gaming(無心道, 15388152619)
  * @version v1.1
@@ -57,6 +59,14 @@ public class ReqLoginHandler extends HoldApplicationContext {
             UserDataVo userDataVo = jsonToken.getObject("user", UserDataVo.class);
 
             YunyingData yunyingData = globalDataService.get(GlobalDataConst.YUNYINGDATA);
+
+            ConcurrentHashMap<String, Long> accountBanLoginTime = yunyingData.getAccountBanLoginTime();
+            long banTime = accountBanLoginTime.getOrDefault(userDataVo.getAccount(), 0L);
+            if (banTime > System.currentTimeMillis()) {
+                tipsService.tips(socketSession, "账号被封禁");
+                return;
+            }
+
             UserMapping userMapping = dataCenterService.getUserMapping(userDataVo.getAccount());
 
             userMapping.setSid(sid);

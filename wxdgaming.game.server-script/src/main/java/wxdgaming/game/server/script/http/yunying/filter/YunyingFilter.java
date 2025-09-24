@@ -1,10 +1,17 @@
 package wxdgaming.game.server.script.http.yunying.filter;
 
+import io.netty.handler.codec.http.HttpHeaderNames;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.WebFilter;
+import wxdgaming.boot2.core.util.AssertUtil;
+import wxdgaming.boot2.core.util.SignUtil;
+import wxdgaming.game.common.bean.login.ConnectLoginProperties;
+
+import java.util.Map;
 
 /**
  * 运营过滤器
@@ -16,12 +23,22 @@ import wxdgaming.boot2.core.WebFilter;
 @Component
 public class YunyingFilter implements WebFilter {
 
+    final ConnectLoginProperties connectLoginProperties;
+
+    public YunyingFilter(ConnectLoginProperties connectLoginProperties) {
+        this.connectLoginProperties = connectLoginProperties;
+    }
+
     @Override public String filterPath() {
         return "/yunying/**";
     }
 
     @Override public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        return WebFilter.super.preHandle(request, response, handler);
+        String sign = request.getHeader(HttpHeaderNames.AUTHORIZATION.toString());
+        Map<String, String> stringStringMap = SpringUtil.readParameterMap(request);
+        String selfSign = SignUtil.signByFormData(stringStringMap, connectLoginProperties.getJwtKey());
+        AssertUtil.assertTrue(selfSign.equals(sign), "签名错误");
+        return true;
     }
 
 

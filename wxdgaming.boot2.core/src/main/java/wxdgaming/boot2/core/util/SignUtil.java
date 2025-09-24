@@ -1,8 +1,10 @@
 package wxdgaming.boot2.core.util;
 
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.json.FastJsonUtil;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * 签名
@@ -26,7 +28,7 @@ public class SignUtil {
         if (data instanceof String s) {
             dataString = s;
         } else {
-            dataString = FastJsonUtil.toJSONString(data, SerializerFeature.MapSortField, SerializerFeature.SortField);
+            dataString = FastJsonUtil.toJSONString(data, FastJsonUtil.Writer_Features);
         }
         String string = dataString + key;
         String sign = Md5Util.md5(string);
@@ -35,4 +37,24 @@ public class SignUtil {
         }
         return sign;
     }
+
+    public static String signByFormData(Map<String, ?> data, String key) {
+        TreeMap<String, ?> tmap;
+        if (data instanceof TreeMap<String, ?>) {
+            tmap = (TreeMap<String, ?>) data;
+        } else {
+            tmap = new TreeMap<>(data);
+        }
+        String dataString = tmap.entrySet().stream()
+                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .reduce((a, b) -> a + "&" + b)
+                .orElse("");
+        String string = dataString + key;
+        String sign = Md5Util.md5(string);
+        if (log.isDebugEnabled()) {
+            log.debug("source: {}, sign: {}", string, sign);
+        }
+        return sign;
+    }
+
 }

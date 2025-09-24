@@ -109,6 +109,7 @@ public class ExecutorFactory implements InitPrint {
         return Lazy.instance.EXECUTOR_SERVICE_LOGIC;
     }
 
+    /** 虚拟线程池 */
     public static ExecutorService getExecutorServiceVirtual() {
         return Lazy.instance.EXECUTOR_SERVICE_VIRTUAL;
     }

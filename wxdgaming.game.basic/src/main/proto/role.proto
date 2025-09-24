@@ -21,6 +21,11 @@ message ResLogin {
   repeated RoleBean roles              = 4;//角色列表
 }
 
+//踢下线
+message ResKick {
+  string reason                        = 1;//踢下线的原因,
+}
+
 //角色信息
 message RoleBean {
   int64 rid                           = 1;

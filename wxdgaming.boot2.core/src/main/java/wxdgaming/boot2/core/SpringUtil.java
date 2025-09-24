@@ -37,6 +37,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
@@ -117,6 +119,16 @@ public class SpringUtil implements InitPrint {
             bytes = GzipUtil.unGZip(bytes);
         }
         return new String(bytes, request.getCharacterEncoding());
+    }
+
+    public static Map<String, String> readParameterMap(HttpServletRequest request) {
+        Map<String, String> map = new java.util.HashMap<>();
+        Enumeration<String> parameterNames = request.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String name = parameterNames.nextElement();
+            map.put(name, request.getParameter(name));
+        }
+        return map;
     }
 
     public static JSONObject readBodyJson(HttpServletRequest request) throws IOException {

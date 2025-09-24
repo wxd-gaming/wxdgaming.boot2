@@ -59,7 +59,7 @@ public class BuffService extends HoldApplicationContext {
     }
 
     @OnHeartMinute
-    public void onHeartMinuteBuffActionTest(MapNpc mapNpc, long mill) {
+    public void onHeartMinuteBuffActionTest(MapNpc mapNpc, int minute) {
 
         addBuff(mapNpc, mapNpc, 2, 1, ReasonDTO.of(ReasonConst.GM));
         addBuff(mapNpc, mapNpc, 3, 1, ReasonDTO.of(ReasonConst.GM));

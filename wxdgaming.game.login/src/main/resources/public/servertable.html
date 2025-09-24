@@ -78,7 +78,7 @@
                 <tr>
                     <td>
                         <a href="#">删除</a>
-                        <a href="#" onclick="editServer(${row.serverId},'${row.name}','${row.openTime}','${maintenanceTime}')">修改</a>
+                        <a href="#" onclick="editServer(${row.serverId},'${row.name}','${row.openTime}','${row.maintenanceTime}','${row.showLevel}')">修改</a>
                     </td>
                     <td>${index}</td>
                     <td>${row.serverId}</td>
@@ -106,10 +106,7 @@
 
         $(() => {
             wxd.loading();
-            let urlQuery = new wxd.Map().loadSearch();
             pageView = new PageView("/admin/gameserver/queryList", search, createRow);
-            pageView.gameId = urlQuery.get("gameId");
-
             search();
         });
 
@@ -146,7 +143,7 @@
             $("#labOrderBy").text("");
         }
 
-        function editServer(serverId, serverName, openTime, maintenanceTime) {
+        function editServer(serverId, serverName, openTime, maintenanceTime, showLevel) {
             // language=HTML
             let content = `
                 <div>
@@ -161,6 +158,9 @@
                         <li>
                             <label for="updateMaintenanceTime">维护时间:</label><input id="updateMaintenanceTime" type="datetime-local" value="${maintenanceTime}"/>
                         </li>
+                        <li>
+                            <label for="updateServerName">显示等级:</label><input id="updateShowLevel" type="text" value="${showLevel}">
+                        </li>
                     </ul>
                 </div>
             `;
@@ -173,7 +173,8 @@
                         serverId: serverId,
                         serverName: $("#updateServerName").val(),
                         openTime: $("#updateOpenTime").val(),
-                        maintenanceTime: $("#updateMaintenanceTime").val()
+                        maintenanceTime: $("#updateMaintenanceTime").val(),
+                        showLevel: $("#updateShowLevel").val()
                     },
                     (data) => {
                         wxd.message.notice(data.msg);
@@ -183,7 +184,8 @@
                         } else {
                             return false;
                         }
-                    }).async(false)
+                    })
+                    .async(false)
                     .send();
             };
             alertBox.show();
