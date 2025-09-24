@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.WebFilter;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.util.AssertUtil;
@@ -38,6 +39,17 @@ public class AdminFilter implements WebFilter {
         AdminUserToken adminUserToken = AdminUserToken.parse(request, loginServerProperties.getAdminKey());
         AssertUtil.assertTrue(adminUserToken != null, "token过期");
         ThreadContext.putContent("adminUserToken", adminUserToken);
+        String currentUrl = SpringUtil.getCurrentUrl(request);
+        String body = SpringUtil.readBody(request);
+        log.info("{}", """ 
+                
+                -------------------------------------------------------
+                请求日志记录
+                   url: %s
+                params: %s
+                 admin: %s
+                -------------------------------------------------------
+                """.formatted(currentUrl, body, adminUserToken));
         return true;
     }
 

@@ -9,13 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.InitPrint;
+import wxdgaming.boot2.core.function.FunctionUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.boot2.core.function.FunctionUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryBuilder;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
+import wxdgaming.game.authority.AdminUserToken;
 import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.login.LoginServerProperties;
 import wxdgaming.game.login.bean.global.GlobalDataConst;
@@ -123,8 +124,8 @@ public class AdminGameServerController implements InitPrint {
 
     @RequestMapping(value = "/editShowName")
     public RunResult editShowName(@RequestParam("serverId") int serverId,
-                                 @RequestParam("showName") String showName,
-                                 @RequestParam("showNameExpireTime") String showNameExpireTime) {
+                                  @RequestParam("showName") String showName,
+                                  @RequestParam("showNameExpireTime") String showNameExpireTime) {
         ServerShowNameGlobalData showNameGlobalData = globalDataService.get(GlobalDataConst.ServerNameGlobalData);
         ConcurrentHashMap<Integer, ServerShowName> serverNameMap = showNameGlobalData.getServerNameMap();
         ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(serverId);
