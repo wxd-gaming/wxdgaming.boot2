@@ -61,13 +61,7 @@ public class InnerService {
                 .map(bean -> {
                     JSONObject map = new JSONObject();
                     map.put("id", bean.getServerId());
-                    map.put("name", bean.getName());
-                    ServerShowName serverShowName = serverNameMap.get(bean.getServerId());
-                    if (serverShowName != null && StringUtils.isNotBlank(serverShowName.getName())
-                        && System.currentTimeMillis() < serverShowName.getExpireTime()) {
-                        /*TODO 服务器冠名有效期*/
-                        map.put("name", serverShowName.getName());
-                    }
+                    map.put("name", showNameGlobalData.showName(bean.getServerId(), bean.getName()));
                     map.put("host", bean.getHost());
                     map.put("port", bean.getPort());
                     return map;

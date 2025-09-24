@@ -12,10 +12,15 @@ import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.AssertUtil;
+import wxdgaming.boot2.core.function.FunctionUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryBuilder;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
+import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.login.LoginServerProperties;
+import wxdgaming.game.login.bean.global.GlobalDataConst;
+import wxdgaming.game.login.bean.global.ServerShowName;
+import wxdgaming.game.login.bean.global.ServerShowNameGlobalData;
 import wxdgaming.game.login.entity.ServerInfoEntity;
 import wxdgaming.game.login.inner.InnerService;
 import wxdgaming.game.util.Util;
@@ -24,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 对外接口
@@ -39,11 +45,14 @@ public class AdminGameServerController implements InitPrint {
     final LoginServerProperties loginServerProperties;
     final SqlDataHelper sqlDataHelper;
     final InnerService innerService;
+    final GlobalDataService globalDataService;
 
-    public AdminGameServerController(LoginServerProperties loginServerProperties, PgsqlDataHelper sqlDataHelper, InnerService innerService) {
+    public AdminGameServerController(LoginServerProperties loginServerProperties, PgsqlDataHelper sqlDataHelper,
+                                     InnerService innerService, GlobalDataService globalDataService) {
         this.loginServerProperties = loginServerProperties;
         this.sqlDataHelper = sqlDataHelper;
         this.innerService = innerService;
+        this.globalDataService = globalDataService;
     }
 
     @RequestMapping(value = "/addServer")
@@ -110,6 +119,24 @@ public class AdminGameServerController implements InitPrint {
         entity.setMaintenanceTime(time);
         sqlDataHelper.update(entity);
         return RunResult.ok().msg("修改成功");
+    }
+
+    @RequestMapping(value = "/editShowName")
+    public RunResult editShowName(@RequestParam("serverId") int serverId,
+                                 @RequestParam("showName") String showName,
+                                 @RequestParam("showNameExpireTime") String showNameExpireTime) {
+        ServerShowNameGlobalData showNameGlobalData = globalDataService.get(GlobalDataConst.ServerNameGlobalData);
+        ConcurrentHashMap<Integer, ServerShowName> serverNameMap = showNameGlobalData.getServerNameMap();
+        ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(serverId);
+        AssertUtil.assertTrue(entity != null, "服务器不存在");
+        long time = Util.parseWebDate(showNameExpireTime);
+        if (time < System.currentTimeMillis()) {
+            serverNameMap.remove(serverId);
+            return RunResult.ok().msg("删除成功");
+        } else {
+            serverNameMap.put(serverId, new ServerShowName().setName(showName).setExpireTime(time));
+            return RunResult.ok().msg("设置成功");
+        }
     }
 
     /** 踢玩家下线 */
@@ -185,10 +212,16 @@ public class AdminGameServerController implements InitPrint {
         long rowCount = queryBuilder.findCount();
         List<ServerInfoEntity> list2Entity = queryBuilder.findList2Entity(ServerInfoEntity.class);
 
+        ServerShowNameGlobalData showNameGlobalData = globalDataService.get(GlobalDataConst.ServerNameGlobalData);
+        ConcurrentHashMap<Integer, ServerShowName> serverNameMap = showNameGlobalData.getServerNameMap();
+
         List<JSONObject> list = new ArrayList<>();
         for (ServerInfoEntity entity : list2Entity) {
             JSONObject jsonObject = entity.toJSONObject();
             jsonObject.remove("token");
+            ServerShowName serverShowName = serverNameMap.get(entity.getServerId());
+            jsonObject.put("showName", FunctionUtil.nullDefaultValue(serverShowName, ServerShowName::getName, ""));
+            jsonObject.put("showNameExpireTime", FunctionUtil.nullDefaultValue(serverShowName, v -> Util.formatWebDate(v.getExpireTime()), ""));
             jsonObject.put("openTime", Util.formatWebDate(entity.getOpenTime()));
             jsonObject.put("maintenanceTime", Util.formatWebDate(entity.getMaintenanceTime()));
             jsonObject.put("lastSyncTime", Util.formatWebDate(entity.getLastSyncTime()));

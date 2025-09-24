@@ -76,15 +76,18 @@
             // language=HTML
             let tr = `
                 <tr>
-                    <td>
+                    <td style="width: 180px;">
                         <a href="#">删除</a>
-                        <a href="#" onclick="editServer(${row.serverId})">踢下线</a>
+                        <a href="#" onclick="kick(${row.serverId})">踢下线</a>
                         <a href="#" onclick="editServer(${row.serverId},'${row.name}','${row.openTime}','${row.maintenanceTime}','${row.showLevel}')">修改</a>
+                        <a href="#" onclick="editShowName(${row.serverId},'${row.name}','${row.showName}','${row.showNameExpireTime}')">冠名</a>
                     </td>
                     <td>${index}</td>
                     <td>${row.serverId}</td>
                     <td>${row.mainId}</td>
                     <td>${row.name}</td>
+                    <td>${row.showName}</td>
+                    <td>${row.showNameExpireTime}</td>
                     <td>${row.openTime}</td>
                     <td>${row.maintenanceTime}</td>
                     <td>${row.host}</td>
@@ -200,6 +203,46 @@
             }).send();
         }
 
+        function editShowName(serverId, serverName, showName, showNameExpireTime) {
+            // language=HTML
+            let content = `
+                <div>
+                    <ul>
+                        <li><label>服务ID:</label><span>${serverId}-${serverName}</span></li>
+                        <li>
+                            <label for="updateShowName">服务名字:</label><input id="updateShowName" type="text" value="${showName}">
+                        </li>
+                        <li>
+                            <label for="updateShowNameExpireTime">开服时间:</label><input id="updateShowNameExpireTime" type="datetime-local" value="${showNameExpireTime}"/>
+                        </li>
+                    </ul>
+                </div>
+            `;
+
+            let alertBox = new wxd.message.Alert(content, "区服冠名");
+            alertBox.okShow = "提交";
+            alertBox.okCallback = () => {
+                return new wxd.netty.PostRequest(
+                    "/admin/gameserver/editShowName",
+                    {
+                        serverId: serverId,
+                        showName: $("#updateShowName").val(),
+                        showNameExpireTime: $("#updateShowNameExpireTime").val()
+                    },
+                    (data) => {
+                        wxd.message.notice(data.msg);
+                        if (data.code === 1) {
+                            search();
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                ).async(false).send();
+            };
+            alertBox.show();
+        }
+
         function addServer() {
             // language=HTML
             let content = `
@@ -300,11 +343,13 @@
     <table>
         <thead>
         <tr>
-            <th>操作</th>
+            <th style="width: 180px;">操作</th>
             <th>序号</th>
             <th>区分ID</th>
             <th>主服ID</th>
             <th>名称</th>
+            <th>冠名</th>
+            <th>冠名到期时间</th>
             <th>开服时间</th>
             <th>维护时间</th>
             <th>IP</th>

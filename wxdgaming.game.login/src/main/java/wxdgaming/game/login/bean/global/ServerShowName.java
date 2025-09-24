@@ -2,6 +2,7 @@ package wxdgaming.game.login.bean.global;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  * 服务器冠名
@@ -11,6 +12,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Accessors(chain = true)
 public class ServerShowName {
 
     /** 服务器新名字 */

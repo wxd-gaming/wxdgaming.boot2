@@ -23,4 +23,12 @@ public class ServerShowNameGlobalData extends AbstractGlobalData {
      */
     private ConcurrentHashMap<Integer, ServerShowName> serverNameMap = new ConcurrentHashMap<>();
 
+    public String showName(int sid, String name) {
+        ServerShowName serverShowName = serverNameMap.get(sid);
+        if (serverShowName != null && System.currentTimeMillis() < serverShowName.getExpireTime()) {
+            return serverShowName.getName();
+        }
+        return name;
+    }
+
 }
