@@ -22,11 +22,11 @@
 
         a:visited { color: #0866b4;}
 
-        .message_alert_c_1 li {height: 23px;line-height: 20px;}
+        .alertBoxBg .alertBox li {height: 23px;line-height: 20px;}
 
-        .message_alert_c_1 label {padding-left: 5px;padding-right: 5px;text-align: right;width: 80px;display: inline-block;}
+        .alertBoxBg .alertBox label {padding-left: 5px;padding-right: 5px;text-align: right;width: 80px;display: inline-block;}
 
-        .message_alert_c_1 input, .message_alert_c_1 select {width: 180px;border: #8c8c8c 1px solid;}
+        .alertBoxBg .alertBox input, .alertBoxBg .alertBox select {width: 180px;border: #8c8c8c 1px solid;}
     </style>
     <script>
 
@@ -135,8 +135,7 @@
                     wxd.message.notice("请填写完整信息");
                     return;
                 }
-                let needHide = true;
-                new wxd.netty.PostRequest(
+                return new wxd.netty.PostRequest(
                     "/admin/account/edit",
                     {
                         userName: userName,
@@ -148,12 +147,14 @@
                         if (data.code === 1) {
                             wxd.message.notice("添加成功");
                             search();
+                            return true;
                         } else {
                             wxd.message.notice(data.msg);
-                            needHide = false;
+                            return false;
                         }
-                    }).async(false).send();
-                return needHide;
+                    })
+                    .async(false)
+                    .send();
             };
             alertBox.show();
         }
@@ -188,8 +189,7 @@
                     wxd.message.notice("请填写完整信息");
                     return;
                 }
-                let needHide = true;
-                new wxd.netty.PostRequest(
+                return new wxd.netty.PostRequest(
                     "/admin/account/add",
                     {
                         userName: userName,
@@ -201,14 +201,14 @@
                         if (data.code === 1) {
                             wxd.message.notice("添加成功");
                             search();
+                            return true;
                         } else {
                             wxd.message.notice(data.msg);
-                            needHide = false;
+                            return false;
                         }
                     })
                     .async(false)
                     .send();
-                return needHide;
             };
             alertBox.show();
         }

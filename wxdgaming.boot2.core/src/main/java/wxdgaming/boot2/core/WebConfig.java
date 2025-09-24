@@ -16,13 +16,14 @@ public class WebConfig implements WebMvcConfigurer {
         }});
     }
 
-    @Override public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://127.0.0.1:18888") // 替换为你的前端地址
-                .allowedMethods("*")
-                .allowedHeaders("*")
-                .allowCredentials(true)  // 关键配置
-                .maxAge(3600);
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")  // 所有路径
+                .allowedOriginPatterns("*") // This works with allowCredentials
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 允许的方法
+                .allowedHeaders("*") // 允许所有头
+                .allowCredentials(true) // 允许凭证
+                .maxAge(3600); // 预检请求的缓存时间
     }
 
 }
