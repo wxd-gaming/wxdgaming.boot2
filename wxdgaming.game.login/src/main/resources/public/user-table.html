@@ -128,12 +128,12 @@
         function whiteLogin(account) {
             let urlQuery = new wxd.Map().loadSearch();
             urlQuery.put("account", account);
-            wxd.netty.post("/admin/userData/whiteLogin", urlQuery.toString(), (data) => {
+            new wxd.netty.PostRequest("/admin/userData/whiteLogin", urlQuery.toString(), (data) => {
                 wxd.message.notice(data.msg);
                 if (data.code === 1) {
                     search();
                 }
-            });
+            }).send();
         }
 
         function banLogin(account, banTime) {
@@ -150,20 +150,19 @@
                 let urlQuery = new wxd.Map().loadSearch();
                 urlQuery.put("account", $("#labAccount").text());
                 urlQuery.put("banTime", $("#banTime").val());
-                let needHide = true;
-                wxd.netty.post({
-                    url: "/admin/userData/banLogin",
-                    params: urlQuery.toString(),
-                    onload: (data) => {
+                return new wxd.netty.PostRequest(
+                    "/admin/userData/banLogin",
+                    urlQuery.toString(),
+                    (data) => {
                         wxd.message.notice(data.msg);
                         if (data.code === 1) {
                             search();
+                            return true;
                         } else {
-                            needHide = false;
+                            return false;
                         }
-                    },
-                    async: false
-                });
+                    }).async(false)
+                    .send();
             };
             alertBox.show();
         }
@@ -184,19 +183,15 @@
                     account: $("#labAccount").text(),
                     gmLevel: $("#gmLevel").val(),
                 }
-                let needHide = true;
-                wxd.netty.post({
-                    url: "/admin/userData/gmLevel", params: formData,
-                    async: false,
-                    onload: (data) => {
+                return new wxd.netty.PostRequest(
+                    "/admin/userData/gmLevel", formData,
+                    (data) => {
                         wxd.message.notice(data.msg);
                         if (data.code === 1) {
                             needHide = true;
                             search();
                         }
-                    }
-                });
-                return needHide;
+                    }).async(false).send();
             };
             alertBox.show();
         }

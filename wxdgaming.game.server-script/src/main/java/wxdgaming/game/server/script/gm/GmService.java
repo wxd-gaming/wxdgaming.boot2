@@ -12,6 +12,7 @@ import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.game.message.gm.GMBean;
 import wxdgaming.game.message.gm.GmGroup;
 import wxdgaming.game.message.gm.ResGmList;
+import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.gm.ann.GM;
 import wxdgaming.game.server.script.tips.TipsService;
@@ -30,11 +31,13 @@ import java.util.*;
 @Service
 public class GmService extends HoldApplicationContext {
 
-    private final TipsService tipsService;
+    final GameServerProperties gameServerProperties;
+    final TipsService tipsService;
     Map<String, ApplicationContextProvider.ProviderMethod> gmMap = new HashMap<>();
     ResGmList resGmList = new ResGmList();
 
-    public GmService(TipsService tipsService) {
+    public GmService(GameServerProperties gameServerProperties, TipsService tipsService) {
+        this.gameServerProperties = gameServerProperties;
         this.tipsService = tipsService;
     }
 
@@ -79,7 +82,7 @@ public class GmService extends HoldApplicationContext {
             return;
         }
         GM annotation = providerMethod.getMethod().getAnnotation(GM.class);
-        if (annotation.level() > player.getUserMapping().getUserDataVo().getGmLevel()) {
+        if (!gameServerProperties.isDebug() && annotation.level() > player.getUserMapping().getUserDataVo().getGmLevel()) {
             tipsService.tips(player, "权限不足: " + cmd);
             return;
         }

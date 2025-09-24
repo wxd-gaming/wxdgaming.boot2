@@ -40,13 +40,14 @@
         $(() => {
 
             let map = new wxd.Map().loadSearch();
-            wxd.netty.post("/author/check", map.toString(), (data) => {
+            new wxd.netty.PostRequest("/author/check", map.toString(), (data) => {
                 if (data.code === 1) {
+                    sessionStorage.setItem("authorization", data.data);
                     $(".nav").append(`<object data="nav.html"></object>`);
                 } else {
-                    window.top.location.href = "/login.html";
+                    window.top.location = "/login.html";
                 }
-            });
+            }).send();
 
         });
 

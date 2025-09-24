@@ -6,6 +6,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
+import wxdgaming.game.authority.AuthorityScan;
 
 /**
  * 日子中心启动器
@@ -18,6 +19,7 @@ import wxdgaming.boot2.starter.scheduled.ScheduledScan;
         scanBasePackageClasses = {
                 PgsqlScan.class,
                 ScheduledScan.class,
+                AuthorityScan.class,
                 LogServerApplication.class
         }
 )

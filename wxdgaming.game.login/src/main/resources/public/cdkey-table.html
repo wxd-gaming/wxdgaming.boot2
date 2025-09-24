@@ -137,25 +137,25 @@
 
         function gainCode(cdKeyId, num) {
             let param = "cdKeyId=" + cdKeyId + "&num=" + num;
-            wxd.netty.post("/admin/cdkey/gainCode", param, function (data) {
+            new wxd.netty.PostRequest("/admin/cdkey/gainCode", param, (data) => {
                 if (data.code === 1) {
                     new wxd.message.Alert(formatForDisplay(data.data), "提示").show();
                 } else {
-                    new wxd.message.notice(data.msg);
+                    wxd.message.notice(data.msg);
                 }
-            });
+            }).send();
         }
 
 
         function queryCode(cdKeyId) {
             let param = "cdKeyId=" + cdKeyId;
-            wxd.netty.post("/admin/cdkey/queryCode", param, function (data) {
+            new wxd.netty.PostRequest("/admin/cdkey/queryCode", param, (data) => {
                 if (data.code === 1) {
                     new wxd.message.Alert(formatForDisplay(data.data), "提示").show();
                 } else {
-                    new wxd.message.notice(data.msg);
+                    wxd.message.notice(data.msg);
                 }
-            });
+            }).send();
         }
 
     </script>

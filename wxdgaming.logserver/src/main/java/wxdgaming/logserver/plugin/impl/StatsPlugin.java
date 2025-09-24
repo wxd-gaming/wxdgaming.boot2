@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.ApplicationContextProvider;
-import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.logserver.bean.LogEntity;
@@ -34,31 +33,35 @@ public class StatsPlugin extends AbstractPlugin {
         for (int i = 0; i <= beforeDay; i++) {
             LocalDate localDate = startDate.plusDays(i);
             log.info("开始处理{}", localDate);
-            int dataKey = localDate.getYear() * 10000 + localDate.getMonthValue() * 100 + localDate.getDayOfMonth();
-            int registerRoleCount = registerRoleCount(sqlDataHelper, dataKey);
-            int registerAccountCount = registerAccountCount(sqlDataHelper, dataKey);
-            int activeAccountCount = activeAccountCount(sqlDataHelper, dataKey);
-            JSONObject jsonObject = new JSONObject(true);
-            jsonObject.put("registerAccountCount", registerAccountCount);
-            jsonObject.put("registerRoleCount", registerRoleCount);
-            jsonObject.put("activeAccountCount", activeAccountCount);
-            jsonObject.put("orderCount", 0);
-            jsonObject.put("orderMoneyCount", 0);
-            JSONObject loginAccountDay = MapOf.newJSONObject();
-            if (registerAccountCount > 0) {
-                for (int j = 0; j <= beforeDay; j++) {
-                    LocalDate loginDate = localDate.plusDays(j);
-                    if (loginDate.isAfter(now))
-                        break;
-                    int loginDataKey = loginDate.getYear() * 10000 + loginDate.getMonthValue() * 100 + loginDate.getDayOfMonth();
-                    int loginAccountCount = loginAccountCount(sqlDataHelper, dataKey, loginDataKey);
-                    float v = loginAccountCount * 10000 / loginAccountCount / 100f;
-                    loginAccountDay.put(String.valueOf(j + 1), String.format("%.2f", v) + "%");
+            try {
+                int dataKey = localDate.getYear() * 10000 + localDate.getMonthValue() * 100 + localDate.getDayOfMonth();
+                int registerRoleCount = registerRoleCount(sqlDataHelper, dataKey);
+                int registerAccountCount = registerAccountCount(sqlDataHelper, dataKey);
+                int activeAccountCount = activeAccountCount(sqlDataHelper, dataKey);
+                JSONObject jsonObject = new JSONObject(true);
+                jsonObject.put("registerAccountCount", registerAccountCount);
+                jsonObject.put("registerRoleCount", registerRoleCount);
+                jsonObject.put("activeAccountCount", activeAccountCount);
+                jsonObject.put("orderCount", 0);
+                jsonObject.put("arpu", 0.0f);
+                jsonObject.put("arppu", 0.0f);
+                if (registerAccountCount > 0) {
+                    for (int j = 0; j <= beforeDay; j++) {
+                        LocalDate loginDate = localDate.plusDays(j);
+                        if (loginDate.isAfter(now))
+                            break;
+                        int loginDataKey = loginDate.getYear() * 10000 + loginDate.getMonthValue() * 100 + loginDate.getDayOfMonth();
+                        int loginAccountCount = loginAccountCount(sqlDataHelper, dataKey, loginDataKey);
+                        if (loginAccountCount < 1) continue;
+                        float v = loginAccountCount * 10000 / registerAccountCount / 100f;
+                        jsonObject.put("login_" + (j + 1), String.format("%.2f", v) + "%");
+                    }
                 }
+                log.info("{} {} {}", localDate, dataKey, jsonObject);
+                addLog(sqlDataHelper, "stats", MyClock.time2Milli(localDate), jsonObject);
+            } catch (Exception e) {
+                log.error("处理异常 {}", localDate, e);
             }
-            jsonObject.put("loginAccountDay", loginAccountDay);
-            log.info("{} {} {}", localDate, dataKey, jsonObject);
-            addLog(sqlDataHelper, "stats", MyClock.time2Milli(localDate), jsonObject);
         }
 
     }

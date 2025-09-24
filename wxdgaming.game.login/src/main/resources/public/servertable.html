@@ -167,26 +167,24 @@
             let alertBox = new wxd.message.Alert(content, "编辑区服");
             alertBox.okShow = "确认";
             alertBox.okCallback = () => {
-                let needHide = true;
-                wxd.netty.post({
-                    url: "/admin/gameserver/editServer",
-                    params: {
+                return new wxd.netty.PostRequest(
+                    "/admin/gameserver/editServer",
+                    {
                         serverId: serverId,
                         serverName: $("#updateServerName").val(),
                         openTime: $("#updateOpenTime").val(),
                         maintenanceTime: $("#updateMaintenanceTime").val()
                     },
-                    onload: (data) => {
+                    (data) => {
                         wxd.message.notice(data.msg);
                         if (data.code === 1) {
                             search();
+                            return true;
                         } else {
-                            needHide = false;
+                            return false;
                         }
-                    },
-                    async: false
-                });
-                return needHide;
+                    }).async(false)
+                    .send();
             };
             alertBox.show();
         }
@@ -208,25 +206,22 @@
             alertBox.okShow = "新增";
             alertBox.okCallback = () => {
                 console.log("addServer");
-                let needHide = true;
-                wxd.netty.post({
-                    url: "/admin/gameserver/addServer",
-                    params: {
+                return new wxd.netty.PostRequest(
+                    "/admin/gameserver/addServer",
+                    {
                         serverId: $("#addServerId").val(),
                         serverName: $("#addServerName").val(),
                         openTime: $("#addOpenTime").val()
                     },
-                    onload: (data) => {
+                    (data) => {
                         wxd.message.notice(data.msg);
                         if (data.code === 1) {
                             search();
+                            return true;
                         } else {
-                            needHide = false;
+                            return false;
                         }
-                    },
-                    async: false
-                });
-                return needHide;
+                    }).async(false).send();
             };
             alertBox.show();
         }

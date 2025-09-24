@@ -620,65 +620,90 @@ const wxd = {
             }
         },
 
-        /**
-         * post 请求
-         * @param url 地址
-         * @param params 参数
-         * @param onLoad 接收消息回调
-         * @param onError 异常回调
-         * @param contentType 数据格式类型
-         * @param async false 表示同步请求
-         * @param time_out 超时时间
-         */
-        post: function (url, params, onLoad, onError, contentType, async, time_out) {
-            if (wxd.isNull(async)) {
-                async = true;
-            }
-            if (wxd.isNull(time_out)) {
-                time_out = 3000;
-            }
-            if (wxd.isNull(contentType))
-                contentType = "application/x-www-form-urlencoded; charset=UTF-8";
-            $.ajax({
-                type: "post",
-                url: url,
-                timeout: time_out, //超时时间设置，单位毫秒
-                contentType: contentType,
-                data: params,
-                async: async,
-                beforeSend: function (xhr) {
-                    let token = localStorage.getItem("token");
-                    if (wxd.notNull(token)) {
-                        xhr.setRequestHeader('token', token);
-                    }
-                },
-                success: function (data) {
-                    if (!wxd.isNull(onLoad)) {
-                        try {
-                            onLoad(data);
-                        } catch (e) {
-                            console.error(e);
-                            console.error(JSON.stringify(data));
-                            wxd.message.notice("error: " + e, true);
-                        }
-                    } else {
-                        console.log(data);
-                    }
-                    wxd.loading_close();
-                }, error: function (jqXHR, textStatus, errorMsg) {
-                    // jqXHR 是经过jQuery封装的XMLHttpRequest对象
-                    // textStatus 可能为null、 'timeout'、 'error'、 'abort'和'parsererror'等
-                    wxd.loading_close();
-                    if (!wxd.isNull(onError)) {
-                        onError(errorMsg);
-                    } else {
-                        console.error("error: " + errorMsg);
-                        wxd.message.notice("error: " + errorMsg, true);
-                    }
-                }
-            });
-        },
+        PostRequest: class {
+            /**ddd*/
+            url;
+            params;
+            _onload;
+            _onerror = (textStatus, errorMsg) => {
+                console.error(textStatus + " - " + errorMsg);
+                wxd.message.notice(textStatus + " - " + errorMsg, true);
+            };
+            contentType = "application/x-www-form-urlencoded; charset=UTF-8";
+            _async = true;
+            time_out = 3000;
 
+            constructor(url, params, onload) {
+                this.url = url;
+                this.params = params;
+                this._onload = onload;
+            }
+
+            onload(value) {
+                this._onload = value;
+                return this;
+            }
+
+            async(value) {
+                this._async = value;
+                return this;
+            }
+
+            onerror(value) {
+                this._onerror = value;
+                return this;
+            }
+
+            /**
+             * 发送请求
+             * @returns async false 返回值通过onload函数获取
+             */
+            send() {
+                console.log("url:" + this.url + ", post: " + this.params);
+                let ret = null;
+                $.ajax({
+                    type: "post",
+                    url: this.url,
+                    timeout: this.time_out, //超时时间设置，单位毫秒
+                    contentType: this.contentType,
+                    data: this.params,
+                    async: this._async,
+                    xhrFields: {
+                        withCredentials: true // 必须设置此项
+                    },
+                    beforeSend: (xhr) => {
+                        let token = sessionStorage.getItem("authorization");
+                        if (wxd.notNull(token)) {
+                            console.log("authorization:" + token)
+                            xhr.setRequestHeader('authorization', token);
+                        }
+                    },
+                    success: (data) => {
+                        if (!wxd.isNull(this._onload)) {
+                            try {
+                                ret = this._onload(data);
+                            } catch (e) {
+                                console.error(e);
+                                console.error(JSON.stringify(data));
+                                wxd.message.notice("error: " + e, true);
+                            }
+                        } else {
+                            console.log(data);
+                        }
+                        wxd.loading_close();
+                    }, error: (jqXHR, textStatus, errorMsg) => {
+                        // jqXHR 是经过jQuery封装的XMLHttpRequest对象
+                        // textStatus 可能为null、 'timeout'、 'error'、 'abort'和'parsererror'等
+                        wxd.loading_close();
+                        if (!wxd.isNull(this._onerror)) {
+                            this._onerror(errorMsg);
+                        }
+                    }
+                });
+                return ret;
+            }
+
+        }
     },
 
     /** 页面消息提示*/

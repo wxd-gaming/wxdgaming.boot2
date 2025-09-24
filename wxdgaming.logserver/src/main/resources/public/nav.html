@@ -69,7 +69,7 @@
 
         $(() => {
             let url = "/admin/log/nav";
-            wxd.netty.post(url, "", (response) => {
+            new wxd.netty.PostRequest(url, "", (response) => {
                 if (response.code === 1) {
                     let data = response.data;
                     for (let i = 0; i < data.length; i++) {
@@ -80,7 +80,7 @@
                         $(".log_nav").append(l);
                     }
                 }
-            });
+            }).send();
         });
 
     </script>

@@ -34,7 +34,10 @@ public class AdminUserToken extends ObjectBase {
     public static AdminUserToken parse(HttpServletRequest request, String jwtKey) {
         String token = SpringUtil.getCookieValue(request, authorization);
         if (StringUtils.isBlank(token)) {
-            token = request.getParameter("token");
+            token = request.getHeader(authorization);
+        }
+        if (StringUtils.isBlank(token)) {
+            token = request.getParameter(authorization);
         }
         if (StringUtils.isBlank(token)) {
             return null;

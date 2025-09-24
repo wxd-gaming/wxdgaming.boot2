@@ -6,6 +6,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.collection.ListOf;
@@ -91,7 +92,8 @@ public class RobotMainService {
                         log.info("游戏服。。。。。");
                         return;
                     }
-                    JSONObject jsonObject = RandomUtils.randomItem(serverList);
+                    List<JSONObject> list = serverList.stream().filter(v -> StringUtils.isNotBlank(v.getString("host"))).toList();
+                    JSONObject jsonObject = RandomUtils.randomItem(list);
                     log.info("登录成功：{}, 选择游戏服={}", robot, jsonObject);
                     String host = jsonObject.getString("host");
                     int port = jsonObject.getInteger("port");

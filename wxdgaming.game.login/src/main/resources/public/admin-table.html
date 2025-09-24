@@ -136,15 +136,15 @@
                     return;
                 }
                 let needHide = true;
-                wxd.netty.post({
-                    url: "/admin/account/edit",
-                    params: {
+                new wxd.netty.PostRequest(
+                    "/admin/account/edit",
+                    {
                         userName: userName,
                         password: password,
                         admin: admin,
                         phone: phone
                     },
-                    onload: function (data) {
+                    (data) => {
                         if (data.code === 1) {
                             wxd.message.notice("添加成功");
                             search();
@@ -152,9 +152,7 @@
                             wxd.message.notice(data.msg);
                             needHide = false;
                         }
-                    },
-                    async: false
-                });
+                    }).async(false).send();
                 return needHide;
             };
             alertBox.show();
@@ -191,15 +189,15 @@
                     return;
                 }
                 let needHide = true;
-                wxd.netty.post({
-                    url: "/admin/account/add",
-                    params: {
+                new wxd.netty.PostRequest(
+                    "/admin/account/add",
+                    {
                         userName: userName,
                         password: password,
                         admin: admin,
                         phone: phone
                     },
-                    onload: function (data) {
+                    (data) => {
                         if (data.code === 1) {
                             wxd.message.notice("添加成功");
                             search();
@@ -207,9 +205,9 @@
                             wxd.message.notice(data.msg);
                             needHide = false;
                         }
-                    },
-                    async: false
-                });
+                    })
+                    .async(false)
+                    .send();
                 return needHide;
             };
             alertBox.show();

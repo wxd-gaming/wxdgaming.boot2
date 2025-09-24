@@ -3,9 +3,9 @@ package wxdgaming.logserver.module.logs;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
-import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
@@ -112,6 +112,11 @@ public class LogService implements InitPrint {
                         fieldHtmlStyle = "";
                     }
                     jsonObject.put("style", fieldHtmlStyle);
+                    String fieldHtmlTips = logField.getFieldHtmlTips();
+                    if (StringUtils.isBlank(fieldHtmlTips)) {
+                        fieldHtmlTips = "";
+                    }
+                    jsonObject.put("title", fieldHtmlTips);
                     return jsonObject;
                 })
                 .toList();

@@ -6,9 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.core.io.FileUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.Tuple2;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.batis.TableMapping;
@@ -80,9 +80,11 @@ public class DataCenterService implements InitPrint {
         dataHelper.checkTable(tableStructMap, tableMapping, tableName, tableComment, checkPartition);
         if (checkPartition) {
             /*TODO 处理分区表 */
-            LocalDateTime localDate = LocalDateTime.now().plusDays(-2);
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < 5; i++) {
+            LocalDateTime now = LocalDateTime.now();
+            int beforeDay = 121;
+            LocalDateTime localDate = now.plusDays(-beforeDay);
+            for (int i = 0; i <= beforeDay; i++) {
                 /*创建表分区*/
                 String from = MyClock.formatDate("yyyyMMdd", localDate.plusDays(i));
                 String to = MyClock.formatDate("yyyyMMdd", localDate.plusDays(i + 1));

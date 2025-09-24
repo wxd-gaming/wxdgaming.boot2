@@ -20,5 +20,6 @@ public class LogField extends ObjectBase {
     private String fieldComment;
     private String fieldType;
     private String fieldHtmlStyle;
+    private String fieldHtmlTips;
 
 }

@@ -11,13 +11,6 @@
     <link rel="stylesheet" type="text/css" href="/style/table.css"/>
     <style>
 
-        html, body {
-            display: block;overflow: auto;width: 100%;height: 100%;
-            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
-            color: #535252;
-            min-width: 1400px;
-        }
-
         a:link {color: #0866b4;}
 
         a:visited { color: #0866b4;}
@@ -75,7 +68,12 @@
                 let columnName = column.name;
                 let columnComment = column.comment;
                 let columnStyle = column.style;
-                tr += `<td ondblclick="alertShow(this,'${columnComment}');" style="${columnStyle}">${row[columnName]}</td>`;
+                let columntitle = column.title;
+                let rowValue = row[columnName];
+                if (rowValue === null || rowValue === undefined) {
+                    rowValue = "";
+                }
+                tr += `<td ondblclick="alertShow(this,'${columnComment}');" style="${columnStyle}" title="${columntitle}">${rowValue}</td>`;
             }
             tr += `</tr>`;
             return tr;
@@ -98,7 +96,7 @@
             let url = "/admin/log/title";
             let map = new wxd.Map();
             map.loadSearch();
-            wxd.netty.post(url, map.toString(), (response) => {
+            new wxd.netty.PostRequest(url, map.toString(), (response) => {
                 if (response.code === 1) {
                     document.title = response.comment;
                     $(".tableDom").attr("style", $(".tableDom").attr("style") + "" + response.style);
@@ -108,12 +106,12 @@
                         pageView.columns[item.name] = item;
                         $("#where").append(`<option value="${item.name}">${item.comment}</option>`);
                         $("#orderField").append(`<option value="${item.name}">${item.comment}</option>`);
-                        let l = `<th class="${item.name}" style="${item.style}">${item.comment}</th>`;
+                        let l = `<th class="${item.name}" style="${item.style}" title="${item.title}">${item.comment}</th>`;
                         $(".table_head").append(l);
                     }
                     search();
                 }
-            });
+            }).send();
 
         });
 
@@ -153,58 +151,60 @@
     </script>
 </head>
 <body>
-<div class="btn_box" style="width: 100%;height: 180px;padding-left: 20px; padding-top: 8px; text-align: left;vertical-align: center;">
-    <label for="minTime">开始日期: </label><input id="minTime" type="date"/>
-    <label for="maxTime">结束日期: </label><input id="maxTime" type="date"/>
-    <br>
-    <label for="where">查询条件:</label>
+<div class="root">
+    <div class="btn_box" style="width: 100%;min-width: 1600px;height: 180px;padding-left: 20px; padding-top: 8px; text-align: left;vertical-align: center;">
+        <label for="minTime">开始日期: </label><input id="minTime" type="date"/>
+        <label for="maxTime">结束日期: </label><input id="maxTime" type="date"/>
+        <br>
+        <label for="where">查询条件:</label>
 
-    <select id="where">
+        <select id="where">
 
-    </select>
+        </select>
 
-    <select id="and" style="width: 60px;">
-        <option value="=">=</option>
-        <option value="<="><=</option>
-        <option value="<"><</option>
-        <option value=">=">>=</option>
-        <option value=">">></option>
-    </select>
+        <select id="and" style="width: 60px;">
+            <option value="=">=</option>
+            <option value="<="><=</option>
+            <option value="<"><</option>
+            <option value=">=">>=</option>
+            <option value=">">></option>
+        </select>
 
-    <input id="whereValue" type="text"/>
-    <input type="button" onclick="addWhere();" value="添加"/>
-    <input type="button" onclick="clearWhere();" value="清理"/>
-    <br>
-    <label for="labWhere">查询条件:</label><label id="labWhere"></label>
-    <br>
-    <label for="orderField">排序条件:</label>
+        <input id="whereValue" type="text"/>
+        <input type="button" onclick="addWhere();" value="添加"/>
+        <input type="button" onclick="clearWhere();" value="清理"/>
+        <br>
+        <label for="labWhere">查询条件:</label><label id="labWhere"></label>
+        <br>
+        <label for="orderField">排序条件:</label>
 
-    <select id="orderField">
+        <select id="orderField">
 
-    </select>
+        </select>
 
-    <select id="orderOption" style="width: 60px;">
-        <option value="DESC">降序</option>
-        <option value="ASC">升序</option>
-    </select>
+        <select id="orderOption" style="width: 60px;">
+            <option value="DESC">降序</option>
+            <option value="ASC">升序</option>
+        </select>
 
-    <input type="button" onclick="addOrder();" value="添加"/>
-    <input type="button" onclick="clearOrder();" value="清理"/>
-    <br>
-    <label for="labOrderBy">排序条件:</label><label id="labOrderBy"></label>
-    <br>
-    <br>
-    <button onclick="search();">查询</button>
-</div>
-<div class="tableDom" style="position: absolute;left: 20px;top: 200px;right: 20px;bottom: 40px;padding-right: 10px;border-radius: 0;">
-    <table>
-        <thead>
-        <tr class="table_head">
-        </tr>
-        </thead>
-        <tbody class="tbody">
-        </tbody>
-    </table>
+        <input type="button" onclick="addOrder();" value="添加"/>
+        <input type="button" onclick="clearOrder();" value="清理"/>
+        <br>
+        <label for="labOrderBy">排序条件:</label><label id="labOrderBy"></label>
+        <br>
+        <br>
+        <button onclick="search();">查询</button>
+    </div>
+    <div class="tableDom" style="position: absolute;left: 20px;top: 200px;right: 20px;bottom: 40px;padding-right: 10px;border-radius: 0;min-width: 1600px;">
+        <table>
+            <thead>
+            <tr class="table_head">
+            </tr>
+            </thead>
+            <tbody class="tbody">
+            </tbody>
+        </table>
+    </div>
 </div>
 </body>
 </html>

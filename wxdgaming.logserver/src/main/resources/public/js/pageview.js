@@ -59,10 +59,10 @@ class PageView {
     remoteGetData(postQuery) {
         postQuery.put("pageIndex", this.pageIndex());
         postQuery.put("pageSize", this.pageSize());
-        wxd.netty.post({
-            url: this.url,
-            params: postQuery.toString(),
-            onload: (responseText) => {
+        new wxd.netty.PostRequest(
+            this.url,
+            postQuery.toString(),
+            (responseText) => {
                 if (responseText.code !== 1) {
                     new wxd.message.Alert("异常：" + responseText.msg).show();
                     return
@@ -72,13 +72,7 @@ class PageView {
                 $("#lab_row_count").text(responseText.rowCount);
                 this.pageMaxIndex();
                 this.showData();
-            },
-            onerror: (errorMsg) => {
-                new wxd.message.Alert("异常：" + errorMsg).show();
-            },
-            async: true,
-            time_out: 30_000
-        });
+            }).send();
     }
 
     pageSize() {

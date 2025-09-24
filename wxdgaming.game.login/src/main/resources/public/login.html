@@ -14,24 +14,19 @@
     <script>
 
         function login() {
-            wxd.netty.post({
-                url: "/web/account/login",
-                params: {
+            new wxd.netty.PostRequest("/web/account/login", {
                     userName: $("#accountName").val(),
                     password: $("#password").val()
                 },
-                onload: (responseText) => {
+                (responseText) => {
                     if (responseText.code === 1) {
+                        sessionStorage.setItem("authorization", responseText.data);
                         window.top.location.href = "/index.html";
                     } else {
                         new wxd.message.Alert(responseText.msg).show();
                     }
-                },
-                onerror: (error) => {
-                    new wxd.message.Alert(error).show();
-                },
-                async: true
-            });
+                }
+            ).send();
         }
     </script>
 

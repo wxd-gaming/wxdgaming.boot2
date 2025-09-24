@@ -8,7 +8,6 @@
     <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
     <title>登录服</title>
     <style>
-        html, body {display: block;overflow: hidden;width: 100%;height: 100%;}
 
         table, tbody, tr {
             display: block;
@@ -33,38 +32,44 @@
     </style>
     <script>
         function changeContent(url) {
-            let obj = `<object id="content_body" data="${url}"></object>`;
+            let authorization = sessionStorage.getItem("authorization");
+            let obj = `<object id="content_body" data="${url}?authorization=${authorization}"></object>`;
             $('.content').html(obj);
         }
 
         $(() => {
             let map = new wxd.Map().loadSearch();
-            wxd.netty.post("/web/account/check", map.toString(), (data) => {
-                console.log(data);
-                if (data.code === 1) {
-                    $(".nav").append(`<object data="nav.html"></object>`);
-                } else {
-                    let alertBox = new wxd.message.Alert("请重新登录", "提示");
-                    alertBox.okCallback = () => {
-                        window.top.location.href = "/login.html";
-                    };
-                    alertBox.show();
-                }
-            });
+            map.put("authorization", sessionStorage.getItem("authorization"));
+            new wxd.netty.PostRequest("/web/account/check", map.toString(),
+                (data) => {
+                    if (data.code === 1) {
+                        sessionStorage.setItem("authorization", data.data);
+                        $(".nav").append(`<object data="nav.html"></object>`);
+                    } else {
+                        let alertBox = new wxd.message.Alert("请重新登录", "提示");
+                        alertBox.okCallback = () => {
+                            window.top.location.href = "/login.html";
+                        };
+                        alertBox.show();
+                    }
+                })
+                .send();
         });
 
     </script>
 </head>
 <body>
-<table>
-    <tbody>
-    <tr>
-        <td class="nav">
-        </td>
-        <td class="content">
-        <td>
-    </tr>
-    </tbody>
-</table>
+<div class="root">
+    <table style="min-width: 1400px;">
+        <tbody>
+        <tr>
+            <td class="nav">
+            </td>
+            <td class="content">
+            <td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

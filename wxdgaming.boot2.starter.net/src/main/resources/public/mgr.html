@@ -37,14 +37,14 @@
             let urlQuery = new wxd.Map().loadTopSearch()
                 .put("content", "1");
 
-            wxd.netty.post("/menu/list", urlQuery.toString(),
-                function (responseText) {
+            new wxd.netty.PostRequest("/menu/list", urlQuery.toString(),
+                (responseText) => {
                     for (const row of responseText.rows) {
                         let ls = `<a class="J_menuItem" href="${row.value}">${row.key}</a>`;
                         $("#side-menu-sub").append(ls);
                     }
-                }
-            );
+                })
+                .send();
 
         }
 

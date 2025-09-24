@@ -1,6 +1,6 @@
 package wxdgaming.boot2.core.token;
 
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.util.AesUtil;
 import wxdgaming.boot2.core.util.Base64Util;
@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-06-16 13:59
  **/
+@Slf4j
 public class JsonTokenBuilder {
 
     protected static final int[] ENCODE_KK = {2, 7, 3};
@@ -79,8 +80,10 @@ public class JsonTokenBuilder {
 
     /** 生成加密字符串 */
     public String compact() {
-        String dataString = jsonToken.getData().toString(SerializerFeature.MapSortField, SerializerFeature.SortField);
-        jsonToken.setSignature(Md5Util.md5DigestEncode0("#", dataString, key));
+        String dataString = jsonToken.getData().toString(FastJsonUtil.Writer_Features);
+        String join = String.join("#", dataString, key);
+        log.debug("md5join: {}", join);
+        jsonToken.setSignature(Md5Util.md5(join));
         byte[] jsonString = FastJsonUtil.toJSONBytes(jsonToken);
         String encode = Base64Util.encode2String(jsonString);
         encode = AesUtil.convert_ASE(encode, ENCODE_KK);

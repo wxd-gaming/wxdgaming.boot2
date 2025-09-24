@@ -51,11 +51,12 @@ public class AuthorController implements InitPrint {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
+                .maxAge(adminUserToken.getExpireTime() - System.currentTimeMillis())
                 .build();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(RunResult.ok());
+                .body(RunResult.ok().data(jsonToken));
     }
 
 }

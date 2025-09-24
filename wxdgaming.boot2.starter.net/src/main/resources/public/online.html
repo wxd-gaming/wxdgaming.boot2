@@ -31,10 +31,8 @@
         function ban(url, uid) {
             let urlQuery = new wxd.Map().loadSearch();
             urlQuery.put("uid", uid);
-            wxd.netty.post({
-                url: url,
-                params: urlQuery.toString(),
-                onload: function (responseText) {
+            new wxd.netty.PostRequest(url, urlQuery.toString())
+                .onload((responseText) => {
                     let alertBox = new wxd.message.Alert(JSON.stringify(responseText), "提示：");
                     alertBox.okShow = "关闭";
                     alertBox.onload = () => {
@@ -43,12 +41,9 @@
                         }, 1);
                     };
                     alertBox.show();
-                },
-                onerror: (errorMsg) => {
-                    new wxd.message.Alert("异常：" + errorMsg).show();
-                },
-                async: false
-            });
+                })
+                .async(false)
+                .send();
         }
 
         function searchName() {
@@ -56,25 +51,17 @@
             let urlQuery = new wxd.Map().loadSearch();
             urlQuery.put("search", $("#search").val());
             let url = "/gm/001/002/003/onlineBody";
-            wxd.netty.post({
-                url: url, params: urlQuery.toString(),
-                onload: function (responseText) {
-                    let parse = JSON.parse(responseText);
-                    $("tbody:first").html("");
-                    var index = 0;
-                    parse.forEach((row) => {
-                        index++;
-                        $("tbody:first").append(createRow(index, row));
-                    });
-                    wxd.message.tips_init_bind(); //初始化
-                    colse_loading();
-                },
-                onerror: (errorMsg) => {
-                    colse_loading();
-                    new wxd.message.Alert("异常：" + errorMsg).show();
-                },
-                async: false
-            });
+            new wxd.netty.PostRequest(url, urlQuery.toString(), (responseText) => {
+                let parse = JSON.parse(responseText);
+                $("tbody:first").html("");
+                var index = 0;
+                parse.forEach((row) => {
+                    index++;
+                    $("tbody:first").append(createRow(index, row));
+                });
+                wxd.message.tips_init_bind(); //初始化
+                colse_loading();
+            }).async(false).send();
         }
 
         function createRow(index, row) {
@@ -127,10 +114,8 @@
 
         $(() => {
             let url = "/gm/001/002/003/onlineBase";
-            wxd.netty.post({
-                url: url,
-                params: "",
-                onload: function (responseText) {
+            new wxd.netty.PostRequest(
+                url, "", (responseText) => {
                     let parse = JSON.parse(responseText);
                     $("#base").html("");
                     // language=HTML
@@ -153,12 +138,9 @@
                         <label>跨服用户：${parse.crossSize}</label>
                     `;
                     $("#base").append(base);
-                },
-                onerror: (errorMsg) => {
-                    new wxd.message.Alert("异常：" + errorMsg).show();
-                },
-                async: false
-            });
+                })
+                .async(false)
+                .send();
             searchName();
         });
 

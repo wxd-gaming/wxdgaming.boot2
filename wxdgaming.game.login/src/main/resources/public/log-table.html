@@ -98,7 +98,7 @@
             let url = "/admin/log/title";
             let map = new wxd.Map();
             map.loadSearch();
-            wxd.netty.post(url, map.toString(), (response) => {
+            new wxd.netty.PostRequest(url, map.toString(), (response) => {
                 if (response.code === 1) {
                     document.title = response.comment;
                     $(".tableDom").attr("style", $(".tableDom").attr("style") + "" + response.style);
@@ -113,8 +113,7 @@
                     }
                     search();
                 }
-            });
-
+            }).send();
         });
 
         let whereJsonArray = [];
