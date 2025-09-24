@@ -78,6 +78,7 @@
                 <tr>
                     <td>
                         <a href="#">删除</a>
+                        <a href="#" onclick="editServer(${row.serverId})">踢下线</a>
                         <a href="#" onclick="editServer(${row.serverId},'${row.name}','${row.openTime}','${row.maintenanceTime}','${row.showLevel}')">修改</a>
                     </td>
                     <td>${index}</td>
@@ -189,6 +190,14 @@
                     .send();
             };
             alertBox.show();
+        }
+
+        function kick(serverId) {
+            let urlQuery = new wxd.Map().loadSearch();
+            urlQuery.put("serverId", serverId);
+            new wxd.netty.PostRequest("/admin/gameserver/kick", urlQuery.toString(), (data) => {
+                wxd.message.notice(data.msg);
+            }).send();
         }
 
         function addServer() {

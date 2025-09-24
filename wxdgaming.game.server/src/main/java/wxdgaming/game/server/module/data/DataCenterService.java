@@ -1,6 +1,7 @@
 package wxdgaming.game.server.module.data;
 
 import com.alibaba.fastjson.JSONObject;
+import io.netty.channel.ChannelFuture;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import wxdgaming.boot2.core.keywords.KeywordsMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryResult;
 import wxdgaming.boot2.starter.net.SessionGroup;
+import wxdgaming.game.message.role.ResKick;
 import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.api.role.GetPlayerStrategy;
 import wxdgaming.game.server.api.role.GetPlayerStrategyFactory;
@@ -21,6 +23,7 @@ import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -98,6 +101,30 @@ public class DataCenterService extends HoldApplicationContext implements GetPlay
 
     @Override public void save(RoleEntity roleEntity) {
         getPlayerStrategyFactory.putCache(roleEntity);
+    }
+
+    public void kickAccountAll() {
+        for (Map.Entry<String, UserMapping> entry : userMappingMap.entrySet()) {
+            kickAccount(entry.getKey());
+        }
+    }
+
+    public void kickAccount(String account) {
+        UserMapping userMapping = getUserMapping(account);
+        if (userMapping == null) {
+            return;
+        }
+        if (userMapping.getSocketSession() != null) {
+            ResKick resKick = new ResKick();
+            resKick.setReason("被运营后台强制下线");
+            ChannelFuture channelFuture = userMapping.writeAndFlush(resKick);
+            channelFuture.addListener(future -> {
+                if (!future.isSuccess()) {
+                    log.error("强制下线失败：{}", account, future.cause());
+                }
+                userMapping.getSocketSession().close("被运营后台强制下线");
+            });
+        }
     }
 
     public UserMapping getUserMapping(String account) {

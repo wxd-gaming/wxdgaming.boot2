@@ -76,26 +76,30 @@ public class InnerService {
     }
 
     public void executeAll(String flag, String url, Map<String, ?> params) {
+        for (ServerInfoEntity serverInfo : getInnerGameServerInfoMap().values()) {
+            executeServer(flag, url, params, serverInfo);
+        }
+    }
+
+    public void executeServer(String flag, String url, Map<String, ?> params, ServerInfoEntity serverInfo) {
         String sign = SignUtil.signByFormData(params, loginServerProperties.getJwtKey());
-        getInnerGameServerInfoMap().values().forEach(serverInfo -> {
-            String host = serverInfo.getHost();
-            int httpPort = serverInfo.getHttpPort();
-            if (StringUtils.isBlank(host) || httpPort < 1000) {
-                return;
-            }
-            String formatted = "http://%s:%s/%s".formatted(host, httpPort, url);
-            HttpRequestPost.of(formatted, params)
-                    .addHeader(HttpHeaderNames.AUTHORIZATION.toString(), sign)
-                    .executeAsync()
-                    .subscribe(
-                            httpResponse -> {
-                                log.info("远程调用：{}-{} {}：{}, {}", serverInfo.getServerId(), serverInfo.getName(), flag, params, httpResponse);
-                            },
-                            throwable -> {
-                                log.info("远程调用：{}-{} {}: {} 请求异常", serverInfo.getServerId(), serverInfo.getName(), flag, params, throwable);
-                            }
-                    );
-        });
+        String host = serverInfo.getHost();
+        int httpPort = serverInfo.getHttpPort();
+        if (StringUtils.isBlank(host) || httpPort < 1000) {
+            return;
+        }
+        String formatted = "http://%s:%s/%s".formatted(host, httpPort, url);
+        HttpRequestPost.of(formatted, params)
+                .addHeader(HttpHeaderNames.AUTHORIZATION.toString(), sign)
+                .executeAsync()
+                .subscribe(
+                        httpResponse -> {
+                            log.info("远程调用：{}-{} {}：{}, {}", serverInfo.getServerId(), serverInfo.getName(), flag, params, httpResponse);
+                        },
+                        throwable -> {
+                            log.info("远程调用：{}-{} {}: {} 请求异常", serverInfo.getServerId(), serverInfo.getName(), flag, params, throwable);
+                        }
+                );
     }
 
     @Order(10)

@@ -23,6 +23,7 @@ import wxdgaming.game.util.Util;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * 对外接口
@@ -109,6 +110,17 @@ public class AdminGameServerController implements InitPrint {
         entity.setMaintenanceTime(time);
         sqlDataHelper.update(entity);
         return RunResult.ok().msg("修改成功");
+    }
+
+    /** 踢玩家下线 */
+    @RequestMapping(value = "/kick")
+    public RunResult kick(@RequestParam("serverId") int serverId) {
+        ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(serverId);
+        AssertUtil.assertTrue(entity != null, "服务器不存在");
+        TreeMap<String, Object> params = new TreeMap<>();
+        params.put("account", "ALL");
+        innerService.executeServer("kick", "yunying/kick", params, entity);
+        return RunResult.ok().msg("执行成功");
     }
 
     @RequestMapping(value = "/editServerShowLevel")

@@ -1,6 +1,5 @@
 package wxdgaming.game.server.script.http.yunying.api;
 
-import io.netty.channel.ChannelFuture;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,8 +9,6 @@ import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.game.common.global.GlobalDataService;
-import wxdgaming.game.message.role.ResKick;
-import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.global.GlobalDataConst;
 import wxdgaming.game.server.bean.global.impl.YunyingData;
 import wxdgaming.game.server.module.data.DataCenterService;
@@ -44,20 +41,10 @@ public class YunyingController extends HoldApplicationContext {
 
     @RequestMapping(value = "/kick")
     public Object kick(HttpServletRequest httpContext, @RequestParam("account") String account) {
-        UserMapping userMapping = dataCenterService.getUserMapping(account);
-        if (userMapping == null) {
-            return RunResult.fail("用户不存在");
-        }
-        if (userMapping.getSocketSession() != null) {
-            ResKick resKick = new ResKick();
-            resKick.setReason("被运营后台强制下线");
-            ChannelFuture channelFuture = userMapping.writeAndFlush(resKick);
-            channelFuture.addListener(future -> {
-                if (!future.isSuccess()) {
-                    log.error("强制下线失败：{}", account, future.cause());
-                }
-                userMapping.getSocketSession().close("被运营后台强制下线");
-            });
+        if ("ALL".equals(account)) {
+            dataCenterService.kickAccountAll();
+        } else {
+            dataCenterService.kickAccount(account);
         }
         return RunResult.ok();
     }
