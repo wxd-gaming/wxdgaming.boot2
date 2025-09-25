@@ -19,7 +19,7 @@ class PageView {
 
         // language=HTML
         let html = `
-            <div style="position: absolute;left: 2px;right: 2px;bottom: 5px;padding: 2px;border-radius: 0px;overflow: auto;text-align: center;">
+            <div style="position: absolute;left: 2px;right: 2px;bottom: 8px;padding: 2px;border-radius: 0px;overflow: auto;text-align: center;">
                 <div>
                     <label for="page_size">共</label>
                     <label id="lab_row_count" style="width: 40px; text-align: center; border: slategrey 1px solid;background-color: white;">0</label>
@@ -47,7 +47,7 @@ class PageView {
             </div>
         `;
 
-        $(document.body).append(html);
+        $(".root .root_box_bottom").append(html);
 
         /*读取本地存储，根据个人爱好查看数据*/
         let ps = localStorage.getItem(this.pathname + "-page-max");
@@ -63,7 +63,7 @@ class PageView {
         new wxd.netty.PostRequest(
             this.url,
             postQuery.toString(),
-            (responseText) => {
+            async (responseText) => {
                 if (responseText.code !== 1) {
                     new wxd.message.Alert("异常：" + responseText.msg).show();
                     return
@@ -72,7 +72,8 @@ class PageView {
                 this.dataCount = Number(responseText.rowCount);
                 $("#lab_row_count").text(responseText.rowCount);
                 this.pageMaxIndex();
-                this.showData();
+                await this.showData();
+                wxd.loading_close();
             }).send();
     }
 

@@ -17,36 +17,37 @@ class PageView {
         this.searchFunction = searchFunction;
         this.rowFunction = rowFunction;
 
+        // language=HTML
         let html = `
-<div style="position: absolute;left: 2px;right: 2px;bottom: 5px;padding: 2px;border-radius: 0px;overflow: auto;text-align: center;">
-    <div>
-        <label for="page_size">共</label>
-        <label id="lab_row_count" style="width: 40px; text-align: center; border: slategrey 1px solid;background-color: white;">0</label>
-        &nbsp;&nbsp;
-        <label for="page_size">每页显示</label>
-        <select id="page_size" onchange="pageView.nextPage(-99999999999999999999)">
-            <option value="20">20</option>
-            <option value="30" selected="selected">30</option>
-            <option value="40">40</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-            <option value="500">500</option>
-        </select>
-        <label for="page_size">条</label>
-        <a href="javascript:void(0);" onclick="pageView.nextPage(-99999999999999999999)">首页</a>
-        <a href="javascript:void(0);" onclick="pageView.nextPage(-1)">上一页</a>
-        &nbsp;&nbsp;
-        <label id="lab_page_index" style="width: 40px; text-align: center; border: slategrey 1px solid;background-color: white;">1</label>
-        /
-        <label id="lab_page_max" style="width: 40px; text-align: center; border: slategrey 1px solid;background-color: white;">1</label>
-        &nbsp;&nbsp;
-        <a href="javascript:void(0);" onclick="pageView.nextPage(1)">下一页</a>
-        <a href="javascript:void(0);" onclick="pageView.nextPage(99999999999999999999)">末页</a>
-    </div>
-</div>
+            <div style="position: absolute;left: 2px;right: 2px;bottom: 8px;padding: 2px;border-radius: 0px;overflow: auto;text-align: center;">
+                <div>
+                    <label for="page_size">共</label>
+                    <label id="lab_row_count" style="width: 40px; text-align: center; border: slategrey 1px solid;background-color: white;">0</label>
+                    &nbsp;&nbsp;
+                    <label for="page_size">每页显示</label>
+                    <select id="page_size" onchange="pageView.nextPage(-99999999999999999999)">
+                        <option value="20">20</option>
+                        <option value="30" selected="selected">30</option>
+                        <option value="40">40</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="500">500</option>
+                    </select>
+                    <label for="page_size">条</label>
+                    <a href="javascript:void(0);" onclick="pageView.nextPage(-99999999999999999999)">首页</a>
+                    <a href="javascript:void(0);" onclick="pageView.nextPage(-1)">上一页</a>
+                    &nbsp;&nbsp;
+                    <label id="lab_page_index" style="width: 40px; text-align: center; border: slategrey 1px solid;background-color: white;">1</label>
+                    /
+                    <label id="lab_page_max" style="width: 40px; text-align: center; border: slategrey 1px solid;background-color: white;">1</label>
+                    &nbsp;&nbsp;
+                    <a href="javascript:void(0);" onclick="pageView.nextPage(1)">下一页</a>
+                    <a href="javascript:void(0);" onclick="pageView.nextPage(99999999999999999999)">末页</a>
+                </div>
+            </div>
         `;
 
-        $(document.body).append(html);
+        $(".root .root_box_bottom").append(html);
 
         /*读取本地存储，根据个人爱好查看数据*/
         let ps = localStorage.getItem(this.pathname + "-page-max");
@@ -59,8 +60,8 @@ class PageView {
     remoteGetData(postQuery) {
         postQuery.put("pageIndex", this.pageIndex());
         postQuery.put("pageSize", this.pageSize());
-        return new wxd.netty.PostRequest(this.url, postQuery.toJson(),
-            (responseText) => {
+        new wxd.netty.PostRequest(this.url, postQuery.toJson(),
+            async (responseText) => {
                 if (responseText.code !== 1) {
                     new wxd.message.Alert("异常：" + responseText.msg).show();
                     return
@@ -69,10 +70,10 @@ class PageView {
                 this.dataCount = Number(responseText.rowCount);
                 $("#lab_row_count").text(responseText.rowCount);
                 this.pageMaxIndex();
-                this.showData();
+                await this.showData();
+                wxd.loading_close();
             })
             .postJson()
-            .async(false)
             .send();
     }
 

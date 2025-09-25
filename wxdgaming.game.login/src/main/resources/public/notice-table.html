@@ -10,12 +10,7 @@
     <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
     <link rel="stylesheet" type="text/css" href="/style/table.css"/>
     <style>
-
-        a:link {color: #0866b4;}
-
-        a:visited { color: #0866b4;}
-
-        label {padding-left: 5px;padding-right: 5px;}
+        .root_box_bottom label {padding-left: 5px;padding-right: 5px;}
     </style>
     <script>
 
@@ -126,8 +121,8 @@
     </script>
 </head>
 <body>
-<div class="root">
-    <div class="btn_box" style="width: 100%;height: 180px;padding-left: 20px; padding-top: 8px; text-align: left;vertical-align: center;">
+<div class="root root_box_table">
+    <div class="root_box_top btn_box" style="padding-left: 20px; padding-top: 8px; text-align: left;vertical-align: center;">
         <label for="minTime">开始日期: </label><input id="minTime" type="date"/>
         <label for="maxTime">结束日期: </label><input id="maxTime" type="date"/>
         <br>
@@ -173,8 +168,8 @@
         <br>
         <button onclick="search();">查询</button>
     </div>
-    <div class="tableDom" style="position: absolute;left: 20px;top: 200px;right: 20px;bottom: 40px;padding-right: 10px;border-radius: 0;">
-        <table>
+    <div class="root_box_center tableDom" style="margin: 10px; padding-right: 10px;border-radius: 0; overflow-x: auto;">
+        <table style="min-width: 1400px;">
             <thead>
             <tr>
                 <th>ID</th>
@@ -186,6 +181,8 @@
             <tbody class="tbody">
             </tbody>
         </table>
+    </div>
+    <div class="root_box_bottom">
     </div>
 </div>
 </body>

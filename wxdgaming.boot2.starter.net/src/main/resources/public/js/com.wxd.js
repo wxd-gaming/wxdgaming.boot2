@@ -700,7 +700,6 @@ const wxd = {
                         } else {
                             console.log(data);
                         }
-                        wxd.loading_close();
                     }, error: (jqXHR, textStatus, errorMsg) => {
                         // jqXHR 是经过jQuery封装的XMLHttpRequest对象
                         // textStatus 可能为null、 'timeout'、 'error'、 'abort'和'parsererror'等
