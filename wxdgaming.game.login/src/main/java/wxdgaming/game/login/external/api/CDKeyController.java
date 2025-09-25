@@ -1,14 +1,15 @@
 package wxdgaming.game.login.external.api;
 
 import com.alibaba.fastjson.JSONObject;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.CacheHttpServletRequest;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.starter.batis.sql.WebSqlQueryCondition;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.login.cdkey.CDKeyService;
 import wxdgaming.game.login.cfg.QCdkeyTable;
@@ -49,12 +50,9 @@ public class CDKeyController implements InitPrint {
     }
 
     @RequestMapping(value = "/queryList")
-    public RunResult queryCDKeyList(CacheHttpServletRequest context,
-                                    @RequestParam("pageIndex") int pageIndex,
-                                    @RequestParam("pageSize") int pageSize,
-                                    @RequestParam("where") String where,
-                                    @RequestParam("order") String orderJson) {
-
+    public RunResult queryCDKeyList(@RequestBody WebSqlQueryCondition condition) {
+        int pageIndex = condition.getPageIndex();
+        int pageSize = condition.getPageSize();
         if (pageIndex < 1) pageIndex = 1;
         if (pageSize < 10) pageSize = 10;
 

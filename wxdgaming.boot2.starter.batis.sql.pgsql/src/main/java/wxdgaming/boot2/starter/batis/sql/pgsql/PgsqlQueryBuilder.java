@@ -21,4 +21,5 @@ public class PgsqlQueryBuilder extends SqlQueryBuilder {
     @Override public String buildSelectSql() {
         return super.buildSelectSql().replace('`', '"');
     }
+
 }

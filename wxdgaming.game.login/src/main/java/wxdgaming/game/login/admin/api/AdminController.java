@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,8 +14,10 @@ import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.core.util.PatternUtil;
+import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryBuilder;
+import wxdgaming.boot2.starter.batis.sql.WebSqlQueryCondition;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
 import wxdgaming.game.authority.AdminUserToken;
 import wxdgaming.game.login.admin.AdminService;
@@ -124,14 +127,15 @@ public class AdminController implements InitPrint {
     }
 
     @RequestMapping("/queryList")
-    public ResponseEntity<RunResult> queryList(CacheHttpServletRequest request) {
+    public ResponseEntity<RunResult> queryList(CacheHttpServletRequest request, @RequestBody WebSqlQueryCondition condition) {
         AdminUserToken adminUserToken = AdminUserToken.threadContext();
         AssertUtil.assertTrue(adminUserToken.isAdmin(), "没有权限");
 
-        SqlQueryBuilder sqlQueryBuilder = sqlDataHelper.queryBuilder();
-        sqlQueryBuilder.sqlByEntity(AdminUserEntity.class);
+        Class<AdminUserEntity> adminUserEntityClass = AdminUserEntity.class;
+        SqlQueryBuilder sqlQueryBuilder = condition.build(sqlDataHelper, adminUserEntityClass, null);
+
         long rowCount = sqlQueryBuilder.findCount();
-        List<AdminUserEntity> list2Entity = sqlQueryBuilder.findList2Entity(AdminUserEntity.class);
+        List<AdminUserEntity> list2Entity = sqlQueryBuilder.findList2Entity(adminUserEntityClass);
         List<JSONObject> jsonList = new ArrayList<>();
         for (AdminUserEntity adminUserEntity : list2Entity) {
             JSONObject jsonObject = MapOf.newJSONObject();

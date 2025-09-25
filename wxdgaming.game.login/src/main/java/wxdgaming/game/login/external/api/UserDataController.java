@@ -1,18 +1,18 @@
 package wxdgaming.game.login.external.api;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryBuilder;
+import wxdgaming.boot2.starter.batis.sql.WebSqlQueryCondition;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
 import wxdgaming.game.authority.AdminUserToken;
 import wxdgaming.game.login.LoginServerProperties;
@@ -22,7 +22,6 @@ import wxdgaming.game.login.login.LoginService;
 import wxdgaming.game.util.Util;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -114,54 +113,10 @@ public class UserDataController implements InitPrint {
     }
 
     @RequestMapping("/queryList")
-    public RunResult queryList(@RequestParam("pageIndex") int pageIndex,
-                               @RequestParam("pageSize") int pageSize,
-                               @RequestParam("minTime") String minTime,
-                               @RequestParam("maxTime") String maxTime,
-                               @RequestParam("where") String whereJson,
-                               @RequestParam("order") String orderJson) {
-        SqlQueryBuilder queryBuilder = sqlDataHelper.queryBuilder();
-        queryBuilder.sqlByEntity(UserData.class);
+    public RunResult queryList(@RequestBody WebSqlQueryCondition condition) {
+        condition.setDefaultOrderBy("createtime desc");
+        SqlQueryBuilder queryBuilder = condition.build(sqlDataHelper, UserData.class, "createtime");
 
-        TableMapping userDataMapping = sqlDataHelper.tableMapping(UserData.class);
-
-        if (StringUtils.isNotBlank(whereJson)) {
-            List<JSONObject> jsonObjects = JSON.parseArray(whereJson, JSONObject.class);
-            for (JSONObject jsonObject : jsonObjects) {
-                String whereFiled = jsonObject.getString("where");
-                String and = jsonObject.getString("and");
-                String where = whereFiled + " " + and + " ?";
-                Object whereValue = jsonObject.getObject("whereValue", userDataMapping.getColumns().get(whereFiled).getFileType());
-                queryBuilder.pushWhereAnd(where, whereValue);
-            }
-        }
-        if (StringUtils.isNotBlank(minTime)) {
-            Date minDate = MyClock.parseDate("yyyy-MM-dd'T'HH:mm", minTime);
-            queryBuilder.pushWhereAnd("createtime >= ?::int8", minDate.getTime());
-        }
-
-        if (StringUtils.isNotBlank(maxTime)) {
-            Date maxDate = MyClock.parseDate("yyyy-MM-dd'T'HH:mm", maxTime);
-            queryBuilder.pushWhereAnd("createtime <= ?::int8", maxDate.getTime());
-        }
-
-        if (StringUtils.isNotBlank(orderJson)) {
-            StringBuilder stringBuilder = new StringBuilder();
-            List<JSONObject> jsonObjects = JSON.parseArray(orderJson, JSONObject.class);
-            for (JSONObject jsonObject : jsonObjects) {
-                String orderField = jsonObject.getString("orderField");
-                String orderOption = jsonObject.getString("orderOption");
-                if (!stringBuilder.isEmpty()) {
-                    stringBuilder.append(",");
-                }
-                stringBuilder.append(orderField);
-                stringBuilder.append(" ").append(orderOption);
-            }
-            queryBuilder.setOrderBy(stringBuilder.toString());
-        } else {
-            queryBuilder.setOrderBy("createtime desc");
-        }
-        queryBuilder.page(pageIndex, pageSize, 1, 1000);
         long rowCount = queryBuilder.findCount();
         List<UserData> list2Entity = queryBuilder.findList2Entity(UserData.class);
 

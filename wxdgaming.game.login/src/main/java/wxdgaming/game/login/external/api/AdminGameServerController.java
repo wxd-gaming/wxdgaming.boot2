@@ -1,22 +1,20 @@
 package wxdgaming.game.login.external.api;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.function.FunctionUtil;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryBuilder;
+import wxdgaming.boot2.starter.batis.sql.WebSqlQueryCondition;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
-import wxdgaming.game.authority.AdminUserToken;
 import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.login.LoginServerProperties;
 import wxdgaming.game.login.bean.global.GlobalDataConst;
@@ -27,7 +25,6 @@ import wxdgaming.game.login.inner.InnerService;
 import wxdgaming.game.util.Util;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -162,54 +159,11 @@ public class AdminGameServerController implements InitPrint {
     }
 
     @RequestMapping(value = "/queryList")
-    public RunResult queryGameServerList(HttpServletRequest context,
-                                         @RequestParam("pageIndex") int pageIndex,
-                                         @RequestParam("pageSize") int pageSize,
-                                         @RequestParam("minTime") String minTime,
-                                         @RequestParam("maxTime") String maxTime,
-                                         @RequestParam("where") String whereJson,
-                                         @RequestParam("order") String orderJson) {
+    public RunResult queryGameServerList(HttpServletRequest context, @RequestBody WebSqlQueryCondition condition) {
 
-        SqlQueryBuilder queryBuilder = sqlDataHelper.queryBuilder();
-        queryBuilder.sqlByEntity(ServerInfoEntity.class);
+        condition.setDefaultOrderBy("serverid desc");
+        SqlQueryBuilder queryBuilder = condition.build(sqlDataHelper, ServerInfoEntity.class, "openTime");
 
-
-        if (StringUtils.isNotBlank(whereJson)) {
-            List<JSONObject> jsonObjects = JSON.parseArray(whereJson, JSONObject.class);
-            for (JSONObject jsonObject : jsonObjects) {
-                String whereFiled = jsonObject.getString("where");
-                String and = jsonObject.getString("and");
-                String where = whereFiled + " " + and + " ?";
-                queryBuilder.pushWhereAnd(where, jsonObject.getString("whereValue"));
-            }
-        }
-        if (StringUtils.isNotBlank(minTime)) {
-            Date minDate = MyClock.parseDate("yyyy-MM-dd'T'HH:mm", minTime);
-            queryBuilder.pushWhereAnd("openTime >= ?::int8", minDate.getTime());
-        }
-
-        if (StringUtils.isNotBlank(maxTime)) {
-            Date maxDate = MyClock.parseDate("yyyy-MM-dd'T'HH:mm", maxTime);
-            queryBuilder.pushWhereAnd("openTime <= ?::int8", maxDate.getTime());
-        }
-
-        if (StringUtils.isNotBlank(orderJson)) {
-            StringBuilder stringBuilder = new StringBuilder();
-            List<JSONObject> jsonObjects = JSON.parseArray(orderJson, JSONObject.class);
-            for (JSONObject jsonObject : jsonObjects) {
-                String orderField = jsonObject.getString("orderField");
-                String orderOption = jsonObject.getString("orderOption");
-                if (!stringBuilder.isEmpty()) {
-                    stringBuilder.append(",");
-                }
-                stringBuilder.append(orderField);
-                stringBuilder.append(" ").append(orderOption);
-            }
-            queryBuilder.setOrderBy(stringBuilder.toString());
-        } else {
-            queryBuilder.setOrderBy("serverid desc");
-        }
-        queryBuilder.page(pageIndex, pageSize, 1, 1000);
         long rowCount = queryBuilder.findCount();
         List<ServerInfoEntity> list2Entity = queryBuilder.findList2Entity(ServerInfoEntity.class);
 

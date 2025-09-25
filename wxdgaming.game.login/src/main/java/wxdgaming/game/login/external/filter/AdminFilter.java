@@ -12,6 +12,8 @@ import wxdgaming.game.authority.AdminUserToken;
 import wxdgaming.game.login.LoginServerProperties;
 import wxdgaming.game.login.admin.AdminService;
 
+import java.util.Map;
+
 /**
  * 拦截器, 通过参数或者cookie的 authorization 值获取授权信息
  *
@@ -41,15 +43,16 @@ public class AdminFilter implements WebFilter {
         ThreadContext.putContent("adminUserToken", adminUserToken);
         String currentUrl = SpringUtil.getCurrentUrl(request);
         String body = SpringUtil.readBody(request);
+        Map<String, String> stringStringMap = SpringUtil.readParameterMap(request);
         log.info("{}", """ 
                 
                 -------------------------------------------------------
                 请求日志记录
                    url: %s
-                params: %s
+                params: (%s)(%s)
                  admin: %s
                 -------------------------------------------------------
-                """.formatted(currentUrl, body, adminUserToken));
+                """.formatted(currentUrl, body, stringStringMap, adminUserToken));
         return true;
     }
 

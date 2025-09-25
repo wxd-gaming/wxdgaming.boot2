@@ -59,7 +59,7 @@ class PageView {
     remoteGetData(postQuery) {
         postQuery.put("pageIndex", this.pageIndex());
         postQuery.put("pageSize", this.pageSize());
-        return new wxd.netty.PostRequest(this.url, postQuery.toString(),
+        return new wxd.netty.PostRequest(this.url, postQuery.toJson(),
             (responseText) => {
                 if (responseText.code !== 1) {
                     new wxd.message.Alert("异常：" + responseText.msg).show();
@@ -71,6 +71,7 @@ class PageView {
                 this.pageMaxIndex();
                 this.showData();
             })
+            .postJson()
             .async(false)
             .send();
     }

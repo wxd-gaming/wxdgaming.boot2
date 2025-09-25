@@ -34,14 +34,7 @@ public class LogMappingInfo extends ObjectBase {
         return fieldList.stream()
                 .filter(logField -> logField.getFieldName().equals(fieldName))
                 .findFirst()
-                .map(logField -> switch (logField.getFieldType()) {
-                    case "int" -> (Function<String, Object>) Integer::valueOf;
-                    case "long" -> (Function<String, Object>) Long::valueOf;
-                    case "float" -> (Function<String, Object>) Float::valueOf;
-                    case "double" -> (Function<String, Object>) Double::valueOf;
-                    case "boolean" -> (Function<String, Object>) Boolean::valueOf;
-                    default -> (Function<String, Object>) String::valueOf;
-                })
+                .map(LogField::getFieldValueFunction)
                 .orElse(null);
     }
 

@@ -629,7 +629,7 @@ const wxd = {
                 console.error(textStatus + " - " + errorMsg);
                 wxd.message.notice(textStatus + " - " + errorMsg, true);
             };
-            contentType = "application/x-www-form-urlencoded; charset=UTF-8";
+            _contentType = "application/x-www-form-urlencoded; charset=UTF-8";
             _async = true;
             time_out = 3000;
 
@@ -654,6 +654,16 @@ const wxd = {
                 return this;
             }
 
+            postJson() {
+                this.contentType("application/json; charset=UTF-8");
+                return this;
+            }
+
+            contentType(value) {
+                this._contentType = value;
+                return this;
+            }
+
             /**
              * 发送请求
              * @returns async false 返回值通过onload函数获取
@@ -665,7 +675,7 @@ const wxd = {
                     type: "post",
                     url: this.url,
                     timeout: this.time_out, //超时时间设置，单位毫秒
-                    contentType: this.contentType,
+                    contentType: this._contentType,
                     data: this.params,
                     async: this._async,
                     xhrFields: {
