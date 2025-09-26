@@ -5,31 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script charset="utf-8" type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
     <script charset="utf-8" type="text/javascript" src="/js/com.wxd.js"></script>
+    <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
     <title>index</title>
     <style>
-        html, body, table, tbody, tr, td, object {border: 0;margin: 0;padding: 0;box-sizing: border-box;}
+        .box { width: 100%; height: 100%; display: flex;overflow: hidden;min-width: 1100px;}
 
-        html, body {display: block;overflow: hidden;width: 100%;height: 100%;}
+        .box_left { width: 220px; background: lightblue;}
 
-        table, tbody, tr {
-            display: block;
-            width: 100%; height: 100%;
-            border-collapse: collapse;
-            border-spacing: 0;
-            table-layout: fixed;font-size: 0; /* 消除空白字符影响 */
-        }
+        .box_right { background: #f6f6f6; overflow: hidden; flex: 1;}
 
-        tr {display: inline-block;width: 100%;}
+        .nav { width: 180px;border-right: 0 solid rgba(67, 67, 67, 0.1);}
 
-        td {display: inline-block;height: 100%;}
+        .content { width: calc(100% - 181px); /* 或者不设置，让它自动填充 */ }
 
-        td.nav { width: 180px;border-right: 0px solid rgba(67, 67, 67, 0.1);}
-
-        td.content {
-            width: calc(100% - 181px); /* 或者不设置，让它自动填充 */
-        }
-
-        td object {width: 100%;height: 100%;}
+        object {width: 100%;height: 100%;}
     </style>
     <script>
         function changeContent(url) {
@@ -45,7 +34,7 @@
                     sessionStorage.setItem("authorization", data.data);
                     $(".nav").append(`<object data="nav.html"></object>`);
                 } else {
-                    window.top.location = "/login.html";
+                    new wxd.message.Alert(data.msg, "提升").show();
                 }
             }).send();
 
@@ -54,16 +43,13 @@
     </script>
 </head>
 <body>
-<table>
-    <tbody>
-    <tr>
-        <td class="nav">
+<div class="root">
+    <div class="box">
+        <div class="box_left nav"></div>
+        <div class="box_right content">
 
-        </td>
-        <td class="content">
-        <td>
-    </tr>
-    </tbody>
-</table>
+        </div>
+    </div>
+</div>
 </body>
 </html>

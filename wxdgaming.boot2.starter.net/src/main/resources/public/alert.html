@@ -10,11 +10,12 @@
         .box {
             width: 100%;
             height: 100%;
-            display: grid;
-            grid-template-rows: 120px 1fr 1fr 28px;
+            display: flex;
+            flex-direction: column;
         }
 
         .top {
+            height: 180px;
             background: lightblue;
         }
 
@@ -24,6 +25,7 @@
         }
 
         .bottom {
+            height: 42px;
             background: lightgreen;
         }
     </style>
@@ -46,13 +48,13 @@
 </head>
 <body>
 <div class="box">
-    <div class="top"></div>
-    <div class="center">
+    <div class="top">3</div>
+    <div class="center" style="flex: 0.2;">
             <pre style="min-width: 2200px;">
     1
 </pre>
     </div>
-    <div class="center">
+    <div class="center" style="flex: 0.8;">
             <pre style="min-width: 2200px;">
     2
 </pre>

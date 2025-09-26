@@ -9,37 +9,28 @@
     <title>登录服</title>
     <style>
 
-        table, tbody, tr {
-            display: block;
-            width: 100%; height: 100%;
-            border-collapse: collapse;
-            border-spacing: 0;
-            table-layout: fixed;
-            font-size: 0; /* 消除空白字符影响 */
-        }
+        .box { width: 100%; height: 100%; display: flex;overflow: hidden;min-width: 1600px;}
 
-        tr {display: inline-block;width: 100%;}
+        .box_left { width: 220px; background: lightblue;}
 
-        td {display: inline-block;height: 100%;}
+        .box_right { background: #f6f6f6; overflow: hidden; flex: 1;}
 
-        td.nav { width: 180px;border-right: 0px solid rgba(67, 67, 67, 0.1);}
+        .nav { width: 180px;border-right: 0 solid rgba(67, 67, 67, 0.1);}
 
-        td.content {
-            width: calc(100% - 181px); /* 或者不设置，让它自动填充 */
-        }
+        .content { width: calc(100% - 181px); /* 或者不设置，让它自动填充 */ }
 
-        td object {width: 100%;height: 100%;}
+        object {width: 100%;height: 100%;}
     </style>
     <script>
         function changeContent(url) {
-            let authorization = sessionStorage.getItem("authorization");
+            let authorization = wxd.getAuthor();
             let obj = `<object id="content_body" data="${url}?authorization=${authorization}"></object>`;
             $('.content').html(obj);
         }
 
         $(() => {
             let map = new wxd.Map().loadSearch();
-            map.put("authorization", sessionStorage.getItem("authorization"));
+            map.put("authorization", wxd.getAuthor());
             new wxd.netty.PostRequest("/web/account/check", map.toString(),
                 (data) => {
                     if (data.code === 1) {
@@ -60,16 +51,12 @@
 </head>
 <body>
 <div class="root">
-    <table>
-        <tbody>
-        <tr>
-            <td class="nav">
-            </td>
-            <td class="content">
-            <td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="box">
+        <div class="box_left nav"></div>
+        <div class="box_right content">
+
+        </div>
+    </div>
 </div>
 </body>
 </html>

@@ -101,8 +101,12 @@ const wxd = {
         return promise;
     },
 
-    /** 从 Cookie 获取登录授权 */
+    /** 从 sessionStorage 和 Cookie 获取登录授权 */
     getAuthor: function () {
+        let authorization = sessionStorage.getItem("authorization");
+        if (!wxd.isNull(authorization)) {
+            return authorization;
+        }
         return wxd.getCookie("authorization");
     },
 
@@ -571,6 +575,15 @@ const wxd = {
                     async: true,/*必须是异步才能成功执行上传进度*/
                     contentType: false,
                     processData: false,
+                    xhrFields: {
+                        withCredentials: true // 必须设置此项
+                    },
+                    beforeSend: (xhr) => {
+                        let author = wxd.getAuthor();
+                        if (wxd.notNull(author)) {
+                            xhr.setRequestHeader('authorization', author);
+                        }
+                    },
                     xhr: () => {
                         let xhr = $.ajaxSettings.xhr();
                         // 获取文件上传的进度
@@ -682,10 +695,9 @@ const wxd = {
                         withCredentials: true // 必须设置此项
                     },
                     beforeSend: (xhr) => {
-                        let token = sessionStorage.getItem("authorization");
-                        if (wxd.notNull(token)) {
-                            console.log("authorization:" + token)
-                            xhr.setRequestHeader('authorization', token);
+                        let author = wxd.getAuthor();
+                        if (wxd.notNull(author)) {
+                            xhr.setRequestHeader('authorization', author);
                         }
                     },
                     success: (data) => {

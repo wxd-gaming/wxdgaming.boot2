@@ -8,15 +8,7 @@
     <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
     <title>nav</title>
     <style>
-        html, body {
-            display: block;overflow: hidden;width: 180px;height: 100%;
-            background-color: rgba(2, 82, 115, 0.82);
-            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
-            color: #ffffff;
-        }
-
         ul, li {width: 180px;box-sizing: border-box;margin: 0;padding: 0;}
-
 
         .title_box {border: 1px solid #888888;border-right: 0;}
 
@@ -67,17 +59,21 @@
             window.parent.changeContent(url);
         }
 
+        function logout() {
+            sessionStorage.setItem("authorization", "");
+            wxd.clearCookie();
+            window.top.location.href = "/login.html";
+        }
+
         $(() => {
         });
 
     </script>
 </head>
 <body>
-<ul>
-    <li style="height: 80px;">
-        Admin
-    </li>
-</ul>
+<div style="height: 80px;">
+    <button onclick="logout();">退出</button>
+</div>
 <ul class="title_box ul_left">
     <li class="title_one check" onclick="selectNav(this)">导航<strong>∨</strong></li>
     <li class="title_sub_box">
