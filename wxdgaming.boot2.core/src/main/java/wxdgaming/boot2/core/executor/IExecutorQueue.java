@@ -8,6 +8,6 @@ package wxdgaming.boot2.core.executor;
  **/
 public interface IExecutorQueue {
 
-    String queueName();
+    String getQueueName();
 
 }

@@ -53,8 +53,8 @@ class ExecutorJobScheduled implements Runnable {
             return null;
         }
 
-        @Override public String queueName() {
-            return iExecutorQueue == null ? null : iExecutorQueue.queueName();
+        @Override public String getQueueName() {
+            return iExecutorQueue == null ? null : iExecutorQueue.getQueueName();
         }
 
         /** 标记本次运行结束 */

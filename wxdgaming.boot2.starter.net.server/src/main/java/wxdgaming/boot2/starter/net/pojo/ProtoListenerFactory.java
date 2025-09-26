@@ -89,7 +89,7 @@ public class ProtoListenerFactory extends HoldApplicationContext {
             return;
         }
         if (!protoEvent.getProtoMapping().protoRequest().ignoreQueue()) {
-            if (StringUtils.isBlank(protoListenerTrigger.queueName())) {
+            if (StringUtils.isBlank(protoListenerTrigger.getQueueName())) {
                 String queueName;
                 if (queueSupplier != null) {
                     queueName = queueSupplier.get();
@@ -101,7 +101,7 @@ public class ProtoListenerFactory extends HoldApplicationContext {
             }
         }
         if (log.isDebugEnabled()) {
-            log.debug("收到消息：{} queue={}, msgId={}, {}", socketSession, protoListenerTrigger.queueName(), protoEvent.getMessageId(), protoEvent.buildMessage());
+            log.debug("收到消息：{} queue={}, msgId={}, {}", socketSession, protoListenerTrigger.getQueueName(), protoEvent.getMessageId(), protoEvent.buildMessage());
         }
         /*提交到对应的线程和队列*/
         protoListenerTrigger.submit();

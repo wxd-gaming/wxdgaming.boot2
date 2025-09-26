@@ -39,75 +39,75 @@
       "fieldName": "arpu",
       "fieldComment": "ARPU",
       "fieldType": "float",
-      "fieldHtmlStyle": "width:50px;",
+      "fieldHtmlStyle": "width:80px;",
       "fieldHtmlTips": "ARPU=收入/活跃账号数"
     },
     {
       "fieldName": "arppu",
       "fieldComment": "ARPPU",
       "fieldType": "float",
-      "fieldHtmlStyle": "width:50px;",
+      "fieldHtmlStyle": "width:80px;",
       "fieldHtmlTips": "ARPPU=收入/付费账号数"
     },
     {
       "fieldName": "login_2",
       "fieldComment": "次留",
       "fieldType": "string",
-      "fieldHtmlStyle": "width:50px;"
+      "fieldHtmlStyle": "width:60px;"
     },
     {
       "fieldName": "login_3",
       "fieldComment": "3留",
       "fieldType": "string",
-      "fieldHtmlStyle": "width:50px;"
+      "fieldHtmlStyle": "width:60px;"
     },
     {
       "fieldName": "login_4",
       "fieldComment": "4留",
       "fieldType": "string",
-      "fieldHtmlStyle": "width:50px;"
+      "fieldHtmlStyle": "width:60px;"
     },
     {
       "fieldName": "login_5",
       "fieldComment": "5留",
       "fieldType": "string",
-      "fieldHtmlStyle": "width:50px;"
+      "fieldHtmlStyle": "width:60px;"
     },
     {
       "fieldName": "login_7",
       "fieldComment": "7留",
       "fieldType": "string",
-      "fieldHtmlStyle": "width:50px;"
+      "fieldHtmlStyle": "width:60px;"
     },
     {
       "fieldName": "login_10",
       "fieldComment": "10留",
       "fieldType": "string",
-      "fieldHtmlStyle": "width:50px;"
+      "fieldHtmlStyle": "width:60px;"
     },
     {
       "fieldName": "login_15",
       "fieldComment": "15留",
       "fieldType": "string",
-      "fieldHtmlStyle": "width:50px;"
+      "fieldHtmlStyle": "width:60px;"
     },
     {
       "fieldName": "login_20",
       "fieldComment": "20留",
       "fieldType": "string",
-      "fieldHtmlStyle": "width:50px;"
+      "fieldHtmlStyle": "width:60px;"
     },
     {
       "fieldName": "login_25",
       "fieldComment": "25留",
       "fieldType": "string",
-      "fieldHtmlStyle": "width:50px;"
+      "fieldHtmlStyle": "width:60px;"
     },
     {
       "fieldName": "login_30",
       "fieldComment": "30留",
       "fieldType": "string",
-      "fieldHtmlStyle": "width:50px;"
+      "fieldHtmlStyle": "width:60px;"
     }
   ]
 }

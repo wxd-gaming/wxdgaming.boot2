@@ -46,7 +46,7 @@ public class ExecutorServiceVirtualTest {
 
     private static class MyRunnableQueue implements Runnable, IExecutorQueue {
 
-        @Override public String queueName() {
+        @Override public String getQueueName() {
             return "1";
         }
 
@@ -76,7 +76,7 @@ public class ExecutorServiceVirtualTest {
 
     private static class MyTimerRunnable2Queue implements Runnable, IExecutorQueue {
 
-        @Override public String queueName() {
+        @Override public String getQueueName() {
             return "2";
         }
 

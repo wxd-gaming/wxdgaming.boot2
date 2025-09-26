@@ -66,9 +66,9 @@ public class ExecutorServiceVirtual extends ExecutorService {
             }
 
             if (executorJob instanceof IExecutorQueue iExecutorQueue) {
-                if (StringUtils.isNotBlank(iExecutorQueue.queueName())) {
+                if (StringUtils.isNotBlank(iExecutorQueue.getQueueName())) {
                     queueMap
-                            .computeIfAbsent(iExecutorQueue.queueName(), k -> new ExecutorQueue(k, this, this.queueSize, warnSize, this.queuePolicy))
+                            .computeIfAbsent(iExecutorQueue.getQueueName(), k -> new ExecutorQueue(k, this, this.queueSize, warnSize, this.queuePolicy))
                             .execute(executorJob);
                     return;
                 }

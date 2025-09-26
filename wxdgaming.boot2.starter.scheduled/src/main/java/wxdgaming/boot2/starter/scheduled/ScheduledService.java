@@ -101,7 +101,7 @@ public class ScheduledService extends HoldApplicationContext {
             super();
         }
 
-        @Override public String queueName() {
+        @Override public String getQueueName() {
             return "scheduled-timer";
         }
 
@@ -110,7 +110,7 @@ public class ScheduledService extends HoldApplicationContext {
         }
 
         @Override public String getStack() {
-            return queueName();
+            return this.getQueueName();
         }
 
         int curSecond = -1;

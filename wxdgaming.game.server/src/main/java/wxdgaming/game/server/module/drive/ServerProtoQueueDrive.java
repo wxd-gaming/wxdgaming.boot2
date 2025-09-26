@@ -36,9 +36,9 @@ public class ServerProtoQueueDrive implements ServerProtoFilter {
         protoListenerTrigger.getProtoEvent().bindData(userMapping);
         if (userMapping != null && userMapping.getRid() > 0) {
             Player player = dataCenterService.getPlayer(userMapping.getRid());
-            if (StringUtils.isBlank(protoListenerTrigger.queueName())) {
+            if (StringUtils.isBlank(protoListenerTrigger.getQueueName())) {
                 protoListenerTrigger.setQueueName("player-drive-" + (player.getUid() % executorProperties.getLogic().getCoreSize()));
-            } else if ("map-drive".equalsIgnoreCase(protoListenerTrigger.queueName())) {
+            } else if ("map-drive".equalsIgnoreCase(protoListenerTrigger.getQueueName())) {
                 MapKey mapKey = player.getMapKey();
 
             }

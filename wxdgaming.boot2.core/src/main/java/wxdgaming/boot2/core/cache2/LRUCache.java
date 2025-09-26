@@ -67,12 +67,12 @@ public class LRUCache<K, V> extends Cache<K, V> {
             final int hashIndex = i;
             Runnable heartEvent = new ExecutorEvent() {
 
-                @Override public String queueName() {
+                @Override public String getQueueName() {
                     return "cache-heart-event";
                 }
 
                 @Override public String getStack() {
-                    return queueName();
+                    return this.getQueueName();
                 }
 
                 @Override public void onEvent() throws Exception {

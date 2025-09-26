@@ -79,7 +79,7 @@ public class ExecutorServiceTest {
 
     private static class MyRunnableQueue extends ExecutorEvent implements Runnable, IExecutorQueue {
 
-        @Override public String queueName() {
+        @Override public String getQueueName() {
             return "1";
         }
 
@@ -120,7 +120,7 @@ public class ExecutorServiceTest {
 
         ScheduledFuture<?> scheduledFuture;
 
-        @Override public String queueName() {
+        @Override public String getQueueName() {
             return "2";
         }
 

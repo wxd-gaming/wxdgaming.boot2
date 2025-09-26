@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.executor;
 
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -14,10 +15,12 @@ import java.lang.reflect.Method;
  * @version 2025-05-15 19:56
  **/
 @Slf4j
+@Getter
+@Setter
 public abstract class ExecutorEvent extends ExecutorJob implements IExecutorQueue {
 
     protected ExecutorWith executorWith;
-    @Setter protected String queueName;
+    protected String queueName;
 
     public ExecutorEvent() {
         super(null);
@@ -32,10 +35,6 @@ public abstract class ExecutorEvent extends ExecutorJob implements IExecutorQueu
     /** 堆栈，也是任务名称，日志记录关键 */
     @Override public String getStack() {
         return super.getStack();
-    }
-
-    @Override public String queueName() {
-        return queueName;
     }
 
     @Override public void run() {
@@ -59,11 +58,11 @@ public abstract class ExecutorEvent extends ExecutorJob implements IExecutorQueu
 
     public void submit() {
         ExecutorService executorService = ExecutorFactory.getExecutorServiceLogic();
-        if (executorWith != null) {
-            String threadName = executorWith.threadName();
+        if (getExecutorWith() != null) {
+            String threadName = getExecutorWith().threadName();
             if (StringUtils.isNotBlank(threadName)) {
                 executorService = ExecutorFactory.getExecutor(threadName);
-            }else if(executorWith.useVirtualThread()){
+            } else if (getExecutorWith().useVirtualThread()) {
                 executorService = ExecutorFactory.getExecutorServiceVirtual();
             }
         }

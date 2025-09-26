@@ -24,8 +24,8 @@ class ExecutorJobFuture<T> extends ExecutorJob implements Runnable, IExecutorQue
         iExecutorQueue = supplier instanceof IExecutorQueue eq ? eq : null;
     }
 
-    @Override public String queueName() {
-        return iExecutorQueue == null ? null : iExecutorQueue.queueName();
+    @Override public String getQueueName() {
+        return iExecutorQueue == null ? null : iExecutorQueue.getQueueName();
     }
 
     @Override public void run() {

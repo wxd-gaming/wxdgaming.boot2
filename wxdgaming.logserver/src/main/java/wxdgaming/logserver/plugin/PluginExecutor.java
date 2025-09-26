@@ -1,8 +1,10 @@
 package wxdgaming.logserver.plugin;
 
 import wxdgaming.boot2.core.ApplicationContextProvider;
+import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.starter.scheduled.AbstractCronTrigger;
 
+import java.lang.annotation.Annotation;
 import java.util.function.Supplier;
 
 /**
@@ -20,6 +22,28 @@ public class PluginExecutor extends AbstractCronTrigger {
         super(abstractPlugin.cron());
         this.applicationProvider = applicationProvider;
         this.abstractPlugin = abstractPlugin;
+        this.setExecutorWith(new ExecutorWith(){
+            @Override public Class<? extends Annotation> annotationType() {
+                return ExecutorWith.class;
+            }
+
+            @Override public String queueName() {
+                return "PluginExecutor";
+            }
+
+            @Override public String threadName() {
+                return "";
+            }
+
+            @Override public boolean useVirtualThread() {
+                return true;
+            }
+        });
+    }
+
+
+    @Override public boolean isAsync() {
+        return true;
     }
 
     @Override public void onEvent() throws Exception {
