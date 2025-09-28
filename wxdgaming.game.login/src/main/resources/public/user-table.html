@@ -10,6 +10,13 @@
     <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
     <link rel="stylesheet" type="text/css" href="/style/table.css"/>
     <style>
+        .box {display: flex;flex-direction: column;}
+
+        .root_box_top {height: 120px;}
+
+        .root_box_center {flex: 1;}
+
+        .root_box_bottom {height: 38px;}
 
         .root_box_bottom label {padding-left: 5px;padding-right: 5px;}
 
@@ -202,7 +209,7 @@
     </script>
 </head>
 <body>
-<div class="root root_box_table">
+<div class="root box">
     <div class="root_box_top btn_box" style="padding-left: 20px; padding-top: 8px; text-align: left;vertical-align: center;">
         <label for="minTime">开始日期: </label><input id="minTime" type="datetime-local"/>
         <label for="maxTime">结束日期: </label><input id="maxTime" type="datetime-local"/>
