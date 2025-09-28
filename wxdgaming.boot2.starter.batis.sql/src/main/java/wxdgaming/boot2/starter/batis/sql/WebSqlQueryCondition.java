@@ -22,7 +22,6 @@ import java.util.List;
  **/
 @Getter
 @Setter
-@Accessors(chain = true)
 public class WebSqlQueryCondition extends ObjectBase {
 
     int pageIndex;

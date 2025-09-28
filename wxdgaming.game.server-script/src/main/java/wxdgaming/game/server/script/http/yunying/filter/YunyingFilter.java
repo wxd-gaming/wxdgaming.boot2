@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.WebFilter;
 import wxdgaming.boot2.core.util.AssertUtil;
-import wxdgaming.boot2.core.util.SignUtil;
+import wxdgaming.game.authority.SignUtil;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 
 import java.util.Map;

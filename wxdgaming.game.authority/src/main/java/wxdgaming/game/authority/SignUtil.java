@@ -1,7 +1,8 @@
-package wxdgaming.boot2.core.util;
+package wxdgaming.game.authority;
 
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.json.FastJsonUtil;
+import wxdgaming.boot2.core.util.Md5Util;
 
 import java.util.Map;
 import java.util.TreeMap;

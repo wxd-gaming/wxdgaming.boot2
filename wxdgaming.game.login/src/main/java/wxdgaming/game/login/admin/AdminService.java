@@ -11,7 +11,7 @@ import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.token.JsonTokenBuilder;
-import wxdgaming.boot2.core.util.SignUtil;
+import wxdgaming.game.authority.SignUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
 import wxdgaming.game.authority.AdminUserToken;

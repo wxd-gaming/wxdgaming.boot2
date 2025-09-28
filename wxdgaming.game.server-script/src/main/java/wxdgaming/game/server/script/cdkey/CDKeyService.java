@@ -9,6 +9,7 @@ import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
+import wxdgaming.game.authority.SignUtil;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 import wxdgaming.game.login.bean.UseCDKeyDTO;
 import wxdgaming.game.message.cdkey.ResUseCdKey;
@@ -24,7 +25,6 @@ import wxdgaming.game.server.module.inner.ConnectLoginService;
 import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.cdkey.bean.CDKeyReward;
 import wxdgaming.game.server.script.tips.TipsService;
-import wxdgaming.boot2.core.util.SignUtil;
 
 import java.util.ArrayList;
 import java.util.List;

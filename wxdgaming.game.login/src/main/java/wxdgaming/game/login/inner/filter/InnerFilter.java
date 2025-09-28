@@ -12,7 +12,7 @@ import wxdgaming.boot2.core.WebFilter;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.game.login.LoginServerProperties;
-import wxdgaming.boot2.core.util.SignUtil;
+import wxdgaming.game.authority.SignUtil;
 
 /**
  * 拦截器

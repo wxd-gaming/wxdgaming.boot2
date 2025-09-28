@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.ann.StopBefore;
-import wxdgaming.boot2.core.util.SignUtil;
+import wxdgaming.game.authority.SignUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
