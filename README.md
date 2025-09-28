@@ -21,9 +21,14 @@ B站 https://www.bilibili.com/list/316421251
 | starter.net.httpclient | 基于 apache http client 网络通信模块     |
 | starter.net.server     | 网络监听，端口同时支持 http, websocket, tcp |
 | starter.schedule       | 定时任务模块                           |
-| game.test              | 容器启动测试模块                         |
-| game.test-scrtip       | 容器启动测试模块脚本模块实现热更新                |
-| boot.yml               | 容器采用yml作为启动配置                    |
+| game.authority         | web权限模块                          |
+| game.basic             | 游戏基础模块                           |
+| game.login             | 游戏的登录模块，管理模块，服务器列表模块             |
+| game.robot             | 游戏机器人模块，模拟机器人操作                  |
+| game.server            | 服务器模块，管理模块                       |
+| game.server-script     | 游戏服务器脚本，业务逻辑模块                   |
+| logbus                 | 日志处理模块，用于上报日志                    |
+| logserver              | 日志服务，用户处理游戏内的日志，包括统计             |
 
 ### 配置
 

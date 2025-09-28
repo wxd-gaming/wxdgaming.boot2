@@ -62,7 +62,7 @@ public class ValidationUtil extends HoldApplicationContext {
         return true;
     }
 
-    /** 完全满足条件 */
+    /** 任意一个条件满足就行 */
     public boolean validateAny(Object player, ConfigString configString) {
         return validateAny(player, configString, Validation.Parse);
     }
