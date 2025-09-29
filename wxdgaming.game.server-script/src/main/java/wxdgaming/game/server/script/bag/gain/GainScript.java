@@ -12,7 +12,7 @@ import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.bag.ItemBag;
-import wxdgaming.game.server.bean.bag.ItemGrid;
+import wxdgaming.game.server.bean.goods.ItemGrid;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;

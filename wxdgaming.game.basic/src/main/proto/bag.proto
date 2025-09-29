@@ -39,3 +39,13 @@ message ItemBean {
   int64 expireTime    = 5;
 
 }
+
+//请求使用道具
+message ReqUseBagItem {
+  BagType bagType               = 1;
+  map<int64, int64> useMap      = 2;//道具id，使用数量
+}
+
+//回复使用道具
+message ResUseBagItem {
+}

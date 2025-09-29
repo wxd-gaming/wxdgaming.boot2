@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import wxdgaming.game.server.bean.goods.ItemTypeConst;
 import wxdgaming.game.cfg.bean.QItem;
 import wxdgaming.game.server.bean.bag.BagChangesContext;
-import wxdgaming.game.server.bean.bag.ItemGrid;
+import wxdgaming.game.server.bean.goods.ItemGrid;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.bag.cost.CostScript;
 

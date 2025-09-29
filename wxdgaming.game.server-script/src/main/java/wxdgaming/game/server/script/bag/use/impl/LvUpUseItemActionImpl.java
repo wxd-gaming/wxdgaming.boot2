@@ -22,7 +22,7 @@ public class LvUpUseItemActionImpl extends AbstractUseItemAction {
     }
 
     @Override public boolean canUse(Player player, BagChangesContext bagChangesContext, Item item) {
-        return player.getHp() < player.maxHp();
+        return player.getLevel() < 100;
     }
 
     @Override public void doUse(Player player, BagChangesContext bagChangesContext, Item item) {

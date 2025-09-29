@@ -23,7 +23,7 @@ import java.util.List;
 public class CurrencyGainScript extends GainScript {
 
     @Override public ItemTypeConst type() {
-        return ItemTypeConst.CurrencyType;
+        return ItemTypeConst.Currency;
     }
 
     @Override public void newItem(List<Item> items, ItemCfg itemCfg) {

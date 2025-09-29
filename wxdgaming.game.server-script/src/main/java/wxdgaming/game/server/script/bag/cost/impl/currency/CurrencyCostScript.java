@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.game.server.bean.goods.ItemTypeConst;
 import wxdgaming.game.cfg.bean.QItem;
-import wxdgaming.game.server.bean.bag.ItemGrid;
+import wxdgaming.game.server.bean.goods.ItemGrid;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.script.bag.cost.CostScript;
@@ -20,7 +20,7 @@ import wxdgaming.game.server.script.bag.cost.CostScript;
 public class CurrencyCostScript extends CostScript {
 
     @Override public ItemTypeConst type() {
-        return ItemTypeConst.CurrencyType;
+        return ItemTypeConst.Currency;
     }
 
     @Override public void cost(Player player, BagChangesContext bagChangesContext, QItem qItem, long count) {

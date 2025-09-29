@@ -9,34 +9,25 @@ import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.bag.use.AbstractUseItemAction;
 
 /**
- * 血量增加
+ * 等级丹
  *
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-07-02 11:12
  */
 @Component
-public class HPAddUseItemActionImpl extends AbstractUseItemAction {
+public class ExpUseItemActionImpl extends AbstractUseItemAction {
 
     @Override public ItemTypeConst type() {
-        return ItemTypeConst.HPMPADD;
+        return ItemTypeConst.Exp;
     }
 
     @Override public boolean canUse(Player player, BagChangesContext bagChangesContext, Item item) {
-        QItem qItem = item.qItem();
-        return (qItem.getParam1() > 0 && player.getHp() < player.maxHp())
-               ||
-               (qItem.getParam2() > 0 && player.getMp() < player.maxMp());
+        return player.getExp() < Integer.MAX_VALUE;
     }
 
     @Override public void doUse(Player player, BagChangesContext bagChangesContext, Item item) {
         QItem qItem = item.qItem();
-        int changeHp = qItem.getParam1();
-        fightService.changeHp(player, changeHp, bagChangesContext.getReasonDTO());
-
-
-        int changeMp = qItem.getParam2();
-        fightService.changeMp(player, changeMp, bagChangesContext.getReasonDTO());
-
+        playerService.addExp(player, qItem.getParam1(), bagChangesContext.getReasonDTO());
     }
 
 }

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.server.bean.goods.Item;
+import wxdgaming.game.server.bean.goods.ItemGrid;
 
 import java.util.*;
 

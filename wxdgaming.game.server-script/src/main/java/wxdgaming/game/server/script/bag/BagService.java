@@ -10,6 +10,7 @@ import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.cfg.QItemTable;
 import wxdgaming.game.cfg.bean.QItem;
+import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.message.bag.ResBagInfo;
 import wxdgaming.game.server.bean.bag.BagChangesContext;
@@ -27,7 +28,6 @@ import wxdgaming.game.server.script.bag.log.ItemSlog;
 import wxdgaming.game.server.script.bag.use.AbstractUseItemAction;
 import wxdgaming.game.server.script.mail.MailService;
 import wxdgaming.game.server.script.tips.TipsService;
-import wxdgaming.game.common.slog.SlogService;
 
 import java.util.*;
 
@@ -246,6 +246,24 @@ public class BagService extends HoldApplicationContext implements InitPrint {
         return true;
     }
 
+    /** 在执行 cost 之前切记用这个 */
+    public boolean checkCost(Player player, BagChangeDTO4ItemGrid bagChangeDTO) {
+        BagType bagType = bagChangeDTO.getBagType();
+        for (Map.Entry<ItemGrid, Long> entry : bagChangeDTO.getItemMap().entrySet()) {
+            ItemGrid itemGrid = entry.getKey();
+            QItem qItem = itemGrid.getItem().qItem();
+            long change = entry.getValue();
+            AssertUtil.assertTrue(change >= 0, "扣除数量不能是负数");
+            if (itemGrid.getItem().getCount() < change) {
+                if (bagChangeDTO.isBagErrorNoticeClient()) {
+                    tipsService.tips(player, qItem.getToName() + "道具不足", bagChangeDTO.getReasonDTO().getReasonConst());
+                }
+                return false;
+            }
+        }
+        return true;
+    }
+
     /** 调用之前请使用 {@link BagService#checkCost(Player, BagChangeDTO4ItemCfg)} 函数 是否够消耗 */
     public void cost(Player player, BagChangeDTO4ItemCfg bagChangeDTO) {
         BagType bagType = bagChangeDTO.getBagType();
@@ -282,6 +300,77 @@ public class BagService extends HoldApplicationContext implements InitPrint {
 
         }
         player.write(bagChangesContext.toResUpdateBagInfo());
+
+    }
+
+    public void cost(Player player, BagChangeDTO4ItemGrid bagChangeDTO) {
+        BagType bagType = bagChangeDTO.getBagType();
+        ItemBag itemBag = player.getBagPack().itemBag(bagType);
+        BagChangesContext bagChangesContext = new BagChangesContext(player, bagType, itemBag, bagChangeDTO.getReasonDTO());
+        for (Map.Entry<ItemGrid, Long> entry : bagChangeDTO.getItemMap().entrySet()) {
+            ItemGrid itemGrid = entry.getKey();
+            QItem qItem = itemGrid.getItem().qItem();
+            long change = entry.getValue();
+
+            AssertUtil.assertTrue(change >= 0, "扣除数量不能是负数");
+
+            int type = qItem.getItemType();
+            int subtype = qItem.getItemSubType();
+            GainScript gainScript = gainScriptProvider.getScript(type, subtype);
+
+            long oldCount = gainScript.getCount(player, itemBag, qItem.getId());
+            CostScript costScript = costScriptProvider.getScript(type, subtype);
+
+            costScript.cost(player, bagChangesContext, itemGrid, change);
+            long newCount = gainScript.getCount(player, itemBag, qItem.getId());
+
+            log.info("消耗道具：{}, {}, {} {}-{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeDTO.getReasonDTO());
+
+            ItemSlog itemLog = new ItemSlog(player, bagType.name(),
+                    "消耗",
+                    qItem.getId(), qItem.getName(),
+                    oldCount, change, newCount,
+                    bagChangeDTO.getReasonDTO().getReasonConst().name(),
+                    bagChangeDTO.getReasonDTO().getReasonText()
+            );
+            slogService.pushLog(itemLog);
+        }
+        player.write(bagChangesContext.toResUpdateBagInfo());
+    }
+
+
+    public void use(Player player, BagChangeDTO4ItemGrid bagChangeDTO) {
+        BagType bagType = bagChangeDTO.getBagType();
+        ItemBag itemBag = player.getBagPack().itemBag(bagType);
+        BagChangesContext bagChangesContext = new BagChangesContext(player, bagType, itemBag, bagChangeDTO.getReasonDTO());
+        /*先检查能不能使用*/
+        for (Map.Entry<ItemGrid, Long> entry : bagChangeDTO.getItemMap().entrySet()) {
+            ItemGrid itemGrid = entry.getKey();
+            QItem qItem = itemGrid.getItem().qItem();
+            int type = qItem.getItemType();
+            int subtype = qItem.getItemSubType();
+            AbstractUseItemAction useScript = useItemScriptProvider.getScript(type, subtype);
+            if (!useScript.canUse(player, bagChangesContext, itemGrid.getItem())) {
+                return;
+            }
+        }
+
+        /*在检查够不够数量*/
+        if (!checkCost(player, bagChangeDTO)) {
+            return;
+        }
+        /*扣除*/
+        cost(player, bagChangeDTO);
+
+        for (Map.Entry<ItemGrid, Long> entry : bagChangeDTO.getItemMap().entrySet()) {
+            ItemGrid itemGrid = entry.getKey();
+            QItem qItem = itemGrid.getItem().qItem();
+            int type = qItem.getItemType();
+            int subtype = qItem.getItemSubType();
+            AbstractUseItemAction useScript = useItemScriptProvider.getScript(type, subtype);
+            /*使用*/
+            useScript.doUse(player, bagChangesContext, itemGrid.getItem());
+        }
 
     }
 

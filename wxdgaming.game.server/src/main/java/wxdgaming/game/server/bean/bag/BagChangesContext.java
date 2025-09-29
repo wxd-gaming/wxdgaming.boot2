@@ -3,6 +3,7 @@ package wxdgaming.game.server.bean.bag;
 import lombok.AccessLevel;
 import lombok.Getter;
 import wxdgaming.boot2.core.util.AssertUtil;
+import wxdgaming.game.server.bean.goods.ItemGrid;
 import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.message.bag.ResUpdateBagInfo;
