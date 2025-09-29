@@ -3,6 +3,8 @@ package wxdgaming.boot2.starter.batis;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.function.BiConsumer;
+
 /**
  * 数据批量提交
  *
@@ -13,7 +15,9 @@ import lombok.Setter;
 @Setter
 public abstract class DataBatch {
 
-    /** {@link Entity#isNewEntity()} <p> true 调用insert false 调用update } */
+    BiConsumer<String, Entity> errorCallback;
+
+    /** {@link Entity#getNewEntity()} <p> true 调用insert false 调用update } */
     public abstract void save(Entity entity);
 
     public abstract void insert(Entity entity);

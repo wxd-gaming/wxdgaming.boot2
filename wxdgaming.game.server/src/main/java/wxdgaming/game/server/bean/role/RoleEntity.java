@@ -34,6 +34,9 @@ public class RoleEntity extends EntityLongUID {
     @DbColumn(index = true)
     boolean del;
     /** 最好登录时间 */
+    @DbColumn()
+    long loginCount;
+    /** 最好登录时间 */
     @DbColumn(index = true)
     long lastLoginTime;
     /** 最好退出登录时间 */
@@ -55,6 +58,7 @@ public class RoleEntity extends EntityLongUID {
         name = player.getName();
         account = player.getAccount();
         del = player.isDel();
+        loginCount = player.getOnlineInfo().getLoginCount();
         lastLoginTime = player.getOnlineInfo().getLastLoginTime();
         lastLogoutTime = player.getOnlineInfo().getLastLogoutTime();
         totalOnlineMills = player.getOnlineInfo().getOnlineTotalMills();

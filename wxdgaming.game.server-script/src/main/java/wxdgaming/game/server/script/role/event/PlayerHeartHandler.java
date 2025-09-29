@@ -9,6 +9,7 @@ import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.game.server.bean.reason.ReasonConst;
 import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.server.bean.role.Player;
+import wxdgaming.game.server.entity.role.OnlineInfo;
 import wxdgaming.game.server.event.*;
 import wxdgaming.game.server.script.fight.FightService;
 
@@ -58,10 +59,11 @@ public class PlayerHeartHandler extends HoldApplicationContext {
         long millis = MyClock.millis();
         {
             /*记录在线时长*/
-            long diff = millis - player.getOnlineInfo().getLastUpdateOnlineTime();
-            player.getOnlineInfo().setOnlineMills(player.getOnlineInfo().getOnlineMills() + diff);
-            player.getOnlineInfo().setOnlineTotalMills(player.getOnlineInfo().getOnlineTotalMills() + diff);
-            player.getOnlineInfo().setLastUpdateOnlineTime(millis);
+            OnlineInfo onlineInfo = player.getOnlineInfo();
+            long diff = millis - onlineInfo.getLastUpdateOnlineTime();
+            onlineInfo.setOnlineMills(onlineInfo.getOnlineMills() + diff);
+            onlineInfo.setOnlineTotalMills(onlineInfo.getOnlineTotalMills() + diff);
+            onlineInfo.setLastUpdateOnlineTime(millis);
             applicationContextProvider.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("onlineTime", diff));
         }
 

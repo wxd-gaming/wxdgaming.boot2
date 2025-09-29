@@ -6,7 +6,10 @@ import lombok.Setter;
 import wxdgaming.boot2.core.ann.Stop;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * 数据集
@@ -102,6 +105,25 @@ public abstract class DataHelper {
     public abstract void update(Entity entity);
 
     public abstract void delete(Entity entity);
+
+    public void saveList(List<? extends Entity> entityList, BiConsumer<String, Entity> errorCallback) {
+        List<Entity> insertList = new ArrayList<>();
+        List<Entity> updateList = new ArrayList<>();
+        for (Entity entity : entityList) {
+            if (Boolean.FALSE.equals(entity.getNewEntity()) || existBean(entity)) {
+                entity.setNewEntity(false);
+                updateList.add(entity);
+            } else {
+                insertList.add(entity);
+            }
+        }
+        insertList(insertList, errorCallback == null ? null : entity -> errorCallback.accept("insert", entity));
+        updateList(updateList, errorCallback == null ? null : entity -> errorCallback.accept("update", entity));
+    }
+
+    public abstract void insertList(List<? extends Entity> entityList, Consumer<Entity> errorCallback);
+
+    public abstract void updateList(List<? extends Entity> entityList, Consumer<Entity> errorCallback);
 
     public abstract <R extends Entity> void deleteByKey(Class<R> cls, Object... args);
 

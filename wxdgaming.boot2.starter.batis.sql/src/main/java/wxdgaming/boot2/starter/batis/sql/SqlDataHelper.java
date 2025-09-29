@@ -8,12 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.Stop;
 import wxdgaming.boot2.core.ann.StopBefore;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
-import wxdgaming.boot2.core.runtime.IgnoreRunTimeRecord;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.batis.DataHelper;
 import wxdgaming.boot2.starter.batis.Entity;
@@ -28,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -279,26 +278,32 @@ public abstract class SqlDataHelper extends DataHelper {
      */
     public int executeUpdate(String sql, Object... params) {
         AssertUtil.assertTrue(StringUtils.isNotBlank(sql), "sql 语句不能为空");
-        try (Connection connection = connection(); PreparedStatement statement = connection.prepareStatement(sql)) {
-            if (params != null) {
-                for (int i = 0; i < params.length; i++) {
-                    Object param = params[i];
-                    statement.setObject(i + 1, param);
-                }
-            }
-            if (sqlConfig.isDebug()) {
-                log.info(
-                        "\n{} executeUpdate sql: \n{}",
-                        getDbName(), statement.toString()
-                );
-            }
-            int i = statement.executeUpdate();
+        try (Connection connection = connection()) {
+            int i = executeUpdate(connection, sql, params);
             if (!connection.getAutoCommit())
                 connection.commit();
             return i;
         } catch (Exception e) {
             throw Throw.of(getDbName() + " " + sql + " " + Objects.toString(params), e);
         }
+    }
+
+    public int executeUpdate(Connection connection, String sql, Object... params) throws Exception {
+        AssertUtil.assertTrue(StringUtils.isNotBlank(sql), "sql 语句不能为空");
+        PreparedStatement statement = connection.prepareStatement(sql);
+        if (params != null) {
+            for (int i = 0; i < params.length; i++) {
+                Object param = params[i];
+                statement.setObject(i + 1, param);
+            }
+        }
+        if (sqlConfig.isDebug()) {
+            log.info(
+                    "\n{} executeUpdate sql: \n{}",
+                    getDbName(), statement.toString()
+            );
+        }
+        return statement.executeUpdate();
     }
 
     /** 返回第一行，第一列 */
@@ -519,6 +524,76 @@ public abstract class SqlDataHelper extends DataHelper {
         String sql = "delete from `" + tableName + "` where " + where;
         String string = ddlBuilder().buildSql$$(sql);
         executeUpdate(string, args);
+    }
+
+    @Override public void insertList(List<? extends Entity> entityList, Consumer<Entity> errorCallback) {
+        try (Connection connection = getHikariDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            try {
+                try {
+                    for (Entity entity : entityList) {
+                        TableMapping tableMapping = tableMapping(entity.getClass());
+                        String tableName = TableMapping.beanTableName(entity);
+                        String insert = ddlBuilder().buildInsertSql(tableMapping, tableName);
+                        Object[] insertParams = ddlBuilder().buildInsertParams(tableMapping, entity);
+                        this.executeUpdate(connection, insert, insertParams);
+                    }
+                    connection.commit();
+                } catch (Exception e) {
+                    connection.rollback();
+                    for (Entity entity : entityList) {
+                        try {
+                            insert(entity);
+                        } catch (Exception ex) {
+                            if (errorCallback != null) {
+                                errorCallback.accept(entity);
+                            } else {
+                                log.error("插入数据 {} 失败", entity, ex);
+                            }
+                        }
+                    }
+                }
+            } finally {
+                connection.setAutoCommit(true);
+            }
+        } catch (Exception e) {
+            throw Throw.of(getDbName(), e);
+        }
+    }
+
+    @Override public void updateList(List<? extends Entity> entityList, Consumer<Entity> errorCallback) {
+        try (Connection connection = getHikariDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            try {
+                try {
+                    for (Entity entity : entityList) {
+                        TableMapping tableMapping = tableMapping(entity.getClass());
+                        String tableName = TableMapping.beanTableName(entity);
+                        String sql = ddlBuilder().buildUpdateSql(tableMapping, tableName);
+                        Object[] objects = ddlBuilder().builderUpdateParams(tableMapping, entity);
+                        this.executeUpdate(connection, sql, objects);
+                    }
+                    connection.commit();
+                } catch (Exception e) {
+                    connection.rollback();
+                    for (Entity entity : entityList) {
+                        try {
+                            update(entity);
+                        } catch (Exception ex) {
+                            if (errorCallback != null) {
+                                errorCallback.accept(entity);
+                            } else {
+                                log.error("更新数据 {} 失败", entity, ex);
+                            }
+                        }
+                    }
+                }
+            } finally {
+                connection.setAutoCommit(true);
+            }
+        } catch (Exception e) {
+            throw Throw.of(getDbName(), e);
+        }
     }
 
     @Override public void truncates() {

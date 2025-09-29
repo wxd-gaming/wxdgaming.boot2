@@ -22,6 +22,11 @@
       "fieldType": "string"
     },
     {
+      "fieldName": "refreshTime",
+      "fieldComment": "更新时间",
+      "fieldType": "long"
+    },
+    {
       "fieldName": "roleId",
       "fieldComment": "角色ID",
       "fieldType": "long"
@@ -32,6 +37,11 @@
       "fieldType": "string"
     },
     {
+      "fieldName": "roleCreateTime",
+      "fieldComment": "创建时间",
+      "fieldType": "long"
+    },
+    {
       "fieldName": "lv",
       "fieldComment": "角色等级",
       "fieldType": "int"
@@ -40,6 +50,26 @@
       "fieldName": "vipLv",
       "fieldComment": "角色VIP",
       "fieldType": "int"
+    },
+    {
+      "fieldName": "lastLoginTime",
+      "fieldComment": "最后登录时间",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "lastLogoutTime",
+      "fieldComment": "最后退出时间",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "totalOnlineMills",
+      "fieldComment": "在线时长",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "loginCount",
+      "fieldComment": "登录次数",
+      "fieldType": "long"
     }
   ]
 }

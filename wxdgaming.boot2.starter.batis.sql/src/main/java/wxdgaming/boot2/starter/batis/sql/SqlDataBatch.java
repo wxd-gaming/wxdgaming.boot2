@@ -231,7 +231,7 @@ public abstract class SqlDataBatch extends DataBatch {
                     while (!splitCollection.isEmpty()) {
                         List<BatchParam> batchParams = splitCollection.removeFirst();
                         diffTimeRecord.reset();
-                        int executeCount = executeUpdate(sql, batchParams);
+                        int executeCount = executeUpdate(sqlType, sql, batchParams);
                         long diff = diffTimeRecord.interval().interval() / 10000;
                         executeDiffTime += diff;
                         this.executeCount += executeCount;
@@ -262,7 +262,7 @@ public abstract class SqlDataBatch extends DataBatch {
             }
         }
 
-        protected int executeUpdate(String sql, List<BatchParam> paramList) {
+        protected int executeUpdate(String sqlType, String sql, List<BatchParam> paramList) {
             int insertCount = 0;
             try (Connection connection = sqlDataHelper.connection()) {
                 connection.setAutoCommit(false);
@@ -280,20 +280,24 @@ public abstract class SqlDataBatch extends DataBatch {
                 }
             } catch (Exception e) {
                 insertCount = 0;
-                for (BatchParam objects : paramList) {
+                for (BatchParam batchParam : paramList) {
                     try (Connection connection = sqlDataHelper.connection();
                          PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-                        for (int i = 0; i < objects.params.length; i++) {
-                            Object object = objects.params[i];
+                        for (int i = 0; i < batchParam.params.length; i++) {
+                            Object object = batchParam.params[i];
                             preparedStatement.setObject(i + 1, object);
                         }
                         preparedStatement.executeUpdate();
                         insertCount++;
                     } catch (Exception e1) {
-                        File file = new File("target/db_error/" + sqlDataHelper.getDbName() + "/" + this.threadId + "_" + System.nanoTime() + ".txt");
-                        String formatted = "db batch error\nsql: %s\ndata: %s\n\nerror: \n%s".formatted(sql, FastJsonUtil.toJSONString(objects), e1.toString());
-                        FileWriteUtil.writeString(file, formatted, true);
-                        log.error("{}", formatted, e1);
+                        if (getErrorCallback() != null) {
+                            getErrorCallback().accept(sqlType, batchParam.entity);
+                        } else {
+                            File file = new File("target/db_error/" + sqlDataHelper.getDbName() + "/" + this.threadId + "_" + System.nanoTime() + ".txt");
+                            String formatted = "db batch error\nsql: %s\ndata: %s\n\nerror: \n%s".formatted(sql, FastJsonUtil.toJSONString(batchParam), e1.toString());
+                            FileWriteUtil.writeString(file, formatted, true);
+                            log.error("{}", formatted, e1);
+                        }
                     }
                 }
             }
@@ -302,7 +306,7 @@ public abstract class SqlDataBatch extends DataBatch {
     }
 
     @Getter
-    protected class BatchParam {
+    protected static class BatchParam {
 
         protected final Entity entity;
         /** 主键的值 */

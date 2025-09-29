@@ -2,9 +2,10 @@ package wxdgaming.game.server.script.role.handler;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
@@ -95,6 +96,7 @@ public class ReqCreateRoleHandler extends HoldApplicationContext {
             player = new Player();
             player.setUid(dataCenterService.getHexid().newId());
             player.setAccount(account);
+            player.setCreateTime(MyClock.millis());
             player.setAppId(userMapping.getUserDataVo().getAppId());
             player.setPlatform(userMapping.getUserDataVo().getPlatform());
             player.setPlatformUserId(userMapping.getUserDataVo().getPlatformUserId());

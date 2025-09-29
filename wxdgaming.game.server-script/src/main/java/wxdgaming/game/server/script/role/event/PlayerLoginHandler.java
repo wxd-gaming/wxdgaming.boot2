@@ -40,6 +40,12 @@ public class PlayerLoginHandler extends HoldApplicationContext {
             /*触发任务登录天数*/
             applicationContextProvider.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("loginDay", 1));
         }
+        player.getOnlineInfo().setLastUpdateOnlineTime(MyClock.millis());
+        /*清理本次在线时长*/
+        player.getOnlineInfo().setOnlineMills(0);
+        if (player.getCreateTime() == 0) {
+            player.setCreateTime(MyClock.millis());
+        }
     }
 
     /** 创建角色之后赠送初始化道具 */
@@ -49,6 +55,7 @@ public class PlayerLoginHandler extends HoldApplicationContext {
         log.info("玩家上线:{} {}", ThreadContext.context().queueName(), player);
         player.getStatus().addFlags(StatusConst.Online);
         player.getOnlineInfo().setLastLoginTime(MyClock.millis());
+        player.getOnlineInfo().setLoginCount(player.getOnlineInfo().getLoginCount() + 1);
     }
 
 

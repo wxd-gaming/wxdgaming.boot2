@@ -92,6 +92,7 @@ public class PlayerDriveService extends HoldApplicationContext {
         ExecutorFactory.getExecutorServiceLogic().execute(executorEvent);
     }
 
+    @Order
     @OnLogin
     public void addPlayer(Player player) {
         int driveId = getPlayerDriveId(player.getUid());
@@ -120,6 +121,7 @@ public class PlayerDriveService extends HoldApplicationContext {
 
     }
 
+    @Order
     @OnLogout
     public void removePlayer(Player player) {
         int driveId = getPlayerDriveId(player.getUid());
@@ -136,7 +138,7 @@ public class PlayerDriveService extends HoldApplicationContext {
 
     @OnHeartMinute
     public void updateRoleInfoSlog(Player player) {
-        RoleInfoSlog roleInfoSlog = new RoleInfoSlog(player, String.valueOf(player.checkOnline()), 1);
+        RoleInfoSlog roleInfoSlog = new RoleInfoSlog(player, String.valueOf(player.checkOnline()));
         slogService.updateLog(player.getUid(), player.getCreateTime(), roleInfoSlog);
     }
 
@@ -151,6 +153,12 @@ public class PlayerDriveService extends HoldApplicationContext {
 
         public PlayerDriveContent(String queueName) {
             this.queueName = queueName;
+            long millis = MyClock.millis();
+            LocalDateTime localDateTime = MyClock.localDateTime(millis);
+            lsatSecond = localDateTime.getSecond();
+            lsatMinute = localDateTime.getMinute();
+            lsatHour = localDateTime.getHour();
+            lastDay = localDateTime.getDayOfMonth();
         }
 
         @Override public String getStack() {
@@ -164,23 +172,40 @@ public class PlayerDriveService extends HoldApplicationContext {
             int minute = localDateTime.getMinute();
             int hour = localDateTime.getHour();
             int day = localDateTime.getDayOfMonth();
+            boolean updateSecond = false;
+            boolean updateMinute = false;
+            boolean updateHour = false;
+            boolean updateDay = false;
+
+            if (lsatSecond != second) {
+                lsatSecond = second;
+                updateSecond = true;
+                if (lsatMinute != minute) {
+                    lsatMinute = minute;
+                    updateMinute = true;
+                    if (lsatHour != hour) {
+                        lsatHour = hour;
+                        updateHour = true;
+                        if (lastDay != day) {
+                            lastDay = day;
+                            updateDay = true;
+                        }
+                    }
+                }
+            }
 
             for (Player player : playerMap.values()) {
                 applicationContextProvider.executeMethodWithAnnotatedException(OnHeart.class, player, millis);
-                if (lsatSecond != second) {
-                    lsatSecond = second;
+                if (updateSecond) {
                     applicationContextProvider.executeMethodWithAnnotatedException(OnHeartSecond.class, player, second);
                 }
-                if (lsatMinute != minute) {
-                    lsatMinute = minute;
+                if (updateMinute) {
                     applicationContextProvider.executeMethodWithAnnotatedException(OnHeartMinute.class, player, minute);
                 }
-                if (lsatHour != hour && minute == 0) {
-                    lsatHour = hour;
+                if (updateHour) {
                     applicationContextProvider.executeMethodWithAnnotatedException(OnHeartHour.class, player, hour);
                 }
-                if (lastDay != day && hour == 0 && minute == 0) {
-                    lastDay = day;
+                if (updateDay) {
                     applicationContextProvider.executeMethodWithAnnotatedException(OnHeartDay.class, player, day);
                 }
             }

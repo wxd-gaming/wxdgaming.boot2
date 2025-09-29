@@ -3,6 +3,7 @@ package wxdgaming.game.server.entity.role;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
+import wxdgaming.boot2.core.lang.ObjectBase;
 
 /**
  * 在线信息
@@ -12,7 +13,8 @@ import lombok.Setter;
  **/
 @Getter
 @Setter
-public class OnlineInfo {
+public class OnlineInfo extends ObjectBase {
+    private long loginCount;
     private long lastLoginDayTime;
     private long lastLoginTime;
     private long lastLogoutTime;

@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.collection.MapOf;
+import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.NumberUtil;
@@ -17,6 +18,7 @@ import wxdgaming.logserver.bean.LogMappingInfo;
 import wxdgaming.logserver.bean.LogTableContext;
 import wxdgaming.logserver.module.data.DataCenterService;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,27 +47,59 @@ public class LogService implements InitPrint {
         return logTableContextMap.computeIfAbsent(logName, LogTableContext::new);
     }
 
-    public void submitLog(LogEntity logEntity) {
-        String logType = logEntity.getLogType().toLowerCase();
-        LogTableContext logTableContext = logTableContext(logType);
-        if (logEntity.getUid() == 0) {
-            logEntity.setUid(logTableContext.newId());
-        }
-        if (logTableContext.filter(logEntity.getUid())) {
-            log.debug("uid 已存在丢弃 {}", logEntity);
-            return;
-        }
-        logEntity.checkDataKey();
-        logTableContext.addFilter(logEntity.getUid());
-        log.debug("保存 uid={}, logType={}, entity={}", logEntity.getUid(), logType, logEntity);
-        pgsqlDataHelper.getDataBatch().insert(logEntity);
+    public void submitLog(List<LogEntity> logEntityList) {
+        List<LogEntity> list = logEntityList.stream()
+                .peek(logEntity -> {
+                    String logType = logEntity.getLogType().toLowerCase();
+                    LogTableContext logTableContext = logTableContext(logType);
+                    if (logEntity.getUid() == 0) {
+                        logEntity.setUid(logTableContext.newId());
+                    }
+                })
+                .filter(logEntity -> {
+                    String logType = logEntity.getLogType().toLowerCase();
+                    LogTableContext logTableContext = logTableContext(logType);
+                    if (logTableContext.filter(logEntity.getUid())) {
+                        log.debug("uid 已存在丢弃 {}", logEntity);
+                        return false;
+                    }
+                    return true;
+                })
+                .peek(logEntity -> {
+                    String logType = logEntity.getLogType().toLowerCase();
+                    LogTableContext logTableContext = logTableContext(logType);
+                    logEntity.checkDataKey();
+                    logTableContext.addFilter(logEntity.getUid());
+                    log.debug("保存 uid={}, logType={}, entity={}", logEntity.getUid(), logType, logEntity);
+                }).toList();
+
+        pgsqlDataHelper.insertList(list, entity -> {
+            LogEntity logEntity = (LogEntity) entity;
+            String logType = logEntity.getLogType();
+            long uid = logEntity.getUid();
+            FileWriteUtil.writeString(
+                    Paths.get("slog", "error", "insert", MyClock.formatDate(MyClock.SDF_YYYYMMDD), logType, uid + ".log").toFile(),
+                    logEntity.toJSONString()
+            );
+        });
+
     }
 
-    public void updateLog(LogEntity logEntity) {
-        String logType = logEntity.getLogType().toLowerCase();
-        logEntity.setDayKey(0);
-        log.debug("保存 uid={}, logType={}, entity={}", logEntity.getUid(), logType, logEntity);
-        pgsqlDataHelper.getDataBatch().save(logEntity);
+    public void updateLog(List<LogEntity> logEntityList) {
+        logEntityList.forEach(logEntity -> {
+            String logType = logEntity.getLogType().toLowerCase();
+            logEntity.setDayKey(0);
+            log.debug("保存 uid={}, logType={}, entity={}", logEntity.getUid(), logType, logEntity);
+        });
+        pgsqlDataHelper.saveList(logEntityList, (type, entity) -> {
+            LogEntity logEntity = (LogEntity) entity;
+            String logType = logEntity.getLogType();
+            long uid = logEntity.getUid();
+            FileWriteUtil.writeString(
+                    Paths.get("slog", "error", type, MyClock.formatDate(MyClock.SDF_YYYYMMDD), logType, uid + ".log").toFile(),
+                    logEntity.toJSONString()
+            );
+        });
     }
 
     public void saveErrorLog(String reason, String data, String stackTrace) {
