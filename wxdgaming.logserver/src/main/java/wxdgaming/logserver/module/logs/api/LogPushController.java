@@ -4,23 +4,35 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import wxdgaming.boot2.core.CacheHttpServletRequest;
 import wxdgaming.boot2.core.SpringUtil;
+import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
+import wxdgaming.boot2.core.io.FileReadUtil;
+import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.io.Objects;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.Md5Util;
 import wxdgaming.boot2.starter.net.http.HttpDataAction;
 import wxdgaming.logserver.LogServerProperties;
 import wxdgaming.logserver.bean.LogEntity;
 import wxdgaming.logserver.module.logs.LogService;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * 日志接口
@@ -39,6 +51,24 @@ public class LogPushController {
     public LogPushController(LogServerProperties logServerProperties, LogService logService) {
         this.logServerProperties = logServerProperties;
         this.logService = logService;
+    }
+
+    @Start
+    public void start() {
+        ExecutorFactory.getExecutorServiceLogic()
+                .scheduleAtFixedRate(
+                        new PostLog2FileEvent("insert", logService::submitLog),
+                        500,
+                        500,
+                        TimeUnit.MILLISECONDS
+                );
+        ExecutorFactory.getExecutorServiceLogic()
+                .scheduleAtFixedRate(
+                        new PostLog2FileEvent("update", logService::updateLog),
+                        500,
+                        500,
+                        TimeUnit.MILLISECONDS
+                );
     }
 
     List<LogEntity> checkSign(HttpServletRequest request) throws Exception {
@@ -60,39 +90,81 @@ public class LogPushController {
     @RequestMapping("/push")
     public RunResult pushList(HttpServletRequest request) throws Exception {
         List<LogEntity> logEntityList = checkSign(request);
-        for (LogEntity logEntity : logEntityList) {
-            if (StringUtils.isBlank(logEntity.getLogType())) {
-                logService.saveErrorLog("logType 空", logEntity.toJSONString(), "pushList");
-                continue;
-            }
-            logService.submitLog(logEntity);
-        }
+        savePath("insert", logEntityList);
+        //        for (LogEntity logEntity : logEntityList) {
+        //            if (StringUtils.isBlank(logEntity.getLogType())) {
+        //                logService.saveErrorLog("logType 空", logEntity.toJSONString(), "pushList");
+        //                continue;
+        //            }
+        //            logService.submitLog(logEntity);
+        //        }
         return RunResult.ok();
-    }
-
-    @RequestMapping("/m")
-    public String m(CacheHttpServletRequest request) {
-        Map<String, String[]> parameterMap = request.getParameterMap();
-        return "ok";
     }
 
     @RequestMapping("/update")
     public RunResult updateList(HttpServletRequest request) throws Exception {
 
         List<LogEntity> logEntityList = checkSign(request);
-
-        for (LogEntity logEntity : logEntityList) {
-            if (StringUtils.isBlank(logEntity.getLogType())) {
-                logService.saveErrorLog("logType 空", logEntity.toJSONString(), "updateList");
-                continue;
-            }
-            if (logEntity.getUid() == 0) {
-                logService.saveErrorLog("uid 为0", logEntity.toJSONString(), "updateList");
-                continue;
-            }
-            logService.updateLog(logEntity);
-        }
+        savePath("update", logEntityList);
+        //        for (LogEntity logEntity : logEntityList) {
+        //            if (StringUtils.isBlank(logEntity.getLogType())) {
+        //                logService.saveErrorLog("logType 空", logEntity.toJSONString(), "updateList");
+        //                continue;
+        //            }
+        //            if (logEntity.getUid() == 0) {
+        //                logService.saveErrorLog("uid 为0", logEntity.toJSONString(), "updateList");
+        //                continue;
+        //            }
+        //            logService.updateLog(logEntity);
+        //        }
         return RunResult.ok();
+    }
+
+    void savePath(String path, List<LogEntity> logEntityList) {
+        Path slog = Paths.get(
+                "slog",
+                path,
+                MyClock.formatDate(MyClock.SDF_YYYYMMDD),
+                RandomStringUtils.secure().next(128, true, true) + ".dat"
+        );
+        FileWriteUtil.writeString(slog.toFile(), FastJsonUtil.toJSONString(logEntityList));
+    }
+
+    private class PostLog2FileEvent extends ExecutorEvent {
+
+        private final String type;
+        private final Consumer<LogEntity> consumer;
+
+        public PostLog2FileEvent(String type, Consumer<LogEntity> consumer) {
+            this.type = type;
+            this.consumer = consumer;
+        }
+
+        @Override public String getStack() {
+            return "log-push-db";
+        }
+
+        @Override public void onEvent() throws Exception {
+            Path path = Path.of("slog", type);
+            if (!Files.exists(path)) return;
+            Files.walk(path)
+                    .filter(Files::isRegularFile)
+                    .map(Path::toFile)
+                    .filter(f -> System.currentTimeMillis() - f.lastModified() > TimeUnit.SECONDS.toMillis(5))
+                    .sorted(Comparator.comparingLong(File::lastModified))
+                    .limit(50)
+                    .filter(f -> f.toString().endsWith(".dat"))
+                    .forEach(f -> {
+                        String json = FileReadUtil.readString(f);
+                        List<LogEntity> objects = FastJsonUtil.parseArray(json, LogEntity.class);
+                        for (LogEntity object : objects) {
+                            consumer.accept(object);
+                        }
+                        f.delete();
+                        log.debug("LogService delete: {}", f);
+                    });
+        }
+
     }
 
 }
