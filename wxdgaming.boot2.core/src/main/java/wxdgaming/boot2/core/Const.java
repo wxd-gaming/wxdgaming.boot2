@@ -11,7 +11,7 @@ import java.nio.charset.Charset;
 public interface Const {
 
     int SORT_DEFAULT = 99999;
-
+    String authorization = "authorization";
     /** 使用 gzip 的最小值 */
     int USE_GZIP_MIN_LENGTH = 1024 * 8;
 

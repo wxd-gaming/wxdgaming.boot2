@@ -32,6 +32,7 @@ public class AdminUserEntity extends Entity {
     /** 是否是管理员 */
     @DbColumn(index = true)
     private boolean admin;
+    private int lv = 0;
     private long loginCount;
     /** 路由权限 */
     @DbColumn(columnType = ColumnType.String, length = 12000)

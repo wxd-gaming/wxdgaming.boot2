@@ -33,6 +33,10 @@ data:
 spring:
   profiles:
     active: [ pgsql,mapdb, httpclient,logbus ]
+  freemarker:
+    template-loader-path: classpath:/templates/
+    suffix: .ftl
+
 
 server:
   port: 19800

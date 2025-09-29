@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.web.servlet.filter.OrderedFilter;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +37,8 @@ public class CacheHttpServletRequestFilter implements OrderedFilter {
         if (request instanceof HttpServletRequest httpServletRequest) {
             //传递包装类下去。这样后面的servlet等可以拿到这个包装后的request
             CacheHttpServletRequest requestWrapperNew = new CacheHttpServletRequest(httpServletRequest);
-            if ("POST".equalsIgnoreCase(httpServletRequest.getMethod()) && request.getContentType().contains("application/json")) {
+            String contentType = request.getContentType();
+            if ("POST".equalsIgnoreCase(httpServletRequest.getMethod()) && StringUtils.isNotBlank(contentType) && contentType.contains("application/json")) {
                 /*TODO 这个代码不能删除，必须强制读取一次才行*/
                 String string = requestWrapperNew.getReader().readLine();
             }

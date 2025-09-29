@@ -11,10 +11,10 @@ import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.token.JsonTokenBuilder;
-import wxdgaming.game.authority.SignUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
 import wxdgaming.game.authority.AdminUserToken;
+import wxdgaming.game.authority.SignUtil;
 import wxdgaming.game.login.LoginServerProperties;
 import wxdgaming.game.login.entity.AdminUserEntity;
 
@@ -74,6 +74,7 @@ public class AdminService extends HoldApplicationContext {
         AdminUserToken adminUserToken = new AdminUserToken();
         adminUserToken.setAdmin(adminUser.isAdmin());
         adminUserToken.setUserName(adminUser.getUserName());
+        adminUserToken.setLv(adminUser.getLv());
         adminUserToken.setLoginCount(adminUser.getLoginCount());
         adminUserToken.setPhone(adminUser.getPhone());
         adminUserToken.setRoutes(adminUser.getRoutes());

@@ -25,20 +25,12 @@ import java.util.List;
 @Setter
 public class AdminUserToken extends ObjectBase {
 
-    public static final String authorization = "authorization";
-
     public static AdminUserToken threadContext() {
         return ThreadContext.context("adminUserToken");
     }
 
     public static AdminUserToken parse(HttpServletRequest request, String jwtKey) {
-        String token = SpringUtil.getCookieValue(request, authorization);
-        if (StringUtils.isBlank(token)) {
-            token = request.getHeader(authorization);
-        }
-        if (StringUtils.isBlank(token)) {
-            token = request.getParameter(authorization);
-        }
+        String token = SpringUtil.getAuthor(request);
         if (StringUtils.isBlank(token)) {
             return null;
         }
@@ -57,6 +49,7 @@ public class AdminUserToken extends ObjectBase {
     private String phone;
     /** 过期时间 */
     private long expireTime;
+    private int lv = 0;
     /** 路由权限 */
     private List<String> routes = Collections.emptyList();
 

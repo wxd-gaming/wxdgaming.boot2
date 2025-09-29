@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.CacheHttpServletRequest;
+import wxdgaming.boot2.core.Const;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.token.JsonTokenBuilder;
@@ -47,7 +48,7 @@ public class AuthorController implements InitPrint {
                 .put("user", adminUserToken)
                 .compact();
 
-        ResponseCookie cookie = ResponseCookie.from(AdminUserToken.authorization, jsonToken)
+        ResponseCookie cookie = ResponseCookie.from(Const.authorization, jsonToken)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")

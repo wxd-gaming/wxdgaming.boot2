@@ -15,7 +15,6 @@ public enum HttpHeadNameType {
     Content_Encoding("content-encoding"),
     Content_Type("content-type"),
     Connection("connection"),
-    AUTHORIZATION("authorization"),
     ;
     final String value;
 

@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 import wxdgaming.game.message.gm.ReqGmList;
+import wxdgaming.game.server.bean.UserMapping;
+import wxdgaming.game.server.bean.role.Player;
 
 /**
  * gm命令列表

@@ -80,12 +80,19 @@
     <li class="title_one check" onclick="selectNav(this)">导航<strong>∨</strong></li>
     <li class="title_sub_box">
         <ul class="title_sub">
-            <li onclick="selectNav2(this, '/admin-table.html')">账户列表</li>
-            <li onclick="selectNav2(this, '/servertable.html')">服务器列表</li>
-            <li onclick="selectNav2(this, '/user-table.html')">玩家账号列表</li>
-            <li onclick="selectNav2(this, '/cdkey-table.html')">礼包码</li>
-            <li onclick="selectNav2(this, '/notice-table.html')">公告</li>
-            <li onclick="selectNav2(this, 'http://127.0.0.1:18888/log-index.html')">日志查询</li>
+            <#list navList as nav>
+                <li onclick="selectNav2(this, '${nav.routing}')">${nav.name}</li>
+            </#list>
+        </ul>
+    </li>
+</ul>
+<ul class="title_box">
+    <li class="title_one" onclick="selectNav(this)">日志<strong>∨</strong></li>
+    <li class="title_sub_box" style="display: none;">
+        <ul class="title_sub">
+            <#list logNavList as nav>
+                <li onclick="selectNav2(this, '${nav.routing}?tableName=${nav.name}')">${nav.comment}</li>
+            </#list>
         </ul>
     </li>
 </ul>

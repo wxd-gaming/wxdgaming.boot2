@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -133,6 +134,17 @@ public class SpringUtil implements InitPrint {
 
     public static JSONObject readBodyJson(HttpServletRequest request) throws IOException {
         return JSONObject.parseObject(readBody(request));
+    }
+
+    public static String getAuthor(HttpServletRequest request) {
+        String token = SpringUtil.getCookieValue(request, Const.authorization);
+        if (StringUtils.isBlank(token)) {
+            token = request.getHeader(Const.authorization);
+        }
+        if (StringUtils.isBlank(token)) {
+            token = request.getParameter(Const.authorization);
+        }
+        return token;
     }
 
     public static String getCurrentUrl(HttpServletRequest request) {

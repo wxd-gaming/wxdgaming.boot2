@@ -24,7 +24,13 @@
     <script>
         function changeContent(url) {
             let authorization = wxd.getAuthor();
-            let obj = `<object id="content_body" data="${url}?authorization=${authorization}"></object>`;
+            if (url.indexOf("?") >= 0) {
+                url = url + "&authorization=" + authorization;
+            } else {
+                url = url + "?authorization=" + authorization;
+            }
+
+            let obj = `<object id="content_body" data="${url}"></object>`;
             $('.content').html(obj);
         }
 
@@ -35,7 +41,7 @@
                 (data) => {
                     if (data.code === 1) {
                         sessionStorage.setItem("authorization", data.data);
-                        $(".nav").append(`<object data="nav.html"></object>`);
+                        $(".nav").append(`<object data="/admin/nav"></object>`);
                     } else {
                         let alertBox = new wxd.message.Alert("请重新登录", "提示");
                         alertBox.okCallback = () => {
