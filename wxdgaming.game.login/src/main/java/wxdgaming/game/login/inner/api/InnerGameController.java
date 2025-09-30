@@ -1,6 +1,8 @@
 package wxdgaming.game.login.inner.api;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,7 +15,9 @@ import wxdgaming.game.login.bean.ServerInfoDTO;
 import wxdgaming.game.login.bean.UseCDKeyDTO;
 import wxdgaming.game.login.cdkey.CDKeyService;
 import wxdgaming.game.login.entity.ServerInfoEntity;
+import wxdgaming.game.login.entity.UserData;
 import wxdgaming.game.login.inner.InnerService;
+import wxdgaming.game.login.login.LoginService;
 
 /**
  * 登录接口
@@ -28,15 +32,38 @@ public class InnerGameController extends HoldApplicationContext {
 
     final InnerService innerService;
     final CDKeyService cdKeyService;
+    final LoginService loginService;
 
-    public InnerGameController(InnerService innerService, CDKeyService cdKeyService) {
+    public InnerGameController(InnerService innerService, CDKeyService cdKeyService, LoginService loginService) {
         this.innerService = innerService;
         this.cdKeyService = cdKeyService;
+        this.loginService = loginService;
     }
 
     @RequestMapping("/cdkey/use")
     public RunResult use(CacheHttpServletRequest request, @RequestBody UseCDKeyDTO dto) {
         return cdKeyService.use(dto.getCdKey(), dto.getSid(), dto.getAccount(), dto.getRoleId(), dto.getRoleName());
+    }
+
+    @RequestMapping(value = "/lastLoginGame")
+    public RunResult lastLoginGame(CacheHttpServletRequest request, @RequestBody JSONObject params) {
+        String account = params.getString("account");
+        if (StringUtils.isBlank(account)) {
+            return RunResult.fail("请输入账号");
+        }
+        Integer sid = params.getInteger("sid");
+        if (sid == null) {
+            return RunResult.fail("请输入服务器ID");
+        }
+        String string = params.getString("roleInfo");
+        UserData userData = loginService.userData(account);
+        if (userData == null) {
+            return RunResult.fail("账号异常");
+        }
+        userData.setLastLoginServerId(sid);
+        userData.setLastLoginServerTime(MyClock.nowString());
+        userData.getGameRoleMap().put(sid, string);
+        return RunResult.ok();
     }
 
     @RequestMapping(value = "/sync")

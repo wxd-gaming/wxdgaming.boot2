@@ -2,9 +2,12 @@ package wxdgaming.game.login.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import wxdgaming.boot2.starter.batis.ColumnType;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 登录数据
@@ -41,5 +44,9 @@ public class UserData extends Entity {
     /** 是不是白名单 */
     private boolean white;
     private int gmLevel;
+    private int lastLoginServerId;
+    private String lastLoginServerTime;
+    @DbColumn(length = 20000, columnType = ColumnType.String)
+    private ConcurrentHashMap<Integer, String> gameRoleMap = new ConcurrentHashMap<>();
 
 }
