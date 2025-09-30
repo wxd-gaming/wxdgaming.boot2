@@ -37,9 +37,9 @@ public class ValidationService extends HoldApplicationContext {
 
     /** 完全满足条件 */
     public boolean validateAll(Object object, ConfigString configString, Function<String, List<Validation>> parse, boolean sendTips) {
-        return validationUtil.validateAll(object, configString, parse, (error) -> {
+        return validationUtil.validateAll(object, configString, parse, (handler) -> {
             if (sendTips && object instanceof Player player) {
-                tipsService.tips(player, error);
+                tipsService.tips(player, handler.tips());
             }
         });
     }
@@ -51,7 +51,9 @@ public class ValidationService extends HoldApplicationContext {
 
     /** 任意一个条件满足就行 */
     public boolean validateAny(Object object, ConfigString configString, Function<String, List<Validation>> parse) {
-        return validationUtil.validateAny(object, configString, parse);
+        return validationUtil.validateAny(object, configString, parse, (handler) -> {
+
+        });
     }
 
 

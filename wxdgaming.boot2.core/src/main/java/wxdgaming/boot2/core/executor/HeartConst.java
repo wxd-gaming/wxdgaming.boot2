@@ -1,4 +1,4 @@
-package wxdgaming.game.server.bean.activity;
+package wxdgaming.boot2.core.executor;
 
 import lombok.Getter;
 import wxdgaming.boot2.core.collection.MapOf;

@@ -16,11 +16,11 @@ import wxdgaming.game.server.module.system.GameService;
  **/
 @Slf4j
 @Component
-public class MainThreadDriveHandlerScript extends HoldApplicationContext implements HeartDriveHandler {
+public class MainHeartDriveHandlerScript extends HoldApplicationContext implements HeartDriveHandler {
 
     final GameService gameService;
 
-    public MainThreadDriveHandlerScript(GameService gameService) {
+    public MainHeartDriveHandlerScript(GameService gameService) {
         this.gameService = gameService;
     }
 

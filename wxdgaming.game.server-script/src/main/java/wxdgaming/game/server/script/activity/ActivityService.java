@@ -5,7 +5,9 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.executor.HeartConst;
 import wxdgaming.boot2.core.executor.HeartDriveHandler;
+import wxdgaming.boot2.core.function.FunctionUtil;
 import wxdgaming.boot2.core.timer.CronDuration;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
@@ -13,7 +15,6 @@ import wxdgaming.game.cfg.QActivityTable;
 import wxdgaming.game.cfg.bean.QActivity;
 import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.server.bean.activity.ActivityData;
-import wxdgaming.game.server.bean.activity.HeartConst;
 import wxdgaming.game.server.bean.global.GlobalDataConst;
 import wxdgaming.game.server.bean.global.impl.ServerActivityData;
 import wxdgaming.game.server.module.system.GameService;
@@ -50,7 +51,6 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
     @Order(Integer.MAX_VALUE)
     public void init() {
         activityHandlerMap = getApplicationContextProvider().toMap(AbstractActivityHandler.class, AbstractActivityHandler::activityType);
-        check();
         gameService.getActivityThreadDrive().setDriveHandler(this);
     }
 
@@ -66,25 +66,54 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
         long nowMillis = MyClock.millis();
         QActivityTable qActivityTable = dataRepository.dataTable(QActivityTable.class);
         Map<Integer, Map<Integer, QActivity>> activityType2IdCfgMap = qActivityTable.getActivityType2IdMap();
+        boolean changed = false;
         for (Map.Entry<Integer, Map<Integer, QActivity>> mapEntry : activityType2IdCfgMap.entrySet()) {
             Integer type = mapEntry.getKey();
+            AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(type);
+            if (abstractActivityHandler == null) {
+                log.warn("{}", "活动处理器不存在：activityType=%5s".formatted(type));
+                continue;
+            }
             /*当前id*/
             int selfActivityId = activityType2IdMap.getOrDefault(type, 0);
             ActivityData selfActivityData = activityDataMap.get(type);
             if (selfActivityData != null) {
                 boolean over = selfActivityData.getEndTime() < nowMillis;
+                QActivity qActivity = qActivityTable.get(selfActivityData.getActivityId());
+                if (qActivity != null) {
+                    /* 查找一个可以的时间，会先向过去时间查询，如果时间戳符合范围条件，如果不合法会向未来时间查询 */
+                    CronDuration cronDuration = qActivity.getOpenTime().findValidateTime();
+                    if (cronDuration == null || !cronDuration.valid(nowMillis)) {
+                        /*到这里说明策划该配置，当前活动需要关闭*/
+                        over = true;
+                    }
+                } else {
+                    log.warn("{}", "活动配置不存在：activityId=%5s".formatted(selfActivityData.getActivityId()));
+                    over = true;
+                }
+
                 if (!over) {
-                    QActivity qActivity = qActivityTable.get(selfActivityData.getActivityId());
-                    log.info("{}",
-                            "活动继续：activityType=%5s, activityId=%10s, activityName=%15s, startTime=%s, endTime=%s"
-                                    .formatted(
-                                            selfActivityData.getActivityType(), selfActivityData.getActivityId(), qActivity.getName(),
-                                            MyClock.formatDate(selfActivityData.getStartTime()),
-                                            MyClock.formatDate(selfActivityData.getEndTime())
-                                    )
-                    );
                     /*TODO 当前活动未结束，跳过*/
                     continue;
+                }
+
+                if (selfActivityData.getEndTime() > 0) {
+                    String formatted = "活动结束：activityType=%5s, activityId=%10s, activityName=%15s, startTime=%s, endTime=%s"
+                            .formatted(
+                                    selfActivityData.getActivityType(), selfActivityData.getActivityId(),
+                                    FunctionUtil.nullDefaultValue(qActivity, QActivity::getName, "活动已删除"),
+                                    MyClock.formatDate(selfActivityData.getStartTime()),
+                                    MyClock.formatDate(selfActivityData.getEndTime())
+                            );
+                    log.info(formatted);
+                    try {
+                        abstractActivityHandler.end(selfActivityData);
+                    } catch (Exception e) {
+                        log.error(formatted, e);
+                    } finally {
+                        selfActivityData.clear();
+                        changed = true;
+                    }
                 }
             }
 
@@ -94,44 +123,54 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
                     /*TODO 活动滚动下一轮，所以id是递增的*/
                     continue;
                 }
-                if (validationService.validateAll(null, qActivity.getValidation(), false)) {
-                    AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(qActivity.getType());
-                    if (abstractActivityHandler != null) {
-                        ActivityData activityData = abstractActivityHandler.newData();
-                        activityData.setActivityId(qActivity.getId());
-                        activityData.setActivityType(qActivity.getType());
-                        /* 查找一个可以的时间，会先向过去时间查询，如果时间戳符合范围条件，如果不合法会向未来时间查询 */
-                        CronDuration cronDuration = qActivity.getOpenTime().findValidateTime();
-                        if (cronDuration != null && cronDuration.valid(nowMillis)) {
-                            long start = cronDuration.getStart();
-                            long end = cronDuration.getEnd();
-                            activityData.setStartTime(start);
-                            activityData.setEndTime(end);
-                            activityDataMap.put(qActivity.getType(), activityData);
-                            abstractActivityHandler.start(activityData);
-                            log.info("{}",
-                                    "活动开启：activityType=%5s, activityId=%10s, activityName=%15s, startTime=%s, endTime=%s"
-                                            .formatted(
-                                                    activityData.getActivityType(), activityData.getActivityId(), qActivity.getName(),
-                                                    MyClock.formatDate(activityData.getStartTime()),
-                                                    MyClock.formatDate(activityData.getEndTime())
-                                            )
-                            );
+                /* 查找一个可以的时间，会先向过去时间查询，如果时间戳符合范围条件，如果不合法会向未来时间查询 */
+                CronDuration cronDuration = qActivity.getOpenTime().findValidateTime();
+                if (cronDuration == null || cronDuration.getEnd() <= nowMillis) {
+                    /*说明这个活动永久性过期*/
+                    continue;
+                }
+                if (cronDuration.valid(nowMillis)) {
+                    if (validationService.validateAll(null, qActivity.getValidation(), false)) {
+                        if (selfActivityData == null) {
+                            selfActivityData = abstractActivityHandler.newData();
+                        }
+                        selfActivityData.setActivityId(qActivity.getId());
+                        selfActivityData.setActivityType(qActivity.getType());
+                        long start = cronDuration.getStart();
+                        /*TODO 活动结束时间减1秒*/
+                        long end = cronDuration.getEnd() - 1000;
+                        selfActivityData.setStartTime(start);
+                        selfActivityData.setEndTime(end);
+                        String formatted = "活动开启：activityType=%5s, activityId=%10s, activityName=%15s, startTime=%s, endTime=%s"
+                                .formatted(
+                                        selfActivityData.getActivityType(), selfActivityData.getActivityId(), qActivity.getName(),
+                                        MyClock.formatDate(selfActivityData.getStartTime()),
+                                        MyClock.formatDate(selfActivityData.getEndTime())
+                                );
+                        log.info(formatted);
+                        try {
+                            abstractActivityHandler.start(selfActivityData);
+                            activityDataMap.put(qActivity.getType(), selfActivityData);
+                            changed = true;
+                        } catch (Exception e) {
+                            log.error("活动开启异常：{}", formatted, e);
                         }
                     }
                 }
                 break;
             }
         }
-        Map<HeartConst, List<ActivityData>> tmp = new HashMap<>();
-        for (ActivityData activityData : activityDataMap.values()) {
-            Collection<HeartConst> heartConsts = activityHandlerMap.get(activityData.getActivityType()).heartConst();
-            for (HeartConst heartConst : heartConsts) {
-                List<ActivityData> handlers = tmp.computeIfAbsent(heartConst, l -> new ArrayList<>());
-                handlers.add(activityData);
+        if (changed) {
+            Map<HeartConst, List<ActivityData>> tmp = new HashMap<>();
+            for (ActivityData activityData : activityDataMap.values()) {
+                Collection<HeartConst> heartConsts = activityHandlerMap.get(activityData.getActivityType()).heartConst();
+                for (HeartConst heartConst : heartConsts) {
+                    List<ActivityData> handlers = tmp.computeIfAbsent(heartConst, l -> new ArrayList<>());
+                    handlers.add(activityData);
+                }
             }
+            heartHandlerMap = tmp;
         }
-        heartHandlerMap = tmp;
     }
 
     @SuppressWarnings("unchecked")
@@ -145,6 +184,9 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
 
     @SuppressWarnings("unchecked")
     @Override public void heartSecond(int second) {
+
+        check();
+
         List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.Second, Collections.emptyList());
         for (ActivityData activityData : activityDataList) {
             AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());

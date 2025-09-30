@@ -1,8 +1,10 @@
 package wxdgaming.game.server.script.activity;
 
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.executor.HeartConst;
 import wxdgaming.game.server.bean.activity.ActivityData;
-import wxdgaming.game.server.bean.activity.HeartConst;
 
 import java.util.Collection;
 
@@ -12,7 +14,10 @@ import java.util.Collection;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-09-11 17:35
  **/
+@Getter
 public abstract class AbstractActivityHandler<T extends ActivityData> extends HoldApplicationContext {
+
+    @Autowired protected ActivityService activityService;
 
     public abstract int activityType();
 

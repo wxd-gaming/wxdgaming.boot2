@@ -20,6 +20,11 @@ public class ActivityData extends ObjectBase {
     private long startTime;
     private long endTime;
 
+    public void clear() {
+        startTime = 0;
+        endTime = 0;
+    }
+
     @Override public String toString() {
         return "ActivityData{activityId=%10d, activityType=%5d, startTime=%s, endTime=%s}"
                 .formatted(activityId, activityType, MyClock.formatDate(startTime), MyClock.formatDate(endTime));

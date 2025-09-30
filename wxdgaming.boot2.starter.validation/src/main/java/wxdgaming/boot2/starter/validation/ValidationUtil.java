@@ -27,19 +27,19 @@ public class ValidationUtil extends HoldApplicationContext {
     Map<ValidationType, AbstractValidationHandler> validationHandlerMap;
 
     @Init
-    @Order(1)
+    @Order(-100)
     public void init() {
         validationHandlerMap = getApplicationContextProvider().toMap(AbstractValidationHandler.class, AbstractValidationHandler::conditionType);
     }
 
     /** 完全满足条件 */
-    public boolean validateAll(Object object, ConfigString configString, Consumer<String> errorCall) {
+    public boolean validateAll(Object object, ConfigString configString, Consumer<AbstractValidationHandler<Object>> errorCall) {
         return validateAll(object, configString, Validation.Parse, errorCall);
     }
 
     /** 完全满足条件 */
     @SuppressWarnings("unchecked")
-    public boolean validateAll(Object object, ConfigString configString, Function<String, List<Validation>> parse, Consumer<String> errorCall) {
+    public boolean validateAll(Object object, ConfigString configString, Function<String, List<Validation>> parse, Consumer<AbstractValidationHandler<Object>> errorCall) {
         if (configString == null || StringUtils.isBlank(configString.getValue())) {
             return true;
         }
@@ -54,7 +54,7 @@ public class ValidationUtil extends HoldApplicationContext {
             if (!validationHandler.validate(object, validation)) {
                 log.debug("{} 验证条件失败: {}", object, validation);
                 if (errorCall != null) {
-                    errorCall.accept(validationHandler.tips());
+                    errorCall.accept(validationHandler);
                 }
                 return false;
             }
@@ -63,13 +63,13 @@ public class ValidationUtil extends HoldApplicationContext {
     }
 
     /** 任意一个条件满足就行 */
-    public boolean validateAny(Object player, ConfigString configString) {
-        return validateAny(player, configString, Validation.Parse);
+    public boolean validateAny(Object player, ConfigString configString, Consumer<AbstractValidationHandler<Object>> sources) {
+        return validateAny(player, configString, Validation.Parse, sources);
     }
 
     /** 任意一个条件满足就行 */
     @SuppressWarnings("unchecked")
-    public boolean validateAny(Object object, ConfigString configString, Function<String, List<Validation>> parse) {
+    public boolean validateAny(Object object, ConfigString configString, Function<String, List<Validation>> parse, Consumer<AbstractValidationHandler<Object>> sources) {
         if (configString == null || StringUtils.isBlank(configString.getValue())) {
             return true;
         }
@@ -82,6 +82,10 @@ public class ValidationUtil extends HoldApplicationContext {
                 return false;
             }
             if (validationHandler.validate(object, validation)) {
+                log.debug("{} 验证条件成功: {}", object, validation);
+                if (sources != null) {
+                    sources.accept(validationHandler);
+                }
                 return true;
             }
         }

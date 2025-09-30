@@ -3,8 +3,9 @@ package wxdgaming.game.server.script.activity.openserverrecharge;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.game.server.bean.activity.ActivityData;
-import wxdgaming.game.server.bean.activity.HeartConst;
+import wxdgaming.boot2.core.executor.HeartConst;
 import wxdgaming.game.server.script.activity.AbstractActivityHandler;
+import wxdgaming.game.server.script.activity.ActivityConst;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +25,7 @@ public class OpenServerFirstRechargeHandler extends AbstractActivityHandler<Acti
     }
 
     @Override public int activityType() {
-        return 1;
+        return ActivityConst.OPEN_SERVER_RECHARGE;
     }
 
     @Override public Collection<HeartConst> heartConst() {
