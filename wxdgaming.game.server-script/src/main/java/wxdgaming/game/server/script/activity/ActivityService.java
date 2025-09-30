@@ -5,7 +5,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.executor.ThreadDriveHandler;
+import wxdgaming.boot2.core.executor.HeartDriveHandler;
 import wxdgaming.boot2.core.timer.CronDuration;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 @Slf4j
 @Service
-public class ActivityService extends HoldApplicationContext implements ThreadDriveHandler {
+public class ActivityService extends HoldApplicationContext implements HeartDriveHandler {
 
     final GameService gameService;
     final GlobalDataService globalDataService;
@@ -135,7 +135,7 @@ public class ActivityService extends HoldApplicationContext implements ThreadDri
     }
 
     @SuppressWarnings("unchecked")
-    @Override public void heart() {
+    @Override public void heart(long millis) {
         List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.Heart, Collections.emptyList());
         for (ActivityData activityData : activityDataList) {
             AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());
@@ -171,7 +171,7 @@ public class ActivityService extends HoldApplicationContext implements ThreadDri
     }
 
     @SuppressWarnings("unchecked")
-    @Override public void heartDayEnd() {
+    @Override public void heartDayEnd(int dayOfYear) {
         List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.DayEnd, Collections.emptyList());
         for (ActivityData activityData : activityDataList) {
             AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());

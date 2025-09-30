@@ -63,7 +63,7 @@
     },
     {
       "fieldName": "totalOnlineMills",
-      "fieldComment": "在线时长",
+      "fieldComment": "在线时长(秒)",
       "fieldType": "long"
     },
     {

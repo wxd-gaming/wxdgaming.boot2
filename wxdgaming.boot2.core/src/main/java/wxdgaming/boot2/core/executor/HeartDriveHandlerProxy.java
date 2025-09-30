@@ -12,14 +12,14 @@ import wxdgaming.boot2.core.runtime.RunTimeUtil;
  **/
 @Getter
 @Setter
-class ThreadDriveHandlerProxy implements ThreadDriveHandler {
+class HeartDriveHandlerProxy implements HeartDriveHandler {
 
-    private ThreadDriveHandler driveHandler;
+    private HeartDriveHandler driveHandler;
 
-    @Override public void heart() {
+    @Override public void heart(long millis) {
         long start = RunTimeUtil.start();
         try {
-            driveHandler.heart();
+            driveHandler.heart(millis);
         } finally {
             RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heart()", start);
         }
@@ -53,10 +53,10 @@ class ThreadDriveHandlerProxy implements ThreadDriveHandler {
         }
     }
 
-    @Override public void heartDayEnd() {
+    @Override public void heartDayEnd(int dayOfYear) {
         long start = RunTimeUtil.start();
         try {
-            driveHandler.heartDayEnd();
+            driveHandler.heartDayEnd(dayOfYear);
         } finally {
             RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartDayEnd()", start);
         }

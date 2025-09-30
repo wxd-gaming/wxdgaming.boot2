@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.StopBefore;
-import wxdgaming.boot2.core.executor.ExecutorEvent;
-import wxdgaming.boot2.core.executor.ExecutorFactory;
-import wxdgaming.boot2.core.executor.ExecutorProperties;
-import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.boot2.core.executor.*;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.server.bean.UserMapping;
@@ -18,7 +15,6 @@ import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.slog.RoleInfoSlog;
 import wxdgaming.game.server.event.*;
 
-import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ScheduledFuture;
@@ -142,73 +138,58 @@ public class PlayerDriveService extends HoldApplicationContext {
         slogService.updateLog(player.getUid(), player.getCreateTime(), roleInfoSlog);
     }
 
-    public class PlayerDriveContent extends ExecutorEvent {
+    public class PlayerDriveContent extends ExecutorEvent implements HeartDriveHandler {
 
-        private int lsatSecond = -1;
-        private int lsatMinute = -1;
-        private int lsatHour = -1;
-        private int lastDay = -1;
         ScheduledFuture<?> timerJob;
-        private final ConcurrentSkipListMap<Long, Player> playerMap = new ConcurrentSkipListMap<>();
+        final HeartDrive heartDrive;
+        final ConcurrentSkipListMap<Long, Player> playerMap = new ConcurrentSkipListMap<>();
 
         public PlayerDriveContent(String queueName) {
             this.queueName = queueName;
-            long millis = MyClock.millis();
-            LocalDateTime localDateTime = MyClock.localDateTime(millis);
-            lsatSecond = localDateTime.getSecond();
-            lsatMinute = localDateTime.getMinute();
-            lsatHour = localDateTime.getHour();
-            lastDay = localDateTime.getDayOfMonth();
+            this.heartDrive = new HeartDrive(this.queueName);
+            this.heartDrive.setDriveHandler(this);
         }
 
         @Override public String getStack() {
-            return "PlayerDriveContent";
+            return this.queueName;
         }
 
         @Override public void onEvent() throws Exception {
-            long millis = MyClock.millis();
-            LocalDateTime localDateTime = MyClock.localDateTime(millis);
-            int second = localDateTime.getSecond();
-            int minute = localDateTime.getMinute();
-            int hour = localDateTime.getHour();
-            int day = localDateTime.getDayOfMonth();
-            boolean updateSecond = false;
-            boolean updateMinute = false;
-            boolean updateHour = false;
-            boolean updateDay = false;
+            heartDrive.doHeart();
+        }
 
-            if (lsatSecond != second) {
-                lsatSecond = second;
-                updateSecond = true;
-                if (lsatMinute != minute) {
-                    lsatMinute = minute;
-                    updateMinute = true;
-                    if (lsatHour != hour) {
-                        lsatHour = hour;
-                        updateHour = true;
-                        if (lastDay != day) {
-                            lastDay = day;
-                            updateDay = true;
-                        }
-                    }
-                }
-            }
-
+        @Override public void heart(long millis) {
             for (Player player : playerMap.values()) {
                 applicationContextProvider.executeMethodWithAnnotatedException(OnHeart.class, player, millis);
-                if (updateSecond) {
-                    applicationContextProvider.executeMethodWithAnnotatedException(OnHeartSecond.class, player, second);
-                }
-                if (updateMinute) {
-                    applicationContextProvider.executeMethodWithAnnotatedException(OnHeartMinute.class, player, minute);
-                }
-                if (updateHour) {
-                    applicationContextProvider.executeMethodWithAnnotatedException(OnHeartHour.class, player, hour);
-                }
-                if (updateDay) {
-                    applicationContextProvider.executeMethodWithAnnotatedException(OnHeartDay.class, player, day);
-                }
             }
+        }
+
+        @Override public void heartSecond(int second) {
+            for (Player player : playerMap.values()) {
+                applicationContextProvider.executeMethodWithAnnotatedException(OnHeartSecond.class, player, second);
+            }
+        }
+
+        @Override public void heartMinute(int minute) {
+            for (Player player : playerMap.values()) {
+                applicationContextProvider.executeMethodWithAnnotatedException(OnHeartMinute.class, player, minute);
+            }
+        }
+
+        @Override public void heartHour(int hour) {
+            for (Player player : playerMap.values()) {
+                applicationContextProvider.executeMethodWithAnnotatedException(OnHeartHour.class, player, hour);
+            }
+        }
+
+        @Override public void heartDayEnd(int dayOfYear) {
+            for (Player player : playerMap.values()) {
+                applicationContextProvider.executeMethodWithAnnotatedException(OnHeartDay.class, player, dayOfYear);
+            }
+        }
+
+        @Override public void heartWeek(long weekFirstDayStartTime) {
+            HeartDriveHandler.super.heartWeek(weekFirstDayStartTime);
         }
     }
 

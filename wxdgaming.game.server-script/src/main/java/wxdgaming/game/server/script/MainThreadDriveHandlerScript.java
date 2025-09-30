@@ -5,7 +5,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.executor.ThreadDriveHandler;
+import wxdgaming.boot2.core.executor.HeartDriveHandler;
 import wxdgaming.game.server.module.system.GameService;
 
 /**
@@ -16,7 +16,7 @@ import wxdgaming.game.server.module.system.GameService;
  **/
 @Slf4j
 @Component
-public class MainThreadDriveHandlerScript extends HoldApplicationContext implements ThreadDriveHandler {
+public class MainThreadDriveHandlerScript extends HoldApplicationContext implements HeartDriveHandler {
 
     final GameService gameService;
 
@@ -30,7 +30,7 @@ public class MainThreadDriveHandlerScript extends HoldApplicationContext impleme
         gameService.getMainThreadDrive().setDriveHandler(this);
     }
 
-    @Override public void heart() {
+    @Override public void heart(long millis) {
 
     }
 
@@ -46,7 +46,7 @@ public class MainThreadDriveHandlerScript extends HoldApplicationContext impleme
 
     }
 
-    @Override public void heartDayEnd() {
+    @Override public void heartDayEnd(int dayOfYear) {
 
     }
 
