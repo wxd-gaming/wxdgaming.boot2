@@ -45,8 +45,8 @@ public class InnerGameController extends HoldApplicationContext {
         return cdKeyService.use(dto.getCdKey(), dto.getSid(), dto.getAccount(), dto.getRoleId(), dto.getRoleName());
     }
 
-    @RequestMapping(value = "/lastLoginGame")
-    public RunResult lastLoginGame(CacheHttpServletRequest request, @RequestBody JSONObject params) {
+    @RequestMapping(value = "/lastLogin")
+    public RunResult lastLogin(CacheHttpServletRequest request, @RequestBody JSONObject params) {
         String account = params.getString("account");
         if (StringUtils.isBlank(account)) {
             return RunResult.fail("请输入账号");
