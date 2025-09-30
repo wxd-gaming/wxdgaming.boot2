@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实时大屏</title>
+
+    <script charset="utf-8" type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script charset="utf-8" type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script charset="utf-8" type="text/javascript" src="/js/com.wxd.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
+    <link rel="stylesheet" type="text/css" href="/style/table.css"/>
+
+    <style>
+        html, body {
+            display: block;width: 100%;height: 100%;overflow: hidden;background: rgb(255, 255, 255);
+            font-size: 14px;
+        }
+
+        #tableDom { display: block;border: 0;box-sizing: border-box;background-color: #fffefe;transform-box: revert; box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.55); /* 修改阴影效果 */border-radius: 5px 5px;overflow: auto;padding-right: 10px; /*预留给滚动条的*/padding-bottom: 8px;}
+
+        table {width: 100%;height: 100%;}
+
+        th {text-align: right;width: 120px;}
+
+        td {text-align: center;}
+    </style>
+
+    <script>
+
+        const bgs = ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)',
+            'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)'];
+
+        function newChartLine(ctx, datas) {
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '20', '23'],
+                    datasets: [{
+                        label: '# 每小时在线',
+                        data: datas,
+                        backgroundColor: bgs,
+                        borderColor: bgs,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true, // 启用响应式布局
+                    maintainAspectRatio: false, // 禁用保持宽高比
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function newChartBar(ctx, title, labels, datas) {
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: title,
+                        data: datas,
+                        backgroundColor: bgs,
+                        borderColor: bgs,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true, // 启用响应式布局
+                    maintainAspectRatio: false, // 禁用保持宽高比
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function getRealData() {
+            let post = new wxd.netty.PostRequest("/admin/log/real", "", (responseText) => {
+
+                if (responseText.code !== 1) {
+                    new wxd.message.Alert(responseText.msg).show();
+                    return;
+                }
+
+                // language=HTML
+                let appendTable = `
+                    <table>
+                        <tr>
+                            <th title="">充值金额:</th>
+                            <td>${responseText.rechargeOrderAmount}</td>
+                            <th title="今日充值金额 / 今日活跃账号数">ARPU:</th>
+                            <td>${responseText.ARPU}</td>
+                        </tr>
+                        <tr>
+                            <th title="今日注册充值账号数 / 今日注册的账号数">付费率:</th>
+                            <td>${responseText.fufeilv}</td>
+                            <th title="今日充值金额 / 今日充值的账号数">ARPPU:</th>
+                            <td>${responseText.ARPPU}</td>
+                        </tr>
+                        <tr style="height: 34%;width: 100%;">
+                            <td colspan="4">
+                                <canvas id="count"></canvas>
+                            </td>
+                        </tr>
+                        <tr style="height: 22%;width: 100%;">
+                            <td colspan="4">
+                                <div id="rechargeGroupBox" style="min-width: 100%;height: 100%;">
+                                    <canvas id="rechargeGroup"></canvas>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr style="height: 22%;width: 100%;">
+                            <td colspan="4">
+                                <canvas id="onlineHour"></canvas>
+                            </td>
+                        </tr>
+                    </table>
+                `;
+                $("#tableDom").html(appendTable);
+
+                newChartBar($('#count'),
+                    '实时大屏',
+                    [
+                        '活跃(' + responseText.activeAccountCount + ')',
+                        '在线(' + responseText.onlineUser + ')',
+                        '注册(' + responseText.registerAccountCount + ')',
+                        '注册付费(' + responseText.registerAccountRechargeCount + ')',
+                        '订单(' + responseText.rechargeOrderCount + ')',
+                        '付费人数(' + responseText.rechargeAccountCount + ')'
+                    ],
+                    [
+                        responseText.activeAccountCount,
+                        responseText.onlineUser,
+                        responseText.registerAccountCount,
+                        responseText.registerAccountRechargeCount,
+                        responseText.rechargeOrderCount,
+                        responseText.rechargeAccountCount
+                    ]
+                );
+
+                let rechargeGroup = responseText.rechargeGroup;//[800, 900, 300, 50, 200, 300, 300, 300, 300, 600, 300, 700];
+                $("#rechargeGroupBox").css("width", (rechargeGroup[0].length * 30) + "px");
+                $("#rechargeGroupBox").css("min-width", "100%");
+                newChartBar($('#rechargeGroup'), "充值挡位分布", rechargeGroup[0], rechargeGroup[1]);
+
+                let onlineHour = responseText.onlineHour;//[800, 900, 300, 50, 200, 300, 300, 300, 300, 600, 300, 700];
+                newChartLine($('#onlineHour'), onlineHour);
+                wxd.loading_close();
+            });
+            post.send();
+        }
+
+        $(() => {
+            wxd.loading();
+            getRealData();
+            setInterval(() => {
+                getRealData();
+            }, 10_000);
+        });
+
+    </script>
+
+</head>
+<body>
+<div id="tableDom" style="position: absolute;right: 15px;bottom: 35px;left: 50%;top: 50%;transform: translate(-50%,-50%);width: 90%;height:80%;padding: 20px;">
+</div>
+</body>
+</html>

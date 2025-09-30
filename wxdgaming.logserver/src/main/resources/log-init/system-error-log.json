@@ -2,7 +2,7 @@
   "logName": "systemerrorlog",
   "logComment": "系统异常",
   "routing": "/log-table.html",
-  "sort": "1-9",
+  "sort": "0-0-0",
   "partition": true,
   "fieldList": [
     {

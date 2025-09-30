@@ -1,5 +1,5 @@
 {
-  "logName": "recharge",
+  "logName": "rolerechargeslog",
   "logComment": "充值日志",
   "routing": "/log-table.html",
   "sort": "2-1",
@@ -22,11 +22,6 @@
       "fieldHtmlStyle": "width:38px;"
     },
     {
-      "fieldName": "openId",
-      "fieldComment": "账号Id",
-      "fieldType": "string"
-    },
-    {
       "fieldName": "account",
       "fieldComment": "账号",
       "fieldType": "string"
@@ -42,9 +37,24 @@
       "fieldType": "string"
     },
     {
-      "fieldName": "money",
-      "fieldComment": "金额",
+      "fieldName": "amount",
+      "fieldComment": "金额(单位：分)",
       "fieldType": "int"
+    },
+    {
+      "fieldName": "productId",
+      "fieldComment": "商品ID",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "productName",
+      "fieldComment": "商品名称",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "comment",
+      "fieldComment": "备注",
+      "fieldType": "string"
     }
   ]
 }

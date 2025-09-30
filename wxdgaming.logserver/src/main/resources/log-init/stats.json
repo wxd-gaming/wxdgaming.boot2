@@ -26,24 +26,34 @@
       "fieldType": "long"
     },
     {
-      "fieldName": "orderCount",
+      "fieldName": "rechargeAccountCount",
+      "fieldComment": "充值用户数",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "registerAccountRechargeCount",
+      "fieldComment": "新注充值用户数",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "rechargeOrderCount",
       "fieldComment": "订单数",
       "fieldType": "int"
     },
     {
-      "fieldName": "orderMoneyCount",
-      "fieldComment": "订单金额",
+      "fieldName": "rechargeOrderAmount",
+      "fieldComment": "订单金额(单位：分)",
       "fieldType": "long"
     },
     {
-      "fieldName": "arpu",
+      "fieldName": "ARPU",
       "fieldComment": "ARPU",
       "fieldType": "float",
       "fieldHtmlStyle": "width:80px;",
       "fieldHtmlTips": "ARPU=收入/活跃账号数"
     },
     {
-      "fieldName": "arppu",
+      "fieldName": "ARPPU",
       "fieldComment": "ARPPU",
       "fieldType": "float",
       "fieldHtmlStyle": "width:80px;",

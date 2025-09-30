@@ -18,7 +18,7 @@ public class GMFilter implements WebFilter {
 
 
     @Override public String filterPath() {
-        return "/gm/**";
+        return "/recharge/**";
     }
 
     @Override public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

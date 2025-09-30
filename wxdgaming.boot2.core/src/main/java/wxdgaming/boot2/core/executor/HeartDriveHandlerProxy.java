@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.executor;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.runtime.RunTimeUtil;
 
 /**
@@ -10,6 +11,7 @@ import wxdgaming.boot2.core.runtime.RunTimeUtil;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-09-12 16:50
  **/
+@Slf4j
 @Getter
 @Setter
 class HeartDriveHandlerProxy implements HeartDriveHandler {
@@ -20,6 +22,8 @@ class HeartDriveHandlerProxy implements HeartDriveHandler {
         long start = RunTimeUtil.start();
         try {
             driveHandler.heart(millis);
+        } catch (Exception e) {
+            log.error("{}.heart() error", driveHandler.getClass().getName(), e);
         } finally {
             RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heart()", start);
         }
@@ -29,6 +33,8 @@ class HeartDriveHandlerProxy implements HeartDriveHandler {
         long start = RunTimeUtil.start();
         try {
             driveHandler.heartSecond(second);
+        } catch (Exception e) {
+            log.error("{}.heartSecond() error", driveHandler.getClass().getName(), e);
         } finally {
             RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartSecond()", start);
         }
@@ -39,6 +45,8 @@ class HeartDriveHandlerProxy implements HeartDriveHandler {
         try {
 
             driveHandler.heartMinute(minute);
+        } catch (Exception e) {
+            log.error("{}.heartMinute() error", driveHandler.getClass().getName(), e);
         } finally {
             RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartMinute()", start);
         }
@@ -48,6 +56,8 @@ class HeartDriveHandlerProxy implements HeartDriveHandler {
         long start = RunTimeUtil.start();
         try {
             driveHandler.heartHour(hour);
+        } catch (Exception e) {
+            log.error("{}.heartHour() error", driveHandler.getClass().getName(), e);
         } finally {
             RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartHour()", start);
         }
@@ -57,6 +67,8 @@ class HeartDriveHandlerProxy implements HeartDriveHandler {
         long start = RunTimeUtil.start();
         try {
             driveHandler.heartDayEnd(dayOfYear);
+        } catch (Exception e) {
+            log.error("{}.heartDayEnd() error", driveHandler.getClass().getName(), e);
         } finally {
             RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartDayEnd()", start);
         }
@@ -66,6 +78,8 @@ class HeartDriveHandlerProxy implements HeartDriveHandler {
         long start = RunTimeUtil.start();
         try {
             driveHandler.heartWeek(weekFirstDayStartTime);
+        } catch (Exception e) {
+            log.error("{}.heartWeek() error", driveHandler.getClass().getName(), e);
         } finally {
             RunTimeUtil.record(driveHandler.getClass().getSimpleName() + "#heartWeek()", start);
         }

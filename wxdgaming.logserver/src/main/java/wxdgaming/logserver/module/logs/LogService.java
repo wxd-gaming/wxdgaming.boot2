@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 日志服务
@@ -121,7 +122,7 @@ public class LogService implements InitPrint {
     }
 
     public List<JSONObject> nav() {
-        return dataCenterService.getLogMappingInfoList().stream()
+        List<JSONObject> collect = dataCenterService.getLogMappingInfoList().stream()
                 .map(li -> {
                     JSONObject jsonObject = MapOf.newJSONObject();
                     jsonObject.put("name", li.getLogName());
@@ -129,7 +130,9 @@ public class LogService implements InitPrint {
                     jsonObject.put("routing", li.getRouting());
                     return jsonObject;
                 })
-                .toList();
+                .collect(Collectors.toList());
+        collect.addFirst(MapOf.newJSONObject().fluentPut("name", "real").fluentPut("comment", "实时大屏").fluentPut("routing", "/game-real.html"));
+        return collect;
     }
 
     public RunResult logTitle(String tableName) {

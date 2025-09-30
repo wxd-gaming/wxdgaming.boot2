@@ -160,7 +160,7 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
                 break;
             }
         }
-        if (changed) {
+        if (changed || heartHandlerMap == null || heartHandlerMap.isEmpty()) {
             Map<HeartConst, List<ActivityData>> tmp = new HashMap<>();
             for (ActivityData activityData : activityDataMap.values()) {
                 Collection<HeartConst> heartConsts = activityHandlerMap.get(activityData.getActivityType()).heartConst();

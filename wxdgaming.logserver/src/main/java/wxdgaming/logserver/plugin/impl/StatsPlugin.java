@@ -10,6 +10,7 @@ import wxdgaming.logserver.bean.LogEntity;
 import wxdgaming.logserver.plugin.AbstractPlugin;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * 统计测试 stats
@@ -42,9 +43,18 @@ public class StatsPlugin extends AbstractPlugin {
                 jsonObject.put("registerAccountCount", registerAccountCount);
                 jsonObject.put("registerRoleCount", registerRoleCount);
                 jsonObject.put("activeAccountCount", activeAccountCount);
-                jsonObject.put("orderCount", 0);
-                jsonObject.put("arpu", 0.0f);
-                jsonObject.put("arppu", 0.0f);
+                int rechargeOrderCount = rechargeOrderCount(sqlDataHelper, dataKey);
+                int rechargeAccountCount = rechargeAccountCount(sqlDataHelper, dataKey);
+                long rechargeOrderAmount = rechargeOrderAmount(sqlDataHelper, dataKey);
+                long registerAccountRechargeCount = registerAccountRechargeCount(sqlDataHelper, dataKey);
+                jsonObject.put("rechargeOrderCount", rechargeOrderCount);
+                jsonObject.put("rechargeAccountCount", rechargeAccountCount);
+                jsonObject.put("rechargeOrderAmount", rechargeOrderAmount);
+                jsonObject.put("registerAccountRechargeCount", registerAccountRechargeCount);
+                /*ARPA = 收入/活跃账号数*/
+                jsonObject.put("ARPU", activeAccountCount > 0 ? rechargeOrderAmount / activeAccountCount / 100f : 0.0f);
+                /*CARPUS = 收入/付费账号数*/
+                jsonObject.put("ARPPU", rechargeAccountCount > 0 ? rechargeOrderAmount / rechargeAccountCount / 100f : 0.0f);
                 if (registerAccountCount > 0) {
                     for (int j = 0; j <= beforeDay; j++) {
                         LocalDate loginDate = localDate.plusDays(j);
@@ -103,6 +113,52 @@ public class StatsPlugin extends AbstractPlugin {
     public int activeAccountCount(SqlDataHelper sqlDataHelper, int loginDataKey) {
         String sql = "SELECT count(1) FROM (SELECT logdata->>'account' as account FROM accountloginlog WHERE daykey= ? GROUP BY logdata->>'account') as rc;";
         return sqlDataHelper.executeScalar(sql, Integer.class, loginDataKey);
+    }
+
+    /** 查询今日充值的订单数 */
+    public int rechargeOrderCount(SqlDataHelper sqlDataHelper, int loginDataKey) {
+        String sql = "SELECT count(1) FROM (SELECT logdata->>'spOrderId' as spOrderId FROM rolerechargeslog WHERE daykey= ? GROUP BY logdata->>'spOrderId') as rc;";
+        return sqlDataHelper.executeScalar(sql, Integer.class, loginDataKey);
+    }
+
+    /** 查询今日充值的账号数 */
+    public int rechargeAccountCount(SqlDataHelper sqlDataHelper, int loginDataKey) {
+        String sql = "SELECT count(1) FROM (SELECT logdata->>'account' as account FROM rolerechargeslog WHERE daykey= ? GROUP BY logdata->>'account') as rc;";
+        return sqlDataHelper.executeScalar(sql, Integer.class, loginDataKey);
+    }
+
+    public long rechargeOrderAmount(SqlDataHelper sqlDataHelper, int loginDataKey) {
+        String sql = "SELECT sum(amount) FROM (SELECT sum((logdata->>'amount')::int8) as amount FROM rolerechargeslog WHERE daykey= ? GROUP BY logdata->>'spOrderId') as rc;";
+        Long aLong = sqlDataHelper.executeScalar(sql, Long.class, loginDataKey);
+        return aLong == null ? 0 : aLong;
+    }
+
+    /** 新增注册账号充值账号数 */
+    public long registerAccountRechargeCount(SqlDataHelper sqlDataHelper, int loginDataKey) {
+        String sql = """
+                SELECT count(1) FROM (SELECT logdata->>'account' as account FROM rolerechargeslog WHERE daykey= ? GROUP BY logdata->>'account') as ra
+                WHERE ra.account in((SELECT logdata->>'account' as account FROM accountregisterlog WHERE daykey= ? GROUP BY logdata->>'account'));
+                """;
+        Long aLong = sqlDataHelper.executeScalar(sql, Long.class, loginDataKey, loginDataKey);
+        return aLong == null ? 0 : aLong;
+    }
+
+    /** 充值金额分组统计 */
+    public int[][] rechargeGroup(SqlDataHelper sqlDataHelper, int loginDataKey) {
+        String sql = """
+                SELECT ((logdata->>'amount')::int) as amount,count(1) as count FROM rolerechargeslog\s
+                WHERE daykey= ?\s
+                and uid in(SELECT min(uid) as uid FROM rolerechargeslog WHERE daykey= ? GROUP BY logdata->>'spOrderId')
+                GROUP BY logdata->>'amount';
+                """;
+        List<JSONObject> jsonObjects = sqlDataHelper.queryList(sql, loginDataKey, loginDataKey);
+        int[][] ints = new int[2][jsonObjects.size()];
+        for (int i = 0; i < jsonObjects.size(); i++) {
+            JSONObject jsonObject = jsonObjects.get(i);
+            ints[0][i] = jsonObject.getInteger("amount");
+            ints[1][i] = jsonObject.getInteger("count");
+        }
+        return ints;
     }
 
     public void addLog(SqlDataHelper sqlDataHelper, String logName, long time, JSONObject jsonObject) {
