@@ -40,6 +40,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     private ApplicationContext applicationContext;
     /** 所有的类 */
     private List<ProviderBean> beanList;
+    private Map<String, List<ApplicationContextProvider.ProviderMethod>> eventMap;
     /** 实现了某个注解的类 */
     private final ConcurrentHashMap<Class<? extends Annotation>, List<ProviderBean>> annotationCacheMap = new ConcurrentHashMap<>();
     /** 实现了某个注解的类 */
@@ -60,6 +61,20 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
             beanList = buildBeans(applicationContext).map(ProviderBean::new).sorted().toList();
         }
         return beanList;
+    }
+
+    public synchronized Map<String, List<ProviderMethod>> getEventMap() {
+        if (eventMap == null) {
+            log.info("EventService init");
+            Map<String, List<ApplicationContextProvider.ProviderMethod>> tmpEventMap = new HashMap<>();
+            withMethodAssignableFrom(Event.class).forEach(method -> {
+                Class<?> parameterType = method.getMethod().getParameterTypes()[0];
+                String parameterTypeName = parameterType.getName();
+                tmpEventMap.computeIfAbsent(parameterTypeName, k -> new ArrayList<>()).add(method);
+            });
+            eventMap = tmpEventMap;
+        }
+        return eventMap;
     }
 
     /** 所有的bean */
@@ -185,14 +200,57 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         return Collections.unmodifiableMap(tmp);
     }
 
+    /**
+     * 抛出事件，但是如果执行遇到异常会中断
+     * <p>如果事件执行需要先后顺序 {@link org.springframework.core.annotation.Order}
+     */
+    public ApplicationContextProvider postEvent(Event event) {
+        List<ApplicationContextProvider.ProviderMethod> providerMethods = getEventMap().get(event.getClass().getName());
+        if (providerMethods != null) {
+            for (ApplicationContextProvider.ProviderMethod providerMethod : providerMethods) {
+                providerMethod.invoke(event);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 抛出事件，如果遇到异常会继续执行
+     * <p>如果事件执行需要先后顺序 {@link org.springframework.core.annotation.Order}
+     */
+    public ApplicationContextProvider postEventIgnoreException(Event event) {
+        List<ApplicationContextProvider.ProviderMethod> providerMethods = getEventMap().get(event.getClass().getName());
+        if (providerMethods != null) {
+            for (ApplicationContextProvider.ProviderMethod providerMethod : providerMethods) {
+                try {
+                    providerMethod.invoke(event);
+                } catch (Throwable throwable) {
+                    log.error("执行方法异常：{}-{}", providerMethod.getBean().getClass(), providerMethod.getMethod().getName(), throwable);
+                }
+            }
+        }
+        return this;
+    }
+
+    public ApplicationContextProvider executeMethodWithAnnotatedInit() {
+        executeMethodWithAnnotated(Init.class);
+        return this;
+    }
+
+    public ApplicationContextProvider executeMethodWithAnnotatedStart() {
+        executeMethodWithAnnotated(Start.class);
+        return this;
+    }
+
     /** 执行循环过程中某一个函数执行失败中断执行 */
-    public void executeMethodWithAnnotated(Class<? extends Annotation> annotation, Object... args) {
+    public ApplicationContextProvider executeMethodWithAnnotated(Class<? extends Annotation> annotation, Object... args) {
         Collection<ProviderMethod> providerMethodStream = withMethodAnnotatedCache(annotation);
         providerMethodStream.forEach(providerMethod -> providerMethod.invokeInjectorParameters(args));
+        return this;
     }
 
     /** 执行循环过程中某一个函数执行失败会继续执行其它函数 */
-    public void executeMethodWithAnnotatedException(Class<? extends Annotation> annotation, Object... args) {
+    public ApplicationContextProvider executeMethodWithAnnotatedException(Class<? extends Annotation> annotation, Object... args) {
         Collection<ProviderMethod> providerMethodStream = withMethodAnnotatedCache(annotation);
         for (ProviderMethod providerMethod : providerMethodStream) {
             try {
@@ -201,6 +259,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
                 log.error("执行方法异常：{}-{}", providerMethod.getMethod(), providerMethod.getMethod().getName(), e);
             }
         }
+        return this;
     }
 
     public Object[] injectorParameters(Object bean, Method method, Object... args) {
@@ -251,16 +310,6 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     @SuppressWarnings("unchecked")
     public <R> R getBean(String names) {
         return (R) applicationContext.getBean(names);
-    }
-
-    public ApplicationContextProvider executeMethodWithAnnotatedInit() {
-        executeMethodWithAnnotated(Init.class);
-        return this;
-    }
-
-    public ApplicationContextProvider executeMethodWithAnnotatedStart() {
-        executeMethodWithAnnotated(Start.class);
-        return this;
     }
 
     @Getter

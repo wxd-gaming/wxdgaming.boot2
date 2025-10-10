@@ -2,7 +2,7 @@ package wxdgaming.game.server.script.attribute;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import wxdgaming.boot2.starter.event.Event;
+import wxdgaming.boot2.core.Event;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.server.bean.attr.AttrInfo;
 import wxdgaming.game.server.bean.MapNpc;

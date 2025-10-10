@@ -1,9 +1,9 @@
 package wxdgaming.game.server.event;
 
-import wxdgaming.boot2.starter.event.Event;
-import wxdgaming.game.server.bean.reason.ReasonDTO;
+import wxdgaming.boot2.core.Event;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.attribute.CalculatorType;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.server.bean.role.Player;
 
 /**
@@ -12,8 +12,15 @@ import wxdgaming.game.server.bean.role.Player;
  **/
 public interface EventConst {
 
-    public record LevelUpEvent(Player player, int changeLv) implements Event {
-    }
+    public record CreatePlayerEvent(Player player) implements Event {}
+
+    public record LoginBeforePlayerEvent(Player player) implements Event {}
+
+    public record LoginPlayerEvent(Player player) implements Event {}
+
+    public record LogoutPlayerEvent(Player player) implements Event {}
+
+    public record LevelUpEvent(Player player, int changeLv) implements Event {}
 
     /**
      * 玩家属性计算

@@ -18,9 +18,7 @@ import wxdgaming.game.server.bean.bag.BagPack;
 import wxdgaming.game.server.bean.bag.ItemBag;
 import wxdgaming.game.server.bean.goods.*;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.event.OnCreateRole;
-import wxdgaming.game.server.event.OnLogin;
-import wxdgaming.game.server.event.OnLoginBefore;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.bag.cost.CostScript;
 import wxdgaming.game.server.script.bag.gain.GainScript;
@@ -71,23 +69,22 @@ public class BagService extends HoldApplicationContext implements InitPrint {
     }
 
     /** 创建角色之后创建背包 */
-    @OnCreateRole
-    @Order(1)
-    public void onCreateRoleInitBag(Player player) {
-        onLoginBefore(player);
+    @Order(-10000)
+    public void onCreateRoleInitBag(EventConst.CreatePlayerEvent event) {
     }
 
     /** 登录的时候检查背包问题 */
-    @OnLoginBefore
-    public void onLoginBefore(Player player) {
+    @Order(-10000)
+    public void onLoginBefore(EventConst.LoginBeforePlayerEvent event) {
+        Player player = event.player();
         BagPack bagPack = player.getBagPack();
         bagPack.getBagMap().computeIfAbsent(BagType.Bag, k -> new ItemBag(100).resetGrid());/*背包*/
         bagPack.getBagMap().computeIfAbsent(BagType.Store, k -> new ItemBag(100).resetGrid());/*仓库*/
     }
 
     /** 登录的时候推送背包 */
-    @OnLogin
-    public void onLogin(Player player) {
+    public void onLogin(EventConst.LoginPlayerEvent event) {
+        Player player = event.player();
         /*推送数据的*/
         sendBagInfo(player, BagType.Bag);
     }

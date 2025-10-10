@@ -12,7 +12,7 @@ import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.global.GlobalDataConst;
 import wxdgaming.game.server.bean.global.impl.YunyingData;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.event.OnLogin;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.chat.ChatService;
 import wxdgaming.game.server.script.gm.GmService;
@@ -83,8 +83,8 @@ public class ReqChatMessageHandler {
     }
 
     /** 登录，推送gm命令 */
-    @OnLogin
-    public void onLoginSendGmList(Player player) {
+    public void onLoginSendGmList(EventConst.LoginPlayerEvent event) {
+        Player player = event.player();
         if (checkOpenGm(player)) {
             ResGmList resGmList = gmService.getResGmList();
             player.write(resGmList);

@@ -15,7 +15,7 @@ import wxdgaming.game.cfg.bean.QAchieve;
 import wxdgaming.game.server.bean.achieve.AchievePack;
 import wxdgaming.game.server.bean.achieve.AchieveProgress;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.event.OnLoginBefore;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.event.OnTask;
 import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.tips.TipsService;
@@ -45,9 +45,8 @@ public class AchieveService implements InitPrint {
         this.bagService = bagService;
     }
 
-    @OnLoginBefore
-    public void onLoginBefore(Player player) {
-
+    public void onLoginBefore(EventConst.LoginBeforePlayerEvent event) {
+        Player player = event.player();
         QAchieveTable qAchieveTable = this.dataRepository.dataTable(QAchieveTable.class);
         HashMap<Integer, Condition> typeMap = qAchieveTable.getTypeMap();
         AchievePack achievePack = player.getAchievePack();

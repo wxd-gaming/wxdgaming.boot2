@@ -13,7 +13,7 @@ import wxdgaming.game.message.task.TaskType;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.task.TaskInfo;
 import wxdgaming.game.server.bean.task.TaskPack;
-import wxdgaming.game.server.event.OnLogin;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.event.OnTask;
 import wxdgaming.game.server.script.task.init.ConditionInitValueHandler;
 
@@ -69,8 +69,8 @@ public class TaskService extends HoldApplicationContext {
     }
 
     /** 登录的时候检查任务 */
-    @OnLogin
-    public void onLogin(Player player) {
+    public void onLogin(EventConst.LoginPlayerEvent event) {
+        Player player = event.player();
         TaskPack taskPack = player.getTaskPack();
         /*推送数据的*/
         ResTaskList resTaskList = new ResTaskList();

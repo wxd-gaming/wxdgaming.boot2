@@ -10,8 +10,7 @@ import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.game.server.bean.StatusConst;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.event.OnLogin;
-import wxdgaming.game.server.event.OnLoginBefore;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.event.OnTask;
 
 /**
@@ -29,8 +28,8 @@ public class PlayerLoginHandler extends HoldApplicationContext {
 
     /** 创建角色之后赠送初始化道具 */
     @Order(1)
-    @OnLoginBefore
-    public void onLoginBefore(Player player) {
+    public void onLoginBefore(EventConst.LoginBeforePlayerEvent event) {
+        Player player = event.player();
         log.info("玩家上线:{} {}", ThreadContext.context().queueName(), player);
         player.setStatus(new BitFlag());
         /*触发任务登录次数*/
@@ -50,8 +49,8 @@ public class PlayerLoginHandler extends HoldApplicationContext {
 
     /** 创建角色之后赠送初始化道具 */
     @Order(1)
-    @OnLogin
-    public void onLogin(Player player) {
+    public void onLogin(EventConst.LoginPlayerEvent event) {
+        Player player = event.player();
         log.info("玩家上线:{} {}", ThreadContext.context().queueName(), player);
         player.getStatus().addFlags(StatusConst.Online);
         player.getOnlineInfo().setLastLoginTime(MyClock.millis());

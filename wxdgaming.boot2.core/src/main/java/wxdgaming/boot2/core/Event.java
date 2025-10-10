@@ -1,4 +1,4 @@
-package wxdgaming.boot2.starter.event;
+package wxdgaming.boot2.core;
 
 /**
  * 事件

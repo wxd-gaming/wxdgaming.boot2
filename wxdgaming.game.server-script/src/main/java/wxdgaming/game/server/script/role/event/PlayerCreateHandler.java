@@ -2,12 +2,12 @@ package wxdgaming.game.server.script.role.event;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import wxdgaming.game.server.bean.reason.ReasonConst;
-import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.server.bean.goods.BagChangeDTO4ItemCfg;
 import wxdgaming.game.server.bean.goods.ItemCfg;
+import wxdgaming.game.server.bean.reason.ReasonConst;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.event.OnCreateRole;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.script.bag.BagService;
 
 import java.util.ArrayList;
@@ -30,8 +30,8 @@ public class PlayerCreateHandler {
     }
 
     /** 创建角色之后赠送初始化道具 */
-    @OnCreateRole
-    public void onCreateRoleInitGoods(Player player) {
+    public void onCreateRoleInitGoods(EventConst.CreatePlayerEvent event) {
+        Player player = event.player();
         log.info("角色创建:{}", player);
         ItemCfg.ItemCfgBuilder builder = ItemCfg.builder();
         List<ItemCfg> rewards = new ArrayList<>();

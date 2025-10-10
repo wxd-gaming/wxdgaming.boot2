@@ -18,7 +18,7 @@ import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.task.TaskInfo;
 import wxdgaming.game.server.bean.task.TaskPack;
-import wxdgaming.game.server.event.OnLoginBefore;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.task.slog.AcceptTaskSlog;
 import wxdgaming.game.server.script.task.slog.SubmitTaskSlog;
@@ -48,8 +48,8 @@ public abstract class ITaskScript extends HoldApplicationContext {
     public abstract TaskType type();
 
     /** 登录的时候检查任务 */
-    @OnLoginBefore
-    public void onLoginBefore(Player player) {
+    public void onLoginBefore(EventConst.LoginBeforePlayerEvent event) {
+        Player player = event.player();
         TaskPack taskPack = player.getTaskPack();
         initTask(player, taskPack);
     }

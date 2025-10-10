@@ -15,7 +15,6 @@ import wxdgaming.game.server.bean.MapObject;
 import wxdgaming.game.server.bean.attribute.CalculatorType;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.EventConst;
-import wxdgaming.game.server.event.OnLoginBefore;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -126,15 +125,16 @@ public class PlayerAttributeService extends HoldApplicationContext {
 
     }
 
-    @OnLoginBefore
-    public void onLoginBefore(Player player) {
+    @Order(Integer.MAX_VALUE)
+    public void onLoginBefore(EventConst.LoginBeforePlayerEvent event) {
+        Player player = event.player();
         EventConst.PlayerAttributeCalculatorEvent playerAttributeCalculatorEvent = new EventConst.PlayerAttributeCalculatorEvent(
                 player,
                 calculatorTypes,
                 ReasonDTO.of(ReasonConst.Login)
         );
 
-        finalCalculator(playerAttributeCalculatorEvent);
+        onPlayerAttributeCalculator(playerAttributeCalculatorEvent);
     }
 
     final CalculatorType[] calculatorBASE = {CalculatorType.BASE};

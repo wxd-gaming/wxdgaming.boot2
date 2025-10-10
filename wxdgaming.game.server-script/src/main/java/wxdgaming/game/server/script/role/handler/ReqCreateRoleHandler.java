@@ -15,7 +15,7 @@ import wxdgaming.game.message.role.ReqCreateRole;
 import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
-import wxdgaming.game.server.event.OnCreateRole;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.role.PlayerService;
 import wxdgaming.game.server.script.role.slog.RoleRegisterSlog;
@@ -121,7 +121,7 @@ public class ReqCreateRoleHandler extends HoldApplicationContext {
         } finally {
             SingletonLockUtil.unlock("role_" + name);
         }
-        applicationContextProvider.executeMethodWithAnnotatedException(OnCreateRole.class, player);
+        applicationContextProvider.postEventIgnoreException(new EventConst.CreatePlayerEvent(player));
         playerService.sendPlayerList(socketSession, sid, account);
     }
 

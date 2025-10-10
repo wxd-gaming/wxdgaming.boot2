@@ -17,8 +17,7 @@ import wxdgaming.game.message.role.ResChooseRole;
 import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.entity.role.PlayerSnap;
-import wxdgaming.game.server.event.OnLogin;
-import wxdgaming.game.server.event.OnLoginBefore;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.event.OnLogout;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.module.data.GlobalDbDataCenterService;
@@ -91,12 +90,12 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
 
             /*绑定*/
             log.info("sid={}, {} 触发登录之前校验事件", sid, player);
-            applicationContextProvider.executeMethodWithAnnotatedException(OnLoginBefore.class, player);
+            applicationContextProvider.postEvent(new EventConst.LoginBeforePlayerEvent(player));
             ResChooseRole resChooseRole = new ResChooseRole();
             resChooseRole.setRid(rid);
             socketSession.write(resChooseRole);
             log.info("sid={}, {} 触发登录事件", sid, player);
-            applicationContextProvider.executeMethodWithAnnotatedException(OnLogin.class, player, 1, 1);
+            applicationContextProvider.postEvent(new EventConst.LoginPlayerEvent(player));
             log.info("sid={}, {} 选择角色成功", sid, player);
 
             RoleLoginSlog roleLoginLog = new RoleLoginSlog(player, userMapping.getClientIp(), JSON.toJSONString(userMapping.getClientParams()));

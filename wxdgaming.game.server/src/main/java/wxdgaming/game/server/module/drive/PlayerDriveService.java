@@ -89,8 +89,8 @@ public class PlayerDriveService extends HoldApplicationContext {
     }
 
     @Order
-    @OnLogin
-    public void addPlayer(Player player) {
+    public void addPlayer(EventConst.LoginPlayerEvent event) {
+        Player player = event.player();
         int driveId = getPlayerDriveId(player.getUid());
         PlayerDriveContent playerDriveContent = playerDriveContentMap.get(driveId);
         playerDriveContent.playerMap.put(player.getUid(), player);

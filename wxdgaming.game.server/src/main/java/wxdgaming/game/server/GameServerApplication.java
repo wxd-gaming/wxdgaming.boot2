@@ -11,15 +11,14 @@ import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
-import wxdgaming.boot2.starter.event.EventScan;
 import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.net.SocketScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 import wxdgaming.boot2.starter.validation.ValidationScan;
 import wxdgaming.boot2.util.ChildApplicationContextProvider;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
-import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.common.global.GlobalDataService;
+import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.logbus.LogBusService;
 
 import java.io.File;
@@ -27,7 +26,6 @@ import java.io.File;
 @Slf4j
 @SpringBootApplication(scanBasePackageClasses = {
         CoreScan.class,
-        EventScan.class,
         DataExcelScan.class,
         ScheduledScan.class,
         SocketScan.class,

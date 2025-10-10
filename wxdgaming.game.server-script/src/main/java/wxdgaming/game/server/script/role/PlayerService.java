@@ -4,14 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.lang.condition.Condition;
-import wxdgaming.boot2.starter.event.EventService;
 import wxdgaming.boot2.starter.net.SocketSession;
-import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.message.role.ResLogin;
 import wxdgaming.game.message.role.ResUpdateExp;
 import wxdgaming.game.message.role.ResUpdateLevel;
 import wxdgaming.game.message.role.RoleBean;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.event.OnTask;
@@ -30,12 +29,10 @@ public class PlayerService extends HoldApplicationContext {
 
     final DataCenterService dataCenterService;
     final SlogService slogService;
-    final EventService eventService;
 
-    public PlayerService(DataCenterService dataCenterService, SlogService slogService, EventService eventService) {
+    public PlayerService(DataCenterService dataCenterService, SlogService slogService) {
         this.dataCenterService = dataCenterService;
         this.slogService = slogService;
-        this.eventService = eventService;
     }
 
 
@@ -90,7 +87,7 @@ public class PlayerService extends HoldApplicationContext {
 
         player.write(resUpdateLevel);
         /*触发升级, 比如功能开放监听需要*/
-        eventService.postEventIgnoreException(new EventConst.LevelUpEvent(player, changeLv));
+        applicationContextProvider.postEventIgnoreException(new EventConst.LevelUpEvent(player, changeLv));
         /*触发当前等级*/
         applicationContextProvider.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("level", player.getLevel()));
         /*触发提升等级*/
