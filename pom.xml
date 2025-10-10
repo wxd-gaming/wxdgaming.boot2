@@ -23,12 +23,15 @@
         <module>wxdgaming.boot2.starter.batis.sql</module>
         <module>wxdgaming.boot2.starter.batis.sql.mysql</module>
         <module>wxdgaming.boot2.starter.batis.sql.pgsql</module>
+        <module>wxdgaming.boot2.starter.event</module>
         <module>wxdgaming.boot2.starter.excel</module>
         <module>wxdgaming.boot2.starter.js</module>
         <module>wxdgaming.boot2.starter.net</module>
         <module>wxdgaming.boot2.starter.net.httpclient</module>
         <module>wxdgaming.boot2.starter.net.server</module>
         <module>wxdgaming.boot2.starter.scheduled</module>
+        <module>wxdgaming.boot2.starter.validation</module>
+        <module>wxdgaming.game.authority</module>
         <module>wxdgaming.game.basic</module>
         <module>wxdgaming.game.login</module>
         <module>wxdgaming.game.robot</module>
@@ -36,9 +39,6 @@
         <module>wxdgaming.game.server-script</module>
         <module>wxdgaming.logbus</module>
         <module>wxdgaming.logserver</module>
-        <module>wxdgaming.boot2.starter.event</module>
-        <module>wxdgaming.game.authority</module>
-        <module>wxdgaming.boot2.starter.validation</module>
     </modules>
 
     <properties>
