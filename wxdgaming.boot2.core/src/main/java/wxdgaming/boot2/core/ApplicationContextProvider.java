@@ -228,11 +228,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
             /*实现注入*/
             Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
             if (qualifier != null) {
-                String name = qualifier.value();
-                if (StringUtils.isBlank(name))
-                    params[i] = applicationContext.getBean(parameterType);
-                else
-                    params[i] = applicationContext.getBean(name);
+                params[i] = getBean(qualifier, parameterType);
                 continue;
             }
             params[i] = holderArgument.next();
@@ -240,10 +236,19 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         return params;
     }
 
+    public <R> R getBean(Qualifier qualifier, Class<R> beanClass) {
+        String name = qualifier.value();
+        if (StringUtils.isBlank(name))
+            return getBean(beanClass);
+        else
+            return getBean(name);
+    }
+
     public <R> R getBean(Class<R> cls) {
         return applicationContext.getBean(cls);
     }
 
+    @SuppressWarnings("unchecked")
     public <R> R getBean(String names) {
         return (R) applicationContext.getBean(names);
     }
@@ -406,26 +411,16 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
 
         /** 参数类型强制匹配关系 */
         public boolean equalsParameters(Class<?>... args) {
-            AssertUtil.assertTrue(args.length < 1, "参数的类型不允许空");
             Class<?>[] parameterTypes = method.getParameterTypes();
             return parameterTypes.length == args.length && Arrays.equals(parameterTypes, args);
         }
 
         /** 参数类型继承关系 */
         public boolean isAssignableFrom(Class<?>... args) {
-            AssertUtil.assertTrue(args.length > 0, "参数的类型不允许空");
-            Class<?>[] parameterTypes = method.getParameterTypes();
-            if (parameterTypes.length != args.length)
-                return false;
-            for (int i = 0; i < args.length; i++) {
-                if (!args[i].isAssignableFrom(parameterTypes[i])) {
-                    return false;
-                }
-            }
-            return true;
+            return MethodUtil.isAssignableFrom(method, args);
         }
 
-        /** 会重新组件参数列表 */
+        /** 会重新组织参数列表 */
         public Object invokeInjectorParameters(Object... args) {
             Object[] objects = ApplicationContextProvider.this.injectorParameters(bean, method, args);
             return invoke(objects);

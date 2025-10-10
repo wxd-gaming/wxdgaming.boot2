@@ -116,6 +116,14 @@ public class RpcListenerTrigger extends ExecutorEvent {
                 }
             }
             {
+                /*实现注入*/
+                Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
+                if (qualifier != null) {
+                    params[i] = applicationContextProvider.getBean(qualifier, parameterType);
+                    continue;
+                }
+            }
+            {
                 RequestParam requestParam = parameter.getAnnotation(RequestParam.class);
                 if (requestParam != null) {
                     String name = requestParam.value();
@@ -153,16 +161,6 @@ public class RpcListenerTrigger extends ExecutorEvent {
                     params[i] = o;
                     continue;
                 }
-            }
-            /*实现注入*/
-            Qualifier qualifier = parameter.getAnnotation(Qualifier.class);
-            if (qualifier != null) {
-                String name = qualifier.value();
-                if (StringUtils.isBlank(name))
-                    params[i] = applicationContextProvider.getBean(parameterType);
-                else
-                    params[i] = applicationContextProvider.getBean(name);
-                continue;
             }
         }
         return params;

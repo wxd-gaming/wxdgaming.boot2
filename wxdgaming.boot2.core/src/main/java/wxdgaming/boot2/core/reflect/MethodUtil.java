@@ -3,7 +3,10 @@ package wxdgaming.boot2.core.reflect;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Throw;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 
 /***
@@ -57,13 +60,14 @@ public class MethodUtil {
 
     public static Method findMethod(boolean readStatic, Class<?> cls, String methodName, Class<?>[] parameters) {
         Map<String, Method> stringMethodTreeMap = readAllMethods0(cls);
-        String fullName = methodName;
+        StringBuilder fullName = new StringBuilder(methodName);
         if (parameters != null) {
             for (Class<?> parameter : parameters) {
-                fullName += "_" + parameter.getSimpleName();
+                fullName.append("_").append(parameter.getSimpleName());
             }
-            if (stringMethodTreeMap.containsKey(fullName)) {
-                return stringMethodTreeMap.get(fullName);
+            String fullNameString = fullName.toString();
+            if (stringMethodTreeMap.containsKey(fullNameString)) {
+                return stringMethodTreeMap.get(fullNameString);
             }
         }
         return stringMethodTreeMap.values().stream()
@@ -76,17 +80,23 @@ public class MethodUtil {
                     if (parameters == null) {
                         return true;
                     }
-                    Class<?>[] parameterTypes = method.getParameterTypes();
-                    if (parameterTypes.length != parameters.length) return false;
-                    for (int i = 0; i < parameterTypes.length; i++) {
-                        if (!parameterTypes[i].isAssignableFrom(parameters[i])) {
-                            return false;
-                        }
-                    }
-                    return true;
+                    return isAssignableFrom(method, parameters);
                 })
                 .findAny()
                 .orElse(null);
+    }
+
+    /** 对应的参数继承关系 */
+    public static boolean isAssignableFrom(Method method, Class<?>... parameterClass) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        if (parameterTypes.length != parameterClass.length)
+            return false;
+        for (int i = 0; i < parameterTypes.length; i++) {
+            if (!parameterTypes[i].isAssignableFrom(parameterClass[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 
 
@@ -107,7 +117,6 @@ public class MethodUtil {
      * @param readStatic     读取静态字段
      * @param cls            需要分析的类型
      * @param parameterClass 需要判断函数第一个参数是否继承自此类型
-     * @return
      */
     public static Map<String, Method> readAllMethod(boolean readStatic, Class<?> cls, Class<?>... parameterClass) {
         Map<String, Method> stringMethodTreeMap = readAllMethods0(cls);
@@ -126,7 +135,7 @@ public class MethodUtil {
 
             /*参数类型 带泛型*/
             Type[] genericParameterTypes = method.getGenericParameterTypes();
-            if (parameterClass.length > 0 && genericParameterTypes.length < parameterClass.length) {
+            if (parameterClass.length > 0 && genericParameterTypes.length != parameterClass.length) {
                 continue;
             }
 
