@@ -30,6 +30,31 @@ B站 https://www.bilibili.com/list/316421251
 | logbus                 | 日志处理模块，用于上报日志                    |
 | logserver              | 日志服务，用户处理游戏内的日志，包括统计             |
 
+### 完成情况
+#### 登录（模块：game.login）
+###### 1.账号系统
+1. 封号
+2. 解封，
+3. gm等级
+4. 白名单
+###### 2.区服信息
+1. 新增区服
+2. 修改开服时间
+3. 服务器冠名
+#### 游戏（模块：game.server）
+1. 角色系统
+2. 角色快照
+3. 邮件
+4. 成就
+5. 任务
+6. 活动
+7. 属性计算
+8. buff基础
+#### 日志(模块：logserver)
+1. 日志记录
+2. 日志查询
+3. 日志统计分析
+
 ### 配置
 
 #### 开启端口服务
@@ -148,26 +173,6 @@ public class EntityTest extends EntityLongUID {
     }
 </code>
 </pre>
-
-#### 开启 http 监听接口
-
-<pre><code class="language-lava">
-    @HttpRequest()
-    public String error(RunApplication runApplication,
-                        @Value(path = "executor") ExecutorConfig executorConfig,
-                        @Value(path = "executor1", required = false) ExecutorConfig executorConfig1,
-                        @Body(defaultValue = "1") String body,
-                        @Param(path = "b1", defaultValue = "2") String b1) {
-        throw new RuntimeException("d");
-    }
-</code>
-</pre>
-支持多种方式注入参数，
-
-1. @Value 是通过配置文件获取参数注入
-2. @Param 是通过请求的数据获取注入
-3. @Body 是完整的参数映射
-4. @Qualifier 是容器类实例参数
 
 #### 开启 rpc 监听接口
 
