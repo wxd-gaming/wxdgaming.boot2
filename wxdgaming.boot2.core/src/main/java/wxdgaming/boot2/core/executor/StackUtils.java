@@ -42,9 +42,11 @@ public class StackUtils {
         StringBuilder builder = new StringBuilder();
         for (int i = 2; i < traceElements.length; i++) {
             StackTraceElement traceElement = traceElements[i];
+            if (!builder.isEmpty()) {
+                builder.append("=>");
+            }
             builder.append(traceElement.getClassName()).append("#").append(traceElement.getMethodName())
                     .append("(").append(traceElement.getFileName()).append(":").append(traceElement.getLineNumber()).append(")");
-            builder.append("=>");
         }
         return builder.toString();
     }

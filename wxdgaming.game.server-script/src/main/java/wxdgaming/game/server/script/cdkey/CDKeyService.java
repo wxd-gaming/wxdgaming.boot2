@@ -106,7 +106,7 @@ public class CDKeyService implements InitPrint {
             boolean validate = validationService.validateAll(countMap, apply, (handler, validation) -> {
                 String tips = handler.tips();
                 tipsService.tips(player, tips);
-                log.info("条件验证不通过：{}, {} -> {}", player, validation, countMap);
+                log.info("条件验证不通过：{}, 使用礼包码：{} {} -> {}", player, cdKey, validation, countMap);
             });
             if (!validate) {
                 return;

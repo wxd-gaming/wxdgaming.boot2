@@ -75,7 +75,6 @@ public class PlayerDriveService extends HoldApplicationContext {
 
     /** 提交到玩家队列处理任务 */
     public void executor(Player player, Runnable runnable) {
-        String playerDriveName = getPlayerDriveName(player.getUid());
 
         ExecutorEvent executorEvent = new ExecutorEvent() {
 
@@ -84,8 +83,13 @@ public class PlayerDriveService extends HoldApplicationContext {
             }
 
         };
-        executorEvent.setQueueName(playerDriveName);
-        ExecutorFactory.getExecutorServiceLogic().execute(executorEvent);
+        executor(player, executorEvent);
+    }
+
+    public void executor(Player player, ExecutorEvent event) {
+        String playerDriveName = getPlayerDriveName(player.getUid());
+        event.setQueueName(playerDriveName);
+        ExecutorFactory.getExecutorServiceLogic().execute(event);
     }
 
     @Order

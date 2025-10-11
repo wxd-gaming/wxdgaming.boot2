@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.executor;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.core.runtime.RunTimeUtil;
 
 import java.util.Map;
@@ -22,18 +23,18 @@ public final class ExecutorMonitor extends Thread {
     public static ConcurrentHashMap<Thread, JobContent> executorJobConcurrentHashMap = new ConcurrentHashMap<>();
 
     public static void put(ExecutorJob executorJob) {
-        executorJobConcurrentHashMap.put(Thread.currentThread(), new JobContent(executorJob, System.nanoTime()));
+        executorJobConcurrentHashMap.put(Thread.currentThread(), new JobContent(executorJob));
     }
 
     public static void release() {
         Thread thread = Thread.currentThread();
         JobContent jobContent = executorJobConcurrentHashMap.remove(thread);
         if (jobContent == null) return;
-        long diffNs = System.nanoTime() - jobContent.start();
-        ExecutorJob executorJob = jobContent.executorJob();
+        long diffNs = System.nanoTime() - jobContent.startTime;
+        ExecutorJob executorJob = jobContent.executorJob;
         String stack = executorJob.getStack();
         if (!executorJob.isIgnoreRunTimeRecord()) {
-            RunTimeUtil.record(stack, jobContent.start());
+            RunTimeUtil.record(stack, jobContent.startTime);
         }
         long diffMs = TimeUnit.NANOSECONDS.toMillis(diffNs);
         if (diffMs > 150) {
@@ -54,15 +55,17 @@ public final class ExecutorMonitor extends Thread {
     @Override public void run() {
         while (!exit.get()) {
             try {
-                LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(30));
+                LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
                 for (Map.Entry<Thread, JobContent> entry : executorJobConcurrentHashMap.entrySet()) {
                     Thread thread = entry.getKey();
                     JobContent jobContent = entry.getValue();
-                    long diff = System.nanoTime() - jobContent.start();
-                    if (diff > TimeUnit.SECONDS.toNanos(30)) {
+                    long nanoTime = System.nanoTime();
+                    if ((nanoTime - jobContent.lastMonitorTime) > TimeUnit.SECONDS.toNanos(10)) {
+                        jobContent.lastMonitorTime = nanoTime;
+                        long diff = TimeUnit.NANOSECONDS.toSeconds(nanoTime - jobContent.startTime);
                         log.warn(
                                 "线程执行器监视, 线程: {}, 执行器: {}, 执行时间: {}s, 堆栈：{}",
-                                thread.getName(), jobContent.executorJob().getStack(), TimeUnit.NANOSECONDS.toSeconds(diff),
+                                thread.getName(), jobContent.executorJob.getStack(), diff,
                                 StackUtils.stack(thread.getStackTrace())
                         );
                     }
@@ -73,7 +76,16 @@ public final class ExecutorMonitor extends Thread {
         }
     }
 
-    public record JobContent(ExecutorJob executorJob, long start) {
+    public static final class JobContent extends ObjectBase {
+
+        final ExecutorJob executorJob;
+        final long startTime;
+        long lastMonitorTime;
+
+        public JobContent(ExecutorJob executorJob) {
+            this.executorJob = executorJob;
+            this.startTime = this.lastMonitorTime = System.nanoTime();
+        }
 
     }
 

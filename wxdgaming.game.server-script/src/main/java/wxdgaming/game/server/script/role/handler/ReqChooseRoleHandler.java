@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.collection.MapOf;
+import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
@@ -30,6 +31,8 @@ import wxdgaming.game.server.script.role.slog.RoleLoginSlog;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * 选择角色
@@ -77,38 +80,39 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
         }
 
         Player player = dataCenterService.getPlayer(rid);
-        playerDriveService.executor(player, () -> {
+        playerDriveService.executor(player, new ExecutorEvent() {
+            @Override public void onEvent() throws Exception {
+                if (userMapping.getRid() > 0 && userMapping.getRid() != player.getUid()) {
+                    /*角色切换*/
+                    log.info("sid={}, account={} 角色切换 rid={} -> {}", sid, account, userMapping.getRid(), player.getUid());
+                    applicationContextProvider.executeMethodWithAnnotatedException(OnLogout.class, player);
+                }
 
-            if (userMapping.getRid() > 0 && userMapping.getRid() != player.getUid()) {
-                /*角色切换*/
-                log.info("sid={}, account={} 角色切换 rid={} -> {}", sid, account, userMapping.getRid(), player.getUid());
-                applicationContextProvider.executeMethodWithAnnotatedException(OnLogout.class, player);
+                player.setClientData(new ArrayList<>(userMapping.getClientParams()));
+
+                PlayerSnap playerSnap = globalDbDataCenterService.playerSnap(player.getUid());
+                player.buildPlayerSnap(playerSnap);
+                player.setUserMapping(userMapping);
+                userMapping.setRid(player.getUid());
+
+                dataCenterService.getOnlinePlayers().add(socketSession);
+
+                /*绑定*/
+                log.info("sid={}, {} 触发登录之前校验事件", sid, player);
+                applicationContextProvider.postEvent(new EventConst.LoginBeforePlayerEvent(player));
+                ResChooseRole resChooseRole = new ResChooseRole();
+                resChooseRole.setRid(rid);
+                socketSession.write(resChooseRole);
+                log.info("sid={}, {} 触发登录事件", sid, player);
+                applicationContextProvider.postEvent(new EventConst.LoginPlayerEvent(player));
+                log.info("sid={}, {} 选择角色成功", sid, player);
+
+                RoleLoginSlog roleLoginLog = new RoleLoginSlog(player, userMapping.getClientIp(), JSON.toJSONString(userMapping.getClientParams()));
+                slogService.pushLog(roleLoginLog);
+
+                reportPlayer2Login(player, 0);
+                LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(130));
             }
-
-            player.setClientData(new ArrayList<>(userMapping.getClientParams()));
-
-            PlayerSnap playerSnap = globalDbDataCenterService.playerSnap(player.getUid());
-            player.buildPlayerSnap(playerSnap);
-            player.setUserMapping(userMapping);
-            userMapping.setRid(player.getUid());
-
-            dataCenterService.getOnlinePlayers().add(socketSession);
-
-            /*绑定*/
-            log.info("sid={}, {} 触发登录之前校验事件", sid, player);
-            applicationContextProvider.postEvent(new EventConst.LoginBeforePlayerEvent(player));
-            ResChooseRole resChooseRole = new ResChooseRole();
-            resChooseRole.setRid(rid);
-            socketSession.write(resChooseRole);
-            log.info("sid={}, {} 触发登录事件", sid, player);
-            applicationContextProvider.postEvent(new EventConst.LoginPlayerEvent(player));
-            log.info("sid={}, {} 选择角色成功", sid, player);
-
-            RoleLoginSlog roleLoginLog = new RoleLoginSlog(player, userMapping.getClientIp(), JSON.toJSONString(userMapping.getClientParams()));
-            slogService.pushLog(roleLoginLog);
-
-            reportPlayer2Login(player, 0);
-
         });
     }
 

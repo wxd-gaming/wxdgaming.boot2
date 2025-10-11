@@ -1,6 +1,7 @@
 package code;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -9,6 +10,7 @@ import lombok.Setter;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import wxdgaming.boot2.core.format.data.Data2Size;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.DiffTimeRecord;
 
 import java.util.Collections;
@@ -26,6 +28,16 @@ public class FastUtilTest {
 
     public DiffTimeRecord newDiffTimeRecord() {
         return DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
+    }
+
+    @Test
+    public void f100() {
+        Int2ObjectOpenHashMap<Object> map = new Int2ObjectOpenHashMap<>();
+//        map.put(1, "2");
+        String jsonString = JSON.toJSONString(map, FastJsonUtil.Writer_Features_Type_Name);
+        System.out.println(jsonString);
+        Int2ObjectOpenHashMap map1 = JSON.parseObject(jsonString, new TypeReference<Int2ObjectOpenHashMap<Object>>(){});
+        System.out.println(map1);
     }
 
     @Test
