@@ -8,6 +8,7 @@ import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.boot2.starter.validation.Validation;
 import wxdgaming.boot2.starter.validation.ValidationUtil;
 import wxdgaming.game.server.bean.ValidationType;
+import wxdgaming.game.server.bean.count.CountValidationType;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.tips.TipsService;
 
@@ -30,6 +31,11 @@ public class ValidationService extends HoldApplicationContext {
     public ValidationService(ValidationUtil validationUtil, TipsService tipsService) {
         this.validationUtil = validationUtil;
         this.tipsService = tipsService;
+    }
+
+    /** 完全满足条件 */
+    public boolean validateCountAll(Object object, ConfigString configString, boolean sendTips) {
+        return validateAll(object, configString, CountValidationType.Parse, sendTips);
     }
 
     /** 完全满足条件 */

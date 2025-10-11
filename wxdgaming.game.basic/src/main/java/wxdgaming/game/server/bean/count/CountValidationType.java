@@ -23,6 +23,9 @@ public enum CountValidationType implements IValidationType {
     DayCount(4, "每天计数", MyClock::isSameDay),
     WeekCount(5, "每周计数", MyClock::isSameWeek),
     MonthCount(6, "每月计数", MyClock::isSameMonth),
+    YearCount(7, "每年计数", MyClock::isSameYear),
+    /** 永久 */
+    ForeverCount(8, "永久计数", l -> true),
     ;
 
     public static final Function<String, List<Validation>> Parse = (string) -> {

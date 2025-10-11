@@ -605,6 +605,16 @@ public class MyClock {
     /**
      * 判断两个时间是否在同一年
      *
+     * @param time 时间戳
+     * @return true 同一年
+     */
+    public static boolean isSameYear(long time) {
+        return getYear(millis()) == getYear(time);
+    }
+
+    /**
+     * 判断两个时间是否在同一年
+     *
      * @param time1 时间戳
      * @param time2 时间戳
      * @return true 同一年
