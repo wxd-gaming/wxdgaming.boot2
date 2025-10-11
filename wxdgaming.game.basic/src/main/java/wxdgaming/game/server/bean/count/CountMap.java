@@ -15,7 +15,7 @@ import java.util.Map;
 @Setter
 public class CountMap extends ObjectBase {
 
-    private Map<CountValidationType, CountData> validationMap = new HashMap<>();
+    private HashMap<CountValidationType, CountData> validationMap = new HashMap<>();
 
     public void checkClear() {
         for (Map.Entry<CountValidationType, CountData> entry : validationMap.entrySet()) {

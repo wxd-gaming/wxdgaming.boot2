@@ -17,10 +17,10 @@ import java.util.function.Predicate;
 @Setter
 public class CountData extends ObjectBase {
 
-    private int count;
+    private long count;
     private long time;
 
-    public int update(int change) {
+    public long update(long change) {
         count = Math.addExact(count, change);
         return count;
     }

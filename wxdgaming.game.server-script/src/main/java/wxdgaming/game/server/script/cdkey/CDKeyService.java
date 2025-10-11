@@ -2,7 +2,6 @@ package wxdgaming.game.server.script.cdkey;
 
 import com.alibaba.fastjson.TypeReference;
 import io.netty.handler.codec.http.HttpHeaderNames;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +33,7 @@ import wxdgaming.game.server.script.tips.TipsService;
 import wxdgaming.game.server.script.validation.ValidationService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -96,7 +96,7 @@ public class CDKeyService implements InitPrint {
             tipsService.tips(player, "内部异常");
             return;
         }
-        Int2ObjectOpenHashMap<CountMap> useCDKeyCountMap = player.getUseCDKeyCountMap();
+        HashMap<Integer, CountMap> useCDKeyCountMap = player.getUseCDKeyCountMap();
         CountMap countMap = useCDKeyCountMap.computeIfAbsent(cid, k -> new CountMap());
 
         String validateConfig = runResult.getString("validate");

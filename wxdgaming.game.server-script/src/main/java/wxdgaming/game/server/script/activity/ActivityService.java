@@ -52,6 +52,7 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
     public void init() {
         activityHandlerMap = getApplicationContextProvider().toMap(AbstractActivityHandler.class, AbstractActivityHandler::activityType);
         gameService.getActivityThreadDrive().setDriveHandler(this);
+        check();
     }
 
     public void check() {

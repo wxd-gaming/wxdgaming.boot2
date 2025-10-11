@@ -88,7 +88,7 @@ public class CDKeyService implements InitPrint {
 
             RunResult runResult = RunResult.ok()
                     .fluentPut("cid", cdKeyEntity.getId())
-                    .fluentPut("validate", "")
+                    .fluentPut("validate", cdKeyEntity.getValidation())
                     .fluentPut("comment", cdKeyEntity.getComment())
                     .fluentPut("rewards", cdKeyEntity.getRewards());
             log.info("使用cdkey {}, sid={}, account={}, roleId={}, roleName={}, info={}", key, sid, account, roleId, roleName, runResult.toJSONString());

@@ -4,19 +4,16 @@ import org.springframework.stereotype.Component;
 import wxdgaming.game.server.bean.count.CountValidationType;
 
 /**
- * 每周次数 条件
+ * 永久性次数限制 条件
  *
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-09-11 10:55
  **/
 @Component
-public class WeekCountValidationHandler extends AbstractCountValidationHandler {
+public class ForeverCountValidationHandler extends AbstractCountValidationHandler {
 
     public CountValidationType getValidationType() {
-        return CountValidationType.WeekCount;
+        return CountValidationType.ForeverCount;
     }
 
-    @Override public String tips() {
-        return "每周次数已达上限";
-    }
 }

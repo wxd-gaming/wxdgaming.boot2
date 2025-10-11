@@ -26,6 +26,8 @@ public abstract class QCdkeyMapping extends ObjectBase implements Serializable, 
     protected String code;
     /** 备注说明 */
     protected String comment;
+    /** 条件 */
+    protected String validation;
     /** 奖励 */
     protected final List<wxdgaming.game.server.bean.goods.ItemCfg> rewards = new ArrayList<>();
 

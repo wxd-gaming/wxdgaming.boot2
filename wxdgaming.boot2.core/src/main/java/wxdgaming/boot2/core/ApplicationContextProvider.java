@@ -40,7 +40,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     private ApplicationContext applicationContext;
     /** 所有的类 */
     private List<ProviderBean> beanList;
-    private Map<String, List<ApplicationContextProvider.ProviderMethod>> eventMap;
+    private final ConcurrentHashMap<String, List<ApplicationContextProvider.ProviderMethod>> eventMap = new ConcurrentHashMap<>();
     /** 实现了某个注解的类 */
     private final ConcurrentHashMap<Class<? extends Annotation>, List<ProviderBean>> annotationCacheMap = new ConcurrentHashMap<>();
     /** 实现了某个注解的类 */
@@ -61,20 +61,6 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
             beanList = buildBeans(applicationContext).map(ProviderBean::new).sorted().toList();
         }
         return beanList;
-    }
-
-    public synchronized Map<String, List<ProviderMethod>> getEventMap() {
-        if (eventMap == null) {
-            log.info("EventService init");
-            Map<String, List<ApplicationContextProvider.ProviderMethod>> tmpEventMap = new HashMap<>();
-            withMethodAssignableFrom(Event.class).forEach(method -> {
-                Class<?> parameterType = method.getMethod().getParameterTypes()[0];
-                String parameterTypeName = parameterType.getName();
-                tmpEventMap.computeIfAbsent(parameterTypeName, k -> new ArrayList<>()).add(method);
-            });
-            eventMap = tmpEventMap;
-        }
-        return eventMap;
     }
 
     /** 所有的bean */
@@ -200,13 +186,17 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         return Collections.unmodifiableMap(tmp);
     }
 
+    public synchronized List<ProviderMethod> findEventMap(Class<? extends Event> eventClass) {
+        return eventMap.computeIfAbsent(eventClass.getName(), l -> withMethodAssignableFrom(eventClass).toList());
+    }
+
     /**
      * 抛出事件，但是如果执行遇到异常会中断
      * <p>如果事件执行需要先后顺序 {@link org.springframework.core.annotation.Order}
      */
     public ApplicationContextProvider postEvent(Event event) {
-        List<ApplicationContextProvider.ProviderMethod> providerMethods = getEventMap().getOrDefault(event.getClass().getName(), Collections.emptyList());
-        providerMethods.forEach(providerMethod -> providerMethod.invoke(event));
+        List<ProviderMethod> methods = findEventMap(event.getClass());
+        methods.forEach(providerMethod -> providerMethod.invoke(event));
         return this;
     }
 
@@ -215,8 +205,8 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
      * <p>如果事件执行需要先后顺序 {@link org.springframework.core.annotation.Order}
      */
     public ApplicationContextProvider postEventIgnoreException(Event event) {
-        List<ApplicationContextProvider.ProviderMethod> providerMethods = getEventMap().getOrDefault(event.getClass().getName(), Collections.emptyList());
-        for (ApplicationContextProvider.ProviderMethod providerMethod : providerMethods) {
+        List<ProviderMethod> methods = findEventMap(event.getClass());
+        for (ApplicationContextProvider.ProviderMethod providerMethod : methods) {
             try {
                 providerMethod.invoke(event);
             } catch (Throwable throwable) {

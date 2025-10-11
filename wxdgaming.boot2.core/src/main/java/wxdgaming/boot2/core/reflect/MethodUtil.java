@@ -92,7 +92,7 @@ public class MethodUtil {
         if (parameterTypes.length != parameterClass.length)
             return false;
         for (int i = 0; i < parameterTypes.length; i++) {
-            if (!parameterTypes[i].isAssignableFrom(parameterClass[i])) {
+            if (!parameterClass[i].isAssignableFrom(parameterTypes[i])) {
                 return false;
             }
         }

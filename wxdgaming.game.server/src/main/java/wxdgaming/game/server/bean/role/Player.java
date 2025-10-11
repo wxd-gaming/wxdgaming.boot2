@@ -2,7 +2,6 @@ package wxdgaming.game.server.bean.role;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.util.AssertUtil;
@@ -20,6 +19,7 @@ import wxdgaming.game.server.entity.role.OnlineInfo;
 import wxdgaming.game.server.entity.role.PlayerSnap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -50,7 +50,7 @@ public class Player extends MapNpc {
     private int sex;
     private int job;
     private Int2IntOpenHashMap useCDKeyTotalMap = new Int2IntOpenHashMap();
-    private Int2ObjectOpenHashMap<CountMap> useCDKeyCountMap = new Int2ObjectOpenHashMap<>();
+    private HashMap<Integer, CountMap> useCDKeyCountMap = new HashMap<>();
     private OnlineInfo onlineInfo = new OnlineInfo();
     private VipInfo vipInfo = new VipInfo();
     private BagPack bagPack = new BagPack();
