@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.lang.ConfigString;
+import wxdgaming.boot2.starter.validation.AbstractValidationHandler;
 import wxdgaming.boot2.starter.validation.Validation;
 import wxdgaming.boot2.starter.validation.ValidationUtil;
 import wxdgaming.game.server.bean.ValidationType;
@@ -13,6 +14,7 @@ import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.tips.TipsService;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
@@ -54,11 +56,15 @@ public class ValidationService extends HoldApplicationContext {
     }
 
     public boolean validateAll(Object object, List<Validation> validations, boolean sendTips) {
-        return validationUtil.validateAll(object, validations, (handler) -> {
+        return validateAll(object, validations, (handler, validation) -> {
             if (sendTips && object instanceof Player player) {
                 tipsService.tips(player, handler.tips());
             }
         });
+    }
+
+    public boolean validateAll(Object object, List<Validation> validations, BiConsumer<AbstractValidationHandler<Object>, Validation> errorCall) {
+        return validationUtil.validateAll(object, validations, errorCall);
     }
 
     /** 完全满足条件 */

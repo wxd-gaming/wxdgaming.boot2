@@ -5,9 +5,9 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
-import wxdgaming.game.server.bean.reason.ReasonConst;
 import wxdgaming.game.message.tips.ResTips;
 import wxdgaming.game.message.tips.TipsType;
+import wxdgaming.game.server.bean.reason.ReasonConst;
 import wxdgaming.game.server.bean.role.Player;
 
 import java.util.List;
@@ -52,8 +52,8 @@ public class TipsService {
                      String tips, List<String> params,
                      Class<? extends PojoBase> responseClass,
                      ReasonConst reason) {
-        log.info("提示: {}", tips);
         if (socketSession == null) {
+            log.debug("提示: {} session 异常", tips);
             return;
         }
         ResTips resTips = new ResTips();

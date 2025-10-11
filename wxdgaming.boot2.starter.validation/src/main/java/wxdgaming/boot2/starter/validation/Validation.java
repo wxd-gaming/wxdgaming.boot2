@@ -27,6 +27,6 @@ public class Validation extends ObjectBase {
     }
 
     @Override public String toString() {
-        return "Validation{%s, %s %d}".formatted(validationType.toString(), validationEquals.getComment(), value);
+        return "Validation{%s %s %d}".formatted(validationType.toString(), validationEquals.getCodeString(), value);
     }
 }

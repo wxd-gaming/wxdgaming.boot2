@@ -12,6 +12,7 @@ import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -34,7 +35,8 @@ public class ValidationUtil extends HoldApplicationContext {
     }
 
     /** 完全满足条件 */
-    public boolean validateAll(Object object, ConfigString configString, Function<String, List<Validation>> parse, Consumer<AbstractValidationHandler<Object>> errorCall) {
+    public boolean validateAll(Object object, ConfigString configString, Function<String, List<Validation>> parse,
+                               BiConsumer<AbstractValidationHandler<Object>, Validation> errorCall) {
         if (configString == null || StringUtils.isBlank(configString.getValue())) {
             return true;
         }
@@ -44,14 +46,15 @@ public class ValidationUtil extends HoldApplicationContext {
     }
 
     @SuppressWarnings("unchecked")
-    public boolean validateAll(Object object, List<Validation> validations, Consumer<AbstractValidationHandler<Object>> errorCall) {
+    public boolean validateAll(Object object, List<Validation> validations, BiConsumer<AbstractValidationHandler<Object>, Validation> errorCall) {
         for (Validation validation : validations) {
             AbstractValidationHandler<Object> validationHandler = validationHandlerMap.get(validation.getValidationType());
             AssertUtil.assertNull(validationHandler, "验证条件为实现: %s, %s", validation.getValidationType(), StackUtils.stackAll());
             if (!validationHandler.validate(object, validation)) {
-                log.debug("{} 验证条件失败: {}", object, validation);
                 if (errorCall != null) {
-                    errorCall.accept(validationHandler);
+                    errorCall.accept(validationHandler, validation);
+                } else {
+                    log.debug("验证条件失败: {} -> {}", validation, object);
                 }
                 return false;
             }
@@ -76,9 +79,10 @@ public class ValidationUtil extends HoldApplicationContext {
             AbstractValidationHandler<Object> validationHandler = validationHandlerMap.get(validation.getValidationType());
             AssertUtil.assertNull(validationHandler, "验证条件为实现: %s, %s", validation.getValidationType(), StackUtils.stackAll());
             if (validationHandler.validate(object, validation)) {
-                log.debug("{} 验证条件成功: {}", object, validation);
                 if (sources != null) {
                     sources.accept(validationHandler);
+                } else {
+                    log.debug("验证条件成功: {} -> {}", validation, object);
                 }
                 return true;
             }

@@ -103,7 +103,11 @@ public class CDKeyService implements InitPrint {
         if (StringUtils.isNotBlank(validateConfig)) {
             /*配置检查，每天使用次数，每周使用次数，每月使用次数*/
             List<Validation> apply = CountValidationType.Parse.apply(validateConfig);
-            boolean validate = validationService.validateAll(countMap, apply, true);
+            boolean validate = validationService.validateAll(countMap, apply, (handler, validation) -> {
+                String tips = handler.tips();
+                tipsService.tips(player, tips);
+                log.info("条件验证不通过：{}, {} -> {}", player, validation, countMap);
+            });
             if (!validate) {
                 return;
             }

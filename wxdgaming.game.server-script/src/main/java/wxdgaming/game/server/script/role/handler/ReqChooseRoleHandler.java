@@ -2,6 +2,7 @@ package wxdgaming.game.server.script.role.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
@@ -10,14 +11,17 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
+import wxdgaming.game.authority.SignUtil;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.message.role.ReqChooseRole;
 import wxdgaming.game.message.role.ResChooseRole;
+import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.entity.role.PlayerSnap;
 import wxdgaming.game.server.event.EventConst;
+import wxdgaming.game.server.event.OnHeartMinute;
 import wxdgaming.game.server.event.OnLogout;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.module.data.GlobalDbDataCenterService;
@@ -37,15 +41,17 @@ import java.util.HashSet;
 @Component
 public class ReqChooseRoleHandler extends HoldApplicationContext {
 
+    final GameServerProperties gameServerProperties;
     final DataCenterService dataCenterService;
     final GlobalDbDataCenterService globalDbDataCenterService;
     final PlayerDriveService playerDriveService;
     final SlogService slogService;
     final ConnectLoginProperties connectLoginProperties;
 
-    public ReqChooseRoleHandler(DataCenterService dataCenterService,
+    public ReqChooseRoleHandler(GameServerProperties gameServerProperties, DataCenterService dataCenterService,
                                 GlobalDbDataCenterService globalDbDataCenterService,
                                 PlayerDriveService playerDriveService, SlogService slogService, ConnectLoginProperties connectLoginProperties) {
+        this.gameServerProperties = gameServerProperties;
         this.dataCenterService = dataCenterService;
         this.globalDbDataCenterService = globalDbDataCenterService;
         this.playerDriveService = playerDriveService;
@@ -101,28 +107,37 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
             RoleLoginSlog roleLoginLog = new RoleLoginSlog(player, userMapping.getClientIp(), JSON.toJSONString(userMapping.getClientParams()));
             slogService.pushLog(roleLoginLog);
 
-            String url = connectLoginProperties.getUrl();
-            url = url + "/inner/game/lastLogin";
-            JSONObject jsonObject = MapOf.newJSONObject();
-            jsonObject.put("account", account);
-            jsonObject.put("sid", sid);
-            JSONObject roleInfo = new JSONObject()
-                    .fluentPut("rid", player.getUid())
-                    .fluentPut("name", player.getName())
-                    .fluentPut("level", player.getLevel());
-            jsonObject.put("roleInfo", roleInfo);
-            HttpRequestPost.of(url).setParamsJson(jsonObject)
-                    .executeAsync()
-                    .subscribe(
-                            response -> {
-                                log.info("上报角色登录信息：{} -> {}", jsonObject, response);
-                            },
-                            throwable -> {
-                                log.info("上报角色 {} 登录信息", jsonObject, throwable);
-                            }
-                    );
+            reportPlayer2Login(player, 0);
 
         });
+    }
+
+    @OnHeartMinute
+    public void reportPlayer2Login(Player player, int minute) {
+        String url = connectLoginProperties.getUrl();
+        url = url + "/inner/game/lastLogin";
+        JSONObject jsonObject = MapOf.newJSONObject();
+        jsonObject.put("account", player.getAccount());
+        jsonObject.put("sid", gameServerProperties.getSid());
+        JSONObject roleInfo = new JSONObject()
+                .fluentPut("rid", player.getUid())
+                .fluentPut("name", player.getName())
+                .fluentPut("level", player.getLevel());
+        jsonObject.put("roleInfo", roleInfo);
+
+        String sign = SignUtil.signByJsonKey(jsonObject, connectLoginProperties.getJwtKey());
+
+        HttpRequestPost.of(url).setParamsJson(jsonObject)
+                .addHeader(HttpHeaderNames.AUTHORIZATION.toString(), sign)
+                .executeAsync()
+                .subscribe(
+                        response -> {
+                            log.info("上报角色登录信息：{} -> {}", jsonObject, response);
+                        },
+                        throwable -> {
+                            log.info("上报角色 {} 登录信息", jsonObject, throwable);
+                        }
+                );
     }
 
 }

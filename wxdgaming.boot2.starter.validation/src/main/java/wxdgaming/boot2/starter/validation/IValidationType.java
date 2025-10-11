@@ -8,4 +8,6 @@ package wxdgaming.boot2.starter.validation;
  */
 public interface IValidationType {
 
+    String getComment();
+
 }
