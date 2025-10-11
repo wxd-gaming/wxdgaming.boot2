@@ -58,11 +58,11 @@ public final class ExecutorMonitor extends Thread {
                 for (Map.Entry<Thread, JobContent> entry : executorJobConcurrentHashMap.entrySet()) {
                     Thread thread = entry.getKey();
                     JobContent jobContent = entry.getValue();
-                    long diff = System.currentTimeMillis() - jobContent.start();
-                    if (diff > TimeUnit.SECONDS.toMillis(30)) {
+                    long diff = System.nanoTime() - jobContent.start();
+                    if (diff > TimeUnit.SECONDS.toNanos(30)) {
                         log.warn(
-                                "线程执行器监视, 线程: {}, 执行器: {}, 执行时间: {}ms\n{}",
-                                thread.getName(), jobContent.executorJob().getStack(), diff,
+                                "线程执行器监视, 线程: {}, 执行器: {}, 执行时间: {}s, 堆栈：{}",
+                                thread.getName(), jobContent.executorJob().getStack(), TimeUnit.NANOSECONDS.toSeconds(diff),
                                 StackUtils.stack(thread.getStackTrace())
                         );
                     }
