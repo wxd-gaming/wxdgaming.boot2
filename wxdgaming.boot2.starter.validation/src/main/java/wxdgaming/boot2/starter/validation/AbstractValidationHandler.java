@@ -8,7 +8,7 @@ package wxdgaming.boot2.starter.validation;
  **/
 public abstract class AbstractValidationHandler<T> {
 
-    public abstract ValidationType conditionType();
+    public abstract IValidationType conditionType();
 
     public abstract String tips();
 

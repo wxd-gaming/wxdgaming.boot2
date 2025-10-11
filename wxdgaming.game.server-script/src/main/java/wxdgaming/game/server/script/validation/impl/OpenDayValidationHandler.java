@@ -2,8 +2,9 @@ package wxdgaming.game.server.script.validation.impl;
 
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.validation.AbstractValidationHandler;
+import wxdgaming.boot2.starter.validation.IValidationType;
 import wxdgaming.boot2.starter.validation.Validation;
-import wxdgaming.boot2.starter.validation.ValidationType;
+import wxdgaming.game.server.bean.ValidationType;
 import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.bean.role.Player;
 
@@ -22,7 +23,7 @@ public class OpenDayValidationHandler extends AbstractValidationHandler<Player> 
         this.gameServerProperties = gameServerProperties;
     }
 
-    @Override public ValidationType conditionType() {
+    @Override public IValidationType conditionType() {
         return ValidationType.OpenDay;
     }
 

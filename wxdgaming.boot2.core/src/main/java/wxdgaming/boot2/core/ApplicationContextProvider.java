@@ -205,12 +205,8 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
      * <p>如果事件执行需要先后顺序 {@link org.springframework.core.annotation.Order}
      */
     public ApplicationContextProvider postEvent(Event event) {
-        List<ApplicationContextProvider.ProviderMethod> providerMethods = getEventMap().get(event.getClass().getName());
-        if (providerMethods != null) {
-            for (ApplicationContextProvider.ProviderMethod providerMethod : providerMethods) {
-                providerMethod.invoke(event);
-            }
-        }
+        List<ApplicationContextProvider.ProviderMethod> providerMethods = getEventMap().getOrDefault(event.getClass().getName(), Collections.emptyList());
+        providerMethods.forEach(providerMethod -> providerMethod.invoke(event));
         return this;
     }
 
@@ -219,14 +215,12 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
      * <p>如果事件执行需要先后顺序 {@link org.springframework.core.annotation.Order}
      */
     public ApplicationContextProvider postEventIgnoreException(Event event) {
-        List<ApplicationContextProvider.ProviderMethod> providerMethods = getEventMap().get(event.getClass().getName());
-        if (providerMethods != null) {
-            for (ApplicationContextProvider.ProviderMethod providerMethod : providerMethods) {
-                try {
-                    providerMethod.invoke(event);
-                } catch (Throwable throwable) {
-                    log.error("执行方法异常：{}-{}", providerMethod.getBean().getClass(), providerMethod.getMethod().getName(), throwable);
-                }
+        List<ApplicationContextProvider.ProviderMethod> providerMethods = getEventMap().getOrDefault(event.getClass().getName(), Collections.emptyList());
+        for (ApplicationContextProvider.ProviderMethod providerMethod : providerMethods) {
+            try {
+                providerMethod.invoke(event);
+            } catch (Throwable throwable) {
+                log.error("执行方法异常：{}-{}", providerMethod.getBean().getClass(), providerMethod.getMethod().getName(), throwable);
             }
         }
         return this;

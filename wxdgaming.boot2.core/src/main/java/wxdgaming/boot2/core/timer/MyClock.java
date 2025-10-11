@@ -569,6 +569,16 @@ public class MyClock {
     /**
      * 判断两个时间是否在同一月
      *
+     * @param time 时间戳
+     * @return true 在同一月
+     */
+    public static boolean isSameMonth(long time) {
+        return monthFirstDay(millis()) == monthFirstDay(time);
+    }
+
+    /**
+     * 判断两个时间是否在同一月
+     *
      * @param time1 时间戳
      * @param time2 时间戳
      * @return true 在同一月

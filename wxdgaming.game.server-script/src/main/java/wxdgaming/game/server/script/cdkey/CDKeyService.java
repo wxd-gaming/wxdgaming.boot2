@@ -2,18 +2,24 @@ package wxdgaming.game.server.script.cdkey;
 
 import com.alibaba.fastjson.TypeReference;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
+import wxdgaming.boot2.starter.validation.Validation;
 import wxdgaming.game.authority.SignUtil;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 import wxdgaming.game.login.bean.UseCDKeyDTO;
 import wxdgaming.game.message.cdkey.ResUseCdKey;
 import wxdgaming.game.server.GameServerProperties;
+import wxdgaming.game.server.bean.count.CountData;
+import wxdgaming.game.server.bean.count.CountMap;
+import wxdgaming.game.server.bean.count.CountValidationType;
 import wxdgaming.game.server.bean.goods.BagChangeDTO4Item;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.goods.ItemCfg;
@@ -25,6 +31,7 @@ import wxdgaming.game.server.module.inner.ConnectLoginService;
 import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.cdkey.bean.CDKeyReward;
 import wxdgaming.game.server.script.tips.TipsService;
+import wxdgaming.game.server.script.validation.ValidationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,22 +49,23 @@ public class CDKeyService implements InitPrint {
 
     final ConnectLoginProperties connectLoginProperties;
     final GameServerProperties gameServerProperties;
-    private final DataCenterService dataCenterService;
-    private final TipsService tipsService;
-    private final BagService bagService;
+    final DataCenterService dataCenterService;
+    final TipsService tipsService;
+    final BagService bagService;
     final ConnectLoginService connectLoginService;
-
+    final ValidationService validationService;
 
     public CDKeyService(ConnectLoginProperties connectLoginProperties, GameServerProperties gameServerProperties,
                         DataCenterService dataCenterService,
                         TipsService tipsService, BagService bagService,
-                        ConnectLoginService connectLoginService) {
+                        ConnectLoginService connectLoginService, ValidationService validationService) {
         this.dataCenterService = dataCenterService;
         this.tipsService = tipsService;
         this.bagService = bagService;
         this.connectLoginProperties = connectLoginProperties;
         this.gameServerProperties = gameServerProperties;
         this.connectLoginService = connectLoginService;
+        this.validationService = validationService;
     }
 
     public void use(Player player, String cdKey) {
@@ -83,6 +91,27 @@ public class CDKeyService implements InitPrint {
             return;
         }
 
+        Integer cid = runResult.getInteger("cid");
+        if (cid == null || cid < 1) {
+            tipsService.tips(player, "内部异常");
+            return;
+        }
+        Int2ObjectOpenHashMap<CountMap> useCDKeyCountMap = player.getUseCDKeyCountMap();
+        CountMap countMap = useCDKeyCountMap.computeIfAbsent(cid, k -> new CountMap());
+
+        String validateConfig = runResult.getString("validate");
+        if (StringUtils.isNotBlank(validateConfig)) {
+            /*配置检查，每天使用次数，每周使用次数，每月使用次数*/
+            List<Validation> apply = CountValidationType.Parse.apply(validateConfig);
+            boolean validate = validationService.validateAll(countMap, apply, true);
+            if (!validate) {
+                return;
+            }
+        }
+        player.getUseCDKeyTotalMap().addTo(cid, 1);
+        for (CountData countData : countMap.getValidationMap().values()) {
+            countData.update(1);
+        }
         ArrayList<CDKeyReward> rewardCfgList = runResult.getObject("rewards", new TypeReference<ArrayList<CDKeyReward>>() {});
 
         List<ItemCfg> rewards = new ArrayList<>();
@@ -98,7 +127,7 @@ public class CDKeyService implements InitPrint {
 
         ReasonDTO reasonDTO = ReasonDTO.of(
                 ReasonConst.USE_CDKEY,
-                "cdkey=", cdKey, "cid=%d(%s)".formatted(runResult.getIntValue("cid"), runResult.getString("comment"))
+                "cdkey=", cdKey, "cid=%d(%s)".formatted(cid, runResult.getString("comment"))
         );
 
         List<Item> itemList = bagService.newItems(rewards);

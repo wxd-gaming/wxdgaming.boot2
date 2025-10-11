@@ -11,6 +11,7 @@ import wxdgaming.boot2.core.MainApplicationContextProvider;
 import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 import wxdgaming.boot2.starter.validation.Validation;
+import wxdgaming.game.server.bean.ValidationType;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.script.tips.TipsService;
 import wxdgaming.game.server.script.validation.ValidationService;
@@ -41,24 +42,24 @@ public class ValidationTest {
     public void v1() {
         String t = "Level|gte|1;Level|lte|999";
         System.out.println(t);
-        List<Validation> apply = Validation.Parse.apply(t);
+        List<Validation> apply = ValidationType.Parse.apply(t);
         System.out.println(apply);
         ConfigString configString = new ConfigString("Level|gte|1;Level|lte|999");
         Player player = new Player();
         player.setLevel(100);
-        System.out.println(validationService.validateAll(player, configString, Validation.Parse, false));
+        System.out.println(validationService.validateAll(player, configString, ValidationType.Parse, false));
     }
 
     @Test
     public void v2() {
         String t = "Level|>=|1;Level|<=|999";
         System.out.println(t);
-        List<Validation> apply = Validation.Parse2.apply(t);
+        List<Validation> apply = ValidationType.Parse2.apply(t);
         System.out.println(apply);
         ConfigString configString = new ConfigString("Level|>=|1;Level|<=|999");
         Player player = new Player();
         player.setLevel(100);
-        System.out.println(validationService.validateAll(player, configString, Validation.Parse2, false));
+        System.out.println(validationService.validateAll(player, configString, ValidationType.Parse2, false));
     }
 
 }

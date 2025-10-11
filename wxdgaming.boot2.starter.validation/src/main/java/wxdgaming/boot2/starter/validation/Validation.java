@@ -3,9 +3,6 @@ package wxdgaming.boot2.starter.validation;
 import lombok.Getter;
 import wxdgaming.boot2.core.lang.ObjectBase;
 
-import java.util.List;
-import java.util.function.Function;
-
 /**
  * 条件配置
  *
@@ -15,33 +12,11 @@ import java.util.function.Function;
 @Getter
 public class Validation extends ObjectBase {
 
-    public static final Function<String, List<Validation>> Parse = (string) -> {
-        String[] split = string.split(";");
-        List<Validation> list = new java.util.ArrayList<>();
-        for (String s : split) {
-            String[] vs = s.split("[|]");
-            Validation validation = new Validation(ValidationType.valueOf(vs[0]), ValidationEquals.valueOf(vs[1]), Long.parseLong(vs[2]));
-            list.add(validation);
-        }
-        return list;
-    };
-
-    public static final Function<String, List<Validation>> Parse2 = (string) -> {
-        String[] split = string.split(";");
-        List<Validation> list = new java.util.ArrayList<>();
-        for (String s : split) {
-            String[] vs = s.split("[|]");
-            Validation validation = new Validation(ValidationType.valueOf(vs[0]), ValidationEquals.of2OrException(vs[1]), Long.parseLong(vs[2]));
-            list.add(validation);
-        }
-        return list;
-    };
-
-    private final ValidationType validationType;
+    private final IValidationType validationType;
     private final ValidationEquals validationEquals;
     private final long value;
 
-    public Validation(ValidationType validationType, ValidationEquals validationEquals, long value) {
+    public Validation(IValidationType validationType, ValidationEquals validationEquals, long value) {
         this.validationType = validationType;
         this.validationEquals = validationEquals;
         this.value = value;
@@ -52,6 +27,6 @@ public class Validation extends ObjectBase {
     }
 
     @Override public String toString() {
-        return "Validation{%s, %s %d}".formatted(validationType.getComment(), validationEquals.getComment(), value);
+        return "Validation{%s, %s %d}".formatted(validationType.toString(), validationEquals.getComment(), value);
     }
 }
