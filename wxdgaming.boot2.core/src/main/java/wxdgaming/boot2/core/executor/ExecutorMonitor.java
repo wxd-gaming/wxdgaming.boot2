@@ -20,9 +20,9 @@ import java.util.concurrent.locks.LockSupport;
 @Slf4j
 public final class ExecutorMonitor extends Thread {
 
-    public static ConcurrentHashMap<Thread, JobContent> executorJobConcurrentHashMap = new ConcurrentHashMap<>();
+    static ConcurrentHashMap<Thread, JobContent> executorJobConcurrentHashMap = new ConcurrentHashMap<>();
 
-    public static void put(ExecutorJob executorJob) {
+    static void put(ExecutorJob executorJob) {
         executorJobConcurrentHashMap.put(Thread.currentThread(), new JobContent(executorJob));
     }
 
@@ -76,7 +76,7 @@ public final class ExecutorMonitor extends Thread {
         }
     }
 
-    public static final class JobContent extends ObjectBase {
+    static final class JobContent extends ObjectBase {
 
         final ExecutorJob executorJob;
         final long startTime;
