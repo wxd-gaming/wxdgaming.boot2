@@ -68,7 +68,7 @@ public class BitFlag implements Serializable {
      * @return
      */
     public BitFlag addFlag(int index) {
-        AssertUtil.assertTrue(index > 0, "index 大于 0");
+        AssertUtil.isTrue(index > 0, "index 大于 0");
         final int flag1 = (index - 1) % 64;
         addFlag(index, 1L << flag1);
         return this;
@@ -89,7 +89,7 @@ public class BitFlag implements Serializable {
 
     /** 追加覆盖 */
     public BitFlag addFlag(int index, long value) {
-        AssertUtil.assertTrue(index > 0, "index 大于 0");
+        AssertUtil.isTrue(index > 0, "index 大于 0");
         index--;
         final int flag0 = index / 64;
         checkBounds(flag0);
@@ -163,7 +163,7 @@ public class BitFlag implements Serializable {
 
     /** 移除一个标记 */
     public BitFlag removeFlag(int index) {
-        AssertUtil.assertTrue(index > 0, "index 大于 0");
+        AssertUtil.isTrue(index > 0, "index 大于 0");
         final int flag1 = (index - 1) % 64;
         removeFlag(index, 1L << flag1);
         return this;
@@ -179,7 +179,7 @@ public class BitFlag implements Serializable {
      * @version 2024-06-13 14:09
      */
     public BitFlag removeFlag(int index, long value) {
-        AssertUtil.assertTrue(index > 0, "index 大于 0");
+        AssertUtil.isTrue(index > 0, "index 大于 0");
         index--;
         final int flag0 = index / 64;
         checkBounds(flag0);
@@ -206,7 +206,7 @@ public class BitFlag implements Serializable {
 
     /** 是否包含一个标记 */
     public boolean hasFlag(int index) {
-        AssertUtil.assertTrue(index > 0, "index 大于 0");
+        AssertUtil.isTrue(index > 0, "index 大于 0");
         index--;
         final int flag0 = index / 64;
         final int flag1 = index % 64;

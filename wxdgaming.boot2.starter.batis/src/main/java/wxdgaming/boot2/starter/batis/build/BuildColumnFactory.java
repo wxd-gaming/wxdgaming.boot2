@@ -45,7 +45,7 @@ public class BuildColumnFactory implements IColumnFactory {
 
     @Override public void register(Class<?> type, IBuildColumn buildColumn) {
         IBuildColumn put = buildColumnMap.put(type, buildColumn);
-        AssertUtil.assertTrue(put == null, "类型重复注册 %s %s %s", type, put, buildColumn);
+        AssertUtil.isTrue(put == null, "类型重复注册 %s %s %s", type, put, buildColumn);
     }
 
     public void buildColumn(TableMapping.FieldMapping fieldMapping) {

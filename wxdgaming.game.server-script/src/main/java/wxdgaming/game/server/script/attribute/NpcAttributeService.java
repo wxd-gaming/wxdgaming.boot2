@@ -41,7 +41,7 @@ public class NpcAttributeService extends HoldApplicationContext {
                         return;
                     }
                     AbstractCalculatorAction old = tmp.put(calculatorAction.calculatorType(), calculatorAction);
-                    AssertUtil.assertTrue(old == null, "重复的属性计算器类型 " + calculatorAction.calculatorType().getCode() + " " + old + ", " + calculatorAction);
+                    AssertUtil.isTrue(old == null, "重复的属性计算器类型 " + calculatorAction.calculatorType().getCode() + " " + old + ", " + calculatorAction);
                 });
         calculatorImplMap = tmp;
         calculatorTypes = calculatorImplMap.keySet().toArray(new CalculatorType[calculatorImplMap.size()]);

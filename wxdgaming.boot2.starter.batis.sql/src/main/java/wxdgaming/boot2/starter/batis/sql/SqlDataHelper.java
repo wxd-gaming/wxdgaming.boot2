@@ -277,7 +277,7 @@ public abstract class SqlDataHelper extends DataHelper {
      * @version 2025-02-21 13:35
      */
     public int executeUpdate(String sql, Object... params) {
-        AssertUtil.assertTrue(StringUtils.isNotBlank(sql), "sql 语句不能为空");
+        AssertUtil.isTrue(StringUtils.isNotBlank(sql), "sql 语句不能为空");
         try (Connection connection = connection()) {
             int i = executeUpdate(connection, sql, params);
             if (!connection.getAutoCommit())
@@ -289,7 +289,7 @@ public abstract class SqlDataHelper extends DataHelper {
     }
 
     public int executeUpdate(Connection connection, String sql, Object... params) throws Exception {
-        AssertUtil.assertTrue(StringUtils.isNotBlank(sql), "sql 语句不能为空");
+        AssertUtil.isTrue(StringUtils.isNotBlank(sql), "sql 语句不能为空");
         PreparedStatement statement = connection.prepareStatement(sql);
         if (params != null) {
             for (int i = 0; i < params.length; i++) {

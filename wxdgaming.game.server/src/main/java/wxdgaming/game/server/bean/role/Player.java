@@ -94,7 +94,7 @@ public class Player extends MapNpc {
 
     public void executor(Runnable task) {
         boolean add = eventList.add(task);
-        AssertUtil.assertTrue(add, "事件队列已满，添加失败");
+        AssertUtil.isTrue(add, "事件队列已满，添加失败");
     }
 
     public boolean checkOnline() {

@@ -45,7 +45,7 @@ public class LogFindController extends HoldApplicationContext implements InitPri
 
     @RequestMapping("/title")
     public RunResult logTitle(@RequestParam("tableName") String tableName) {
-        AssertUtil.assertTrue(StringUtils.isNotBlank(tableName), "tableName不能为空");
+        AssertUtil.isTrue(StringUtils.isNotBlank(tableName), "tableName不能为空");
         return logService.logTitle(tableName);
     }
 

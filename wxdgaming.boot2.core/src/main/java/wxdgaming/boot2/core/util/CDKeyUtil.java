@@ -20,11 +20,11 @@ public class CDKeyUtil {
 
     public static Collection<String> cdKey(int[] encode, final long cdKeyId, int num) {
         final long randomMax = 281474976710655L;
-        AssertUtil.assertTrue(cdKeyId < 4095, "cdKeyId 最大 4095");
+        AssertUtil.isTrue(cdKeyId < 4095, "cdKeyId 最大 4095");
         HashSet<String> list = new HashSet<>();
         while (num > 0) {
             long random = Long.parseLong("1" + RandomStringUtils.secure().next(14, false, true));
-            AssertUtil.assertTrue(random < randomMax, "random 错误");
+            AssertUtil.isTrue(random < randomMax, "random 错误");
             long randomKey = random << 12 | cdKeyId;
             BigInteger bigInteger = new BigInteger(String.valueOf(randomKey));
             String string = bigInteger.toString(36);

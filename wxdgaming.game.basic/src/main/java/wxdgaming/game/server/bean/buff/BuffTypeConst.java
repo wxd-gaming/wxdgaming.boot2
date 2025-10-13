@@ -29,7 +29,7 @@ public enum BuffTypeConst implements BuffType {
 
     public static BuffTypeConst ofOrException(int value) {
         BuffTypeConst tmp = static_map.get(value);
-        AssertUtil.assertNull(tmp, "查找失败 " + value);
+        AssertUtil.isNull(tmp, "查找失败 " + value);
         return tmp;
     }
 

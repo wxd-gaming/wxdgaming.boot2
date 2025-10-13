@@ -9,10 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.WebFilter;
-import wxdgaming.boot2.core.io.Objects;
-import wxdgaming.boot2.core.lang.AssertException;
-import wxdgaming.game.login.LoginServerProperties;
+import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.authority.SignUtil;
+import wxdgaming.game.login.LoginServerProperties;
 
 /**
  * 拦截器
@@ -39,9 +38,7 @@ public class InnerFilter implements WebFilter {
         JSONObject parameter = JSON.parseObject(body);
         String sign = request.getHeader(HttpHeaderNames.AUTHORIZATION.toString());
         String selfSign = SignUtil.signByJsonKey(parameter, loginServerProperties.getJwtKey());
-        if (!Objects.equals(selfSign, sign)) {
-            throw new AssertException("签名错误");
-        }
+        AssertUtil.isEquals(selfSign, sign, "签名错误");
         return true;
     }
 

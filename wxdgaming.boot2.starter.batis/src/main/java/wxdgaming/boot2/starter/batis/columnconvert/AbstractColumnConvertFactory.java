@@ -20,7 +20,7 @@ public abstract class AbstractColumnConvertFactory {
 
     public void register(ColumnType columnType, IColumnConvert columnConvert) {
         IColumnConvert put = columnConvertTable.put(columnType, columnConvert);
-        AssertUtil.assertTrue(put == null, "columnConvertTable.put()");
+        AssertUtil.isTrue(put == null, "columnConvertTable.put()");
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

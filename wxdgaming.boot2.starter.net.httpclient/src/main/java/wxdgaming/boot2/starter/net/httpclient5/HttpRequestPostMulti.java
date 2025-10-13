@@ -87,7 +87,7 @@ public class HttpRequestPostMulti extends AbstractHttpRequest {
 
     public HttpRequestPostMulti setParam(String key, Object value) {
         if (value instanceof File file) {
-            AssertUtil.assertTrue(file.exists(), "文件不存在：%s", file);
+            AssertUtil.isTrue(file.exists(), "文件不存在：%s", file);
             multipartEntityBuilder.addBinaryBody(key, file);
             multipartEntityBuilder.addTextBody(file.getName() + "_lastModified", file.lastModified() + "");
         } else if (value instanceof byte[] bytes) {

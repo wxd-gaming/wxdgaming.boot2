@@ -14,7 +14,6 @@ import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.core.util.PatternUtil;
-import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlQueryBuilder;
 import wxdgaming.boot2.starter.batis.sql.WebSqlQueryCondition;
@@ -56,14 +55,14 @@ public class AdminController implements InitPrint {
                                          @RequestParam("phone") String phone) {
 
         AdminUserToken adminUserToken = AdminUserToken.threadContext();
-        AssertUtil.assertTrue(adminUserToken.isAdmin(), "没有权限");
+        AssertUtil.isTrue(adminUserToken.isAdmin(), "没有权限");
 
-        AssertUtil.assertTrue(StringUtils.length(userName) > 4, "用户名长度不能小于5个字符");
-        AssertUtil.assertTrue(StringUtils.length(password) > 4, "密码长度不能小于5个字符");
-        AssertUtil.assertTrue(StringUtils.length(phone) >= 11, "手机号不正确");
-        AssertUtil.assertTrue(!AdminSet.contains(userName.toUpperCase()), "用户名不合法");
+        AssertUtil.isTrue(StringUtils.length(userName) > 4, "用户名长度不能小于5个字符");
+        AssertUtil.isTrue(StringUtils.length(password) > 4, "密码长度不能小于5个字符");
+        AssertUtil.isTrue(StringUtils.length(phone) >= 11, "手机号不正确");
+        AssertUtil.isTrue(!AdminSet.contains(userName.toUpperCase()), "用户名不合法");
         boolean b = PatternUtil.checkMatches(userName.toUpperCase(), PatternUtil.PATTERN_ACCOUNT);
-        AssertUtil.assertTrue(b, "用户名不合法,仅允许 数字，字母，汉字");
+        AssertUtil.isTrue(b, "用户名不合法,仅允许 数字，字母，汉字");
 
         AdminUserEntity adminUserEntity = adminService.findByName(userName);
         if (adminUserEntity != null) {
@@ -81,7 +80,7 @@ public class AdminController implements InitPrint {
                                           @RequestParam("password") String password,
                                           @RequestParam("phone") String phone) {
         AdminUserToken adminUserToken = AdminUserToken.threadContext();
-        AssertUtil.assertTrue(adminUserToken.isAdmin() || userName.equalsIgnoreCase(adminUserToken.getUserName()), "没有权限");
+        AssertUtil.isTrue(adminUserToken.isAdmin() || userName.equalsIgnoreCase(adminUserToken.getUserName()), "没有权限");
         AdminUserEntity adminUserEntity = adminService.findByName(userName);
         if (adminUserEntity == null) {
             return ResponseEntity.ok(RunResult.fail("用户名存在"));
@@ -95,8 +94,8 @@ public class AdminController implements InitPrint {
             admin = adminUserEntity.isAdmin();
         }
 
-        AssertUtil.assertTrue(StringUtils.length(password) > 4, "密码长度不能小于5个字符");
-        AssertUtil.assertTrue(StringUtils.length(phone) >= 11, "手机号不正确");
+        AssertUtil.isTrue(StringUtils.length(password) > 4, "密码长度不能小于5个字符");
+        AssertUtil.isTrue(StringUtils.length(phone) >= 11, "手机号不正确");
 
         adminService.save(adminUserEntity, admin, password, phone);
         return ResponseEntity.ok(RunResult.ok().msg("修改成功"));
@@ -105,8 +104,8 @@ public class AdminController implements InitPrint {
     @RequestMapping("/delete")
     public ResponseEntity<RunResult> delete(CacheHttpServletRequest request, @RequestParam("userName") String userName) {
         AdminUserToken adminUserToken = AdminUserToken.threadContext();
-        AssertUtil.assertTrue(adminUserToken.isAdmin(), "没有权限");
-        AssertUtil.assertTrue(!userName.equalsIgnoreCase(adminUserToken.getUserName()), "不能删除自己");
+        AssertUtil.isTrue(adminUserToken.isAdmin(), "没有权限");
+        AssertUtil.isTrue(!userName.equalsIgnoreCase(adminUserToken.getUserName()), "不能删除自己");
         adminService.delete(userName);
         return ResponseEntity.ok(RunResult.ok().msg("修改成功"));
     }
@@ -114,7 +113,7 @@ public class AdminController implements InitPrint {
     @RequestMapping("/query")
     public ResponseEntity<RunResult> query(CacheHttpServletRequest request, @RequestParam("userName") String userName) {
         AdminUserToken adminUserToken = AdminUserToken.threadContext();
-        AssertUtil.assertTrue(adminUserToken.isAdmin() || userName.equalsIgnoreCase(adminUserToken.getUserName()), "没有权限");
+        AssertUtil.isTrue(adminUserToken.isAdmin() || userName.equalsIgnoreCase(adminUserToken.getUserName()), "没有权限");
         AdminUserEntity adminUserEntity = adminService.findByName(userName);
 
         JSONObject jsonObject = MapOf.newJSONObject();
@@ -129,7 +128,7 @@ public class AdminController implements InitPrint {
     @RequestMapping("/queryList")
     public ResponseEntity<RunResult> queryList(CacheHttpServletRequest request, @RequestBody WebSqlQueryCondition condition) {
         AdminUserToken adminUserToken = AdminUserToken.threadContext();
-        AssertUtil.assertTrue(adminUserToken.isAdmin(), "没有权限");
+        AssertUtil.isTrue(adminUserToken.isAdmin(), "没有权限");
 
         Class<AdminUserEntity> adminUserEntityClass = AdminUserEntity.class;
         SqlQueryBuilder sqlQueryBuilder = condition.build(sqlDataHelper, adminUserEntityClass, null);

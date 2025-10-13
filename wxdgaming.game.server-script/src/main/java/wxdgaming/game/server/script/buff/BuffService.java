@@ -104,7 +104,7 @@ public class BuffService extends HoldApplicationContext {
         if (abstractBuffAction == null) {
             abstractBuffAction = actionMap.get(BuffTypeConst.None);
         }
-        AssertUtil.assertNull(abstractBuffAction, "没有对应的buff处理类%s", buffType);
+        AssertUtil.isNull(abstractBuffAction, "没有对应的buff处理类%s", buffType);
         abstractBuffAction.doAction(mapNpc, buff, qBuff);
         buff.setLastExecuteTime(MyClock.millis());
         buff.setExecuteCount(buff.getExecuteCount() + 1);

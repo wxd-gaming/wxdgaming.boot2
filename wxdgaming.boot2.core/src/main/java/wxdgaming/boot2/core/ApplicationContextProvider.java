@@ -12,7 +12,6 @@ import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.executor.ThreadContext;
-import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.FieldUtil;
 import wxdgaming.boot2.core.reflect.MethodUtil;
@@ -180,7 +179,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
             K key = convertKey.apply(bean);
             V value = convertValue.apply(bean);
             V oldPut = tmp.put(key, value);
-            AssertUtil.assertTrue(oldPut == null, "重复类型：" + key);
+            AssertUtil.isTrue(oldPut == null, "重复类型：" + key);
             log.debug("register {}: {}", key, value);
         }
         return Collections.unmodifiableMap(tmp);
@@ -479,7 +478,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
                     }
                 }
             } catch (Throwable throwable) {
-                if (throwable instanceof AssertException assertException) {
+                if (throwable instanceof IllegalArgumentException assertException) {
                     throw assertException;
                 }
                 if (throwable instanceof InvocationTargetException) {

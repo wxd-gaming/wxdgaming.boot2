@@ -55,8 +55,8 @@ class CacheDriver<K, V> {
         private long expireTime;
 
         public CacheNode(K key, V value) {
-            AssertUtil.assertNull(key, "value is null");
-            AssertUtil.assertNull(value, "value is null");
+            AssertUtil.isNull(key, "value is null");
+            AssertUtil.isNull(value, "value is null");
             this.key = key;
             this.value = value;
             refresh();

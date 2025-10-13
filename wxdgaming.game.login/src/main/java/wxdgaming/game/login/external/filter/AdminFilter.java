@@ -39,7 +39,7 @@ public class AdminFilter implements WebFilter {
 
     @Override public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         AdminUserToken adminUserToken = AdminUserToken.parse(request, loginServerProperties.getAdminKey());
-        AssertUtil.assertTrue(adminUserToken != null, "token过期");
+        AssertUtil.isTrue(adminUserToken != null, "token过期");
         ThreadContext.putContent("adminUserToken", adminUserToken);
         String currentUrl = SpringUtil.getCurrentUrl(request);
         String body = SpringUtil.readBody(request);

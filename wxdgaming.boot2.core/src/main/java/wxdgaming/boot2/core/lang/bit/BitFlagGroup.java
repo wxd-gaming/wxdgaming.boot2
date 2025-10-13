@@ -18,7 +18,7 @@ public class BitFlagGroup {
 
     public static BitFlagGroup of(int flag) {
         BitFlagGroup bitFlagGroup = flagMap.get(flag);
-        AssertUtil.assertNull(bitFlagGroup, "状态不存在 flag=%d", flag);
+        AssertUtil.isNull(bitFlagGroup, "状态不存在 flag=%d", flag);
         return bitFlagGroup;
     }
 
@@ -34,8 +34,8 @@ public class BitFlagGroup {
         this.index = index;
         this.flag = flag;
         this.end = index + len - 1;
-        AssertUtil.assertTrue(index <= flag && flag <= end, "状态范围错问 index <= flag && flag <= end");
-        AssertUtil.assertTrue(flagMap.putIfAbsent(flag, this) == null, "重复定义状态");
+        AssertUtil.isTrue(index <= flag && flag <= end, "状态范围错问 index <= flag && flag <= end");
+        AssertUtil.isTrue(flagMap.putIfAbsent(flag, this) == null, "重复定义状态");
     }
 
     @Override public String toString() {

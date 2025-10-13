@@ -55,8 +55,8 @@ public abstract class AbstractHttpRequest {
 
     public HttpResponse execute() {
         retry++;
-        AssertUtil.assertNull(uriPath, "uriPath不能为空");
-        AssertUtil.assertTrue(retry > 0, "重试次数不能小于1");
+        AssertUtil.isNull(uriPath, "uriPath不能为空");
+        AssertUtil.isTrue(retry > 0, "重试次数不能小于1");
         HttpUriRequestBase httpUriRequestBase = buildRequest();
 
         if (connectionRequestTimeout > 0 || connectionTimeout > 0 || readTimeout > 0) {

@@ -34,7 +34,7 @@ public class ExecutorFactory implements InitPrint {
     private final ExecutorService EXECUTOR_SERVICE_VIRTUAL;
 
     public ExecutorFactory(ExecutorProperties executorProperties) {
-        AssertUtil.assertTrue(Lazy.instance == null, "ExecutorFactory is already exists");
+        AssertUtil.isTrue(Lazy.instance == null, "ExecutorFactory is already exists");
         Lazy.instance = this;
         EXECUTOR_MAP = new ConcurrentHashMap<>();
         EXECUTOR_MONITOR = new ExecutorMonitor();

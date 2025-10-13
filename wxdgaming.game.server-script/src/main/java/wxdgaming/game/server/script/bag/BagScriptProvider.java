@@ -27,7 +27,7 @@ public class BagScriptProvider<T extends IBagScript> {
         runApplication.classWithSuperStream(cls).forEach(script -> {
             ItemTypeConst itemTypeConst = script.type();
             T old = scriptTable.put(itemTypeConst.getType(), itemTypeConst.getSubType(), script);
-            AssertUtil.assertTrue(old == null, "重复注册类型：" + itemTypeConst);
+            AssertUtil.isTrue(old == null, "重复注册类型：" + itemTypeConst);
         });
         this.implTable = scriptTable;
     }

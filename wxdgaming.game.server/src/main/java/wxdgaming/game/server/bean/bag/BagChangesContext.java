@@ -39,14 +39,14 @@ public class BagChangesContext {
 
     /** 添加货币 */
     public void addCurrency(int cfgId, long num) {
-        AssertUtil.assertTrue(num >= 0, "num < 0");
+        AssertUtil.isTrue(num >= 0, "num < 0");
         long merged = itemBag.getCurrencyMap().merge(cfgId, num, Math::addExact);
         resUpdateBagInfo.getCurrencyMap().put(cfgId, merged);
     }
 
     /** 扣除货币 */
     public void subtractCurrency(int cfgId, long num) {
-        AssertUtil.assertTrue(num >= 0, "num < 0");
+        AssertUtil.isTrue(num >= 0, "num < 0");
         long hasNum = itemBag.getCurrencyMap().getOrDefault(cfgId, 0L);
         if (hasNum < num) {
             throw new IllegalArgumentException("货币不足");
@@ -56,13 +56,13 @@ public class BagChangesContext {
     }
 
     public void addDel(ItemGrid itemGrid) {
-        AssertUtil.assertNull(itemGrid, "null");
+        AssertUtil.isNull(itemGrid, "null");
         changeItems.remove(itemGrid);
         resUpdateBagInfo.getDelItemIds().add(itemGrid.getGrid());
     }
 
     public void addChange(ItemGrid itemGrid) {
-        AssertUtil.assertNull(itemGrid, "null");
+        AssertUtil.isNull(itemGrid, "null");
         changeItems.add(itemGrid);
     }
 

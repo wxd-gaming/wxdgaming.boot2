@@ -175,7 +175,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
 
             long oldCount = gainScript.getCount(player, itemBag, cfgId);
             long change = newItem.getCount();
-            AssertUtil.assertTrue(change >= 0, "添加数量不能是负数");
+            AssertUtil.isTrue(change >= 0, "添加数量不能是负数");
 
             boolean gain = gainScript.gain(bagChangesContext, newItem);
 
@@ -227,7 +227,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
         for (Map.Entry<Integer, Long> entry : costMap.entrySet()) {
             int cfgId = entry.getKey();
             long change = entry.getValue();
-            AssertUtil.assertTrue(change >= 0, "扣除数量不能是负数");
+            AssertUtil.isTrue(change >= 0, "扣除数量不能是负数");
             QItem qItem = dataRepository.dataTable(QItemTable.class, cfgId);
             int type = qItem.getItemType();
             int subtype = qItem.getItemSubType();
@@ -250,7 +250,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
             ItemGrid itemGrid = entry.getKey();
             QItem qItem = itemGrid.getItem().qItem();
             long change = entry.getValue();
-            AssertUtil.assertTrue(change >= 0, "扣除数量不能是负数");
+            AssertUtil.isTrue(change >= 0, "扣除数量不能是负数");
             if (itemGrid.getItem().getCount() < change) {
                 if (bagChangeDTO.isBagErrorNoticeClient()) {
                     tipsService.tips(player, qItem.getToName() + "道具不足", bagChangeDTO.getReasonDTO().getReasonConst());
@@ -271,7 +271,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
             int cfgId = itemCfg.getCfgId();
             long change = itemCfg.getNum();
 
-            AssertUtil.assertTrue(change >= 0, "扣除数量不能是负数");
+            AssertUtil.isTrue(change >= 0, "扣除数量不能是负数");
 
             QItem qItem = dataRepository.dataTable(QItemTable.class, cfgId);
             int type = qItem.getItemType();
@@ -309,7 +309,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
             QItem qItem = itemGrid.getItem().qItem();
             long change = entry.getValue();
 
-            AssertUtil.assertTrue(change >= 0, "扣除数量不能是负数");
+            AssertUtil.isTrue(change >= 0, "扣除数量不能是负数");
 
             int type = qItem.getItemType();
             int subtype = qItem.getItemSubType();

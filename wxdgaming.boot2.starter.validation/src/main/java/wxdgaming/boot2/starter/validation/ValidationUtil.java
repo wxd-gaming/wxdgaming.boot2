@@ -49,7 +49,7 @@ public class ValidationUtil extends HoldApplicationContext {
     public boolean validateAll(Object object, List<Validation> validations, BiConsumer<AbstractValidationHandler<Object>, Validation> errorCall) {
         for (Validation validation : validations) {
             AbstractValidationHandler<Object> validationHandler = validationHandlerMap.get(validation.getValidationType());
-            AssertUtil.assertNull(validationHandler, "验证条件为实现: %s, %s", validation.getValidationType(), StackUtils.stackAll());
+            AssertUtil.isNull(validationHandler, "验证条件为实现: %s, %s", validation.getValidationType(), StackUtils.stackAll());
             if (!validationHandler.validate(object, validation)) {
                 if (errorCall != null) {
                     errorCall.accept(validationHandler, validation);
@@ -77,7 +77,7 @@ public class ValidationUtil extends HoldApplicationContext {
     public boolean validateAny(Object object, List<Validation> validations, Consumer<AbstractValidationHandler<Object>> sources) {
         for (Validation validation : validations) {
             AbstractValidationHandler<Object> validationHandler = validationHandlerMap.get(validation.getValidationType());
-            AssertUtil.assertNull(validationHandler, "验证条件为实现: %s, %s", validation.getValidationType(), StackUtils.stackAll());
+            AssertUtil.isNull(validationHandler, "验证条件为实现: %s, %s", validation.getValidationType(), StackUtils.stackAll());
             if (validationHandler.validate(object, validation)) {
                 if (sources != null) {
                     sources.accept(validationHandler);

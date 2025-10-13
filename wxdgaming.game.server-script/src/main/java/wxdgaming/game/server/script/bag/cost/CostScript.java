@@ -82,7 +82,7 @@ public class CostScript extends HoldApplicationContext implements IBagScript {
                 }
             }
         }
-        AssertUtil.assertTrue(count <= 0, "背包变更：%s, %s, %s, 数量不足", player, bagType, qItem.getToName());
+        AssertUtil.isTrue(count <= 0, "背包变更：%s, %s, %s, 数量不足", player, bagType, qItem.getToName());
     }
 
     public void cost(Player player, BagChangesContext bagChangesContext, ItemGrid itemGrid, long count) {

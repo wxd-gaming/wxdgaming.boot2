@@ -33,7 +33,7 @@ public class HexId implements Serializable {
     volatile long seed = 0;
 
     public HexId(long hexId) {
-        AssertUtil.assertTrue(0 < hexId && hexId < Offset14, "取值范围 1 ~ %s", Offset14);
+        AssertUtil.isTrue(0 < hexId && hexId < Offset14, "取值范围 1 ~ %s", Offset14);
         this.hexId = hexId;
     }
 
@@ -51,7 +51,7 @@ public class HexId implements Serializable {
 
         /*因为无符号 所以每一秒的id最大值是52万*/
         seed++;
-        AssertUtil.assertTrue(
+        AssertUtil.isTrue(
                 seed < Offset20,
                 max_exception_format,
                 Offset20
@@ -64,7 +64,7 @@ public class HexId implements Serializable {
         int i = secondByDay(lid);
         long idValue = idValue(lid);
 
-        AssertUtil.assertTrue(
+        AssertUtil.isTrue(
                 i == secondByDay && idValue == seed,
                 exception_format,
                 lid, hexId, secondByDay, seed

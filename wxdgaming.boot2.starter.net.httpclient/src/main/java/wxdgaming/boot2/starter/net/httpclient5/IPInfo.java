@@ -20,7 +20,7 @@ public class IPInfo extends ObjectBase {
     public static IPInfo get(String ip) {
         HttpRequestGet httpRequestGet = HttpRequestGet.of(String.format(format, ip));
         IPInfo ipInfo = httpRequestGet.execute().bodyObject(IPInfo.class);
-        AssertUtil.assertTrue(!"success".equals(ipInfo.getStatus()), "ip地址解析失败");
+        AssertUtil.isTrue(!"success".equals(ipInfo.getStatus()), "ip地址解析失败");
         return ipInfo;
     }
 

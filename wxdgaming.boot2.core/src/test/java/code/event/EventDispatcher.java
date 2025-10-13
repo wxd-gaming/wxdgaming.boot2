@@ -20,8 +20,8 @@ public class EventDispatcher {
 
     /** 获取事件类型监听器容器 */
     private CopyOnWriteArrayList<EventListener<? extends EventObject>> getListeners(EventType eventType, Class<? extends EventObject> eventData) {
-        AssertUtil.assertTrue(eventType != null, "eventType is null");
-        AssertUtil.assertTrue(eventData != null, "eventDataClass is null");
+        AssertUtil.isTrue(eventType != null, "eventType is null");
+        AssertUtil.isTrue(eventData != null, "eventDataClass is null");
         return listeners.computeIfAbsent(eventType, eventData, k -> new CopyOnWriteArrayList<>());
     }
 

@@ -161,7 +161,7 @@ public class RankByLazyListSort {
     public RankScore rankDataByRank(final int rank) {
         readLock.lock();
         try {
-            AssertUtil.assertTrue(rank > 0, "从1开始");
+            AssertUtil.isTrue(rank > 0, "从1开始");
             RankScore[] rankScores = rankCache.get(0);
             if (rankScores.length < rank) {
                 return null;
@@ -173,8 +173,8 @@ public class RankByLazyListSort {
     }
 
     public List<RankScore> rankByRange(int startRank, int endRank) {
-        AssertUtil.assertTrue(startRank > 0, "从1开始");
-        AssertUtil.assertTrue(endRank > 0 && endRank > startRank, "从1开始");
+        AssertUtil.isTrue(startRank > 0, "从1开始");
+        AssertUtil.isTrue(endRank > 0 && endRank > startRank, "从1开始");
         readLock.lock();
         try {
             ArrayList<RankScore> resultRankScores = new ArrayList<>(endRank - startRank + 1);

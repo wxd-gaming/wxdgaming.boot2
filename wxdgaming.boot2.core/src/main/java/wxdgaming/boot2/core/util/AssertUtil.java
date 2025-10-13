@@ -1,7 +1,5 @@
 package wxdgaming.boot2.core.util;
 
-import wxdgaming.boot2.core.lang.AssertException;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
@@ -14,56 +12,84 @@ import java.util.Objects;
  */
 public class AssertUtil {
 
-    public static AssertException assertException(String message) {
+    public static IllegalArgumentException assertException(String format, Object... args) {
+        String message = format;
+        if (args.length > 0) {
+            message = String.format(format, args);
+        }
         return assertException(4, message);
     }
 
-    public static AssertException assertException(String format, Object... args) {
-        return assertException(4, String.format(format, args));
-    }
-
-    public static AssertException assertException(int stackIndex, String message) {
+    public static IllegalArgumentException assertException(int stackIndex, String message) {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         stackTrace = Arrays.copyOfRange(stackTrace, stackIndex, stackTrace.length);
-        return new AssertException(message, stackTrace);
+        IllegalArgumentException illegalArgumentException = new IllegalArgumentException(message);
+        illegalArgumentException.setStackTrace(stackTrace);
+        return illegalArgumentException;
     }
 
     /** 条件如果是false 抛出异常 */
-    public static void assertTrue(boolean success) {
+    public static void isTrue(boolean success) {
         if (!success) throw assertException("检查异常");
     }
 
     /** 条件如果是false 抛出异常 */
-    public static void assertTrue(boolean success, String format, Object... args) {
+    public static void isTrue(boolean success, String format, Object... args) {
         if (!success) throw assertException(format, args);
     }
 
     /** 如果{@code !Objects.equals(o1, o2)} 抛出异常 */
-    public static void assertEquals(Object o1, Object o2, String message) {
-        if (!Objects.equals(o1, o2)) throw assertException(message);
+    public static void isEquals(Object o1, Object o2, String format, Object... args) {
+        if (!Objects.equals(o1, o2)) throw assertException(format, args);
     }
 
     /** 如果{@code Objects.equals(o1, o2)} 抛出异常 */
-    public static void assertNotEquals(Object o1, Object o2, String message) {
-        if (Objects.equals(o1, o2)) throw assertException(message);
+    public static void notEquals(Object o1, Object o2, String format, Object... args) {
+        if (Objects.equals(o1, o2)) throw assertException(format, args);
+    }
+
+    /** 如果{@code !type.isInstance(o)} 抛出异常 */
+    public static void isInstanceOf(Class<?> type, Object o, String format, Object... args) {
+        if (!type.isInstance(o))
+            throw assertException(format, args);
+    }
+
+    /** 如果{@code type.isInstance(o)} 抛出异常 */
+    public static void notInstanceOf(Class<?> type, Object o, String format, Object... args) {
+        if (type.isInstance(o))
+            throw assertException(format, args);
     }
 
     /** 参数是 null 抛出异常 */
-    public static void assertNull(Object object) {
+    public static void isNull(Object object) {
         if (object == null) {
             throw assertException("参数 null");
         }
     }
 
     /** 参数是 null 抛出异常 */
-    public static void assertNull(Object object, String format, Object... args) {
+    public static void isNull(Object object, String format, Object... args) {
         if (object == null) {
             throw assertException(format, args);
         }
     }
 
+    /** 参数是 null 抛出异常 */
+    public static void notNull(Object object) {
+        if (object != null) {
+            throw assertException("参数 null");
+        }
+    }
+
+    /** 参数是 null 抛出异常 */
+    public static void notNull(Object object, String format, Object... args) {
+        if (object != null) {
+            throw assertException(format, args);
+        }
+    }
+
     /** null empty */
-    public static void assertNullEmpty(Object source, String message) {
+    public static void nullEmpty(Object source, String message) {
         if (source == null
             || (source instanceof String str && str.isBlank())
             || (source instanceof Collection && ((Collection<?>) source).isEmpty())) {

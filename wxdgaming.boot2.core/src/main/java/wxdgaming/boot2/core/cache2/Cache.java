@@ -39,7 +39,7 @@ public abstract class Cache<K, V> {
     protected ScheduledFuture<?>[] timerJobs = null;
 
     public void start() {
-        AssertUtil.assertTrue(this.area > 0, "area must > 0");
+        AssertUtil.isTrue(this.area > 0, "area must > 0");
         if (this.heartTimeMs < 100) {
             throw new RuntimeException("heartTime must > 100");
         }
@@ -49,7 +49,7 @@ public abstract class Cache<K, V> {
         if (this.heartTimeMs > expireAfterWriteMs && this.heartTimeMs > expireAfterReadMs) {
             throw new RuntimeException("心跳时间必须小于过期时间");
         }
-        AssertUtil.assertTrue(this.timerJobs == null, "重复调用 start");
+        AssertUtil.isTrue(this.timerJobs == null, "重复调用 start");
     }
 
     /** 关闭缓存 */

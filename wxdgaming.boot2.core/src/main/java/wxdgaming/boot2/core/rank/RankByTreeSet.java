@@ -129,7 +129,7 @@ public class RankByTreeSet {
     public RankScore rankDataByRank(final int rank) {
         readLock.lock();
         try {
-            AssertUtil.assertTrue(rank > 0, "rank must be greater than 0");
+            AssertUtil.isTrue(rank > 0, "rank must be greater than 0");
             if (map.size() < rank) {
                 return null;
             }

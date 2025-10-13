@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.format.StreamWriter;
 import wxdgaming.boot2.core.io.FileReadUtil;
-import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.FieldUtil;
@@ -51,7 +50,7 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
         }
         jsonPath += dataMapping.name() + ".json";
         String json = FileReadUtil.readString(jsonPath);
-        AssertUtil.assertTrue(StringUtils.isNotBlank(json), "加载配置表：" + this.getClass().getSimpleName() + " 查询文件失败：" + jsonPath);
+        AssertUtil.isTrue(StringUtils.isNotBlank(json), "加载配置表：" + this.getClass().getSimpleName() + " 查询文件失败：" + jsonPath);
         setModelList(FastJsonUtil.parseArray(json, tClass));
     }
 
@@ -67,7 +66,7 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
             try {
                 Object keyValue = dbModel.key();
                 if (modeMap.put(keyValue, dbModel) != null) {
-                    throw new AssertException("数据 主键 【" + keyValue + "】 重复");
+                    throw new IllegalArgumentException("数据 主键 【" + keyValue + "】 重复");
                 }
                 Keys keys = AnnUtil.ann(DataTable.this.getClass(), Keys.class);
                 if (keys != null) {
@@ -81,7 +80,7 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
                         }
                         /*添加自定义索引*/
                         if (modeMap.put(index.toString(), dbModel) != null) {
-                            throw new AssertException("数据 自定义索引 【" + s + "】 【" + keyValue + "】 重复 ");
+                            throw new IllegalArgumentException("数据 自定义索引 【" + s + "】 【" + keyValue + "】 重复 ");
                         }
                     }
                 }

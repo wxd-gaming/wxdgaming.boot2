@@ -37,7 +37,7 @@ public class YunyingFilter implements WebFilter {
         String sign = request.getHeader(HttpHeaderNames.AUTHORIZATION.toString());
         Map<String, String> stringStringMap = SpringUtil.readParameterMap(request);
         String selfSign = SignUtil.signByFormData(stringStringMap, connectLoginProperties.getJwtKey());
-        AssertUtil.assertTrue(selfSign.equals(sign), "签名错误");
+        AssertUtil.isTrue(selfSign.equals(sign), "签名错误");
         return true;
     }
 

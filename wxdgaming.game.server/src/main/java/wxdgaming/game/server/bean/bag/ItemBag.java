@@ -41,7 +41,7 @@ public class ItemBag {
         if (itemGrids == null) {
             itemGrids = new Item[newLength];
         } else {
-            AssertUtil.assertTrue(itemGrids.length <= newLength, "背包格子数异常，最大格子小于当前格子数");
+            AssertUtil.isTrue(itemGrids.length <= newLength, "背包格子数异常，最大格子小于当前格子数");
             if (itemGrids.length < newLength) {
                 itemGrids = Arrays.copyOf(itemGrids, newLength);
             }

@@ -30,7 +30,7 @@ public class CDKeyTest {
         System.out.println(upperCase + " - " + upperCase.length());
         int cdKeyId = CDKeyUtil.getCdKeyId(upperCase);
         System.out.println(cdKeyId);
-        AssertUtil.assertTrue(cdKeyId == 1001, "cdKeyId 错误");
+        AssertUtil.isTrue(cdKeyId == 1001, "cdKeyId 错误");
     }
 
     @Test

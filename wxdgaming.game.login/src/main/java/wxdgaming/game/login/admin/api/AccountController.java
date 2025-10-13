@@ -35,8 +35,8 @@ public class AccountController implements InitPrint {
 
     @RequestMapping("/login")
     public ResponseEntity<RunResult> login(@RequestParam("userName") String userName, @RequestParam("password") String password) {
-        AssertUtil.assertTrue(StringUtils.isNotBlank(userName), "用户名输入不正确");
-        AssertUtil.assertTrue(StringUtils.isNotBlank(password), "密码输入不正确");
+        AssertUtil.isTrue(StringUtils.isNotBlank(userName), "用户名输入不正确");
+        AssertUtil.isTrue(StringUtils.isNotBlank(password), "密码输入不正确");
         return adminService.login(userName, password);
     }
 

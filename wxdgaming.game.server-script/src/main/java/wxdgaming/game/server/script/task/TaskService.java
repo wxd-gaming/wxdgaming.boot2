@@ -51,7 +51,7 @@ public class TaskService extends HoldApplicationContext {
 
     public ITaskScript getTaskScript(TaskType taskType) {
         ITaskScript taskScript = taskScriptImplHashMap.get(taskType);
-        AssertUtil.assertNull(taskScript, "任务类型不存在：" + taskType);
+        AssertUtil.isNull(taskScript, "任务类型不存在：" + taskType);
         return taskScript;
     }
 

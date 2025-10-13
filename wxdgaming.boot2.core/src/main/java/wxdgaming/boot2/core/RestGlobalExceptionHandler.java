@@ -8,7 +8,6 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.boot2.core.lang.RunResult;
 
 @Slf4j
@@ -29,7 +28,7 @@ public class RestGlobalExceptionHandler {
         return ResponseEntity.ok(RunResult.fail(ex.getMessage()));
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, AssertException.class, ServletRequestBindingException.class})
+    @ExceptionHandler({IllegalArgumentException.class, ServletRequestBindingException.class})
     public ResponseEntity<RunResult> handleIllegalArgumentException(Exception ex) {
         log.warn("参数异常", ex);
         return ResponseEntity.ok(RunResult.fail(ex.getMessage()));

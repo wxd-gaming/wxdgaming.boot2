@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.Init;
-import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.game.message.gm.GMBean;
 import wxdgaming.game.message.gm.GmGroup;
 import wxdgaming.game.message.gm.ResGmList;
@@ -90,8 +89,8 @@ public class GmService extends HoldApplicationContext {
             providerMethod.invoke(player, jsonArray);
         } catch (Exception e) {
             log.error("执行gm命令失败: {}", cmd, e);
-            if (e instanceof AssertException assertException) {
-                cmd = cmd + ", " + assertException.getMessage();
+            if (e instanceof IllegalArgumentException argumentException) {
+                cmd = cmd + ", " + argumentException.getMessage();
             }
             tipsService.tips(player, "执行gm命令失败: " + cmd);
         }

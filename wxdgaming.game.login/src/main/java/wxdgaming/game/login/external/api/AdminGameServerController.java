@@ -58,7 +58,7 @@ public class AdminGameServerController implements InitPrint {
                                @RequestParam("serverId") int serverId,
                                @RequestParam("serverName") String serverName,
                                @RequestParam("openTime") String openTime) {
-        AssertUtil.assertTrue(!innerService.getInnerGameServerInfoMap().containsKey(serverId), "服务器id重复");
+        AssertUtil.isTrue(!innerService.getInnerGameServerInfoMap().containsKey(serverId), "服务器id重复");
         ServerInfoEntity entity = new ServerInfoEntity();
         entity.setServerId(serverId);
         entity.setName(serverName);
@@ -75,7 +75,7 @@ public class AdminGameServerController implements InitPrint {
                                 @RequestParam("openTime") String openTime,
                                 @RequestParam(value = "showLevel") int showLevel) {
         ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(serverId);
-        AssertUtil.assertTrue(entity != null, "服务器不存在");
+        AssertUtil.isTrue(entity != null, "服务器不存在");
         long time = Util.parseWebDate(openTime);
         if (time < System.currentTimeMillis() && time < entity.getOpenTime()) {
             if (!loginServerProperties.isDebug()) {
@@ -93,7 +93,7 @@ public class AdminGameServerController implements InitPrint {
     public RunResult editServerOpenTime(@RequestParam("serverId") int serverId,
                                         @RequestParam("openTime") String openTime) {
         ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(serverId);
-        AssertUtil.assertTrue(entity != null, "服务器不存在");
+        AssertUtil.isTrue(entity != null, "服务器不存在");
         long time = Util.parseWebDate(openTime);
         if (time < System.currentTimeMillis() && time < entity.getOpenTime()) {
             if (!loginServerProperties.isDebug()) {
@@ -109,7 +109,7 @@ public class AdminGameServerController implements InitPrint {
     public RunResult editServerMaintenanceTime(@RequestParam("serverId") int serverId,
                                                @RequestParam("maintenanceTime") String maintenanceTime) {
         ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(serverId);
-        AssertUtil.assertTrue(entity != null, "服务器不存在");
+        AssertUtil.isTrue(entity != null, "服务器不存在");
         long time = Util.parseWebDate(maintenanceTime);
         if (time < System.currentTimeMillis()) {
             return RunResult.fail("维护时间小于当前时间");
@@ -126,7 +126,7 @@ public class AdminGameServerController implements InitPrint {
         ServerShowNameGlobalData showNameGlobalData = globalDataService.get(GlobalDataConst.ServerNameGlobalData);
         ConcurrentHashMap<Integer, ServerShowName> serverNameMap = showNameGlobalData.getServerNameMap();
         ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(serverId);
-        AssertUtil.assertTrue(entity != null, "服务器不存在");
+        AssertUtil.isTrue(entity != null, "服务器不存在");
         long time = Util.parseWebDate(showNameExpireTime);
         if (time < System.currentTimeMillis()) {
             serverNameMap.remove(serverId);
@@ -141,7 +141,7 @@ public class AdminGameServerController implements InitPrint {
     @RequestMapping(value = "/kick")
     public RunResult kick(@RequestParam("serverId") int serverId) {
         ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(serverId);
-        AssertUtil.assertTrue(entity != null, "服务器不存在");
+        AssertUtil.isTrue(entity != null, "服务器不存在");
         TreeMap<String, Object> params = new TreeMap<>();
         params.put("account", "ALL");
         innerService.executeServer("kick", "yunying/kick", params, entity);
@@ -152,7 +152,7 @@ public class AdminGameServerController implements InitPrint {
     public RunResult editServerShowLevel(@RequestParam("serverId") int serverId,
                                          @RequestParam("showLevel") int showLevel) {
         ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(serverId);
-        AssertUtil.assertTrue(entity != null, "服务器不存在");
+        AssertUtil.isTrue(entity != null, "服务器不存在");
         entity.setShowLevel(showLevel);
         sqlDataHelper.update(entity);
         return RunResult.ok().msg("修改成功");

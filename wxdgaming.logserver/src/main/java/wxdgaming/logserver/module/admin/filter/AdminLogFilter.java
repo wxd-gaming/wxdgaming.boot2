@@ -36,7 +36,7 @@ public class AdminLogFilter implements WebFilter {
 
     @Override public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         AdminUserToken adminUserToken = AdminUserToken.parse(request, logServerProperties.getAdminKey());
-        AssertUtil.assertTrue(adminUserToken != null, "token过期");
+        AssertUtil.isTrue(adminUserToken != null, "token过期");
         ThreadContext.putContent("adminUserToken", adminUserToken);
         return true;
     }

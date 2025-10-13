@@ -21,7 +21,7 @@ public class AppPlatformParams extends ObjectBase {
 
     public static void register(AppPlatformParams appPlatformParams) {
         AppPlatformParams put = appPlatformParamsMap.put(appPlatformParams.getAppId(), appPlatformParams);
-        AssertUtil.assertTrue(put == null, "重复注册appId：" + appPlatformParams.getAppId());
+        AssertUtil.isTrue(put == null, "重复注册appId：" + appPlatformParams.getAppId());
     }
 
     public static AppPlatformParams getAppPlatformParams(int appId) {

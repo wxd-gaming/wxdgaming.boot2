@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.SpringUtil;
@@ -16,7 +17,6 @@ import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.json.FastJsonUtil;
-import wxdgaming.boot2.core.lang.AssertException;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.Md5Util;
@@ -88,7 +88,7 @@ public class LogPushController {
         if (!Objects.equals(sign, selfSign)) {
             log.warn("LogPushController sign={} signBefore={}", sign, signBefore);
             logService.saveErrorLog("sign 签名错误", json, "pushList");
-            throw new AssertException("sign 签名错误");
+            throw new IllegalArgumentException("sign 签名错误");
         }
         return JSON.parseArray(map.get("data"), LogEntity.class);
     }

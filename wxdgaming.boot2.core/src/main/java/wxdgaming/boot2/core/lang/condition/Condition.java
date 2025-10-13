@@ -56,7 +56,7 @@ public class Condition extends ObjectBase implements Serializable {
                      Serializable k3,
                      ConditionUpdatePolicy update,
                      long target) {
-        AssertUtil.assertTrue(k1 != null, "条件1不能为空");
+        AssertUtil.isTrue(k1 != null, "条件1不能为空");
         this.k1 = k1;
         this.k2 = k2 == null ? "0" : k2;
         this.k3 = k3 == null ? "0" : k3;
