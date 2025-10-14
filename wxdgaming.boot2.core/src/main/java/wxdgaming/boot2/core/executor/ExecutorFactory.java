@@ -21,8 +21,8 @@ import java.util.concurrent.ScheduledExecutorService;
 @Configuration
 public class ExecutorFactory implements InitPrint {
 
-    private static class Lazy {
-        static ExecutorFactory instance = null;
+    public static class Lazy {
+        public static ExecutorFactory instance = null;
     }
 
     @Getter private final ExecutorMonitor EXECUTOR_MONITOR;

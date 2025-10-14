@@ -2,14 +2,16 @@ package code.cache;
 
 import lombok.Builder;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
-import wxdgaming.boot2.core.function.Consumer3;
+import wxdgaming.boot2.core.function.Predicate3;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 /**
@@ -22,9 +24,10 @@ class CacheDriver<K, V> {
 
     static final ScheduledExecutorService scheduledExecutorService = ExecutorFactory.newSingleThreadScheduledExecutor("cache-scheduled");
 
-    protected final ReentrantLock lock = new ReentrantLock();
-    protected final int block;
-    protected final List<CacheBlock> cacheAtomicReference;
+    /** 容器驱动锁 */
+    protected final ReentrantLock driverLock = new ReentrantLock();
+    protected final int blockSize;
+    protected List<CacheBlock> cacheAtomicReference;
 
     /** 读取过期时间 */
     protected final Duration expireAfterAccess;
@@ -32,19 +35,15 @@ class CacheDriver<K, V> {
     protected final Duration expireAfterWrite;
 
     protected final Function<K, V> loader;
-    protected final Consumer3<K, V, RemovalCause> removalListener;
+    protected final Predicate3<K, V, RemovalCause> removalListener;
 
     public enum RemovalCause {
-        /** 删除 */
-        DELETE,
         /** 替换 */
         REPLACED,
         /** 过期删除 */
         EXPIRE,
         /** 手动删除 */
         EXPLICIT,
-        /** 特殊 */
-        SPECIAL,
         ;
     }
 
@@ -54,20 +53,20 @@ class CacheDriver<K, V> {
         private final V value;
         private long expireTime;
 
-        public CacheNode(K key, V value) {
+        public CacheNode(Lock selfLock, K key, V value) {
             AssertUtil.isNull(key, "value is null");
             AssertUtil.isNull(value, "value is null");
             this.key = key;
             this.value = value;
-            refresh();
+            refresh(selfLock, false);
         }
 
-        private void refresh() {
-            lock.lock();
+        private void refresh(Lock selfLock, boolean force) {
+//            selfLock.lock();
             try {
                 if (expireAfterAccess != null || expireAfterWrite != null) {
                     if (expireAfterWrite != null) {
-                        if (expireTime == 0) {
+                        if (expireTime == 0 || force) {
                             expireTime = System.currentTimeMillis() + expireAfterWrite.toMillis();
                         }
                     } else {
@@ -75,7 +74,7 @@ class CacheDriver<K, V> {
                     }
                 }
             } finally {
-                lock.unlock();
+//                selfLock.unlock();
             }
         }
 
@@ -99,15 +98,17 @@ class CacheDriver<K, V> {
     }
 
     protected class CacheBlock {
-
-        final ReentrantLock lock = new ReentrantLock();
+        /** 区块锁 */
+        final ReentrantReadWriteLock blockLock = new ReentrantReadWriteLock();
+        final ReentrantReadWriteLock.ReadLock blockReadLock = blockLock.readLock();
+        final ReentrantReadWriteLock.WriteLock blockWriteLock = blockLock.writeLock();
         final HashMap<K, CacheNode> nodeMap = new HashMap<>();
         final TreeSet<CacheNode> expireSet = new TreeSet<>();
 
         public void put(K key, V value) {
-            lock.lock();
+            blockWriteLock.lock();
             try {
-                CacheNode newNode = new CacheNode(key, value);
+                CacheNode newNode = new CacheNode(blockReadLock, key, value);
                 CacheNode oldNode = nodeMap.put(key, newNode);
                 if (oldNode != null) {
                     expireSet.remove(oldNode);
@@ -117,63 +118,77 @@ class CacheDriver<K, V> {
                 }
                 expireSet.add(newNode);
             } finally {
-                lock.unlock();
+                blockWriteLock.unlock();
             }
         }
 
 
         public V get(K key) {
-            lock.lock();
+            blockReadLock.lock();
+            CacheNode cacheNode = null;
             try {
-                CacheNode cacheNode = nodeMap.get(key);
-                if (cacheNode == null) {
-                    V value = null;
-                    if (loader != null)
-                        value = loader.apply(key);
+                cacheNode = nodeMap.get(key);
+            } finally {
+                blockReadLock.unlock();
+            }
+            if (cacheNode == null) {
+                V value = null;
+                if (loader == null)
+                    return null;
+                blockWriteLock.lock();
+                try {
+                    value = loader.apply(key);
                     if (value == null)
                         return null;
-                    cacheNode = new CacheNode(key, value);
-                    nodeMap.put(key, cacheNode);
+                    put(key, value);
+                    return value;
+                } finally {
+                    blockWriteLock.unlock();
+                }
+            } else {
+                if (expireAfterWrite == null) {
+                    /*TODO 固定缓存不需要刷新，因为时间不会边*/
+                    expireSet.remove(cacheNode);
+                    cacheNode.refresh(blockReadLock, false);
                     expireSet.add(cacheNode);
-                } else {
-                    if (expireAfterWrite == null) {
-                        /*TODO 固定缓存不需要刷新，因为时间不会边*/
-                        expireSet.remove(cacheNode);
-                        cacheNode.refresh();
-                        expireSet.add(cacheNode);
-                    }
                 }
                 return cacheNode.value;
-            } finally {
-                lock.unlock();
             }
         }
 
+        public int size() {
+            return nodeMap.size();
+        }
+
         public Collection<V> values() {
-            lock.lock();
+            blockReadLock.lock();
             try {
                 return nodeMap.values().stream().map(n -> n.value).toList();
             } finally {
-                lock.unlock();
+                blockReadLock.unlock();
             }
         }
 
     }
 
     @Builder
-    public CacheDriver(int block, Duration expireAfterAccess, Duration expireAfterWrite, Function<K, V> loader, Consumer3<K, V, RemovalCause> removalListener) {
+    public CacheDriver(int blockSize, Duration expireAfterAccess, Duration expireAfterWrite, Function<K, V> loader, Predicate3<K, V, RemovalCause> removalListener) {
 
         if (expireAfterAccess != null && expireAfterWrite != null)
             throw new RuntimeException("expireAfterAccess or expireAfterWrite");
 
-        this.block = block;
+        this.blockSize = blockSize == 0 ? 16 : blockSize;
         this.expireAfterAccess = expireAfterAccess;
         this.expireAfterWrite = expireAfterWrite;
         this.loader = loader;
         this.removalListener = removalListener;
 
-        cacheAtomicReference = new ArrayList<>(block);
-        for (int i = 0; i < block; i++) {
+        init();
+    }
+
+    private void init() {
+        cacheAtomicReference = new ArrayList<>(blockSize);
+        for (int i = 0; i < this.blockSize; i++) {
             cacheAtomicReference.add(new CacheBlock());
         }
 
@@ -182,12 +197,18 @@ class CacheDriver<K, V> {
             if (delay < 1000)
                 throw new RuntimeException("expire < 1s");
             delay = delay / 100;
-            scheduledExecutorService.scheduleWithFixedDelay(this::refresh, delay, delay, TimeUnit.MILLISECONDS);
+            scheduledExecutorService.scheduleWithFixedDelay(this::onCleanup, delay, delay, TimeUnit.MILLISECONDS);
+        } else {
+            AssertUtil.notNull(this.removalListener, "removalListener 非空 请配置过期时间");
         }
     }
 
     private int getBlockIndex(K key) {
-        return Math.abs(key.hashCode()) % block;
+        return Math.abs(key.hashCode()) % blockSize;
+    }
+
+    public long size() {
+        return cacheAtomicReference.stream().mapToLong(CacheBlock::size).sum();
     }
 
     public void put(K key, V value) {
@@ -200,33 +221,62 @@ class CacheDriver<K, V> {
         return cacheAtomicReference.get(blockIndex).get(key);
     }
 
-    public V remove(K k) {
-        return remove(k, RemovalCause.EXPLICIT);
+    public void invalidate(K k) {
+        invalidate(k, RemovalCause.EXPLICIT);
     }
 
-    public V remove(K k, RemovalCause cause) {
-        int blockIndex = getBlockIndex(k);
-        CacheBlock cacheBlock = cacheAtomicReference.get(blockIndex);
-        cacheBlock.lock.lock();
-        try {
-            CacheNode remove = cacheBlock.nodeMap.remove(k);
-            if (remove != null) {
-                cacheBlock.expireSet.remove(remove);
-                onRemove(remove, cause);
-                return remove.value;
+    public void invalidate(K k, RemovalCause cause) {
+        scheduledExecutorService.execute(() -> {
+            int blockIndex = getBlockIndex(k);
+            CacheBlock cacheBlock = cacheAtomicReference.get(blockIndex);
+            cacheBlock.blockWriteLock.lock();
+            try {
+                CacheNode remove = cacheBlock.nodeMap.remove(k);
+                if (remove != null) {
+                    cacheBlock.expireSet.remove(remove);
+                    onRemove(remove, cause);
+                }
+            } finally {
+                cacheBlock.blockWriteLock.unlock();
             }
-            return null;
-        } finally {
-            cacheBlock.lock.unlock();
-        }
+        });
+    }
+
+    /** 强制过期所有 */
+    public void invalidateAll() {
+        scheduledExecutorService.execute(() -> {
+            driverLock.lock();
+            try {
+                for (CacheBlock cacheBlock : cacheAtomicReference) {
+                    cacheBlock.blockWriteLock.lock();
+                    try {
+                        Iterator<CacheNode> iterator = cacheBlock.expireSet.iterator();
+                        while (iterator.hasNext()) {
+                            CacheNode cacheNode = iterator.next();
+                            onRemove(cacheNode, RemovalCause.EXPIRE);
+                            iterator.remove();
+                            cacheBlock.nodeMap.remove(cacheNode.key);
+                        }
+                    } finally {
+                        cacheBlock.blockWriteLock.unlock();
+                    }
+                }
+            } finally {
+                driverLock.unlock();
+            }
+        });
     }
 
     /** 强制刷新，定时清理过期数据可能出现延迟，所以也可以手动调用清理 */
-    public void refresh() {
-        lock.lock();
+    public void cleanup() {
+        scheduledExecutorService.execute(this::onCleanup);
+    }
+
+    private void onCleanup() {
+        driverLock.lock();
         try {
             for (CacheBlock cacheBlock : cacheAtomicReference) {
-                cacheBlock.lock.lock();
+                cacheBlock.blockWriteLock.lock();
                 try {
                     Iterator<CacheNode> iterator = cacheBlock.expireSet.iterator();
                     while (iterator.hasNext()) {
@@ -234,25 +284,31 @@ class CacheDriver<K, V> {
                         if (cacheNode.expireTime > System.currentTimeMillis()) {
                             break;
                         }
-                        iterator.remove();
-                        cacheBlock.nodeMap.remove(cacheNode.key);
-                        onRemove(cacheNode, RemovalCause.EXPIRE);
+                        if (onRemove(cacheNode, RemovalCause.EXPIRE)) {
+                            iterator.remove();
+                            cacheBlock.nodeMap.remove(cacheNode.key);
+                        } else {
+                            cacheBlock.expireSet.remove(cacheNode);
+                            cacheNode.refresh(cacheBlock.blockReadLock, true);
+                            cacheBlock.expireSet.add(cacheNode);
+                        }
                     }
                 } finally {
-                    cacheBlock.lock.unlock();
+                    cacheBlock.blockWriteLock.unlock();
                 }
             }
         } finally {
-            lock.unlock();
+            driverLock.unlock();
         }
     }
 
-    private void onRemove(CacheNode cacheNode, RemovalCause cause) {
+    private boolean onRemove(CacheNode cacheNode, RemovalCause cause) {
         if (cacheNode != null) {
-            if (removalListener != null) {
-                removalListener.accept(cacheNode.key, cacheNode.value, cause);
+            if (removalListener != null && !cause.equals(RemovalCause.REPLACED)) {
+                return removalListener.test(cacheNode.key, cacheNode.value, cause);
             }
         }
+        return true;
     }
 
 }

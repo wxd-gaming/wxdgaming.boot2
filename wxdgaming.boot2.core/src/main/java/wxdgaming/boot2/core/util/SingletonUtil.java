@@ -15,6 +15,7 @@ public class SingletonUtil {
     static final ConcurrentHashMap<Object, Object> map = new ConcurrentHashMap<>();
 
     /** 返回单例实例 */
+    @SuppressWarnings("unchecked")
     public static <R> R singleton(R r) {
         R old = (R) map.computeIfAbsent(r, identity);
         return old != null ? old : r;

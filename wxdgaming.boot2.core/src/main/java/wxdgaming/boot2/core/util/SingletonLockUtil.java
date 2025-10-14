@@ -6,6 +6,7 @@ import wxdgaming.boot2.core.cache2.LRUCache;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
 
 /**
  * 重入锁,单例锁
@@ -47,6 +48,24 @@ public class SingletonLockUtil {
 
     public static void lock(Object key) {
         getLockObject(key).reentrantLock.lock();
+    }
+
+    public static void lockRunning(Object key, Runnable runnable) {
+        lock(key);
+        try {
+            runnable.run();
+        } finally {
+            unlock(key);
+        }
+    }
+
+    public static <R> R lockRunning(Object key, Supplier<R> runnable) {
+        lock(key);
+        try {
+            return runnable.get();
+        } finally {
+            unlock(key);
+        }
     }
 
     public static boolean tryLock(Object key) {
