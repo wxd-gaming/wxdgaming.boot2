@@ -23,19 +23,16 @@ import java.util.concurrent.locks.LockSupport;
 @Slf4j
 public class CacheDriverStampedLockTest {
 
-    static int area = 5;
-    static long heartTimeMs = 50000;
-    static long expireTimeMs = 1200000;
+    static int threadSize = 64;
     static long readSize = 65535;
-    static long maxSize = 600;
-    static int sleepTimeMs = 12000;
+    static long maxSize = 100;
 
     @BeforeEach
     void beforeEach() {
         if (ExecutorFactory.Lazy.instance != null) return;
         ExecutorProperties executorProperties = new ExecutorProperties();
         ExecutorConfig logic = new ExecutorConfig();
-        logic.setCoreSize(12).setMaxQueueSize(500000).setWarnSize(500000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
+        logic.setCoreSize(threadSize).setMaxQueueSize(500000).setWarnSize(500000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
         executorProperties.setLogic(logic);
         new ExecutorFactory(executorProperties);
     }
@@ -119,7 +116,7 @@ public class CacheDriverStampedLockTest {
         /*2秒钟读取过期缓存*/
         CacheDriverStampedLockImpl<Long, Object> cache = CacheDriverStampedLockImpl.<Long, Object>builder()
                 .cacheName("test")
-                .blockSize(32)
+                .blockSize(64)
                 .expireAfterAccess(Duration.ofSeconds(16))
                 .heartExpireAfterWrite(Duration.ofSeconds(5))
                 .loader(key -> key)
@@ -136,7 +133,7 @@ public class CacheDriverStampedLockTest {
     }
 
     public void singleThread(CacheDriverStampedLockImpl<Long, Object> cache) {
-        cache.invalidateAll();
+//        cache.invalidateAll();
         DiffTimeRecord diffTime = DiffTimeRecord.start4Ms();
         Object string = "";
         for (long i = 0; i < readSize; i++) {
@@ -150,7 +147,7 @@ public class CacheDriverStampedLockTest {
     }
 
     public void multiThread(CacheDriverStampedLockImpl<Long, Object> cache) throws Exception {
-        cache.invalidateAll();
+//        cache.invalidateAll();
         DiffTimeRecord diffTime = DiffTimeRecord.start4Ms();
         AtomicReference string = new AtomicReference();
         CountDownLatch latch = new CountDownLatch((int) readSize);

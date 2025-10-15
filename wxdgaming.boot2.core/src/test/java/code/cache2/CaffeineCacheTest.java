@@ -24,14 +24,17 @@ import java.util.concurrent.locks.LockSupport;
 @Slf4j
 public class CaffeineCacheTest {
 
-    static long maxSize = 655350;
+    static int threadSize = 64;
+    static long readSize = 65535;
+    static long maxSize = 100;
+
 
     @BeforeEach
     void beforeEach() {
         if (ExecutorFactory.Lazy.instance != null) return;
         ExecutorProperties executorProperties = new ExecutorProperties();
         ExecutorConfig logic = new ExecutorConfig();
-        logic.setCoreSize(12).setMaxQueueSize(500000).setWarnSize(500000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
+        logic.setCoreSize(threadSize).setMaxQueueSize(500000).setWarnSize(500000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
         executorProperties.setLogic(logic);
         new ExecutorFactory(executorProperties);
     }
@@ -67,7 +70,7 @@ public class CaffeineCacheTest {
         LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(8));
     }
 
-    @RepeatedTest(10)
+    @RepeatedTest(5)
     public void c10() throws Exception {
         /*2秒钟读取过期缓存*/
         CaffeineCacheImpl<Long, Object> caffeineCacheImpl = CaffeineCacheImpl.<Long, Object>builder()
@@ -92,12 +95,12 @@ public class CaffeineCacheTest {
         cache.invalidateAll();
         DiffTimeRecord diffTime = DiffTimeRecord.start4Ms();
         Object string = "";
-        for (long i = 0; i < maxSize; i++) {
+        for (long i = 0; i < readSize; i++) {
             string = cache.get(RandomUtils.random(maxSize));
         }
         log.info(
                 "{} 单线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}, 耗时：{}",
-                cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string), diffTime.interval()
+                cache.getCacheName(), readSize, cache.size(), JSON.toJSONString(string), diffTime.interval()
         );
         log.info("{} 缓存数量：{}, 内存 {}", cache.getCacheName(), cache.size(), ByteFormat.format(cache.memorySize()));
     }
@@ -106,8 +109,8 @@ public class CaffeineCacheTest {
         cache.invalidateAll();
         DiffTimeRecord diffTime = DiffTimeRecord.start4Ms();
         AtomicReference string = new AtomicReference();
-        CountDownLatch latch = new CountDownLatch((int) maxSize);
-        for (long i = 0; i < maxSize; i++) {
+        CountDownLatch latch = new CountDownLatch((int) readSize);
+        for (long i = 0; i < readSize; i++) {
             ExecutorFactory.getExecutorServiceLogic().execute(() -> {
                 string.set(cache.get(RandomUtils.random(maxSize)));
                 latch.countDown();
@@ -116,7 +119,7 @@ public class CaffeineCacheTest {
         latch.await();
         log.info(
                 "{} 多线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}, 耗时：{}",
-                cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string.get()), diffTime.interval()
+                cache.getCacheName(), readSize, cache.size(), JSON.toJSONString(string.get()), diffTime.interval()
         );
         log.info("{} 缓存数量：{}, 内存 {}", cache.getCacheName(), cache.size(), ByteFormat.format(cache.memorySize()));
     }

@@ -23,19 +23,16 @@ import java.util.concurrent.locks.LockSupport;
 @Slf4j
 public class CASCacheDriverTest {
 
-    static int area = 5;
-    static long heartTimeMs = 50000;
-    static long expireTimeMs = 1200000;
-    static long readSize = 655350;
-    static long maxSize = 65535;
-    static int sleepTimeMs = 12000;
+    static int threadSize = 64;
+    static long readSize = 65535;
+    static long maxSize = 100;
 
     @BeforeEach
     void beforeEach() {
         if (ExecutorFactory.Lazy.instance != null) return;
         ExecutorProperties executorProperties = new ExecutorProperties();
         ExecutorConfig logic = new ExecutorConfig();
-        logic.setCoreSize(12).setMaxQueueSize(500000).setWarnSize(500000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
+        logic.setCoreSize(threadSize).setMaxQueueSize(500000).setWarnSize(500000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
         executorProperties.setLogic(logic);
         new ExecutorFactory(executorProperties);
     }
