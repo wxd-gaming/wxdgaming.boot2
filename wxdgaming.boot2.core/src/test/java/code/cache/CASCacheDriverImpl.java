@@ -11,13 +11,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 /**
- * 加载缓存
+ * 加载缓存 容器
  *
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-07-03 10:57
  **/
 @Getter
-public class LoadingCacheImpl<K, V> {
+public class CASCacheDriverImpl<K, V> {
 
     static final Duration minHeartDuration = Duration.ofSeconds(5);
     static final Duration outerDuration = Duration.ofSeconds(2);
@@ -41,7 +41,7 @@ public class LoadingCacheImpl<K, V> {
     private final Predicate3<K, V, CacheDriver.RemovalCause> removalListener;
 
     @Builder
-    public LoadingCacheImpl(String cacheName, int blockSize, Duration heartExpireAfterWrite, Duration expireAfterAccess, Duration expireAfterWrite, Function<K, V> loader, Consumer3<K, V, CacheDriver.RemovalCause> heartListener, Predicate3<K, V, CacheDriver.RemovalCause> removalListener) {
+    public CASCacheDriverImpl(String cacheName, int blockSize, Duration heartExpireAfterWrite, Duration expireAfterAccess, Duration expireAfterWrite, Function<K, V> loader, Consumer3<K, V, CacheDriver.RemovalCause> heartListener, Predicate3<K, V, CacheDriver.RemovalCause> removalListener) {
         this.cacheName = cacheName;
         this.blockSize = blockSize;
         this.heartExpireAfterWrite = heartExpireAfterWrite == null ? heartDurationDefault : heartExpireAfterWrite;

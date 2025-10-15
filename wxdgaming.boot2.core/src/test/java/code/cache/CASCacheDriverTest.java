@@ -21,12 +21,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 
 @Slf4j
-public class LoadingCacheTest {
+public class CASCacheDriverTest {
 
     static int area = 5;
     static long heartTimeMs = 50000;
     static long expireTimeMs = 1200000;
-    static long maxSize = 655350;
+    static long readSize = 655350;
+    static long maxSize = 65535;
     static int sleepTimeMs = 12000;
 
     @BeforeEach
@@ -42,7 +43,7 @@ public class LoadingCacheTest {
     @Test
     public void c1() {
         /*2秒钟读取过期缓存*/
-        LoadingCacheImpl<String, Object> cache = LoadingCacheImpl.<String, Object>builder()
+        CASCacheDriverImpl<String, Object> cache = CASCacheDriverImpl.<String, Object>builder()
                 .expireAfterAccess(Duration.ofSeconds(16))
                 .heartExpireAfterWrite(Duration.ofSeconds(5))
                 .loader(key -> key)
@@ -74,7 +75,7 @@ public class LoadingCacheTest {
     @Test
     public void c2() {
         /*没有过期的缓存*/
-        LoadingCacheImpl<String, Object> cache = LoadingCacheImpl.<String, Object>builder()
+        CASCacheDriverImpl<String, Object> cache = CASCacheDriverImpl.<String, Object>builder()
                 .expireAfterAccess(null)
                 .expireAfterWrite(null)
                 .loader(key -> "value")
@@ -98,7 +99,7 @@ public class LoadingCacheTest {
     @Test
     public void c3() {
         /*没有过期的缓存*/
-        LoadingCacheImpl<String, Object> loadingCache = LoadingCacheImpl.<String, Object>builder()
+        CASCacheDriverImpl<String, Object> loadingCache = CASCacheDriverImpl.<String, Object>builder()
                 .expireAfterWrite(Duration.ofSeconds(5))
                 .heartExpireAfterWrite(Duration.ofSeconds(2))
                 .loader(key -> "value")
@@ -116,7 +117,7 @@ public class LoadingCacheTest {
     @RepeatedTest(10)
     public void c10() throws Exception {
         /*2秒钟读取过期缓存*/
-        LoadingCacheImpl<Long, Object> cache = LoadingCacheImpl.<Long, Object>builder()
+        CASCacheDriverImpl<Long, Object> cache = CASCacheDriverImpl.<Long, Object>builder()
                 .cacheName("test")
                 .blockSize(32)
                 .expireAfterAccess(Duration.ofSeconds(16))
@@ -134,26 +135,26 @@ public class LoadingCacheTest {
         multiThread(cache);
     }
 
-    public void singleThread(LoadingCacheImpl<Long, Object> cache) {
+    public void singleThread(CASCacheDriverImpl<Long, Object> cache) {
         cache.invalidateAll();
         DiffTimeRecord diffTime = DiffTimeRecord.start4Ms();
         Object string = "";
-        for (long i = 0; i < maxSize; i++) {
+        for (long i = 0; i < readSize; i++) {
             string = cache.get(RandomUtils.random(maxSize));
         }
         log.info(
                 "{} 单线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}, 耗时：{}",
-                cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string), diffTime.interval()
+                cache.getCacheName(), readSize, cache.size(), JSON.toJSONString(string), diffTime.interval()
         );
         log.info("{} 缓存数量：{}, 内存 {}", cache.getCacheName(), cache.size(), ByteFormat.format(cache.memorySize()));
     }
 
-    public void multiThread(LoadingCacheImpl<Long, Object> cache) throws Exception {
+    public void multiThread(CASCacheDriverImpl<Long, Object> cache) throws Exception {
         cache.invalidateAll();
         DiffTimeRecord diffTime = DiffTimeRecord.start4Ms();
         AtomicReference string = new AtomicReference();
-        CountDownLatch latch = new CountDownLatch((int) maxSize);
-        for (long i = 0; i < maxSize; i++) {
+        CountDownLatch latch = new CountDownLatch((int) readSize);
+        for (long i = 0; i < readSize; i++) {
             ExecutorFactory.getExecutorServiceLogic().execute(() -> {
                 string.set(cache.get(RandomUtils.random(maxSize)));
                 latch.countDown();
@@ -162,7 +163,7 @@ public class LoadingCacheTest {
         latch.await();
         log.info(
                 "{} 多线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}, 耗时：{}",
-                cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string.get()), diffTime.interval()
+                cache.getCacheName(), readSize, cache.size(), JSON.toJSONString(string.get()), diffTime.interval()
         );
         log.info("{} 缓存数量：{}, 内存 {}", cache.getCacheName(), cache.size(), ByteFormat.format(cache.memorySize()));
     }
