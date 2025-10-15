@@ -11,17 +11,17 @@ import java.util.concurrent.*;
 import java.util.function.Function;
 
 /**
- * 缓存驱动
+ * 缓存持有容器，通过blockSize 切割成多个容器，避免数据过多但容器太大
  *
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-07-03 10:57
  **/
-class CASCacheDriver<K, V> {
+class CASCacheHolder<K, V> {
 
     static final ScheduledExecutorService scheduledExecutorService = ExecutorFactory.newSingleThreadScheduledExecutor("cache-scheduled");
 
     protected final int blockSize;
-    protected List<CacheBlock> cacheAtomicReference;
+    protected List<CacheBlock> blockList;
     protected ScheduledFuture<?> scheduledFuture;
     /** 读取过期时间 */
     protected final Duration expireAfterAccess;
@@ -29,17 +29,7 @@ class CASCacheDriver<K, V> {
     protected final Duration expireAfterWrite;
 
     protected final Function<K, V> loader;
-    protected final Predicate3<K, V, RemovalCause> removalListener;
-
-    public enum RemovalCause {
-        /** 替换 */
-        REPLACED,
-        /** 过期删除 */
-        EXPIRE,
-        /** 手动删除 */
-        EXPLICIT,
-        ;
-    }
+    protected final Predicate3<K, V, CASCache.RemovalCause> removalListener;
 
     protected class CacheNode implements Comparable<CacheNode> {
 
@@ -86,6 +76,7 @@ class CASCacheDriver<K, V> {
         }
     }
 
+    /** 容器快 */
     protected class CacheBlock {
         /** 区块锁 */
         final ConcurrentHashMap<K, CacheNode> nodeMap = new ConcurrentHashMap<>();
@@ -97,7 +88,7 @@ class CASCacheDriver<K, V> {
             if (oldNode != null) {
                 expireSet.remove(oldNode);
                 if (!Objects.equals(oldNode.value, value)) {
-                    onRemove(oldNode, RemovalCause.REPLACED);
+                    onRemove(oldNode, CASCache.RemovalCause.REPLACED);
                 }
             }
             expireSet.add(newNode);
@@ -111,16 +102,17 @@ class CASCacheDriver<K, V> {
                 V value = loader.apply(key);
                 if (value == null)
                     return null;
-                return new CacheNode(key, value);
+                CacheNode loadNode = new CacheNode(key, value);
+                expireSet.add(loadNode);
+                return loadNode;
             });
             if (cacheNode != null && expireAfterWrite == null) {
                 /*TODO 固定缓存不需要刷新，因为时间不会边*/
                 expireSet.remove(cacheNode);
                 cacheNode.refresh(false);
                 expireSet.add(cacheNode);
-                return cacheNode.value;
             }
-            return null;
+            return cacheNode == null ? null : cacheNode.value;
         }
 
         public int size() {
@@ -134,7 +126,11 @@ class CASCacheDriver<K, V> {
     }
 
     @Builder
-    public CASCacheDriver(int blockSize, Duration expireAfterAccess, Duration expireAfterWrite, Function<K, V> loader, Predicate3<K, V, RemovalCause> removalListener) {
+    public CASCacheHolder(int blockSize,
+                          Duration expireAfterAccess,
+                          Duration expireAfterWrite,
+                          Function<K, V> loader,
+                          Predicate3<K, V, CASCache.RemovalCause> removalListener) {
 
         if (expireAfterAccess != null && expireAfterWrite != null)
             throw new RuntimeException("expireAfterAccess or expireAfterWrite");
@@ -150,9 +146,9 @@ class CASCacheDriver<K, V> {
 
 
     private void init() {
-        cacheAtomicReference = new ArrayList<>(blockSize);
+        blockList = new ArrayList<>(blockSize);
         for (int i = 0; i < this.blockSize; i++) {
-            cacheAtomicReference.add(new CacheBlock());
+            blockList.add(new CacheBlock());
         }
 
         if (expireAfterAccess != null || expireAfterWrite != null) {
@@ -160,10 +156,14 @@ class CASCacheDriver<K, V> {
             if (delay < 1000)
                 throw new RuntimeException("expire < 1s");
             delay = delay / 100;
-            scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(this::onCleanup, delay, delay, TimeUnit.MILLISECONDS);
+            scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> onCleanup(CASCache.RemovalCause.EXPIRE), delay, delay, TimeUnit.MILLISECONDS);
         } else {
             AssertUtil.notNull(this.removalListener, "removalListener 非空 请配置过期时间");
         }
+    }
+
+    public void close() {
+        scheduledFuture.cancel(true);
     }
 
     private int getBlockIndex(K key) {
@@ -171,43 +171,45 @@ class CASCacheDriver<K, V> {
     }
 
     public long size() {
-        return cacheAtomicReference.stream().mapToLong(CacheBlock::size).sum();
+        return blockList.stream().mapToLong(CacheBlock::size).sum();
     }
 
     public void put(K key, V value) {
         int blockIndex = getBlockIndex(key);
-        cacheAtomicReference.get(blockIndex).put(key, value);
+        blockList.get(blockIndex).put(key, value);
     }
 
     public V get(K key) {
         int blockIndex = getBlockIndex(key);
-        return cacheAtomicReference.get(blockIndex).get(key);
+        return blockList.get(blockIndex).get(key);
     }
 
     public void invalidate(K k) {
-        invalidate(k, RemovalCause.EXPLICIT);
+        invalidate(k, CASCache.RemovalCause.EXPLICIT);
     }
 
-    public void invalidate(K k, RemovalCause cause) {
-        scheduledExecutorService.execute(() -> {
-            int blockIndex = getBlockIndex(k);
-            CacheBlock cacheBlock = cacheAtomicReference.get(blockIndex);
-            CacheNode remove = cacheBlock.nodeMap.remove(k);
-            if (remove != null) {
-                cacheBlock.expireSet.remove(remove);
-                onRemove(remove, cause);
-            }
-        });
+    public void invalidate(K k, CASCache.RemovalCause cause) {
+        int blockIndex = getBlockIndex(k);
+        CacheBlock cacheBlock = blockList.get(blockIndex);
+        CacheNode remove = cacheBlock.nodeMap.remove(k);
+        if (remove != null) {
+            cacheBlock.expireSet.remove(remove);
+            onRemove(remove, cause);
+        }
     }
 
     /** 强制过期所有 */
     public void invalidateAll() {
+        invalidateAll(CASCache.RemovalCause.EXPIRE);
+    }
+
+    public void invalidateAll(CASCache.RemovalCause removalCause) {
         scheduledExecutorService.execute(() -> {
-            for (CacheBlock cacheBlock : cacheAtomicReference) {
+            for (CacheBlock cacheBlock : blockList) {
                 Iterator<CacheNode> iterator = cacheBlock.expireSet.iterator();
                 while (iterator.hasNext()) {
                     CacheNode cacheNode = iterator.next();
-                    onRemove(cacheNode, RemovalCause.EXPIRE);
+                    onRemove(cacheNode, removalCause);
                     iterator.remove();
                     cacheBlock.nodeMap.remove(cacheNode.key);
                 }
@@ -217,18 +219,22 @@ class CASCacheDriver<K, V> {
 
     /** 强制刷新，定时清理过期数据可能出现延迟，所以也可以手动调用清理 */
     public void cleanup() {
-        scheduledExecutorService.execute(this::onCleanup);
+        scheduledExecutorService.execute(() -> onCleanup(CASCache.RemovalCause.EXPIRE));
     }
 
-    private void onCleanup() {
-        for (CacheBlock cacheBlock : cacheAtomicReference) {
+    public void cleanup(CASCache.RemovalCause removalCause) {
+        scheduledExecutorService.execute(() -> onCleanup(removalCause));
+    }
+
+    private void onCleanup(CASCache.RemovalCause removalCause) {
+        for (CacheBlock cacheBlock : blockList) {
             Iterator<CacheNode> iterator = cacheBlock.expireSet.iterator();
             while (iterator.hasNext()) {
                 CacheNode cacheNode = iterator.next();
                 if (cacheNode.expireTime > System.currentTimeMillis()) {
                     break;
                 }
-                if (onRemove(cacheNode, RemovalCause.EXPIRE)) {
+                if (onRemove(cacheNode, removalCause)) {
                     iterator.remove();
                     cacheBlock.nodeMap.remove(cacheNode.key);
                 } else {
@@ -240,9 +246,9 @@ class CASCacheDriver<K, V> {
         }
     }
 
-    private boolean onRemove(CacheNode cacheNode, RemovalCause cause) {
+    private boolean onRemove(CacheNode cacheNode, CASCache.RemovalCause cause) {
         if (cacheNode != null) {
-            if (removalListener != null && !cause.equals(RemovalCause.REPLACED)) {
+            if (removalListener != null) {
                 return removalListener.test(cacheNode.key, cacheNode.value, cause);
             }
         }

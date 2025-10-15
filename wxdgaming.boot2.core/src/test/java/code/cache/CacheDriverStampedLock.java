@@ -129,28 +129,26 @@ class CacheDriverStampedLock<K, V> {
                 long writeLock = stampedLock.writeLock();
                 try {
                     cacheNode = nodeMap.get(key);
-                    if (cacheNode != null) {
-                        return cacheNode.value;
+                    if (cacheNode == null) {
+                        V loadValue = loader.apply(key);
+                        if (loadValue == null)
+                            return null;
+                        cacheNode = new CacheNode(key, loadValue);
+                        expireSet.add(cacheNode);
+                        nodeMap.put(key, cacheNode);
+                        return loadValue;
                     }
-                    V loadValue = loader.apply(key);
-                    if (loadValue == null)
-                        return null;
-                    cacheNode = new CacheNode(key, loadValue);
-                    expireSet.add(cacheNode);
-                    nodeMap.put(key, cacheNode);
-                    return loadValue;
                 } finally {
                     stampedLock.unlockWrite(writeLock);
                 }
-            } else {
-                if (expireAfterWrite == null) {
-                    /*TODO 固定缓存不需要刷新，因为时间不会边*/
-                    expireSet.remove(cacheNode);
-                    cacheNode.refresh(false);
-                    expireSet.add(cacheNode);
-                }
-                return cacheNode.value;
             }
+            if (expireAfterWrite == null) {
+                /*TODO 固定缓存不需要刷新，因为时间不会边*/
+                expireSet.remove(cacheNode);
+                cacheNode.refresh(false);
+                expireSet.add(cacheNode);
+            }
+            return cacheNode.value;
         }
 
         public int size() {

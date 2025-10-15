@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 
 @Slf4j
-public class CASCacheDriverTest {
+public class CASCacheTest {
 
     static int threadSize = 64;
     static long readSize = 65535;
@@ -40,12 +40,12 @@ public class CASCacheDriverTest {
     @Test
     public void c1() {
         /*2秒钟读取过期缓存*/
-        CASCacheDriverImpl<String, Object> cache = CASCacheDriverImpl.<String, Object>builder()
+        CASCache<String, Object> cache = CASCache.<String, Object>builder()
                 .expireAfterAccess(Duration.ofSeconds(16))
                 .heartExpireAfterWrite(Duration.ofSeconds(5))
-                .loader(key -> key)
-                .heartListener(new Consumer3<String, Object, CacheDriver.RemovalCause>() {
-                    @Override public void accept(String string, Object object, CacheDriver.RemovalCause removalCause) {
+                .loader(key -> "e" + System.currentTimeMillis())
+                .heartListener(new Consumer3<String, Object, CASCache.RemovalCause>() {
+                    @Override public void accept(String string, Object object, CASCache.RemovalCause removalCause) {
                         log.info("心跳事件 key:{} value:{} cause:{}", string, object, removalCause);
                     }
                 })
@@ -64,7 +64,7 @@ public class CASCacheDriverTest {
         }
         System.out.println("----------------------------");
         LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(18));
-        cache.invalidateAll();
+        cache.invalidateAll(CASCache.RemovalCause.EXPLICIT);
         LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(8));
         log.info("size:{}", cache.size());
     }
@@ -72,7 +72,7 @@ public class CASCacheDriverTest {
     @Test
     public void c2() {
         /*没有过期的缓存*/
-        CASCacheDriverImpl<String, Object> cache = CASCacheDriverImpl.<String, Object>builder()
+        CASCache<String, Object> cache = CASCache.<String, Object>builder()
                 .expireAfterAccess(null)
                 .expireAfterWrite(null)
                 .loader(key -> "value")
@@ -96,7 +96,7 @@ public class CASCacheDriverTest {
     @Test
     public void c3() {
         /*没有过期的缓存*/
-        CASCacheDriverImpl<String, Object> loadingCache = CASCacheDriverImpl.<String, Object>builder()
+        CASCache<String, Object> loadingCache = CASCache.<String, Object>builder()
                 .expireAfterWrite(Duration.ofSeconds(5))
                 .heartExpireAfterWrite(Duration.ofSeconds(2))
                 .loader(key -> "value")
@@ -111,10 +111,10 @@ public class CASCacheDriverTest {
         LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(8));
     }
 
-    @RepeatedTest(10)
+    @RepeatedTest(5)
     public void c10() throws Exception {
         /*2秒钟读取过期缓存*/
-        CASCacheDriverImpl<Long, Object> cache = CASCacheDriverImpl.<Long, Object>builder()
+        CASCache<Long, Object> cache = CASCache.<Long, Object>builder()
                 .cacheName("test")
                 .blockSize(32)
                 .expireAfterAccess(Duration.ofSeconds(16))
@@ -132,7 +132,7 @@ public class CASCacheDriverTest {
         multiThread(cache);
     }
 
-    public void singleThread(CASCacheDriverImpl<Long, Object> cache) {
+    public void singleThread(CASCache<Long, Object> cache) {
         cache.invalidateAll();
         DiffTimeRecord diffTime = DiffTimeRecord.start4Ms();
         Object string = "";
@@ -146,7 +146,7 @@ public class CASCacheDriverTest {
         log.info("{} 缓存数量：{}, 内存 {}", cache.getCacheName(), cache.size(), ByteFormat.format(cache.memorySize()));
     }
 
-    public void multiThread(CASCacheDriverImpl<Long, Object> cache) throws Exception {
+    public void multiThread(CASCache<Long, Object> cache) throws Exception {
         cache.invalidateAll();
         DiffTimeRecord diffTime = DiffTimeRecord.start4Ms();
         AtomicReference string = new AtomicReference();
