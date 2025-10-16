@@ -2,7 +2,11 @@ package wxdgaming.boot2.core.collection;
 
 import com.alibaba.fastjson.annotation.JSONType;
 import io.netty.util.collection.IntObjectHashMap;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -14,8 +18,12 @@ import java.util.function.Function;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2023-10-09 10:08
  */
+@Getter
+@Setter
 @JSONType(seeAlso = {HashMap.class})
-public class IntTable<V> {
+public class IntTable<V> implements Serializable {
+
+    @Serial private static final long serialVersionUID = 1L;
 
     private IntObjectHashMap<IntObjectHashMap<V>> maps = new IntObjectHashMap<>();
 

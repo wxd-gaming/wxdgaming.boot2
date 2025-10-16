@@ -1,27 +1,33 @@
 package wxdgaming.boot2.core.collection;
 
 
-import com.alibaba.fastjson.annotation.JSONType;
+import lombok.Getter;
+import lombok.Setter;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.LongBinaryOperator;
 import java.util.function.LongUnaryOperator;
 
 /** 非线程安全的 */
-@JSONType(seeAlso = {HashMap.class})
-public class ObjLongMap<K> extends HashMap<K, Long> implements Map<K, Long> {
+@Getter
+@Setter
+public class ObjLongMap<K> implements Serializable {
 
+    @Serial private static final long serialVersionUID = 1L;
+
+    final HashMap<K, Long> map = new HashMap<>();
 
     /** 会覆盖数据 */
-    public long putCount(K key, long newValue) {
-        return getAndUpdate(key, x -> newValue);
+    public Long put(K key, long newValue) {
+        return map.put(key, newValue);
     }
 
     public long sum() {
-        return this.values().stream().mapToLong(Long::longValue).sum();
+        return map.values().stream().mapToLong(Long::longValue).sum();
     }
 
     /** 获取到最新的数据 +1 */
@@ -56,12 +62,12 @@ public class ObjLongMap<K> extends HashMap<K, Long> implements Map<K, Long> {
 
     /** 获取到最新的数据 */
     public long updateAndGet(K key, LongUnaryOperator updaterFunction) {
-        return this.compute(key, (k, value) -> updaterFunction.applyAsLong((value == null) ? 0L : value));
+        return map.compute(key, (k, value) -> updaterFunction.applyAsLong((value == null) ? 0L : value));
     }
 
     private long getAndUpdate(K key, LongUnaryOperator updaterFunction) {
         AtomicLong holder = new AtomicLong();
-        this.compute(
+        map.compute(
                 key,
                 (k, value) -> {
                     long oldValue = (value == null) ? 0L : value;
@@ -81,22 +87,21 @@ public class ObjLongMap<K> extends HashMap<K, Long> implements Map<K, Long> {
 
     /** 当前值和最新值谁大，用谁 */
     public long max(K key, long value) {
-        return super.merge(key, value, Math::max);
+        return map.merge(key, value, Math::max);
     }
 
     /** 当前值和最新值谁小，用谁 */
     public long min(K key, long value) {
-        return super.merge(key, value, Math::min);
+        return map.merge(key, value, Math::min);
     }
 
     public long getCount(K key) {
-        return this.getOrDefault(key, 0L);
+        return map.getOrDefault(key, 0L);
     }
 
     /** 重写了方法，获取的值，如果不存在返回 0 而不是null */
-    @Override
-    public Long get(Object key) {
-        return super.getOrDefault(key, 0L);
+    public Long get(K key) {
+        return map.getOrDefault(key, 0L);
     }
 
     @Override public String toString() {

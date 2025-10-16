@@ -3,6 +3,8 @@ package wxdgaming.boot2.core.collection;
 import lombok.Getter;
 import wxdgaming.boot2.core.util.RandomUtils;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +16,9 @@ import java.util.Map;
  * @version 2025-10-16 14:40
  **/
 @Getter
-public class RandomList<T> {
+public class RandomList<T> implements Serializable {
+
+    @Serial private static final long serialVersionUID = 1L;
 
     private Map<T, Integer> map = new HashMap<>();
     private List<T> list = ListOf.newArrayList();
@@ -36,6 +40,7 @@ public class RandomList<T> {
     }
 
     public T random() {
+        if (list.isEmpty()) return null;
         return list.get(RandomUtils.random(list.size()));
     }
 

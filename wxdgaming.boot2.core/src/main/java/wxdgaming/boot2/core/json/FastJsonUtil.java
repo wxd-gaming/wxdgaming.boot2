@@ -26,6 +26,8 @@ public class FastJsonUtil {
 
     /** 默认值 */
     public static final SerializerFeature[] Writer_Features;
+    /** 带排序 */
+    public static final SerializerFeature[] Writer_Features_Sort;
     /** 格式化 */
     public static final SerializerFeature[] Writer_Features_Fmt;
     /** 写入字段类型 */
@@ -75,19 +77,18 @@ public class FastJsonUtil {
                 SerializerFeature.WriteNullStringAsEmpty,           /*String字段如果为null,输出为"",而非null*/
                 SerializerFeature.SkipTransientField,               /*忽律 transient*/
                 SerializerFeature.WriteEnumUsingName,               /*枚举用 toString() */
-                // SerializerFeature.IgnoreNonFieldGetter,             /*忽略 没有 get 属性 继续写入*/
                 SerializerFeature.DisableCircularReferenceDetect,   /*屏蔽循环引用*/
-                SerializerFeature.SortField,                        /*排序*/
-                SerializerFeature.MapSortField                      /*排序*/
         };
 
         Reader_Features = new Feature[]{Feature.IgnoreAutoType};
 
-        Writer_Features_Fmt = ArrayUtils.add(Writer_Features, SerializerFeature.PrettyFormat);
+        Writer_Features_Fmt = ArrayUtils.addAll(Writer_Features, SerializerFeature.PrettyFormat);
 
-        Writer_Features_Type_Name = ArrayUtils.add(Writer_Features, SerializerFeature.WriteClassName);
+        Writer_Features_Sort = ArrayUtils.addAll(Writer_Features, SerializerFeature.SortField, SerializerFeature.MapSortField);
 
-        Writer_Features_Type_Name_NOT_ROOT = ArrayUtils.add(Writer_Features_Type_Name, SerializerFeature.NotWriteRootClassName);
+        Writer_Features_Type_Name = ArrayUtils.addAll(Writer_Features, SerializerFeature.WriteClassName);
+
+        Writer_Features_Type_Name_NOT_ROOT = ArrayUtils.addAll(Writer_Features_Type_Name, SerializerFeature.NotWriteRootClassName);
 
         Writer_Features_Type_Name_Fmt = ArrayUtils.add(Writer_Features_Type_Name, SerializerFeature.PrettyFormat);
 

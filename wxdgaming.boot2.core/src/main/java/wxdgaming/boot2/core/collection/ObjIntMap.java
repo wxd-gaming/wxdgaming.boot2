@@ -1,21 +1,32 @@
 package wxdgaming.boot2.core.collection;
 
 
-import com.alibaba.fastjson.annotation.JSONType;
+import lombok.Getter;
+import lombok.Setter;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntBinaryOperator;
 import java.util.function.IntUnaryOperator;
 
 /** 非线程安全的 */
-@JSONType(seeAlso = {HashMap.class})
-public class ObjIntMap<K> extends HashMap<K, Integer> implements Map<K, Integer> {
+@Getter
+@Setter
+public class ObjIntMap<K> implements Serializable {
+
+    @Serial private static final long serialVersionUID = 1L;
+
+    private final HashMap<K, Integer> map = new HashMap<>();
 
     public int getCount(K key) {
-        return this.getOrDefault(key, 0);
+        return map.getOrDefault(key, 0);
+    }
+
+    public Integer put(K key, int newValue) {
+        return map.put(key, newValue);
     }
 
     public int putCount(K key, int newValue) {
@@ -23,7 +34,7 @@ public class ObjIntMap<K> extends HashMap<K, Integer> implements Map<K, Integer>
     }
 
     public int sum() {
-        return this.values().stream().mapToInt(Integer::intValue).sum();
+        return map.values().stream().mapToInt(Integer::intValue).sum();
     }
 
     /** 获取到最新的数据 */
@@ -58,13 +69,13 @@ public class ObjIntMap<K> extends HashMap<K, Integer> implements Map<K, Integer>
 
     /** 更新新数据 */
     public int updateAndGet(K key, IntUnaryOperator updaterFunction) {
-        return this.compute(key, (k, value) -> updaterFunction.applyAsInt((value == null) ? 0 : value));
+        return map.compute(key, (k, value) -> updaterFunction.applyAsInt((value == null) ? 0 : value));
     }
 
     /** 返回老数据，更新新数据 */
     private int getAndUpdate(K key, IntUnaryOperator updaterFunction) {
         AtomicInteger holder = new AtomicInteger();
-        this.compute(
+        map.compute(
                 key,
                 (k, value) -> {
                     int oldValue = (value == null) ? 0 : value;
@@ -86,18 +97,17 @@ public class ObjIntMap<K> extends HashMap<K, Integer> implements Map<K, Integer>
 
     /** 当前值和最新值谁大，用谁 */
     public int max(K key, int value) {
-        return super.merge(key, value, Math::max);
+        return map.merge(key, value, Math::max);
     }
 
     /** 当前值和最新值谁小，用谁 */
     public int min(K key, int value) {
-        return super.merge(key, value, Math::min);
+        return map.merge(key, value, Math::min);
     }
 
     /** 重写了方法，获取的值，如果不存在返回 0 而不是null */
-    @Override
-    public Integer get(Object key) {
-        return super.getOrDefault(key, 0);
+    public Integer get(K key) {
+        return map.getOrDefault(key, 0);
     }
 
     @Override public String toString() {

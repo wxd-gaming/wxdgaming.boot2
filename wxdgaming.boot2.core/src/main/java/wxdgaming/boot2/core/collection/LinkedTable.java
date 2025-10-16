@@ -3,9 +3,9 @@ package wxdgaming.boot2.core.collection;
 import com.alibaba.fastjson.annotation.JSONType;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.format.data.Data2Json;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Consumer;
@@ -20,9 +20,10 @@ import java.util.function.Predicate;
  **/
 @Getter
 @Setter
-@Accessors(chain = true)
 @JSONType(seeAlso = {HashMap.class})
 public class LinkedTable<K1, K2, V> implements Serializable, Data2Json {
+
+    @Serial private static final long serialVersionUID = 1L;
 
     private static final Map EMPTY_MAP = Collections.emptyMap();
 

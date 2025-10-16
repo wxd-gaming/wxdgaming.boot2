@@ -1,12 +1,12 @@
 package wxdgaming.boot2.core.collection.concurrent;
 
 
-import com.alibaba.fastjson.annotation.JSONType;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
-import java.util.Map;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntBinaryOperator;
@@ -15,11 +15,14 @@ import java.util.function.IntUnaryOperator;
 /** 线程安全的 */
 @Getter
 @Setter
-@JSONType(seeAlso = {ConcurrentHashMap.class})
-public class ConcurrentObjIntMap<K> extends ConcurrentHashMap<K, Integer> implements Map<K, Integer> {
+public class ConcurrentObjIntMap<K> implements Serializable {
+
+    @Serial private static final long serialVersionUID = 1L;
+
+    final ConcurrentHashMap<K, Integer> map = new ConcurrentHashMap<>();
 
     public int getCount(K key) {
-        return this.getOrDefault(key, 0);
+        return map.getOrDefault(key, 0);
     }
 
     public int putCount(K key, int newValue) {
@@ -27,7 +30,7 @@ public class ConcurrentObjIntMap<K> extends ConcurrentHashMap<K, Integer> implem
     }
 
     public int sum() {
-        return this.values().stream().mapToInt(Integer::intValue).sum();
+        return map.values().stream().mapToInt(Integer::intValue).sum();
     }
 
     /** 获取到最新的数据 */
@@ -62,13 +65,13 @@ public class ConcurrentObjIntMap<K> extends ConcurrentHashMap<K, Integer> implem
 
     /** 更新新数据 */
     public int updateAndGet(K key, IntUnaryOperator updaterFunction) {
-        return this.compute(key, (k, value) -> updaterFunction.applyAsInt((value == null) ? 0 : value));
+        return map.compute(key, (k, value) -> updaterFunction.applyAsInt((value == null) ? 0 : value));
     }
 
     /** 返回老数据，更新新数据 */
     private int getAndUpdate(K key, IntUnaryOperator updaterFunction) {
         AtomicInteger holder = new AtomicInteger();
-        this.compute(
+        map.compute(
                 key,
                 (k, value) -> {
                     int oldValue = (value == null) ? 0 : value;
@@ -90,18 +93,17 @@ public class ConcurrentObjIntMap<K> extends ConcurrentHashMap<K, Integer> implem
 
     /** 当前值和最新值谁大，用谁 */
     public int max(K key, int value) {
-        return super.merge(key, value, Math::max);
+        return map.merge(key, value, Math::max);
     }
 
     /** 当前值和最新值谁大，用谁 */
     public int min(K key, int value) {
-        return super.merge(key, value, Math::min);
+        return map.merge(key, value, Math::min);
     }
 
     /** 重写了方法，获取的值，如果不存在返回 0 而不是null */
-    @Override
-    public Integer get(Object key) {
-        return super.getOrDefault(key, 0);
+    public Integer get(K key) {
+        return map.getOrDefault(key, 0);
     }
 
     @Override public String toString() {

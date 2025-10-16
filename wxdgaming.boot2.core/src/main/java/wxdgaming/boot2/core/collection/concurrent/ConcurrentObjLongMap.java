@@ -1,19 +1,25 @@
 package wxdgaming.boot2.core.collection.concurrent;
 
 
-import com.alibaba.fastjson.annotation.JSONType;
+import lombok.Getter;
+import lombok.Setter;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
-import java.util.Map;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.LongBinaryOperator;
 import java.util.function.LongUnaryOperator;
 
 /** 线程安全的 */
-@JSONType(seeAlso = {ConcurrentHashMap.class})
-public class ConcurrentObjLongMap<K> extends ConcurrentHashMap<K, Long> implements Map<K, Long> {
+@Getter
+@Setter
+public class ConcurrentObjLongMap<K> implements Serializable {
 
+    @Serial private static final long serialVersionUID = 1L;
+
+    final ConcurrentHashMap<K, Long> map = new ConcurrentHashMap<>();
 
     /** 会覆盖数据 */
     public long putCount(K key, long newValue) {
@@ -21,7 +27,7 @@ public class ConcurrentObjLongMap<K> extends ConcurrentHashMap<K, Long> implemen
     }
 
     public long sum() {
-        return this.values().stream().mapToLong(Long::longValue).sum();
+        return map.values().stream().mapToLong(Long::longValue).sum();
     }
 
     /** 获取到最新的数据 +1 */
@@ -56,12 +62,12 @@ public class ConcurrentObjLongMap<K> extends ConcurrentHashMap<K, Long> implemen
 
     /** 获取到最新的数据 */
     public long updateAndGet(K key, LongUnaryOperator updaterFunction) {
-        return this.compute(key, (k, value) -> updaterFunction.applyAsLong((value == null) ? 0L : value));
+        return map.compute(key, (k, value) -> updaterFunction.applyAsLong((value == null) ? 0L : value));
     }
 
     private long getAndUpdate(K key, LongUnaryOperator updaterFunction) {
         AtomicLong holder = new AtomicLong();
-        this.compute(
+        map.compute(
                 key,
                 (k, value) -> {
                     long oldValue = (value == null) ? 0L : value;
@@ -81,22 +87,21 @@ public class ConcurrentObjLongMap<K> extends ConcurrentHashMap<K, Long> implemen
 
     /** 当前值和最新值谁大，用谁 */
     public long max(K key, long value) {
-        return super.merge(key, value, Math::max);
+        return map.merge(key, value, Math::max);
     }
 
     /** 当前值和最新值谁大，用谁 */
     public long min(K key, long value) {
-        return super.merge(key, value, Math::min);
+        return map.merge(key, value, Math::min);
     }
 
     public long getCount(K key) {
-        return this.getOrDefault(key, 0L);
+        return map.getOrDefault(key, 0L);
     }
 
     /** 重写了方法，获取的值，如果不存在返回 0 而不是null */
-    @Override
-    public Long get(Object key) {
-        return super.getOrDefault(key, 0L);
+    public Long get(K key) {
+        return map.getOrDefault(key, 0L);
     }
 
     @Override public String toString() {
