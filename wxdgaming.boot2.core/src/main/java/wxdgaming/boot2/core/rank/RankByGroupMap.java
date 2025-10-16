@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.rank;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.util.AssertUtil;
@@ -25,29 +26,30 @@ public class RankByGroupMap {
     private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
     private final ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
 
-    private final HashMap<String, RankScore> map = new HashMap<>();
-    private final TreeMap<Long, TreeSet<RankScore>> rankScoreMap = new TreeMap<>(Comparator.reverseOrder());
+    private final HashMap<String, RankElement> map = new HashMap<>();
+    @JSONField(serialize = false, deserialize = false)
+    private final transient TreeMap<Long, TreeSet<RankElement>> rankScoreMap = new TreeMap<>(Comparator.reverseOrder());
 
     public RankByGroupMap() {
 
     }
 
-    public RankByGroupMap(List<RankScore> rankScores) {
-        push(rankScores);
+    public RankByGroupMap(List<RankElement> rankElements) {
+        push(rankElements);
     }
 
     /** 所有的排行 */
-    private void push(List<RankScore> rankScores) {
+    private void push(List<RankElement> rankElements) {
         writeLock.lock();
         try {
-            rankScores.forEach(rankScore -> {
-                RankScore oldRankScore = map.get(rankScore.getKey());
-                long oldScore = oldRankScore.getScore();
+            rankElements.forEach(rankScore -> {
+                RankElement oldRankElement = map.get(rankScore.getKey());
+                long oldScore = oldRankElement.getScore();
                 if (oldScore != rankScore.getScore()) {
-                    TreeSet<RankScore> oldRankScoreSet = rankScoreMap.get(oldScore);
-                    if (oldRankScoreSet != null) {
-                        oldRankScoreSet.remove(oldRankScore);
-                        if (oldRankScoreSet.isEmpty()) {
+                    TreeSet<RankElement> oldRankElementSet = rankScoreMap.get(oldScore);
+                    if (oldRankElementSet != null) {
+                        oldRankElementSet.remove(oldRankElement);
+                        if (oldRankElementSet.isEmpty()) {
                             rankScoreMap.remove(oldScore);
                         }
                     }
@@ -66,7 +68,7 @@ public class RankByGroupMap {
      * @param key      用户ID
      * @param newScore 新的分数
      */
-    public RankScore updateScore(String key, long newScore) {
+    public RankElement updateScore(String key, long newScore) {
         return updateScore(key, newScore, System.nanoTime());
     }
 
@@ -77,26 +79,26 @@ public class RankByGroupMap {
      * @param newScore  分数
      * @param timestamp 时间戳,建议使用 {@link System#nanoTime()}
      */
-    public RankScore updateScore(String key, long newScore, long timestamp) {
+    public RankElement updateScore(String key, long newScore, long timestamp) {
         writeLock.lock();
         try {
-            RankScore rankScore = map.computeIfAbsent(key, k -> new RankScore().setKey(key));
-            long oldScore = rankScore.getScore();
+            RankElement rankElement = map.computeIfAbsent(key, k -> new RankElement().setKey(key));
+            long oldScore = rankElement.getScore();
             if (oldScore != newScore) {
-                TreeSet<RankScore> oldRankScoreSet = rankScoreMap.get(oldScore);
-                if (oldRankScoreSet != null) {
-                    oldRankScoreSet.remove(rankScore);
-                    if (oldRankScoreSet.isEmpty()) {
+                TreeSet<RankElement> oldRankElementSet = rankScoreMap.get(oldScore);
+                if (oldRankElementSet != null) {
+                    oldRankElementSet.remove(rankElement);
+                    if (oldRankElementSet.isEmpty()) {
                         rankScoreMap.remove(oldScore);
                     }
                 }
 
-                rankScore.setScore(newScore);
-                rankScore.setTimestamp(timestamp);
+                rankElement.setScore(newScore);
+                rankElement.setTimestamp(timestamp);
                 // 插入新的ScoreKey
-                rankScoreMap.computeIfAbsent(newScore, l -> new TreeSet<>()).add(rankScore);
+                rankScoreMap.computeIfAbsent(newScore, l -> new TreeSet<>()).add(rankElement);
             }
-            return rankScore;
+            return rankElement;
         } finally {
             writeLock.unlock();
         }
@@ -105,16 +107,16 @@ public class RankByGroupMap {
     public int rank(String key) {
         readLock.lock();
         try {
-            RankScore rankScore = map.get(key);
-            if (rankScore == null) {
+            RankElement rankElement = map.get(key);
+            if (rankElement == null) {
                 return -1;
             }
             int rank = 0;
-            for (Map.Entry<Long, TreeSet<RankScore>> entry : rankScoreMap.entrySet()) {
-                if (entry.getKey() > rankScore.getScore()) {
+            for (Map.Entry<Long, TreeSet<RankElement>> entry : rankScoreMap.entrySet()) {
+                if (entry.getKey() > rankElement.getScore()) {
                     rank += entry.getValue().size();
                 } else {
-                    for (RankScore value : entry.getValue()) {
+                    for (RankElement value : entry.getValue()) {
                         rank++;
                         if (value.getKey().equals(key)) {
                             return rank;
@@ -130,18 +132,18 @@ public class RankByGroupMap {
     }
 
     public long score(String key) {
-        RankScore rankScore = map.get(key);
-        if (rankScore == null) {
+        RankElement rankElement = map.get(key);
+        if (rankElement == null) {
             return -1;
         }
-        return rankScore.getScore();
+        return rankElement.getScore();
     }
 
-    public RankScore rankData(String key) {
+    public RankElement rankData(String key) {
         return map.get(key);
     }
 
-    public RankScore rankDataByRank(final int rank) {
+    public RankElement rankDataByRank(final int rank) {
         readLock.lock();
         try {
             AssertUtil.isTrue(rank > 0, "rank must be greater than 0");
@@ -149,11 +151,11 @@ public class RankByGroupMap {
                 return null;
             }
             int currentRank = 0;
-            for (Map.Entry<Long, TreeSet<RankScore>> entry : rankScoreMap.entrySet()) {
+            for (Map.Entry<Long, TreeSet<RankElement>> entry : rankScoreMap.entrySet()) {
                 if (entry.getValue().size() + currentRank < rank) {
                     currentRank += entry.getValue().size();
                 } else {
-                    for (RankScore value : entry.getValue()) {
+                    for (RankElement value : entry.getValue()) {
                         currentRank++;
                         if (currentRank >= rank) {
                             return value;
@@ -167,18 +169,18 @@ public class RankByGroupMap {
         }
     }
 
-    public List<RankScore> rankByRange(int startRank, int endRank) {
+    public List<RankElement> rankByRange(int startRank, int endRank) {
         return rankByRange(startRank, true, endRank, true);
     }
 
-    public List<RankScore> rankByRange(int startRank, boolean hasStart, int endRank, boolean hasEnd) {
+    public List<RankElement> rankByRange(int startRank, boolean hasStart, int endRank, boolean hasEnd) {
         readLock.lock();
         try {
-            ArrayList<RankScore> rankScores = new ArrayList<>(endRank - startRank + 1);
+            ArrayList<RankElement> rankElements = new ArrayList<>(endRank - startRank + 1);
             int currentRank = 0;
-            for (Map.Entry<Long, TreeSet<RankScore>> entry : rankScoreMap.entrySet()) {
-                TreeSet<RankScore> rankScoreSet = entry.getValue();
-                for (RankScore rankScore : rankScoreSet) {
+            for (Map.Entry<Long, TreeSet<RankElement>> entry : rankScoreMap.entrySet()) {
+                TreeSet<RankElement> rankElementSet = entry.getValue();
+                for (RankElement rankElement : rankElementSet) {
                     currentRank++;
                     if (currentRank < startRank) {
                         continue;
@@ -186,20 +188,20 @@ public class RankByGroupMap {
                     if (currentRank == startRank && !hasStart) {
                         continue;
                     }
-                    rankScores.add(rankScore);
+                    rankElements.add(rankElement);
                     if (currentRank > endRank || (currentRank == endRank && !hasEnd)) {
-                        return rankScores;
+                        return rankElements;
                     }
                 }
             }
-            return rankScores;
+            return rankElements;
         } finally {
             readLock.unlock();
         }
     }
 
     /** 返回前多少名 */
-    public List<RankScore> rankBySize(int n) {
+    public List<RankElement> rankBySize(int n) {
         readLock.lock();
         try {
             if (n <= 0) {
@@ -208,23 +210,23 @@ public class RankByGroupMap {
             if (map.isEmpty()) {
                 return Collections.emptyList();
             }
-            ArrayList<RankScore> rankScores = new ArrayList<>(n);
-            for (Map.Entry<Long, TreeSet<RankScore>> entry : rankScoreMap.entrySet()) {
-                TreeSet<RankScore> rankScoreSet = entry.getValue();
-                for (RankScore rankScore : rankScoreSet) {
-                    rankScores.add(rankScore);
-                    if (rankScores.size() >= n) {
-                        return rankScores;
+            ArrayList<RankElement> rankElements = new ArrayList<>(n);
+            for (Map.Entry<Long, TreeSet<RankElement>> entry : rankScoreMap.entrySet()) {
+                TreeSet<RankElement> rankElementSet = entry.getValue();
+                for (RankElement rankElement : rankElementSet) {
+                    rankElements.add(rankElement);
+                    if (rankElements.size() >= n) {
+                        return rankElements;
                     }
                 }
             }
-            return rankScores;
+            return rankElements;
         } finally {
             readLock.unlock();
         }
     }
 
-    public List<RankScore> toList() {
+    public List<RankElement> toList() {
         return rankBySize(rankScoreMap.size());
     }
 

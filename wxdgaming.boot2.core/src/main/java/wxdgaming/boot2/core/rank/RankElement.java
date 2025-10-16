@@ -17,7 +17,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class RankScore extends ObjectBase implements Comparable<RankScore> {
+public class RankElement extends ObjectBase implements Comparable<RankElement> {
 
     private String key;
     /**
@@ -30,7 +30,7 @@ public class RankScore extends ObjectBase implements Comparable<RankScore> {
     private long timestamp;
     private HashMap<String, String> other = new HashMap<>();
 
-    @Override public int compareTo(RankScore o) {
+    @Override public int compareTo(RankElement o) {
         if (this.score != o.score)
             return Long.compare(o.score, this.score);
         if (this.timestamp != o.timestamp)
@@ -41,8 +41,8 @@ public class RankScore extends ObjectBase implements Comparable<RankScore> {
     @Override public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
-        RankScore rankScore = (RankScore) o;
-        return Objects.equals(getKey(), rankScore.getKey());
+        RankElement rankElement = (RankElement) o;
+        return Objects.equals(getKey(), rankElement.getKey());
     }
 
     @Override public int hashCode() {

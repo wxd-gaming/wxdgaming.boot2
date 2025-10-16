@@ -2,7 +2,7 @@ package wxdgaming.boot2.starter.batis.convert.impl;
 
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.rank.RankByGroupMap;
-import wxdgaming.boot2.core.rank.RankScore;
+import wxdgaming.boot2.core.rank.RankElement;
 import wxdgaming.boot2.starter.batis.convert.AbstractConverter;
 
 import java.lang.reflect.Type;
@@ -21,7 +21,7 @@ public class RankGroupMapConverter extends AbstractConverter<RankByGroupMap, Str
     }
 
     @Override public RankByGroupMap fromDb(Type type, String s) {
-        List<RankScore> parseArray = FastJsonUtil.parseArray(s, RankScore.class);
+        List<RankElement> parseArray = FastJsonUtil.parseArray(s, RankElement.class);
         return new RankByGroupMap(parseArray);
     }
 

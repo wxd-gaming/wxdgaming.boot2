@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.rank;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.util.AssertUtil;
@@ -25,26 +26,27 @@ public class RankByTreeSet {
     private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
     private final ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
 
-    private final HashMap<String, RankScore> map = new HashMap<>();
-    private final TreeSet<RankScore> rankTreeSet = new TreeSet<>();
+    private final HashMap<String, RankElement> map = new HashMap<>();
+    @JSONField(serialize = false, deserialize = false)
+    private final transient TreeSet<RankElement> rankTreeSet = new TreeSet<>();
 
     public RankByTreeSet() {
 
     }
 
-    public RankByTreeSet(List<RankScore> rankScores) {
-        push(rankScores);
+    public RankByTreeSet(List<RankElement> rankElements) {
+        push(rankElements);
     }
 
     /** 所有的排行 */
-    private void push(List<RankScore> rankScores) {
+    private void push(List<RankElement> rankElements) {
         writeLock.lock();
         try {
-            rankScores.forEach(rankScore -> {
-                RankScore oldRankScore = map.get(rankScore.getKey());
-                long oldScore = oldRankScore.getScore();
+            rankElements.forEach(rankScore -> {
+                RankElement oldRankElement = map.get(rankScore.getKey());
+                long oldScore = oldRankElement.getScore();
                 if (oldScore != rankScore.getScore()) {
-                    rankTreeSet.remove(oldRankScore);
+                    rankTreeSet.remove(oldRankElement);
                     // 插入新的ScoreKey
                     rankTreeSet.add(rankScore);
                 }
@@ -60,7 +62,7 @@ public class RankByTreeSet {
      * @param key      用户ID
      * @param newScore 新的分数
      */
-    public RankScore updateScore(String key, long newScore) {
+    public RankElement updateScore(String key, long newScore) {
         return updateScore(key, newScore, System.nanoTime());
     }
 
@@ -71,20 +73,20 @@ public class RankByTreeSet {
      * @param newScore  分数
      * @param timestamp 时间戳,建议使用 {@link System#nanoTime()}
      */
-    public RankScore updateScore(String key, long newScore, long timestamp) {
+    public RankElement updateScore(String key, long newScore, long timestamp) {
         writeLock.lock();
         try {
-            RankScore rankScore = map.computeIfAbsent(key, k -> new RankScore().setKey(key));
-            long oldScore = rankScore.getScore();
+            RankElement rankElement = map.computeIfAbsent(key, k -> new RankElement().setKey(key));
+            long oldScore = rankElement.getScore();
             if (oldScore != newScore) {
-                rankTreeSet.remove(rankScore);
+                rankTreeSet.remove(rankElement);
 
-                rankScore.setScore(newScore);
-                rankScore.setTimestamp(timestamp);
+                rankElement.setScore(newScore);
+                rankElement.setTimestamp(timestamp);
                 // 插入新的ScoreKey
-                rankTreeSet.add(rankScore);
+                rankTreeSet.add(rankElement);
             }
-            return rankScore;
+            return rankElement;
         } finally {
             writeLock.unlock();
         }
@@ -93,8 +95,8 @@ public class RankByTreeSet {
     public int rank(String key) {
         readLock.lock();
         try {
-            RankScore rankScore = map.get(key);
-            if (rankScore == null) {
+            RankElement rankElement = map.get(key);
+            if (rankElement == null) {
                 return -1;
             }
             //                        SortedSet<RankScore> rankScores = rankMap.headSet(rankScore);
@@ -102,7 +104,7 @@ public class RankByTreeSet {
             //                            return rankScores.size() + 1;
             //                        }
             int rank = 0;
-            for (RankScore value : rankTreeSet) {
+            for (RankElement value : rankTreeSet) {
                 rank++;
                 if (value.getKey().equals(key)) {
                     return rank;
@@ -115,18 +117,18 @@ public class RankByTreeSet {
     }
 
     public long score(String key) {
-        RankScore rankScore = map.get(key);
-        if (rankScore == null) {
+        RankElement rankElement = map.get(key);
+        if (rankElement == null) {
             return -1;
         }
-        return rankScore.getScore();
+        return rankElement.getScore();
     }
 
-    public RankScore rankData(String key) {
+    public RankElement rankData(String key) {
         return map.get(key);
     }
 
-    public RankScore rankDataByRank(final int rank) {
+    public RankElement rankDataByRank(final int rank) {
         readLock.lock();
         try {
             AssertUtil.isTrue(rank > 0, "rank must be greater than 0");
@@ -134,7 +136,7 @@ public class RankByTreeSet {
                 return null;
             }
             int currentRank = 0;
-            for (RankScore value : rankTreeSet) {
+            for (RankElement value : rankTreeSet) {
                 currentRank++;
                 if (currentRank >= rank) {
                     return value;
@@ -146,16 +148,16 @@ public class RankByTreeSet {
         }
     }
 
-    public List<RankScore> rankByRange(int startRank, int endRank) {
+    public List<RankElement> rankByRange(int startRank, int endRank) {
         return rankByRange(startRank, true, endRank, true);
     }
 
-    public List<RankScore> rankByRange(int startRank, boolean hasStart, int endRank, boolean hasEnd) {
+    public List<RankElement> rankByRange(int startRank, boolean hasStart, int endRank, boolean hasEnd) {
         readLock.lock();
         try {
-            ArrayList<RankScore> rankScores = new ArrayList<>(endRank - startRank + 1);
+            ArrayList<RankElement> rankElements = new ArrayList<>(endRank - startRank + 1);
             int currentRank = 0;
-            for (RankScore rankScore : rankTreeSet) {
+            for (RankElement rankElement : rankTreeSet) {
                 currentRank++;
                 if (currentRank < startRank) {
                     continue;
@@ -163,19 +165,19 @@ public class RankByTreeSet {
                 if (currentRank == startRank && !hasStart) {
                     continue;
                 }
-                rankScores.add(rankScore);
+                rankElements.add(rankElement);
                 if (currentRank > endRank || (currentRank == endRank && !hasEnd)) {
-                    return rankScores;
+                    return rankElements;
                 }
             }
-            return rankScores;
+            return rankElements;
         } finally {
             readLock.unlock();
         }
     }
 
     /** 返回前多少名 */
-    public List<RankScore> rankBySize(int n) {
+    public List<RankElement> rankBySize(int n) {
         readLock.lock();
         try {
             if (n <= 0) {
@@ -184,20 +186,20 @@ public class RankByTreeSet {
             if (map.isEmpty()) {
                 return Collections.emptyList();
             }
-            ArrayList<RankScore> rankScores = new ArrayList<>(n);
-            for (RankScore rankScore : rankTreeSet) {
-                rankScores.add(rankScore);
-                if (rankScores.size() >= n) {
-                    return rankScores;
+            ArrayList<RankElement> rankElements = new ArrayList<>(n);
+            for (RankElement rankElement : rankTreeSet) {
+                rankElements.add(rankElement);
+                if (rankElements.size() >= n) {
+                    return rankElements;
                 }
             }
-            return rankScores;
+            return rankElements;
         } finally {
             readLock.unlock();
         }
     }
 
-    public List<RankScore> toList() {
+    public List<RankElement> toList() {
         return rankBySize(rankTreeSet.size());
     }
 

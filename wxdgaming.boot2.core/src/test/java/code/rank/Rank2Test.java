@@ -5,7 +5,7 @@ import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
 import wxdgaming.boot2.core.lang.DiffTimeRecord;
 import wxdgaming.boot2.core.rank.RankByTreeSet;
-import wxdgaming.boot2.core.rank.RankScore;
+import wxdgaming.boot2.core.rank.RankElement;
 import wxdgaming.boot2.core.util.RandomUtils;
 
 import java.util.concurrent.TimeUnit;
@@ -44,8 +44,8 @@ public class Rank2Test {
                 {
                     int rank = rankMap.rank(random);
                     diffTime.marker("随机读取一个对象 " + random + " 排名 " + rank);
-                    RankScore rankScore = rankMap.rankDataByRank(rank);
-                    diffTime.marker("随机读取一个排名 " + rank + " 对象 " + rankScore.getKey());
+                    RankElement rankElement = rankMap.rankDataByRank(rank);
+                    diffTime.marker("随机读取一个排名 " + rank + " 对象 " + rankElement.getKey());
                 }
                 rankMap.rankBySize(100);
                 diffTime.marker("返回前 100 名 ");

@@ -23,8 +23,8 @@ public class RankByLimitSet {
 
     private final int limit;
     /** 记录前500名 */
-    private final HashMap<String, RankScore> map = new HashMap<>();
-    private final TreeSet<RankScore> rankTreeSet = new TreeSet<>();
+    private final HashMap<String, RankElement> map = new HashMap<>();
+    private final TreeSet<RankElement> rankTreeSet = new TreeSet<>();
     /** 根据分数阶段记录排名 */
     private final TreeMap<Long, Integer> scoreSizeMap = new TreeMap<>(Comparator.reverseOrder());
 
@@ -39,17 +39,17 @@ public class RankByLimitSet {
     public RankByLimitSet(int limit, Rank2Db rank2Db) {
         this.limit = limit;
         this.scoreSizeMap.putAll(rank2Db.getScoreSizeMap());
-        push(rank2Db.rankScoreList);
+        push(rank2Db.rankElementList);
     }
 
     /** 所有的排行 */
-    private void push(List<RankScore> rankScores) {
+    private void push(List<RankElement> rankElements) {
         writeLock.lock();
         try {
-            for (RankScore rankScore : rankScores) {
-                map.put(rankScore.getKey(), rankScore);
-                rankTreeSet.add(rankScore);
-                scoreSizeMap.merge(rankScore.getScore(), 1, Math::addExact);
+            for (RankElement rankElement : rankElements) {
+                map.put(rankElement.getKey(), rankElement);
+                rankTreeSet.add(rankElement);
+                scoreSizeMap.merge(rankElement.getScore(), 1, Math::addExact);
             }
             clearLimit();
         } finally {
@@ -60,9 +60,9 @@ public class RankByLimitSet {
     private void clearLimit() {
         if (rankTreeSet.size() > limit) {
             for (int i = limit; i < rankTreeSet.size(); i++) {
-                RankScore rankScore = rankTreeSet.last();
-                map.remove(rankScore.getKey());
-                rankTreeSet.remove(rankScore);
+                RankElement rankElement = rankTreeSet.last();
+                map.remove(rankElement.getKey());
+                rankTreeSet.remove(rankElement);
             }
         }
         scoreSizeMap.entrySet().removeIf(entry -> entry.getValue() == 0);
@@ -74,7 +74,7 @@ public class RankByLimitSet {
      * @param key      用户ID
      * @param newScore 新的分数
      */
-    public RankScore updateScore(String key, long newScore) {
+    public RankElement updateScore(String key, long newScore) {
         return updateScore(key, newScore, System.nanoTime());
     }
 
@@ -85,29 +85,29 @@ public class RankByLimitSet {
      * @param newScore  分数
      * @param timestamp 时间戳,建议使用 {@link System#nanoTime()}
      */
-    public RankScore updateScore(String key, long newScore, long timestamp) {
+    public RankElement updateScore(String key, long newScore, long timestamp) {
         writeLock.lock();
         try {
-            RankScore rankScore = map.computeIfAbsent(key, k -> new RankScore().setKey(key));
-            long oldScore = rankScore.getScore();
+            RankElement rankElement = map.computeIfAbsent(key, k -> new RankElement().setKey(key));
+            long oldScore = rankElement.getScore();
             if (oldScore != newScore) {
 
                 if (oldScore != 0) {
                     scoreSizeMap.merge(oldScore, -1, Math::addExact);
                 }
 
-                rankTreeSet.remove(rankScore);
+                rankTreeSet.remove(rankElement);
 
-                rankScore.setScore(newScore);
-                rankScore.setTimestamp(timestamp);
+                rankElement.setScore(newScore);
+                rankElement.setTimestamp(timestamp);
 
-                rankTreeSet.add(rankScore);
+                rankTreeSet.add(rankElement);
 
                 // 插入新的ScoreKey
                 scoreSizeMap.merge(newScore, 1, Math::addExact);
                 clearLimit();
             }
-            return rankScore;
+            return rankElement;
         } finally {
             writeLock.unlock();
         }
@@ -116,10 +116,10 @@ public class RankByLimitSet {
     public int rank(String key, long score) {
         readLock.lock();
         try {
-            RankScore rankScore = map.get(key);
-            if (rankScore != null) {
-                SortedSet<RankScore> rankScores = rankTreeSet.headSet(rankScore);
-                return rankScores.size() + 1;
+            RankElement rankElement = map.get(key);
+            if (rankElement != null) {
+                SortedSet<RankElement> rankElements = rankTreeSet.headSet(rankElement);
+                return rankElements.size() + 1;
             }
             int rank = 0;
             for (Map.Entry<Long, Integer> longIntegerEntry : scoreSizeMap.entrySet()) {
@@ -136,11 +136,11 @@ public class RankByLimitSet {
         return -1;
     }
 
-    public Collection<RankScore> limitValues() {
+    public Collection<RankElement> limitValues() {
         return new ArrayList<>(rankTreeSet);
     }
 
-    public Collection<RankScore> limitValues(int start, int end) {
+    public Collection<RankElement> limitValues(int start, int end) {
         return new ArrayList<>(rankTreeSet).subList(start, end);
     }
 
@@ -152,7 +152,7 @@ public class RankByLimitSet {
     @Setter
     public static class Rank2Db {
 
-        private List<RankScore> rankScoreList;
+        private List<RankElement> rankElementList;
         /** 根据分数阶段记录排名 */
         private HashMap<Long, Integer> scoreSizeMap;
 
@@ -160,7 +160,7 @@ public class RankByLimitSet {
         }
 
         public Rank2Db(RankByLimitSet rankByLimitSet) {
-            this.rankScoreList = new ArrayList<>(rankByLimitSet.map.values());
+            this.rankElementList = new ArrayList<>(rankByLimitSet.map.values());
             this.scoreSizeMap = new HashMap<>(rankByLimitSet.scoreSizeMap);
         }
 

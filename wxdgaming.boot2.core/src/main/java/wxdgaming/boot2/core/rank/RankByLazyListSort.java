@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.rank;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.cache2.LRUIntCache;
@@ -26,8 +27,9 @@ public class RankByLazyListSort {
     private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
     private final ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
 
-    private final HashMap<String, RankScore> map = new HashMap<>();
-    private final LRUIntCache<RankScore[]> rankCache;
+    private final HashMap<String, RankElement> map = new HashMap<>();
+    @JSONField(serialize = false, deserialize = false)
+    private final transient LRUIntCache<RankElement[]> rankCache;
 
     /**
      * 构造函数
@@ -35,14 +37,14 @@ public class RankByLazyListSort {
      * @param lazyTimeMs 排行榜延迟刷新时间
      */
     public RankByLazyListSort(long lazyTimeMs) {
-        rankCache = LRUIntCache.<RankScore[]>builder()
+        rankCache = LRUIntCache.<RankElement[]>builder()
                 .expireAfterWriteMs(lazyTimeMs)
                 .heartTimeMs(lazyTimeMs)
                 .loader(k -> {
                     readLock.lock();
                     try {
-                        Set<RankScore> rankScores = new TreeSet<>(map.values());
-                        return rankScores.toArray(new RankScore[map.size()]);
+                        Set<RankElement> rankElements = new TreeSet<>(map.values());
+                        return rankElements.toArray(new RankElement[map.size()]);
                     } finally {
                         readLock.unlock();
                     }
@@ -55,11 +57,11 @@ public class RankByLazyListSort {
      * 构造函数
      *
      * @param lazyTimeMs 排行榜延迟刷新时间
-     * @param rankScores 排行榜容器数据
+     * @param rankElements 排行榜容器数据
      */
-    public RankByLazyListSort(long lazyTimeMs, List<RankScore> rankScores) {
+    public RankByLazyListSort(long lazyTimeMs, List<RankElement> rankElements) {
         this(lazyTimeMs);
-        push(rankScores);
+        push(rankElements);
     }
 
     /** 强制刷新 */
@@ -68,11 +70,11 @@ public class RankByLazyListSort {
     }
 
     /** 所有的排行 */
-    private void push(List<RankScore> rankScores) {
+    private void push(List<RankElement> rankElements) {
         writeLock.lock();
         try {
-            rankScores.forEach(rankScore -> {
-                RankScore old = map.put(rankScore.getKey(), rankScore);
+            rankElements.forEach(rankScore -> {
+                RankElement old = map.put(rankScore.getKey(), rankScore);
             });
         } finally {
             writeLock.unlock();
@@ -85,7 +87,7 @@ public class RankByLazyListSort {
      * @param key      用户ID
      * @param newScore 新的分数
      */
-    public RankScore updateScore(String key, long newScore) {
+    public RankElement updateScore(String key, long newScore) {
         return updateScore(key, newScore, System.nanoTime());
     }
 
@@ -96,19 +98,19 @@ public class RankByLazyListSort {
      * @param newScore  分数
      * @param timestamp 时间戳,建议使用 {@link System#nanoTime()}
      */
-    public RankScore updateScore(String key, long newScore, long timestamp) {
+    public RankElement updateScore(String key, long newScore, long timestamp) {
         writeLock.lock();
         try {
-            RankScore rankScore = map.computeIfAbsent(key, k -> {
-                RankScore newRankScore = new RankScore().setKey(key);
-                return newRankScore;
+            RankElement rankElement = map.computeIfAbsent(key, k -> {
+                RankElement newRankElement = new RankElement().setKey(key);
+                return newRankElement;
             });
-            long oldScore = rankScore.getScore();
+            long oldScore = rankElement.getScore();
             if (oldScore != newScore) {
-                rankScore.setScore(newScore);
-                rankScore.setTimestamp(timestamp);
+                rankElement.setScore(newScore);
+                rankElement.setTimestamp(timestamp);
             }
-            return rankScore;
+            return rankElement;
         } finally {
             writeLock.unlock();
         }
@@ -117,15 +119,15 @@ public class RankByLazyListSort {
     public int rank(String key) {
         readLock.lock();
         try {
-            RankScore rankScore = map.get(key);
-            if (rankScore == null) {
+            RankElement rankElement = map.get(key);
+            if (rankElement == null) {
                 return -1;
             }
-            RankScore[] rankScores = rankCache.get(0);
-            RankScore score = null;
-            for (int i = 0; i < rankScores.length; i++) {
-                score = rankScores[i];
-                if (score.getScore() > rankScore.getScore()) {
+            RankElement[] rankElements = rankCache.get(0);
+            RankElement score = null;
+            for (int i = 0; i < rankElements.length; i++) {
+                score = rankElements[i];
+                if (score.getScore() > rankElement.getScore()) {
                     continue;
                 }
                 if (score.getKey().equals(key)) {
@@ -139,14 +141,14 @@ public class RankByLazyListSort {
     }
 
     public long score(String key) {
-        RankScore rankScore = map.get(key);
-        if (rankScore == null) {
+        RankElement rankElement = map.get(key);
+        if (rankElement == null) {
             return -1;
         }
-        return rankScore.getScore();
+        return rankElement.getScore();
     }
 
-    public RankScore rankData(String key) {
+    public RankElement rankData(String key) {
         return map.get(key);
     }
 
@@ -158,44 +160,44 @@ public class RankByLazyListSort {
      * @author wxd-gaming(無心道, 15388152619)
      * @version 2025-05-26 11:01
      */
-    public RankScore rankDataByRank(final int rank) {
+    public RankElement rankDataByRank(final int rank) {
         readLock.lock();
         try {
             AssertUtil.isTrue(rank > 0, "从1开始");
-            RankScore[] rankScores = rankCache.get(0);
-            if (rankScores.length < rank) {
+            RankElement[] rankElements = rankCache.get(0);
+            if (rankElements.length < rank) {
                 return null;
             }
-            return rankScores[rank - 1];
+            return rankElements[rank - 1];
         } finally {
             readLock.unlock();
         }
     }
 
-    public List<RankScore> rankByRange(int startRank, int endRank) {
+    public List<RankElement> rankByRange(int startRank, int endRank) {
         AssertUtil.isTrue(startRank > 0, "从1开始");
         AssertUtil.isTrue(endRank > 0 && endRank > startRank, "从1开始");
         readLock.lock();
         try {
-            ArrayList<RankScore> resultRankScores = new ArrayList<>(endRank - startRank + 1);
-            RankScore[] cache = rankCache.get(0);
+            ArrayList<RankElement> resultRankElements = new ArrayList<>(endRank - startRank + 1);
+            RankElement[] cache = rankCache.get(0);
             int firstRank = startRank;
             firstRank--;
             for (int i = firstRank; i < endRank; i++) {
                 if (cache.length <= i) {
                     break;
                 }
-                RankScore rankScore = cache[i];
-                resultRankScores.add(rankScore);
+                RankElement rankElement = cache[i];
+                resultRankElements.add(rankElement);
             }
-            return resultRankScores;
+            return resultRankElements;
         } finally {
             readLock.unlock();
         }
     }
 
     /** 返回前多少名 */
-    public List<RankScore> rankBySize(int n) {
+    public List<RankElement> rankBySize(int n) {
         readLock.lock();
         try {
             if (n <= 0) {
@@ -204,22 +206,22 @@ public class RankByLazyListSort {
             if (map.isEmpty()) {
                 return Collections.emptyList();
             }
-            ArrayList<RankScore> rankScores = new ArrayList<>(n);
-            RankScore[] cache = rankCache.get(0);
+            ArrayList<RankElement> rankElements = new ArrayList<>(n);
+            RankElement[] cache = rankCache.get(0);
             for (int i = 0; i < cache.length; i++) {
-                RankScore rankScore = cache[i];
-                rankScores.add(rankScore);
-                if (rankScores.size() >= n) {
+                RankElement rankElement = cache[i];
+                rankElements.add(rankElement);
+                if (rankElements.size() >= n) {
                     break;
                 }
             }
-            return rankScores;
+            return rankElements;
         } finally {
             readLock.unlock();
         }
     }
 
-    public List<RankScore> toList() {
+    public List<RankElement> toList() {
         return rankBySize(map.size());
     }
 
