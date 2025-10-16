@@ -1,13 +1,15 @@
 package code.cache;
 
 import lombok.Builder;
-import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.function.Predicate3;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
@@ -16,9 +18,7 @@ import java.util.function.Function;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-07-03 10:57
  **/
-class CASCacheHolder<K, V> {
-
-    static final ScheduledExecutorService scheduledExecutorService = ExecutorFactory.newSingleThreadScheduledExecutor("cache-scheduled");
+class LRUCacheHolderCAS<K, V> {
 
     protected final int blockSize;
     protected List<CacheBlock> blockList;
@@ -29,7 +29,7 @@ class CASCacheHolder<K, V> {
     protected final Duration expireAfterWrite;
 
     protected final Function<K, V> loader;
-    protected final Predicate3<K, V, CASCache.RemovalCause> removalListener;
+    protected final Predicate3<K, V, RemovalCause> removalListener;
 
     protected class CacheNode implements Comparable<CacheNode> {
 
@@ -88,7 +88,7 @@ class CASCacheHolder<K, V> {
             if (oldNode != null) {
                 expireSet.remove(oldNode);
                 if (!Objects.equals(oldNode.value, value)) {
-                    onRemove(oldNode, CASCache.RemovalCause.REPLACED);
+                    onRemove(oldNode, RemovalCause.REPLACED);
                 }
             }
             expireSet.add(newNode);
@@ -126,11 +126,11 @@ class CASCacheHolder<K, V> {
     }
 
     @Builder
-    public CASCacheHolder(int blockSize,
-                          Duration expireAfterAccess,
-                          Duration expireAfterWrite,
-                          Function<K, V> loader,
-                          Predicate3<K, V, CASCache.RemovalCause> removalListener) {
+    public LRUCacheHolderCAS(int blockSize,
+                             Duration expireAfterAccess,
+                             Duration expireAfterWrite,
+                             Function<K, V> loader,
+                             Predicate3<K, V, RemovalCause> removalListener) {
 
         if (expireAfterAccess != null && expireAfterWrite != null)
             throw new RuntimeException("expireAfterAccess or expireAfterWrite");
@@ -156,7 +156,7 @@ class CASCacheHolder<K, V> {
             if (delay < 1000)
                 throw new RuntimeException("expire < 1s");
             delay = delay / 100;
-            scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> onCleanup(CASCache.RemovalCause.EXPIRE), delay, delay, TimeUnit.MILLISECONDS);
+            scheduledFuture = CacheConst.scheduledExecutorService.scheduleWithFixedDelay(() -> onCleanup(RemovalCause.EXPIRE), delay, delay, TimeUnit.MILLISECONDS);
         } else {
             AssertUtil.notNull(this.removalListener, "removalListener 非空 请配置过期时间");
         }
@@ -185,10 +185,10 @@ class CASCacheHolder<K, V> {
     }
 
     public void invalidate(K k) {
-        invalidate(k, CASCache.RemovalCause.EXPLICIT);
+        invalidate(k, RemovalCause.EXPLICIT);
     }
 
-    public void invalidate(K k, CASCache.RemovalCause cause) {
+    public void invalidate(K k, RemovalCause cause) {
         int blockIndex = getBlockIndex(k);
         CacheBlock cacheBlock = blockList.get(blockIndex);
         CacheNode remove = cacheBlock.nodeMap.remove(k);
@@ -200,11 +200,11 @@ class CASCacheHolder<K, V> {
 
     /** 强制过期所有 */
     public void invalidateAll() {
-        invalidateAll(CASCache.RemovalCause.EXPIRE);
+        invalidateAll(RemovalCause.EXPIRE);
     }
 
-    public void invalidateAll(CASCache.RemovalCause removalCause) {
-        scheduledExecutorService.execute(() -> {
+    public void invalidateAll(RemovalCause removalCause) {
+        CacheConst.scheduledExecutorService.execute(() -> {
             for (CacheBlock cacheBlock : blockList) {
                 Iterator<CacheNode> iterator = cacheBlock.expireSet.iterator();
                 while (iterator.hasNext()) {
@@ -219,14 +219,14 @@ class CASCacheHolder<K, V> {
 
     /** 强制刷新，定时清理过期数据可能出现延迟，所以也可以手动调用清理 */
     public void cleanup() {
-        scheduledExecutorService.execute(() -> onCleanup(CASCache.RemovalCause.EXPIRE));
+        CacheConst.scheduledExecutorService.execute(() -> onCleanup(RemovalCause.EXPIRE));
     }
 
-    public void cleanup(CASCache.RemovalCause removalCause) {
-        scheduledExecutorService.execute(() -> onCleanup(removalCause));
+    public void cleanup(RemovalCause removalCause) {
+        CacheConst.scheduledExecutorService.execute(() -> onCleanup(removalCause));
     }
 
-    private void onCleanup(CASCache.RemovalCause removalCause) {
+    private void onCleanup(RemovalCause removalCause) {
         for (CacheBlock cacheBlock : blockList) {
             Iterator<CacheNode> iterator = cacheBlock.expireSet.iterator();
             while (iterator.hasNext()) {
@@ -246,7 +246,7 @@ class CASCacheHolder<K, V> {
         }
     }
 
-    private boolean onRemove(CacheNode cacheNode, CASCache.RemovalCause cause) {
+    private boolean onRemove(CacheNode cacheNode, RemovalCause cause) {
         if (cacheNode != null) {
             if (removalListener != null) {
                 return removalListener.test(cacheNode.key, cacheNode.value, cause);

@@ -10,35 +10,17 @@ import java.time.Duration;
 import java.util.function.Function;
 
 /**
- * 缓存容器，通过3层架构实现，
- * <p>1. 核心缓存，用于存储缓存数据，真正的缓存数据容器，当缓存过期，触发删除监听
- * <p>2. 心跳缓存，用于存储缓存心跳数据,用户心跳处理，比如获取缓存后修改了数据需要存储数据，可以通过这个监听
- * <p>3. 外部缓存，用于存储缓存过期数据,固定2秒实现，也是防止缓存穿透关键一步
+ * 加载缓存
  *
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-07-03 10:57
  **/
 @Getter
-public class CASCache<K, V> {
+public class LRUCacheLock<K, V> {
 
-    static final Duration minHeartDuration = Duration.ofSeconds(5);
-    static final Duration outerDuration = Duration.ofSeconds(2);
-    static final Duration heartDurationDefault = Duration.ofSeconds(5);
-
-    public enum RemovalCause {
-        /** 替换 */
-        REPLACED,
-        /** 过期删除 */
-        EXPIRE,
-        /** 手动删除 */
-        EXPLICIT,
-        ;
-    }
-
-
-    private CASCacheHolder<K, V> coreCacheReference;
-    private CASCacheHolder<K, V> heartCacheReference;
-    private CASCacheHolder<K, Hold> outerCacheReference;
+    private LRUCacheHolderLock<K, V> cacheDriver;
+    private LRUCacheHolderLock<K, V> heartDriver;
+    private LRUCacheHolderLock<K, Hold> outerDriver;
 
     private final String cacheName;
     private final int blockSize;
@@ -53,14 +35,16 @@ public class CASCache<K, V> {
     private final Predicate3<K, V, RemovalCause> removalListener;
 
     @Builder
-    public CASCache(String cacheName, int blockSize,
-                    Duration heartExpireAfterWrite,
-                    Duration expireAfterAccess, Duration expireAfterWrite,
-                    Function<K, V> loader, Consumer3<K, V, RemovalCause> heartListener,
-                    Predicate3<K, V, RemovalCause> removalListener) {
+    public LRUCacheLock(String cacheName, int blockSize,
+                        Duration heartExpireAfterWrite,
+                        Duration expireAfterAccess,
+                        Duration expireAfterWrite,
+                        Function<K, V> loader,
+                        Consumer3<K, V, RemovalCause> heartListener,
+                        Predicate3<K, V, RemovalCause> removalListener) {
         this.cacheName = cacheName;
         this.blockSize = blockSize;
-        this.heartExpireAfterWrite = heartExpireAfterWrite == null ? heartDurationDefault : heartExpireAfterWrite;
+        this.heartExpireAfterWrite = heartExpireAfterWrite == null ? CacheConst.heartDurationDefault : heartExpireAfterWrite;
         this.expireAfterAccess = expireAfterAccess;
         this.expireAfterWrite = expireAfterWrite;
         this.loader = loader;
@@ -76,9 +60,12 @@ public class CASCache<K, V> {
             AssertUtil.isTrue(removeDuration.toMillis() >= this.heartExpireAfterWrite.toMillis() * 3, "过期时间不得低于心跳时间的3倍");
         }
 
-        AssertUtil.isTrue(this.heartExpireAfterWrite.toMillis() >= minHeartDuration.toMillis(), "心跳时间不得低于%s秒", minHeartDuration.toSeconds());
+        AssertUtil.isTrue(
+                this.heartExpireAfterWrite.toMillis() >= CacheConst.minHeartDuration.toMillis(),
+                "心跳时间不得低于%s秒", CacheConst.minHeartDuration.toSeconds()
+        );
 
-        coreCacheReference = CASCacheHolder.<K, V>builder()
+        cacheDriver = LRUCacheHolderLock.<K, V>builder()
                 .loader(loader)
                 .blockSize(blockSize)
                 .removalListener(removalListener)
@@ -86,29 +73,31 @@ public class CASCache<K, V> {
                 .expireAfterWrite(expireAfterWrite)
                 .build();
 
-        heartCacheReference = CASCacheHolder.<K, V>builder()
+        heartDriver = LRUCacheHolderLock.<K, V>builder()
                 .blockSize(blockSize)
-                .loader(key -> coreCacheReference.get(key))
+                .loader(key -> cacheDriver.get(key))
                 .expireAfterWrite(this.heartExpireAfterWrite)
                 .removalListener((k, v, removalCause) -> {
+                    if (removalCause != RemovalCause.EXPIRE) return true;
                     if (heartListener != null)
                         heartListener.accept(k, v, removalCause);
                     return true;
                 })
                 .build();
 
-        outerCacheReference = CASCacheHolder.<K, Hold>builder()
+        outerDriver = LRUCacheHolderLock.<K, Hold>builder()
                 .blockSize(blockSize)
-                .loader(key -> new Hold(heartCacheReference.get(key)))
-                .expireAfterWrite(outerDuration)
+                .loader(key -> new Hold(heartDriver.get(key)))
+                .expireAfterWrite(CacheConst.outerDuration)
+                .removalListener((k, v, removalCause) -> {
+                    if (removalCause != RemovalCause.EXPIRE) {
+                        /*刷新一次*/
+                        heartDriver.get(k);
+                    }
+                    return true;
+                })
                 .build();
 
-    }
-
-    public void close() {
-        coreCacheReference.close();
-        heartCacheReference.close();
-        outerCacheReference.close();
     }
 
     /** 计算内存大小 注意特别耗时，并且可能死循环 */
@@ -125,24 +114,24 @@ public class CASCache<K, V> {
     }
 
     public long size() {
-        return coreCacheReference.size();
+        return cacheDriver.size();
     }
 
     public V get(K k) {
-        Hold hold = outerCacheReference.get(k);
+        Hold hold = outerDriver.get(k);
         return hold.v;
     }
 
     public void put(K k, V v) {
-        outerCacheReference.invalidate(k, RemovalCause.REPLACED);
-        heartCacheReference.invalidate(k, RemovalCause.REPLACED);
-        coreCacheReference.put(k, v);
+        outerDriver.invalidate(k, RemovalCause.REPLACED);
+        heartDriver.invalidate(k, RemovalCause.REPLACED);
+        cacheDriver.put(k, v);
     }
 
     public void invalidate(K k) {
-        outerCacheReference.invalidate(k, RemovalCause.EXPLICIT);
-        heartCacheReference.invalidate(k, RemovalCause.EXPLICIT);
-        coreCacheReference.invalidate(k, RemovalCause.EXPLICIT);
+        outerDriver.invalidate(k, RemovalCause.EXPLICIT);
+        heartDriver.invalidate(k, RemovalCause.EXPLICIT);
+        cacheDriver.invalidate(k, RemovalCause.EXPLICIT);
     }
 
     public void invalidateAll() {
@@ -150,16 +139,16 @@ public class CASCache<K, V> {
     }
 
     public void invalidateAll(RemovalCause cause) {
-        outerCacheReference.invalidateAll(cause);
-        heartCacheReference.invalidateAll(cause);
-        coreCacheReference.invalidateAll(cause);
+        outerDriver.invalidateAll();
+        heartDriver.invalidateAll();
+        cacheDriver.invalidateAll();
     }
 
     /** 强制刷新，定时清理过期数据可能出现延迟，所以也可以手动调用清理 */
     public void refresh() {
-        outerCacheReference.cleanup();
-        heartCacheReference.cleanup();
-        coreCacheReference.cleanup();
+        outerDriver.cleanup();
+        heartDriver.cleanup();
+        cacheDriver.cleanup();
     }
 
 }

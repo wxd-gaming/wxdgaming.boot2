@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 
 @Slf4j
-public class CacheDriverStampedLockTest {
+public class LRUCacheLockTest {
 
     static int threadSize = 64;
     static long readSize = 65535;
@@ -40,12 +40,12 @@ public class CacheDriverStampedLockTest {
     @Test
     public void c1() {
         /*2秒钟读取过期缓存*/
-        CacheDriverStampedLockImpl<String, Object> cache = CacheDriverStampedLockImpl.<String, Object>builder()
+        LRUCacheLock<String, Object> cache = LRUCacheLock.<String, Object>builder()
                 .expireAfterAccess(Duration.ofSeconds(16))
                 .heartExpireAfterWrite(Duration.ofSeconds(5))
                 .loader(key -> key)
-                .heartListener(new Consumer3<String, Object, CacheDriverStampedLock.RemovalCause>() {
-                    @Override public void accept(String string, Object object, CacheDriverStampedLock.RemovalCause removalCause) {
+                .heartListener(new Consumer3<String, Object, RemovalCause>() {
+                    @Override public void accept(String string, Object object, RemovalCause removalCause) {
                         log.info("心跳事件 key:{} value:{} cause:{}", string, object, removalCause);
                     }
                 })
@@ -72,7 +72,7 @@ public class CacheDriverStampedLockTest {
     @Test
     public void c2() {
         /*没有过期的缓存*/
-        CacheDriverStampedLockImpl<String, Object> cache = CacheDriverStampedLockImpl.<String, Object>builder()
+        LRUCacheLock<String, Object> cache = LRUCacheLock.<String, Object>builder()
                 .expireAfterAccess(null)
                 .expireAfterWrite(null)
                 .loader(key -> "value")
@@ -96,7 +96,7 @@ public class CacheDriverStampedLockTest {
     @Test
     public void c3() {
         /*没有过期的缓存*/
-        CacheDriverStampedLockImpl<String, Object> loadingCache = CacheDriverStampedLockImpl.<String, Object>builder()
+        LRUCacheLock<String, Object> loadingCache = LRUCacheLock.<String, Object>builder()
                 .expireAfterWrite(Duration.ofSeconds(5))
                 .heartExpireAfterWrite(Duration.ofSeconds(2))
                 .loader(key -> "value")
@@ -114,7 +114,7 @@ public class CacheDriverStampedLockTest {
     @RepeatedTest(5)
     public void c10() throws Exception {
         /*2秒钟读取过期缓存*/
-        CacheDriverStampedLockImpl<Long, Object> cache = CacheDriverStampedLockImpl.<Long, Object>builder()
+        LRUCacheLock<Long, Object> cache = LRUCacheLock.<Long, Object>builder()
                 .cacheName("test")
                 .blockSize(64)
                 .expireAfterAccess(Duration.ofSeconds(16))
@@ -132,8 +132,8 @@ public class CacheDriverStampedLockTest {
         multiThread(cache);
     }
 
-    public void singleThread(CacheDriverStampedLockImpl<Long, Object> cache) {
-//        cache.invalidateAll();
+    public void singleThread(LRUCacheLock<Long, Object> cache) {
+        cache.invalidateAll();
         DiffTimeRecord diffTime = DiffTimeRecord.start4Ms();
         Object string = "";
         for (long i = 0; i < readSize; i++) {
@@ -146,8 +146,8 @@ public class CacheDriverStampedLockTest {
         log.info("{} 缓存数量：{}, 内存 {}", cache.getCacheName(), cache.size(), ByteFormat.format(cache.memorySize()));
     }
 
-    public void multiThread(CacheDriverStampedLockImpl<Long, Object> cache) throws Exception {
-//        cache.invalidateAll();
+    public void multiThread(LRUCacheLock<Long, Object> cache) throws Exception {
+        cache.invalidateAll();
         DiffTimeRecord diffTime = DiffTimeRecord.start4Ms();
         AtomicReference string = new AtomicReference();
         CountDownLatch latch = new CountDownLatch((int) readSize);
