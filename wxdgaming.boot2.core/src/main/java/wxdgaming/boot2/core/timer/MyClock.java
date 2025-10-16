@@ -11,11 +11,10 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -27,21 +26,17 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class MyClock {
 
-    private static final ConcurrentHashMap<String, ThreadLocal<SimpleDateFormat>> Time_Simple_Format = new ConcurrentHashMap<>();
+    public static final ThreadLocal<Map<String, SimpleDateFormat>> THREAD_LOCAL_SimpleDateFormat = ThreadLocal.withInitial(HashMap::new);
 
     /** 获取一个线程安全的格式化对象， */
     public static SimpleDateFormat simpleDateFormat(String formatter) {
-        return Time_Simple_Format.computeIfAbsent(
-                        formatter,
-                        k -> ThreadLocal.withInitial(() -> new SimpleDateFormat(k))
-                )
-                .get();
+        return THREAD_LOCAL_SimpleDateFormat.get().computeIfAbsent(formatter, SimpleDateFormat::new);
     }
 
-    public static final ConcurrentSkipListMap<String, ThreadLocal<DateTimeFormatter>> SKIP_LIST_MAP = new ConcurrentSkipListMap<>();
+    public static final ThreadLocal<Map<String, DateTimeFormatter>> THREAD_LOCAL_DateTimeFormatter = ThreadLocal.withInitial(HashMap::new);
 
-    public static DateTimeFormatter dateTimeFormatter(String pa) {
-        return SKIP_LIST_MAP.computeIfAbsent(pa, l -> ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern(l))).get();
+    public static DateTimeFormatter dateTimeFormatter(String pattern) {
+        return THREAD_LOCAL_DateTimeFormatter.get().computeIfAbsent(pattern, DateTimeFormatter::ofPattern);
     }
 
 
@@ -131,12 +126,12 @@ public class MyClock {
 
     /** yyyyMMdd */
     public static int dayInt() {
-        LocalDateTime localDateTime = LocalDateTime.now();
-        return dayInt(localDateTime);
+        LocalDate localDate = LocalDate.now();
+        return dayInt(localDate);
     }
 
     /** yyyyMMdd */
-    public static int dayInt(LocalDateTime localDateTime) {
+    public static int dayInt(LocalDate localDateTime) {
         return (localDateTime.getYear() * 10000 + localDateTime.getMonthValue() * 100 + localDateTime.getDayOfMonth());
     }
 
@@ -164,13 +159,9 @@ public class MyClock {
     }
 
     public long dayOffset(long date, int dayOffset) {
-        LocalDateTime localDateTime = dayOffset(localDateTime(date), dayOffset);
-        return time2Milli(localDateTime);
+        return date + TimeUnit.DAYS.toMillis(dayOffset);
     }
 
-    public LocalDateTime dayOffset(LocalDateTime localDateTime, int dayOffset) {
-        return localDateTime.plusDays(dayOffset);
-    }
 
     /** 获取今日时间格式,yyyy-MM-dd */
     public static String newDayString() {
@@ -205,6 +196,11 @@ public class MyClock {
     /** 获取日期的时间格式 */
     public static String formatDate(String formatter, LocalDateTime localDateTime) {
         return localDateTime.format(dateTimeFormatter(formatter));
+    }
+
+    /** 获取日期的时间格式 */
+    public static String formatDate(String formatter, LocalDate localDate) {
+        return localDate.format(dateTimeFormatter(formatter));
     }
 
     /** 把指定格式的字符串还原成date */
@@ -298,12 +294,12 @@ public class MyClock {
 
     /** 获取传入毫秒的星期 1-7 */
     public static int dayOfWeek(long time) {
-        LocalDateTime localDateTime = localDateTime(time);
+        LocalDate localDateTime = localDate(time);
         return dayOfWeek(localDateTime);
     }
 
     /** 获取传入毫秒的星期 1-7 */
-    public static int dayOfWeek(LocalDateTime localDateTime) {
+    public static int dayOfWeek(LocalDate localDateTime) {
         return localDateTime.getDayOfWeek().getValue();
     }
 
@@ -320,110 +316,115 @@ public class MyClock {
     /**
      * 获取时间当月的第几天 1 - 31
      *
-     * @param dayCount 如果往后加一天 1 往前一天是 -1
-     * @return
+     * @param daysToAdd 如果往后加一天 1 往前一天是 -1
+     * @return 当月的第几天 1 - 31
      */
-    public static int dayOfMonth(int dayCount) {
-        return dayOfMonth(millis(), dayCount);
+    public static int dayOfMonth(int daysToAdd) {
+        return dayOfMonth(millis(), daysToAdd);
     }
 
     /**
      * 获取时间当月的第几天 1 - 31
      *
-     * @param time
-     * @param dayCount 如果往后加一天 1 往前一天是 -1
-     * @return
+     * @param time      指定的时间戳
+     * @param daysToAdd 如果往后加一天 1 往前一天是 -1
+     * @return 当月的第几天 1 - 31
      */
-    public static int dayOfMonth(long time, int dayCount) {
-        return dayOfMonth(localDateTime(time), dayCount);
+    public static int dayOfMonth(long time, int daysToAdd) {
+        return dayOfMonth(localDate(time), daysToAdd);
     }
 
-    public static int dayOfMonth(LocalDateTime localDateTime, int dayCount) {
-        return localDateTime.plusDays(dayCount).getDayOfMonth();
+    /**
+     * 获取时间当月的第几天 1 - 31
+     *
+     * @param localDate 日期函数
+     * @param daysToAdd 如果往后加一天 1 往前一天是 -1
+     * @return 当月的第几天 1 - 31
+     */
+    public static int dayOfMonth(LocalDate localDate, int daysToAdd) {
+        return localDate.plusDays(daysToAdd).getDayOfMonth();
     }
 
     /** 获取当前日期的星期1 00:00:00 */
-    public static long weekFirstDay() {
-        return weekFirstDay(millis());
+    public static long weekMinTime() {
+        return weekMinTime(millis());
     }
 
     /** 获取当前日期的星期1 00:00:00 */
-    public static long weekFirstDay(long time) {
+    public static long weekMinTime(long time) {
         LocalDateTime localDateTime = localDateTime(time);
-        return time2Milli(weekFirstDay(localDateTime));
+        return time2Milli(weekMinTime(localDateTime));
     }
 
     /** 获取当前日期的星期1 00:00:00 */
-    public static LocalDateTime weekFirstDay(LocalDateTime localDateTime) {
-        LocalDateTime localDateTime1 = LocalDateTime.of(localDateTime.toLocalDate(), LocalTime.MIN);
-        return localDateTime1.with(DayOfWeek.MONDAY);
+    public static LocalDateTime weekMinTime(LocalDateTime localDateTime) {
+        return LocalDateTime.of(localDateTime.toLocalDate(), LocalTime.MIN).with(DayOfWeek.MONDAY);
     }
 
     /** 获取当前日期的星期天 23:59:59 */
-    public static long weekLastDay() {
-        return weekLastDay(millis());
+    public static long weekMaxTime() {
+        return weekMaxTime(millis());
     }
 
     /** 获取当前日期的星期天 23:59:59 */
-    public static long weekLastDay(long time) {
+    public static long weekMaxTime(long time) {
         LocalDateTime localDateTime = localDateTime(time);
-        return time2Milli(weekLastDay(localDateTime));
+        return time2Milli(weekMaxTime(localDateTime));
     }
 
     /** 获取当前日期的星期天 23:59:59 */
-    public static LocalDateTime weekLastDay(LocalDateTime localDateTime) {
-        LocalDateTime localDateTime1 = LocalDateTime.of(localDateTime.toLocalDate(), LocalTime.MAX);
-        return localDateTime1.with(DayOfWeek.SUNDAY);
+    public static LocalDateTime weekMaxTime(LocalDateTime localDateTime) {
+        return LocalDateTime.of(localDateTime.toLocalDate(), LocalTime.MAX).with(DayOfWeek.SUNDAY);
     }
 
     /** 获取时间当月的第一天00:00:00 */
-    public static long monthFirstDay() {
-        return monthFirstDay(millis());
+    public static long monthMinTime() {
+        return monthMinTime(millis());
     }
 
     /** 获取时间当月的第一天00:00:00 */
-    public static long monthFirstDay(long time) {
-        return time2Milli(monthFirstDay(localDateTime(time)));
+    public static long monthMinTime(long time) {
+        return time2Milli(monthMinTime(localDateTime(time)));
     }
 
     /** 获取时间当月的第一天00:00:00 */
-    public static LocalDateTime monthFirstDay(LocalDateTime localDateTime) {
+    public static LocalDateTime monthMinTime(LocalDateTime localDateTime) {
         return LocalDateTime.of(localDateTime.toLocalDate(), LocalTime.MIN).with(TemporalAdjusters.firstDayOfMonth());
     }
 
     /** 获取时间当月的最后一天23:59:59 */
-    public static long monthLastDay() {
-        return monthLastDay(millis());
+    public static long monthMaxTime() {
+        return monthMaxTime(millis());
     }
 
     /** 获取时间当月的最后一天23:59:59 */
-    public static long monthLastDay(long time) {
-        return time2Milli(monthLastDay(localDateTime(time)));
+    public static long monthMaxTime(long time) {
+        return time2Milli(monthMaxTime(localDateTime(time)));
     }
 
     /** 获取时间当月的最后一天23:59:59 */
-    public static LocalDateTime monthLastDay(LocalDateTime localDateTime) {
+    public static LocalDateTime monthMaxTime(LocalDateTime localDateTime) {
         return LocalDateTime.of(localDateTime.toLocalDate(), LocalTime.MAX).with(TemporalAdjusters.lastDayOfMonth());
     }
 
     /** 获取当前时间月有多少天 */
     public static int monthDays() {
-        return monthDays(localDateTime());
+        return monthDays(localDate());
 
     }
 
     /** 获取当前时间月有多少天 */
-    public static int monthDays(LocalDateTime localDateTime) {
-        return localDateTime.toLocalDate().lengthOfMonth();
+    public static int monthDays(LocalDate localDate) {
+        return localDate.lengthOfMonth();
     }
 
     public static int yearDays() {
-        return yearDays(localDateTime());
+        return yearDays(localDate());
     }
 
     /** 获取当前时间年有多少天 */
-    public static int yearDays(LocalDateTime localDateTime) {
-        return localDateTime.toLocalDate().lengthOfYear();
+    public static int yearDays(LocalDate localDateTime) {
+        return localDateTime.lengthOfYear();
     }
 
     /** 获取系统当前月份 1-12 */
@@ -433,7 +434,7 @@ public class MyClock {
 
     /** 获取传入毫秒的月份 1-12 */
     public static int getMonth(long time) {
-        return localDateTime(time).getMonth().getValue();
+        return localDate(time).getMonth().getValue();
     }
 
     /** 获取系统当前小时 0 to 23 */
@@ -473,13 +474,13 @@ public class MyClock {
 
     /** 获取年 */
     public static int getYear(long time) {
-        LocalDateTime localDateTime = localDateTime(time);
+        LocalDate localDateTime = localDate(time);
         return getYear(localDateTime);
     }
 
     /** 获取年 */
-    public static int getYear(LocalDateTime localDateTime) {
-        return localDateTime.getYear();
+    public static int getYear(LocalDate localDate) {
+        return localDate.getYear();
     }
 
     /** 获取系统当前的天 1 to 365, or 366 */
@@ -489,12 +490,12 @@ public class MyClock {
 
     /** 获取传入毫秒的天 1 to 365, or 366 */
     public static int dayOfYear(long time) {
-        LocalDateTime localDateTime = localDateTime(time);
-        return dayOfYear(localDateTime);
+        LocalDate localDate = localDate(time);
+        return dayOfYear(localDate);
     }
 
     /** 获取传入毫秒的天 1 to 365, or 366 */
-    public static int dayOfYear(LocalDateTime localDateTime) {
+    public static int dayOfYear(LocalDate localDateTime) {
         return localDateTime.getDayOfYear();
     }
 
@@ -527,11 +528,9 @@ public class MyClock {
      * @param sourceTime 需要对比的时间,相当于当前时间
      * @param targetTime 目标时间和对比时间做比较
      * @param checkHour  检查的时间,确切的小时,比如凌晨5点到第二天凌晨5点
-     * @author wxd-gaming(無心道, 15388152619)
-     * @version 2024-04-28 17:11
      */
     public static boolean isSameDay(long sourceTime, long targetTime, int checkHour) {
-        long startTime = dayOfStartMillis(sourceTime);
+        long startTime = dayMinTime(sourceTime);
         if (checkHour != 0) {
             /*说明有小时偏移*/
             startTime += TimeUnit.HOURS.toMillis(checkHour);
@@ -563,7 +562,7 @@ public class MyClock {
      * @return true 表示同一周
      */
     public static boolean isSameWeek(long time1, long time2) {
-        return weekFirstDay(time1) == weekFirstDay(time2);
+        return weekMinTime(time1) == weekMinTime(time2);
     }
 
     /**
@@ -573,7 +572,7 @@ public class MyClock {
      * @return true 在同一月
      */
     public static boolean isSameMonth(long time) {
-        return monthFirstDay(millis()) == monthFirstDay(time);
+        return monthMinTime(millis()) == monthMinTime(time);
     }
 
     /**
@@ -584,7 +583,7 @@ public class MyClock {
      * @return true 在同一月
      */
     public static boolean isSameMonth(long time1, long time2) {
-        return monthFirstDay(time1) == monthFirstDay(time2);
+        return monthMinTime(time1) == monthMinTime(time2);
     }
 
     /**
@@ -623,31 +622,25 @@ public class MyClock {
         return getYear(time1) == getYear(time2);
     }
 
-    /** 返回指定日期的季度第一天 yyyy-MM-dd */
+    /** 季度第一天 yyyy-MM-dd */
     public static String getQuarterOfYear() {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(millis());
-        int month = cal.get(Calendar.MONTH);
-        int newmonth = month % 3;
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-        cal.set(Calendar.MONTH, month - newmonth);
-        return formatDate(SDF_YYYYMMDD, cal.getTime());
+        LocalDate localDate = localDate();
+        int monthValue = localDate.getMonthValue();
+        monthValue = monthValue - monthValue % 3;
+        localDate = LocalDate.of(localDate.getYear(), monthValue + 1, 1);
+        return formatDate(SDF_YYYYMMDD, localDate);
     }
 
     /** 获取每一个月的第一天的日期 ,yyyy-MM-dd */
     public static String getDateMonthDayString() {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(millis());
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-        return formatDate(SDF_YYYYMMDD, cal.getTime());
+        LocalDate with = localDate().with(TemporalAdjusters.firstDayOfMonth());
+        return formatDate(SDF_YYYYMMDD, with);
     }
 
     /** 获取每一年的第一天的日期,yyyy-MM-dd */
     public static String getDateYearDayString() {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(millis());
-        cal.set(Calendar.DAY_OF_YEAR, 1);
-        return formatDate(SDF_YYYYMMDD, cal.getTime());
+        LocalDate with = localDate().with(TemporalAdjusters.firstDayOfYear());
+        return formatDate(SDF_YYYYMMDD, with);
     }
 
     /** 当前时间追加偏移量 */
@@ -716,29 +709,8 @@ public class MyClock {
 
 
     /** 获取指定日期，开始时间，00:00:00 */
-    public static long dayOfStartMillis() {
-        return dayOfStartMillis(millis());
-    }
-
-    /**
-     * 获取指定日期，开始时间，00:00:00
-     *
-     * @param time 指定起始时间偏移 单位是 秒 时间磋
-     * @return
-     */
-    public static long dayOfStartMillis(int time) {
-        return dayOfStartMillis(time, 0);
-    }
-
-    /**
-     * 获取指定日期，开始时间，00:00:00
-     *
-     * @param time   指定起始时间偏移 单位是 秒 时间磋
-     * @param addDay 指定偏移的天数
-     * @return
-     */
-    public static long dayOfStartMillis(int time, int addDay) {
-        return dayOfStartMillis(time * 1000L, addDay);
+    public static long dayMinTime() {
+        return dayMinTime(millis());
     }
 
     /**
@@ -747,8 +719,8 @@ public class MyClock {
      * @param time 指定起始时间偏移 单位是 毫秒 时间磋
      * @return
      */
-    public static long dayOfStartMillis(long time) {
-        return dayOfStartMillis(time, 0);
+    public static long dayMinTime(long time) {
+        return dayMinTime(time, 0);
     }
 
 
@@ -759,8 +731,8 @@ public class MyClock {
      * @param addDay 指定偏移的天数
      * @return
      */
-    public static long dayOfStartMillis(long time, int addDay) {
-        return dayOfStartMillis(localDateTime(time), addDay);
+    public static long dayMinTime(long time, int addDay) {
+        return dayMinTime(localDateTime(time), addDay);
     }
 
     /**
@@ -770,8 +742,8 @@ public class MyClock {
      * @param addDay 指定偏移的天数
      * @return
      */
-    public static long dayOfStartMillis(LocalDateTime time, int addDay) {
-        return time2Milli(dayOfStart(time, addDay));
+    public static long dayMinTime(LocalDateTime time, int addDay) {
+        return time2Milli(dayMin(time, addDay));
     }
 
     /**
@@ -781,7 +753,7 @@ public class MyClock {
      * @param addDay 指定偏移的天数
      * @return
      */
-    public static LocalDateTime dayOfStart(LocalDateTime time, int addDay) {
+    public static LocalDateTime dayMin(LocalDateTime time, int addDay) {
         return time.plusDays(addDay).with(LocalTime.MIN);
     }
 
@@ -790,29 +762,8 @@ public class MyClock {
      *
      * @return
      */
-    public static long dayOfEndMillis() {
-        return dayOfEndMillis(0);
-    }
-
-    /**
-     * 获取指定日期，结束时间，23:59:59
-     *
-     * @param addDay 指定偏移的天数
-     * @return
-     */
-    public static long dayOfEndMillis(int addDay) {
-        return dayOfEndMillis(millis(), addDay);
-    }
-
-    /**
-     * 获取指定日期，结束时间，23:59:59
-     *
-     * @param time   指定起始时间偏移 单位是 秒 时间磋
-     * @param addDay 指定偏移的天数
-     * @return
-     */
-    public static long dayOfEndMillis(int time, int addDay) {
-        return dayOfEndMillis(time * 1000L, addDay);
+    public static long dayMaxTime() {
+        return dayMaxTime(0);
     }
 
     /**
@@ -821,8 +772,8 @@ public class MyClock {
      * @param time 指定起始时间偏移 单位是 毫秒 时间磋
      * @return
      */
-    public static long dayOfEndMillis(long time) {
-        return dayOfEndMillis(time, 0);
+    public static long dayMaxTime(long time) {
+        return dayMaxTime(time, 0);
     }
 
     /**
@@ -832,15 +783,15 @@ public class MyClock {
      * @param addDay 指定偏移的天数
      * @return
      */
-    public static long dayOfEndMillis(long time, int addDay) {
-        return dayOfEndMillis(localDateTime(time), addDay);
+    public static long dayMaxTime(long time, int addDay) {
+        return dayMaxTime(localDateTime(time), addDay);
     }
 
-    public static long dayOfEndMillis(LocalDateTime time, int addDay) {
-        return time2Milli(dayOfEnd(time, addDay));
+    public static long dayMaxTime(LocalDateTime time, int addDay) {
+        return time2Milli(dayMax(time, addDay));
     }
 
-    public static LocalDateTime dayOfEnd(LocalDateTime time, int addDay) {
+    public static LocalDateTime dayMax(LocalDateTime time, int addDay) {
         return time.plusDays(addDay).with(LocalTime.MAX);
     }
 

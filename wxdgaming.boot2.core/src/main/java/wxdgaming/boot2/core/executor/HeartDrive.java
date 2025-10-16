@@ -32,7 +32,7 @@ public class HeartDrive {
         m = localDateTime.getMinute();
         h = localDateTime.getHour();
         dayOfYear = localDateTime.getDayOfYear();
-        w = MyClock.weekFirstDay(millis);
+        w = MyClock.weekMinTime(millis);
     }
 
     public void setDriveHandler(HeartDriveHandler driveHandler) {
@@ -61,7 +61,7 @@ public class HeartDrive {
             if (td == dayOfYear) {return;}
             dayOfYear = td;
             driveHandlerProxy.heartDayEnd(dayOfYear);
-            long tw = MyClock.weekFirstDay(millis);
+            long tw = MyClock.weekMinTime(millis);
             if (tw != w) {
                 w = tw;
                 driveHandlerProxy.heartWeek(w);
