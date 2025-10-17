@@ -32,24 +32,24 @@ public class LNumTime extends LNum implements Serializable {
     }
 
     @Override public void clear() {
-        lock();
+        writeLock();
         try {
             super.clear();
             this.lUTime = 0;
         } finally {
-            unlock();
+            unWriteLock();
         }
     }
 
-    @Override public LNumTime setNum(long num) {
-        lock();
+    @Override public LNumTime setNum(long change) {
+        writeLock();
         try {
-            super.setNum(num);
+            super.setNum(change);
             this.lUTime = MyClock.millis();
-            return this;
         } finally {
-            unlock();
+            unReadLock();
         }
+        return this;
     }
 
 }

@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.format.data;
 
+import com.alibaba.fastjson.JSONObject;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
 /**
@@ -10,28 +11,32 @@ import wxdgaming.boot2.core.json.FastJsonUtil;
  **/
 public interface Data2Json {
 
+    default JSONObject toJSONObject() {
+        return FastJsonUtil.parseJSONObject(this);
+    }
+
     /** json */
-    default String toJson() {
+    default String toJSONString() {
         return FastJsonUtil.toJSONString(this);
     }
 
     /** 一般是js用的，所有 key 值都是字符串 格式化 */
-    default String toJsonKeyAsString() {
+    default String toJSONStringKeyAsString() {
         return FastJsonUtil.toJSONStringKeyAsString(this);
     }
 
     /** 一般是js用的，所有 key - value 值都是字符串 格式化 */
-    default String toJsonAllAsString() {
+    default String toJSONStringAllAsString() {
         return FastJsonUtil.toJSONStringAllAsString(this);
     }
 
     /** json, 输出类型名称 */
-    default String toJsonWriteType() {
+    default String toJSONStringAsWriteType() {
         return FastJsonUtil.toJSONStringAsWriteType(this);
     }
 
     /** 格式化json */
-    default String toJsonFmt() {
+    default String toJSONStringAsFmt() {
         return FastJsonUtil.toJSONStringAsFmt(this);
     }
 

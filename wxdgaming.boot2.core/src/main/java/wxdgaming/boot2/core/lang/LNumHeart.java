@@ -39,7 +39,7 @@ public class LNumHeart extends LNum implements Serializable {
      * @return
      */
     public boolean heartTimer(long maxValue, long currentTimeMillis, long cd) {
-        lock();
+        writeLock();
         try {
             if (getNum() < maxValue) {
                 if (lUTime == 0) {
@@ -64,22 +64,22 @@ public class LNumHeart extends LNum implements Serializable {
             }
             return false;
         } finally {
-            unlock();
+            unWriteLock();
         }
     }
 
     @Override public void clear() {
-        lock();
+        writeLock();
         try {
             super.clear();
             this.lUTime = 0;
         } finally {
-            unlock();
+            unWriteLock();
         }
     }
 
-    @Override public LNumHeart setNum(long num) {
-        super.setNum(num);
+    @Override public LNumHeart setNum(long change) {
+        super.setNum(change);
         return this;
     }
 }

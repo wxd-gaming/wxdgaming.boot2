@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.lang;
 
-import com.alibaba.fastjson.JSONObject;
+import wxdgaming.boot2.core.format.data.Data2Json;
+import wxdgaming.boot2.core.format.data.Data2Size;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
 import java.io.Serial;
@@ -12,7 +13,7 @@ import java.io.Serializable;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-02-13 14:21
  **/
-public abstract class ObjectBase implements Serializable, Cloneable {
+public abstract class ObjectBase implements Serializable, Cloneable, Data2Json, Data2Size {
 
     @Serial private static final long serialVersionUID = 1L;
 
@@ -25,21 +26,6 @@ public abstract class ObjectBase implements Serializable, Cloneable {
         }
     }
 
-    public JSONObject toJSONObject() {
-        return FastJsonUtil.parseJSONObject(this);
-    }
-
-    public String toJSONString() {
-        return FastJsonUtil.toJSONString(this);
-    }
-
-    public String toJSONStringAsFmt() {
-        return FastJsonUtil.toJSONStringAsFmt(this);
-    }
-
-    public String toJSONStringAsWriteType() {
-        return FastJsonUtil.toJSONStringAsWriteType(this);
-    }
 
     @Override public String toString() {
         return this.getClass().getSimpleName() + FastJsonUtil.toJSONString(this);

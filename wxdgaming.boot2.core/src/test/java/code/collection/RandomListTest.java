@@ -15,7 +15,7 @@ public class RandomListTest {
         randomList.add(4);
         System.out.println(randomList.getList());
         System.out.println(randomList.random());
-        randomList.remove(4);
+        randomList.remove(3);
         System.out.println(randomList.getList());
         System.out.println(randomList.random());
     }

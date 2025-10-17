@@ -16,7 +16,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class LNum extends ObjectBaseLock implements Serializable {
+public class LNum extends ObjectBaseRWLock implements Serializable {
 
     @Serial private static final long serialVersionUID = 1L;
 
@@ -30,12 +30,7 @@ public class LNum extends ObjectBaseLock implements Serializable {
     }
 
     public void clear() {
-        lock();
-        try {
-            this.num = 0;
-        } finally {
-            unlock();
-        }
+        syncWrite(() -> this.num = 0);
     }
 
     public int intValue() {
@@ -45,14 +40,9 @@ public class LNum extends ObjectBaseLock implements Serializable {
         return (int) this.num;
     }
 
-    public LNum setNum(long num) {
-        lock();
-        try {
-            this.num = num;
-            return this;
-        } finally {
-            unlock();
-        }
+    public LNum setNum(long change) {
+        syncWrite(() -> this.num = change);
+        return this;
     }
 
     /** 加法 */
@@ -67,21 +57,19 @@ public class LNum extends ObjectBaseLock implements Serializable {
 
     /** 加法 */
     public long add(long val, Long min, Long max) {
-        lock();
-        try {
-            setNum(Math.addExact(this.num, val));
+        syncWrite(() -> {
+            long change = Math.addExact(this.num, val);
             if (min != null) {
                 /*有最小值，实际上就是谁最大取谁*/
-                max(min);
+                change = Math.max(min, change);
             }
             if (max != null) {
                 /*有最大值，实际上就是谁最小取谁*/
-                min(max);
+                change = Math.min(max, change);
             }
-            return getNum();
-        } finally {
-            unlock();
-        }
+            this.num = change;
+        });
+        return getNum();
     }
 
     /** 减法 */
@@ -97,44 +85,40 @@ public class LNum extends ObjectBaseLock implements Serializable {
 
     /** 减法 */
     public long sub(long val, Long min, Long max) {
-        lock();
-        try {
-            setNum(Math.subtractExact(this.num, val));
+        syncWrite(() -> {
+            long change = Math.subtractExact(this.num, val);
             if (min != null) {
                 /*有最小值，实际上就是谁最大取谁*/
-                max(min);
+                change = Math.max(min, change);
             }
             if (max != null) {
                 /*有最大值，实际上就是谁最小取谁*/
-                min(max);
+                change = Math.min(max, change);
             }
-            return getNum();
-        } finally {
-            unlock();
-        }
+            this.num = change;
+        });
+        return getNum();
     }
+
 
     /** 如果更新成功返回 true */
     public boolean min(long val) {
-        lock();
-        try {
+        return supplierWrite(() -> {
             long oldVal = this.num;
             setNum(Math.min(this.num, val));
             return getNum() != oldVal;
-        } finally {
-            unlock();
-        }
+        });
     }
 
     /** 如果更新成功返回 true */
     public boolean max(long val) {
-        lock();
+        writeLock();
         try {
             long oldVal = this.num;
             setNum(Math.max(this.num, val));
             return getNum() != oldVal;
         } finally {
-            unlock();
+            unWriteLock();
         }
     }
 
