@@ -10,6 +10,7 @@ import wxdgaming.logserver.bean.LogEntity;
 import wxdgaming.logserver.plugin.AbstractPlugin;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -152,10 +153,11 @@ public class StatsPlugin extends AbstractPlugin {
                 GROUP BY logdata->>'amount';
                 """;
         List<JSONObject> jsonObjects = sqlDataHelper.queryList(sql, loginDataKey, loginDataKey);
+        jsonObjects.sort(Comparator.comparingInt(o -> o.getIntValue("amount")));
         int[][] ints = new int[2][jsonObjects.size()];
         for (int i = 0; i < jsonObjects.size(); i++) {
             JSONObject jsonObject = jsonObjects.get(i);
-            ints[0][i] = jsonObject.getInteger("amount");
+            ints[0][i] = jsonObject.getInteger("amount") / 100;
             ints[1][i] = jsonObject.getInteger("count");
         }
         return ints;

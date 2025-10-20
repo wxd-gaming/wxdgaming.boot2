@@ -9,7 +9,6 @@ import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.mail.MailInfo;
 import wxdgaming.game.server.bean.mail.MailPack;
-import wxdgaming.game.server.bean.mail.ServerMailInfo;
 import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.server.bean.global.GlobalDataConst;
 import wxdgaming.game.server.bean.global.impl.ServerMailData;
@@ -53,24 +52,24 @@ public class MailService extends HoldApplicationContext {
         });
 
         ServerMailData serverMailData = globalDataService.get(GlobalDataConst.SERVER_MAIL_DATA);
-        ArrayList<ServerMailInfo> mailInfoList = serverMailData.getMailInfoList();
-        for (ServerMailInfo mailInfo : mailInfoList) {
-            if (!mailInfo.checkValidity())
-                continue;
-            if (mailInfo.getLvMin() > player.getLevel() || mailInfo.getLvMax() < player.getLevel())
-                continue;
-            int vipLv = player.getVipInfo().getLv();
-            if (mailInfo.getVipLvMin() > vipLv || mailInfo.getVipLvMax() < vipLv)
-                continue;
-            if (!mailInfo.getRidList().isEmpty() && !mailInfo.getRidList().contains(player.getUid()))
-                /*指定的角色才可用领取*/
-                continue;
-            if (mailInfo.getRewardRidList().contains(player.getUid()))
-                /*该角色已经领取过了*/
-                continue;
-            mailInfo.getRewardRidList().add(player.getUid());
-            addMail(player, mailInfo);
-        }
+//        ArrayList<ServerMailInfo> mailInfoList = serverMailData.getMailInfoList();
+//        for (ServerMailInfo mailInfo : mailInfoList) {
+//            if (!mailInfo.checkValidity())
+//                continue;
+//            if (mailInfo.getLvMin() > player.getLevel() || mailInfo.getLvMax() < player.getLevel())
+//                continue;
+//            int vipLv = player.getVipInfo().getLv();
+//            if (mailInfo.getVipLvMin() > vipLv || mailInfo.getVipLvMax() < vipLv)
+//                continue;
+//            if (!mailInfo.getRidList().isEmpty() && !mailInfo.getRidList().contains(player.getUid()))
+//                /*指定的角色才可用领取*/
+//                continue;
+//            if (mailInfo.getRewardRidList().contains(player.getUid()))
+//                /*该角色已经领取过了*/
+//                continue;
+//            mailInfo.getRewardRidList().add(player.getUid());
+//            addMail(player, mailInfo);
+//        }
     }
 
     public void sendMail(Player player, String sender, String title, String content, List<String> contentArgs, List<Item> items, String logMsg) {

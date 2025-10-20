@@ -26,7 +26,7 @@ public class JsonTokenParse {
         String string = jsonToken.getData().toString(FastJsonUtil.Writer_Features);
         String join = String.join("#", string, key);
         log.debug("md5join: {}", join);
-        AssertUtil.isTrue(Objects.equals(Md5Util.md5(join), jsonToken.getSignature()), "token错误");
+        AssertUtil.isTrue(!Objects.equals(Md5Util.md5(join), jsonToken.getSignature()), "token错误");
         return jsonToken;
     }
 

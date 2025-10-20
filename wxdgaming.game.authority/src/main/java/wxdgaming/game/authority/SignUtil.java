@@ -29,7 +29,7 @@ public class SignUtil {
         if (data instanceof String s) {
             dataString = s;
         } else {
-            dataString = FastJsonUtil.toJSONString(data, FastJsonUtil.Writer_Features);
+            dataString = FastJsonUtil.toJSONString(data, FastJsonUtil.Writer_Features_Sort);
         }
         String string = dataString + key;
         String sign = Md5Util.md5(string);
