@@ -39,8 +39,12 @@ public class ConcurrentRandomList<T> extends ObjectBaseRWLock implements Seriali
             Integer index = map.remove(t);
             if (index == null) return;
             if (index < list.size() - 1) {
-                list.set(index, list.getLast());
+                /*TODO 如果删除的元素并非最后一个，那么把最后一个元素替换到需要删除的位置*/
+                T last = list.getLast();
+                map.put(last, index);
+                list.set(index, last);
             }
+            /*TODO 删除最后一个*/
             list.removeLast();
         });
     }
@@ -52,6 +56,18 @@ public class ConcurrentRandomList<T> extends ObjectBaseRWLock implements Seriali
             }
             return list.get(RandomUtils.random(list.size()));
         });
+    }
+
+    public String toString2() {
+        return """
+                {
+                     map=%s,
+                    list=%s
+                }""".formatted(map, list);
+    }
+
+    @Override public String toString() {
+        return "RandomList{%s}".formatted(list);
     }
 
 }

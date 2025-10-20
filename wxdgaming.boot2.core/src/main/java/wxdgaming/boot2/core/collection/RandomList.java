@@ -24,11 +24,11 @@ public class RandomList<T> implements Serializable {
      * <p> key: 数据
      * <p> value: 数据在list中的索引
      */
-    private Map<T, Integer> map = new HashMap<>();
+    private final Map<T, Integer> map = new HashMap<>();
     /**
      * 用于操作的数据，因为random 要快速高效，数组下标是最高效的
      */
-    private List<T> list = ListOf.newArrayList();
+    private final List<T> list = ListOf.newArrayList();
 
     public void add(T t) {
         if (!map.containsKey(t)) {
@@ -42,7 +42,9 @@ public class RandomList<T> implements Serializable {
         if (index == null) return;
         if (index < list.size() - 1) {
             /*TODO 如果删除的元素并非最后一个，那么把最后一个元素替换到需要删除的位置*/
-            list.set(index, list.getLast());
+            T last = list.getLast();
+            map.put(last, index);
+            list.set(index, last);
         }
         /*TODO 删除最后一个*/
         list.removeLast();
@@ -53,4 +55,15 @@ public class RandomList<T> implements Serializable {
         return list.get(RandomUtils.random(list.size()));
     }
 
+    public String toString2() {
+        return """
+                {
+                     map=%s,
+                    list=%s
+                }""".formatted(map, list);
+    }
+
+    @Override public String toString() {
+        return "RandomList{%s}".formatted(list);
+    }
 }

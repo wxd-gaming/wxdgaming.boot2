@@ -13,10 +13,10 @@ public class RandomListTest {
         randomList.add(3);
         randomList.add(2);
         randomList.add(4);
-        System.out.println(randomList.getList());
+        System.out.println(randomList.toString2());
         System.out.println(randomList.random());
         randomList.remove(3);
-        System.out.println(randomList.getList());
+        System.out.println(randomList.toString2());
         System.out.println(randomList.random());
     }
 
@@ -24,13 +24,13 @@ public class RandomListTest {
     public void t2() {
         ConcurrentRandomList<Integer> randomList = new ConcurrentRandomList<>();
         randomList.add(1);
+        randomList.add(4);
         randomList.add(3);
         randomList.add(2);
-        randomList.add(4);
-        System.out.println(randomList.getList());
+        System.out.println(randomList.toString2());
         System.out.println(randomList.random());
         randomList.remove(4);
-        System.out.println(randomList.getList());
+        System.out.println(randomList.toString2());
         System.out.println(randomList.random());
     }
 
