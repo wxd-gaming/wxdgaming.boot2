@@ -49,7 +49,7 @@ public class DataCenterService implements InitPrint {
     }
 
     @ExecutorWith(useVirtualThread = true)
-    @Scheduled(value = "0 0 0 * * ?", async = true)
+    @Scheduled(value = "0 0 0 * * ?")
     public void initLogTable() {
         Map<String, String> dbTableMap = sqlDataHelper.findTableMap();
         Map<String, LinkedHashMap<String, JSONObject>> tableStructMap = sqlDataHelper.findTableStructMap();

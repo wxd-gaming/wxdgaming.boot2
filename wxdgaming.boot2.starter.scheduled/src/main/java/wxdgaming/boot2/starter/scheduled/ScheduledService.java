@@ -137,7 +137,7 @@ public class ScheduledService extends HoldApplicationContext {
         }
 
         public boolean runJob(AbstractCronTrigger scheduledInfo, long millis) {
-            scheduledInfo.lock.lock();
+            scheduledInfo.monitor.lock();
             try {
                 if (!scheduledInfo.scheduleAtFixedRate() && !scheduledInfo.runEnd.get())
                     return false;
@@ -145,7 +145,7 @@ public class ScheduledService extends HoldApplicationContext {
                 scheduledInfo.runEnd.set(false);
                 scheduledInfo.nextRunTime = scheduledInfo.getCronExpress().validateTimeAfterMillis();
             } finally {
-                scheduledInfo.lock.unlock();
+                scheduledInfo.monitor.unlock();
             }
 
             if (scheduledInfo.isAsync()) {

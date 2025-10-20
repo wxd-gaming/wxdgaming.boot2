@@ -172,7 +172,7 @@ public class RobotMainService {
     }
 
     /** 1秒一次主循环 */
-    @Scheduled(value = "*/5", async = true)
+    @Scheduled(value = "*/5")
     public void timer60() {
         for (Robot robot : robotMap.values()) {
             if (robot.isLoginEnd()) {
@@ -190,7 +190,7 @@ public class RobotMainService {
     AtomicBoolean resetTime = new AtomicBoolean();
 
     /** 设置时间 */
-    @Scheduled(value = "0", async = true)
+    @Scheduled(value = "0")
     public void timer61() {
         for (Robot robot : robotMap.values()) {
             if (robot.isLoginEnd()) {

@@ -8,13 +8,13 @@ import wxdgaming.boot2.core.Const;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.IExecutorQueue;
 import wxdgaming.boot2.core.executor.StackUtils;
+import wxdgaming.boot2.core.locks.Monitor;
 import wxdgaming.boot2.core.timer.CronExpress;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * cron 表达式时间触发器
@@ -30,7 +30,7 @@ public abstract class AbstractCronTrigger extends ExecutorEvent implements Runna
 
     protected final CronExpress cronExpress;
     /** 上一次执行尚未完成是否持续执行 默认false 不执行 */
-    protected final ReentrantLock lock = new ReentrantLock();
+    protected final Monitor monitor = new Monitor();
     protected final AtomicBoolean runEnd = new AtomicBoolean(true);
     protected long nextRunTime = -1;
 
@@ -72,13 +72,8 @@ public abstract class AbstractCronTrigger extends ExecutorEvent implements Runna
         try {
             super.run();
         } finally {
-            lock.lock();
-            try {
-                /*标记为执行完成*/
-                runEnd.set(true);
-            } finally {
-                lock.unlock();
-            }
+            /*标记为执行完成*/
+            monitor.sync(() -> runEnd.set(true));
         }
     }
 

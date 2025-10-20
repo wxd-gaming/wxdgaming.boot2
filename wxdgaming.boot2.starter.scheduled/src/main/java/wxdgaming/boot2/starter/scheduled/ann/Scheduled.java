@@ -37,6 +37,4 @@ public @interface Scheduled {
      */
     String value() default "";
 
-    boolean async() default false;
-
 }

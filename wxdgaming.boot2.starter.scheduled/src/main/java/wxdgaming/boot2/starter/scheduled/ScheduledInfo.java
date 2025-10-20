@@ -76,13 +76,8 @@ public class ScheduledInfo extends AbstractCronTrigger implements Runnable, IExe
             String msg = "执行：" + this.name;
             log.error(msg, throwable);
         } finally {
-            lock.lock();
-            try {
-                /*标记为执行完成*/
-                runEnd.set(true);
-            } finally {
-                lock.unlock();
-            }
+            /*标记为执行完成*/
+            monitor.sync(() -> runEnd.set(true));
         }
     }
 
