@@ -1,5 +1,7 @@
 package wxdgaming.boot2.core.locks;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
@@ -11,7 +13,8 @@ import java.util.function.Supplier;
  */
 public class Monitor {
 
-    final ReentrantLock reentrantLock = new ReentrantLock();
+    @JSONField(serialize = false, deserialize = false)
+    protected transient final ReentrantLock reentrantLock = new ReentrantLock();
 
     public void lock() {
         reentrantLock.lock();

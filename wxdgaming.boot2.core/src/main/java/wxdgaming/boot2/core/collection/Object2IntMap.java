@@ -15,7 +15,7 @@ import java.util.function.IntUnaryOperator;
 /** 非线程安全的 */
 @Getter
 @Setter
-public class ObjIntMap<K> implements Serializable {
+public class Object2IntMap<K> implements Serializable {
 
     @Serial private static final long serialVersionUID = 1L;
 

@@ -15,7 +15,7 @@ import java.util.function.LongUnaryOperator;
 /** 非线程安全的 */
 @Getter
 @Setter
-public class ObjLongMap<K> implements Serializable {
+public class Object2LongMap<K> implements Serializable {
 
     @Serial private static final long serialVersionUID = 1L;
 

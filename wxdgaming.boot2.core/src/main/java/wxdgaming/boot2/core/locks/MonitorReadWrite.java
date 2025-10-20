@@ -1,5 +1,7 @@
 package wxdgaming.boot2.core.locks;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
@@ -11,9 +13,12 @@ import java.util.function.Supplier;
  */
 public class MonitorReadWrite {
 
-    final ReentrantReadWriteLock reentrantLock = new ReentrantReadWriteLock();
-    final ReentrantReadWriteLock.ReadLock readLock = reentrantLock.readLock();
-    final ReentrantReadWriteLock.WriteLock writeLock = reentrantLock.writeLock();
+    @JSONField(serialize = false, deserialize = false)
+    protected transient final ReentrantReadWriteLock reentrantLock = new ReentrantReadWriteLock();
+    @JSONField(serialize = false, deserialize = false)
+    protected transient final ReentrantReadWriteLock.ReadLock readLock = reentrantLock.readLock();
+    @JSONField(serialize = false, deserialize = false)
+    protected transient final ReentrantReadWriteLock.WriteLock writeLock = reentrantLock.writeLock();
 
     public void readLock() {
         readLock.lock();

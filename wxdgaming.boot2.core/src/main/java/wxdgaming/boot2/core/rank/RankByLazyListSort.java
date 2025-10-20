@@ -4,10 +4,10 @@ import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.cache2.LRUIntCache;
+import wxdgaming.boot2.core.locks.MonitorReadWrite;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.util.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * 排行榜容器,延迟排序的懒惰容器
@@ -21,11 +21,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  **/
 @Getter
 @Setter
-public class RankByLazyListSort {
-
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
-    private final ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
+public class RankByLazyListSort extends MonitorReadWrite {
 
     private final HashMap<String, RankElement> map = new HashMap<>();
     @JSONField(serialize = false, deserialize = false)
@@ -56,7 +52,7 @@ public class RankByLazyListSort {
     /**
      * 构造函数
      *
-     * @param lazyTimeMs 排行榜延迟刷新时间
+     * @param lazyTimeMs   排行榜延迟刷新时间
      * @param rankElements 排行榜容器数据
      */
     public RankByLazyListSort(long lazyTimeMs, List<RankElement> rankElements) {

@@ -20,7 +20,14 @@ public class RandomList<T> implements Serializable {
 
     @Serial private static final long serialVersionUID = 1L;
 
+    /**
+     * <p> key: 数据
+     * <p> value: 数据在list中的索引
+     */
     private Map<T, Integer> map = new HashMap<>();
+    /**
+     * 用于操作的数据，因为random 要快速高效，数组下标是最高效的
+     */
     private List<T> list = ListOf.newArrayList();
 
     public void add(T t) {
@@ -34,8 +41,10 @@ public class RandomList<T> implements Serializable {
         Integer index = map.remove(t);
         if (index == null) return;
         if (index < list.size() - 1) {
+            /*TODO 如果删除的元素并非最后一个，那么把最后一个元素替换到需要删除的位置*/
             list.set(index, list.getLast());
         }
+        /*TODO 删除最后一个*/
         list.removeLast();
     }
 

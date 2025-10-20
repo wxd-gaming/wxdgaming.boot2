@@ -2,6 +2,7 @@ package code.cache;
 
 import lombok.Builder;
 import wxdgaming.boot2.core.function.Predicate3;
+import wxdgaming.boot2.core.locks.MonitorReadWrite;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.time.Duration;
@@ -9,7 +10,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 /**
@@ -76,17 +76,13 @@ class LRUCacheHolderLock<K, V> {
         }
     }
 
-    protected class CacheBlock {
+    protected class CacheBlock extends MonitorReadWrite {
         /** 区块锁 */
-        final ReentrantReadWriteLock blockLock = new ReentrantReadWriteLock();
-        final ReentrantReadWriteLock.ReadLock blockReadLock = blockLock.readLock();
-        final ReentrantReadWriteLock.WriteLock blockWriteLock = blockLock.writeLock();
         final HashMap<K, CacheNode> nodeMap = new HashMap<>();
         final ConcurrentSkipListSet<CacheNode> expireSet = new ConcurrentSkipListSet<>();
 
         public void put(K key, V value) {
-            blockWriteLock.lock();
-            try {
+            syncWrite(() -> {
                 CacheNode newNode = new CacheNode(key, value);
                 CacheNode oldNode = nodeMap.put(key, newNode);
                 if (oldNode != null) {
@@ -96,24 +92,22 @@ class LRUCacheHolderLock<K, V> {
                     }
                 }
                 expireSet.add(newNode);
-            } finally {
-                blockWriteLock.unlock();
-            }
+            });
         }
 
 
         public V get(K key) {
-            blockReadLock.lock();
+            readLock();
             CacheNode cacheNode = null;
             try {
                 cacheNode = nodeMap.get(key);
             } finally {
-                blockReadLock.unlock();
+                unReadLock();
             }
             if (cacheNode == null) {
                 if (loader == null)
                     return null;
-                blockWriteLock.lock();
+                writeLock();
                 try {
                     cacheNode = nodeMap.get(key);
                     if (cacheNode == null) {
@@ -126,7 +120,7 @@ class LRUCacheHolderLock<K, V> {
                         return loadValue;
                     }
                 } finally {
-                    blockWriteLock.unlock();
+                    unWriteLock();
                 }
             }
             if (expireAfterWrite == null) {
@@ -143,12 +137,7 @@ class LRUCacheHolderLock<K, V> {
         }
 
         public Collection<V> values() {
-            blockReadLock.lock();
-            try {
-                return nodeMap.values().stream().map(n -> n.value).toList();
-            } finally {
-                blockReadLock.unlock();
-            }
+            return supplierRead(() -> nodeMap.values().stream().map(n -> n.value).toList());
         }
 
     }
@@ -217,16 +206,13 @@ class LRUCacheHolderLock<K, V> {
         CacheConst.scheduledExecutorService.execute(() -> {
             int blockIndex = getBlockIndex(k);
             CacheBlock cacheBlock = cacheAtomicReference.get(blockIndex);
-            cacheBlock.blockWriteLock.lock();
-            try {
+            cacheBlock.syncWrite(() -> {
                 CacheNode remove = cacheBlock.nodeMap.remove(k);
                 if (remove != null) {
                     cacheBlock.expireSet.remove(remove);
                     onRemove(remove, cause);
                 }
-            } finally {
-                cacheBlock.blockWriteLock.unlock();
-            }
+            });
         });
     }
 
@@ -238,8 +224,7 @@ class LRUCacheHolderLock<K, V> {
     public void invalidateAll(RemovalCause removalCause) {
         CacheConst.scheduledExecutorService.execute(() -> {
             for (CacheBlock cacheBlock : cacheAtomicReference) {
-                cacheBlock.blockWriteLock.lock();
-                try {
+                cacheBlock.syncWrite(() -> {
                     Iterator<CacheNode> iterator = cacheBlock.expireSet.iterator();
                     while (iterator.hasNext()) {
                         CacheNode cacheNode = iterator.next();
@@ -247,9 +232,7 @@ class LRUCacheHolderLock<K, V> {
                         iterator.remove();
                         cacheBlock.nodeMap.remove(cacheNode.key);
                     }
-                } finally {
-                    cacheBlock.blockWriteLock.unlock();
-                }
+                });
             }
         });
     }
@@ -265,8 +248,7 @@ class LRUCacheHolderLock<K, V> {
 
     private void onCleanup(code.cache.RemovalCause removalCause) {
         for (CacheBlock cacheBlock : cacheAtomicReference) {
-            cacheBlock.blockWriteLock.lock();
-            try {
+            cacheBlock.syncWrite(() -> {
                 Iterator<CacheNode> iterator = cacheBlock.expireSet.iterator();
                 while (iterator.hasNext()) {
                     CacheNode cacheNode = iterator.next();
@@ -282,9 +264,7 @@ class LRUCacheHolderLock<K, V> {
                         cacheBlock.expireSet.add(cacheNode);
                     }
                 }
-            } finally {
-                cacheBlock.blockWriteLock.unlock();
-            }
+            });
         }
     }
 

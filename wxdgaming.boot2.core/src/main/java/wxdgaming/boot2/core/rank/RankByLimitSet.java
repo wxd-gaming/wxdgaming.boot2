@@ -2,9 +2,9 @@ package wxdgaming.boot2.core.rank;
 
 import lombok.Getter;
 import lombok.Setter;
+import wxdgaming.boot2.core.locks.MonitorReadWrite;
 
 import java.util.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * 排行榜限制排行榜, 如果需要存入数据库使用 {@link #toDb()}
@@ -15,11 +15,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @version 2025-06-27 16:02
  **/
 @Getter
-public class RankByLimitSet {
-
-    private transient final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private transient final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
-    private transient final ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
+public class RankByLimitSet extends MonitorReadWrite {
 
     private final int limit;
     /** 记录前500名 */

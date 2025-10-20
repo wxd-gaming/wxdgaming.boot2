@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.collection;
 
 import com.alibaba.fastjson.JSONObject;
+import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.io.Serializable;
 import java.util.*;
@@ -129,25 +130,21 @@ public class MapOf implements Serializable {
         return map;
     }
 
-    public static <K, T> Map<K, T> ofMap(Function<T, K> kf, T... args) {
+    @SafeVarargs public static <K, T> Map<K, T> ofMap(Function<T, K> kf, T... args) {
         Map<K, T> map = new LinkedHashMap<>();
         for (T t : args) {
             final K k = kf.apply(t);
-            if (map.containsKey(k)) {
-                throw new RuntimeException("存在相同的key：" + k + " - " + t);
-            }
+            AssertUtil.isTrue(!map.containsKey(k), "存在相同的key：%s - %s", k, t);
             map.put(k, t);
         }
         return map;
     }
 
-    public static <K, V, T> Map<K, V> ofMap(Function<T, K> kf, Function<T, V> kv, T... args) {
+    @SafeVarargs public static <K, V, T> Map<K, V> ofMap(Function<T, K> kf, Function<T, V> kv, T... args) {
         Map<K, V> map = new LinkedHashMap<>();
         for (T t : args) {
             final K k = kf.apply(t);
-            if (map.containsKey(k)) {
-                throw new RuntimeException("存在相同的key：" + k);
-            }
+            AssertUtil.isTrue(!map.containsKey(k), "存在相同的key：%s - %s", k, t);
             final V v = kv.apply(t);
             map.put(k, v);
         }
@@ -163,9 +160,7 @@ public class MapOf implements Serializable {
     public static <K, T> Map<K, T> ofMap(Map<K, T> map, Collection<T> args, Function<T, K> function) {
         for (T t : args) {
             final K k = function.apply(t);
-            if (map.containsKey(k)) {
-                throw new RuntimeException("存在相同的key：" + k);
-            }
+            AssertUtil.isTrue(!map.containsKey(k), "存在相同的key：%s - %s", k, t);
             map.put(k, t);
         }
         return map;
@@ -180,9 +175,7 @@ public class MapOf implements Serializable {
     public static <K, V, T> Map<K, V> ofMap(Map<K, V> map, Collection<T> args, Function<T, K> fk, Function<T, V> fv) {
         for (T t : args) {
             final K k = fk.apply(t);
-            if (map.containsKey(k)) {
-                throw new RuntimeException("存在相同的key：" + k);
-            }
+            AssertUtil.isTrue(!map.containsKey(k), "存在相同的key：%s - %s", k, t);
             final V v = fv.apply(t);
             map.put(k, v);
         }

@@ -3,12 +3,12 @@ package wxdgaming.boot2.core.rank;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
+import wxdgaming.boot2.core.locks.MonitorReadWrite;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.TreeSet;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 自动排序
@@ -18,10 +18,8 @@ import java.util.concurrent.locks.ReentrantLock;
  **/
 @Getter
 @Setter
-public class SortedList<K, V extends Comparable<V>> {
+public class SortedList<K, V extends Comparable<V>> extends MonitorReadWrite {
 
-    @JSONField(serialize = false, deserialize = false)
-    private final transient ReentrantLock reentrantLock = new ReentrantLock();
     private final HashMap<K, SortedElement<K, V>> map = new HashMap<>();
     @JSONField(serialize = false, deserialize = false)
     private final transient TreeSet<SortedElement<K, V>> sortSet = new TreeSet<>();
@@ -41,9 +39,8 @@ public class SortedList<K, V extends Comparable<V>> {
     }
 
     public void update(K k, V v, long updateTime) {
-        reentrantLock.lock();
-        try {
-            SortedElement<K, V> sortedElement = map.computeIfAbsent(k, l -> new SortedElement<K, V>(l));
+        syncWrite(() -> {
+            SortedElement<K, V> sortedElement = map.computeIfAbsent(k, SortedElement::new);
             V oldV = sortedElement.getV();
             if (!Objects.equals(v, oldV)) {
                 if (oldV != null) {
@@ -53,27 +50,17 @@ public class SortedList<K, V extends Comparable<V>> {
                 sortedElement.setUpdateTime(updateTime);
                 sortSet.add(sortedElement);
             }
-        } finally {
-            reentrantLock.unlock();
-        }
+        });
     }
 
+    /** 如果是保存数据库，请调用这个函数 */
     public List<SortedElement<K, V>> toList() {
-        reentrantLock.lock();
-        try {
-            return map.values().stream().toList();
-        } finally {
-            reentrantLock.unlock();
-        }
+        return supplierRead(() -> map.values().stream().toList());
     }
 
+    /** 这里是拷贝数据，避免获取数据之后，数据被修改 */
     public List<Element> toSortElement() {
-        reentrantLock.lock();
-        try {
-            return sortSet.stream().map(e -> new Element(e.getK(), e.getV())).toList();
-        } finally {
-            reentrantLock.unlock();
-        }
+        return supplierRead(() -> sortSet.stream().map(e -> new Element(e.getK(), e.getV())).toList());
     }
 
     @Getter

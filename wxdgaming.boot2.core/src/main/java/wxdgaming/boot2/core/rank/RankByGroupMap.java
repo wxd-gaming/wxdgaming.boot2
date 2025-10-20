@@ -3,10 +3,10 @@ package wxdgaming.boot2.core.rank;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
+import wxdgaming.boot2.core.locks.MonitorReadWrite;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.util.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * 集中型排行榜容器, 如果要序列化存储到数据库中，请调用tolist方案
@@ -20,11 +20,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  **/
 @Getter
 @Setter
-public class RankByGroupMap {
-
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
-    private final ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
+public class RankByGroupMap extends MonitorReadWrite {
 
     private final HashMap<String, RankElement> map = new HashMap<>();
     @JSONField(serialize = false, deserialize = false)
