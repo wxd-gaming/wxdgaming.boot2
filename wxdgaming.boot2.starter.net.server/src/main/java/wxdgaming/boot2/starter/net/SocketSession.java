@@ -1,6 +1,7 @@
 package wxdgaming.boot2.starter.net;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Joiner;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -160,7 +161,7 @@ public class SocketSession {
                 【%s - %s%s%s%s】""".formatted(
                 type.name(),
                 ChannelUtil.ctxTostring(channel),
-                getBindData().isEmpty() ? "" : ", bindData: " + getBindData().entrySet().stream().map(v -> v.getKey() + "=" + v.getValue()).collect(Collectors.joining(", ")),
+                getBindData().isEmpty() ? "" : ", bindData: " + Joiner.on(", ").withKeyValueSeparator("=").join(getBindData()),
                 isWebSocket() ? ", websocket" : "",
                 isSsl() ? ", ssl" : ""
         );

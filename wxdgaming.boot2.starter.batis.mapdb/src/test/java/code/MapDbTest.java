@@ -1,6 +1,7 @@
 package code;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.base.Joiner;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -22,7 +23,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
-import java.util.stream.Collectors;
 
 /**
  * @author wxd-gaming(無心道, 15388152619)
@@ -83,7 +83,7 @@ public class MapDbTest {
         DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
         ConcurrentMap<String, Object> map = db.hashMap(cacheName, Serializer.STRING, Serializer.JAVA).open();
         diffTime.marker("读取耗时");
-        String collect = map.entrySet().stream().map(v -> v.getKey() + ":" + v.getValue()).collect(Collectors.joining("&"));
+        String collect = Joiner.on("&").withKeyValueSeparator(":").join(map);
         diffTime.marker("打印耗时");
         System.out.println(diffTime + "\n" + collect);
     }

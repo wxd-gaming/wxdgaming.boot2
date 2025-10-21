@@ -1,6 +1,7 @@
 package wxdgaming.boot2.starter.net.http;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Joiner;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -47,26 +48,21 @@ public class HttpDataAction {
     }
 
     public static String httpData(Map<String, ?> paramsMap) {
-        if (paramsMap == null) return "";
-        return paramsMap.entrySet()
-                .stream()
-                .map(v -> v.getKey() + "=" + v.getValue())
-                .collect(Collectors.joining("&"));
+        if (paramsMap == null || paramsMap.isEmpty()) return "";
+        return Joiner.on("&").withKeyValueSeparator("=").join(paramsMap);
     }
 
     public static String httpDataEncoder(Map<String, ?> paramsMap) {
         if (paramsMap == null) return "";
-        return paramsMap.entrySet()
-                .stream()
+        return paramsMap.entrySet().stream()
                 .map(v -> v.getKey() + "=" + urlEncoder(v.getValue()))
                 .collect(Collectors.joining("&"));
     }
 
     /** php一样的算法 */
-    public static String httpDataRawEncoder(Map paramsMap) {
-        if (paramsMap == null) return "";
-        Map<Object, Object> paramsMaps = paramsMap;
-        return paramsMaps.entrySet()
+    public static String httpDataRawEncoder(Map<?, ?> paramsMap) {
+        if (paramsMap == null || paramsMap.isEmpty()) return "";
+        return paramsMap.entrySet()
                 .stream()
                 .map(v -> v.getKey() + "=" + rawUrlEncode(v.getValue()))
                 .collect(Collectors.joining("&"));

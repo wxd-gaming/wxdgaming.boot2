@@ -1,6 +1,8 @@
 package wxdgaming.boot2.core.format.string;
 
+import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.function.FunctionUtil;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
 import java.util.ArrayList;
@@ -19,15 +21,10 @@ public class String2LongArrayList {
                 if (trim.startsWith("[") && trim.endsWith("]")) {
                     arrays = FastJsonUtil.parseArray(trim, long[].class);
                 } else {
-                    String[] split = trim.split("[;]");
-                    arrays = new ArrayList<>(split.length);
-                    for (int i = 0; i < split.length; i++) {
-                        String[] split2 = split[i].split("[,，|]");
-                        long[] vs1 = new long[split2.length];
-                        for (int i1 = 0; i1 < split2.length; i1++) {
-                            vs1[i1] = Double.valueOf(split2[i1]).longValue();
-                        }
-                        arrays.add(vs1);
+                    List<JSONArray> jsonArrays = FunctionUtil.split2ListJSONArray(trim, ";", ",");
+                    arrays = new ArrayList<>(jsonArrays.size());
+                    for (JSONArray jsonArray : jsonArrays) {
+                        arrays.add(FunctionUtil.jsonArray2LongArray.apply(jsonArray));
                     }
                 }
             } else {

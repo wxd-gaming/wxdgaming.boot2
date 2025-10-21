@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter.js.plugin;
 
+import com.google.common.base.Joiner;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.json.FastJsonUtil;
@@ -27,7 +28,7 @@ public class JLog implements IJSPlugin {
     }
 
     public void print(Object... args) {
-        System.out.println(Arrays.stream(args).map(String::valueOf).collect(Collectors.joining(" ")));
+        System.out.println(Joiner.on(" ").join(args));
     }
 
     public void printf(String format, Object... args) {
