@@ -1,6 +1,8 @@
 package wxdgaming.boot2.core.format.string;
 
+import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.function.FunctionUtil;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
 public class String2BoolArray {
@@ -14,11 +16,8 @@ public class String2BoolArray {
             if (trim.startsWith("[") && trim.endsWith("]")) {
                 arrays = FastJsonUtil.parse(trim, boolean[].class);
             } else {
-                String[] split = trim.split("[，,|]");
-                arrays = new boolean[split.length];
-                for (int i = 0; i < split.length; i++) {
-                    arrays[i] = Boolean.parseBoolean(split[i]);
-                }
+                JSONArray jsonArray = FunctionUtil.split2JSONArray(trim, ",");
+                arrays = FunctionUtil.jsonArray2BooleanArray.apply(jsonArray);
             }
         } else {
             arrays = EMPTY;
