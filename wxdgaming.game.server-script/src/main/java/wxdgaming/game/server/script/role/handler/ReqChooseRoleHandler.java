@@ -111,7 +111,6 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
                 slogService.pushLog(roleLoginLog);
 
                 reportPlayer2Login(player, 0);
-                LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(130));
             }
         });
     }

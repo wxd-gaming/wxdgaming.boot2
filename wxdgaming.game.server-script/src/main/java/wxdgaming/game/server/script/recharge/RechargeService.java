@@ -22,7 +22,7 @@ import java.util.List;
 @Service
 public class RechargeService extends HoldApplicationContext {
 
-    List<Integer> rechargeList = String2IntList.parse.apply("600,1200,64800");
+    List<Integer> rechargeList = String2IntList.parse.apply("600,1200,3000,6800,12800,64800");
     final SlogService slogService;
 
     public RechargeService(SlogService slogService) {

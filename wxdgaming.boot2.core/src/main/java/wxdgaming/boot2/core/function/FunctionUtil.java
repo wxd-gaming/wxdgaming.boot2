@@ -47,20 +47,22 @@ public class FunctionUtil {
     }
 
 
-    public static List<JSONArray> split2ListJSONArray(String source, String separator1, String separator2) {
-        String[] split = source.split(separator1);
-        List<JSONArray> list = new ArrayList<>(split.length);
-        for (String s : split) {
-            JSONArray line = new JSONArray();
-            String[] split1 = s.split(separator2);
-            line.addAll(Arrays.asList(split1));
-            list.add(line);
+    public static Function3<String, String, String, List<JSONArray>> split2ListJSONArray = new Function3<String, String, String, List<JSONArray>>() {
+        @Override public List<JSONArray> apply(String source, String separator1, String separator2) {
+            String[] split = source.split(separator1);
+            List<JSONArray> list = new ArrayList<>(split.length);
+            for (String s : split) {
+                JSONArray line = new JSONArray();
+                String[] split1 = s.split(separator2);
+                line.addAll(Arrays.asList(split1));
+                list.add(line);
+            }
+            return list;
         }
-        return list;
-    }
+    };
 
     public static List<int[]> split2ListIntArray(String source, String separator1, String separator2) {
-        List<JSONArray> jsonArrays = FunctionUtil.split2ListJSONArray(source, separator1, separator2);
+        List<JSONArray> jsonArrays = FunctionUtil.split2ListJSONArray.apply(source, separator1, separator2);
         ArrayList<int[]> arrays = new ArrayList<>(jsonArrays.size());
         for (JSONArray jsonArray : jsonArrays) {
             int[] apply = FunctionUtil.jsonArray2IntArray.apply(jsonArray);
@@ -69,15 +71,6 @@ public class FunctionUtil {
         return arrays;
     }
 
-    public static List<long[]> split2ListLongArray(String source, String separator1, String separator2) {
-        List<JSONArray> jsonArrays = FunctionUtil.split2ListJSONArray(source, separator1, separator2);
-        ArrayList<long[]> arrays = new ArrayList<>(jsonArrays.size());
-        for (JSONArray jsonArray : jsonArrays) {
-            long[] apply = FunctionUtil.jsonArray2LongArray.apply(jsonArray);
-            arrays.add(apply);
-        }
-        return arrays;
-    }
 
     public static Function<JSONArray, boolean[]> jsonArray2BooleanArray = new Function<JSONArray, boolean[]>() {
         @Override public boolean[] apply(JSONArray jsonArray) {
@@ -116,6 +109,26 @@ public class FunctionUtil {
                 vs1[i] = jsonArray.getString(i);
             }
             return vs1;
+        }
+    };
+
+    public static Function<List<JSONArray>, List<int[]>> listJsonArray2ListIntArray = new Function<List<JSONArray>, List<int[]>>() {
+        @Override public List<int[]> apply(List<JSONArray> jsonArrays) {
+            List<int[]> list = new ArrayList<>();
+            for (JSONArray jsonArray : jsonArrays) {
+                list.add(jsonArray2IntArray.apply(jsonArray));
+            }
+            return list;
+        }
+    };
+
+    public static Function<List<JSONArray>, List<long[]>> listJsonArray2ListLongArray = new Function<List<JSONArray>, List<long[]>>() {
+        @Override public List<long[]> apply(List<JSONArray> jsonArrays) {
+            List<long[]> list = new ArrayList<>();
+            for (JSONArray jsonArray : jsonArrays) {
+                list.add(jsonArray2LongArray.apply(jsonArray));
+            }
+            return list;
         }
     };
 

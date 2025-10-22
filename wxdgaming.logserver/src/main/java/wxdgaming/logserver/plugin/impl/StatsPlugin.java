@@ -50,7 +50,7 @@ public class StatsPlugin extends AbstractPlugin {
                 long registerAccountRechargeCount = registerAccountRechargeCount(sqlDataHelper, dataKey);
                 jsonObject.put("rechargeOrderCount", rechargeOrderCount);
                 jsonObject.put("rechargeAccountCount", rechargeAccountCount);
-                jsonObject.put("rechargeOrderAmount", rechargeOrderAmount);
+                jsonObject.put("rechargeOrderAmount", rechargeOrderAmount / 100);
                 jsonObject.put("registerAccountRechargeCount", registerAccountRechargeCount);
                 /*ARPA = 收入/活跃账号数*/
                 jsonObject.put("ARPU", activeAccountCount > 0 ? rechargeOrderAmount / activeAccountCount / 100f : 0.0f);
