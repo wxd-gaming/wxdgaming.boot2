@@ -14,8 +14,8 @@ public class ExecGM implements IGmDynamic {
     @Override public Object execute(ApplicationContextProvider runApplication, JSONObject jsonObject) throws Exception {
         TestApi instance = runApplication.getBean(TestApi.class);
         instance.strMap.put("a", "2");
-        // player = instance.getPlayer();
-        // player.setName("aabb");
+        // mapNpc = instance.getPlayer();
+        // mapNpc.setName("aabb");
         Field str2Map = TestApi.class.getDeclaredField("str2Map");
         str2Map.setAccessible(true);
         Object object = str2Map.get(instance);

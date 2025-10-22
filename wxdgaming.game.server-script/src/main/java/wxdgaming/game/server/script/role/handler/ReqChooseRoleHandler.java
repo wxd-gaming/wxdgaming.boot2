@@ -22,7 +22,6 @@ import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.entity.role.PlayerSnap;
 import wxdgaming.game.server.event.EventConst;
-import wxdgaming.game.server.event.OnHeartMinute;
 import wxdgaming.game.server.event.OnLogout;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.module.data.GlobalDbDataCenterService;
@@ -31,8 +30,6 @@ import wxdgaming.game.server.script.role.slog.RoleLoginSlog;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.LockSupport;
 
 /**
  * 选择角色
@@ -115,7 +112,10 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
         });
     }
 
-    @OnHeartMinute
+    public void playerHeartMinuteEvent(EventConst.MapNpcHeartMinuteEvent event) {
+        reportPlayer2Login((Player) event.mapNpc(), event.minute());
+    }
+
     public void reportPlayer2Login(Player player, int minute) {
         String url = connectLoginProperties.getUrl();
         url = url + "/inner/game/lastLogin";

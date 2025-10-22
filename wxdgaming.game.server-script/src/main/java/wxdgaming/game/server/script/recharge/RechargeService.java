@@ -6,8 +6,9 @@ import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.format.string.String2IntList;
 import wxdgaming.boot2.core.util.RandomUtils;
 import wxdgaming.game.common.slog.SlogService;
+import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.event.OnHeartMinute;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.script.recharge.slog.RoleRechargeSlog;
 
 import java.util.List;
@@ -29,8 +30,9 @@ public class RechargeService extends HoldApplicationContext {
         this.slogService = slogService;
     }
 
-    @OnHeartMinute
-    public void onHeartMinute(Player player, int minute) {
+    public void onHeartMinute(EventConst.MapNpcHeartMinuteEvent event) {
+        MapNpc mapNpc = event.mapNpc();
+        Player player = (Player) mapNpc;
         log.info("开始执行充值服务");
         if (RandomUtils.randomBoolean(2000)) {
             int amount = RandomUtils.randomItem(rechargeList);

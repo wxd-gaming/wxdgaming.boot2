@@ -22,6 +22,31 @@ public interface EventConst {
 
     public record LevelUpEvent(Player player, int changeLv) implements Event {}
 
+    public interface HeartEvent extends Event {
+
+        MapNpc mapNpc();
+
+        default boolean isPlayer() {
+            return mapNpc() instanceof Player;
+        }
+
+        default Player player() {
+            return (Player) mapNpc();
+        }
+
+    }
+
+    public record MapNpcHeartEvent(MapNpc mapNpc) implements HeartEvent {}
+
+    public record MapNpcHeartSecondEvent(MapNpc mapNpc, int second) implements HeartEvent {}
+
+    public record MapNpcHeartMinuteEvent(MapNpc mapNpc, int minute) implements HeartEvent {}
+
+    public record MapNpcHeartHourEvent(MapNpc mapNpc, int hour) implements HeartEvent {}
+
+    /** 跨天 */
+    public record MapNpcHeartDayEvent(MapNpc mapNpc, int hour) implements HeartEvent {}
+
     /**
      * 玩家属性计算
      *

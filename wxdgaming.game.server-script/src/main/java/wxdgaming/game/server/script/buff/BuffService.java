@@ -9,19 +9,17 @@ import wxdgaming.boot2.core.lang.bit.BitFlagGroup;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
-import wxdgaming.game.server.bean.reason.ReasonConst;
-import wxdgaming.game.server.bean.reason.ReasonDTO;
-import wxdgaming.game.server.bean.buff.BuffType;
-import wxdgaming.game.server.bean.buff.BuffTypeConst;
 import wxdgaming.game.cfg.QBuffTable;
 import wxdgaming.game.cfg.bean.QBuff;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.attribute.CalculatorType;
 import wxdgaming.game.server.bean.buff.Buff;
+import wxdgaming.game.server.bean.buff.BuffType;
+import wxdgaming.game.server.bean.buff.BuffTypeConst;
+import wxdgaming.game.server.bean.reason.ReasonConst;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.EventConst;
-import wxdgaming.game.server.event.OnHeart;
-import wxdgaming.game.server.event.OnHeartMinute;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.attribute.NpcAttributeService;
 import wxdgaming.game.server.script.attribute.PlayerAttributeService;
@@ -58,15 +56,18 @@ public class BuffService extends HoldApplicationContext {
         actionMap = applicationContextProvider.toMap(AbstractBuffAction.class, AbstractBuffAction::buffType);
     }
 
-    @OnHeartMinute
-    public void onHeartMinuteBuffActionTest(MapNpc mapNpc, int minute) {
+    public void onHeartMinuteBuffActionTest(EventConst.MapNpcHeartMinuteEvent event) {
+
+        MapNpc mapNpc = event.mapNpc();
 
         addBuff(mapNpc, mapNpc, 2, 1, ReasonDTO.of(ReasonConst.GM));
         addBuff(mapNpc, mapNpc, 3, 1, ReasonDTO.of(ReasonConst.GM));
+
     }
 
-    @OnHeart
-    public void onHeartBuffAction(MapNpc mapNpc, long mill) {
+    public void onHeartBuffAction(EventConst.MapNpcHeartEvent event) {
+        MapNpc mapNpc = event.mapNpc();
+        long millis = MyClock.millis();
         QBuffTable qBuffTable = DataRepository.getIns().dataTable(QBuffTable.class);
         ArrayList<Buff> buffs = mapNpc.getBuffs();
         Iterator<Buff> iterator = buffs.iterator();
@@ -78,11 +79,11 @@ public class BuffService extends HoldApplicationContext {
                 log.warn("buff不存在 {}, {} {}", mapNpc, buff.getBuffCfgId(), buff.getLv());
                 continue;
             }
-            if (buff.getLastExecuteTime() + qBuff.getInterval() > mill) {
+            if (buff.getLastExecuteTime() + qBuff.getInterval() > millis) {
                 continue;
             }
-            executeBuff(mapNpc, buff, qBuff, mill);
-            if (buff.clearTime(mill) && buff.getTimeList().isEmpty()) {
+            executeBuff(mapNpc, buff, qBuff, millis);
+            if (buff.clearTime(millis) && buff.getTimeList().isEmpty()) {
                 log.debug("buff {}, 结束, {}", mapNpc, buff);
                 iterator.remove();
                 onRemoveBuff(mapNpc, buff);

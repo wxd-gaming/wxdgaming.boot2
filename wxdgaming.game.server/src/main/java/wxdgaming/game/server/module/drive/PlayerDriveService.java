@@ -13,7 +13,8 @@ import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.slog.RoleInfoSlog;
-import wxdgaming.game.server.event.*;
+import wxdgaming.game.server.event.EventConst;
+import wxdgaming.game.server.event.OnLogout;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -45,7 +46,7 @@ public class PlayerDriveService extends HoldApplicationContext {
     public void start() {
 
         for (int i = 0; i < logicCoreSize; i++) {
-            PlayerDriveContent driveContent = new PlayerDriveContent("player-drive-" + i);
+            PlayerDriveContent driveContent = new PlayerDriveContent("mapNpc-drive-" + i);
             playerDriveContentMap.put(i, driveContent);
             driveContent.timerJob = ExecutorFactory.getExecutorServiceLogic().scheduleAtFixedRate(driveContent, 33, 33, TimeUnit.MILLISECONDS);
         }
@@ -70,7 +71,7 @@ public class PlayerDriveService extends HoldApplicationContext {
     }
 
     public String getPlayerDriveName(int driveId) {
-        return "player-drive-" + driveId;
+        return "mapNpc-drive-" + driveId;
     }
 
     /** 提交到玩家队列处理任务 */
@@ -100,7 +101,7 @@ public class PlayerDriveService extends HoldApplicationContext {
         playerDriveContent.playerMap.put(player.getUid(), player);
         onlineSize.incrementAndGet();
         if (log.isDebugEnabled()) {
-            log.debug("PlayerHeartDrive add player {}", player);
+            log.debug("PlayerHeartDrive add mapNpc {}", player);
         }
         updateRoleInfoSlog(player);
 
@@ -136,7 +137,12 @@ public class PlayerDriveService extends HoldApplicationContext {
         updateRoleInfoSlog(player);
     }
 
-    @OnHeartMinute
+    public void playerHeartMinuteEvent(EventConst.MapNpcHeartMinuteEvent event) {
+        if (event.mapNpc() instanceof Player player) {
+            updateRoleInfoSlog(player);
+        }
+    }
+
     public void updateRoleInfoSlog(Player player) {
         RoleInfoSlog roleInfoSlog = new RoleInfoSlog(player, String.valueOf(player.checkOnline()));
         slogService.updateLog(player.getUid(), player.getCreateTime(), roleInfoSlog);
@@ -164,31 +170,31 @@ public class PlayerDriveService extends HoldApplicationContext {
 
         @Override public void heart(long millis) {
             for (Player player : playerMap.values()) {
-                applicationContextProvider.executeMethodWithAnnotatedException(OnHeart.class, player, millis);
+                applicationContextProvider.postEventIgnoreException(new EventConst.MapNpcHeartEvent(player));
             }
         }
 
         @Override public void heartSecond(int second) {
             for (Player player : playerMap.values()) {
-                applicationContextProvider.executeMethodWithAnnotatedException(OnHeartSecond.class, player, second);
+                applicationContextProvider.postEventIgnoreException(new EventConst.MapNpcHeartSecondEvent(player, second));
             }
         }
 
         @Override public void heartMinute(int minute) {
             for (Player player : playerMap.values()) {
-                applicationContextProvider.executeMethodWithAnnotatedException(OnHeartMinute.class, player, minute);
+                applicationContextProvider.postEventIgnoreException(new EventConst.MapNpcHeartMinuteEvent(player, minute));
             }
         }
 
         @Override public void heartHour(int hour) {
             for (Player player : playerMap.values()) {
-                applicationContextProvider.executeMethodWithAnnotatedException(OnHeartHour.class, player, hour);
+                applicationContextProvider.postEventIgnoreException(new EventConst.MapNpcHeartHourEvent(player, hour));
             }
         }
 
         @Override public void heartDayEnd(int dayOfYear) {
             for (Player player : playerMap.values()) {
-                applicationContextProvider.executeMethodWithAnnotatedException(OnHeartDay.class, player, dayOfYear);
+                applicationContextProvider.postEventIgnoreException(new EventConst.MapNpcHeartDayEvent(player, dayOfYear));
             }
         }
 

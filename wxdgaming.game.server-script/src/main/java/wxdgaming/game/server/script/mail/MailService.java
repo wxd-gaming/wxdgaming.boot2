@@ -5,19 +5,19 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.collection.ListOf;
 import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.common.slog.SlogService;
+import wxdgaming.game.server.bean.MapNpc;
+import wxdgaming.game.server.bean.global.GlobalDataConst;
+import wxdgaming.game.server.bean.global.impl.ServerMailData;
 import wxdgaming.game.server.bean.goods.Item;
 import wxdgaming.game.server.bean.mail.MailInfo;
 import wxdgaming.game.server.bean.mail.MailPack;
-import wxdgaming.game.common.global.GlobalDataService;
-import wxdgaming.game.server.bean.global.GlobalDataConst;
-import wxdgaming.game.server.bean.global.impl.ServerMailData;
 import wxdgaming.game.server.bean.role.Player;
-import wxdgaming.game.server.event.OnHeartMinute;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.mail.slog.MailSlog;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,8 +40,9 @@ public class MailService extends HoldApplicationContext {
         this.slogService = slogService;
     }
 
-    @OnHeartMinute
-    public void playerHeartMinute(Player player) {
+    public void playerHeartMinute(EventConst.MapNpcHeartMinuteEvent event) {
+        MapNpc mapNpc = event.mapNpc();
+        Player player = (Player) mapNpc;
         MailPack mailPack = player.getMailPack();
         mailPack.getMailInfoList().removeIf(v -> {
             if (!v.checkValidity()) {
@@ -56,19 +57,19 @@ public class MailService extends HoldApplicationContext {
 //        for (ServerMailInfo mailInfo : mailInfoList) {
 //            if (!mailInfo.checkValidity())
 //                continue;
-//            if (mailInfo.getLvMin() > player.getLevel() || mailInfo.getLvMax() < player.getLevel())
+//            if (mailInfo.getLvMin() > mapNpc.getLevel() || mailInfo.getLvMax() < mapNpc.getLevel())
 //                continue;
-//            int vipLv = player.getVipInfo().getLv();
+//            int vipLv = mapNpc.getVipInfo().getLv();
 //            if (mailInfo.getVipLvMin() > vipLv || mailInfo.getVipLvMax() < vipLv)
 //                continue;
-//            if (!mailInfo.getRidList().isEmpty() && !mailInfo.getRidList().contains(player.getUid()))
+//            if (!mailInfo.getRidList().isEmpty() && !mailInfo.getRidList().contains(mapNpc.getUid()))
 //                /*指定的角色才可用领取*/
 //                continue;
-//            if (mailInfo.getRewardRidList().contains(player.getUid()))
+//            if (mailInfo.getRewardRidList().contains(mapNpc.getUid()))
 //                /*该角色已经领取过了*/
 //                continue;
-//            mailInfo.getRewardRidList().add(player.getUid());
-//            addMail(player, mailInfo);
+//            mailInfo.getRewardRidList().add(mapNpc.getUid());
+//            addMail(mapNpc, mailInfo);
 //        }
     }
 
