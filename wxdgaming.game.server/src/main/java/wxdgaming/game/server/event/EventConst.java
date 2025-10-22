@@ -22,7 +22,7 @@ public interface EventConst {
 
     public record LevelUpEvent(Player player, int changeLv) implements Event {}
 
-    public interface HeartEvent extends Event {
+    public interface MapNpcEvent extends Event {
 
         MapNpc mapNpc();
 
@@ -36,33 +36,21 @@ public interface EventConst {
 
     }
 
-    public record MapNpcHeartEvent(MapNpc mapNpc) implements HeartEvent {}
+    public record MapNpcHeartEvent(MapNpc mapNpc) implements MapNpcEvent {}
 
-    public record MapNpcHeartSecondEvent(MapNpc mapNpc, int second) implements HeartEvent {}
+    public record MapNpcHeartSecondEvent(MapNpc mapNpc, int second) implements MapNpcEvent {}
 
-    public record MapNpcHeartMinuteEvent(MapNpc mapNpc, int minute) implements HeartEvent {}
+    public record MapNpcHeartMinuteEvent(MapNpc mapNpc, int minute) implements MapNpcEvent {}
 
-    public record MapNpcHeartHourEvent(MapNpc mapNpc, int hour) implements HeartEvent {}
+    public record MapNpcHeartHourEvent(MapNpc mapNpc, int hour) implements MapNpcEvent {}
 
     /** 跨天 */
-    public record MapNpcHeartDayEvent(MapNpc mapNpc, int hour) implements HeartEvent {}
+    public record MapNpcHeartDayEvent(MapNpc mapNpc, int hour) implements MapNpcEvent {}
 
-    /**
-     * 玩家属性计算
-     *
-     * @author wxd-gaming(無心道, 15388152619)
-     * @version 2025-05-09 20:38
-     */
-    public record PlayerAttributeCalculatorEvent(
-            Player player,
+    public record MapNpcAttributeCalculatorEvent(
+            MapNpc mapNpc,
             CalculatorType[] calculatorTypes,
-            ReasonDTO reasonDTO) implements Event {
-    }
-
-    public record NpcAttributeCalculatorEvent(
-            MapNpc npc,
-            CalculatorType[] calculatorTypes,
-            ReasonDTO msg) implements Event {
+            ReasonDTO reasonDTO) implements MapNpcEvent {
     }
 
 }

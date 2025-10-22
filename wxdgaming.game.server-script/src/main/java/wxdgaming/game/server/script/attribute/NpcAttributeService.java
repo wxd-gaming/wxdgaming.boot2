@@ -50,7 +50,7 @@ public class NpcAttributeService extends HoldApplicationContext {
 
 
     public void calculatorAll(MapNpc mapNpc) {
-        EventConst.NpcAttributeCalculatorEvent playerAttributeCalculatorEvent = new EventConst.NpcAttributeCalculatorEvent(
+        EventConst.MapNpcAttributeCalculatorEvent playerAttributeCalculatorEvent = new EventConst.MapNpcAttributeCalculatorEvent(
                 mapNpc,
                 calculatorTypes,
                 ReasonDTO.of(ReasonConst.Level)
@@ -58,15 +58,15 @@ public class NpcAttributeService extends HoldApplicationContext {
         finalCalculator(playerAttributeCalculatorEvent);
     }
 
-    public void onNpcAttributeCalculator(EventConst.NpcAttributeCalculatorEvent event) {
+    public void onNpcAttributeCalculator(EventConst.MapNpcAttributeCalculatorEvent event) {
         for (CalculatorType calculatorType : event.calculatorTypes()) {
             calculator(calculatorType, event);
         }
         finalCalculator(event);
     }
 
-    public void calculator(CalculatorType calculatorType, EventConst.NpcAttributeCalculatorEvent event) {
-        MapNpc mapNpc = event.npc();
+    public void calculator(CalculatorType calculatorType, EventConst.MapNpcAttributeCalculatorEvent event) {
+        MapNpc mapNpc = event.mapNpc();
         AbstractCalculatorAction calculatorAction = calculatorImplMap.get(calculatorType);
 
         AttrInfo calculate = calculatorAction.calculate(mapNpc, event);
@@ -76,8 +76,8 @@ public class NpcAttributeService extends HoldApplicationContext {
 
     }
 
-    public void finalCalculator(EventConst.NpcAttributeCalculatorEvent event) {
-        MapNpc mapNpc = event.npc();
+    public void finalCalculator(EventConst.MapNpcAttributeCalculatorEvent event) {
+        MapNpc mapNpc = event.mapNpc();
         /*累计基础属性*/
         AttrInfo finalAttrInfo = new AttrInfo();
         for (AttrInfo attrInfo : mapNpc.getAttrMap().values()) {

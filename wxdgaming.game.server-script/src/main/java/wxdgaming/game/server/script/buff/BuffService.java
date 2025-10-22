@@ -119,14 +119,14 @@ public class BuffService extends HoldApplicationContext {
         CalculatorType[] calculatorTypes = {CalculatorType.BUFF};
         ReasonDTO reasonDTO = ReasonDTO.of(ReasonConst.Buff);
         if (mapNpc instanceof Player player) {
-            EventConst.PlayerAttributeCalculatorEvent event = new EventConst.PlayerAttributeCalculatorEvent(
+            EventConst.MapNpcAttributeCalculatorEvent event = new EventConst.MapNpcAttributeCalculatorEvent(
                     player,
                     calculatorTypes,
                     reasonDTO
             );
             playerAttributeService.onPlayerAttributeCalculator(event);
         } else {
-            EventConst.NpcAttributeCalculatorEvent event = new EventConst.NpcAttributeCalculatorEvent(
+            EventConst.MapNpcAttributeCalculatorEvent event = new EventConst.MapNpcAttributeCalculatorEvent(
                     mapNpc,
                     calculatorTypes,
                     reasonDTO

@@ -51,7 +51,7 @@ public class PlayerAttributeService extends HoldApplicationContext {
         calculatorTypes = calculatorImplMap.keySet().toArray(new CalculatorType[calculatorImplMap.size()]);
     }
 
-    public void calculator(CalculatorType calculatorType, EventConst.PlayerAttributeCalculatorEvent event) {
+    public void calculator(CalculatorType calculatorType, EventConst.MapNpcAttributeCalculatorEvent event) {
         Player player = event.player();
         AbstractCalculatorAction calculatorAction = calculatorImplMap.get(calculatorType);
 
@@ -62,7 +62,7 @@ public class PlayerAttributeService extends HoldApplicationContext {
 
     }
 
-    public void finalCalculator(EventConst.PlayerAttributeCalculatorEvent event) {
+    public void finalCalculator(EventConst.MapNpcAttributeCalculatorEvent event) {
 
         /*累计基础属性*/
         AttrInfo finalAttrInfo = new AttrInfo();
@@ -130,7 +130,7 @@ public class PlayerAttributeService extends HoldApplicationContext {
     @EventListener
     public void onLoginBefore(EventConst.LoginBeforePlayerEvent event) {
         Player player = event.player();
-        EventConst.PlayerAttributeCalculatorEvent playerAttributeCalculatorEvent = new EventConst.PlayerAttributeCalculatorEvent(
+        EventConst.MapNpcAttributeCalculatorEvent playerAttributeCalculatorEvent = new EventConst.MapNpcAttributeCalculatorEvent(
                 player,
                 calculatorTypes,
                 ReasonDTO.of(ReasonConst.Login)
@@ -145,7 +145,7 @@ public class PlayerAttributeService extends HoldApplicationContext {
     @Order(Integer.MAX_VALUE)
     @EventListener
     public void onLevelUp(EventConst.LevelUpEvent event) {
-        EventConst.PlayerAttributeCalculatorEvent playerAttributeCalculatorEvent = new EventConst.PlayerAttributeCalculatorEvent(
+        EventConst.MapNpcAttributeCalculatorEvent playerAttributeCalculatorEvent = new EventConst.MapNpcAttributeCalculatorEvent(
                 event.player(),
                 calculatorBASE,
                 ReasonDTO.of(ReasonConst.Level)
@@ -155,7 +155,7 @@ public class PlayerAttributeService extends HoldApplicationContext {
 
     /** 触发属性计算事件监听 */
     @Order(Integer.MAX_VALUE)
-    public void onPlayerAttributeCalculator(EventConst.PlayerAttributeCalculatorEvent event) {
+    public void onPlayerAttributeCalculator(EventConst.MapNpcAttributeCalculatorEvent event) {
         for (CalculatorType calculatorType : event.calculatorTypes()) {
             calculator(calculatorType, event);
         }
