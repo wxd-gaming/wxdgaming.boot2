@@ -2,6 +2,7 @@ package wxdgaming.game.login.login.api;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.web.bind.annotation.*;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.InitEvent;
@@ -25,6 +26,7 @@ public class LoginController extends HoldApplicationContext {
 
     Map<AppPlatformParams.Platform, AbstractSdkLoginApi> sdkMap = new HashMap<>();
 
+    @EventListener
     public void init(InitEvent initEvent) {
         sdkMap = applicationContextProvider.toMap(AbstractSdkLoginApi.class, AbstractSdkLoginApi::platform);
     }

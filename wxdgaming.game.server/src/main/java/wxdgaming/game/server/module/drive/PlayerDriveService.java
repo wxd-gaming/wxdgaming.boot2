@@ -2,6 +2,7 @@ package wxdgaming.game.server.module.drive;
 
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
@@ -94,6 +95,7 @@ public class PlayerDriveService extends HoldApplicationContext {
     }
 
     @Order
+    @EventListener
     public void addPlayer(EventConst.LoginPlayerEvent event) {
         Player player = event.player();
         int driveId = getPlayerDriveId(player.getUid());
@@ -137,6 +139,7 @@ public class PlayerDriveService extends HoldApplicationContext {
         updateRoleInfoSlog(player);
     }
 
+    @EventListener
     public void playerHeartMinuteEvent(EventConst.MapNpcHeartMinuteEvent event) {
         if (event.mapNpc() instanceof Player player) {
             updateRoleInfoSlog(player);

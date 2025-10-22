@@ -2,6 +2,7 @@ package wxdgaming.boot2.starter.net.module.rpc;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.ApplicationContextProvider;
@@ -22,6 +23,7 @@ public class RpcListenerFactory {
     RpcListenerContent rpcListenerContent = null;
 
     @Order(9)
+    @EventListener
     public void init(InitEvent initEvent) {
         rpcListenerContent = new RpcListenerContent(initEvent.applicationContextProvider());
     }

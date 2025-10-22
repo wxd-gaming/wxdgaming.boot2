@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.task;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.InitEvent;
@@ -38,6 +39,7 @@ public class TaskService extends HoldApplicationContext {
     public TaskService() {
     }
 
+    @EventListener
     public void init(InitEvent initEvent) {
 
         conditionInitValueHandlerMap = applicationContextProvider.toMap(
@@ -68,6 +70,7 @@ public class TaskService extends HoldApplicationContext {
     }
 
     /** 登录的时候检查任务 */
+    @EventListener
     public void onLogin(EventConst.LoginPlayerEvent event) {
         Player player = event.player();
         TaskPack taskPack = player.getTaskPack();

@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.role.event;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
@@ -28,6 +29,7 @@ public class PlayerLoginHandler extends HoldApplicationContext {
 
     /** 创建角色之后赠送初始化道具 */
     @Order(1)
+    @EventListener
     public void onLoginBefore(EventConst.LoginBeforePlayerEvent event) {
         Player player = event.player();
         log.info("玩家上线:{} {}", ThreadContext.context().queueName(), player);
@@ -49,6 +51,7 @@ public class PlayerLoginHandler extends HoldApplicationContext {
 
     /** 创建角色之后赠送初始化道具 */
     @Order(1)
+    @EventListener
     public void onLogin(EventConst.LoginPlayerEvent event) {
         Player player = event.player();
         log.info("玩家上线:{} {}", ThreadContext.context().queueName(), player);

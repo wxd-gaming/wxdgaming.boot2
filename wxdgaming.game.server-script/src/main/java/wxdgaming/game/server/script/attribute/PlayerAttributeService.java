@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.attribute;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
@@ -33,6 +34,7 @@ public class PlayerAttributeService extends HoldApplicationContext {
     TreeMap<CalculatorType, AbstractCalculatorAction> calculatorImplMap = new TreeMap<>();
     CalculatorType[] calculatorTypes;
 
+    @EventListener
     public void init(InitEvent initEvent) {
 
         TreeMap<CalculatorType, AbstractCalculatorAction> tmp = new TreeMap<>();
@@ -125,6 +127,7 @@ public class PlayerAttributeService extends HoldApplicationContext {
     }
 
     @Order(Integer.MAX_VALUE)
+    @EventListener
     public void onLoginBefore(EventConst.LoginBeforePlayerEvent event) {
         Player player = event.player();
         EventConst.PlayerAttributeCalculatorEvent playerAttributeCalculatorEvent = new EventConst.PlayerAttributeCalculatorEvent(
@@ -140,6 +143,7 @@ public class PlayerAttributeService extends HoldApplicationContext {
 
     /** 提升等级后触发属性计算 */
     @Order(Integer.MAX_VALUE)
+    @EventListener
     public void onLevelUp(EventConst.LevelUpEvent event) {
         EventConst.PlayerAttributeCalculatorEvent playerAttributeCalculatorEvent = new EventConst.PlayerAttributeCalculatorEvent(
                 event.player(),

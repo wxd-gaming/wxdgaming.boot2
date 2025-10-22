@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.recharge;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.format.string.String2IntList;
@@ -30,6 +31,7 @@ public class RechargeService extends HoldApplicationContext {
         this.slogService = slogService;
     }
 
+    @EventListener
     public void onHeartMinute(EventConst.MapNpcHeartMinuteEvent event) {
         MapNpc mapNpc = event.mapNpc();
         Player player = (Player) mapNpc;

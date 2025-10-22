@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.buff;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.InitEvent;
@@ -51,10 +52,12 @@ public class BuffService extends HoldApplicationContext {
         this.npcAttributeService = npcAttributeService;
     }
 
+    @EventListener
     public void init(InitEvent initEvent) {
         actionMap = applicationContextProvider.toMap(AbstractBuffAction.class, AbstractBuffAction::buffType);
     }
 
+    @EventListener
     public void onHeartMinuteBuffActionTest(EventConst.MapNpcHeartMinuteEvent event) {
 
         MapNpc mapNpc = event.mapNpc();
@@ -64,6 +67,7 @@ public class BuffService extends HoldApplicationContext {
 
     }
 
+    @EventListener
     public void onHeartBuffAction(EventConst.MapNpcHeartEvent event) {
         MapNpc mapNpc = event.mapNpc();
         long millis = MyClock.millis();

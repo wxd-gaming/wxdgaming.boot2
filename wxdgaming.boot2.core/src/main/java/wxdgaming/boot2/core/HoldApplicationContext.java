@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core;
 
 import lombok.Getter;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.boot2.core.runtime.IgnoreRunTimeRecord;
@@ -16,6 +17,7 @@ public abstract class HoldApplicationContext implements InitPrint {
 
     protected ApplicationContextProvider applicationContextProvider;
 
+    @EventListener
     @Order(Integer.MIN_VALUE)
     @IgnoreRunTimeRecord
     public void ___initHold(InitEvent initEvent) {

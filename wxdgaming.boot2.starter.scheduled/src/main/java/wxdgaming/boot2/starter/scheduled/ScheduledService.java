@@ -2,6 +2,7 @@ package wxdgaming.boot2.starter.scheduled;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
@@ -42,6 +43,7 @@ public class ScheduledService extends HoldApplicationContext {
         executorServicePlatform = ExecutorFactory.create("scheduled-executor", executorProperties.getExecutor());
     }
 
+    @EventListener
     public void init(InitEvent initEvent) {
         log.debug("------------------------------初始化定时任务调度器------------------------------");
         List<AbstractCronTrigger> tmpJobList = new ArrayList<>();

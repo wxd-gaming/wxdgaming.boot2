@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.fight;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.InitEvent;
@@ -23,6 +24,7 @@ public class FightService extends HoldApplicationContext {
 
     Map<Integer, AbstractFightAction> actionImplMap = new HashMap<>();
 
+    @EventListener
     public void init(InitEvent initEvent) {
         actionImplMap = applicationContextProvider.toMap(AbstractFightAction.class, AbstractFightAction::type);
     }

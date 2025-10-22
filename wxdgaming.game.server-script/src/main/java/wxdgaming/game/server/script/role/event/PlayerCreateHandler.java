@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.role.event;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import wxdgaming.game.server.bean.goods.BagChangeDTO4ItemCfg;
 import wxdgaming.game.server.bean.goods.ItemCfg;
@@ -30,6 +31,7 @@ public class PlayerCreateHandler {
     }
 
     /** 创建角色之后赠送初始化道具 */
+    @EventListener
     public void onCreateRoleInitGoods(EventConst.CreatePlayerEvent event) {
         Player player = event.player();
         log.info("角色创建:{}", player);

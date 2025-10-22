@@ -2,6 +2,7 @@ package wxdgaming.boot2.starter.validation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
@@ -29,6 +30,7 @@ public class ValidationUtil extends HoldApplicationContext {
     Map<IValidationType, AbstractValidationHandler> validationHandlerMap;
 
     @Order(-100)
+    @EventListener
     public void init(InitEvent initEvent) {
         validationHandlerMap = getApplicationContextProvider().toMap(AbstractValidationHandler.class, AbstractValidationHandler::conditionType);
     }

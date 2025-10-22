@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.role.event;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.executor.ThreadContext;
@@ -33,6 +34,7 @@ public class PlayerHeartHandler extends HoldApplicationContext {
         this.fightService = fightService;
     }
 
+    @EventListener
     public void onHeart(EventConst.MapNpcHeartEvent event) {
         MapNpc mapNpc = event.mapNpc();
         Player player = (Player) mapNpc;
@@ -52,6 +54,7 @@ public class PlayerHeartHandler extends HoldApplicationContext {
 
     final ReasonDTO reasonDTO = ReasonDTO.of(ReasonConst.Heart, "心跳回血");
 
+    @EventListener
     public void onHeartSecond(EventConst.MapNpcHeartSecondEvent event) {
         int second = event.second();
         MapNpc mapNpc = event.mapNpc();
@@ -74,16 +77,19 @@ public class PlayerHeartHandler extends HoldApplicationContext {
 
     }
 
+    @EventListener
     public void onHeartMinute(EventConst.MapNpcHeartMinuteEvent event) {
         Player player = event.player();
         log.info("onHeartMinute:{} {}", player, ThreadContext.context().queueName());
     }
 
+    @EventListener
     public void onHeartHour(EventConst.MapNpcHeartHourEvent event) {
         Player player = event.player();
         log.info("onHeartHour:{} {}", player, ThreadContext.context().queueName());
     }
 
+    @EventListener
     public void onHeartDay(EventConst.MapNpcHeartDayEvent event) {
         Player player = event.player();
         log.info("onHeartDay:{} {}", player, ThreadContext.context().queueName());

@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.activity;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
@@ -47,6 +48,7 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
         this.validationService = validationService;
     }
 
+    @EventListener
     @Order(Integer.MAX_VALUE)
     public void init(InitEvent initEvent) {
         activityHandlerMap = getApplicationContextProvider().toMap(AbstractActivityHandler.class, AbstractActivityHandler::activityType);

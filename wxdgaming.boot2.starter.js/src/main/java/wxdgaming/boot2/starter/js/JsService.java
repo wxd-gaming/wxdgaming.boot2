@@ -2,6 +2,7 @@ package wxdgaming.boot2.starter.js;
 
 import lombok.Getter;
 import org.graalvm.polyglot.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.InitEvent;
@@ -26,6 +27,7 @@ public class JsService extends HoldApplicationContext {
     private final List<Consumer<JSContext>> onInitListener = new ArrayList<>();
     private ConcurrentHashMap<Thread, JSContext> threadJsContext = new ConcurrentHashMap<>();
 
+    @EventListener
     public void init(InitEvent initEvent) {
         /*重构插件*/
         clear();

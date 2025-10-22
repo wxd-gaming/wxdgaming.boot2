@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.bag;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
@@ -61,6 +62,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
         this.slogService = slogService;
     }
 
+    @EventListener
     public void init(InitEvent initEvent) {
         this.gainScriptProvider.init(getApplicationContextProvider());
         this.costScriptProvider.init(getApplicationContextProvider());
@@ -69,11 +71,13 @@ public class BagService extends HoldApplicationContext implements InitPrint {
 
     /** 创建角色之后创建背包 */
     @Order(-10000)
+    @EventListener
     public void onCreateRoleInitBag(EventConst.CreatePlayerEvent event) {
     }
 
     /** 登录的时候检查背包问题 */
     @Order(-10000)
+    @EventListener
     public void onLoginBefore(EventConst.LoginBeforePlayerEvent event) {
         Player player = event.player();
         BagPack bagPack = player.getBagPack();
@@ -82,6 +86,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
     }
 
     /** 登录的时候推送背包 */
+    @EventListener
     public void onLogin(EventConst.LoginPlayerEvent event) {
         Player player = event.player();
         /*推送数据的*/

@@ -7,6 +7,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.event.EventListener;
 import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.ThreadParam;
@@ -186,7 +187,12 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     }
 
     public synchronized List<ProviderMethod> findEventMap(Class<? extends Event> eventClass) {
-        return eventMap.computeIfAbsent(eventClass.getName(), l -> withMethodAssignableFrom(eventClass).toList());
+        return eventMap.computeIfAbsent(
+                eventClass.getName(),
+                l -> withMethodAssignableFrom(eventClass)
+                        .filter(method -> method.hasAnn(EventListener.class))
+                        .toList()
+        );
     }
 
     /**

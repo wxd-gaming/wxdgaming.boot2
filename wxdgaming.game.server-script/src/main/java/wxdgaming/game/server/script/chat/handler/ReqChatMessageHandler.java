@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.chat.handler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
@@ -83,6 +84,7 @@ public class ReqChatMessageHandler {
     }
 
     /** 登录，推送gm命令 */
+    @EventListener
     public void onLoginSendGmList(EventConst.LoginPlayerEvent event) {
         Player player = event.player();
         if (checkOpenGm(player)) {

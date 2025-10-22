@@ -2,6 +2,7 @@ package wxdgaming.game.server.script.task;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.collection.ListOf;
 import wxdgaming.boot2.core.lang.condition.Condition;
@@ -48,6 +49,7 @@ public abstract class ITaskScript extends HoldApplicationContext {
     public abstract TaskType type();
 
     /** 登录的时候检查任务 */
+    @EventListener
     public void onLoginBefore(EventConst.LoginBeforePlayerEvent event) {
         Player player = event.player();
         TaskPack taskPack = player.getTaskPack();

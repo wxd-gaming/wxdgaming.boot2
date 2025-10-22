@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.achieve;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.condition.Condition;
@@ -45,6 +46,7 @@ public class AchieveService implements InitPrint {
         this.bagService = bagService;
     }
 
+    @EventListener
     public void onLoginBefore(EventConst.LoginBeforePlayerEvent event) {
         Player player = event.player();
         QAchieveTable qAchieveTable = this.dataRepository.dataTable(QAchieveTable.class);

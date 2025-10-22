@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.attribute;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.ann.InitEvent;
@@ -31,6 +32,7 @@ public class NpcAttributeService extends HoldApplicationContext {
     TreeMap<CalculatorType, AbstractCalculatorAction> calculatorImplMap = new TreeMap<>();
     CalculatorType[] calculatorTypes;
 
+    @EventListener
     public void init(InitEvent initEvent) {
         TreeMap<CalculatorType, AbstractCalculatorAction> tmp = new TreeMap<>();
         applicationContextProvider.classWithSuperStream(AbstractCalculatorAction.class)
