@@ -30,13 +30,13 @@ public final class MainApplicationContextProvider extends ApplicationContextProv
         return this;
     }
 
-    @Override public MainApplicationContextProvider executeMethodWithAnnotatedStart() {
-        super.executeMethodWithAnnotatedStart();
+    @Override public MainApplicationContextProvider postStartEvent() {
+        super.postStartEvent();
         return this;
     }
 
     public MainApplicationContextProvider startBootstrap() {
-        executeMethodWithAnnotatedStart();
+        postStartEvent();
         log.info("""
                 
                 =========================================================

@@ -1,6 +1,6 @@
 package wxdgaming.game.server.event;
 
-import wxdgaming.boot2.core.Event;
+import wxdgaming.boot2.core.event.Event;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.attribute.CalculatorType;
 import wxdgaming.game.server.bean.reason.ReasonDTO;

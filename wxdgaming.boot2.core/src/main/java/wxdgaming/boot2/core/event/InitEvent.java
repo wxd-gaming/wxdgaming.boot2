@@ -1,7 +1,6 @@
-package wxdgaming.boot2.core.ann;
+package wxdgaming.boot2.core.event;
 
 import wxdgaming.boot2.core.ApplicationContextProvider;
-import wxdgaming.boot2.core.Event;
 
 /**
  * 执行init操作

@@ -3,7 +3,8 @@ package wxdgaming.boot2.starter.batis;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.ann.Stop;
+import org.springframework.context.event.EventListener;
+import wxdgaming.boot2.core.event.StopEvent;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -32,8 +33,8 @@ public abstract class DataHelper {
         return (DDL) ddlBuilder;
     }
 
-    @Stop
-    public abstract void stop();
+    @EventListener
+    public abstract void stop(StopEvent event);
 
     public TableMapping tableMapping(Class<? extends Entity> cls) {
         return ddlBuilder.tableMapping(cls);

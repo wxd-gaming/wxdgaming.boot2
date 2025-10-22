@@ -6,10 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.Stop;
-import wxdgaming.boot2.core.ann.StopBefore;
+import wxdgaming.boot2.core.event.StopBeforeEvent;
+import wxdgaming.boot2.core.event.StopEvent;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
@@ -75,16 +76,16 @@ public abstract class SqlDataHelper extends DataHelper {
     }
 
     @Order(100/*优先清空缓存*/)
-    @StopBefore
-    public void stopCache() {
+    @EventListener
+    public void stopCache(StopBeforeEvent event) {
         log.info("关闭数据库缓存：{}", this.getSqlConfig().getUrl());
         if (this.cacheService != null)
             this.cacheService.stop();
     }
 
-    @Stop
+    @EventListener
     @Order(Integer.MAX_VALUE/*最后关闭*/)
-    @Override public void stop() {
+    @Override public void stop(StopEvent event) {
         log.info("准备关闭数据库服务：{}", this.getSqlConfig().getUrl());
         if (this.dataBatch != null)
             this.dataBatch.stop();

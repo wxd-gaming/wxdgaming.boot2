@@ -1,9 +1,10 @@
 package wxdgaming.logserver.plugin;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.event.StartEvent;
 import wxdgaming.boot2.starter.scheduled.ScheduledService;
 
 /**
@@ -22,8 +23,8 @@ public class PluginService extends HoldApplicationContext {
         this.scheduledService = scheduledService;
     }
 
-    @Start
-    public void start() {
+    @EventListener
+    public void start(StartEvent event) {
         applicationContextProvider.classWithSuperStream(AbstractPlugin.class)
                 .forEach(abstractPlugin -> {
                     log.info("插件: {} 加载成功", abstractPlugin.getClass().getName());

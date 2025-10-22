@@ -1,8 +1,6 @@
 package wxdgaming.boot2.starter.batis.sql;
 
 import lombok.Getter;
-import wxdgaming.boot2.core.ann.Stop;
-import wxdgaming.boot2.core.ann.StopBefore;
 import wxdgaming.boot2.starter.batis.Entity;
 
 import java.util.concurrent.ConcurrentHashMap;

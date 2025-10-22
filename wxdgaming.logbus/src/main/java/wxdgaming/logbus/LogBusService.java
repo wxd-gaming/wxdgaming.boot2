@@ -4,10 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.collection.SplitCollection;
+import wxdgaming.boot2.core.event.StartEvent;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.io.FileWriteUtil;
@@ -56,8 +57,8 @@ public class LogBusService implements InitPrint {
     }
 
 
-    @Start
-    public void start() {
+    @EventListener
+    public void start(StartEvent event) {
         log.info("LogBusService start...");
 
         saveLog2FileThread = Thread.ofPlatform().start(() -> {

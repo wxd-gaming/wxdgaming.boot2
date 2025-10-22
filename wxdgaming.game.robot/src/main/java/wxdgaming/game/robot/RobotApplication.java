@@ -33,7 +33,7 @@ public class RobotApplication {
 
         SpringUtil.mainApplicationContextProvider
                 .postInitEvent()
-                .executeMethodWithAnnotatedStart();
+                .postStartEvent();
 
     }
 

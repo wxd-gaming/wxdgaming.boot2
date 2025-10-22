@@ -6,11 +6,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.StreamUtils;
+import org.springframework.context.event.EventListener;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.SpringUtil;
-import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.event.StartEvent;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.io.FileReadUtil;
@@ -57,8 +57,8 @@ public class LogPushController {
         this.logService = logService;
     }
 
-    @Start
-    public void start() {
+    @EventListener
+    public void start(StartEvent event) {
         for (int i = 0; i < 10; i++) {
             ExecutorFactory.getExecutorServiceLogic()
                     .scheduleAtFixedRate(

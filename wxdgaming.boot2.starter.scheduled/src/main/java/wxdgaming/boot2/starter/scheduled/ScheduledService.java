@@ -6,9 +6,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.InitEvent;
-import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.StopBefore;
+import wxdgaming.boot2.core.event.InitEvent;
+import wxdgaming.boot2.core.event.StartEvent;
+import wxdgaming.boot2.core.event.StopBeforeEvent;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
@@ -67,10 +67,10 @@ public class ScheduledService extends HoldApplicationContext {
         jobList = tmpJobList;
     }
 
-    @Start
+    @EventListener
     @Order(99999998)
     @IgnoreRunTimeRecord
-    public void start() {
+    public void start(StartEvent event) {
         ScheduleTrigger scheduleTrigger = new ScheduleTrigger();
         future = executorServicePlatform.scheduleAtFixedRate(
                 scheduleTrigger,
@@ -80,9 +80,9 @@ public class ScheduledService extends HoldApplicationContext {
         );
     }
 
-    @StopBefore
     @Order(10)
-    public void stopBefore() {
+    @EventListener
+    public void stopBefore(StopBeforeEvent event) {
         log.info("线程 Scheduled 调度器 退出");
         if (future != null) {
             future.cancel(true);

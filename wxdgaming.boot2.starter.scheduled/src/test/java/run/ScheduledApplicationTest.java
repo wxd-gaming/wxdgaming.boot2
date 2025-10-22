@@ -23,7 +23,7 @@ public class ScheduledApplicationTest {
                 .web(WebApplicationType.NONE)
                 .run(args);
 
-        SpringUtil.mainApplicationContextProvider.postInitEvent().executeMethodWithAnnotatedStart();
+        SpringUtil.mainApplicationContextProvider.postInitEvent().postStartEvent();
 
     }
 

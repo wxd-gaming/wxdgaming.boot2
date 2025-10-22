@@ -8,10 +8,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.event.EventListener;
-import wxdgaming.boot2.core.ann.InitEvent;
-import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.assist.JavassistProxy;
+import wxdgaming.boot2.core.event.Event;
+import wxdgaming.boot2.core.event.InitEvent;
+import wxdgaming.boot2.core.event.StartEvent;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.FieldUtil;
@@ -226,8 +227,8 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         return this;
     }
 
-    public ApplicationContextProvider executeMethodWithAnnotatedStart() {
-        executeMethodWithAnnotated(Start.class);
+    public ApplicationContextProvider postStartEvent() {
+        postEvent(new StartEvent());
         return this;
     }
 

@@ -17,15 +17,15 @@ public class WsClientTest {
         socketClientConfig.setEnabledWebSocket(true);
         socketClientConfig.setHost("s1-tsjlbb-910494yq712.shengaowl.com");
         socketClientConfig.setPort(8101);
-        SocketClient socketClient = new SocketClient(socketClientConfig);
-        socketClient.init(new ProtoListenerFactory());
-        socketClient.connect(session->{
+        SocketClient socketClient = new SocketClient(socketClientConfig, new ProtoListenerFactory());
+        socketClient.init();
+        socketClient.connect(session -> {
             System.out.println(session.isOpen());
         });
         LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(10));
         SocketSession idle = socketClient.idle();
         ChannelFuture future = idle.write("ddddd");
-        future.addListener(listener->{
+        future.addListener(listener -> {
             System.out.println(listener.isSuccess());
         }).get();
         System.out.println("sssss");

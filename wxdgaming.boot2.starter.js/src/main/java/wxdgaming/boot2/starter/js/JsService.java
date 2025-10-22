@@ -5,7 +5,7 @@ import org.graalvm.polyglot.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.InitEvent;
+import wxdgaming.boot2.core.event.InitEvent;
 import wxdgaming.boot2.core.io.FileReadUtil;
 
 import java.nio.charset.StandardCharsets;

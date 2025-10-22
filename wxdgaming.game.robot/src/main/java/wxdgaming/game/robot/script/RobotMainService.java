@@ -7,10 +7,11 @@ import io.netty.channel.ChannelFutureListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.collection.ListOf;
 import wxdgaming.boot2.core.collection.MapOf;
+import wxdgaming.boot2.core.event.StartEvent;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.RandomUtils;
@@ -55,8 +56,8 @@ public class RobotMainService {
         this.socketClient = socketClient;
     }
 
-    @Start
-    public void start() {
+    @EventListener
+    public void start(StartEvent event) {
         for (int i = 0; i < 100; i++) {
             String account = "k19" + (i + 1);
             robotMap.put(account, new Robot().setAccount(account).setName(account));

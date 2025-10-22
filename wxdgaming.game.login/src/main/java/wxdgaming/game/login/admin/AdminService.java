@@ -2,13 +2,14 @@ package wxdgaming.game.login.admin;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.CacheHttpServletRequest;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.event.StartEvent;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.token.JsonTokenBuilder;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
@@ -38,8 +39,8 @@ public class AdminService extends HoldApplicationContext {
         this.sqlDataHelper = pgsqlDataHelper;
     }
 
-    @Start
-    public void start() {
+    @EventListener
+    public void start(StartEvent event) {
         String adminName = loginServerProperties.getAdminName();
         AdminUserEntity admin = findByName(adminName);
         if (admin == null) {

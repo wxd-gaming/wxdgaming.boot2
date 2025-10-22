@@ -5,9 +5,10 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
-import wxdgaming.boot2.core.ann.StopBefore;
+import wxdgaming.boot2.core.event.StopBeforeEvent;
 import wxdgaming.game.authority.SignUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
@@ -97,8 +98,8 @@ public class InnerService {
     }
 
     @Order(10)
-    @StopBefore
-    public void stopBefore() {
+    @EventListener
+    public void stopBefore(StopBeforeEvent event) {
         for (ServerInfoEntity bean : innerGameServerInfoMap.values()) {
             sqlDataHelper.getDataBatch().save(bean);
         }

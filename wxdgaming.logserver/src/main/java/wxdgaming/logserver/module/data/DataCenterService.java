@@ -3,9 +3,10 @@ package wxdgaming.logserver.module.data;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.event.StartEvent;
 import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.json.FastJsonUtil;
@@ -42,8 +43,8 @@ public class DataCenterService implements InitPrint {
         this.sqlDataHelper = sqlDataHelper;
     }
 
-    @Start
-    public void start() {
+    @EventListener
+    public void start(StartEvent event) {
         log.info("DataCenterService start");
         initLogTable();
     }

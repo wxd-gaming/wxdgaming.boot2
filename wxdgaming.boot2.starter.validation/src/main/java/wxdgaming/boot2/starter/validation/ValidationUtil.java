@@ -6,7 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.InitEvent;
+import wxdgaming.boot2.core.event.InitEvent;
 import wxdgaming.boot2.core.executor.StackUtils;
 import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.boot2.core.util.AssertUtil;

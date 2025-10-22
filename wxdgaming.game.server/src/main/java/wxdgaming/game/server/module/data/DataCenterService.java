@@ -4,10 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.ChannelFuture;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
+import wxdgaming.boot2.core.event.StartEvent;
 import wxdgaming.boot2.core.format.HexId;
 import wxdgaming.boot2.core.keywords.KeywordsMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
@@ -66,8 +67,8 @@ public class DataCenterService extends HoldApplicationContext implements GetPlay
 
     }
 
-    @Start
-    public void start() {
+    @EventListener
+    public void start(StartEvent event) {
         if (gameServerProperties.getServerType() <= 1) {
             SqlDataHelper sqlDataHelper = applicationContextProvider.getBean(SqlDataHelper.class);
             getPlayerStrategyFactory = new GetPlayerStrategyFactory(new DatabaseGetPlayerStrategy(sqlDataHelper));

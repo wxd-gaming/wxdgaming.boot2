@@ -119,7 +119,7 @@ public class MapDbTest {
             Set<Object> set1 = db.hashSet("set1");
             set1.add("something " + RandomUtils.random(10));
         } finally {
-            db.stop();
+            db.stop(null);
         }
     }
 

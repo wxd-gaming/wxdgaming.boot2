@@ -12,10 +12,10 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
-import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.StopBefore;
+import wxdgaming.boot2.core.event.StartEvent;
+import wxdgaming.boot2.core.event.StopBeforeEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.runtime.IgnoreRunTimeRecord;
 import wxdgaming.boot2.core.util.BytesUnit;
@@ -45,6 +45,7 @@ public class SocketClient {
 
     protected Bootstrap bootstrap;
     protected final SocketClientConfig config;
+    protected final ProtoListenerFactory protoListenerFactory;
 
 
     protected volatile SessionGroup sessionGroup = new SessionGroup();
@@ -53,8 +54,9 @@ public class SocketClient {
     /** 包含的http head参数 */
     protected final HttpHeaders httpHeaders = new DefaultHttpHeaders();
 
-    public SocketClient(SocketClientConfig config) {
+    public SocketClient(SocketClientConfig config, ProtoListenerFactory protoListenerFactory) {
         this.config = config;
+        this.protoListenerFactory = protoListenerFactory;
     }
 
     public WebSocketClientHandshaker newHandshaker() {
@@ -75,7 +77,7 @@ public class SocketClient {
     }
 
 
-    public void init(ProtoListenerFactory protoListenerFactory) {
+    public void init() {
         SocketClientDeviceHandler socketClientDeviceHandler = new SocketClientDeviceHandler();
         ClientMessageDecode clientMessageDecode = new ClientMessageDecode(config, protoListenerFactory);
         SSLContext sslContext = config.sslContext();
@@ -147,11 +149,11 @@ public class SocketClient {
                 });
     }
 
-    @Start
+    @EventListener
     @Order(2000)
     @IgnoreRunTimeRecord
-    public void start(@Qualifier ProtoListenerFactory protoListenerFactory) {
-        init(protoListenerFactory);
+    public void start(StartEvent event) {
+        init();
         for (int i = 0; i < config.getMaxConnectionCount(); i++) {
             ChannelFuture future = connect();
         }
@@ -160,8 +162,8 @@ public class SocketClient {
     protected void addChanelHandler(SocketChannel socketChannel, ChannelPipeline pipeline) {}
 
     @Order(100)
-    @StopBefore
-    public void stopBefore() {
+    @EventListener
+    public void stopBefore(StopBeforeEvent event) {
         closed = true;
         sessionGroup.getChannelGroup().disconnect();
         log.info("stop tcp client：{}:{}", config.getHost(), config.getPort());

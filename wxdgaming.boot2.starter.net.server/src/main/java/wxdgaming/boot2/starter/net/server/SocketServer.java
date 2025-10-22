@@ -7,12 +7,11 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.ScheduledFuture;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.Stop;
-import wxdgaming.boot2.core.ann.StopBefore;
+import wxdgaming.boot2.core.event.StartEvent;
+import wxdgaming.boot2.core.event.StopBeforeEvent;
 import wxdgaming.boot2.core.runtime.IgnoreRunTimeRecord;
 import wxdgaming.boot2.core.util.BytesUnit;
 import wxdgaming.boot2.starter.net.NioFactory;
@@ -33,7 +32,8 @@ import javax.net.ssl.SSLContext;
 @Getter
 public class SocketServer {
 
-    protected SocketServerConfig config;
+    protected final ProtoListenerFactory protoListenerFactory;
+    protected final SocketServerConfig config;
     protected final SessionGroup sessionGroup = new SessionGroup();
     protected ServerBootstrap bootstrap;
     protected ChannelFuture future;
@@ -41,17 +41,18 @@ public class SocketServer {
     protected ScheduledFuture<?> scheduledFuture;
 
 
-    public SocketServer(SocketServerConfig config) {
+    public SocketServer(SocketServerConfig config, ProtoListenerFactory protoListenerFactory) {
+        this.protoListenerFactory = protoListenerFactory;
         if (log.isDebugEnabled()) {
             log.debug("socket server config: {}", config.toJSONString());
         }
         this.config = config;
     }
 
-    @Start
+    @EventListener
     @Order(1000)
     @IgnoreRunTimeRecord
-    public void start(@Qualifier ProtoListenerFactory protoListenerFactory) {
+    public void start(StartEvent event) {
 
         SocketServerDeviceHandler socketServerDeviceHandler = new SocketServerDeviceHandler(config, sessionGroup);
         SocketServerMessageDecode socketServerMessageDecode = new SocketServerMessageDecode(config, protoListenerFactory);
@@ -125,8 +126,8 @@ public class SocketServer {
     }
 
     @Order(100)
-    @StopBefore
-    public void stopBefore() {
+    @EventListener
+    public void stopBefore(StopBeforeEvent event) {
         if (scheduledFuture != null) {
             scheduledFuture.cancel(false);
         }

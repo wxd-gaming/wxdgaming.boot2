@@ -3,7 +3,7 @@ package wxdgaming.game.server.script.attribute.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.json.FastJsonUtil;
-import wxdgaming.boot2.core.Event;
+import wxdgaming.boot2.core.event.Event;
 import wxdgaming.game.server.bean.attr.AttrInfo;
 import wxdgaming.game.server.bean.buff.BuffTypeConst;
 import wxdgaming.game.cfg.bean.QBuff;

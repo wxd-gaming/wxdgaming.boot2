@@ -7,7 +7,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import org.apache.commons.lang3.StringUtils;
-import wxdgaming.boot2.core.ann.InitEvent;
+import wxdgaming.boot2.core.event.InitEvent;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.IClientWebSocketStringListener;
 import wxdgaming.boot2.starter.net.server.IServerWebSocketStringListener;

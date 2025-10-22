@@ -3,7 +3,7 @@ package wxdgaming.boot2.core;
 import lombok.Getter;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
-import wxdgaming.boot2.core.ann.InitEvent;
+import wxdgaming.boot2.core.event.InitEvent;
 import wxdgaming.boot2.core.runtime.IgnoreRunTimeRecord;
 
 /**

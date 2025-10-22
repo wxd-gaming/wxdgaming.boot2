@@ -4,10 +4,12 @@ import kotlin.jvm.functions.Function1;
 import lombok.extern.slf4j.Slf4j;
 import org.mapdb.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.ann.Stop;
+import wxdgaming.boot2.core.event.StopBeforeEvent;
+import wxdgaming.boot2.core.event.StopEvent;
 import wxdgaming.boot2.core.io.FileUtil;
 
 import java.io.File;
@@ -58,9 +60,9 @@ public class MapDBDataHelper implements InitPrint {
         return db;
     }
 
-    @Stop
+    @EventListener
     @Order(Integer.MAX_VALUE)
-    public void stop() {
+    public void stop(StopEvent event) {
         db.close();
         log.info("关闭 map db {}", this.dbFile);
     }

@@ -13,11 +13,8 @@ import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.core5.util.TimeValue;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.ann.Stop;
 
 import java.util.concurrent.TimeUnit;
 

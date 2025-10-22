@@ -6,8 +6,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Start;
-import wxdgaming.boot2.core.ann.StopBefore;
+import wxdgaming.boot2.core.event.StartEvent;
+import wxdgaming.boot2.core.event.StopBeforeEvent;
 import wxdgaming.boot2.core.executor.*;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.common.slog.SlogService;
@@ -43,8 +43,8 @@ public class PlayerDriveService extends HoldApplicationContext {
         this.slogService = slogService;
     }
 
-    @Start
-    public void start() {
+    @EventListener
+    public void start(StartEvent event) {
 
         for (int i = 0; i < logicCoreSize; i++) {
             PlayerDriveContent driveContent = new PlayerDriveContent("mapNpc-drive-" + i);
@@ -54,8 +54,8 @@ public class PlayerDriveService extends HoldApplicationContext {
     }
 
     @Order(1)
-    @StopBefore
-    public void stopBefore() {
+    @EventListener
+    public void stopBefore(StopBeforeEvent event) {
         playerDriveContentMap.values().forEach(v -> v.timerJob.cancel(true));
     }
 

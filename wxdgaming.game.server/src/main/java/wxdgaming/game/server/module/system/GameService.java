@@ -2,9 +2,10 @@ package wxdgaming.game.server.module.system;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.ann.Start;
+import wxdgaming.boot2.core.event.StartEvent;
 import wxdgaming.boot2.core.executor.HeartDriveThread;
 import wxdgaming.boot2.core.lang.Tick;
 import wxdgaming.game.server.GameServerApplication;
@@ -30,8 +31,8 @@ public class GameService implements InitPrint {
     public GameService() {
     }
 
-    @Start
-    public void start() {
+    @EventListener
+    public void start(StartEvent event) {
         mainThreadDrive.start();
         activityThreadDrive.start();
     }
