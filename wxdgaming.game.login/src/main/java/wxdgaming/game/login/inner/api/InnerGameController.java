@@ -12,12 +12,16 @@ import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.game.login.bean.ServerInfoDTO;
+import wxdgaming.game.login.bean.ServerMailDTO;
 import wxdgaming.game.login.bean.UseCDKeyDTO;
 import wxdgaming.game.login.cdkey.CDKeyService;
 import wxdgaming.game.login.entity.ServerInfoEntity;
 import wxdgaming.game.login.entity.UserData;
 import wxdgaming.game.login.inner.InnerService;
 import wxdgaming.game.login.login.LoginService;
+import wxdgaming.game.login.smail.ServerMailService;
+
+import java.util.List;
 
 /**
  * 登录接口
@@ -33,16 +37,25 @@ public class InnerGameController extends HoldApplicationContext {
     final InnerService innerService;
     final CDKeyService cdKeyService;
     final LoginService loginService;
+    final ServerMailService serverMailService;
 
-    public InnerGameController(InnerService innerService, CDKeyService cdKeyService, LoginService loginService) {
+    public InnerGameController(InnerService innerService, CDKeyService cdKeyService, LoginService loginService, ServerMailService serverMailService) {
         this.innerService = innerService;
         this.cdKeyService = cdKeyService;
         this.loginService = loginService;
+        this.serverMailService = serverMailService;
     }
 
     @RequestMapping("/cdkey/use")
     public RunResult use(CacheHttpServletRequest request, @RequestBody UseCDKeyDTO dto) {
         return cdKeyService.use(dto.getCdKey(), dto.getSid(), dto.getAccount(), dto.getRoleId(), dto.getRoleName());
+    }
+
+    @RequestMapping("/serverMail/query")
+    public RunResult serverMailDTOLIST(CacheHttpServletRequest request, @RequestBody JSONObject jsonObject) {
+        int sid = jsonObject.getIntValue("sid");
+        List<ServerMailDTO> serverMailDTOS = serverMailService.serverMailDTOList(sid);
+        return RunResult.ok().data(serverMailDTOS);
     }
 
     @RequestMapping(value = "/lastLogin")

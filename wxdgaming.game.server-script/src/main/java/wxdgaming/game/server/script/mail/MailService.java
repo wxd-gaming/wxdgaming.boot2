@@ -1,13 +1,21 @@
 package wxdgaming.game.server.script.mail;
 
+import com.alibaba.fastjson.TypeReference;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.collection.ListOf;
+import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
+import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
+import wxdgaming.game.authority.SignUtil;
+import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.common.slog.SlogService;
+import wxdgaming.game.login.bean.ServerMailDTO;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.global.GlobalDataConst;
 import wxdgaming.game.server.bean.global.impl.ServerMailData;
@@ -19,6 +27,8 @@ import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.mail.slog.MailSlog;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -34,11 +44,37 @@ public class MailService extends HoldApplicationContext {
     final GlobalDataService globalDataService;
     final DataCenterService dataCenterService;
     final SlogService slogService;
+    final ConnectLoginProperties connectLoginProperties;
+    List<ServerMailDTO> serverMailDTOList = List.of();
 
-    public MailService(GlobalDataService globalDataService, DataCenterService dataCenterService, SlogService slogService) {
+    public MailService(GlobalDataService globalDataService, DataCenterService dataCenterService, SlogService slogService, ConnectLoginProperties connectLoginProperties) {
         this.globalDataService = globalDataService;
         this.dataCenterService = dataCenterService;
         this.slogService = slogService;
+        this.connectLoginProperties = connectLoginProperties;
+    }
+
+    @Scheduled("0 * *")
+    public void requestServerMail() {
+        String url = connectLoginProperties.getUrl() + "/inner/game/serverMail/query";
+        HashMap<String, String> stringHashMap = new HashMap<>();
+        String sign = SignUtil.signByJsonKey(stringHashMap, connectLoginProperties.getJwtKey());
+        HttpRequestPost.ofJson(url, stringHashMap)
+                .addHeader(HttpHeaderNames.AUTHORIZATION.toString(), sign)
+                .executeAsync()
+                .subscribe((response) -> {
+                    log.debug("获取全服邮件列表 {}", response);
+                    if (!response.isSuccess()) {
+                        log.error("获取全服邮件列表失败, {}", response);
+                        return;
+                    }
+                    RunResult runResult = response.bodyRunResult();
+                    if (runResult.code() != 1) {
+                        log.error("获取全服邮件列表失败, {}", runResult.msg());
+                        return;
+                    }
+                    serverMailDTOList = runResult.getObject("data", new TypeReference<ArrayList<ServerMailDTO>>() {});
+                });
     }
 
     @EventListener

@@ -1,13 +1,9 @@
-package wxdgaming.game.login.entity;
+package wxdgaming.game.login.bean;
 
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.boot2.starter.batis.EntityIntegerUID;
-import wxdgaming.boot2.starter.batis.ann.DbTable;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -18,11 +14,9 @@ import java.util.ArrayList;
  **/
 @Getter
 @Setter
-@DbTable
-public class ServerMailEntity extends EntityIntegerUID implements Serializable {
+public class ServerMailDTO {
 
-    @Serial private static final long serialVersionUID = 1L;
-
+    int uid;
     /** 有效期 */
     private long[] validity = new long[2];
     /** 如果是空表示所有区服，如果不为空表示特定区服 */
@@ -34,13 +28,6 @@ public class ServerMailEntity extends EntityIntegerUID implements Serializable {
     private String title;
     private String content;
     private String itemListString;
-    /** 记录一下谁创建的 */
-    private String createAdmin;
-    private long createTime;
-    /** 审核人员 */
-    private String auditAdmin;
-    /** 审核时间 */
-    private long auditTime;
 
     public boolean checkServerId(int serverId) {
         return serverIdList.isEmpty() || serverIdList.contains(serverId);

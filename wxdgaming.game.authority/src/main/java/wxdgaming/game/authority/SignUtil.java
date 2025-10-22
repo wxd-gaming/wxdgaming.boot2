@@ -1,5 +1,6 @@
 package wxdgaming.game.authority;
 
+import com.google.common.base.Joiner;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.util.Md5Util;
@@ -46,10 +47,7 @@ public class SignUtil {
         } else {
             tmap = new TreeMap<>(data);
         }
-        String dataString = tmap.entrySet().stream()
-                .map(entry -> entry.getKey() + "=" + entry.getValue())
-                .reduce((a, b) -> a + "&" + b)
-                .orElse("");
+        String dataString = Joiner.on("&").withKeyValueSeparator("=").join(tmap);
         String string = dataString + key;
         String sign = Md5Util.md5(string);
         if (log.isDebugEnabled()) {
