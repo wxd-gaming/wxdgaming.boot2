@@ -7,7 +7,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.assist.JavassistProxy;
@@ -215,8 +215,8 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         return this;
     }
 
-    public ApplicationContextProvider executeMethodWithAnnotatedInit() {
-        executeMethodWithAnnotated(Init.class);
+    public ApplicationContextProvider postInitEvent() {
+        postEvent(new InitEvent(this));
         return this;
     }
 

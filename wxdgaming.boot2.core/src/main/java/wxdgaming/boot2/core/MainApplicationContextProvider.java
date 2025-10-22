@@ -1,16 +1,10 @@
 package wxdgaming.boot2.core;
 
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.core.ann.Stop;
-import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.util.JvmUtil;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * 运行类
@@ -31,8 +25,8 @@ public final class MainApplicationContextProvider extends ApplicationContextProv
         SpringUtil.mainApplicationContextProvider = this;
     }
 
-    @Override public MainApplicationContextProvider executeMethodWithAnnotatedInit() {
-        super.executeMethodWithAnnotatedInit();
+    @Override public MainApplicationContextProvider postInitEvent() {
+        super.postInitEvent();
         return this;
     }
 

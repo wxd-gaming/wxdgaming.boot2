@@ -26,7 +26,7 @@ public class RpcApplicationTest {
         ConfigurableApplicationContext context = MainApplicationContextProvider.builder(RpcApplicationTest.class)
                 .run(args);
         SpringUtil.mainApplicationContextProvider
-                .executeMethodWithAnnotatedInit()
+                .postInitEvent()
                 .startBootstrap();
 
         RpcTest bean = context.getBean(RpcTest.class);

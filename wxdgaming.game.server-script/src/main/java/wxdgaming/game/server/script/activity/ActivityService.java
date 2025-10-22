@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.boot2.core.executor.HeartConst;
 import wxdgaming.boot2.core.executor.HeartDriveHandler;
 import wxdgaming.boot2.core.function.FunctionUtil;
@@ -47,9 +47,8 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
         this.validationService = validationService;
     }
 
-    @Init
     @Order(Integer.MAX_VALUE)
-    public void init() {
+    public void init(InitEvent initEvent) {
         activityHandlerMap = getApplicationContextProvider().toMap(AbstractActivityHandler.class, AbstractActivityHandler::activityType);
         gameService.getActivityThreadDrive().setDriveHandler(this);
         check();

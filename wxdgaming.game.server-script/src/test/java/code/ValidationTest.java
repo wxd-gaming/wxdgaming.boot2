@@ -35,7 +35,7 @@ public class ValidationTest {
 
     @BeforeEach
     public void before() {
-        mainApplicationContextProvider.executeMethodWithAnnotatedInit();
+        mainApplicationContextProvider.postInitEvent();
     }
 
     @Test

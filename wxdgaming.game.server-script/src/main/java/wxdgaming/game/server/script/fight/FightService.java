@@ -3,7 +3,7 @@ package wxdgaming.game.server.script.fight;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.server.bean.MapNpc;
 
@@ -23,8 +23,7 @@ public class FightService extends HoldApplicationContext {
 
     Map<Integer, AbstractFightAction> actionImplMap = new HashMap<>();
 
-    @Init
-    public void init() {
+    public void init(InitEvent initEvent) {
         actionImplMap = applicationContextProvider.toMap(AbstractFightAction.class, AbstractFightAction::type);
     }
 

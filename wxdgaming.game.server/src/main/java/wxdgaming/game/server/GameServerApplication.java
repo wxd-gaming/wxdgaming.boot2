@@ -74,7 +74,7 @@ public class GameServerApplication {
         }
 
         ChildApplicationContextProvider childApplicationContextProvider = SpringUtil.newChild((ConfigurableApplicationContext) SpringUtil.mainApplicationContextProvider.getApplicationContext(), ScriptScan.class, classDirLoader);
-        childApplicationContextProvider.executeMethodWithAnnotatedInit();
+        childApplicationContextProvider.postInitEvent();
         SpringUtil.newChildAfter(
                 (ConfigurableApplicationContext) SpringUtil.mainApplicationContextProvider.getApplicationContext(),
                 (ConfigurableApplicationContext) childApplicationContextProvider.getApplicationContext(),

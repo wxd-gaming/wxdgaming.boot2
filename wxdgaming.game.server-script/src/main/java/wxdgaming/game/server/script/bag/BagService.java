@@ -5,7 +5,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.cfg.QItemTable;
@@ -61,8 +61,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
         this.slogService = slogService;
     }
 
-    @Init
-    public void init() {
+    public void init(InitEvent initEvent) {
         this.gainScriptProvider.init(getApplicationContextProvider());
         this.costScriptProvider.init(getApplicationContextProvider());
         this.useItemScriptProvider.init(getApplicationContextProvider());

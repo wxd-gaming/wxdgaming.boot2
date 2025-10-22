@@ -3,7 +3,7 @@ package wxdgaming.game.server.script.task;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.message.task.ResTaskList;
@@ -38,8 +38,7 @@ public class TaskService extends HoldApplicationContext {
     public TaskService() {
     }
 
-    @Init
-    public void init() {
+    public void init(InitEvent initEvent) {
 
         conditionInitValueHandlerMap = applicationContextProvider.toMap(
                 ConditionInitValueHandler.class,

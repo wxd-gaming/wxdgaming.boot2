@@ -31,7 +31,7 @@ public class LogServerApplication {
         try {
             new SpringApplicationBuilder(LogServerApplication.class).run(args);
             SpringUtil.mainApplicationContextProvider
-                    .executeMethodWithAnnotatedInit()
+                    .postInitEvent()
                     .startBootstrap();
             log.info("日志中心启动完成...");
         } catch (Exception e) {

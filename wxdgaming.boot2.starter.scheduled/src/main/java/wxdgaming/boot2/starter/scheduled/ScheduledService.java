@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.boot2.core.ann.Start;
 import wxdgaming.boot2.core.ann.StopBefore;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
@@ -42,8 +42,7 @@ public class ScheduledService extends HoldApplicationContext {
         executorServicePlatform = ExecutorFactory.create("scheduled-executor", executorProperties.getExecutor());
     }
 
-    @Init
-    public void init() {
+    public void init(InitEvent initEvent) {
         log.debug("------------------------------初始化定时任务调度器------------------------------");
         List<AbstractCronTrigger> tmpJobList = new ArrayList<>();
         applicationContextProvider.withMethodAnnotatedCache(Scheduled.class)

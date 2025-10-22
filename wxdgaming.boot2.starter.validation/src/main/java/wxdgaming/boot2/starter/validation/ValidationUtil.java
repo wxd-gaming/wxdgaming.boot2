@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.boot2.core.executor.StackUtils;
 import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.boot2.core.util.AssertUtil;
@@ -28,9 +28,8 @@ public class ValidationUtil extends HoldApplicationContext {
 
     Map<IValidationType, AbstractValidationHandler> validationHandlerMap;
 
-    @Init
     @Order(-100)
-    public void init() {
+    public void init(InitEvent initEvent) {
         validationHandlerMap = getApplicationContextProvider().toMap(AbstractValidationHandler.class, AbstractValidationHandler::conditionType);
     }
 

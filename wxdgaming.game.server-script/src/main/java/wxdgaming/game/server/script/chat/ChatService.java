@@ -3,7 +3,7 @@ package wxdgaming.game.server.script.chat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.game.message.chat.ChatType;
 
 import java.util.HashMap;
@@ -21,8 +21,7 @@ public class ChatService extends HoldApplicationContext {
 
     Map<ChatType, AbstractChatAction> chatHandlerMap = new HashMap<>();
 
-    @Init
-    public void init() {
+    public void init(InitEvent initEvent) {
         this.chatHandlerMap = applicationContextProvider.toMap(AbstractChatAction.class, AbstractChatAction::chatType);
     }
 

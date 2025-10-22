@@ -32,7 +32,7 @@ public class RobotApplication {
         MainApplicationContextProvider.builder(RobotApplication.class).web(WebApplicationType.NONE).run(args);
 
         SpringUtil.mainApplicationContextProvider
-                .executeMethodWithAnnotatedInit()
+                .postInitEvent()
                 .executeMethodWithAnnotatedStart();
 
     }

@@ -3,7 +3,7 @@ package wxdgaming.game.server.script.buff;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.boot2.core.lang.Tuple2;
 import wxdgaming.boot2.core.lang.bit.BitFlagGroup;
 import wxdgaming.boot2.core.timer.MyClock;
@@ -51,8 +51,7 @@ public class BuffService extends HoldApplicationContext {
         this.npcAttributeService = npcAttributeService;
     }
 
-    @Init
-    public void init() {
+    public void init(InitEvent initEvent) {
         actionMap = applicationContextProvider.toMap(AbstractBuffAction.class, AbstractBuffAction::buffType);
     }
 

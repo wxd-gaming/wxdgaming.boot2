@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.game.message.gm.GMBean;
 import wxdgaming.game.message.gm.GmGroup;
 import wxdgaming.game.message.gm.ResGmList;
@@ -40,8 +40,7 @@ public class GmService extends HoldApplicationContext {
         this.tipsService = tipsService;
     }
 
-    @Init
-    public void init() {
+    public void init(InitEvent initEvent) {
         gmMap = applicationContextProvider.toMapWithMethodAnnotated(
                 GM.class,
                 providerMethod -> providerMethod.getMethod().getName().toLowerCase(),

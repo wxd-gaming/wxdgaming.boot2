@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.ApplicationContextProvider;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.InitEvent;
 
 /**
  * rpc 监听 绑定工厂
@@ -21,10 +21,9 @@ public class RpcListenerFactory {
     /** 相当于用 read and copy write方式作为线程安全性 */
     RpcListenerContent rpcListenerContent = null;
 
-    @Init
     @Order(9)
-    public void init(ApplicationContextProvider runApplication) {
-        rpcListenerContent = new RpcListenerContent(runApplication);
+    public void init(InitEvent initEvent) {
+        rpcListenerContent = new RpcListenerContent(initEvent.applicationContextProvider());
     }
 
 }

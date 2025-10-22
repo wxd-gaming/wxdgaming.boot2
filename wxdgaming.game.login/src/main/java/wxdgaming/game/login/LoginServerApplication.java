@@ -42,7 +42,7 @@ public class LoginServerApplication {
         try {
             new SpringApplicationBuilder(LoginServerApplication.class).run(args);
             SpringUtil.mainApplicationContextProvider
-                    .executeMethodWithAnnotatedInit()
+                    .postInitEvent()
                     .startBootstrap();
         } catch (Exception e) {
             log.error("登录服务启动异常...", e);

@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Init;
 import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.IClientWebSocketStringListener;
 import wxdgaming.boot2.starter.net.server.IServerWebSocketStringListener;
@@ -33,9 +33,8 @@ public class ProtoListenerFactory extends HoldApplicationContext {
     List<ServerProtoFilter> serverProtoFilters;
     List<ClientProtoFilter> clientProtoFilters;
 
-    @Init
     @Order(6)
-    public void init() {
+    public void init(InitEvent initEvent) {
         protoListenerContent = new ProtoListenerContent(getApplicationContextProvider());
         serverWebSocketStringListener = getApplicationContextProvider().instance(IServerWebSocketStringListener.class);
         clientWebSocketStringListener = getApplicationContextProvider().instance(IClientWebSocketStringListener.class);

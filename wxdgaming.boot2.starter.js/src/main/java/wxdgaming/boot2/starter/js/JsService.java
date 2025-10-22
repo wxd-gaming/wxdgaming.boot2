@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.graalvm.polyglot.Value;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.boot2.core.io.FileReadUtil;
 
 import java.nio.charset.StandardCharsets;
@@ -26,8 +26,7 @@ public class JsService extends HoldApplicationContext {
     private final List<Consumer<JSContext>> onInitListener = new ArrayList<>();
     private ConcurrentHashMap<Thread, JSContext> threadJsContext = new ConcurrentHashMap<>();
 
-    @Init
-    public void init() {
+    public void init(InitEvent initEvent) {
         /*重构插件*/
         clear();
     }

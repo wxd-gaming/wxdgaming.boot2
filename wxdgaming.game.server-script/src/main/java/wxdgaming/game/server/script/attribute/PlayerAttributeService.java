@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.server.bean.reason.ReasonConst;
 import wxdgaming.game.server.bean.reason.ReasonDTO;
@@ -33,8 +33,7 @@ public class PlayerAttributeService extends HoldApplicationContext {
     TreeMap<CalculatorType, AbstractCalculatorAction> calculatorImplMap = new TreeMap<>();
     CalculatorType[] calculatorTypes;
 
-    @Init
-    public void init() {
+    public void init(InitEvent initEvent) {
 
         TreeMap<CalculatorType, AbstractCalculatorAction> tmp = new TreeMap<>();
         applicationContextProvider.classWithSuperStream(AbstractCalculatorAction.class)

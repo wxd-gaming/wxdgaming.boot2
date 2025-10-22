@@ -1,10 +1,11 @@
 package wxdgaming.game.server.script;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.ann.Init;
+import wxdgaming.boot2.core.ann.InitEvent;
 import wxdgaming.boot2.core.executor.HeartDriveHandler;
 import wxdgaming.game.server.module.system.GameService;
 
@@ -24,9 +25,9 @@ public class MainHeartDriveHandlerScript extends HoldApplicationContext implemen
         this.gameService = gameService;
     }
 
-    @Init
+    @EventListener
     @Order(Integer.MAX_VALUE)
-    public void init() {
+    public void init(InitEvent initEvent) {
         gameService.getMainThreadDrive().setDriveHandler(this);
     }
 
