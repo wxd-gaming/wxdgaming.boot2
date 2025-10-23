@@ -3,6 +3,7 @@ package wxdgaming.game.server.script.mail;
 import com.alibaba.fastjson.TypeReference;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
@@ -16,18 +17,19 @@ import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.login.bean.ServerMailDTO;
-import wxdgaming.game.server.bean.MapNpc;
-import wxdgaming.game.server.bean.global.GlobalDataConst;
-import wxdgaming.game.server.bean.global.impl.ServerMailData;
+import wxdgaming.game.server.bean.GameCfgFunction;
 import wxdgaming.game.server.bean.goods.Item;
+import wxdgaming.game.server.bean.goods.ItemCfg;
 import wxdgaming.game.server.bean.mail.MailInfo;
 import wxdgaming.game.server.bean.mail.MailPack;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.module.data.DataCenterService;
+import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.mail.slog.MailSlog;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,17 +43,22 @@ import java.util.List;
 @Service
 public class MailService extends HoldApplicationContext {
 
+    final ConnectLoginProperties connectLoginProperties;
     final GlobalDataService globalDataService;
     final DataCenterService dataCenterService;
     final SlogService slogService;
-    final ConnectLoginProperties connectLoginProperties;
+    final BagService bagService;
     List<ServerMailDTO> serverMailDTOList = List.of();
 
-    public MailService(GlobalDataService globalDataService, DataCenterService dataCenterService, SlogService slogService, ConnectLoginProperties connectLoginProperties) {
+    public MailService(ConnectLoginProperties connectLoginProperties,
+                       GlobalDataService globalDataService, DataCenterService dataCenterService,
+                       SlogService slogService,
+                       @Lazy BagService bagService) {
+        this.connectLoginProperties = connectLoginProperties;
         this.globalDataService = globalDataService;
         this.dataCenterService = dataCenterService;
         this.slogService = slogService;
-        this.connectLoginProperties = connectLoginProperties;
+        this.bagService = bagService;
     }
 
     @Scheduled("0 * *")
@@ -79,8 +86,8 @@ public class MailService extends HoldApplicationContext {
 
     @EventListener
     public void playerHeartMinute(EventConst.MapNpcHeartMinuteEvent event) {
-        MapNpc mapNpc = event.mapNpc();
-        Player player = (Player) mapNpc;
+        if (!event.isPlayer()) return;
+        Player player = event.player();
         MailPack mailPack = player.getMailPack();
         mailPack.getMailInfoList().removeIf(v -> {
             if (!v.checkValidity()) {
@@ -89,26 +96,35 @@ public class MailService extends HoldApplicationContext {
             }
             return false;
         });
-
-        ServerMailData serverMailData = globalDataService.get(GlobalDataConst.SERVER_MAIL_DATA);
-        //        ArrayList<ServerMailInfo> mailInfoList = serverMailData.getMailInfoList();
-        //        for (ServerMailInfo mailInfo : mailInfoList) {
-        //            if (!mailInfo.checkValidity())
-        //                continue;
-        //            if (mailInfo.getLvMin() > mapNpc.getLevel() || mailInfo.getLvMax() < mapNpc.getLevel())
-        //                continue;
-        //            int vipLv = mapNpc.getVipInfo().getLv();
-        //            if (mailInfo.getVipLvMin() > vipLv || mailInfo.getVipLvMax() < vipLv)
-        //                continue;
-        //            if (!mailInfo.getRidList().isEmpty() && !mailInfo.getRidList().contains(mapNpc.getUid()))
-        //                /*指定的角色才可用领取*/
-        //                continue;
-        //            if (mailInfo.getRewardRidList().contains(mapNpc.getUid()))
-        //                /*该角色已经领取过了*/
-        //                continue;
-        //            mailInfo.getRewardRidList().add(mapNpc.getUid());
-        //            addMail(mapNpc, mailInfo);
-        //        }
+        for (ServerMailDTO serverMailDTO : serverMailDTOList) {
+            if (mailPack.getServerMailList().contains(serverMailDTO.getUid()))
+                /*该角色已经领取过了*/
+                continue;
+            if (!serverMailDTO.checkServerId(player.getSid()))
+                continue;
+            if (!serverMailDTO.validTime())
+                continue;
+            if (!serverMailDTO.getLvRange().inRange(player.getLevel()))
+                continue;
+            int vipLv = player.getVipInfo().getLv();
+            if (!serverMailDTO.getVipLvRange().inRange(vipLv))
+                continue;
+            if (!serverMailDTO.getRoleIdList().isEmpty() && !serverMailDTO.getRoleIdList().contains(player.getUid()))
+                /*指定的角色才可用领取*/
+                continue;
+            mailPack.getServerMailList().add(serverMailDTO.getUid());
+            List<ItemCfg> itemCfgs = GameCfgFunction.ItemCfgFunction.apply(serverMailDTO.getItemListString());
+            List<Item> items = bagService.newItems(itemCfgs);
+            sendMail(
+                    player,
+                    "运营后台",
+                    serverMailDTO.getTitle(),
+                    serverMailDTO.getContent(),
+                    Collections.emptyList(),
+                    items,
+                    "运营后台邮件：uid=" + serverMailDTO.getUid()
+            );
+        }
     }
 
     public void sendMail(Player player, String sender, String title, String content, List<String> contentArgs, List<Item> items, String logMsg) {

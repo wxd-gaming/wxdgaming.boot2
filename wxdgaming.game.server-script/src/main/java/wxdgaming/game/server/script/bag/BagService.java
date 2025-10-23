@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.bag;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
@@ -53,7 +54,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
     public BagService(DataCenterService dataCenterService,
                       TipsService tipsService,
                       DataRepository dataRepository,
-                      MailService mailService,
+                      @Lazy MailService mailService,
                       SlogService slogService) {
         this.dataCenterService = dataCenterService;
         this.tipsService = tipsService;

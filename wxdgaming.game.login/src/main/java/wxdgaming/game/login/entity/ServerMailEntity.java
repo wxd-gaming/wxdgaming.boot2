@@ -2,6 +2,8 @@ package wxdgaming.game.login.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import wxdgaming.boot2.core.lang.IntRangeCheck;
+import wxdgaming.boot2.core.lang.LongRangeCheck;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.batis.EntityIntegerUID;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
@@ -24,13 +26,13 @@ public class ServerMailEntity extends EntityIntegerUID implements Serializable {
     @Serial private static final long serialVersionUID = 1L;
 
     /** 有效期 */
-    private long[] validity = new long[2];
+    private LongRangeCheck timeRange = new LongRangeCheck();
     /** 如果是空表示所有区服，如果不为空表示特定区服 */
     private ArrayList<Integer> serverIdList = new ArrayList<>();
     private ArrayList<Long> roleIdList = new ArrayList<>();
     private ArrayList<String> accountList = new ArrayList<>();
-    private int[] lvCondition = new int[2];
-    private int[] vipLvCondition = new int[2];
+    private IntRangeCheck lvRange = new IntRangeCheck();
+    private IntRangeCheck vipLvRange = new IntRangeCheck();
     private String title;
     private String content;
     private String itemListString;
@@ -48,10 +50,7 @@ public class ServerMailEntity extends EntityIntegerUID implements Serializable {
 
     public boolean validTime() {
         long millis = MyClock.millis();
-        if ((validity[0] < 1 || validity[0] <= millis) && (validity[1] < 1 || millis <= validity[1])) {
-            return true;
-        }
-        return false;
+        return timeRange.inRange(millis);
     }
 
 }

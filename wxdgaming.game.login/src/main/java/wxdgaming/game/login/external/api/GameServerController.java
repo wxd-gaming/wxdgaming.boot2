@@ -12,7 +12,9 @@ import wxdgaming.boot2.core.token.JsonToken;
 import wxdgaming.boot2.core.token.JsonTokenParse;
 import wxdgaming.game.login.LoginServerProperties;
 import wxdgaming.game.login.bean.UserDataVo;
+import wxdgaming.game.login.entity.UserData;
 import wxdgaming.game.login.inner.InnerService;
+import wxdgaming.game.login.login.LoginService;
 
 import java.util.List;
 
@@ -29,27 +31,28 @@ public class GameServerController implements InitPrint {
 
     final LoginServerProperties loginServerProperties;
     final InnerService innerService;
+    final LoginService loginService;
 
-    public GameServerController(LoginServerProperties loginServerProperties, InnerService innerService) {
+    public GameServerController(LoginServerProperties loginServerProperties, InnerService innerService, LoginService loginService) {
         this.loginServerProperties = loginServerProperties;
         this.innerService = innerService;
+        this.loginService = loginService;
     }
 
     @RequestMapping(value = "/list")
     public RunResult list(@RequestParam(value = "token", required = false) String token) {
-        boolean white = false;
-        int gmLevel = 0;
+        UserData userData = null;
         if (StringUtils.isNotBlank(token)) {
             try {
                 JsonToken jsonToken = JsonTokenParse.parse(loginServerProperties.getJwtKey(), token);
                 UserDataVo userDataVo = jsonToken.getObject("user", UserDataVo.class);
-                white = userDataVo.isWhite();
-                gmLevel = userDataVo.getGmLevel();
+                String account = userDataVo.getAccount();
+                userData = loginService.userData(account);
             } catch (Exception e) {
                 log.debug("token解析失败:{}", e.getMessage());
             }
         }
-        List<JSONObject> list = innerService.gameServerList(white, gmLevel);
+        List<JSONObject> list = innerService.gameServerList(userData);
         return RunResult.ok().data(list);
     }
 

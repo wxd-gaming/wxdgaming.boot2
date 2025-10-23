@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.token.JsonTokenBuilder;
+import wxdgaming.boot2.core.util.PatternUtil;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.game.common.bean.login.AppPlatformParams;
@@ -17,7 +18,6 @@ import wxdgaming.game.login.login.LoginService;
 import wxdgaming.game.login.slog.AccountLoginLog;
 import wxdgaming.game.login.slog.AccountRegisterLog;
 
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -40,10 +40,9 @@ public abstract class AbstractSdkLoginApi {
 
     public abstract RunResult login(HttpServletRequest context, AppPlatformParams appPlatformParams) throws Exception;
 
-    private static final Set<String> ILLEGAL_USERNAMES = Set.of("null", "undefined", "\t", "\n", "admin", "root");
 
     public void validateUsername(String username) {
-        if (StringUtils.isBlank(username) || ILLEGAL_USERNAMES.contains(username.trim().toLowerCase())) {
+        if (StringUtils.isBlank(username) || PatternUtil.AdminSet.contains(username.trim().toUpperCase())) {
             throw new IllegalArgumentException("用户名非法！");
         }
     }
@@ -121,7 +120,7 @@ public abstract class AbstractSdkLoginApi {
         return RunResult.ok()
                 .fluentPut("userId", userData.getPlatformUserId())
                 .fluentPut("token", token)
-                .fluentPut("serverList", innerService.gameServerList(userData.isWhite(), userData.getGmLevel()));
+                .fluentPut("serverList", innerService.gameServerList(userData));
     }
 
 }

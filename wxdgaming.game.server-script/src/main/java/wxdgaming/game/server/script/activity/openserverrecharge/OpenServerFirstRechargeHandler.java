@@ -44,7 +44,7 @@ public class OpenServerFirstRechargeHandler extends AbstractActivityHandler<Acti
     }
 
     @Override public void heartSecond(ActivityData activityData) {
-        log.info("OpenServerFirstRechargeHandler.heartSecond");
+//        log.info("OpenServerFirstRechargeHandler.heartSecond");
     }
 
     @Override public void heartMinute(ActivityData activityData) {

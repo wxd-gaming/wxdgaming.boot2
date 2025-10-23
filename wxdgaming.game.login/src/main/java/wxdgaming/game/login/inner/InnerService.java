@@ -9,21 +9,21 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.event.StopBeforeEvent;
-import wxdgaming.game.authority.SignUtil;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
+import wxdgaming.game.authority.SignUtil;
 import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.login.LoginServerProperties;
 import wxdgaming.game.login.bean.global.GlobalDataConst;
-import wxdgaming.game.login.bean.global.ServerShowName;
 import wxdgaming.game.login.bean.global.ServerShowNameGlobalData;
 import wxdgaming.game.login.entity.ServerInfoEntity;
+import wxdgaming.game.login.entity.UserData;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.function.Function;
 
 /**
  * 内网服务
@@ -54,17 +54,27 @@ public class InnerService {
 
     }
 
-    public List<JSONObject> gameServerList(boolean white, int gmLevel) {
+    public List<JSONObject> gameServerList(UserData userData) {
         ServerShowNameGlobalData showNameGlobalData = globalDataService.get(GlobalDataConst.ServerNameGlobalData);
-        ConcurrentHashMap<Integer, ServerShowName> serverNameMap = showNameGlobalData.getServerNameMap();
+        boolean checkUser = (userData != null && userData.isWhite() || userData != null && userData.getGmLevel() > 0);
+        final Function<Integer, String> serverRoleInfo = new Function<Integer, String>() {
+            @Override public String apply(Integer integer) {
+                if (userData == null)
+                    return "{}";
+                return userData.getGameRoleMap().getOrDefault(integer, "{}");
+            }
+        };
         return getInnerGameServerInfoMap().values().stream()
-                .filter(bean -> System.currentTimeMillis() > bean.getOpenTime())
+                .filter(bean -> checkUser || System.currentTimeMillis() > bean.getOpenTime())
                 .map(bean -> {
                     JSONObject map = new JSONObject();
                     map.put("id", bean.getServerId());
                     map.put("name", showNameGlobalData.showName(bean.getServerId(), bean.getName()));
                     map.put("host", bean.getHost());
                     map.put("port", bean.getPort());
+                    map.put("openTime", bean.getOpenTime());
+                    map.put("maintenanceTime", bean.getMaintenanceTime());
+                    map.put("roleInfo", serverRoleInfo.apply(bean.getServerId()));
                     return map;
                 })
                 .toList();

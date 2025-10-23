@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.util;
 
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,6 +11,11 @@ import java.util.regex.Pattern;
  * @version 2025-02-13 13:44
  **/
 public class PatternUtil {
+
+    public static final Set<String> AdminSet = Set.of(
+            "ROOT", "ADMIN", "NULL", "UNKNOWN", "USER", "GUEST", "SUPER", "UNDEFINED",
+            "通过", "已通过", "拒绝", "已拒绝", "系统", "管理员", "账号", "审核"
+    );
 
     /** 包含汉字 */
     public static final Pattern PATTERN_Have_UUU = Pattern.compile(".*[\\u4e00-\\u9fa5]+.*");

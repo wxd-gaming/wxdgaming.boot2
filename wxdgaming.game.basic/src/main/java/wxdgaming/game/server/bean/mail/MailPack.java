@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -19,5 +20,7 @@ import java.util.List;
 public class MailPack {
 
     private List<MailInfo> mailInfoList = new ArrayList<>();
+    /** 记录玩家已经的全服邮件 */
+    private HashSet<Integer> serverMailList = new HashSet<>();
 
 }

@@ -24,7 +24,6 @@ import wxdgaming.game.login.entity.AdminUserEntity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 管理接口
@@ -36,8 +35,6 @@ import java.util.Set;
 @RestController
 @RequestMapping("/admin/account")
 public class AdminController implements InitPrint {
-
-    static final Set<String> AdminSet = Set.of("ROOT", "ADMIN", "NULL", "UNKNOWN", "USER", "GUEST", "SUPER", "UNDEFINED");
 
     final AdminService adminService;
     private final SqlDataHelper sqlDataHelper;
@@ -60,7 +57,7 @@ public class AdminController implements InitPrint {
         AssertUtil.isTrue(StringUtils.length(userName) > 4, "用户名长度不能小于5个字符");
         AssertUtil.isTrue(StringUtils.length(password) > 4, "密码长度不能小于5个字符");
         AssertUtil.isTrue(StringUtils.length(phone) >= 11, "手机号不正确");
-        AssertUtil.isTrue(!AdminSet.contains(userName.toUpperCase()), "用户名不合法");
+        AssertUtil.isTrue(!PatternUtil.AdminSet.contains(userName.toUpperCase()), "用户名不合法");
         boolean b = PatternUtil.checkMatches(userName.toUpperCase(), PatternUtil.PATTERN_ACCOUNT);
         AssertUtil.isTrue(b, "用户名不合法,仅允许 数字，字母，汉字");
 

@@ -35,6 +35,7 @@ public class Player extends MapNpc {
 
     /** 是否已经删除 */
     private boolean del;
+    /** 创建角色的时候的sid */
     private int sid;
     private String account;
     private int appId;

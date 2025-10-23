@@ -30,6 +30,41 @@
       "fieldName": "lv",
       "fieldComment": "角色等级",
       "fieldType": "int"
+    },
+    {
+      "fieldName": "mailId",
+      "fieldComment": "邮件ID",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "title",
+      "fieldComment": "标题",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "content",
+      "fieldComment": "内容",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "contentArgs",
+      "fieldComment": "内容参数",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "items",
+      "fieldComment": "附件",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "sender",
+      "fieldComment": "发送者",
+      "fieldType": "string"
+    },
+    {
+      "fieldName": "logMsg",
+      "fieldComment": "备注",
+      "fieldType": "string"
     }
   ]
 }
