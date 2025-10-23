@@ -22,7 +22,7 @@
     },
     {
       "fieldName": "activeAccountCount",
-      "fieldComment": "活跃账号",
+      "fieldComment": "活跃账号(DAU)",
       "fieldType": "long"
     },
     {
