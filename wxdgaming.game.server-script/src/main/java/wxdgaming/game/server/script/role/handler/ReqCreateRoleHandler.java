@@ -66,7 +66,7 @@ public class ReqCreateRoleHandler extends HoldApplicationContext {
 
         Player player = null;
         String name = req.getName();
-        if (StringUtils.isBlank(name) | name.length() < 2 || name.length() > 12) {
+        if (StringUtils.isBlank(name) | name.isEmpty() || name.length() > 12) {
             /*创建角色错误*/
             log.error("sid={}, account={} 创建角色错误 角色名 {} 字符范围不合符", sid, account, name);
             this.tipsService.tips(socketSession, "角色名长度2-12");
@@ -83,7 +83,7 @@ public class ReqCreateRoleHandler extends HoldApplicationContext {
         SingletonLockUtil.lock("role_" + name);
         try {
 
-            boolean containsKey = dataCenterService.getName2RidMap().containsKey(name);
+            boolean containsKey = dataCenterService.getNameRidMap().containsE1(name);
             if (containsKey) {
                 /*创建角色错误*/
                 log.error("sid={}, account={} 创建角色错误 角色名 {} 已存在", sid, account, name);
@@ -112,8 +112,7 @@ public class ReqCreateRoleHandler extends HoldApplicationContext {
             roleEntity.setNewEntity(true);
             dataCenterService.putCache(roleEntity);
             dataCenterService.getAccount2RidsMap().computeIfAbsent(sid, account, l -> new HashSet<>()).add(player.getUid());
-            dataCenterService.getName2RidMap().put(name, player.getUid());
-            dataCenterService.getRid2NameMap().put(player.getUid(), name);
+            dataCenterService.getNameRidMap().bind(name, player.getUid());
 
             RoleRegisterSlog roleLoginLog = new RoleRegisterSlog(player, userMapping.getClientIp(), JSON.toJSONString(userMapping.getClientParams()));
             slogService.pushLog(roleLoginLog);

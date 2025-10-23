@@ -2,11 +2,11 @@ package wxdgaming.game.login.login.sdk.local;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.BootstrapProperties;
-import org.apache.commons.lang3.StringUtils;
-import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.SpringUtil;
+import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.game.common.bean.login.AppPlatformParams;
 import wxdgaming.game.login.entity.UserData;
 import wxdgaming.game.login.login.sdk.AbstractSdkLoginApi;
@@ -46,6 +46,10 @@ public class LocalSdkLoginApi extends AbstractSdkLoginApi {
 
         if (StringUtils.isBlank(account)) {
             return RunResult.fail("account is null");
+        }
+
+        if (account.trim().length() > 128) {
+            return RunResult.fail("must account len < 128");
         }
 
         String finalAccount = platform().name() + "-" + account;

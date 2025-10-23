@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.collection.concurrent.ConcurrentDataBinding;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
 import wxdgaming.boot2.core.event.StartEvent;
 import wxdgaming.boot2.core.format.HexId;
@@ -48,9 +49,7 @@ public class DataCenterService extends HoldApplicationContext implements GetPlay
     /** key:serverID, key:account, value: 角色id列表 */
     final ConcurrentTable<Integer, String, HashSet<Long>> account2RidsMap = new ConcurrentTable<>();
     /** 角色名字和id的映射 key:name, value:roleId */
-    final ConcurrentHashMap<String, Long> name2RidMap = new ConcurrentHashMap<>();
-    /** 角色id和名字的映射 key:roleId, value:name */
-    final ConcurrentHashMap<Long, String> rid2NameMap = new ConcurrentHashMap<>();
+    final ConcurrentDataBinding<String, Long> nameRidMap = new ConcurrentDataBinding<>();
     final KeywordsMapping keywordsMapping = new KeywordsMapping();
     final SessionGroup onlinePlayers = new SessionGroup();
 
@@ -81,8 +80,7 @@ public class DataCenterService extends HoldApplicationContext implements GetPlay
                     long roleId = row.getLongValue("uid");
                     String name = row.getString("name");
                     account2RidsMap.computeIfAbsent(roleSid, account, k -> new HashSet<>()).add(roleId);
-                    name2RidMap.put(name, roleId);
-                    rid2NameMap.put(roleId, name);
+                    nameRidMap.bind(name, roleId);
                 }
             }
         }
