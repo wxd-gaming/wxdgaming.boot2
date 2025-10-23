@@ -1,6 +1,7 @@
 package wxdgaming.game.server.script.role.event;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.executor.ThreadContext;
@@ -9,7 +10,7 @@ import wxdgaming.game.server.bean.StatusConst;
 import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
-import wxdgaming.game.server.event.OnLogout;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.module.data.DataCenterService;
 
 /**
@@ -30,8 +31,9 @@ public class PlayerLogoutHandler {
 
     /** 创建角色之后赠送初始化道具 */
     @Order(1)
-    @OnLogout
-    public void onLogout(Player player) {
+    @EventListener
+    public void onLogout(EventConst.LogoutPlayerEvent event) {
+        Player player = event.player();
         log.info("玩家下线: {} {}", ThreadContext.context().queueName(), player);
         player.getStatus().addFlags(StatusConst.Offline);
         player.getOnlineInfo().setLastLogoutTime(MyClock.millis());

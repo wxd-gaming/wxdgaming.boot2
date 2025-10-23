@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.event.InitEvent;
 import wxdgaming.boot2.core.executor.HeartDriveHandler;
+import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.module.system.GameService;
 
 /**
@@ -32,27 +33,27 @@ public class MainHeartDriveHandlerScript extends HoldApplicationContext implemen
     }
 
     @Override public void heart(long millis) {
-
+        applicationContextProvider.postEventIgnoreException(new EventConst.ServerHeartEvent());
     }
 
     @Override public void heartSecond(int second) {
-
+        applicationContextProvider.postEventIgnoreException(new EventConst.ServerHeartSecondEvent(second));
     }
 
     @Override public void heartMinute(int minute) {
-
+        applicationContextProvider.postEventIgnoreException(new EventConst.ServerHeartMinuteEvent(minute));
     }
 
     @Override public void heartHour(int hour) {
-
+        applicationContextProvider.postEventIgnoreException(new EventConst.ServerHeartHourEvent(hour));
     }
 
     @Override public void heartDayEnd(int dayOfYear) {
-
+        applicationContextProvider.postEventIgnoreException(new EventConst.ServerHeartDayEvent(dayOfYear));
     }
 
     @Override public void heartWeek(long weekFirstDayStartTime) {
-
+        applicationContextProvider.postEventIgnoreException(new EventConst.ServerHeartWeekEvent(weekFirstDayStartTime));
     }
 
 }

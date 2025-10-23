@@ -22,7 +22,6 @@ import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.entity.role.PlayerSnap;
 import wxdgaming.game.server.event.EventConst;
-import wxdgaming.game.server.event.OnLogout;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.module.data.GlobalDbDataCenterService;
 import wxdgaming.game.server.module.drive.PlayerDriveService;
@@ -82,7 +81,7 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
                 if (userMapping.getRid() > 0 && userMapping.getRid() != player.getUid()) {
                     /*角色切换*/
                     log.info("sid={}, account={} 角色切换 rid={} -> {}", sid, account, userMapping.getRid(), player.getUid());
-                    applicationContextProvider.executeMethodWithAnnotatedException(OnLogout.class, player);
+                    applicationContextProvider.postEventIgnoreException(new EventConst.LogoutPlayerEvent(player));
                 }
 
                 player.setClientData(new ArrayList<>(userMapping.getClientParams()));

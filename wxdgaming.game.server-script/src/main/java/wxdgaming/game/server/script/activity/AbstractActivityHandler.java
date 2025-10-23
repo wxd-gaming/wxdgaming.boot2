@@ -39,4 +39,6 @@ public abstract class AbstractActivityHandler<T extends ActivityData> extends Ho
 
     public void heartDayEnd(T activityData) {}
 
+    public void heartWeek(T activityData) {}
+
 }

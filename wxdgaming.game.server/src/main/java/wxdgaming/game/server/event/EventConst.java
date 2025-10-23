@@ -45,12 +45,33 @@ public interface EventConst {
     public record MapNpcHeartHourEvent(MapNpc mapNpc, int hour) implements MapNpcEvent {}
 
     /** 跨天 */
-    public record MapNpcHeartDayEvent(MapNpc mapNpc, int hour) implements MapNpcEvent {}
+    public record MapNpcHeartDayEvent(MapNpc mapNpc, int dayOfYear) implements MapNpcEvent {}
+
+    /** 跨周 */
+    public record MapNpcHeartWeekEvent(MapNpc mapNpc, long weekFirstDayStartTime) implements MapNpcEvent {}
 
     public record MapNpcAttributeCalculatorEvent(
             MapNpc mapNpc,
             CalculatorType[] calculatorTypes,
             ReasonDTO reasonDTO) implements MapNpcEvent {
     }
+
+    public record ServerHeartEvent() implements Event {}
+
+    public record ServerHeartSecondEvent(int second) implements Event {}
+
+    public record ServerHeartMinuteEvent(int minute) implements Event {}
+
+    public record ServerHeartHourEvent(int hour) implements Event {}
+
+    /** 跨天 */
+    public record ServerHeartDayEvent(int dayOfYear) implements Event {}
+
+    /**
+     * 跨周
+     *
+     * @param weekFirstDayStartTime 当前周开始的时间，默认是周一的凌晨
+     */
+    public record ServerHeartWeekEvent(long weekFirstDayStartTime) implements Event {}
 
 }

@@ -223,4 +223,12 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
         }
     }
 
+    @SuppressWarnings("unchecked")
+    @Override public void heartWeek(long weekFirstDayStartTime) {
+        List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.Week, Collections.emptyList());
+        for (ActivityData activityData : activityDataList) {
+            AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());
+            abstractActivityHandler.heartWeek(activityData);
+        }
+    }
 }

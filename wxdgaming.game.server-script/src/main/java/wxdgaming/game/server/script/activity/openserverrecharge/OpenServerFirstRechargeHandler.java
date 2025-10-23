@@ -2,8 +2,8 @@ package wxdgaming.game.server.script.activity.openserverrecharge;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import wxdgaming.game.server.bean.activity.ActivityData;
 import wxdgaming.boot2.core.executor.HeartConst;
+import wxdgaming.game.server.bean.activity.ActivityData;
 import wxdgaming.game.server.script.activity.AbstractActivityHandler;
 import wxdgaming.game.server.script.activity.ActivityConst;
 
@@ -39,12 +39,16 @@ public class OpenServerFirstRechargeHandler extends AbstractActivityHandler<Acti
     @Override public void start(ActivityData activityData) {
     }
 
+    @Override public void end(ActivityData activityData) {
+
+    }
+
     @Override public void heart(ActivityData activityData) {
 
     }
 
     @Override public void heartSecond(ActivityData activityData) {
-//        log.info("OpenServerFirstRechargeHandler.heartSecond");
+        //        log.info("OpenServerFirstRechargeHandler.heartSecond");
     }
 
     @Override public void heartMinute(ActivityData activityData) {
@@ -59,7 +63,7 @@ public class OpenServerFirstRechargeHandler extends AbstractActivityHandler<Acti
 
     }
 
-    @Override public void end(ActivityData activityData) {
-
+    @Override public void heartWeek(ActivityData activityData) {
+        super.heartWeek(activityData);
     }
 }

@@ -15,7 +15,6 @@ import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.slog.RoleInfoSlog;
 import wxdgaming.game.server.event.EventConst;
-import wxdgaming.game.server.event.OnLogout;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -117,7 +116,7 @@ public class PlayerDriveService extends HoldApplicationContext {
                             "sid={}, account={} 角色下线 rid={} -> {}",
                             userMapping.getSid(), userMapping.getAccount(), userMapping.getRid(), player.getUid()
                     );
-                    applicationContextProvider.executeMethodWithAnnotatedException(OnLogout.class, player);
+                    applicationContextProvider.postEventIgnoreException(new EventConst.LogoutPlayerEvent(player));
                 }
             }
         });
@@ -125,8 +124,9 @@ public class PlayerDriveService extends HoldApplicationContext {
     }
 
     @Order
-    @OnLogout
-    public void removePlayer(Player player) {
+    @EventListener
+    public void removePlayer(EventConst.LogoutPlayerEvent event) {
+        Player player = event.player();
         int driveId = getPlayerDriveId(player.getUid());
         PlayerDriveContent playerDriveContent = playerDriveContentMap.get(driveId);
         Player remove = playerDriveContent.playerMap.remove(player.getUid());
@@ -202,7 +202,9 @@ public class PlayerDriveService extends HoldApplicationContext {
         }
 
         @Override public void heartWeek(long weekFirstDayStartTime) {
-            HeartDriveHandler.super.heartWeek(weekFirstDayStartTime);
+            for (Player player : playerMap.values()) {
+                applicationContextProvider.postEventIgnoreException(new EventConst.MapNpcHeartWeekEvent(player, weekFirstDayStartTime));
+            }
         }
     }
 

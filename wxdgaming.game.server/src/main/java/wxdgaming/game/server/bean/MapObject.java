@@ -20,6 +20,8 @@ public class MapObject extends GameBase {
         Player,
         Npc,
         Monster,
+        /** 特性 */
+        Effect,
         Item,
     }
 
