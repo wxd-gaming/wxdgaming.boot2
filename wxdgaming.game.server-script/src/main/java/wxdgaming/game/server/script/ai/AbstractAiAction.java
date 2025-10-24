@@ -12,12 +12,12 @@ import wxdgaming.game.server.bean.ai.AiType;
  * @version 2025-10-24 13:14
  **/
 @Slf4j
-public abstract class AbstractAiAction {
+public abstract class AbstractAiAction<D extends AiActionData> {
 
     public abstract AiType aiType();
 
     /** 执行 */
-    public abstract void doAction(AiPanel aiPanel, AiActionData aiActionData);
+    public abstract void doAction(AiPanel aiPanel, D data);
 
     /** 关闭，切换到其它状态执行 */
     public abstract void doClose(AiPanel aiPanel);

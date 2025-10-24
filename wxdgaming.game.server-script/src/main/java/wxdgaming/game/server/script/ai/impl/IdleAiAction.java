@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  **/
 @Slf4j
 @Component
-public class IdleAiAction extends AbstractAiAction implements InitPrint {
+public class IdleAiAction extends AbstractAiAction<AiActionData> implements InitPrint {
 
     public IdleAiAction() {
     }

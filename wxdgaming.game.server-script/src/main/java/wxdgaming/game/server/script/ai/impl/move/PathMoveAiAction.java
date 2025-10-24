@@ -1,11 +1,11 @@
-package wxdgaming.game.server.script.ai.impl;
+package wxdgaming.game.server.script.ai.impl.move;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.game.server.bean.ai.AiActionData;
 import wxdgaming.game.server.bean.ai.AiPanel;
 import wxdgaming.game.server.bean.ai.AiType;
+import wxdgaming.game.server.bean.ai.MoveAiActionData;
 import wxdgaming.game.server.script.ai.AbstractAiAction;
 
 /**
@@ -16,7 +16,7 @@ import wxdgaming.game.server.script.ai.AbstractAiAction;
  **/
 @Slf4j
 @Component
-public class PathMoveAiAction extends AbstractAiAction implements InitPrint {
+public class PathMoveAiAction extends AbstractAiAction<MoveAiActionData> implements InitPrint {
 
     public PathMoveAiAction() {
     }
@@ -25,7 +25,7 @@ public class PathMoveAiAction extends AbstractAiAction implements InitPrint {
         return AiType.PathMove;
     }
 
-    @Override public void doAction(AiPanel aiPanel, AiActionData aiActionData) {
+    @Override public void doAction(AiPanel aiPanel, MoveAiActionData aiActionData) {
 
     }
 

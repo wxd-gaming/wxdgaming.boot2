@@ -4,6 +4,7 @@ import lombok.Getter;
 import wxdgaming.boot2.core.collection.MapOf;
 
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * @author wxd-gaming(無心道, 15388152619)
@@ -11,10 +12,10 @@ import java.util.Map;
  **/
 @Getter
 public enum AiAction {
-    Idle(1, 1, "休息"),
-    Move(2, 1, "移动"),
-    FindPath(3, 1, "寻路"),
-    UseSkill(4, 3, "使用技能"),
+    Idle(1, 1, "休息", AiActionData::new),
+    Move(2, 1, "移动", MoveAiActionData::new),
+    FindPath(3, 1, "寻路", MoveAiActionData::new),
+    UseSkill(4, 3, "使用技能", AiActionData::new),
     ;
 
     private static final Map<Integer, AiAction> static_map = MapOf.ofMap(AiAction::getCode, AiAction.values());
@@ -32,11 +33,13 @@ public enum AiAction {
     private final int code;
     private final int group;
     private final String comment;
+    private final Function<AiAction, AiActionData> newData;
 
-    AiAction(int code, int group, String comment) {
+    AiAction(int code, int group, String comment, Function<AiAction, AiActionData> newData) {
         this.code = code;
         this.group = group;
         this.comment = comment;
+        this.newData = newData;
     }
 
 }

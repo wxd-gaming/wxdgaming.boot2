@@ -38,8 +38,8 @@ public class AiService extends HoldApplicationContext {
         aiActionMap = event.applicationContextProvider().toMap(AbstractAiAction.class, AbstractAiAction::aiType);
     }
 
-    public AbstractAiAction aiAction(AiType aiType) {
-        return aiActionMap.get(aiType);
+    public <D extends AiActionData, A extends AbstractAiAction<D>> A aiAction(AiType aiType) {
+        return (A) aiActionMap.get(aiType);
     }
 
     @EventListener
@@ -58,7 +58,7 @@ public class AiService extends HoldApplicationContext {
         for (AiActionData aiActionData : aiMap) {
             AiType aiType = aiPanel.getAiActionTemplateMap().get(aiActionData.getAiAction());
             AssertUtil.isNull(aiType, "ai 处理器类型未指定：%s", aiActionData);
-            AbstractAiAction abstractAiAction = aiActionMap.get(aiType);
+            AbstractAiAction<AiActionData> abstractAiAction = aiAction(aiType);
             AssertUtil.isNull(abstractAiAction, "ai 处理器为实现：%s-%s", aiActionData, aiType);
             abstractAiAction.doAction(aiPanel, aiActionData);
         }

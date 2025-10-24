@@ -5,7 +5,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.game.server.bean.MapNpc;
-import wxdgaming.game.server.bean.Vector3D;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -28,11 +27,6 @@ public class AiPanel extends ObjectBase implements Serializable {
     @Serial private static final long serialVersionUID = 1L;
 
     private MapNpc mapNpc;
-    private Object skill;
-    /** 需要的目标点位 */
-    private Vector3D targetPoint = null;
-    private List<Vector3D> targetPathList = null;
-    private List<MapNpc> targetList = null;
     /** 当前有效的ai */
     private TreeMap<Integer, AiActionData> aiMap = new TreeMap<>();
 
@@ -47,14 +41,11 @@ public class AiPanel extends ObjectBase implements Serializable {
         aiActionTemplateMap.put(AiAction.UseSkill, AiType.UseSkill);
     }
 
-    public AiActionData changeAiAction(AiAction action) {
-        AiActionData aiActionData = new AiActionData(action);
+    public <D extends AiActionData> D changeAiAction(AiAction action) {
+        AiActionData aiActionData = action.getNewData().apply(action);
         AiActionData oldActionData = aiMap.put(action.getGroup(), aiActionData);
         log.debug("{} 切换ai：{} -> {}", mapNpc, oldActionData, action);
-        return aiActionData;
-    }
-
-    public void randomSkill() {
+        return (D) aiActionData;
     }
 
     @Override public String toString() {
