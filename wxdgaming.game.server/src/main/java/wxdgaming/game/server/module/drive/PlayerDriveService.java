@@ -167,6 +167,10 @@ public class PlayerDriveService extends HoldApplicationContext {
             return this.queueName;
         }
 
+        @Override public boolean isIgnoreRunTimeRecord() {
+            return true;
+        }
+
         @Override public void onEvent() throws Exception {
             heartDrive.doHeart();
         }

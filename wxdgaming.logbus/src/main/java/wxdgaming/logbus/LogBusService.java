@@ -115,6 +115,10 @@ public class LogBusService implements InitPrint {
             this.type = type;
         }
 
+        @Override public boolean isIgnoreRunTimeRecord() {
+            return true;
+        }
+
         @Override public String getStack() {
             return "logbus-post";
         }
@@ -152,6 +156,10 @@ public class LogBusService implements InitPrint {
 
         public PostLog2FileEvent(String type) {
             this.type = type;
+        }
+
+        @Override public boolean isIgnoreRunTimeRecord() {
+            return true;
         }
 
         @Override public String getStack() {

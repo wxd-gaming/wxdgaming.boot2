@@ -115,7 +115,6 @@ public class RunTimeUtil extends ExecutorEvent {
         } finally {
             MONITOR_READ_WRITE.unWriteLock();
         }
-        throw new RuntimeException("测试");
     }
 
     static String subName(String name) {

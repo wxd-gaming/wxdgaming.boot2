@@ -28,6 +28,10 @@ class ExecutorJobFuture<T> extends ExecutorJob implements Runnable, IExecutorQue
         return iExecutorQueue == null ? null : iExecutorQueue.getQueueName();
     }
 
+    @Override public boolean isIgnoreRunTimeRecord() {
+        return true;
+    }
+
     @Override public void run() {
         try {
             ExecutorMonitor.put(this);
