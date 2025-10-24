@@ -87,7 +87,7 @@
         }
 
         function createRow(index, row) {
-            let tr = `<tr>`;
+            let tr = `<tr ondblclick="alertShow2(${index})">`;
             for (const key in pageView.columns) {
                 let column = pageView.columns[key];
                 let columnName = column.name;
@@ -98,7 +98,7 @@
                 if (rowValue === null || rowValue === undefined) {
                     rowValue = "";
                 }
-                tr += `<td ondblclick="alertShow(this,'${columnComment}');" style="${columnStyle}" title="${columntitle}">${rowValue}</td>`;
+                tr += `<td style="${columnStyle}" title="${columntitle}">${rowValue}</td>`;
             }
             tr += `</tr>`;
             return tr;
@@ -109,6 +109,13 @@
             content = formatJsonWithNewlines(content);
             console.log(typeof content, content);
             new wxd.message.Alert(`<pre>${content}</pre>`, title).show();
+        }
+
+        function alertShow2(index) {
+            let content = pageView.items[index];
+            content = formatJsonWithNewlines(content);
+            console.log(typeof content, content);
+            new wxd.message.Alert(`<pre>${content}</pre>`, "详情").show();
         }
 
         $(() => {
