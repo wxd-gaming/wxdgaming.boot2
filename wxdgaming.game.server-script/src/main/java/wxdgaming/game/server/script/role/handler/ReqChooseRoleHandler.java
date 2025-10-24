@@ -6,6 +6,7 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.assist.LogCostTime;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -60,6 +61,7 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
 
     /** 选择角色 */
     @ProtoRequest(ReqChooseRole.class)
+    @LogCostTime(value = "选择角色", threshold = 5)
     public void reqChooseRole(ProtoEvent event) {
         SocketSession socketSession = event.getSocketSession();
         ReqChooseRole req = event.buildMessage();

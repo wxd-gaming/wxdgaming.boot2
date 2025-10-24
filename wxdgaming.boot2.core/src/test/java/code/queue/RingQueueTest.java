@@ -2,7 +2,7 @@ package code.queue;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import wxdgaming.boot2.core.lang.DiffTimeRecord;
+import org.springframework.util.StopWatch;
 
 import java.util.LinkedList;
 import java.util.concurrent.CountDownLatch;
@@ -52,8 +52,8 @@ public class RingQueueTest {
 
     }
 
-    public DiffTimeRecord newDiffTimeRecord() {
-        return DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
+    public StopWatch newDiffTimeRecord() {
+        return new StopWatch();
     }
 
     @Test
@@ -61,7 +61,7 @@ public class RingQueueTest {
     public void RingQueuePutMulti() throws Exception {
         int capacity = 300_0000;
         RingQueue<String> ringBuffer = new RingQueue<>(capacity);
-        DiffTimeRecord diffTime = newDiffTimeRecord();
+        StopWatch diffTime = newDiffTimeRecord();
         int threadCount = 20;
         int i1 = capacity / threadCount;
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
@@ -75,7 +75,7 @@ public class RingQueueTest {
             });
         }
         countDownLatch.await();
-        System.out.println("RingQueue 需要填充: " + (i1 * threadCount) + ", 填充: " + ringBuffer.size() + ", " + diffTime.interval().toString());
+        System.out.println("RingQueue 需要填充: " + (i1 * threadCount) + ", 填充: " + ringBuffer.size() + ", " + diffTime.prettyPrint());
     }
 
 }

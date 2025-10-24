@@ -1,7 +1,7 @@
 package code.sort;
 
 import org.junit.jupiter.api.Test;
-import wxdgaming.boot2.core.lang.DiffTimeRecord;
+import org.springframework.util.StopWatch;
 import wxdgaming.boot2.core.util.RandomUtils;
 
 import java.util.ArrayList;
@@ -19,8 +19,8 @@ public class SortTest {
 
     static int count = 10000;
 
-    public DiffTimeRecord newDiffTimeRecord() {
-        return DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.MS);
+    public StopWatch newDiffTimeRecord() {
+        return new StopWatch("测试");
     }
 
     @Test
@@ -33,11 +33,11 @@ public class SortTest {
             arrayList[i] = sortBean;
         }
 
-        DiffTimeRecord diffTime = newDiffTimeRecord();
+        StopWatch diffTime = newDiffTimeRecord();
         for (int k = 0; k < 4; k++) {
             SortBean[] sortBeans = Arrays.copyOf(arrayList, arrayList.length);
             Arrays.sort(sortBeans);
-            diffTime.marker("array add Sort");
+            diffTime.start("array add Sort");
         }
 
         for (int k = 0; k < 4; k++) {
@@ -46,18 +46,18 @@ public class SortTest {
                 sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
             }
             Arrays.sort(sortBeans);
-            diffTime.marker("array update all Sort");
+            diffTime.start("array update all Sort");
         }
 
-            SortBean[] sortBeans = Arrays.copyOf(arrayList, arrayList.length);
+        SortBean[] sortBeans = Arrays.copyOf(arrayList, arrayList.length);
         for (int k = 0; k < 4; k++) {
             SortBean sortBean = RandomUtils.random(sortBeans);
             sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
             Arrays.sort(sortBeans);
-            diffTime.marker("array update one Sort");
+            diffTime.start("array update one Sort");
         }
 
-        System.out.println(diffTime.buildString4());
+        System.out.println(diffTime.prettyPrint());
 
     }
 
@@ -73,10 +73,10 @@ public class SortTest {
             arrayList.add(sortBean);
         }
 
-        DiffTimeRecord diffTime = newDiffTimeRecord();
+        StopWatch diffTime = newDiffTimeRecord();
         for (int k = 0; k < 4; k++) {
             arrayList.sort(null);
-            diffTime.marker("list add Sort");
+            diffTime.start("list add Sort");
         }
 
         for (int k = 0; k < 4; k++) {
@@ -85,17 +85,17 @@ public class SortTest {
                 sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
             }
             arrayList.sort(null);
-            diffTime.marker("list update all Sort");
+            diffTime.start("list update all Sort");
         }
 
         for (int k = 0; k < 4; k++) {
             SortBean sortBean = RandomUtils.randomItem(arrayList);
             sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
             arrayList.sort(null);
-            diffTime.marker("list update one Sort");
+            diffTime.start("list update one Sort");
         }
 
-        System.out.println(diffTime.buildString());
+        System.out.println(diffTime.prettyPrint());
 
     }
 
@@ -103,7 +103,7 @@ public class SortTest {
     @Test
     public void setSort() {
         TreeSet<SortBean> treeSet = null;
-        DiffTimeRecord diffTime = newDiffTimeRecord();
+        StopWatch diffTime = newDiffTimeRecord();
         for (int k = 0; k < 4; k++) {
             treeSet = new TreeSet<>();
             for (int i = 0; i < count; i++) {
@@ -112,7 +112,7 @@ public class SortTest {
                 sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
                 treeSet.add(sortBean);
             }
-            diffTime.marker("set add Sort");
+            diffTime.start("set add Sort");
         }
 
         for (int k = 0; k < 4; k++) {
@@ -122,7 +122,7 @@ public class SortTest {
                 sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
                 treeSet.add(sortBean);
             }
-            diffTime.marker("set update all Sort");
+            diffTime.start("set update all Sort");
         }
 
         for (int k = 0; k < 4; k++) {
@@ -130,9 +130,9 @@ public class SortTest {
             treeSet.remove(sortBean);
             sortBean.setOverTime(System.currentTimeMillis() + RandomUtils.random(100, 10000));
             treeSet.add(sortBean);
-            diffTime.marker("set update one Sort");
+            diffTime.start("set update one Sort");
         }
-        System.out.println(diffTime.buildString4());
+        System.out.println(diffTime.prettyPrint());
     }
 
     @Test

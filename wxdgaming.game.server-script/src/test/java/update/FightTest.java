@@ -1,8 +1,8 @@
 package update;
 
 import org.junit.jupiter.api.RepeatedTest;
+import org.springframework.util.StopWatch;
 import wxdgaming.boot2.core.format.TimeFormat;
-import wxdgaming.boot2.core.lang.DiffTimeRecord;
 import wxdgaming.boot2.core.util.RandomUtils;
 
 import java.util.List;
@@ -21,16 +21,16 @@ public class FightTest {
         Role roleLeft = createRole(1, "left");
         Role roleRight = createRole(2, "right");
         Fight fight = new Fight(List.of(roleLeft), List.of(roleRight));
-        DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
+        StopWatch diffTime = new StopWatch();
         fight.execute();
-        DiffTimeRecord.RecordTime recordTime = diffTime.interval();
+        diffTime.stop();
         for (FightEvent fightEvent : fight.getFightResult().getFightEventList()) {
             System.out.println(fightEvent);
         }
 
         System.out.printf(
                 "战斗持续时间：%s - 回合：%d - 战报耗时：%s ms%n",
-                TimeFormat.of(fight.getFightResult().getTimes() * 100), fight.getFightResult().getFightEventList().size(), recordTime
+                TimeFormat.of(fight.getFightResult().getTimes() * 100), fight.getFightResult().getFightEventList().size(), diffTime.getTotalTimeMillis()
         );
     }
 

@@ -1,9 +1,9 @@
 package code.rank;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StopWatch;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
-import wxdgaming.boot2.core.lang.DiffTimeRecord;
 import wxdgaming.boot2.core.rank.RankByTreeSet;
 import wxdgaming.boot2.core.rank.RankElement;
 import wxdgaming.boot2.core.util.RandomUtils;
@@ -25,31 +25,31 @@ public class Rank2Test {
         ExecutorServicePlatform executorService = ExecutorFactory.create("map", 3);
         for (int k = 0; k < 10; k++) {
             executorService.execute(() -> {
-                DiffTimeRecord diffTime = new DiffTimeRecord();
+                StopWatch stopWatch = new StopWatch("rank test");
                 int iCount = 1000;
                 int maxRandom = 5000;
                 for (int i = 0; i < iCount; i++) {
                     rankMap.updateScore(String.valueOf(i + 1), RandomUtils.random(1, maxRandom));
                 }
-                diffTime.marker("插入 " + iCount + " 对象 ");
+                stopWatch.start("插入 " + iCount + " 对象 ");
                 for (int i = 0; i < iCount; i++) {
                     rankMap.updateScore(String.valueOf(i + 1), RandomUtils.random(1, maxRandom));
                 }
-                diffTime.marker("修改 " + iCount + " 对象 ");
+                stopWatch.start("修改 " + iCount + " 对象 ");
                 String random = String.valueOf(RandomUtils.random(1, iCount));
                 {
                     rankMap.updateScore(random, RandomUtils.random(1, maxRandom));
-                    diffTime.marker("随机修改一个对象 " + random);
+                    stopWatch.start("随机修改一个对象 " + random);
                 }
                 {
                     int rank = rankMap.rank(random);
-                    diffTime.marker("随机读取一个对象 " + random + " 排名 " + rank);
+                    stopWatch.start("随机读取一个对象 " + random + " 排名 " + rank);
                     RankElement rankElement = rankMap.rankDataByRank(rank);
-                    diffTime.marker("随机读取一个排名 " + rank + " 对象 " + rankElement.getKey());
+                    stopWatch.start("随机读取一个排名 " + rank + " 对象 " + rankElement.getKey());
                 }
                 rankMap.rankBySize(100);
-                diffTime.marker("返回前 100 名 ");
-                System.out.println(diffTime.toString());
+                stopWatch.start("返回前 100 名 ");
+                System.out.println(stopWatch.toString());
                 System.out.println("==================================");
             });
         }

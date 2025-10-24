@@ -3,6 +3,7 @@ package wxdgaming.game.server.script.role.handler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.assist.LogCostTime;
 import wxdgaming.boot2.core.token.JsonToken;
 import wxdgaming.boot2.core.token.JsonTokenParse;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -47,6 +48,7 @@ public class ReqLoginHandler extends HoldApplicationContext {
     }
 
     @ProtoRequest(ReqLogin.class)
+    @LogCostTime(value = "选择角色", threshold = 5)
     public void reqLogin(ProtoEvent event) {
         SocketSession socketSession = event.getSocketSession();
         ReqLogin req = event.buildMessage();

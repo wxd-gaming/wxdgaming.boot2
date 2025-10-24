@@ -1,8 +1,8 @@
 package code;
 
 import org.junit.jupiter.api.*;
+import org.springframework.util.StopWatch;
 import wxdgaming.boot2.core.format.data.Data2Size;
-import wxdgaming.boot2.core.lang.DiffTimeRecord;
 import wxdgaming.boot2.core.rank.RankElement;
 import wxdgaming.boot2.core.util.RandomUtils;
 import wxdgaming.boot2.starter.batis.mapdb.HoldMap;
@@ -39,15 +39,16 @@ public class RankByBMapDBTest {
     @Order(2)
     @RepeatedTest(10)
     public void b1treeSet() {
-        DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
+
+        StopWatch diffTime = new StopWatch();
         ArrayList<Object> objects = new ArrayList<>(holdMap.values());
-        diffTime.marker("读取耗时");
+        diffTime.start("读取耗时");
         TreeSet<RankElement> rankElements = new TreeSet<>();
         for (Object value : objects) {
             RankElement rankElement = (RankElement) value;
             rankElements.add(rankElement);
         }
-        diffTime.marker("排序耗时" + holdMap.size());
+        diffTime.start("排序耗时" + holdMap.size());
         List<RankElement> list = rankElements.stream().limit(20).toList();
 
         System.out.println(diffTime);
@@ -61,15 +62,16 @@ public class RankByBMapDBTest {
     @Order(2)
     @RepeatedTest(10)
     public void b2skipSet() {
-        DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
+
+        StopWatch diffTime = new StopWatch();
         ArrayList<Object> objects = new ArrayList<>(holdMap.values());
-        diffTime.marker("读取耗时");
+        diffTime.start("读取耗时");
         ConcurrentSkipListSet<RankElement> rankElements = new ConcurrentSkipListSet<>();
         for (Object value : objects) {
             RankElement rankElement = (RankElement) value;
             rankElements.add(rankElement);
         }
-        diffTime.marker("排序耗时" + holdMap.size());
+        diffTime.start("排序耗时" + holdMap.size());
         List<RankElement> list = rankElements.stream().limit(20).toList();
         System.out.println(diffTime);
         System.out.println("==============================");
@@ -82,11 +84,12 @@ public class RankByBMapDBTest {
     @Order(3)
     @RepeatedTest(10)
     public void clistSort() {
-        DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
+
+        StopWatch diffTime = new StopWatch();
         ArrayList<Object> objects = new ArrayList<>(holdMap.values());
-        diffTime.marker("读取耗时");
+        diffTime.start("读取耗时");
         List<RankElement> list = objects.stream().map(value -> (RankElement) value).sorted().limit(20).toList();
-        diffTime.marker("排序耗时" + holdMap.size());
+        diffTime.start("排序耗时" + holdMap.size());
         System.out.println(diffTime);
         System.out.println("==============================");
         //        float v = diffTime.diffMs5();
@@ -98,12 +101,13 @@ public class RankByBMapDBTest {
     @Order(4)
     @RepeatedTest(10)
     public void darraySort() {
-        DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
+
+        StopWatch diffTime = new StopWatch();
         ArrayList<Object> objects = new ArrayList<>(holdMap.values());
-        diffTime.marker("读取耗时");
+        diffTime.start("读取耗时");
         RankElement[] array = objects.toArray(new RankElement[0]);
         Arrays.sort(array);
-        diffTime.marker("排序耗时" + array.length);
+        diffTime.start("排序耗时" + array.length);
         System.out.println(diffTime);
         System.out.println("==============================");
 
@@ -115,7 +119,8 @@ public class RankByBMapDBTest {
     @Order(99994)
     @Test
     public void memery() {
-        DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
+
+        StopWatch diffTime = new StopWatch();
         ArrayList<Object> objects = new ArrayList<>(holdMap.values());
         String string = Data2Size.totalSizes0(objects);
         System.out.println("长度：" + objects.size() + "内存占用：" + string);

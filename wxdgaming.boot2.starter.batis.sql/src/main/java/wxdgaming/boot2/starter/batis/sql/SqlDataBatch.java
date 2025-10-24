@@ -9,7 +9,6 @@ import wxdgaming.boot2.core.collection.SplitCollection;
 import wxdgaming.boot2.core.collection.Table;
 import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.json.FastJsonUtil;
-import wxdgaming.boot2.core.lang.DiffTimeRecord;
 import wxdgaming.boot2.core.lang.Tick;
 import wxdgaming.boot2.starter.batis.DataBatch;
 import wxdgaming.boot2.starter.batis.Entity;
@@ -98,7 +97,6 @@ public abstract class SqlDataBatch extends DataBatch {
         /** key: tableName, value: {key: sql, value: params} */
         protected Table<String, String, ConvertCollection<BatchParam>> batchUpdateMap = new Table<>();
 
-        DiffTimeRecord diffTimeRecord = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.NS);
         protected long executeDiffTime = 0;
         protected long executeCount = 0;
         protected Tick ticket = new Tick(1, TimeUnit.MINUTES);
@@ -230,9 +228,9 @@ public abstract class SqlDataBatch extends DataBatch {
                     SplitCollection<BatchParam> splitCollection = new SplitCollection<>(batchSubmitSize, values.getNodes());
                     while (!splitCollection.isEmpty()) {
                         List<BatchParam> batchParams = splitCollection.removeFirst();
-                        diffTimeRecord.reset();
+                        long nanoTime = System.nanoTime();
                         int executeCount = executeUpdate(sqlType, sql, batchParams);
-                        long diff = diffTimeRecord.interval().interval() / 10000;
+                        long diff = (System.nanoTime() - nanoTime) / 10000;
                         executeDiffTime += diff;
                         this.executeCount += executeCount;
                         if (sqlDataHelper.getSqlConfig().isDebug() || ticket.need() || closed.get() || SpringUtil.exiting.get()) {

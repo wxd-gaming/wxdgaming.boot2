@@ -1,10 +1,11 @@
 package wxdgaming.boot2.core.keywords;
 
 import lombok.Getter;
+import org.springframework.util.StopWatch;
 import wxdgaming.boot2.core.json.FastJsonUtil;
-import wxdgaming.boot2.core.lang.DiffTimeRecord;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 关键字
@@ -28,12 +29,14 @@ public class KeywordsMapping {
         System.out.println(FastJsonUtil.toJSONStringAsFmt(keywordsMapping));
         System.out.println(keywordsMapping.replace(source, '*'));
         for (int i = 0; i < 10; i++) {
-            DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
+            StopWatch diffTime = new StopWatch("关键字");
+            diffTime.start("contains");
             boolean contains = keywordsMapping.contains(source);
-            diffTime.marker("contains " + contains);
+            diffTime.stop();
+            diffTime.start("wordsed");
             List<String> wordsed = keywordsMapping.words(source);
-            diffTime.marker("wordsed " + wordsed.toString());
-            System.out.println(diffTime);
+            diffTime.stop();
+            System.out.println(diffTime.prettyPrint(TimeUnit.MILLISECONDS));
             System.out.println("==================================");
         }
     }

@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.MainApplicationContextProvider;
 import wxdgaming.boot2.core.SpringUtil;
@@ -24,6 +25,7 @@ import wxdgaming.logbus.LogBusService;
 import java.io.File;
 
 @Slf4j
+@EnableAspectJAutoProxy
 @SpringBootApplication(scanBasePackageClasses = {
         CoreScan.class,
         DataExcelScan.class,

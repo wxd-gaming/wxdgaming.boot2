@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Serializer;
-import wxdgaming.boot2.core.lang.DiffTimeRecord;
+import org.springframework.util.StopWatch;
 import wxdgaming.boot2.core.util.DumpUtil;
 import wxdgaming.boot2.core.util.RandomUtils;
 import wxdgaming.boot2.starter.batis.mapdb.HoldMap;
@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
-import java.util.stream.Collectors;
 
 /**
  * @author wxd-gaming(無心道, 15388152619)
@@ -81,11 +80,11 @@ public class MapDbTest2 {
             System.out.println("getFileDB:cacheName:" + cacheName + " not exists");
             return;
         }
-        DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
+        StopWatch diffTime = new StopWatch();
         ConcurrentMap<String, Object> map = db.hashMap(cacheName, Serializer.STRING, Serializer.JAVA).open();
-        diffTime.marker("读取耗时");
+        diffTime.start("读取耗时");
         String collect = Joiner.on("&").withKeyValueSeparator(":").join(map);
-        diffTime.marker("打印耗时");
+        diffTime.start("打印耗时");
         System.out.println(diffTime + "\n" + collect);
     }
 
@@ -130,15 +129,15 @@ public class MapDbTest2 {
             System.out.println("getFileDB:cacheName:" + cacheName + " not exists");
             return;
         }
-        DiffTimeRecord diffTime = DiffTimeRecord.start(DiffTimeRecord.IntervalConvertConst.US);
+        StopWatch diffTime = new StopWatch();
         HoldMap holdMap = db.hMap(cacheName);
-        diffTime.marker("打开耗时");
+        diffTime.start("打开耗时");
         Object o = holdMap.get(key);
-        diffTime.marker(String.format("读取, key=%s, valueType=%s, value=%s", key, o.getClass().getSimpleName(), o));
+        diffTime.start(String.format("读取, key=%s, valueType=%s, value=%s", key, o.getClass().getSimpleName(), o));
         Object o1 = holdMap.get(key);
-        diffTime.marker(String.format("读取, key=%s, valueType=%s, value=%s", key, o1.getClass().getSimpleName(), o1));
+        diffTime.start(String.format("读取, key=%s, valueType=%s, value=%s", key, o1.getClass().getSimpleName(), o1));
         String jsonString = JSON.toJSONString(holdMap.getHold());
-        diffTime.marker("打印耗时");
+        diffTime.start("打印耗时");
         System.out.println(diffTime + "\n" + jsonString);
     }
 

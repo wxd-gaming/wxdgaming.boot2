@@ -39,7 +39,7 @@ public final class ExecutorMonitor extends Thread {
         long diffMs = TimeUnit.NANOSECONDS.toMillis(diffNs);
         if (diffMs > 150) {
             log.warn(
-                    "线程: {}, 执行器: {}, 执行时间: {}ms",
+                    "线程: {}, 执行器: {}, 执行耗时: {}ms",
                     thread.getName(), stack, diffMs
             );
         }
@@ -64,7 +64,7 @@ public final class ExecutorMonitor extends Thread {
                         jobContent.lastMonitorTime = nanoTime;
                         long diff = TimeUnit.NANOSECONDS.toSeconds(nanoTime - jobContent.startTime);
                         log.warn(
-                                "线程执行器监视, 线程: {}, 执行器: {}, 执行时间: {}s, 堆栈：{}",
+                                "线程执行器监视, 线程: {}, 执行器: {}, 执行耗时: {}s, 堆栈：{}",
                                 thread.getName(), jobContent.executorJob.getStack(), diff,
                                 StackUtils.stack(thread.getStackTrace())
                         );

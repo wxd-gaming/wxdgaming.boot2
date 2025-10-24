@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.StopWatch;
 import wxdgaming.boot2.core.cache2.CASCache;
 import wxdgaming.boot2.core.cache2.Cache;
 import wxdgaming.boot2.core.cache2.LRUCache;
@@ -17,7 +18,6 @@ import wxdgaming.boot2.core.executor.ExecutorProperties;
 import wxdgaming.boot2.core.executor.QueuePolicyConst;
 import wxdgaming.boot2.core.format.ByteFormat;
 import wxdgaming.boot2.core.function.Function1;
-import wxdgaming.boot2.core.lang.DiffTimeRecord;
 import wxdgaming.boot2.core.util.RandomUtils;
 
 import java.util.concurrent.CountDownLatch;
@@ -136,21 +136,21 @@ public class Cache2Test {
 
     public void singleThread(Cache cache) {
         cache.discardAll();
-        DiffTimeRecord diffTime = DiffTimeRecord.start4Ms();
+        StopWatch diffTime = new StopWatch();
         Object string = "";
         for (long i = 0; i < maxSize; i++) {
             string = cache.getIfPresent(RandomUtils.random(maxSize));
         }
         log.info(
                 "{} 单线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}, 耗时：{}",
-                cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string), diffTime.interval()
+                cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string), diffTime.getTotalTimeMillis()
         );
         log.info("{} 缓存数量：{}, 内存 {}", cache.getCacheName(), cache.size(), ByteFormat.format(cache.memorySize()));
     }
 
     public void multiThread(Cache cache) throws InterruptedException {
         cache.discardAll();
-        DiffTimeRecord diffTime = DiffTimeRecord.start4Ms();
+        StopWatch diffTime = new StopWatch();
         AtomicReference string = new AtomicReference();
         CountDownLatch latch = new CountDownLatch((int) maxSize);
         for (long i = 0; i < maxSize; i++) {
@@ -162,7 +162,7 @@ public class Cache2Test {
         latch.await();
         log.info(
                 "{} 多线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}, 耗时：{}",
-                cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string.get()), diffTime.interval()
+                cache.getCacheName(), maxSize, cache.size(), JSON.toJSONString(string.get()), diffTime.getTotalTimeMillis()
         );
         log.info("{} 缓存数量：{}, 内存 {}", cache.getCacheName(), cache.size(), ByteFormat.format(cache.memorySize()));
     }
