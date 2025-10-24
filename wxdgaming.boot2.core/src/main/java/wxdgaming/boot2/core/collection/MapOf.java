@@ -46,6 +46,10 @@ public class MapOf implements Serializable {
         return new JSONObject();
     }
 
+    public static JSONObject newJSONObjectLinked() {
+        return new JSONObject(true);
+    }
+
     public static JSONObject newJSONObject(String key, Object value) {
         return MapOf.newJSONObject().fluentPut(key, value);
     }

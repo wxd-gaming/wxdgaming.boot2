@@ -36,6 +36,9 @@ spring:
   freemarker:
     template-loader-path: classpath:/templates/
     suffix: .ftl
+  web:
+    resources:
+      static-locations: classpath:/public/,file:./target/out/
 
 
 server:

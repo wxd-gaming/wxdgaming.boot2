@@ -448,7 +448,7 @@ const wxd = {
             let formElement = document.createElement("form");
             formElement.setAttribute('style', 'display:none'); //在form表单中添加查询参数
             formElement.setAttribute('target', '_blank');
-            formElement.setAttribute('method', 'post');
+            formElement.setAttribute('method', 'get');
             formElement.setAttribute('action', url);
             document.body.appendChild(formElement);
             formElement.submit();
@@ -705,11 +705,13 @@ const wxd = {
                             try {
                                 ret = this._onload(data);
                             } catch (e) {
+                                wxd.loading_close();
                                 console.error(e);
                                 console.error(JSON.stringify(data));
                                 wxd.message.notice("error: " + e, true);
                             }
                         } else {
+                            wxd.loading_close();
                             console.log(data);
                         }
                     }, error: (jqXHR, textStatus, errorMsg) => {

@@ -42,3 +42,6 @@ server:
 spring:
   profiles:
     active: [ pgsql ]
+  web:
+    resources:
+      static-locations: classpath:/public/,file:./target/out/

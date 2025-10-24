@@ -35,6 +35,27 @@
             pageView.remoteGetData(urlQuery);
         }
 
+        function excel() {
+            wxd.loading();
+            let urlQuery = new wxd.Map().loadSearch();
+            urlQuery.put("minTime", $("#minTime").val());
+            urlQuery.put("maxTime", $("#maxTime").val());
+            urlQuery.put("where", $("#labWhere").text());
+            urlQuery.put("order", $("#labOrderBy").text());
+            urlQuery.put("pageIndex", pageView.pageIndex());
+            urlQuery.put("pageSize", pageView.pageSize());
+
+            new wxd.netty.PostRequest("/admin/log/excel", urlQuery.toString(), (response) => {
+                console.log(response)
+                if (response.code === 1) {
+                    wxd.netty.download(response.data);
+                    wxd.loading_close();
+                } else {
+                    wxd.loading_close();
+                }
+            }).send();
+        }
+
         // 用于显示的格式化版本
         function formatForDisplay(str) {
             if (typeof str === "string") {
@@ -198,6 +219,7 @@
         <br>
         <br>
         <button onclick="search();">查询</button>
+        <button onclick="excel();">Excel</button>
     </div>
     <div class="root_box_center tableDom" style="margin: 10px; padding-right: 10px;border-radius: 0; overflow-x: auto;">
         <table style="min-width: 1400px;">

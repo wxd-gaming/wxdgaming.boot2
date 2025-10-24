@@ -141,7 +141,7 @@ public class LogService implements InitPrint {
 
         List<JSONObject> list = logMappingInfo.getFieldList().stream()
                 .map(logField -> {
-                    JSONObject jsonObject = MapOf.newJSONObject();
+                    JSONObject jsonObject = MapOf.newJSONObjectLinked();
                     jsonObject.put("name", logField.getFieldName());
                     jsonObject.put("comment", logField.getFieldComment());
                     String fieldHtmlStyle = logField.getFieldHtmlStyle();

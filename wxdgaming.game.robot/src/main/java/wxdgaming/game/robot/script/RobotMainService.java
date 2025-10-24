@@ -58,8 +58,8 @@ public class RobotMainService {
 
     @EventListener
     public void start(StartEvent event) {
-        for (int i = 0; i < 100; i++) {
-            String account = "k19" + (i + 1);
+        for (int i = 0; i < 50; i++) {
+            String account = "r19" + (i + 1);
             robotMap.put(account, new Robot().setAccount(account).setName(account));
         }
     }
