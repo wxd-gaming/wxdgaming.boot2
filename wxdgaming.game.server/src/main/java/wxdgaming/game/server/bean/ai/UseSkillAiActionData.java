@@ -3,6 +3,7 @@ package wxdgaming.game.server.bean.ai;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.game.server.bean.MapNpc;
+import wxdgaming.game.server.bean.Vector3D;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -21,6 +22,7 @@ public class UseSkillAiActionData extends AiActionData implements Serializable {
     @Serial private static final long serialVersionUID = 1L;
 
     private Object skill;
+    private Vector3D targetPoint;
     private List<MapNpc> targetList = null;
 
     public UseSkillAiActionData(AiAction aiAction) {

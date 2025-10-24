@@ -15,7 +15,8 @@ public enum AiType {
     FindPath(2, AiAction.FindPath, "寻路"),
     Move(3, AiAction.Move, "移动"),
     PathMove(4, AiAction.Move, "按照路径点寻路"),
-    UseSkill(5,  AiAction.UseSkill,"使用技能"),
+    UseSkill(5, AiAction.UseSkill, "使用技能"),
+    FindSkillTarget(6, AiAction.UseSkill, "寻找技能作用目标"),
     ;
 
     private static final Map<Integer, AiType> static_map = MapOf.ofMap(AiType::getCode, AiType.values());

@@ -15,7 +15,7 @@ public enum AiAction {
     Idle(1, 1, "休息", AiActionData::new),
     Move(2, 1, "移动", MoveAiActionData::new),
     FindPath(3, 1, "寻路", MoveAiActionData::new),
-    UseSkill(4, 3, "使用技能", AiActionData::new),
+    UseSkill(4, 3, "使用技能", UseSkillAiActionData::new),
     ;
 
     private static final Map<Integer, AiAction> static_map = MapOf.ofMap(AiAction::getCode, AiAction.values());

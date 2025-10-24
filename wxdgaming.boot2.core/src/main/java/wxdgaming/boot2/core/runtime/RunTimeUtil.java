@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
+import wxdgaming.boot2.core.locks.MonitorReadWrite;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -11,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * 记录器
@@ -23,9 +23,7 @@ public class RunTimeUtil extends ExecutorEvent {
 
     private static final Logger log = LoggerFactory.getLogger("RunTimeRecord");
 
-    private static final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private static final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
-    private static final ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
+    private static final MonitorReadWrite MONITOR_READ_WRITE = new MonitorReadWrite();
     private static final AtomicBoolean Open = new AtomicBoolean(false);
     private static ConcurrentHashMap<String, RunTimeRecord> runTimeRecordMap = new ConcurrentHashMap<>();
     private static ScheduledFuture<?> scheduledFuture = null;
@@ -49,11 +47,11 @@ public class RunTimeUtil extends ExecutorEvent {
     public static void record(String name, long start) {
         long costTimeNs = System.nanoTime() - start;
         if (!Open.get()) return;
-        readLock.lock();
+        MONITOR_READ_WRITE.readLock();
         try {
             runTimeRecordMap.computeIfAbsent(name, l -> new RunTimeRecord(name)).record(costTimeNs);
         } finally {
-            readLock.unlock();
+            MONITOR_READ_WRITE.unReadLock();
         }
     }
 
@@ -62,7 +60,7 @@ public class RunTimeUtil extends ExecutorEvent {
     }
 
     @Override public void onEvent() throws Exception {
-        writeLock.lock();
+        MONITOR_READ_WRITE.writeLock();
         try {
             List<RunTimeRecord> list = runTimeRecordMap.values().stream()
                     .filter(r -> r.getCount().get() > 1)
@@ -115,7 +113,7 @@ public class RunTimeUtil extends ExecutorEvent {
             }
             log.info("\n执行耗时统计\n{}", sb);
         } finally {
-            writeLock.unlock();
+            MONITOR_READ_WRITE.unWriteLock();
         }
         throw new RuntimeException("测试");
     }
