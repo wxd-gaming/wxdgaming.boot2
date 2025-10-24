@@ -18,6 +18,15 @@ public class Vector3D extends ObjectBase {
     private int y;
     private int z;
 
+    public Vector3D() {
+    }
+
+    public Vector3D(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
     @Override public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 

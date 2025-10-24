@@ -3,10 +3,11 @@ package wxdgaming.game.server.bean;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.game.server.bean.attr.AttrInfo;
-import wxdgaming.game.server.bean.attr.AttrType;
 import wxdgaming.game.message.global.AttrBean;
 import wxdgaming.game.message.global.ResUpdateAttr;
+import wxdgaming.game.server.bean.ai.AiPanel;
+import wxdgaming.game.server.bean.attr.AttrInfo;
+import wxdgaming.game.server.bean.attr.AttrType;
 import wxdgaming.game.server.bean.buff.Buff;
 
 import java.util.ArrayList;
@@ -49,9 +50,13 @@ public class MapNpc extends MapObject {
     /** 分组百分比属性 */
     @JSONField(serialize = false, deserialize = false)
     private transient HashMap<Integer, AttrInfo> attrProMap = new HashMap<>();
+    /** ai */
+    @JSONField(serialize = false, deserialize = false)
+    private transient AiPanel aiPanel;
 
     public MapNpc() {
         this.setMapObjectType(MapObjectType.Npc);
+        aiPanel = new AiPanel(this);
     }
 
     public long maxHp() {

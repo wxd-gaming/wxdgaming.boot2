@@ -1,4 +1,4 @@
-package wxdgaming.game.server.script.ai;
+package wxdgaming.game.server.bean.ai;
 
 import lombok.Getter;
 import wxdgaming.boot2.core.collection.MapOf;
@@ -11,7 +11,11 @@ import java.util.Map;
  **/
 @Getter
 public enum AiType {
-    None(0, AiGroup.None, "默认值"),
+    Idle(1, AiAction.Idle, "休息"),
+    FindPath(2, AiAction.FindPath, "寻路"),
+    Move(3, AiAction.Move, "移动"),
+    PathMove(4, AiAction.Move, "按照路径点寻路"),
+    UseSkill(5,  AiAction.UseSkill,"使用技能"),
     ;
 
     private static final Map<Integer, AiType> static_map = MapOf.ofMap(AiType::getCode, AiType.values());
@@ -27,12 +31,12 @@ public enum AiType {
     }
 
     private final int code;
-    private final AiGroup group;
+    private final AiAction aiAction;
     private final String comment;
 
-    AiType(int code, AiGroup group, String comment) {
+    AiType(int code, AiAction aiAction, String comment) {
         this.code = code;
-        this.group = group;
+        this.aiAction = aiAction;
         this.comment = comment;
     }
 
