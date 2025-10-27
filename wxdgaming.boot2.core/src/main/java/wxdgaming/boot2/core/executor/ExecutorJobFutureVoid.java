@@ -31,8 +31,13 @@ class ExecutorJobFutureVoid extends ExecutorJob implements Runnable, IExecutorQu
             if (this.getThreadContext() != null) {
                 ThreadContext.context().putAllIfAbsent(this.getThreadContext());
             }
-            getRunnable().run();
-            future.complete(null);
+            ThreadStopWatch.nullInit(getStack());
+            try {
+                getRunnable().run();
+                future.complete(null);
+            } finally {
+                ThreadStopWatch.releasePrint();
+            }
         } catch (Throwable throwable) {
             future.completeExceptionally(throwable);
         } finally {

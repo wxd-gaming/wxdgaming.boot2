@@ -1,6 +1,7 @@
 package executortest;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import wxdgaming.boot2.core.executor.*;
 
 import java.util.concurrent.ScheduledFuture;
@@ -10,7 +11,19 @@ import java.util.concurrent.locks.LockSupport;
 @Slf4j
 public class ExecutorServiceTest {
 
+    @BeforeEach
+    void beforeEach() {
+        if (ExecutorFactory.Lazy.instance != null) return;
+        ExecutorProperties executorProperties = new ExecutorProperties();
+        ExecutorConfig logic = new ExecutorConfig();
+        logic.setCoreSize(12).setMaxQueueSize(500000).setWarnSize(500000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
+        executorProperties.setLogic(logic);
+        new ExecutorFactory(executorProperties);
+    }
+
+
     public static void main(String[] args) {
+        new ExecutorServiceTest().beforeEach();
         ExecutorServicePlatform executorServicePlatform = ExecutorFactory.create("4", 10, 100, 10, QueuePolicyConst.AbortPolicy);
 
         {
@@ -24,12 +37,6 @@ public class ExecutorServiceTest {
             );
 
             ThreadContext.cleanup();
-
-            executorServicePlatform.schedule(
-                    myRunnable.myRunnableQueue,
-                    1,
-                    TimeUnit.SECONDS
-            );
 
         }
 
@@ -65,14 +72,14 @@ public class ExecutorServiceTest {
     }
 
     private static class MyRunnable extends ExecutorEvent implements Runnable {
-        MyRunnableQueue myRunnableQueue;
 
         public MyRunnable() {
-            myRunnableQueue = new MyRunnableQueue();
         }
 
         @Override public void onEvent() throws Exception {
             log.info("1 {} {}", StackUtils.stack(), ThreadContext.context().get("test"));
+            ThreadStopWatch.start(StackUtils.stack());
+            ThreadStopWatch.stop();
             throw new RuntimeException("1");
         }
     }
@@ -85,6 +92,8 @@ public class ExecutorServiceTest {
 
         @Override public void onEvent() throws Exception {
             log.info("1 {} {}", getStack(), ThreadContext.context().get("test"));
+            ThreadStopWatch.start(StackUtils.stack());
+            ThreadStopWatch.stop();
         }
 
     }

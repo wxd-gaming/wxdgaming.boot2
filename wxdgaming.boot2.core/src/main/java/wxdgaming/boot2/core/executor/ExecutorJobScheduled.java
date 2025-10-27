@@ -34,7 +34,7 @@ class ExecutorJobScheduled implements Runnable {
     public ExecutorJobScheduled(Executor executor, Runnable targetRunnable, boolean atFixedRate) {
         this.executor = executor;
         this.targetRunnable = new ScheduledExecutorJob(targetRunnable);
-        this.targetRunnable.stack = StackUtils.stack();
+        this.targetRunnable.stack = StackUtils.stack(0, 1);
         this.atFixedRate = atFixedRate;
     }
 
@@ -45,7 +45,7 @@ class ExecutorJobScheduled implements Runnable {
 
         public ScheduledExecutorJob(Runnable runnable) {
             super(runnable);
-            this.stack = StackUtils.stack();
+            this.stack = StackUtils.stack(0, 1);
             iExecutorQueue = getRunnable() instanceof IExecutorQueue ? ((IExecutorQueue) getRunnable()) : null;
         }
 

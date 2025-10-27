@@ -38,7 +38,12 @@ class ExecutorJobFuture<T> extends ExecutorJob implements Runnable, IExecutorQue
             if (this.getThreadContext() != null) {
                 ThreadContext.context().putAllIfAbsent(this.getThreadContext());
             }
-            future.complete(this.supplier.get());
+            ThreadStopWatch.nullInit(getStack());
+            try {
+                future.complete(this.supplier.get());
+            } finally {
+                ThreadStopWatch.releasePrint();
+            }
         } catch (Throwable throwable) {
             future.completeExceptionally(throwable);
         } finally {

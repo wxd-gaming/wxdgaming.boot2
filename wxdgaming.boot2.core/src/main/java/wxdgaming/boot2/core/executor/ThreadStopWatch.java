@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.executor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StopWatch;
 import wxdgaming.boot2.core.util.AssertUtil;
 
@@ -11,6 +12,7 @@ import java.util.concurrent.TimeUnit;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-10-27 09:49
  **/
+@Slf4j
 public class ThreadStopWatch {
 
     private static final ThreadLocal<StopWatch> THREAD_LOCAL = new ThreadLocal<>();
@@ -22,8 +24,32 @@ public class ThreadStopWatch {
         THREAD_LOCAL.set(stopWatch);
     }
 
+    public static void nullInit(String name) {
+        StopWatch stopWatch = THREAD_LOCAL.get();
+        if (stopWatch == null) {
+            stopWatch = new StopWatch(name);
+            THREAD_LOCAL.set(stopWatch);
+        }
+    }
+
     public static void release() {
         THREAD_LOCAL.remove();
+    }
+
+    public static void releasePrint() {
+        try {
+            StopWatch stopWatch = THREAD_LOCAL.get();
+            if (stopWatch != null) {
+                if (stopWatch.isRunning()) {
+                    stopWatch.stop();
+                }
+                if (stopWatch.getTaskCount() > 0) {
+                    log.info("{}", stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
+                }
+            }
+        } finally {
+            THREAD_LOCAL.remove();
+        }
     }
 
     public static StopWatch get() {

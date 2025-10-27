@@ -18,7 +18,7 @@ public class ExecutorJob implements Runnable {
 
     public ExecutorJob(Runnable runnable) {
         this.runnable = runnable;
-        this.stack = StackUtils.stack();
+        this.stack = StackUtils.stack(0, 1);
     }
 
     @Override public void run() {
@@ -27,7 +27,12 @@ public class ExecutorJob implements Runnable {
             if (this.getThreadContext() != null) {
                 ThreadContext.context().putAllIfAbsent(this.getThreadContext());
             }
-            runnable.run();
+            ThreadStopWatch.nullInit(getStack());
+            try {
+                runnable.run();
+            } finally {
+                ThreadStopWatch.releasePrint();
+            }
         } catch (Throwable throwable) {
             log.error("{}", stack, throwable);
         } finally {

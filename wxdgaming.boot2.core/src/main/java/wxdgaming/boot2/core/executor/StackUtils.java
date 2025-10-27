@@ -13,18 +13,30 @@ public class StackUtils {
     }
 
 
-    /** 追踪到上一次链路 */
+    /** 追踪到上一层链路 */
     public static String stack() {
-        return stack(1, 2);
+        return stack0(0, 0);
     }
 
-    public static String stack2() {
-        return stack(1, 3);
+    /** 追踪到上一层链路 */
+    public static String stack(int skip) {
+        return stack0(0, skip);
     }
 
+    /**
+     * 获取调用函数所在的文件行数
+     *
+     * @param initSkip 需要跳过的init函数
+     * @param skip     需要跳过行数
+     * @return 文件名行数
+     */
     public static String stack(int initSkip, int skip) {
+        return stack0(initSkip, skip);
+    }
+
+    private static String stack0(int initSkip, int skip) {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        for (int i = 2; i < stackTrace.length; i++) {
+        for (int i = 3; i < stackTrace.length; i++) {
             StackTraceElement stackTraceElement = stackTrace[i];
             if (stackTraceElement.getMethodName().equals("<init>") && initSkip-- > 0) continue;/*跳过自身的init函数即可*/
             if (skip-- > 0) continue;

@@ -36,7 +36,7 @@ public abstract class AbstractCronTrigger extends ExecutorEvent implements Runna
 
     public AbstractCronTrigger(Method method, CronExpress cronExpress) {
         super(method);
-        this.stack = StackUtils.stack();
+        this.stack = StackUtils.stack(0, 1);
         this.cronExpress = cronExpress;
     }
 

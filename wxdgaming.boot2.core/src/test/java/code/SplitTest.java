@@ -9,7 +9,6 @@ public class SplitTest {
 
     public SplitTest() {
         System.out.println(StackUtils.stack());
-        System.out.println(StackUtils.stack2());
         System.out.println(StackUtils.stackAll());
         t12();
     }
@@ -19,7 +18,6 @@ public class SplitTest {
         String source = "sdf|wertcwe23";
         System.out.println(Arrays.toString(source.split("[|]")));
         System.out.println(StackUtils.stack());
-        System.out.println(StackUtils.stack2());
         System.out.println(StackUtils.stackAll());
     }
 

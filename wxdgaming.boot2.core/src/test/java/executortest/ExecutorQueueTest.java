@@ -1,11 +1,9 @@
 package executortest;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import wxdgaming.boot2.core.executor.ExecutorFactory;
-import wxdgaming.boot2.core.executor.ExecutorQueue;
-import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
-import wxdgaming.boot2.core.executor.QueuePolicyConst;
+import wxdgaming.boot2.core.executor.*;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,6 +17,16 @@ import java.util.concurrent.locks.LockSupport;
  **/
 @Slf4j
 public class ExecutorQueueTest {
+
+    @BeforeEach
+    void beforeEach() {
+        if (ExecutorFactory.Lazy.instance != null) return;
+        ExecutorProperties executorProperties = new ExecutorProperties();
+        ExecutorConfig logic = new ExecutorConfig();
+        logic.setCoreSize(12).setMaxQueueSize(500000).setWarnSize(500000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
+        executorProperties.setLogic(logic);
+        new ExecutorFactory(executorProperties);
+    }
 
     @Test
     public void abortPolicy() {
@@ -59,11 +67,13 @@ public class ExecutorQueueTest {
         AtomicInteger count = new AtomicInteger(0);
         ExecutorServicePlatform executorServicePlatform = ExecutorFactory.create("t", 10);
         ExecutorQueue executorQueue = new ExecutorQueue("t", executorServicePlatform, 10, 5, QueuePolicyConst.WaitPolicy);
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 20; i++) {
             int finalI = i;
             executorQueue.execute(() -> {
                 // log.info("执行任务 {}", finalI);
-                count.incrementAndGet();
+                int i1 = count.incrementAndGet();
+                ThreadStopWatch.start(String.valueOf(i1));
+                ThreadStopWatch.stop();
             });
         }
         LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(3));

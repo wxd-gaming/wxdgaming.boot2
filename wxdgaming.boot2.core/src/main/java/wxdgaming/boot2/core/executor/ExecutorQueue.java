@@ -39,6 +39,7 @@ public class ExecutorQueue extends ExecutorJob {
         ExecutorJob executorJob;
         if (!(command instanceof ExecutorJob)) {
             executorJob = new ExecutorJob(command);
+            executorJob.stack = StackUtils.stack(0,2);
         } else {
             executorJob = (ExecutorJob) command;
         }
