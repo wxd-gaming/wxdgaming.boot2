@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
  **/
 @Slf4j
 @Getter
-class ExecutorJob implements Runnable {
+public class ExecutorJob implements Runnable {
 
     /** 堆栈，也是任务名称，日志记录关键 */
     protected String stack;

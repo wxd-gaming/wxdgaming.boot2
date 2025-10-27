@@ -7,16 +7,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.util.StopWatch;
-import wxdgaming.boot2.core.executor.ExecutorConfig;
-import wxdgaming.boot2.core.executor.ExecutorFactory;
-import wxdgaming.boot2.core.executor.ExecutorProperties;
-import wxdgaming.boot2.core.executor.QueuePolicyConst;
-import wxdgaming.boot2.core.format.ByteFormat;
+import wxdgaming.boot2.core.executor.*;
 import wxdgaming.boot2.core.util.RandomUtils;
 
 import java.time.Duration;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
@@ -87,41 +81,61 @@ public class CaffeineCacheTest {
                 //                .heartListener((key, value, cause) -> log.info("心跳处理 key: {}, value: {}, cause: {}", key, value, cause))
                 //                .removalListener((key, value, cause) -> log.info("移除过期 key: {}, value: {}, cause: {}", key, value, cause))
                 .build();
+        ThreadStopWatch.release();
+        ThreadStopWatch.init("缓存测试");
         singleThread(caffeineCacheImpl);
         multiThread(caffeineCacheImpl);
+        log.debug("{}", ThreadStopWatch.prettyPrint());
     }
 
     public void singleThread(CaffeineCacheImpl<Long, Object> cache) {
         cache.invalidateAll();
-        StopWatch diffTime = new StopWatch();
-        Object string = "";
+        ThreadStopWatch.start("循环 " + readSize + " 次数");
+        AtomicReference<Object> string = new AtomicReference<>();
         for (long i = 0; i < readSize; i++) {
-            string = cache.get(RandomUtils.random(maxSize));
+            string.set(cache.get(RandomUtils.random(maxSize)));
         }
+        ThreadStopWatch.stop();
         log.info(
-                "{} 单线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}, 耗时：{}",
-                cache.getCacheName(), readSize, cache.size(), JSON.toJSONString(string), diffTime.getTotalTimeMillis()
+                "{} 单线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}",
+                cache.getCacheName(), readSize, cache.size(), JSON.toJSONString(string)
         );
-        log.info("{} 缓存数量：{}, 内存 {}", cache.getCacheName(), cache.size(), ByteFormat.format(cache.memorySize()));
     }
 
     public void multiThread(CaffeineCacheImpl<Long, Object> cache) throws Exception {
         cache.invalidateAll();
-        StopWatch diffTime = new StopWatch();
-        AtomicReference string = new AtomicReference();
-        CountDownLatch latch = new CountDownLatch((int) readSize);
+        ThreadStopWatch.start("循环 " + readSize + " 次数");
+        AtomicReference<Object> string = new AtomicReference<>();
+        ThreadExecutorLatch.threadLocalInit();
         for (long i = 0; i < readSize; i++) {
-            ExecutorFactory.getExecutorServiceLogic().execute(() -> {
-                string.set(cache.get(RandomUtils.random(maxSize)));
-                latch.countDown();
-            });
+            ThreadExecutorLatch.executor(() -> string.set(cache.get(RandomUtils.random(maxSize))), ExecutorFactory.getExecutorServiceLogic());
         }
-        latch.await();
+        ThreadExecutorLatch.await();
+        ThreadExecutorLatch.release();
+        ThreadStopWatch.stop();
         log.info(
-                "{} 多线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}, 耗时：{}",
-                cache.getCacheName(), readSize, cache.size(), JSON.toJSONString(string.get()), diffTime.getTotalTimeMillis()
+                "{} 多线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}",
+                cache.getCacheName(), readSize, cache.size(), JSON.toJSONString(string.get())
         );
-        log.info("{} 缓存数量：{}, 内存 {}", cache.getCacheName(), cache.size(), ByteFormat.format(cache.memorySize()));
+    }
+
+    @Test
+    public void tt() throws InterruptedException {
+        ExecutorLatch executorLatch = new ExecutorLatch();
+
+        executorLatch.executor(
+                () -> {
+                    try {
+                        Thread.sleep(30000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                ExecutorFactory.getExecutorServiceLogic()
+        );
+
+        executorLatch.await();
+
     }
 
 }
