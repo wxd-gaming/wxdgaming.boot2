@@ -19,6 +19,12 @@
         .root_box_bottom {height: 38px;}
 
         .root_box_bottom label {padding-left: 5px;padding-right: 5px;}
+
+        .alertBoxBg .alertBox li {height: 23px;line-height: 20px;}
+
+        .alertBoxBg .alertBox label {padding-left: 5px;padding-right: 5px;text-align: right;width: 80px;display: inline-block;}
+
+        .alertBoxBg .alertBox input {width: 180px;border: #8c8c8c 1px solid;}
     </style>
     <script>
 
@@ -67,8 +73,12 @@
         function createRow(index, row) {
             // language=HTML
             return `
-                <tr ondblclick="alertShow(this)">
-                    <td>${row.id}</td>
+                <tr ondblclick="alertShow(${index})">
+                    <td>
+                        <a href="#" onclick="editNotice(${row.uid},'${row.title}','${row.content}','${row.startTime}','${row.endTime}')">编辑</a>
+                        <a href="#" onclick="delNotice(${row.uid})">删除</a>
+                    </td>
+                    <td>${row.uid}</td>
                     <td>${row.startTime} / ${row.endTime}</td>
                     <td>${row.title}</td>
                     <td>${row.content}</td>
@@ -76,19 +86,17 @@
             `;
         }
 
-        function alertShow(self) {
-            let titleNode = self.childNodes[2];
-            let contentNode = self.childNodes[3];
-            let title = $(titleNode).text();
-            let content = $(contentNode).text();
+        function alertShow(index) {
+            let content = pageView.items[index];
             content = formatJsonWithNewlines(content);
+            console.log(typeof content, content);
             new wxd.message.Alert(`<pre>${content}</pre>`, title).show();
         }
 
         $(() => {
             wxd.loading();
             let urlQuery = new wxd.Map().loadSearch();
-            pageView = new PageView("/notice/queryList", search, createRow);
+            pageView = new PageView("/admin/notice/queryList", search, createRow);
             pageView.gameId = urlQuery.get("gameId");
             search();
         });
@@ -126,6 +134,63 @@
             $("#labOrderBy").text("");
         }
 
+
+        function editNotice(uid, title, content, startTime, endTime) {
+            // language=HTML
+            let ui = `
+                <div>
+                    <ul>
+                        <li><label>UID:</label><span>${uid}</span></li>
+                        <li>
+                            <label for="title">标题:</label><input id="title" type="text" value="${title}">
+                        </li>
+                        <li>
+                            <label for="content">内容:</label><input id="content" type="text" value="${content}">
+                        </li>
+                        <li>
+                            <label for="startTime">开始时间:</label><input id="startTime" type="datetime-local" value="${startTime}"/>
+                        </li>
+                        <li>
+                            <label for="endTime">结束时间:</label><input id="endTime" type="datetime-local" value="${endTime}"/>
+                        </li>
+                    </ul>
+                </div>
+            `;
+
+            let alertBox = new wxd.message.Alert(ui, "编辑公告");
+            alertBox.okShow = "确认";
+            alertBox.okCallback = () => {
+                return new wxd.netty.PostRequest(
+                    "/admin/notice/edit",
+                    {
+                        uid: uid,
+                        title: $("#title").val(),
+                        content: $("#content").val(),
+                        startTime: $("#startTime").val(),
+                        endTime: $("#endTime").val(),
+                    },
+                    (data) => {
+                        wxd.message.notice(data.msg);
+                        if (data.code === 1) {
+                            search();
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    })
+                    .async(false)
+                    .send();
+            };
+            alertBox.show();
+        }
+
+        function delNotice(uid) {
+            let param = "uid=" + uid;
+            new wxd.netty.PostRequest("/admin/notice/del", param, (data) => {
+                wxd.message.notice(data.msg);
+                search();
+            }).send();
+        }
     </script>
 </head>
 <body>
@@ -175,12 +240,14 @@
         <br>
         <br>
         <button onclick="search();">查询</button>
+        <button onclick="editNotice(0,'','','','');">添加</button>
     </div>
     <div class="root_box_center tableDom" style="margin: 10px; padding-right: 10px;border-radius: 0; overflow-x: auto;">
         <table style="min-width: 1400px;">
             <thead>
             <tr>
-                <th>ID</th>
+                <th>操作</th>
+                <th>UID</th>
                 <th>时间</th>
                 <th>标题</th>
                 <th>内容</th>

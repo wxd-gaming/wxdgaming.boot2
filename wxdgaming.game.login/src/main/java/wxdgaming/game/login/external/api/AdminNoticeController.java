@@ -65,11 +65,25 @@ public class AdminNoticeController implements InitPrint {
         AssertUtil.isTrue(StringUtils.isNotBlank(content), "内容不能为空");
         noticeEntity.setTitle(title);
         noticeEntity.setContent(content);
-        noticeEntity.setStartTime(Util.parseWebDate(startTime));
-        noticeEntity.setEndTime(Util.parseWebDate(endTime));
+        if (StringUtils.isBlank(startTime)) {
+            noticeEntity.setStartTime(0);
+        } else {
+            noticeEntity.setStartTime(Util.parseWebDate(startTime));
+        }
+        if (StringUtils.isBlank(endTime)) {
+            noticeEntity.setEndTime(0);
+        } else {
+            noticeEntity.setEndTime(Util.parseWebDate(endTime));
+        }
         this.sqlDataHelper.save(noticeEntity);
         this.noticeService.getDataTable().loadAll();
-        return RunResult.ok();
+        return RunResult.ok().msg("成功");
+    }
+
+    @RequestMapping(value = "/del")
+    public RunResult del(CacheHttpServletRequest context, @RequestParam(value = "uid") int uid) {
+        this.noticeService.del(uid);
+        return RunResult.ok().msg("删除成功");
     }
 
     @RequestMapping(value = "/queryList")
@@ -83,6 +97,7 @@ public class AdminNoticeController implements InitPrint {
 
         Collection<NoticeEntity> entities = noticeService.getDataTable().getList();
         List<JSONObject> list = entities.stream()
+                .distinct()
                 .skip(skip)
                 .limit(pageSize)
                 .map(entity -> {

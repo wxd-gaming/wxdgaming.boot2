@@ -10,6 +10,7 @@ import wxdgaming.boot2.starter.batis.DataTable;
 import wxdgaming.boot2.starter.batis.EntityIntegerUID;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
+import wxdgaming.game.login.entity.GiftCodeEntity;
 import wxdgaming.game.login.entity.NoticeEntity;
 
 import java.util.Collection;
@@ -35,6 +36,11 @@ public class NoticeService extends HoldApplicationContext {
 
     @EventListener
     public void startEvent(StartEvent startEvent) {
+        dataTable.loadAll();
+    }
+
+    public void del(int uid) {
+        sqlDataHelper.deleteByKey(NoticeEntity.class, uid);
         dataTable.loadAll();
     }
 
