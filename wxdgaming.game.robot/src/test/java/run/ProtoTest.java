@@ -1,8 +1,8 @@
 package run;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import wxdgaming.boot2.starter.net.pojo.ProtoBuf2Pojo;
 
@@ -31,7 +31,10 @@ public class ProtoTest {
                 "wxdgaming.game.message",
                 null,
                 null,
-                null
+                () -> """
+                        SocketSession socketSession = event.getSocketSession();
+                                Robot robot = socketSession.bindData("robot");
+                        """
         );
     }
 

@@ -50,7 +50,7 @@ public class AdminNavController implements InitPrint {
             }},
             new NavItem() {{
                 name = "礼包码";
-                routing = "/cdkey-table.html";
+                routing = "/gift-code-table.html";
                 lv = 1;
             }},
             new NavItem() {{

@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
- * jdbc cache
+ * jdbc cache, 仅仅支持单主键
  *
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-02-17 11:28

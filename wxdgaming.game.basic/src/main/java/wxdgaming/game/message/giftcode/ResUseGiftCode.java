@@ -1,4 +1,4 @@
-package  wxdgaming.game.message.cdkey;
+package  wxdgaming.game.message.giftcode;
 
 import io.protostuff.Tag;
 import java.io.Serial;
@@ -15,18 +15,18 @@ import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 
 
-/** 请求使用cdkey */
+/** 响应使用GiftCode */
 @Getter
 @Setter
 @Accessors(chain = true)
-@Comment("请求使用cdkey")
-public class ReqUseCdKey extends PojoBase implements Serializable {
+@Comment("响应使用GiftCode")
+public class ResUseGiftCode extends PojoBase implements Serializable {
 
     @Serial private static final long serialVersionUID = 1L;
 
     /** 消息ID */
     public static int _msgId() {
-        return 46785580;
+        return 53708055;
     }
 
     /** 消息ID */
@@ -36,7 +36,7 @@ public class ReqUseCdKey extends PojoBase implements Serializable {
 
 
     /**  */
-    @Tag(1) private String cdKey;
+    @Tag(1) private String GiftCode;
 
 
 }

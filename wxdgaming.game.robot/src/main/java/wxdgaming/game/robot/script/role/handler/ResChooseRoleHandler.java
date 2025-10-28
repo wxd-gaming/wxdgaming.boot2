@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
-import wxdgaming.game.message.cdkey.ReqUseCdKey;
+import wxdgaming.game.message.giftcode.ReqUseGiftCode;
 import wxdgaming.game.message.role.ResChooseRole;
 import wxdgaming.game.robot.bean.Robot;
 
@@ -27,9 +27,9 @@ public class ResChooseRoleHandler {
         Robot robot = socketSession.bindData("robot");
         robot.setLoginEnd(true);
 
-        ReqUseCdKey reqUseCdKey = new ReqUseCdKey();
-        reqUseCdKey.setCdKey("vip666");
-        socketSession.write(reqUseCdKey);
+        ReqUseGiftCode reqUseGiftCode = new ReqUseGiftCode();
+        reqUseGiftCode.setGiftCode("vip666");
+        socketSession.write(reqUseGiftCode);
     }
 
 }

@@ -5,12 +5,12 @@ option java_multiple_files = true;
 option java_package = "wxdgaming.game.message";
 
 
-//请求使用cdkey
-message ReqUseCdKey {
-  string cdKey = 1;
+//请求使用GiftCode
+message ReqUseGiftCode {
+  string GiftCode = 1;
 }
 
-//响应使用cdkey
-message ResUseCdKey {
-  string cdKey = 1;
+//响应使用GiftCode
+message ResUseGiftCode {
+  string GiftCode = 1;
 }

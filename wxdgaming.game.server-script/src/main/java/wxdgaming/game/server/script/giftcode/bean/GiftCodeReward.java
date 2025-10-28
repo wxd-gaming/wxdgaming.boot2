@@ -1,4 +1,4 @@
-package wxdgaming.game.server.script.cdkey.bean;
+package wxdgaming.game.server.script.giftcode.bean;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +12,7 @@ import wxdgaming.boot2.core.lang.ObjectBase;
  **/
 @Getter
 @Setter
-public class CDKeyReward extends ObjectBase {
+public class GiftCodeReward extends ObjectBase {
 
     private int cfgId;
     private long num;

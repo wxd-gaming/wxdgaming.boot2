@@ -12,9 +12,9 @@ import wxdgaming.boot2.core.lang.ObjectBase;
  **/
 @Getter
 @Setter
-public class UseCDKeyDTO extends ObjectBase {
+public class UseGiftCodeDTO extends ObjectBase {
 
-    private String cdKey;
+    private String giftCode;
     private int sid;
     private String account;
     private long roleId;

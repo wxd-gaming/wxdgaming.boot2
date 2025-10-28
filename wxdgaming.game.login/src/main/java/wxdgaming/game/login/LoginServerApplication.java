@@ -8,11 +8,10 @@ import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.util.JvmUtil;
 import wxdgaming.boot2.starter.batis.mapdb.MapDBScan;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
-import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.net.httpclient5.HttpClientScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
-import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.common.global.GlobalDataService;
+import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.logbus.LogBusService;
 
 /**
@@ -25,7 +24,6 @@ import wxdgaming.logbus.LogBusService;
 @SpringBootApplication(
         scanBasePackageClasses = {
                 CoreScan.class,
-                DataExcelScan.class,
                 HttpClientScan.class,
                 ScheduledScan.class,
                 PgsqlScan.class,

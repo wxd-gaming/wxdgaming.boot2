@@ -89,11 +89,11 @@ public class AssertUtil {
     }
 
     /** null empty */
-    public static void nullEmpty(Object source, String message) {
+    public static void nullEmpty(Object source, String format, Object... args) {
         if (source == null
             || (source instanceof String str && str.isBlank())
             || (source instanceof Collection && ((Collection<?>) source).isEmpty())) {
-            throw assertException(message);
+            throw assertException(format, args);
         }
     }
 

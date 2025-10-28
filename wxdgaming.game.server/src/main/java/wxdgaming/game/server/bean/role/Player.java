@@ -50,8 +50,8 @@ public class Player extends MapNpc {
     private int lastDirection;
     private int sex;
     private int job;
-    private Int2IntOpenHashMap useCDKeyTotalMap = new Int2IntOpenHashMap();
-    private HashMap<Integer, CountMap> useCDKeyCountMap = new HashMap<>();
+    private Int2IntOpenHashMap useGiftCodeTotalMap = new Int2IntOpenHashMap();
+    private HashMap<Integer, CountMap> useGiftCodeCountMap = new HashMap<>();
     private OnlineInfo onlineInfo = new OnlineInfo();
     private VipInfo vipInfo = new VipInfo();
     private BagPack bagPack = new BagPack();

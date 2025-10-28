@@ -124,4 +124,15 @@ public class NumberUtil {
         }
     }
 
+    /** 检查 */
+    public static boolean check(int min, int mid, int max) {
+        return min <= mid && mid <= max;
+    }
+
+
+    /** 检查 */
+    public static boolean check(long min, long mid, long max) {
+        return min <= mid && mid <= max;
+    }
+
 }

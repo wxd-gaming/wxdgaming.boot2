@@ -14,8 +14,8 @@ import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.game.login.bean.ServerInfoDTO;
 import wxdgaming.game.login.bean.ServerMailDTO;
-import wxdgaming.game.login.bean.UseCDKeyDTO;
-import wxdgaming.game.login.cdkey.CDKeyService;
+import wxdgaming.game.login.bean.UseGiftCodeDTO;
+import wxdgaming.game.login.giftcode.GiftCodeService;
 import wxdgaming.game.login.entity.ServerInfoEntity;
 import wxdgaming.game.login.entity.UserData;
 import wxdgaming.game.login.inner.InnerService;
@@ -36,20 +36,20 @@ import java.util.List;
 public class InnerGameController extends HoldApplicationContext {
 
     final InnerService innerService;
-    final CDKeyService cdKeyService;
+    final GiftCodeService giftCodeService;
     final LoginService loginService;
     final ServerMailService serverMailService;
 
-    public InnerGameController(InnerService innerService, CDKeyService cdKeyService, LoginService loginService, ServerMailService serverMailService) {
+    public InnerGameController(InnerService innerService, GiftCodeService giftCodeService, LoginService loginService, ServerMailService serverMailService) {
         this.innerService = innerService;
-        this.cdKeyService = cdKeyService;
+        this.giftCodeService = giftCodeService;
         this.loginService = loginService;
         this.serverMailService = serverMailService;
     }
 
-    @RequestMapping("/cdkey/use")
-    public RunResult use(CacheHttpServletRequest request, @RequestBody UseCDKeyDTO dto) {
-        return cdKeyService.use(dto.getCdKey(), dto.getSid(), dto.getAccount(), dto.getRoleId(), dto.getRoleName());
+    @RequestMapping("/giftCode/use")
+    public RunResult use(CacheHttpServletRequest request, @RequestBody UseGiftCodeDTO dto) {
+        return giftCodeService.use(dto.getGiftCode(), dto.getSid(), dto.getAccount(), dto.getRoleId(), dto.getRoleName());
     }
 
     @RequestMapping("/serverMail/query")

@@ -1,6 +1,5 @@
-package wxdgaming.game.server.script.cdkey;
+package wxdgaming.game.server.script.giftcode;
 
-import com.alibaba.fastjson.TypeReference;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -13,9 +12,10 @@ import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.validation.Validation;
 import wxdgaming.game.authority.SignUtil;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
-import wxdgaming.game.login.bean.UseCDKeyDTO;
-import wxdgaming.game.message.cdkey.ResUseCdKey;
+import wxdgaming.game.login.bean.UseGiftCodeDTO;
+import wxdgaming.game.message.giftcode.ResUseGiftCode;
 import wxdgaming.game.server.GameServerProperties;
+import wxdgaming.game.server.bean.GameCfgFunction;
 import wxdgaming.game.server.bean.count.CountData;
 import wxdgaming.game.server.bean.count.CountMap;
 import wxdgaming.game.server.bean.count.CountValidationType;
@@ -28,16 +28,14 @@ import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.module.inner.ConnectLoginService;
 import wxdgaming.game.server.script.bag.BagService;
-import wxdgaming.game.server.script.cdkey.bean.CDKeyReward;
 import wxdgaming.game.server.script.tips.TipsService;
 import wxdgaming.game.server.script.validation.ValidationService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 /**
- * cdkey
+ * GiftCode
  *
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-04-29 11:14
@@ -45,7 +43,7 @@ import java.util.List;
 @Slf4j
 @Getter
 @Service
-public class CDKeyService implements InitPrint {
+public class GiftCodeService implements InitPrint {
 
     final ConnectLoginProperties connectLoginProperties;
     final GameServerProperties gameServerProperties;
@@ -55,10 +53,10 @@ public class CDKeyService implements InitPrint {
     final ConnectLoginService connectLoginService;
     final ValidationService validationService;
 
-    public CDKeyService(ConnectLoginProperties connectLoginProperties, GameServerProperties gameServerProperties,
-                        DataCenterService dataCenterService,
-                        TipsService tipsService, BagService bagService,
-                        ConnectLoginService connectLoginService, ValidationService validationService) {
+    public GiftCodeService(ConnectLoginProperties connectLoginProperties, GameServerProperties gameServerProperties,
+                           DataCenterService dataCenterService,
+                           TipsService tipsService, BagService bagService,
+                           ConnectLoginService connectLoginService, ValidationService validationService) {
         this.dataCenterService = dataCenterService;
         this.tipsService = tipsService;
         this.bagService = bagService;
@@ -68,20 +66,20 @@ public class CDKeyService implements InitPrint {
         this.validationService = validationService;
     }
 
-    public void use(Player player, String cdKey) {
+    public void use(Player player, String giftCode) {
 
         String url = connectLoginProperties.getUrl();
-        url = url + "/inner/game/cdkey/use";
+        url = url + "/inner/game/giftCode/use";
 
-        UseCDKeyDTO cdKeyDTO = new UseCDKeyDTO();
-        cdKeyDTO.setCdKey(cdKey);
-        cdKeyDTO.setSid(gameServerProperties.getSid());
-        cdKeyDTO.setRoleId(player.getUid());
-        cdKeyDTO.setRoleName(player.getName());
-        cdKeyDTO.setAccount(player.getAccount());
+        UseGiftCodeDTO useGiftCodeDTO = new UseGiftCodeDTO();
+        useGiftCodeDTO.setGiftCode(giftCode);
+        useGiftCodeDTO.setSid(gameServerProperties.getSid());
+        useGiftCodeDTO.setRoleId(player.getUid());
+        useGiftCodeDTO.setRoleName(player.getName());
+        useGiftCodeDTO.setAccount(player.getAccount());
 
-        String sign = SignUtil.signByJsonKey(cdKeyDTO, connectLoginProperties.getJwtKey());
-        HttpResponse execute = HttpRequestPost.ofJson(url, cdKeyDTO.toJSONString())
+        String sign = SignUtil.signByJsonKey(useGiftCodeDTO, connectLoginProperties.getJwtKey());
+        HttpResponse execute = HttpRequestPost.ofJson(url, useGiftCodeDTO.toJSONString())
                 .addHeader(HttpHeaderNames.AUTHORIZATION.toString(), sign)
                 .execute();
         RunResult runResult = execute.bodyRunResult();
@@ -96,8 +94,8 @@ public class CDKeyService implements InitPrint {
             tipsService.tips(player, "内部异常");
             return;
         }
-        HashMap<Integer, CountMap> useCDKeyCountMap = player.getUseCDKeyCountMap();
-        CountMap countMap = useCDKeyCountMap.computeIfAbsent(cid, k -> new CountMap());
+        HashMap<Integer, CountMap> useGiftCodeCountMap = player.getUseGiftCodeCountMap();
+        CountMap countMap = useGiftCodeCountMap.computeIfAbsent(cid, k -> new CountMap());
 
         String validateConfig = runResult.getString("validate");
         if (StringUtils.isNotBlank(validateConfig)) {
@@ -106,32 +104,21 @@ public class CDKeyService implements InitPrint {
             boolean validate = validationService.validateAll(countMap, apply, (handler, validation) -> {
                 String tips = handler.tips();
                 tipsService.tips(player, tips);
-                log.info("条件验证不通过：{}, 使用礼包码：{} {} -> {}", player, cdKey, validation, countMap);
+                log.info("条件验证不通过：{}, 使用礼包码：{} {} -> {}", player, giftCode, validation, countMap);
             });
             if (!validate) {
                 return;
             }
         }
-        player.getUseCDKeyTotalMap().addTo(cid, 1);
+        player.getUseGiftCodeTotalMap().addTo(cid, 1);
         for (CountData countData : countMap.getValidationMap().values()) {
             countData.update(1);
         }
-        ArrayList<CDKeyReward> rewardCfgList = runResult.getObject("rewards", new TypeReference<ArrayList<CDKeyReward>>() {});
 
-        List<ItemCfg> rewards = new ArrayList<>();
-        for (CDKeyReward reward : rewardCfgList) {
-            ItemCfg itemCfg = ItemCfg.builder()
-                    .cfgId(reward.getCfgId())
-                    .num(reward.getNum())
-                    .bind(reward.isBind())
-                    .expirationTime(reward.getExpirationTime())
-                    .build();
-            rewards.add(itemCfg);
-        }
-
+        List<ItemCfg> rewards = GameCfgFunction.ItemCfgFunction.apply(runResult.getString("rewards"));
         ReasonDTO reasonDTO = ReasonDTO.of(
-                ReasonConst.USE_CDKEY,
-                "cdkey=", cdKey, "cid=%d(%s)".formatted(cid, runResult.getString("comment"))
+                ReasonConst.USE_GiftCode,
+                "giftCode=", giftCode, "cid=%d(%s)".formatted(cid, runResult.getString("comment"))
         );
 
         List<Item> itemList = bagService.newItems(rewards);
@@ -145,9 +132,9 @@ public class CDKeyService implements InitPrint {
 
         bagService.gainItems(player, rewardItemArgs);
 
-        ResUseCdKey resUseCdKey = new ResUseCdKey();
-        resUseCdKey.setCdKey(cdKey);
-        player.write(resUseCdKey);
+        ResUseGiftCode resUseGiftCode = new ResUseGiftCode();
+        resUseGiftCode.setGiftCode(giftCode);
+        player.write(resUseGiftCode);
     }
 
 }
