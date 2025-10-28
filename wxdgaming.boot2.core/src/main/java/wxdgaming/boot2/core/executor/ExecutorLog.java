@@ -14,8 +14,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ExecutorLog {
 
-    /** debug模式下不显示日志，比如心跳太多 */
-    boolean showLog() default true;
+    /** 可以选择关闭或者显示 */
+    boolean off() default false;
 
     /** 执行日志记录时间 */
     long logTime() default 33;

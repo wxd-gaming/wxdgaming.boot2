@@ -42,7 +42,7 @@ public final class ExecutorMonitor extends Thread {
         if (StringUtils.isNotBlank(releasePrint))
             releasePrint = "\n" + releasePrint;
         long diffMs = TimeUnit.NANOSECONDS.toMillis(diffNs);
-        if (executorJob.getExecutorLog().showLog() && diffMs > executorJob.getExecutorLog().logTime()) {
+        if (!executorJob.getExecutorLog().off() && diffMs > executorJob.getExecutorLog().logTime()) {
             if (diffMs > executorJob.getExecutorLog().warningTime()) {
                 log.error(
                         "线程: {}, 执行器: {}, 执行耗时: {}ms, {}",
