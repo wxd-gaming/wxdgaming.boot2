@@ -77,6 +77,10 @@ public class HoldMap {
         return (T) hold.put(key, value);
     }
 
+    public boolean containsKey(String key) {
+        return hold.containsKey(key);
+    }
+
     @SuppressWarnings("unchecked")
     public <T> T computeIfAbsent(String key, Function<String, T> function) {
         return (T) hold.computeIfAbsent(key, function);

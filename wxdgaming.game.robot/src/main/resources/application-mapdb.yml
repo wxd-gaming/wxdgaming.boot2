@@ -1,0 +1,3 @@
+db:
+  mapdb:
+    path: data-base/robot-account.dat

@@ -70,10 +70,19 @@ public class BagService extends HoldApplicationContext implements InitPrint {
         this.useItemScriptProvider.init(getApplicationContextProvider());
     }
 
+    public void onCreateRoleInitBag(Player player) {
+
+        BagPack bagPack = player.getBagPack();
+        bagPack.getBagMap().computeIfAbsent(BagType.Bag, k -> new ItemBag(100).resetGrid());/*背包*/
+        bagPack.getBagMap().computeIfAbsent(BagType.Store, k -> new ItemBag(100).resetGrid());/*仓库*/
+    }
+
     /** 创建角色之后创建背包 */
     @Order(-10000)
     @EventListener
     public void onCreateRoleInitBag(EventConst.CreatePlayerEvent event) {
+        Player player = event.player();
+        onCreateRoleInitBag(player);
     }
 
     /** 登录的时候检查背包问题 */
@@ -81,9 +90,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
     @EventListener
     public void onLoginBefore(EventConst.LoginBeforePlayerEvent event) {
         Player player = event.player();
-        BagPack bagPack = player.getBagPack();
-        bagPack.getBagMap().computeIfAbsent(BagType.Bag, k -> new ItemBag(100).resetGrid());/*背包*/
-        bagPack.getBagMap().computeIfAbsent(BagType.Store, k -> new ItemBag(100).resetGrid());/*仓库*/
+        onCreateRoleInitBag(player);
     }
 
     /** 登录的时候推送背包 */
@@ -118,6 +125,7 @@ public class BagService extends HoldApplicationContext implements InitPrint {
         List<Item> items = new ArrayList<>();
         for (ItemCfg itemCfg : itemCfgList) {
             QItem qItem = dataRepository.dataTable(QItemTable.class, itemCfg.getCfgId());
+            AssertUtil.isNull(qItem, "道具配置id=[%s]异常", itemCfg.getCfgId());
             int type = qItem.getItemType();
             int subtype = qItem.getItemSubType();
             GainScript gainScript = gainScriptProvider.getScript(type, subtype);

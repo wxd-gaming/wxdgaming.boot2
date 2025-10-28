@@ -6,6 +6,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ import wxdgaming.boot2.core.event.StartEvent;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.RandomUtils;
+import wxdgaming.boot2.starter.batis.mapdb.HoldMap;
+import wxdgaming.boot2.starter.batis.mapdb.MapDBDataHelper;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.SocketClient;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
@@ -31,6 +34,8 @@ import wxdgaming.game.message.task.TaskBean;
 import wxdgaming.game.message.task.TaskType;
 import wxdgaming.game.robot.bean.Robot;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -49,18 +54,36 @@ public class RobotMainService {
 
     final ConnectLoginProperties connectLoginProperties;
     final SocketClient socketClient;
+    final MapDBDataHelper mapDBDataHelper;
     final ConcurrentHashMap<String, Robot> robotMap = new ConcurrentHashMap<>();
 
-    public RobotMainService(ConnectLoginProperties connectLoginProperties, SocketClient socketClient) {
+    public RobotMainService(ConnectLoginProperties connectLoginProperties, SocketClient socketClient, MapDBDataHelper mapDBDataHelper) {
         this.connectLoginProperties = connectLoginProperties;
         this.socketClient = socketClient;
+        this.mapDBDataHelper = mapDBDataHelper;
     }
 
     @EventListener
     public void start(StartEvent event) {
-        for (int i = 0; i < 1; i++) {
-            String account = "r19" + (i + 1);
-            robotMap.put(account, new Robot().setAccount(account).setName(account));
+        HoldMap accountDayMap = this.mapDBDataHelper.hMap("account");
+        String dayString = MyClock.nowString();
+        if (!accountDayMap.containsKey(dayString)) {
+            List<String> al = new ArrayList<>();
+            for (int i = 0; i < 50; i++) {
+                String account = dayString + "-" + RandomStringUtils.secure().next(16, false, true);
+                al.add(account);
+            }
+            accountDayMap.put(dayString, al);
+        }
+        List<String> allList = new ArrayList<>();
+        Collection<String> keys = accountDayMap.keys();
+        for (String key : keys) {
+            allList.addAll(accountDayMap.get(key));
+        }
+        for (int i = 0; i < 30; i++) {
+            if (allList.isEmpty()) break;
+            String account = RandomUtils.randomRemove(allList);
+            robotMap.put(account, new Robot().setAccount(account));
         }
     }
 

@@ -75,8 +75,8 @@
             // language=HTML
             let tr = `
                 <tr ondblclick="alertShow(${index});">
-                    <td>${number}</td>
-                    <td>
+                    <td style="width: 40px;">${number}</td>
+                    <td style="width: 220px;">
                         <a href="#" onclick="gainCode(${row.uid}, 100)">生成100</a>
                         <a href="#" onclick="gainCode(${row.uid}, 1000)">生成1000</a>
                         <a href="#" onclick="queryCode(${row.uid})">获取</a>
@@ -287,8 +287,8 @@
         <table>
             <thead>
             <tr>
-                <th>编号</th>
-                <th>操作</th>
+                <th style="width: 40px;">编号</th>
+                <th style="width: 220px;">操作</th>
                 <th>ID</th>
                 <th>通用码</th>
                 <th>限制条件</th>

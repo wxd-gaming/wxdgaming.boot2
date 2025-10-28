@@ -6,11 +6,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.event.StartEvent;
-import wxdgaming.boot2.starter.batis.DataTable;
+import wxdgaming.boot2.starter.batis.DbDataTable;
 import wxdgaming.boot2.starter.batis.EntityIntegerUID;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
-import wxdgaming.game.login.entity.GiftCodeEntity;
 import wxdgaming.game.login.entity.NoticeEntity;
 
 import java.util.Collection;
@@ -26,26 +25,26 @@ import java.util.Collection;
 @Service
 public class NoticeService extends HoldApplicationContext {
 
-    final DataTable<NoticeEntity> dataTable;
+    final DbDataTable<NoticeEntity> dbDataTable;
     final SqlDataHelper sqlDataHelper;
 
     public NoticeService(PgsqlDataHelper pgsqlDataHelper) {
-        this.dataTable = new DataTable<>(NoticeEntity.class, pgsqlDataHelper, EntityIntegerUID::getUid);
+        this.dbDataTable = new DbDataTable<>(NoticeEntity.class, pgsqlDataHelper, EntityIntegerUID::getUid);
         this.sqlDataHelper = pgsqlDataHelper;
     }
 
     @EventListener
     public void startEvent(StartEvent startEvent) {
-        dataTable.loadAll();
+        dbDataTable.loadAll();
     }
 
     public void del(int uid) {
         sqlDataHelper.deleteByKey(NoticeEntity.class, uid);
-        dataTable.loadAll();
+        dbDataTable.loadAll();
     }
 
     public Collection<NoticeEntity> list() {
-        return dataTable.getList();
+        return dbDataTable.getList();
     }
 
 }

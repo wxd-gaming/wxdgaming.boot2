@@ -9,8 +9,6 @@ import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.NumberUtil;
-import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
-import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
 import wxdgaming.game.login.entity.NoticeEntity;
 import wxdgaming.game.login.notice.NoticeService;
 
@@ -29,11 +27,9 @@ import java.util.List;
 public class NoticeController implements InitPrint {
 
     final NoticeService noticeService;
-    final SqlDataHelper sqlDataHelper;
 
-    public NoticeController(NoticeService noticeService, PgsqlDataHelper pgsqlDataHelper) {
+    public NoticeController(NoticeService noticeService) {
         this.noticeService = noticeService;
-        this.sqlDataHelper = pgsqlDataHelper;
     }
 
     @RequestMapping(value = "/list")

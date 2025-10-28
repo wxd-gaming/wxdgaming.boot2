@@ -12,14 +12,14 @@ import java.util.function.Function;
  * @version 2025-10-28 09:53
  **/
 @Getter
-public class DataTable<T extends Entity> {
+public class DbDataTable<T extends Entity> {
 
     final Class<T> cls;
     final DataHelper dataHelper;
     final Function<T, Object>[] keyFunctions;
-    Map<Object, T> map = Map.of();
+    Map<Object, T> map = null;
 
-    @SafeVarargs public DataTable(Class<T> cls, DataHelper dataHelper, Function<T, Object>... keyFunctions) {
+    @SafeVarargs public DbDataTable(Class<T> cls, DataHelper dataHelper, Function<T, Object>... keyFunctions) {
         this.cls = cls;
         this.dataHelper = dataHelper;
         this.keyFunctions = keyFunctions;
@@ -40,11 +40,23 @@ public class DataTable<T extends Entity> {
     }
 
     public Collection<T> getList() {
+        if (map == null) loadAll();
         return map.values();
     }
 
     public T get(Object k) {
+        if (map == null) loadAll();
         return map.get(k);
+    }
+
+    public void del(Object key) {
+        this.dataHelper.deleteByKey(cls, key);
+        loadAll();
+    }
+
+    public void save(T t) {
+        this.dataHelper.save(t);
+        loadAll();
     }
 
 }

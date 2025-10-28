@@ -2,6 +2,7 @@ boot:
   debug: true
   sid: 1
 
+
 core:
   executor:
     default:
@@ -65,4 +66,8 @@ data:
 
 login:
   url: "http://127.0.0.1:19800"
-  token: "123456"
+  jwtKey: "123456"
+
+spring:
+  profiles:
+    active: [ mapdb ]

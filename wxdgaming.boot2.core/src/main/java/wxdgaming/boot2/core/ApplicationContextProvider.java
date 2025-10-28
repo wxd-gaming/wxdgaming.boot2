@@ -192,6 +192,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
                 eventClass.getName(),
                 l -> withMethodAssignableFrom(eventClass)
                         .filter(method -> method.hasAnn(EventListener.class))
+                        .sorted()
                         .toList()
         );
     }

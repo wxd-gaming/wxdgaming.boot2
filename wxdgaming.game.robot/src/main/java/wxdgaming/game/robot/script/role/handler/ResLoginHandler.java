@@ -1,6 +1,7 @@
 package wxdgaming.game.robot.script.role.handler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
@@ -35,12 +36,13 @@ public class ResLoginHandler {
             log.info("没有角色--开始创建角色");
 
             ReqCreateRole reqCreateRole = new ReqCreateRole();
-            reqCreateRole.setName(robot.getName());
+            reqCreateRole.setName(RandomStringUtils.secure().next(12, true, true));
             reqCreateRole.setSex(1);
             reqCreateRole.setJob(1);
             socketSession.write(reqCreateRole);
         } else {
             RoleBean first = roles.getFirst();
+            robot.setName(first.getName());
             robot.setRid(first.getRid());
             robot.setLevel(first.getLevel());
             robot.setExp(first.getExp());

@@ -14,9 +14,7 @@ import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.core.util.NumberUtil;
 import wxdgaming.boot2.starter.batis.EntityIntegerUID;
-import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.WebSqlQueryCondition;
-import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
 import wxdgaming.game.login.entity.NoticeEntity;
 import wxdgaming.game.login.notice.NoticeService;
 import wxdgaming.game.util.Util;
@@ -36,11 +34,9 @@ import java.util.List;
 public class AdminNoticeController implements InitPrint {
 
     final NoticeService noticeService;
-    final SqlDataHelper sqlDataHelper;
 
-    public AdminNoticeController(NoticeService noticeService, PgsqlDataHelper pgsqlDataHelper) {
+    public AdminNoticeController(NoticeService noticeService) {
         this.noticeService = noticeService;
-        this.sqlDataHelper = pgsqlDataHelper;
     }
 
     @RequestMapping(value = "/edit")
@@ -54,8 +50,8 @@ public class AdminNoticeController implements InitPrint {
         if (StringUtils.isNotBlank(uidStr)) {
             uid = NumberUtil.parseInt(uidStr, 0);
         }
-        int maxUid = noticeService.getDataTable().getList().stream().mapToInt(EntityIntegerUID::getUid).max().orElse(0);
-        NoticeEntity noticeEntity = noticeService.getDataTable().get(uid);
+        int maxUid = noticeService.getDbDataTable().getList().stream().mapToInt(EntityIntegerUID::getUid).max().orElse(0);
+        NoticeEntity noticeEntity = noticeService.getDbDataTable().get(uid);
         if (noticeEntity == null) {
             noticeEntity = new NoticeEntity();
             noticeEntity.setUid(maxUid + 1);
@@ -75,8 +71,8 @@ public class AdminNoticeController implements InitPrint {
         } else {
             noticeEntity.setEndTime(Util.parseWebDate(endTime));
         }
-        this.sqlDataHelper.save(noticeEntity);
-        this.noticeService.getDataTable().loadAll();
+        this.noticeService.getSqlDataHelper().save(noticeEntity);
+        this.noticeService.getDbDataTable().loadAll();
         return RunResult.ok().msg("成功");
     }
 
@@ -95,7 +91,7 @@ public class AdminNoticeController implements InitPrint {
 
         int skip = (pageIndex - 1) * pageSize;
 
-        Collection<NoticeEntity> entities = noticeService.getDataTable().getList();
+        Collection<NoticeEntity> entities = noticeService.getDbDataTable().getList();
         List<JSONObject> list = entities.stream()
                 .distinct()
                 .skip(skip)

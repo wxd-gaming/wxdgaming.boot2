@@ -82,7 +82,6 @@ public class InnerGameController extends HoldApplicationContext {
 
     @RequestMapping(value = "/sync")
     public RunResult registerGame(CacheHttpServletRequest request, @RequestBody ServerInfoDTO serverInfoDTO) {
-        ThreadStopWatch.start("sync");
         int sid = serverInfoDTO.getSid();
         int onlineSize = serverInfoDTO.getOnlineSize();
         ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(sid);
@@ -95,10 +94,7 @@ public class InnerGameController extends HoldApplicationContext {
         entity.setHttpPort(serverInfoDTO.getHttpPort());
         entity.setOnlineSize(onlineSize);
         entity.setLastSyncTime(MyClock.millis());
-        ThreadStopWatch.stop();
-        ThreadStopWatch.start("数据库");
         innerService.getSqlDataHelper().getDataBatch().save(entity);
-        ThreadStopWatch.stop();
         return RunResult.ok();
     }
 

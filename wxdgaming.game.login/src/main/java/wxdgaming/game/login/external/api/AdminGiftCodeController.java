@@ -55,9 +55,9 @@ public class AdminGiftCodeController implements InitPrint {
         if (StringUtils.isNotBlank(uidStr)) {
             uid = NumberUtil.parseInt(uidStr, 0);
         }
-        Collection<GiftCodeEntity> list = giftCodeService.getDataTable().getList();
+        Collection<GiftCodeEntity> list = giftCodeService.getDbDataTable().getList();
         int maxUid = list.stream().mapToInt(EntityIntegerUID::getUid).max().orElse(0);
-        GiftCodeEntity giftCodeEntity = giftCodeService.getDataTable().get(uid);
+        GiftCodeEntity giftCodeEntity = giftCodeService.getDbDataTable().get(uid);
         if (giftCodeEntity == null) {
             giftCodeEntity = new GiftCodeEntity();
             giftCodeEntity.setUid(maxUid + 1);
@@ -88,7 +88,7 @@ public class AdminGiftCodeController implements InitPrint {
         }
 
         this.giftCodeService.getSqlDataHelper().save(giftCodeEntity);
-        this.giftCodeService.getDataTable().loadAll();
+        this.giftCodeService.getDbDataTable().loadAll();
         return RunResult.ok().msg("成功");
     }
 
@@ -133,7 +133,7 @@ public class AdminGiftCodeController implements InitPrint {
 
         int skip = (pageIndex - 1) * pageSize;
 
-        Collection<GiftCodeEntity> giftCodeEntities = giftCodeService.getDataTable().getList();
+        Collection<GiftCodeEntity> giftCodeEntities = giftCodeService.getDbDataTable().getList();
         List<JSONObject> list = giftCodeEntities.stream()
                 .distinct()
                 .skip(skip)

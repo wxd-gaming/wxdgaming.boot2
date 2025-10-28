@@ -10,7 +10,7 @@ import wxdgaming.boot2.core.event.StartEvent;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.util.GiftCodeUtil;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
-import wxdgaming.boot2.starter.batis.DataTable;
+import wxdgaming.boot2.starter.batis.DbDataTable;
 import wxdgaming.boot2.starter.batis.mapdb.HoldMap;
 import wxdgaming.boot2.starter.batis.mapdb.MapDBDataHelper;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
@@ -36,12 +36,12 @@ public class GiftCodeService implements InitPrint {
 
     final SqlDataHelper sqlDataHelper;
     final MapDBDataHelper mapDBDataHelper;
-    final DataTable<GiftCodeEntity> dataTable;
+    final DbDataTable<GiftCodeEntity> dbDataTable;
 
     public GiftCodeService(PgsqlDataHelper sqlDataHelper, MapDBDataHelper mapDBDataHelper) {
         this.sqlDataHelper = sqlDataHelper;
         this.mapDBDataHelper = mapDBDataHelper;
-        this.dataTable = new DataTable<>(GiftCodeEntity.class, sqlDataHelper,
+        this.dbDataTable = new DbDataTable<>(GiftCodeEntity.class, sqlDataHelper,
                 GiftCodeEntity::getUid,
                 entity -> {
                     if (StringUtils.isNotBlank(entity.getCode()))
@@ -53,21 +53,21 @@ public class GiftCodeService implements InitPrint {
 
     @EventListener
     public void startEvent(StartEvent event) {
-        dataTable.loadAll();
+        dbDataTable.loadAll();
     }
 
     public void del(int uid) {
         final String lockKey = key_prefix + uid;
         SingletonLockUtil.lock(lockKey);
         try {
-            GiftCodeEntity giftCodeEntity = dataTable.get(uid);
+            GiftCodeEntity giftCodeEntity = dbDataTable.get(uid);
             if (giftCodeEntity == null) {
                 return;
             }
             HoldMap giftCodeMap = this.mapDBDataHelper.bMap(lockKey);
             giftCodeMap.clear();
             sqlDataHelper.deleteByKey(GiftCodeEntity.class, uid);
-            dataTable.loadAll();
+            dbDataTable.loadAll();
         } finally {
             SingletonLockUtil.unlock(lockKey);
         }
@@ -77,7 +77,7 @@ public class GiftCodeService implements InitPrint {
         final String lockKey = key_prefix + uid;
         SingletonLockUtil.lock(lockKey);
         try {
-            GiftCodeEntity giftCodeEntity = dataTable.get(uid);
+            GiftCodeEntity giftCodeEntity = dbDataTable.get(uid);
             if (giftCodeEntity == null) {
                 return RunResult.fail("礼包码不存在");
             }
@@ -101,10 +101,10 @@ public class GiftCodeService implements InitPrint {
         final String lockKey = key_prefix + giftCodeId;
         SingletonLockUtil.lock(lockKey);
         try {
-            GiftCodeEntity giftCodeEntity = dataTable.get(key);
+            GiftCodeEntity giftCodeEntity = dbDataTable.get(key);
             if (giftCodeEntity == null) {
                 /*通用礼包码不存在，查找特定礼包码*/
-                giftCodeEntity = dataTable.get(giftCodeId);
+                giftCodeEntity = dbDataTable.get(giftCodeId);
             }
             if (giftCodeEntity == null) {
                 return RunResult.fail("礼包码不存在");
@@ -139,7 +139,7 @@ public class GiftCodeService implements InitPrint {
         final String lockKey = key_prefix + uid;
         SingletonLockUtil.lock(lockKey);
         try {
-            GiftCodeEntity giftCodeEntity = dataTable.get(uid);
+            GiftCodeEntity giftCodeEntity = dbDataTable.get(uid);
             if (giftCodeEntity == null) {
                 return RunResult.fail("礼包码不存在");
             }

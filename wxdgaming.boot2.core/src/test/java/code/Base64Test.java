@@ -33,4 +33,16 @@ public class Base64Test {
         System.out.println(Md5Util.md5DigestEncode("xxetgyy2398"));
     }
 
+    @Test
+    public void sum() {
+        int i = Integer.MAX_VALUE + Integer.MAX_VALUE;
+        System.out.println(i);
+    }
+
+    @Test
+    public void sum2() {
+        int i = Math.addExact(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        System.out.println(i);
+    }
+
 }
