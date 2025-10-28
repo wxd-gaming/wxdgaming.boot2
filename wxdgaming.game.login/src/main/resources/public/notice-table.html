@@ -70,10 +70,11 @@
                 .replace(/\t/g, "\\t");
         }
 
-        function createRow(index, row) {
+        function createRow(number, row, index) {
             // language=HTML
             return `
                 <tr ondblclick="alertShow(${index})">
+                    <td>${number}</td>
                     <td>
                         <a href="#" onclick="editNotice(${row.uid},'${row.title}','${row.content}','${row.startTime}','${row.endTime}')">编辑</a>
                         <a href="#" onclick="delNotice(${row.uid})">删除</a>
@@ -89,8 +90,7 @@
         function alertShow(index) {
             let content = pageView.items[index];
             content = formatJsonWithNewlines(content);
-            console.log(typeof content, content);
-            new wxd.message.Alert(`<pre>${content}</pre>`, title).show();
+            new wxd.message.Alert(`<pre>${content}</pre>`, "详情").show();
         }
 
         $(() => {
@@ -246,6 +246,7 @@
         <table style="min-width: 1400px;">
             <thead>
             <tr>
+                <th>编号</th>
                 <th>操作</th>
                 <th>UID</th>
                 <th>时间</th>

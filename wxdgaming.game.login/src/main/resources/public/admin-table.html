@@ -66,15 +66,15 @@
                 .replace(/\t/g, "\\t");
         }
 
-        function createRow(index, row) {
+        function createRow(number, row, index) {
             // language=HTML
             let tr = `
                 <tr>
+                    <td>${number}</td>
                     <td>
                         <a href="#">删除</a>
                         <a href="#" onclick="editUser('${row.userName}','${row.admin}','${row.phone}');">修改</a>
                     </td>
-                    <td>${index}</td>
                     <td>${row.userName}</td>
                     <td>${row.admin}</td>
                     <td>${row.phone}</td>
@@ -223,8 +223,8 @@
         <table>
             <thead>
             <tr>
+                <th>编号</th>
                 <th>操作</th>
-                <th>序号</th>
                 <th>用户名</th>
                 <th>管理员</th>
                 <th>电话</th>

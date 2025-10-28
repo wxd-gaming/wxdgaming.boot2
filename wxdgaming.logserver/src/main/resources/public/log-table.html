@@ -86,7 +86,7 @@
                 .replace(/\t/g, "\\t");
         }
 
-        function createRow(index, row) {
+        function createRow(number, row, index) {
             let tr = `<tr ondblclick="alertShow2(${index})">`;
             for (const key in pageView.columns) {
                 let column = pageView.columns[key];
@@ -102,13 +102,6 @@
             }
             tr += `</tr>`;
             return tr;
-        }
-
-        function alertShow(self, title) {
-            let content = $(self).text();
-            content = formatJsonWithNewlines(content);
-            console.log(typeof content, content);
-            new wxd.message.Alert(`<pre>${content}</pre>`, title).show();
         }
 
         function alertShow2(index) {

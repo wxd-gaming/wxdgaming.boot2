@@ -70,10 +70,11 @@
                 .replace(/\t/g, "\\t");
         }
 
-        function createRow(index, row) {
+        function createRow(number, row, index) {
             // language=HTML
             let tr = `
                 <tr>
+                    <td>${number}</td>
                     <td style="width: 180px;">
                         <a href="#" onclick="banLogin('${row.account}','${row.banExpireTime}')">禁止/解封</a>
                         <a href="#" onclick="whiteLogin('${row.account}')">白名单</a>
@@ -260,6 +261,7 @@
         <table style="min-width: 1400px;">
             <thead>
             <tr>
+                <th>编号</th>
                 <th style="width: 180px;">操作</th>
                 <th>账号</th>
                 <th style="width: 60px;">GM等级</th>

@@ -64,7 +64,7 @@
             }).async(false).send();
         }
 
-        function createRow(index, row) {
+        function createRow(number, row, index) {
             // language=HTML
             let tr = `
                 <tr>
@@ -74,7 +74,7 @@
                         <a href="#" onclick="ban('/gm/001/002/003/clearRank', '${row.id}');return false;" title="清理排行榜">排行榜</a>
                         <a href="#" onclick="ban('/gm/001/002/003/kickout', '${row.id}');return false;" title="踢出下线并且清理内存">踢人</a>
                     </td>
-                    <td tips="true" style="width: 40px;">${index}</td>
+                    <td tips="true" style="width: 40px;">${number}</td>
                     <td tips="true" style="width: 80px;">${row.banLogin} / ${row.banChat}</td>
                     <td tips="true" style="width: 80px;">${row.online} / ${row.share}</td>
                     <td style="width: 100px;" title="<label>${row.platform}</label><br><label>${row.subPlatform}</label><br>主服：<label>${row.mainServer}</label>">

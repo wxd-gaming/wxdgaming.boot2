@@ -846,7 +846,7 @@ const wxd = {
                 let boxElement = document.createElement("div");
                 // language=HTML
                 let html = `
-                    <strong class="titleBox">xxxx</strong>
+                    <strong class="titleBox">${this.title}</strong>
                     <span class="closeBox" onclick="wxd.message.alertMap[${this.uid}].alertCancel()"></span>
                     <div class="contentBox" style="max-height: ${bodyHeight}px;">
                         ${this.content}

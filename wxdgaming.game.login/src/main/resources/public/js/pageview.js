@@ -122,7 +122,7 @@ class PageView {
             if (index >= this.items.length) {
                 return;
             }
-            $("tbody:first").append(this.rowFunction(skip + index + 1, this.items[index]));
+            $("tbody:first").append(this.rowFunction(skip + index + 1, this.items[index], index));
         }, 10, limit)
         wxd.message.tips_init_bind(); //初始化
     }

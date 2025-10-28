@@ -70,17 +70,17 @@
                 .replace(/\t/g, "\\t");
         }
 
-        function createRow(index, row) {
+        function createRow(number, row, index) {
             // language=HTML
             let tr = `
                 <tr>
+                    <td>${number}</td>
                     <td style="width: 180px;">
                         <a href="#">删除</a>
                         <a href="#" onclick="kick(${row.serverId})">踢下线</a>
                         <a href="#" onclick="editServer(${row.serverId},'${row.name}','${row.openTime}','${row.maintenanceTime}','${row.showLevel}')">修改</a>
                         <a href="#" onclick="editShowName(${row.serverId},'${row.name}','${row.showName}','${row.showNameExpireTime}')">冠名</a>
                     </td>
-                    <td>${index}</td>
                     <td>${row.serverId}</td>
                     <td>${row.mainId}</td>
                     <td>${row.name}</td>
@@ -342,8 +342,8 @@
         <table style="min-width: 1400px;">
             <thead>
             <tr>
+                <th>编号</th>
                 <th style="width: 180px;">操作</th>
-                <th>序号</th>
                 <th>区分ID</th>
                 <th>主服ID</th>
                 <th>名称</th>

@@ -71,10 +71,11 @@
                 .replace(/\t/g, "\\t");
         }
 
-        function createRow(index, row) {
+        function createRow(number, row, index) {
             // language=HTML
             let tr = `
                 <tr ondblclick="alertShow(${index});">
+                    <td>${number}</td>
                     <td>
                         <a href="#" onclick="gainCode(${row.uid}, 100)">生成100</a>
                         <a href="#" onclick="gainCode(${row.uid}, 1000)">生成1000</a>
@@ -97,8 +98,8 @@
         function alertShow(index) {
             let content = pageView.items[index];
             content = formatJsonWithNewlines(content);
-            console.log(typeof content, content);
-            new wxd.message.Alert(`<pre>${content}</pre>`, title).show();
+            console.log("ddd", typeof content, content);
+            new wxd.message.Alert(`<pre>${content}</pre>`, "详情").show();
         }
 
         $(() => {
@@ -286,6 +287,7 @@
         <table>
             <thead>
             <tr>
+                <th>编号</th>
                 <th>操作</th>
                 <th>ID</th>
                 <th>通用码</th>

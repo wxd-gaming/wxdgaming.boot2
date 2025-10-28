@@ -64,10 +64,10 @@
                 .replace(/\t/g, "\\t");
         }
 
-        function createRow(index, row) {
+        function createRow(number, row, index) {
             // language=HTML
             return `
-                <tr ondblclick="alertShow(${row.id})">
+                <tr ondblclick="alertShow(${index})">
                     <td style="width: 80px;">
                         <a href="#" onclick="return false;">通过</a><a href="#" onclick="return false;">拒绝</a>
                     </td>
@@ -83,13 +83,10 @@
             `;
         }
 
-        function alertShow(self) {
-            let titleNode = self.childNodes[2];
-            let contentNode = self.childNodes[3];
-            let title = $(titleNode).text();
-            let content = $(contentNode).text();
+        function alertShow(index) {
+            let content = pageView.items[index];
             content = formatJsonWithNewlines(content);
-            new wxd.message.Alert(`<pre>${content}</pre>`, title).show();
+            new wxd.message.Alert(`<pre>${content}</pre>`, "详情").show();
         }
 
         $(() => {
