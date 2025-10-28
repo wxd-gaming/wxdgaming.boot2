@@ -41,6 +41,7 @@ public class NoticeController implements InitPrint {
         Collection<NoticeEntity> noticeEntities = this.noticeService.list();
         long millis = MyClock.millis();
         List<JSONObject> list = noticeEntities.stream()
+                .distinct()
                 .filter(entity -> NumberUtil.check(entity.getStartTime(), millis, entity.getEndTime()))
                 .map(NoticeEntity::toJSONObject)
                 .toList();
