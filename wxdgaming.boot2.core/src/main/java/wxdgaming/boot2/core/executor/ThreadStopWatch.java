@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.executor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.StopWatch;
 import wxdgaming.boot2.core.util.AssertUtil;
 
@@ -32,11 +33,8 @@ public class ThreadStopWatch {
         }
     }
 
-    public static void release() {
-        THREAD_LOCAL.remove();
-    }
-
-    public static void releasePrint() {
+    public static String release() {
+        String info = "";
         try {
             StopWatch stopWatch = THREAD_LOCAL.get();
             if (stopWatch != null) {
@@ -44,11 +42,19 @@ public class ThreadStopWatch {
                     stopWatch.stop();
                 }
                 if (stopWatch.getTaskCount() > 0) {
-                    log.info("{}", stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
+                    info = stopWatch.prettyPrint(TimeUnit.MILLISECONDS);
                 }
             }
         } finally {
             THREAD_LOCAL.remove();
+        }
+        return info;
+    }
+
+    public static void releasePrint() {
+        String release = release();
+        if (StringUtils.isNotBlank(release)) {
+            log.info("{}", release);
         }
     }
 

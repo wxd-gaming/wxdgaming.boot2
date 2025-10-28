@@ -25,7 +25,6 @@ import wxdgaming.logbus.LogBusService;
 import java.io.File;
 
 @Slf4j
-@EnableAspectJAutoProxy
 @SpringBootApplication(scanBasePackageClasses = {
         CoreScan.class,
         DataExcelScan.class,

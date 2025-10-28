@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.CacheHttpServletRequest;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.SpringUtil;
+import wxdgaming.boot2.core.executor.ThreadStopWatch;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.game.login.bean.ServerInfoDTO;
@@ -81,6 +82,7 @@ public class InnerGameController extends HoldApplicationContext {
 
     @RequestMapping(value = "/sync")
     public RunResult registerGame(CacheHttpServletRequest request, @RequestBody ServerInfoDTO serverInfoDTO) {
+        ThreadStopWatch.start("sync");
         int sid = serverInfoDTO.getSid();
         int onlineSize = serverInfoDTO.getOnlineSize();
         ServerInfoEntity entity = innerService.getInnerGameServerInfoMap().get(sid);
@@ -93,7 +95,10 @@ public class InnerGameController extends HoldApplicationContext {
         entity.setHttpPort(serverInfoDTO.getHttpPort());
         entity.setOnlineSize(onlineSize);
         entity.setLastSyncTime(MyClock.millis());
+        ThreadStopWatch.stop();
+        ThreadStopWatch.start("数据库");
         innerService.getSqlDataHelper().getDataBatch().save(entity);
+        ThreadStopWatch.stop();
         return RunResult.ok();
     }
 

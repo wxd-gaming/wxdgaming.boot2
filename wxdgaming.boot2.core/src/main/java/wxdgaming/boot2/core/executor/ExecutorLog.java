@@ -15,7 +15,7 @@ import java.lang.annotation.*;
 public @interface ExecutorLog {
 
     /** debug模式下不显示日志，比如心跳太多 */
-    boolean showLog() default false;
+    boolean showLog() default true;
 
     /** 执行日志记录时间 */
     long logTime() default 33;

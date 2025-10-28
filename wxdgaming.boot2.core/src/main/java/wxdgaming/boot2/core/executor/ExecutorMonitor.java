@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.executor;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.core.runtime.RunTimeUtil;
 
@@ -23,6 +24,7 @@ public final class ExecutorMonitor extends Thread {
     static ConcurrentHashMap<Thread, JobContent> executorJobConcurrentHashMap = new ConcurrentHashMap<>();
 
     static void put(ExecutorJob executorJob) {
+        ThreadStopWatch.nullInit(executorJob.getStack());
         executorJobConcurrentHashMap.put(Thread.currentThread(), new JobContent(executorJob));
     }
 
@@ -36,12 +38,22 @@ public final class ExecutorMonitor extends Thread {
         if (!executorJob.isIgnoreRunTimeRecord()) {
             RunTimeUtil.record(stack, jobContent.startTime);
         }
+        String releasePrint = ThreadStopWatch.release();
+        if (StringUtils.isNotBlank(releasePrint))
+            releasePrint = "\n" + releasePrint;
         long diffMs = TimeUnit.NANOSECONDS.toMillis(diffNs);
-        if (diffMs > 150) {
-            log.warn(
-                    "线程: {}, 执行器: {}, 执行耗时: {}ms",
-                    thread.getName(), stack, diffMs
-            );
+        if (executorJob.getExecutorLog().showLog() && diffMs > executorJob.getExecutorLog().logTime()) {
+            if (diffMs > executorJob.getExecutorLog().warningTime()) {
+                log.error(
+                        "线程: {}, 执行器: {}, 执行耗时: {}ms, {}",
+                        thread.getName(), stack, diffMs, releasePrint
+                );
+            } else {
+                log.info(
+                        "线程: {}, 执行器: {}, 执行耗时: {}ms, {}",
+                        thread.getName(), stack, diffMs, releasePrint
+                );
+            }
         }
     }
 

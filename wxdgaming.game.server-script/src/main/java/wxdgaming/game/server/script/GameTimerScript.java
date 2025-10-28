@@ -4,9 +4,9 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.executor.ExecutorLog;
 import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
@@ -52,6 +52,7 @@ public class GameTimerScript extends HoldApplicationContext {
     /** 向登陆服务器注册 */
     @Scheduled(value = "*/5")
     @ExecutorWith(useVirtualThread = true)
+    @ExecutorLog(logTime = 100)
     public void registerLoginServer() {
 
         ServerInfoDTO serverInfoDTO = new ServerInfoDTO();

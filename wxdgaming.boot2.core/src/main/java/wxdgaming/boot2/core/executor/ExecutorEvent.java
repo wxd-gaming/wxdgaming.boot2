@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.StopWatch;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 
 import java.lang.reflect.Method;
@@ -25,11 +24,17 @@ public abstract class ExecutorEvent extends ExecutorJob implements IExecutorQueu
 
     public ExecutorEvent() {
         super(null);
+        this.stack = StackUtils.stack(0, 1);
     }
 
     public ExecutorEvent(Method method) {
         super(null);
+        this.stack = StackUtils.stack(0, 1);
         this.executorWith = AnnUtil.ann(method, ExecutorWith.class);
+        ExecutorLog executorLog1 = AnnUtil.ann(method, ExecutorLog.class);
+        if (executorLog1 != null) {
+            this.executorLog = executorLog1;
+        }
         this.queueName = this.executorWith == null ? null : this.executorWith.queueName();
     }
 
@@ -44,12 +49,7 @@ public abstract class ExecutorEvent extends ExecutorJob implements IExecutorQueu
             if (this.getThreadContext() != null) {
                 ThreadContext.context().putAllIfAbsent(this.getThreadContext());
             }
-            ThreadStopWatch.nullInit(getStack());
-            try {
-                onEvent();
-            } finally {
-                ThreadStopWatch.releasePrint();
-            }
+            onEvent();
         } catch (Throwable throwable) {
             log.error("{}", getStack(), throwable);
         } finally {

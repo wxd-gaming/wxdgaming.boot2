@@ -3,6 +3,8 @@ package wxdgaming.boot2.core.executor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.annotation.Annotation;
+
 /**
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-05-15 09:39
@@ -11,13 +13,39 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class ExecutorJob implements Runnable {
 
+    public static final ExecutorLog EXECUTOR_LOG = new ExecutorLog() {
+
+        @Override public boolean showLog() {
+            return true;
+        }
+
+        @Override public long logTime() {
+            return 15;
+        }
+
+        @Override public long warningTime() {
+            return 150;
+        }
+
+        @Override public Class<? extends Annotation> annotationType() {
+            return ExecutorLog.class;
+        }
+    };
+
     /** 堆栈，也是任务名称，日志记录关键 */
     protected String stack;
     protected ThreadContext threadContext;
+    protected ExecutorLog executorLog = EXECUTOR_LOG;
     private final Runnable runnable;
 
     public ExecutorJob(Runnable runnable) {
         this.runnable = runnable;
+        this.stack = StackUtils.stack(0, 1);
+    }
+
+    public ExecutorJob(Runnable runnable, ExecutorLog executorLog) {
+        this.runnable = runnable;
+        this.executorLog = executorLog == null ? EXECUTOR_LOG : executorLog;
         this.stack = StackUtils.stack(0, 1);
     }
 
@@ -27,12 +55,7 @@ public class ExecutorJob implements Runnable {
             if (this.getThreadContext() != null) {
                 ThreadContext.context().putAllIfAbsent(this.getThreadContext());
             }
-            ThreadStopWatch.nullInit(getStack());
-            try {
-                runnable.run();
-            } finally {
-                ThreadStopWatch.releasePrint();
-            }
+            runnable.run();
         } catch (Throwable throwable) {
             log.error("{}", stack, throwable);
         } finally {
