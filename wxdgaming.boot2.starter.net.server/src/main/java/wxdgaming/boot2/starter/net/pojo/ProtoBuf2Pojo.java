@@ -102,7 +102,7 @@ public class ProtoBuf2Pojo {
                             start.set(true);
                         } else if (line.contains("}")) {
                             String p1 = filePath.getFileName().toString().replace(".proto", "").replace("Message", "");
-                            p1 = PatternUtil.lowerFirst(p1);
+                            p1 = PatternUtil.uncapitalize(p1);
                             comment.get().packageName = " %s.%s".formatted(packageName.get(), p1);
                             String to = "package %s;".formatted(comment.get().packageName);
                             to += "\n";
@@ -466,7 +466,7 @@ public class ProtoBuf2Pojo {
                 className,
                 comment,
                 cls.getSimpleName(),
-                PatternUtil.lowerFirst(cls.getSimpleName()), eventCls.getSimpleName(), methodParams,
+                PatternUtil.uncapitalize(cls.getSimpleName()), eventCls.getSimpleName(), methodParams,
                 cls.getSimpleName(),
                 methodContent
         );

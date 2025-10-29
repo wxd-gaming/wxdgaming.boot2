@@ -56,7 +56,7 @@ public abstract class ICreateCode {
         for (CellInfo cellInfo : tableData.getCellInfo4IndexMap().values()) {
             if (!StringUtils.isBlank(belong) && !cellInfo.getFieldBelong().equals(belong)) continue;
             Map<String, Object> column = new JSONObject();
-            column.put("fieldNameLower", PatternUtil.lowerFirst(cellInfo.getFieldName()));
+            column.put("fieldNameLower", PatternUtil.uncapitalize(cellInfo.getFieldName()));
             column.put("columnComment", cellInfo.getFieldComment());
             column.put("fieldTypeString", cellInfo.getFieldTypeString());
             column.put("fieldBelong", cellInfo.getFieldBelong());

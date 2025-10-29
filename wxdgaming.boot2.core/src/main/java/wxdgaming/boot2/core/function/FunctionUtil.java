@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class FunctionUtil {
@@ -39,25 +40,45 @@ public class FunctionUtil {
         return list;
     }
 
-    public static JSONArray split2JSONArray(String source, String separator1) {
-        String[] split = source.split(separator1);
-        JSONArray list = new JSONArray(split.length);
-        list.addAll(Arrays.asList(split));
-        return list;
-    }
+    public static Function2<String, String, JSONArray> string2JSONArray = new Function2<String, String, JSONArray>() {
+        @Override public JSONArray apply(String source, String separator) {
+            return new JSONArray(List.of(source.split(separator)));
+        }
 
+    };
+
+
+    public static Function2<String[], String, List<JSONArray>> stringArray2ListJSONArray = new Function2<>() {
+
+        @Override public List<JSONArray> apply(String[] array, String s) {
+            List<JSONArray> list = new ArrayList<>(array.length);
+            for (String string : array) {
+                String[] split = string.split(s);
+                list.add(new JSONArray(Arrays.asList(split)));
+            }
+            return list;
+        }
+
+    };
+
+
+    public static Function2<JSONArray, String, List<JSONArray>> jsonArray2ListJSONArray = new Function2<>() {
+
+        @Override public List<JSONArray> apply(JSONArray jsonArray, String s) {
+            List<JSONArray> list = new ArrayList<>(jsonArray.size());
+            for (int i = 0; i < jsonArray.size(); i++) {
+                String string = jsonArray.getString(i);
+                String[] split = string.split(s);
+                list.add(new JSONArray(Arrays.asList(split)));
+            }
+            return list;
+        }
+
+    };
 
     public static Function3<String, String, String, List<JSONArray>> split2ListJSONArray = new Function3<String, String, String, List<JSONArray>>() {
         @Override public List<JSONArray> apply(String source, String separator1, String separator2) {
-            String[] split = source.split(separator1);
-            List<JSONArray> list = new ArrayList<>(split.length);
-            for (String s : split) {
-                JSONArray line = new JSONArray();
-                String[] split1 = s.split(separator2);
-                line.addAll(Arrays.asList(split1));
-                list.add(line);
-            }
-            return list;
+            return string2JSONArray.andThen(jsonArray2ListJSONArray).apply(source, separator1, separator2);
         }
     };
 

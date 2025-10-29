@@ -57,11 +57,11 @@ public class TableData {
         String[] split = tableName.split("_|-");
         if (split.length > 1) {
             for (int i = 1; i < split.length; i++) {
-                split[i] = PatternUtil.upperFirst(split[i]);
+                split[i] = PatternUtil.capitalize(split[i]);
             }
         }
         String codeName = String.join("", split);
-        return PatternUtil.upperFirst(codeName);
+        return PatternUtil.capitalize(codeName);
     }
 
     @JSONField(serialize = false, deserialize = false)

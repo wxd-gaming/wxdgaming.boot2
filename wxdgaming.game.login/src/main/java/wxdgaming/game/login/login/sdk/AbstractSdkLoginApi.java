@@ -87,7 +87,7 @@ public abstract class AbstractSdkLoginApi {
     public RunResult loginSuccess(UserData userData, String loginIp) {
 
         if (userData.getBanExpireTime() > System.currentTimeMillis()) {
-            return RunResult.fail("账号被封禁！").fluentPut("banExpireTime", userData.getBanExpireTime());
+            return RunResult.fail("账号被封禁！").code(5).fluentPut("banExpireTime", userData.getBanExpireTime());
         }
 
         userData.setLoginCount(userData.getLoginCount() + 1);

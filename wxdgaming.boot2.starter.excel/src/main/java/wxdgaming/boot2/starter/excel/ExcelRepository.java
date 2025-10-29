@@ -400,7 +400,7 @@ public class ExcelRepository {
                     .replace("class", "clazz")
                     .replace("-", "_");
             if (isColumnName) {
-                trim = PatternUtil.lowerFirst(trim);
+                trim = PatternUtil.uncapitalize(trim);
             }
         }
         return trim.trim();

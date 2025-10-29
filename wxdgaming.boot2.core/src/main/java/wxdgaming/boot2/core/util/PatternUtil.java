@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-02-13 13:44
  **/
-public class PatternUtil {
+public class PatternUtil extends org.springframework.util.StringUtils {
 
     public static final Set<String> AdminSet = Set.of(
             "ROOT", "ADMIN", "NULL", "UNKNOWN", "USER", "GUEST", "SUPER", "UNDEFINED",
@@ -45,28 +45,14 @@ public class PatternUtil {
         return PATTERN_REPLACE_UUU_2.matcher(source).replaceAll("");
     }
 
-    /**
-     * 将字符串的首字母转大写
-     *
-     * @param str 需要转换的字符串
-     */
-    public static String upperFirst(String str) {
-        // 进行字母的ascii编码前移，效率要高于截取字符串进行转换的操作
-        char[] cs = str.toCharArray();
-        cs[0] = Character.toUpperCase(cs[0]);
-        return String.valueOf(cs);
+    /** 空白字符 null " " */
+    public boolean isBlank(String str) {
+        return !hasText(str);
     }
 
-    /**
-     * 将字符串的首字母转大写
-     *
-     * @param str 需要转换的字符串
-     */
-    public static String lowerFirst(String str) {
-        // 进行字母的ascii编码前移，效率要高于截取字符串进行转换的操作
-        char[] cs = str.toCharArray();
-        cs[0] = Character.toLowerCase(cs[0]);
-        return String.valueOf(cs);
+    /** 非 空白字符 null " " */
+    public boolean isNotBlank(String str) {
+        return hasText(str);
     }
 
     /**
