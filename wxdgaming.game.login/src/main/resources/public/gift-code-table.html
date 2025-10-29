@@ -81,7 +81,7 @@
                         <a href="#" onclick="gainCode(${row.uid}, 1000)">生成1000</a>
                         <a href="#" onclick="queryCode(${row.uid})">获取</a>
                         <a href="#" onclick="editGiftCode(${row.uid},'${row.code}','${row.rewards}','${row.comment}','${row.validation}','${row.startTime}','${row.endTime}')">编辑</a>
-                        <a href="#" onclick="deGiftCode(${row.uid})">删除</a>
+                        <a href="#" onclick="delGiftCode(${row.uid})">删除</a>
                     </td>
                     <td>${row.uid}</td>
                     <td>${row.code}</td>
@@ -213,7 +213,7 @@
             alertBox.show();
         }
 
-        function deGiftCode(uid) {
+        function delGiftCode(uid) {
             let param = "uid=" + uid;
             new wxd.netty.PostRequest("/admin/giftcode/del", param, (data) => {
                 wxd.message.notice(data.msg);

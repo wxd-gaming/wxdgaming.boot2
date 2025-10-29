@@ -49,6 +49,11 @@ public class AdminNavController implements InitPrint {
                 lv = 1;
             }},
             new NavItem() {{
+                name = "封禁列表";
+                routing = "/ban-table.html";
+                lv = 1;
+            }},
+            new NavItem() {{
                 name = "礼包码";
                 routing = "/gift-code-table.html";
                 lv = 1;

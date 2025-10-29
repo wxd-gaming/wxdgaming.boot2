@@ -22,10 +22,7 @@ import wxdgaming.boot2.starter.batis.ann.DbTable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -506,6 +503,25 @@ public abstract class SqlDataHelper extends DataHelper {
         executeUpdate(ddlBuilder().buildDeleteSql(tableMapping, tableMapping.getTableName()), ddlBuilder().buildKeyParams(tableMapping, entity));
     }
 
+    /**
+     * 根据主键字段批量删除数据
+     *
+     * @param cls     需要删除类
+     * @param keyList 需要删除的单主键集合
+     * @param <R>     实体类
+     */
+    public <R extends Entity> void batchDeleteByKey(Class<R> cls, Collection<?> keyList) {
+        transaction(connection -> {
+            for (Object key : keyList) {
+                if (key instanceof Object[] os) {
+                    deleteByKey(cls, os);
+                } else {
+                    deleteByKey(cls, key);
+                }
+            }
+        });
+    }
+
     @Override public <R extends Entity> void deleteByKey(Class<R> cls, Object... args) {
         TableMapping tableMapping = ddlBuilder().tableMapping(cls);
         executeUpdate(ddlBuilder().buildDeleteSql(tableMapping, tableMapping.getTableName()), args);
@@ -589,6 +605,19 @@ public abstract class SqlDataHelper extends DataHelper {
                         }
                     }
                 }
+            } finally {
+                connection.setAutoCommit(true);
+            }
+        } catch (Exception e) {
+            throw Throw.of(getDbName(), e);
+        }
+    }
+
+    public void transaction(Consumer<Connection> consumer) {
+        try (Connection connection = getHikariDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            try {
+                consumer.accept(connection);
             } finally {
                 connection.setAutoCommit(true);
             }

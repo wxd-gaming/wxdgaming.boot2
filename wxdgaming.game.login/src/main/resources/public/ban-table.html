@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script charset="utf-8" type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script charset="utf-8" type="text/javascript" src="/js/com.wxd.js"></script>
+    <script charset="utf-8" type="text/javascript" src="/js/pageview.js"></script>
+    <title>b</title>
+    <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
+    <link rel="stylesheet" type="text/css" href="/style/table.css"/>
+    <style>
+        .box {display: flex;flex-direction: column;}
+
+        .root_box_top {height: 120px;}
+
+        .root_box_center {flex: 1;}
+
+        .root_box_bottom {height: 38px;}
+
+        .root_box_bottom label {padding-left: 5px;padding-right: 5px;}
+
+        .alertBoxBg .alertBox li {height: 23px;line-height: 20px;}
+
+        .alertBoxBg .alertBox label {padding-left: 5px;padding-right: 5px;text-align: right;width: 80px;display: inline-block;}
+
+        .alertBoxBg .alertBox input, .alertBoxBg .alertBox select {width: 180px;border: #8c8c8c 1px solid;}
+    </style>
+    <script>
+
+        let pageView = null;
+
+        function search() {
+            wxd.loading();
+            let urlQuery = new wxd.Map().loadSearch();
+            urlQuery.put("minTime", $("#minTime").val());
+            urlQuery.put("maxTime", $("#maxTime").val());
+            urlQuery.put("where", $("#labWhere").text());
+            urlQuery.put("order", $("#labOrderBy").text());
+            pageView.remoteGetData(urlQuery);
+        }
+
+        // 用于显示的格式化版本
+        function formatForDisplay(str) {
+            if (typeof str === "string") {
+                return str;
+            }
+            return JSON.stringify(str, null, 2); // 会保留换行和缩进
+        }
+
+        function formatJsonWithNewlines(obj) {
+            if (typeof obj === 'string') {
+                try {
+                    obj = JSON.parse(obj);
+                } catch (e) {
+                    // 如果解析失败，直接格式化字符串
+                    return obj;
+                }
+            }
+            // 使用2个空格进行缩进，自动包含换行符
+            return JSON.stringify(obj, null, 2);
+        }
+
+        function escapeJSString(str) {
+            return formatForDisplay(str).replace(/\\/g, "\\\\")
+                .replace(/'/g, "\\'")
+                .replace(/"/g, "\\\"")
+                .replace(/\n/g, "\\n")
+                .replace(/\r/g, "\\r")
+                .replace(/\t/g, "\\t");
+        }
+
+        function createRow(number, row, index) {
+            // language=HTML
+            let tr = `
+                <tr>
+                    <td>${number}</td>
+                    <td style="width: 180px;">
+                        <a href="#" onclick="edit(${row.uid},'${row.banType}','${row.key}','${row.expireTime}','${row.comment}')">编辑</a>
+                        <a href="#" onclick="del(${row.uid})">删除</a>
+                    </td>
+                    <td>${row.banType}</td>
+                    <td>${row.key}</td>
+                    <td>${row.expireTime}</td>
+                    <td>${row.comment}</td>
+                </tr>
+            `;
+            return tr;
+        }
+
+        $(() => {
+            wxd.loading();
+            pageView = new PageView("/admin/ban/queryList", search, createRow);
+            search();
+        });
+
+        let whereJsonArray = [];
+
+        function addWhere() {
+            let whereJson = {};
+            whereJson["where"] = $("#where").val();
+            whereJson["and"] = $("#and").val();
+            whereJson["whereValue"] = $("#whereValue").val();
+            whereJsonArray[whereJsonArray.length] = whereJson;
+            $("#labWhere").text(JSON.stringify(whereJsonArray));
+            $("#whereValue").val("")
+            $("#and").val("=");
+        }
+
+        function clearWhere() {
+            whereJsonArray = [];
+            $("#labWhere").text("");
+        }
+
+        function edit(uid, banType, banKey, expireTime, comment) {
+            // language=HTML
+            let html = `
+                <ul>
+                    <li><label for="banType">类型: </label><select id="banType">
+                        <option value="AccountLogin">账号登录</option>
+                        <option value="AccountChat">账号聊天</option>
+                        <option value="RoleLogin">角色登录</option>
+                        <option value="RoleChat">角色聊天</option>
+                    </select></li>
+                    <li><label for="banKey">关联: </label><input id="banKey" type="text" value="${banKey}"/></li>
+                    <li>
+                        <label for="expireTime">时间: </label><input id="expireTime" type="datetime-local" value="${expireTime}">
+                    </li>
+                    <li>
+                        <label for="comment">备注: </label><input id="comment" type="text" value="${comment}">
+                    </li>
+                </ul>
+            `;
+
+            // 在创建 content 后，设置 banType 的选中值
+            setTimeout(() => {
+                $("#banType").val(banType);
+            }, 200);
+
+            let alertBox = new wxd.message.Alert(html, "封禁设置");
+            alertBox.okShow = "确定";
+            alertBox.okCallback = () => {
+                let urlQuery = new wxd.Map().loadSearch();
+                urlQuery.put("uid", uid);
+                urlQuery.put("banType", $("#banType").val());
+                urlQuery.put("banKey", $("#banKey").val());
+                urlQuery.put("expireTime", $("#expireTime").val());
+                urlQuery.put("comment", $("#comment").val());
+                return new wxd.netty.PostRequest(
+                    "/admin/ban/edit",
+                    urlQuery.toString(),
+                    (data) => {
+                        wxd.message.notice(data.msg);
+                        if (data.code === 1) {
+                            search();
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }).async(false)
+                    .send();
+            };
+            alertBox.show();
+        }
+
+        function del(uid) {
+            let param = "uid=" + uid;
+            new wxd.netty.PostRequest("/admin/ban/del", param, (data) => {
+                wxd.message.notice(data.msg);
+                search();
+            }).send();
+        }
+
+    </script>
+</head>
+<body>
+<div class="root box">
+    <div class="root_box_top btn_box" style="padding-left: 20px; padding-top: 8px; text-align: left;vertical-align: center;">
+        <label for="where">查询条件:</label>
+        <select id="where">
+            <option value="key">关联</option>
+        </select>
+
+        <select id="and" style="width: 60px;">
+            <option value="=" selected>=</option>
+        </select>
+
+        <input id="whereValue" type="text"/>
+        <input type="button" onclick="addWhere();" value="添加"/>
+        <input type="button" onclick="clearWhere();" value="清理"/>
+        <br>
+        <label for="labWhere">查询条件:</label><label id="labWhere"></label>
+        <br>
+        <br>
+        <button onclick="search();">查询</button>
+        <button onclick="edit(0,'','','','');">新增</button>
+    </div>
+    <div class="root_box_center tableDom" style="margin: 10px; padding-right: 10px;border-radius: 0; overflow-x: auto;">
+        <table style="min-width: 1400px;">
+            <thead>
+            <tr>
+                <th>编号</th>
+                <th style="width: 180px;">操作</th>
+                <th>禁止类型</th>
+                <th>关联</th>
+                <th>结束时间</th>
+                <th>备注</th>
+            </tr>
+            </thead>
+            <tbody class="tbody">
+            </tbody>
+        </table>
+    </div>
+    <div class="root_box_bottom">
+
+    </div>
+</div>
+</body>
+</html>
