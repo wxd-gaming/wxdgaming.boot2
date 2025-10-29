@@ -9,15 +9,16 @@ import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.CacheHttpServletRequest;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.SpringUtil;
-import wxdgaming.boot2.core.executor.ThreadStopWatch;
+import wxdgaming.boot2.core.format.data.Data2Json;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.game.login.ban.BanService;
 import wxdgaming.game.login.bean.ServerInfoDTO;
 import wxdgaming.game.login.bean.ServerMailDTO;
 import wxdgaming.game.login.bean.UseGiftCodeDTO;
-import wxdgaming.game.login.giftcode.GiftCodeService;
 import wxdgaming.game.login.entity.ServerInfoEntity;
 import wxdgaming.game.login.entity.UserData;
+import wxdgaming.game.login.giftcode.GiftCodeService;
 import wxdgaming.game.login.inner.InnerService;
 import wxdgaming.game.login.login.LoginService;
 import wxdgaming.game.login.smail.ServerMailService;
@@ -39,12 +40,24 @@ public class InnerGameController extends HoldApplicationContext {
     final GiftCodeService giftCodeService;
     final LoginService loginService;
     final ServerMailService serverMailService;
+    final BanService banService;
 
-    public InnerGameController(InnerService innerService, GiftCodeService giftCodeService, LoginService loginService, ServerMailService serverMailService) {
+    public InnerGameController(InnerService innerService,
+                               GiftCodeService giftCodeService,
+                               LoginService loginService,
+                               ServerMailService serverMailService,
+                               BanService banService) {
         this.innerService = innerService;
         this.giftCodeService = giftCodeService;
         this.loginService = loginService;
         this.serverMailService = serverMailService;
+        this.banService = banService;
+    }
+
+    @RequestMapping("/banList")
+    public RunResult use(CacheHttpServletRequest request) {
+        List<String> list = this.banService.getBanEntityDbDataTable().getList().stream().distinct().map(Data2Json::toJSONString).toList();
+        return RunResult.ok().data(list);
     }
 
     @RequestMapping("/giftCode/use")

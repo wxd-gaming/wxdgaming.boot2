@@ -5,6 +5,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
+import wxdgaming.game.common.bean.ban.BanType;
 import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.message.chat.ReqChatMessage;
 import wxdgaming.game.message.gm.ResGmList;
@@ -51,6 +52,17 @@ public class ReqChatMessageHandler {
         ReqChatMessage req = event.buildMessage();
         UserMapping userMapping = event.bindData();
         Player player = userMapping.player();
+
+        if (globalDataService.checkBan(BanType.AccountChat, userMapping.getAccount())) {
+            tipsService.tips(player, "账号被禁止聊天");
+            return;
+        }
+
+        if (globalDataService.checkBan(BanType.RoleChat, player.getUid())) {
+            tipsService.tips(player, "角色被禁止聊天");
+            return;
+        }
+
         String content = req.getContent();
         log.info("{} 聊天消息 {}", player, req);
         if (content.startsWith("@gm")) {

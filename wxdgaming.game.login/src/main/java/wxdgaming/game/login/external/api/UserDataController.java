@@ -69,7 +69,7 @@ public class UserDataController implements InitPrint {
             TreeMap<String, Object> params = new TreeMap<>();
             params.put("account", account);
             params.put("banTime", userData.getBanExpireTime());
-            innerService.executeAll("banLogin", "yunying/banLogin", params);
+            innerService.executeAllAsync("banLogin", "yunying/banLogin", params);
         }
         return RunResult.ok().msg(userData.getBanExpireTime() == 0 ? "解封成功" : "封禁成功");
     }
@@ -83,7 +83,7 @@ public class UserDataController implements InitPrint {
         log.info("管理：{} 设置：{} 踢下线", AdminUserToken.threadContext().getUserName(), account);
         TreeMap<String, Object> params = new TreeMap<>();
         params.put("account", account);
-        innerService.executeAll("banLogin", "yunying/kick", params);
+        innerService.executeAllAsync("banLogin", "yunying/kick", params);
         return RunResult.ok().msg("成功");
     }
 

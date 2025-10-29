@@ -80,13 +80,13 @@ public class InnerService {
                 .toList();
     }
 
-    public void executeAll(String flag, String url, Map<String, ?> params) {
+    public void executeAllAsync(String flag, String url, Map<String, ?> params) {
         for (ServerInfoEntity serverInfo : getInnerGameServerInfoMap().values()) {
-            executeServer(flag, url, params, serverInfo);
+            executeServerAsync(flag, url, params, serverInfo);
         }
     }
 
-    public void executeServer(String flag, String url, Map<String, ?> params, ServerInfoEntity serverInfo) {
+    public void executeServerAsync(String flag, String url, Map<String, ?> params, ServerInfoEntity serverInfo) {
         String sign = SignUtil.signByFormData(params, loginServerProperties.getJwtKey());
         String host = serverInfo.getHost();
         int httpPort = serverInfo.getHttpPort();

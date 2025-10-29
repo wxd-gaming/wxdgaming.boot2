@@ -56,4 +56,10 @@ public class LoginController extends HoldApplicationContext {
         return RunResult.ok().fluentPut("data", body);
     }
 
+    @RequestMapping(value = "/test/gzip")
+    public RunResult testGZip(HttpServletRequest context, @RequestParam("size") int size) {
+        String body = "ddd".repeat(size);
+        return RunResult.ok().fluentPut("data", body);
+    }
+
 }

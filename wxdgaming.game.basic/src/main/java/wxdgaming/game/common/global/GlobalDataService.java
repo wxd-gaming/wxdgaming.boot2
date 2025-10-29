@@ -1,12 +1,16 @@
 package wxdgaming.game.common.global;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.BootstrapProperties;
 import wxdgaming.boot2.core.InitPrint;
+import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
 import wxdgaming.boot2.starter.batis.sql.SqlDataCache;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
+import wxdgaming.game.common.bean.ban.BanType;
+import wxdgaming.game.common.bean.ban.BanVO;
 import wxdgaming.game.common.bean.global.AbstractGlobalData;
 import wxdgaming.game.common.bean.global.IGlobalDataConst;
 import wxdgaming.game.common.entity.global.GlobalDataEntity;
@@ -18,11 +22,13 @@ import wxdgaming.game.common.entity.global.GlobalDataEntity;
  * @version 2025-09-08 20:32
  **/
 @Slf4j
+@Getter
 @Service
 public class GlobalDataService implements InitPrint {
 
     final BootstrapProperties bootstrapProperties;
     final SqlDataHelper sqlDataHelper;
+    final ConcurrentTable<BanType, String, BanVO> banVOTable = new ConcurrentTable<>();
 
     public GlobalDataService(BootstrapProperties bootstrapProperties, PgsqlDataHelper pgsqlDataHelper) {
         this.bootstrapProperties = bootstrapProperties;
@@ -50,6 +56,17 @@ public class GlobalDataService implements InitPrint {
         } else {
             return (R) byKey.getData();
         }
+    }
+
+    public boolean checkBan(BanType banType, Object key) {
+        BanVO banVO = getBanVOTable().get(banType, String.valueOf(key));
+        if (banVO == null) return false;
+        if (banVO.getExpireTime() < System.currentTimeMillis()) return false;
+        return true;
+    }
+
+    public void editBanVOTable(BanVO banVO) {
+        getBanVOTable().put(banVO.getBanType(), banVO.getKey(), banVO);
     }
 
 }

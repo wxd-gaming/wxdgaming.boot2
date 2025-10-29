@@ -4,20 +4,28 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.event.InitEvent;
 import wxdgaming.boot2.core.executor.ExecutorLog;
 import wxdgaming.boot2.core.executor.ExecutorWith;
+import wxdgaming.boot2.core.json.FastJsonUtil;
+import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.server.SocketServer;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.authority.SignUtil;
+import wxdgaming.game.common.bean.ban.BanVO;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
+import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.login.bean.ServerInfoDTO;
 import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.module.drive.PlayerDriveService;
 import wxdgaming.game.server.module.inner.ConnectLoginService;
+
+import java.util.List;
 
 /**
  * 游戏进程的定时器服务
@@ -37,17 +45,23 @@ public class GameTimerScript extends HoldApplicationContext {
     final ConnectLoginProperties connectLoginProperties;
     final PlayerDriveService playerDriveService;
     final ConnectLoginService connectLoginService;
+    final GlobalDataService globalDataService;
 
     public GameTimerScript(SocketServer socketServer,
                            GameServerProperties gameServerProperties, ConnectLoginProperties connectLoginProperties,
-                           PlayerDriveService playerDriveService, ConnectLoginService connectLoginService) {
+                           PlayerDriveService playerDriveService, ConnectLoginService connectLoginService, GlobalDataService globalDataService) {
         this.socketServer = socketServer;
         this.gameServerProperties = gameServerProperties;
         this.connectLoginProperties = connectLoginProperties;
         this.playerDriveService = playerDriveService;
         this.connectLoginService = connectLoginService;
+        this.globalDataService = globalDataService;
     }
 
+    @EventListener
+    public void init(InitEvent event) {
+        remoteBanList();
+    }
 
     /** 向登陆服务器注册 */
     @Scheduled(value = "*/5")
@@ -72,6 +86,37 @@ public class GameTimerScript extends HoldApplicationContext {
             return;
         }
         log.debug("向登陆服务器注册: {}", execute.bodyString());
+    }
+
+    /** 向登陆服务器注册 */
+    @Scheduled(value = "0 */5 * * ?")
+    @ExecutorWith(useVirtualThread = true)
+    @ExecutorLog(logTime = 100)
+    public void remoteBanList() {
+        try {
+            String json = "{}";
+            String sign = SignUtil.signByJsonKey(json, connectLoginProperties.getJwtKey());
+
+            String url = connectLoginProperties.getUrl() + "/inner/game/banList";
+            HttpResponse execute = HttpRequestPost.ofJson(url, json)
+                    .addHeader(HttpHeaderNames.AUTHORIZATION.toString(), sign)
+                    .execute();
+            if (!execute.isSuccess()) {
+                log.error("访问登陆服务器失败{}", url);
+                return;
+            }
+            log.debug("获取封禁列表: {}", execute.getCode());
+            RunResult runResult = execute.bodyRunResult();
+            if (runResult.isOk()) {
+                String string = runResult.getString("data");
+                List<String> data = FastJsonUtil.parseArray(string, String.class);
+                for (String datum : data) {
+                    globalDataService.editBanVOTable(FastJsonUtil.parse(datum, BanVO.class));
+                }
+            }
+        } catch (Exception e) {
+            log.error("请求登陆服务封禁列表异常", e);
+        }
     }
 
 }

@@ -144,7 +144,7 @@ public class AdminGameServerController implements InitPrint {
         AssertUtil.isTrue(entity != null, "服务器不存在");
         TreeMap<String, Object> params = new TreeMap<>();
         params.put("account", "ALL");
-        innerService.executeServer("kick", "yunying/kick", params, entity);
+        innerService.executeServerAsync("kick", "yunying/kick", params, entity);
         return RunResult.ok().msg("执行成功");
     }
 

@@ -1,5 +1,6 @@
 package wxdgaming.game.login.ban;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -14,6 +15,7 @@ import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.common.bean.ban.BanType;
 import wxdgaming.game.login.entity.BanEntity;
+import wxdgaming.game.login.inner.InnerService;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,11 +31,13 @@ import java.util.HashSet;
 @Service
 public class BanService extends HoldApplicationContext {
 
+    final InnerService innerService;
     final SqlDataHelper sqlDataHelper;
     final DbDataTable<BanEntity> banEntityDbDataTable;
     final HexId banHexId = new HexId(1);
 
-    public BanService(PgsqlDataHelper sqlDataHelper) {
+    public BanService(InnerService innerService, PgsqlDataHelper sqlDataHelper) {
+        this.innerService = innerService;
         this.sqlDataHelper = sqlDataHelper;
         this.banEntityDbDataTable = new DbDataTable<>(
                 BanEntity.class,
@@ -75,10 +79,16 @@ public class BanService extends HoldApplicationContext {
         }
         this.sqlDataHelper.save(banEntity);
         this.banEntityDbDataTable.loadAll();
+        String jsonString = banEntity.toJSONString();
+        JSONObject params = new JSONObject();
+        params.put("data", jsonString);
+        innerService.executeAllAsync("ban", "yunying/ban", params);
     }
 
     public void delete(long uid) {
         this.sqlDataHelper.deleteByKey(BanEntity.class, uid);
+        JSONObject params = new JSONObject().fluentPut("uid", uid);
+        innerService.executeAllAsync("ban", "yunying/banDel", params);
     }
 
 }

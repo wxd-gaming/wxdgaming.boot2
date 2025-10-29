@@ -4,8 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.game.common.bean.global.AbstractGlobalData;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * 运营数据
  *
@@ -16,7 +14,5 @@ import java.util.concurrent.ConcurrentHashMap;
 @Setter
 public class YunyingData extends AbstractGlobalData {
 
-    private final ConcurrentHashMap<String, Long> accountBanLoginTime = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, Long> accountBanChatTime = new ConcurrentHashMap<>();
 
 }

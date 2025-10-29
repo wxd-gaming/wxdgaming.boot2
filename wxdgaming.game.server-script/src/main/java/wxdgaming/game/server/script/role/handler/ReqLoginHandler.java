@@ -10,18 +10,15 @@ import wxdgaming.boot2.core.token.JsonTokenParse;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
+import wxdgaming.game.common.bean.ban.BanType;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.login.bean.UserDataVo;
 import wxdgaming.game.message.role.ReqLogin;
 import wxdgaming.game.server.bean.UserMapping;
-import wxdgaming.game.server.bean.global.GlobalDataConst;
-import wxdgaming.game.server.bean.global.impl.YunyingData;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.role.PlayerService;
 import wxdgaming.game.server.script.tips.TipsService;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author wxd-gaming(無心道, 15388152619)
@@ -62,11 +59,8 @@ public class ReqLoginHandler extends HoldApplicationContext {
             JsonToken jsonToken = JsonTokenParse.parse(connectLoginProperties.getJwtKey(), token);
             UserDataVo userDataVo = jsonToken.getObject("user", UserDataVo.class);
             ThreadStopWatch.stop();
-            YunyingData yunyingData = globalDataService.get(GlobalDataConst.YUNYINGDATA);
 
-            ConcurrentHashMap<String, Long> accountBanLoginTime = yunyingData.getAccountBanLoginTime();
-            long banTime = accountBanLoginTime.getOrDefault(userDataVo.getAccount(), 0L);
-            if (banTime > System.currentTimeMillis()) {
+            if (globalDataService.checkBan(BanType.AccountLogin, userDataVo.getAccount())) {
                 tipsService.tips(socketSession, "账号被封禁");
                 return;
             }

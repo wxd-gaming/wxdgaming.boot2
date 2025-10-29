@@ -6,12 +6,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.game.common.bean.ban.BanType;
+import wxdgaming.game.common.bean.ban.BanVO;
 import wxdgaming.game.common.global.GlobalDataService;
-import wxdgaming.game.server.bean.global.GlobalDataConst;
-import wxdgaming.game.server.bean.global.impl.YunyingData;
+import wxdgaming.game.server.entity.role.PlayerSnap;
 import wxdgaming.game.server.module.data.DataCenterService;
+import wxdgaming.game.server.module.data.GlobalDbDataCenterService;
 
 /**
  * 运营接口
@@ -26,10 +29,12 @@ public class YunyingController extends HoldApplicationContext {
 
     final GlobalDataService globalDataService;
     final DataCenterService dataCenterService;
+    final GlobalDbDataCenterService globalDbDataCenterService;
 
-    public YunyingController(GlobalDataService globalDataService, DataCenterService dataCenterService) {
+    public YunyingController(GlobalDataService globalDataService, DataCenterService dataCenterService, GlobalDbDataCenterService globalDbDataCenterService) {
         this.globalDataService = globalDataService;
         this.dataCenterService = dataCenterService;
+        this.globalDbDataCenterService = globalDbDataCenterService;
     }
 
 
@@ -49,28 +54,31 @@ public class YunyingController extends HoldApplicationContext {
         return RunResult.ok();
     }
 
-    @RequestMapping(value = "/banLogin")
-    public Object banLogin(HttpServletRequest httpContext, @RequestParam("account") String account, @RequestParam("banTime") long banTime) {
-        YunyingData yunyingData = globalDataService.get(GlobalDataConst.YUNYINGDATA);
-        if (banTime < System.currentTimeMillis()) {
-            yunyingData.getAccountBanLoginTime().remove(account);
-        } else {
-            yunyingData.getAccountBanLoginTime().put(account, banTime);
+    @RequestMapping(value = "/ban")
+    public Object ban(HttpServletRequest httpContext, @RequestParam("data") String dataJson) {
+        BanVO parse = FastJsonUtil.parse(dataJson, BanVO.class);
+        globalDataService.editBanVOTable(parse);
+        log.info("运营后台 禁止：{}, {}, {}, {}", parse.getBanType(), parse.getKey(), MyClock.formatDate(parse.getExpireTime()), parse.getComment());
+        if (parse.getBanType() == BanType.AccountLogin) {
+            kick(httpContext, parse.getKey());
+        }
+        if (parse.getBanType() == BanType.RoleLogin) {
+            PlayerSnap playerSnap = this.globalDbDataCenterService.playerSnap(Long.parseLong(parse.getKey()));
+            String account = playerSnap.getAccount();
             kick(httpContext, account);
         }
-        log.info("运营后台 禁止登录：{}, {}", account, MyClock.formatDate(banTime));
+        return RunResult.ok();
+    }
+
+    @RequestMapping(value = "/banLogin")
+    public Object banLogin(HttpServletRequest httpContext, @RequestParam("account") String account, @RequestParam("banTime") long banTime) {
+
         return RunResult.ok();
     }
 
     @RequestMapping(value = "/banChat")
     public Object banChat(HttpServletRequest httpContext, @RequestParam("account") String account, @RequestParam("banTime") long banTime) {
-        YunyingData yunyingData = globalDataService.get(GlobalDataConst.YUNYINGDATA);
-        if (banTime < System.currentTimeMillis()) {
-            yunyingData.getAccountBanChatTime().remove(account);
-        } else {
-            yunyingData.getAccountBanChatTime().put(account, banTime);
-        }
-        log.info("运营后台 禁止聊天：{}, {}", account, MyClock.formatDate(banTime));
+
         return RunResult.ok();
     }
 
