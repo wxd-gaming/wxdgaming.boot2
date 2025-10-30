@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.reflect;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.Throw;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -31,6 +32,29 @@ public class ReflectFieldProvider {
     @Override public String toString() {
         return "ReflectFieldContext{field=%s, setMethod=%s, getMethod=%s}"
                 .formatted(field, setMethod, getMethod);
+    }
+
+    public void setInvoke(Object instance, Object value) {
+        try {
+            if (setMethod != null) {
+                setMethod.invoke(instance, value);
+            }
+            field.set(instance, value);
+        } catch (Exception e) {
+            throw Throw.of(reflectClassProvider.getClazz().getSimpleName() + "." + field.getName(), e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <R> R getInvoke(Object instance) {
+        try {
+            if (getMethod != null) {
+                return (R) getMethod.invoke(instance);
+            }
+            return (R) field.get(instance);
+        } catch (Exception e) {
+            throw Throw.of(reflectClassProvider.getClazz().getSimpleName() + "." + field.getName(), e);
+        }
     }
 
     /** 查找get方法 */

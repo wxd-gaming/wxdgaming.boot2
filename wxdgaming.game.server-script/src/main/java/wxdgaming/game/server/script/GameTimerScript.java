@@ -1,5 +1,6 @@
 package wxdgaming.game.server.script;
 
+import com.alibaba.fastjson.JSONObject;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import wxdgaming.boot2.core.executor.ExecutorLog;
 import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.server.SocketServer;
@@ -20,11 +22,15 @@ import wxdgaming.game.authority.SignUtil;
 import wxdgaming.game.common.bean.ban.BanVO;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 import wxdgaming.game.common.global.GlobalDataService;
+import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.login.bean.ServerInfoDTO;
 import wxdgaming.game.server.GameServerProperties;
+import wxdgaming.game.server.bean.global.GlobalDataConst;
+import wxdgaming.game.server.bean.global.impl.ServerData;
+import wxdgaming.game.server.bean.slog.OnlineRecord;
 import wxdgaming.game.server.module.drive.PlayerDriveService;
-import wxdgaming.game.server.module.inner.ConnectLoginService;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -44,18 +50,21 @@ public class GameTimerScript extends HoldApplicationContext {
     final GameServerProperties gameServerProperties;
     final ConnectLoginProperties connectLoginProperties;
     final PlayerDriveService playerDriveService;
-    final ConnectLoginService connectLoginService;
     final GlobalDataService globalDataService;
+    final SlogService slogService;
 
     public GameTimerScript(SocketServer socketServer,
-                           GameServerProperties gameServerProperties, ConnectLoginProperties connectLoginProperties,
-                           PlayerDriveService playerDriveService, ConnectLoginService connectLoginService, GlobalDataService globalDataService) {
+                           GameServerProperties gameServerProperties,
+                           ConnectLoginProperties connectLoginProperties,
+                           PlayerDriveService playerDriveService,
+                           GlobalDataService globalDataService,
+                           SlogService slogService) {
         this.socketServer = socketServer;
         this.gameServerProperties = gameServerProperties;
         this.connectLoginProperties = connectLoginProperties;
         this.playerDriveService = playerDriveService;
-        this.connectLoginService = connectLoginService;
         this.globalDataService = globalDataService;
+        this.slogService = slogService;
     }
 
     @EventListener
@@ -86,6 +95,44 @@ public class GameTimerScript extends HoldApplicationContext {
             return;
         }
         log.debug("向登陆服务器注册: {}", execute.bodyString());
+    }
+
+    /** 向登陆服务器注册 */
+    @Scheduled(value = "0 * * * ?")
+    @ExecutorWith(useVirtualThread = true)
+    @ExecutorLog(logTime = 100)
+    public void recordOnlineSlog() {
+        ServerData serverData = globalDataService.get(GlobalDataConst.SERVERDATA);
+        OnlineRecord onlineRecord = serverData.getOnlineRecord();
+        if (!MyClock.isSameDay(onlineRecord.getOnlineSlogTime())) {
+            if (onlineRecord.getOnlineSlogTime() > 0) {
+                saveOnlineSlog(onlineRecord);
+            }
+            onlineRecord.setOnlineSlogTime(MyClock.dayMinTime());
+            onlineRecord.setHourOnlineMap(new HashMap<>());
+        }
+
+        int onlineSize = playerDriveService.onlineSize();
+        int hour = MyClock.getHour();
+        String key = "h" + hour;
+        Integer oldSize = onlineRecord.getHourOnlineMap().get(key);
+        if (oldSize == null || oldSize < onlineSize) {
+            /*存储最高值*/
+            onlineRecord.getHourOnlineMap().put(key, onlineSize);
+        }
+        /*记录当前值*/
+        onlineRecord.setOnlineSize(onlineSize);
+        saveOnlineSlog(onlineRecord);
+    }
+
+    private void saveOnlineSlog(OnlineRecord onlineRecord) {
+        String yyyyMMdd = MyClock.formatDate("yyyyMMdd", onlineRecord.getOnlineSlogTime());
+        long uid = Long.parseLong(yyyyMMdd) * 1000000 + gameServerProperties.getSid();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("sid", gameServerProperties.getSid());
+        jsonObject.put("onlineSize", onlineRecord.getOnlineSize());
+        jsonObject.putAll(onlineRecord.getHourOnlineMap());
+        slogService.updateLog(uid, onlineRecord.getOnlineSlogTime(), "onlineslog", jsonObject);
     }
 
     /** 向登陆服务器注册 */

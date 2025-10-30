@@ -55,26 +55,5 @@ public class FieldUtil {
         }
     }
 
-    /**
-     * 获取一个属性字段，包含父类的属性字段查找
-     * 排除静态属性和最终属性字段
-     *
-     * @param clazz
-     * @param name
-     * @return
-     */
-    public static Field getField(Class<?> clazz, String name) {
-        Field[] declaredFields = clazz.getDeclaredFields();
-        for (Field field : declaredFields) {
-            if (field.getName().equals(name)) {
-                return field;
-            }
-        }
-        Class<?> scls = clazz.getSuperclass();
-        if (scls != null && !Object.class.equals(scls)) {
-            return getField(scls, name);
-        }
-        return null;
-    }
 
 }

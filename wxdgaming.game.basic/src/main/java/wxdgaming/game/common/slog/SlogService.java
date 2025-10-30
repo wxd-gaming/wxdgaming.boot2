@@ -1,5 +1,6 @@
 package wxdgaming.game.common.slog;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.BootstrapProperties;
@@ -37,11 +38,6 @@ public class SlogService implements InitPrint {
 
 
     public void pushLog(AbstractLog abstractLog) {
-        LogEntity logEntity = new LogEntity();
-        logEntity.setUid(newLogId(abstractLog.logType()));
-        logEntity.setCreateTime(System.currentTimeMillis());
-        logEntity.setLogType(abstractLog.logType());
-        logEntity.getLogData().putAll(abstractLog.toJSONObject());
         if (abstractLog instanceof AbstractSlog abstractSlog) {
             if (abstractSlog.getSid() == 0) {
                 abstractSlog.setSid(bootstrapProperties.getSid());
@@ -50,15 +46,19 @@ public class SlogService implements InitPrint {
                 abstractSlog.setCurSid(bootstrapProperties.getSid());
             }
         }
+        pushLog(abstractLog.logType(), abstractLog.toJSONObject());
+    }
+
+    public void pushLog(String logType, JSONObject jsonObject) {
+        LogEntity logEntity = new LogEntity();
+        logEntity.setUid(newLogId(logType));
+        logEntity.setCreateTime(System.currentTimeMillis());
+        logEntity.setLogType(logType);
+        logEntity.getLogData().putAll(jsonObject);
         logBusService.pushLog(logEntity);
     }
 
     public void updateLog(long uid, long time, AbstractLog abstractLog) {
-        LogEntity logEntity = new LogEntity();
-        logEntity.setUid(uid);
-        logEntity.setCreateTime(time);
-        logEntity.setLogType(abstractLog.logType());
-        logEntity.getLogData().putAll(abstractLog.toJSONObject());
         if (abstractLog instanceof AbstractSlog abstractSlog) {
             if (abstractSlog.getSid() == 0) {
                 abstractSlog.setSid(bootstrapProperties.getSid());
@@ -67,6 +67,15 @@ public class SlogService implements InitPrint {
                 abstractSlog.setCurSid(bootstrapProperties.getSid());
             }
         }
+        updateLog(uid, time, abstractLog.logType(), abstractLog.toJSONObject());
+    }
+
+    public void updateLog(long uid, long time, String logType, JSONObject jsonObject) {
+        LogEntity logEntity = new LogEntity();
+        logEntity.setUid(uid);
+        logEntity.setCreateTime(time);
+        logEntity.setLogType(logType);
+        logEntity.getLogData().putAll(jsonObject);
         logBusService.updateLog(logEntity);
     }
 

@@ -213,19 +213,19 @@ public class RobotMainService {
 
     AtomicBoolean resetTime = new AtomicBoolean();
 
-    /** 设置时间 */
-    @Scheduled(value = "0")
-    public void timer61() {
-        for (Robot robot : robotMap.values()) {
-            if (robot.isLoginEnd()) {
-                if (resetTime.compareAndSet(false, true)) {
-                    ReqChatMessage reqChatMessage = new ReqChatMessage();
-                    reqChatMessage.setType(ChatType.Chat_TYPE_World);
-                    reqChatMessage.setContent("@gm time " + MyClock.formatDate("yyyy-MM-dd HH:mm:ss", MyClock.millis() + TimeUnit.MINUTES.toMillis(60)));
-                    robot.getSocketSession().write(reqChatMessage);
-                }
-            }
-        }
-    }
+//    /** 设置时间 */
+//    @Scheduled(value = "0")
+//    public void timer61() {
+//        for (Robot robot : robotMap.values()) {
+//            if (robot.isLoginEnd()) {
+//                if (resetTime.compareAndSet(false, true)) {
+//                    ReqChatMessage reqChatMessage = new ReqChatMessage();
+//                    reqChatMessage.setType(ChatType.Chat_TYPE_World);
+//                    reqChatMessage.setContent("@gm time " + MyClock.formatDate("yyyy-MM-dd HH:mm:ss", MyClock.millis() + TimeUnit.MINUTES.toMillis(60)));
+//                    robot.getSocketSession().write(reqChatMessage);
+//                }
+//            }
+//        }
+//    }
 
 }

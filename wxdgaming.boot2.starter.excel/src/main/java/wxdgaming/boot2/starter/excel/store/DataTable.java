@@ -2,14 +2,14 @@ package wxdgaming.boot2.starter.excel.store;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
-import wxdgaming.boot2.core.Throw;
 import org.apache.commons.lang3.StringUtils;
-import wxdgaming.boot2.core.json.FastJsonUtil;
+import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.format.StreamWriter;
 import wxdgaming.boot2.core.io.FileReadUtil;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.core.reflect.AnnUtil;
-import wxdgaming.boot2.core.reflect.FieldUtil;
+import wxdgaming.boot2.core.reflect.ReflectClassProvider;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.core.util.ConvertUtil;
@@ -34,14 +34,14 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
     @Serial private static final long serialVersionUID = 1L;
     final Class<E> tClass;
     final DataMapping dataMapping;
-    final Map<String, Field> fieldMap;
+    final ReflectClassProvider reflectClassProvider;
     private List<E> dataList;
     private Map<Object, E> dataMap;
 
     public DataTable() {
-        tClass = ReflectProvider.getTClass(this.getClass());
-        fieldMap = FieldUtil.getFields(false, tClass);
-        dataMapping = AnnUtil.ann(tClass, DataMapping.class, true);
+        this.tClass = ReflectProvider.getTClass(this.getClass());
+        this.reflectClassProvider = new ReflectClassProvider(tClass);
+        this.dataMapping = AnnUtil.ann(tClass, DataMapping.class, true);
     }
 
     public void loadJson(String jsonPath) {
@@ -74,7 +74,7 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
                         StringBuilder index = new StringBuilder();
                         String[] split = s.split(keys.split());
                         for (String filedName : split) {
-                            Object fv = fieldMap.get(filedName).get(dbModel);
+                            Object fv = reflectClassProvider.getFieldContext(filedName).getInvoke(dbModel);
                             if (!index.isEmpty()) index.append(keys.split());
                             index.append(fv);
                         }
@@ -141,17 +141,17 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
         streamWriter.write("解析：").write(tClass.getName()).writeLn();
         streamWriter.write("表名：").write(dataMapping.name()).writeLn();
 
-        streamWriter.writeRight("-", len * fieldMap.size(), '-').writeLn();
-        for (String columnName : fieldMap.keySet()) {
+        streamWriter.writeRight("-", len * reflectClassProvider.getFieldMap().size(), '-').writeLn();
+        for (String columnName : reflectClassProvider.getFieldMap().keySet()) {
             streamWriter.write("|").writeRight(columnName, len, ' ');
         }
 
         streamWriter.writeLn();
 
-        streamWriter.writeRight("-", len * fieldMap.size(), '-').writeLn();
+        streamWriter.writeRight("-", len * reflectClassProvider.getFieldMap().size(), '-').writeLn();
         for (E row : dataList) {
             streamWriter.writeLn();
-            for (Field entityField : fieldMap.values()) {
+            for (Field entityField : reflectClassProvider.getFieldMap().values()) {
                 entityField.setAccessible(true);
                 Object value = null;
                 try {

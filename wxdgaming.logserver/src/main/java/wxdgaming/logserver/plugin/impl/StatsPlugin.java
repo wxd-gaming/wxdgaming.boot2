@@ -2,6 +2,7 @@ package wxdgaming.logserver.plugin.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.timer.MyClock;
@@ -11,7 +12,9 @@ import wxdgaming.logserver.plugin.AbstractPlugin;
 
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 统计测试 stats
@@ -161,6 +164,31 @@ public class StatsPlugin extends AbstractPlugin {
             ints[1][i] = jsonObject.getInteger("count");
         }
         return ints;
+    }
+
+    /** 新增注册账号充值账号数 */
+    public Pair<Long, Map<String, Long>> online(SqlDataHelper sqlDataHelper) {
+        long minTime = MyClock.dayMinTime();
+        String sql = """
+                SELECT * FROM onlineslog WHERE createtime=?::int8
+                """;
+        List<LogEntity> listBySql = sqlDataHelper.findListBySql(LogEntity.class, sql, minTime);
+        long onlineSize = 0;
+        int hour = MyClock.getHour();
+        Map<String, Long> hourOnlineMap = new HashMap<>();
+        for (LogEntity logEntity : listBySql) {
+            onlineSize += logEntity.getLogData().getIntValue("onlineSize");
+            for (int i = 0; i < 24; i++) {
+                String key = "h" + i;
+                Long aLong = logEntity.getLogData().getLong(key);
+                if (aLong == null && i <= hour) {
+                    aLong = 0L;
+                }
+                if (aLong == null) continue;
+                hourOnlineMap.merge(String.valueOf(i), aLong, Math::addExact);
+            }
+        }
+        return Pair.of(onlineSize, hourOnlineMap);
     }
 
     public void addLog(SqlDataHelper sqlDataHelper, String logName, long time, JSONObject jsonObject) {

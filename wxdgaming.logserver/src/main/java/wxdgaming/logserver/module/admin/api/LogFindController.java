@@ -3,6 +3,7 @@ package wxdgaming.logserver.module.admin.api;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +24,7 @@ import wxdgaming.logserver.plugin.impl.StatsPlugin;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 日志
@@ -88,6 +90,9 @@ public class LogFindController extends HoldApplicationContext implements InitPri
         /*充值金额分组统计*/
         int[][] rechargeGroup = statsPlugin.rechargeGroup(sqlDataHelper, dataKey);
         jsonObject.put("rechargeGroup", rechargeGroup);
+        Pair<Long, Map<String, Long>> online = statsPlugin.online(sqlDataHelper);
+        jsonObject.put("onlineSize", online.getKey());
+        jsonObject.put("onlineHour", online.getValue());
         return RunResult.ok().fluentPutAll(jsonObject);
     }
 

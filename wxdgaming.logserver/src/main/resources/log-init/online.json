@@ -1,0 +1,135 @@
+{
+  "logName": "onlineslog",
+  "logComment": "在线列表",
+  "routing": "/log-table.html",
+  "sort": "1-6",
+  "partition": false,
+  "fieldList": [
+    {
+      "fieldName": "sid",
+      "fieldComment": "区服",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:38px;"
+    },
+    {
+      "fieldName": "h0",
+      "fieldComment": "0点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h1",
+      "fieldComment": "1点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h2",
+      "fieldComment": "2点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h3",
+      "fieldComment": "3点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h4",
+      "fieldComment": "4点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h5",
+      "fieldComment": "5点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h6",
+      "fieldComment": "6点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h7",
+      "fieldComment": "7点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h8",
+      "fieldComment": "8点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h9",
+      "fieldComment": "9点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h10",
+      "fieldComment": "10点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h11",
+      "fieldComment": "11点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h12",
+      "fieldComment": "12点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h13",
+      "fieldComment": "13点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h14",
+      "fieldComment": "14点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h15",
+      "fieldComment": "15点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h16",
+      "fieldComment": "16点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h17",
+      "fieldComment": "17点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h18",
+      "fieldComment": "18点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h19",
+      "fieldComment": "19点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h20",
+      "fieldComment": "20点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h21",
+      "fieldComment": "21点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h22",
+      "fieldComment": "22点",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "h23",
+      "fieldComment": "23点",
+      "fieldType": "int"
+    }
+  ]
+}
