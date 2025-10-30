@@ -14,7 +14,6 @@ import wxdgaming.game.server.bean.role.Player;
 @Setter
 public class RoleInfoSlog extends AbstractRoleSlog {
 
-    long refreshTime;
     long roleCreateTime;
     String online;
     int vipLv;
@@ -24,12 +23,11 @@ public class RoleInfoSlog extends AbstractRoleSlog {
     long lastLoginTime;
     /** 最好退出登录时间 */
     long lastLogoutTime;
-    /** 在线毫秒数 */
+    /** 在线时长，单位秒 */
     long totalOnlineMills;
 
     public RoleInfoSlog(Player player, String online) {
         super(player);
-        this.refreshTime = System.currentTimeMillis();
         this.roleCreateTime = player.getCreateTime();
         this.online = online;
         this.vipLv = 1;

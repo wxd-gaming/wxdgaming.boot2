@@ -161,7 +161,7 @@ public class SocketClient {
 
     protected void addChanelHandler(SocketChannel socketChannel, ChannelPipeline pipeline) {}
 
-    @Order(100)
+    @Order(-1)
     @EventListener
     public void stopBefore(StopBeforeEvent event) {
         closed = true;

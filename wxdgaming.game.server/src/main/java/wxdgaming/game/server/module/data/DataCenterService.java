@@ -24,6 +24,7 @@ import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -88,6 +89,10 @@ public class DataCenterService extends HoldApplicationContext implements GetPlay
 
     @Override public RoleEntity roleEntity(long rid) {
         return getPlayerStrategyFactory.roleEntity(rid);
+    }
+
+    @Override public Collection<Player> cacheAllPlayer() {
+        return getPlayerStrategyFactory.cacheAllPlayer();
     }
 
     @Override public Player getPlayer(long rid) {

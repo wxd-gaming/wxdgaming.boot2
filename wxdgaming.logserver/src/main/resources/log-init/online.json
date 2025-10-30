@@ -6,6 +6,12 @@
   "partition": false,
   "fieldList": [
     {
+      "fieldName": "uid",
+      "fieldComment": "时间",
+      "fieldType": "long",
+      "fieldHtmlStyle": "width:60px;"
+    },
+    {
       "fieldName": "sid",
       "fieldComment": "区服",
       "fieldType": "int",

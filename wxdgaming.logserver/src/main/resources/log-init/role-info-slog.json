@@ -18,38 +18,41 @@
     },
     {
       "fieldName": "online",
-      "fieldComment": "是否在线",
-      "fieldType": "string"
+      "fieldComment": "在线",
+      "fieldType": "string",
+      "fieldHtmlStyle": "width:38px;"
     },
     {
-      "fieldName": "refreshTime",
+      "fieldName": "createTime",
       "fieldComment": "更新时间",
       "fieldType": "long"
     },
     {
       "fieldName": "roleId",
-      "fieldComment": "角色ID",
+      "fieldComment": "RID",
       "fieldType": "long"
     },
     {
       "fieldName": "roleName",
-      "fieldComment": "角色名字",
+      "fieldComment": "名字",
       "fieldType": "string"
     },
     {
       "fieldName": "roleCreateTime",
-      "fieldComment": "创建时间",
+      "fieldComment": "创建",
       "fieldType": "long"
     },
     {
       "fieldName": "lv",
-      "fieldComment": "角色等级",
-      "fieldType": "int"
+      "fieldComment": "LV",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:38px;"
     },
     {
       "fieldName": "vipLv",
-      "fieldComment": "角色VIP",
-      "fieldType": "int"
+      "fieldComment": "VIP",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:38px;"
     },
     {
       "fieldName": "lastLoginTime",

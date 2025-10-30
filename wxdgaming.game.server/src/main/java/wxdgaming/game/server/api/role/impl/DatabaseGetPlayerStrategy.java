@@ -1,10 +1,13 @@
 package wxdgaming.game.server.api.role.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.starter.batis.sql.SqlDataCache;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.game.server.api.role.GetPlayerStrategy;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
+
+import java.util.Collection;
 
 /**
  * 通过数据库获取player
@@ -23,6 +26,13 @@ public class DatabaseGetPlayerStrategy implements GetPlayerStrategy {
 
     @Override public RoleEntity roleEntity(long rid) {
         return sqlDataHelper.getCacheService().cacheIfPresent(RoleEntity.class, rid);
+    }
+
+
+    @Override public Collection<Player> cacheAllPlayer() {
+        SqlDataCache<RoleEntity, Object> cache = sqlDataHelper.getCacheService().cache(RoleEntity.class);
+        Collection<RoleEntity> values = cache.values();
+        return values.stream().map(RoleEntity::getPlayer).toList();
     }
 
     @Override public Player getPlayer(long rid) {

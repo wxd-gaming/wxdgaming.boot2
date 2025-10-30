@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
 
+import java.util.Collection;
+
 /**
  * 获取player对象
  *
@@ -21,6 +23,10 @@ public class GetPlayerStrategyFactory implements GetPlayerStrategy {
 
     @Override public RoleEntity roleEntity(long rid) {
         return playerProxy.roleEntity(rid);
+    }
+
+    @Override public Collection<Player> cacheAllPlayer() {
+        return playerProxy.cacheAllPlayer();
     }
 
     @Override public Player getPlayer(long rid) {

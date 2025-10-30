@@ -9,6 +9,7 @@ import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.event.StartEvent;
 import wxdgaming.boot2.core.event.StopBeforeEvent;
 import wxdgaming.boot2.core.executor.*;
+import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.server.bean.UserMapping;
@@ -50,12 +51,6 @@ public class PlayerDriveService extends HoldApplicationContext {
             playerDriveContentMap.put(i, driveContent);
             driveContent.timerJob = ExecutorFactory.getExecutorServiceLogic().scheduleAtFixedRate(driveContent, 33, 33, TimeUnit.MILLISECONDS);
         }
-    }
-
-    @Order(1)
-    @EventListener
-    public void stopBefore(StopBeforeEvent event) {
-        playerDriveContentMap.values().forEach(v -> v.timerJob.cancel(true));
     }
 
     public int onlineSize() {
@@ -148,7 +143,16 @@ public class PlayerDriveService extends HoldApplicationContext {
 
     public void updateRoleInfoSlog(Player player) {
         RoleInfoSlog roleInfoSlog = new RoleInfoSlog(player, String.valueOf(player.checkOnline()));
-        slogService.updateLog(player.getUid(), player.getCreateTime(), roleInfoSlog);
+        slogService.updateLog(player.getUid(), MyClock.millis(), roleInfoSlog);
+    }
+
+    @Order(Integer.MIN_VALUE)
+    @EventListener
+    public void stopBefore(StopBeforeEvent event) {
+        playerDriveContentMap.values().forEach(v -> v.timerJob.cancel(true));
+        playerDriveContentMap.values().stream()
+                .flatMap(v -> v.playerMap.values().stream())
+                .forEach(this::updateRoleInfoSlog);
     }
 
     public class PlayerDriveContent extends ExecutorEvent implements HeartDriveHandler {

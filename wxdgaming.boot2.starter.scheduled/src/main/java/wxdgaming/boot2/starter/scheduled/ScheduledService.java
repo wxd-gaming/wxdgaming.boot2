@@ -80,7 +80,7 @@ public class ScheduledService extends HoldApplicationContext {
         );
     }
 
-    @Order(10)
+    @Order(-1)
     @EventListener
     public void stopBefore(StopBeforeEvent event) {
         log.info("线程 Scheduled 调度器 退出");

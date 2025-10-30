@@ -72,7 +72,7 @@ public abstract class SqlDataHelper extends DataHelper {
         return super.ddlBuilder();
     }
 
-    @Order(100/*优先清空缓存*/)
+    @Order(Integer.MAX_VALUE/*优先清空缓存*/)
     @EventListener
     public void stopCache(StopBeforeEvent event) {
         log.info("关闭数据库缓存：{}", this.getSqlConfig().getUrl());

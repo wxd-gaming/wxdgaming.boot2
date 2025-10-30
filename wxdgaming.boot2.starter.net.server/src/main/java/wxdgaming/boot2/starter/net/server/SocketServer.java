@@ -125,7 +125,7 @@ public class SocketServer {
         }
     }
 
-    @Order(100)
+    @Order(-1)
     @EventListener
     public void stopBefore(StopBeforeEvent event) {
         if (scheduledFuture != null) {

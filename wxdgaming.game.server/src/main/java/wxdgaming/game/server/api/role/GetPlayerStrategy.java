@@ -3,6 +3,8 @@ package wxdgaming.game.server.api.role;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.bean.role.RoleEntity;
 
+import java.util.Collection;
+
 /**
  * 获取player对象
  *
@@ -12,6 +14,8 @@ import wxdgaming.game.server.bean.role.RoleEntity;
 public interface GetPlayerStrategy {
 
     RoleEntity roleEntity(long rid);
+
+    Collection<Player> cacheAllPlayer();
 
     Player getPlayer(long rid);
 
