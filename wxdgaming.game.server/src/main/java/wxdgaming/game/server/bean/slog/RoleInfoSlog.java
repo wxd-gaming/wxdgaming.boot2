@@ -26,7 +26,7 @@ public class RoleInfoSlog extends AbstractRoleSlog {
     /** 最好退出登录时间 */
     long lastLogoutTime;
     /** 在线时长，单位秒 */
-    long totalOnlineScend;
+    long totalOnlineSeconds;
 
     public RoleInfoSlog(Player player, String online) {
         super(player);
@@ -37,7 +37,7 @@ public class RoleInfoSlog extends AbstractRoleSlog {
         this.loginCount = player.getOnlineInfo().getLoginCount();
         this.lastLoginTime = player.getOnlineInfo().getLastLoginTime();
         this.lastLogoutTime = player.getOnlineInfo().getLastLogoutTime();
-        this.totalOnlineScend = player.getOnlineInfo().getOnlineTotalMills() / 1000;
+        this.totalOnlineSeconds = player.getOnlineInfo().getOnlineTotalMills() / 1000;
     }
 
 }

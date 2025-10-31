@@ -70,7 +70,7 @@
       "fieldType": "long"
     },
     {
-      "fieldName": "totalOnlineScend",
+      "fieldName": "totalOnlineSeconds",
       "fieldComment": "在线时长(秒)",
       "fieldType": "long"
     },

@@ -205,51 +205,37 @@ public class StatsPlugin extends AbstractPlugin {
             if (roleId == null) continue;
             uniqueMap.merge(roleId, totalOnlineScend, Math::max);
         }
-        LinkedHashMap<String, Integer> treeMap = new LinkedHashMap<>();
-        treeMap.put("1m", 0);
-        treeMap.put("2m", 0);
-        treeMap.put("3m", 0);
-        treeMap.put("4m", 0);
-        treeMap.put("5m", 0);
-        treeMap.put("10m", 0);
-        treeMap.put("15m", 0);
-        treeMap.put("20m", 0);
-        treeMap.put("30m", 0);
-        treeMap.put("60m", 0);
-        treeMap.put("120m", 0);
-        treeMap.put("999m", 0);
+
+        TreeMap<Integer, Integer> treeMap = new TreeMap<>();
+        treeMap.put(1, 0);
+        treeMap.put(2, 0);
+        treeMap.put(3, 0);
+        treeMap.put(4, 0);
+        treeMap.put(5, 0);
+        treeMap.put(10, 0);
+        treeMap.put(15, 0);
+        treeMap.put(20, 0);
+        treeMap.put(30, 0);
+        treeMap.put(60, 0);
+        treeMap.put(120, 0);
+        treeMap.put(180, 0);
+        treeMap.put(300, 0);
+        treeMap.put(600, 0);
+        treeMap.put(9999, 0);
+
         for (Long scend : uniqueMap.values()) {
             long minutes = TimeUnit.SECONDS.toMinutes(scend);
-            String key = "";
-            if (minutes <= 1) {
-                key = "1m";
-            } else if (minutes <= 2) {
-                key = "2m";
-            } else if (minutes <= 3) {
-                key = "3m";
-            } else if (minutes <= 4) {
-                key = "4m";
-            } else if (minutes <= 5) {
-                key = "5m";
-            } else if (minutes <= 10) {
-                key = "10m";
-            } else if (minutes <= 15) {
-                key = "15m";
-            } else if (minutes <= 20) {
-                key = "20m";
-            } else if (minutes <= 30) {
-                key = "30m";
-            } else if (minutes <= 60) {
-                key = "60m";
-            } else if (minutes <= 120) {
-                key = "120m";
-            } else {
-                key = "999m";
+            for (Integer key : treeMap.keySet()) {
+                if (minutes <= key) {
+                    treeMap.merge(key, 1, Math::addExact);
+                    break;
+                }
             }
-            treeMap.merge(key, 1, Math::addExact);
         }
         JSONObject integerHashMap = new JSONObject(true);
-        integerHashMap.putAll(treeMap);
+        for (Map.Entry<Integer, Integer> entry : treeMap.entrySet()) {
+            integerHashMap.put(entry.getKey() + "m", entry.getValue());
+        }
         return integerHashMap;
     }
 

@@ -49,12 +49,12 @@
             );
         }
 
-        function newOnlineDistributionChartLine(ctx, datas) {
+        function newOnlineDistributionChartLine(ctx, labels, datas) {
             newChart(
                 ctx,
                 "line",
                 "# 导量在线分布图",
-                ['1m', '2m', '3m', '4m', '5m', '10m', '15m', '20m', '30m', '60m', '120m', '999m'],
+                labels,
                 datas
             );
         }
@@ -165,7 +165,7 @@
                 let onlineHour = responseText.onlineHour;//[800, 900, 300, 50, 200, 300, 300, 300, 300, 600, 300, 700];
                 newOnlineHourChartLine($('#onlineHour'), onlineHour);
                 let onlineDistribution = responseText.onlineDistribution;//[800, 900, 300, 50, 200, 300, 300, 300, 300, 600, 300, 700];
-                newOnlineDistributionChartLine($('#onlineDistribution'), onlineDistribution);
+                newOnlineDistributionChartLine($('#onlineDistribution'), onlineDistribution[0], onlineDistribution[1]);
                 wxd.loading_close();
             });
             post.send();
