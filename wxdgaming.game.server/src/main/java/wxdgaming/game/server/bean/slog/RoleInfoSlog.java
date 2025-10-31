@@ -2,6 +2,7 @@ package wxdgaming.game.server.bean.slog;
 
 import lombok.Getter;
 import lombok.Setter;
+import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.game.server.bean.role.Player;
 
 /**
@@ -15,6 +16,7 @@ import wxdgaming.game.server.bean.role.Player;
 public class RoleInfoSlog extends AbstractRoleSlog {
 
     long roleCreateTime;
+    String roleCreateDay;
     String online;
     int vipLv;
     /** 最好登录时间 */
@@ -24,17 +26,18 @@ public class RoleInfoSlog extends AbstractRoleSlog {
     /** 最好退出登录时间 */
     long lastLogoutTime;
     /** 在线时长，单位秒 */
-    long totalOnlineMills;
+    long totalOnlineScend;
 
     public RoleInfoSlog(Player player, String online) {
         super(player);
         this.roleCreateTime = player.getCreateTime();
+        this.roleCreateDay = MyClock.formatDate("yyyyMMdd", player.getCreateTime());
         this.online = online;
         this.vipLv = 1;
         this.loginCount = player.getOnlineInfo().getLoginCount();
         this.lastLoginTime = player.getOnlineInfo().getLastLoginTime();
         this.lastLogoutTime = player.getOnlineInfo().getLastLogoutTime();
-        this.totalOnlineMills = player.getOnlineInfo().getOnlineTotalMills() / 1000;
+        this.totalOnlineScend = player.getOnlineInfo().getOnlineTotalMills() / 1000;
     }
 
 }

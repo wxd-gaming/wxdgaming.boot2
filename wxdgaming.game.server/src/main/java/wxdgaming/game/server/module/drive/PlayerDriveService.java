@@ -152,7 +152,12 @@ public class PlayerDriveService extends HoldApplicationContext {
         playerDriveContentMap.values().forEach(v -> v.timerJob.cancel(true));
         playerDriveContentMap.values().stream()
                 .flatMap(v -> v.playerMap.values().stream())
-                .forEach(this::updateRoleInfoSlog);
+                .forEach(player -> {
+                    try {
+                        player.getUserMapping().getSocketSession().close("停服");
+                    } catch (Exception ignore) {}
+                    updateRoleInfoSlog(player);
+                });
     }
 
     public class PlayerDriveContent extends ExecutorEvent implements HeartDriveHandler {

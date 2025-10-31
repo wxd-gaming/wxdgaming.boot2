@@ -39,7 +39,12 @@
     },
     {
       "fieldName": "roleCreateTime",
-      "fieldComment": "创建",
+      "fieldComment": "创建时间",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "roleCreateDay",
+      "fieldComment": "创建日期",
       "fieldType": "long"
     },
     {
@@ -65,7 +70,7 @@
       "fieldType": "long"
     },
     {
-      "fieldName": "totalOnlineMills",
+      "fieldName": "totalOnlineScend",
       "fieldComment": "在线时长(秒)",
       "fieldType": "long"
     },

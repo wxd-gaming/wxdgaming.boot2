@@ -1,6 +1,6 @@
 {
   "logName": "onlineslog",
-  "logComment": "在线列表",
+  "logComment": "每小时在线分布",
   "routing": "/log-table.html",
   "sort": "1-6",
   "partition": false,

@@ -11,10 +11,8 @@ import wxdgaming.logserver.bean.LogEntity;
 import wxdgaming.logserver.plugin.AbstractPlugin;
 
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 统计测试 stats
@@ -72,7 +70,12 @@ public class StatsPlugin extends AbstractPlugin {
                     }
                 }
                 log.info("{} {} {}", localDate, dataKey, jsonObject);
-                addLog(sqlDataHelper, "stats", MyClock.time2Milli(localDate), jsonObject);
+                long time = MyClock.time2Milli(localDate);
+                addLog(sqlDataHelper, "stats", time, jsonObject);
+                JSONObject onlineDistributionMap = onlineDistribution(sqlDataHelper, String.valueOf(dataKey));
+                onlineDistributionMap.put("registerAccountCount", registerAccountCount);
+                onlineDistributionMap.put("registerRoleCount", registerRoleCount);
+                addLog(sqlDataHelper, "onlinedistribution", time, onlineDistributionMap);
             } catch (Exception e) {
                 log.error("处理异常 {}", localDate, e);
             }
@@ -189,6 +192,65 @@ public class StatsPlugin extends AbstractPlugin {
             }
         }
         return Pair.of(onlineSize, hourOnlineMap);
+    }
+
+    public JSONObject onlineDistribution(SqlDataHelper sqlDataHelper, String daykey) {
+        String sql = "SELECT logdata->>'roleId' as roleId,logdata->>'totalOnlineScend' as totalOnlineScend FROM roleinfoslog WHERE logdata->>'roleCreateDay'= ?;";
+        List<JSONObject> jsonObjects = sqlDataHelper.queryList(sql, daykey);
+        HashMap<Long, Long> uniqueMap = new HashMap<>();
+        for (JSONObject jsonObject : jsonObjects) {
+            Long totalOnlineScend = jsonObject.getLong("totalonlinescend");
+            if (totalOnlineScend == null) totalOnlineScend = 1L;
+            Long roleId = jsonObject.getLong("roleid");
+            if (roleId == null) continue;
+            uniqueMap.merge(roleId, totalOnlineScend, Math::max);
+        }
+        LinkedHashMap<String, Integer> treeMap = new LinkedHashMap<>();
+        treeMap.put("1m", 0);
+        treeMap.put("2m", 0);
+        treeMap.put("3m", 0);
+        treeMap.put("4m", 0);
+        treeMap.put("5m", 0);
+        treeMap.put("10m", 0);
+        treeMap.put("15m", 0);
+        treeMap.put("20m", 0);
+        treeMap.put("30m", 0);
+        treeMap.put("60m", 0);
+        treeMap.put("120m", 0);
+        treeMap.put("999m", 0);
+        for (Long scend : uniqueMap.values()) {
+            long minutes = TimeUnit.SECONDS.toMinutes(scend);
+            String key = "";
+            if (minutes <= 1) {
+                key = "1m";
+            } else if (minutes <= 2) {
+                key = "2m";
+            } else if (minutes <= 3) {
+                key = "3m";
+            } else if (minutes <= 4) {
+                key = "4m";
+            } else if (minutes <= 5) {
+                key = "5m";
+            } else if (minutes <= 10) {
+                key = "10m";
+            } else if (minutes <= 15) {
+                key = "15m";
+            } else if (minutes <= 20) {
+                key = "20m";
+            } else if (minutes <= 30) {
+                key = "30m";
+            } else if (minutes <= 60) {
+                key = "60m";
+            } else if (minutes <= 120) {
+                key = "120m";
+            } else {
+                key = "999m";
+            }
+            treeMap.merge(key, 1, Math::addExact);
+        }
+        JSONObject integerHashMap = new JSONObject(true);
+        integerHashMap.putAll(treeMap);
+        return integerHashMap;
     }
 
     public void addLog(SqlDataHelper sqlDataHelper, String logName, long time, JSONObject jsonObject) {

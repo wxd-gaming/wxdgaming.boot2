@@ -164,7 +164,7 @@ public class MyClock {
 
 
     /** 获取今日时间格式,yyyy-MM-dd */
-    public static String newDayString() {
+    public static String nowDayString() {
         return formatDate(SDF_YYYYMMDD, millis());
     }
 

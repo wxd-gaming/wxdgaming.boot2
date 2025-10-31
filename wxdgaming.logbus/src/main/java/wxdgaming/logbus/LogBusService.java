@@ -5,11 +5,13 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.collection.SplitCollection;
 import wxdgaming.boot2.core.event.StartEvent;
-import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.event.StopBeforeEvent;
+import wxdgaming.boot2.core.event.StopEvent;
 import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.util.Md5Util;
@@ -57,16 +59,44 @@ public class LogBusService implements InitPrint {
     }
 
 
+    /**
+     * 递归删除指定目录下的所有空目录
+     *
+     * @param dir 要检查的目录
+     */
+    public void deleteEmptyDirectories(File dir) {
+        if (!dir.isDirectory()) return;
+        File[] list = dir.listFiles();
+        if (list != null) {
+            for (File subFile : list) {
+                if (subFile.isDirectory()) {
+                    deleteEmptyDirectories(subFile);
+                }
+            }
+        }
+        list = dir.listFiles();
+        if (list == null || list.length == 0) {
+            dir.delete();
+        }
+    }
+
     @EventListener
     public void start(StartEvent event) {
         log.info("LogBusService start...");
 
+        String filePath = logBusProperties.getFilePath();
+        deleteEmptyDirectories(new File(filePath));
+
         saveLog2FileThread = Thread.ofPlatform().start(() -> {
-            while (!close.get()) {
+            while (!close.get()
+                   || !savePushLog2FileEvent.logEntities.isEmpty()
+                   || !saveUpdateLog2FileEvent.logEntities.isEmpty()) {
                 try {
-                    LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(3000));
-                    savePushLog2FileEvent.run();
-                    saveUpdateLog2FileEvent.run();
+                    if (!close.get()) {
+                        LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(2000));
+                    }
+                    savePushLog2FileEvent.doEvent();
+                    saveUpdateLog2FileEvent.doEvent();
                 } catch (Exception e) {
                     log.error("LogBusService error", e);
                 }
@@ -77,7 +107,7 @@ public class LogBusService implements InitPrint {
             while (!close.get()) {
                 try {
                     LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(500));
-                    postPushLog2FileEvent.run();
+                    postPushLog2FileEvent.doEvent();
                 } catch (Exception e) {
                     log.error("LogBusService error", e);
                 }
@@ -88,13 +118,26 @@ public class LogBusService implements InitPrint {
             while (!close.get()) {
                 try {
                     LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(500));
-                    postUpdateLog2FileEvent.run();
+                    postUpdateLog2FileEvent.doEvent();
                 } catch (Exception e) {
                     log.error("LogBusService error", e);
                 }
             }
         });
 
+    }
+
+    @Order(Integer.MAX_VALUE - 1000)
+    @EventListener
+    public void stopBeforeEvent(StopBeforeEvent event) {}
+
+    @Order(Integer.MAX_VALUE - 1000)
+    @EventListener
+    public void stopEvent(StopEvent event) throws Exception {
+        close.set(true);
+        saveLog2FileThread.join();
+        postPushLogThread.join();
+        postUpdateLogThread.join();
     }
 
     /** 推送日志 */
@@ -107,20 +150,12 @@ public class LogBusService implements InitPrint {
         saveUpdateLog2FileEvent.addLog(logEntity);
     }
 
-    private class SaveLog2FileEvent extends ExecutorEvent {
+    private class SaveLog2FileEvent {
 
         private final String type;
 
         public SaveLog2FileEvent(String type) {
             this.type = type;
-        }
-
-        @Override public boolean isIgnoreRunTimeRecord() {
-            return true;
-        }
-
-        @Override public String getStack() {
-            return "logbus-post";
         }
 
         private SplitCollection<LogEntity> logEntities = null;
@@ -135,7 +170,7 @@ public class LogBusService implements InitPrint {
             logEntities.add(logEntity);
         }
 
-        @Override public void onEvent() throws Exception {
+        public void doEvent() throws Exception {
             SplitCollection<LogEntity> tmpLogEntities = reset();
             while (!tmpLogEntities.isEmpty()) {
                 List<LogEntity> logEntities1 = tmpLogEntities.removeFirst();
@@ -150,7 +185,7 @@ public class LogBusService implements InitPrint {
     }
 
 
-    private class PostLog2FileEvent extends ExecutorEvent {
+    private class PostLog2FileEvent {
 
         private final String type;
 
@@ -158,15 +193,8 @@ public class LogBusService implements InitPrint {
             this.type = type;
         }
 
-        @Override public boolean isIgnoreRunTimeRecord() {
-            return true;
-        }
 
-        @Override public String getStack() {
-            return "logbus-post";
-        }
-
-        @Override public void onEvent() throws Exception {
+        public void doEvent() throws Exception {
             Path path = Path.of(logBusProperties.getFilePath(), type);
             if (!Files.exists(path)) return;
             Files.walk(path)

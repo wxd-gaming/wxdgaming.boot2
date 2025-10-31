@@ -93,6 +93,7 @@ public class LogFindController extends HoldApplicationContext implements InitPri
         Pair<Long, Map<String, Long>> online = statsPlugin.online(sqlDataHelper);
         jsonObject.put("onlineSize", online.getKey());
         jsonObject.put("onlineHour", online.getValue());
+        jsonObject.put("onlineDistribution", statsPlugin.onlineDistribution(sqlDataHelper, String.valueOf(dataKey)));
         return RunResult.ok().fluentPutAll(jsonObject);
     }
 

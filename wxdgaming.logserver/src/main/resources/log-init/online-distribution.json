@@ -1,0 +1,96 @@
+{
+  "logName": "onlinedistribution",
+  "logComment": "导量在线时长分布",
+  "routing": "/log-table.html",
+  "sort": "0-1",
+  "partition": true,
+  "fieldList": [
+    {
+      "fieldName": "dataKey",
+      "fieldComment": "日期",
+      "fieldType": "int"
+    },
+    {
+      "fieldName": "registerAccountCount",
+      "fieldComment": "新增用户",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "registerRoleCount",
+      "fieldComment": "新增角色",
+      "fieldType": "long"
+    },
+    {
+      "fieldName": "1m",
+      "fieldComment": "1m",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:60px;"
+    },
+    {
+      "fieldName": "2m",
+      "fieldComment": "2m",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:60px;"
+    },
+    {
+      "fieldName": "3m",
+      "fieldComment": "3m",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:60px;"
+    },
+    {
+      "fieldName": "4m",
+      "fieldComment": "4m",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:60px;"
+    },
+    {
+      "fieldName": "5m",
+      "fieldComment": "5m",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:60px;"
+    },
+    {
+      "fieldName": "10m",
+      "fieldComment": "10m",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:60px;"
+    },
+    {
+      "fieldName": "15m",
+      "fieldComment": "15m",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:60px;"
+    },
+    {
+      "fieldName": "20m",
+      "fieldComment": "20m",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:60px;"
+    },
+    {
+      "fieldName": "30m",
+      "fieldComment": "30m",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:60px;"
+    },
+    {
+      "fieldName": "60m",
+      "fieldComment": "1h",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:60px;"
+    },
+    {
+      "fieldName": "120m",
+      "fieldComment": "2h",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:60px;"
+    },
+    {
+      "fieldName": "999m",
+      "fieldComment": ">2h",
+      "fieldType": "int",
+      "fieldHtmlStyle": "width:60px;"
+    }
+  ]
+}

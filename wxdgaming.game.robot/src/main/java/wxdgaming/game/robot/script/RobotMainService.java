@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -66,7 +65,7 @@ public class RobotMainService {
     @EventListener
     public void start(StartEvent event) {
         HoldMap accountDayMap = this.mapDBDataHelper.hMap("account");
-        String dayString = MyClock.nowString();
+        String dayString = MyClock.nowDayString();
         if (!accountDayMap.containsKey(dayString)) {
             List<String> al = new ArrayList<>();
             for (int i = 0; i < 50; i++) {
