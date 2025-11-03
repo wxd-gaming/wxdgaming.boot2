@@ -24,19 +24,21 @@ public class CoreShutdownHook extends HoldApplicationContext {
     public void onCoreShutdownHook() {
         log.info("bean={}", this.getClass().getName());
         SpringUtil.exiting.set(true);
-        ExecutorFactory executorFactory = applicationContextProvider.getBean(ExecutorFactory.class);
-        applicationContextProvider.postEvent(new StopBeforeEvent());
-        applicationContextProvider.postEvent(new StopEvent());
-        List<AutoCloseable> list = applicationContextProvider.classWithSuperStream(AutoCloseable.class).toList();
-        for (AutoCloseable closeable : list) {
-            try {
-                log.debug("关闭bean：{}", closeable);
-                closeable.close();
-            } catch (Exception e) {
-                log.error("关闭bean异常...", e);
+        if (applicationContextProvider != null) {
+            ExecutorFactory executorFactory = applicationContextProvider.getBean(ExecutorFactory.class);
+            applicationContextProvider.postEvent(new StopBeforeEvent());
+            applicationContextProvider.postEvent(new StopEvent());
+            List<AutoCloseable> list = applicationContextProvider.classWithSuperStream(AutoCloseable.class).toList();
+            for (AutoCloseable closeable : list) {
+                try {
+                    log.debug("关闭bean：{}", closeable);
+                    closeable.close();
+                } catch (Exception e) {
+                    log.error("关闭bean异常...", e);
+                }
             }
+            executorFactory.getEXECUTOR_MONITOR().getExit().set(true);
         }
-        executorFactory.getEXECUTOR_MONITOR().getExit().set(true);
         JvmUtil.halt(0);
     }
 
