@@ -195,11 +195,11 @@ public class StatsPlugin extends AbstractPlugin {
     }
 
     public JSONObject onlineDistribution(SqlDataHelper sqlDataHelper, String daykey) {
-        String sql = "SELECT logdata->>'roleId' as roleId,logdata->>'totalOnlineScend' as totalOnlineScend FROM roleinfoslog WHERE logdata->>'roleCreateDay'= ?;";
+        String sql = "SELECT logdata->>'roleId' as roleId,logdata->>'totalOnlineSeconds' as totalOnlineSeconds FROM roleinfoslog WHERE logdata->>'roleCreateDay'= ?;";
         List<JSONObject> jsonObjects = sqlDataHelper.queryList(sql, daykey);
         HashMap<Long, Long> uniqueMap = new HashMap<>();
         for (JSONObject jsonObject : jsonObjects) {
-            Long totalOnlineScend = jsonObject.getLong("totalonlinescend");
+            Long totalOnlineScend = jsonObject.getLong("totalonlineseconds");
             if (totalOnlineScend == null) totalOnlineScend = 1L;
             Long roleId = jsonObject.getLong("roleid");
             if (roleId == null) continue;

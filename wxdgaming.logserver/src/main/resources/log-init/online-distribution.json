@@ -87,7 +87,7 @@
       "fieldHtmlStyle": "width:60px;"
     },
     {
-      "fieldName": "999m",
+      "fieldName": "9999m",
       "fieldComment": ">2h",
       "fieldType": "int",
       "fieldHtmlStyle": "width:60px;"

@@ -154,15 +154,17 @@ public class SqlConfig extends ObjectBase {
     }
 
     public Connection connection(String databaseName) {
+        String replace = "";
         try {
             Class.forName(getDriverClassName());
+            replace = url.replace(dbName(), databaseName);
             return DriverManager.getConnection(
-                    url.replace(dbName(), databaseName),
+                    replace,
                     username,
                     password
             );
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw Throw.of(replace, e);
         }
     }
 
