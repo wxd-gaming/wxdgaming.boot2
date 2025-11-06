@@ -13,6 +13,7 @@ import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
 import wxdgaming.boot2.starter.excel.DataExcelScan;
+import wxdgaming.boot2.starter.groovy.GroovyScan;
 import wxdgaming.boot2.starter.net.SocketScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 import wxdgaming.boot2.starter.validation.ValidationScan;
@@ -28,6 +29,7 @@ import java.io.File;
 @SpringBootApplication(scanBasePackageClasses = {
         CoreScan.class,
         DataExcelScan.class,
+        GroovyScan.class,
         ScheduledScan.class,
         SocketScan.class,
         PgsqlScan.class,

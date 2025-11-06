@@ -24,6 +24,7 @@
         <module>wxdgaming.boot2.starter.batis.sql.mysql</module>
         <module>wxdgaming.boot2.starter.batis.sql.pgsql</module>
         <module>wxdgaming.boot2.starter.excel</module>
+        <module>wxdgaming.boot2.starter.groovy</module>
         <module>wxdgaming.boot2.starter.js</module>
         <module>wxdgaming.boot2.starter.net</module>
         <module>wxdgaming.boot2.starter.net.httpclient</module>
@@ -38,7 +39,6 @@
         <module>wxdgaming.game.server-script</module>
         <module>wxdgaming.logbus</module>
         <module>wxdgaming.logserver</module>
-        <module>wxdgaming.boot2.groovy</module>
     </modules>
 
     <properties>

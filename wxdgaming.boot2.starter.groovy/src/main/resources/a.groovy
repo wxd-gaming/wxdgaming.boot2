@@ -1,5 +1,5 @@
 import wxdgaming.boot2.core.SpringUtil
-import wxdgaming.boot2.groovy.GroovyService
+import wxdgaming.boot2.starter.groovy.GroovyService
 
 def provider = SpringUtil.mainApplicationContextProvider
 def groovyService = provider.getBean(GroovyService.class)

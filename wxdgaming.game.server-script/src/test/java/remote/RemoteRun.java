@@ -3,18 +3,20 @@ package remote;
 import com.alibaba.fastjson.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.StreamUtils;
 import remote.code.ExecGM;
 import wxdgaming.boot2.core.CoreScan;
-import wxdgaming.boot2.core.util.Base64Util;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
 import wxdgaming.boot2.core.loader.RemoteClassLoader;
+import wxdgaming.boot2.core.util.Base64Util;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.starter.net.httpclient5.HttpClientScan;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.game.server.script.http.gm.dynamiccode.IGmDynamic;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -49,9 +51,27 @@ public class RemoteRun {
         System.out.println(string);
     }
 
+    public void executeGroovy(String filePath) throws IOException {
+        String script = StreamUtils.copyToString(this.getClass().getResourceAsStream(filePath), StandardCharsets.UTF_8);
+        String base64 = Base64Util.encode(script);
+        System.out.println(base64);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("sign", "ABC");/*签名*/
+        jsonObject.put("code", URLEncoder.encode(base64, StandardCharsets.UTF_8));/*代码*/
+
+        HttpResponse execute = HttpRequestPost.of("http://localhost:18801/888/groovy", jsonObject).execute();
+        String string = execute.bodyString();
+        System.out.println(string);
+    }
+
     @Test
     public void remoteRun() throws Exception {
         execute(ExecGM.class, new JSONObject().fluentPut("cc", "1"));
+    }
+
+    @Test
+    public void remoteGroovy() throws Exception {
+        executeGroovy("/groovy/ss.groovy");
     }
 
 }

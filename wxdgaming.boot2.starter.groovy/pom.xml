@@ -9,7 +9,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>wxdgaming.boot2.groovy</artifactId>
+    <artifactId>wxdgaming.boot2.starter.groovy</artifactId>
 
     <dependencies>
         <dependency>

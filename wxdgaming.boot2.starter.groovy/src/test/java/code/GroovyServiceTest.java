@@ -4,8 +4,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import wxdgaming.boot2.groovy.GroovyScan;
-import wxdgaming.boot2.groovy.GroovyService;
+import wxdgaming.boot2.starter.groovy.GroovyScan;
+import wxdgaming.boot2.starter.groovy.GroovyService;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

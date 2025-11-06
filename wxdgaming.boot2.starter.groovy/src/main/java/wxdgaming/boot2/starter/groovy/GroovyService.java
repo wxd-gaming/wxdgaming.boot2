@@ -1,11 +1,8 @@
-package wxdgaming.boot2.groovy;
+package wxdgaming.boot2.starter.groovy;
 
 import groovy.lang.GroovyShell;
-import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-
-import java.nio.charset.StandardCharsets;
 
 /**
  * 服务
