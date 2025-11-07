@@ -21,6 +21,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * 远程执行
@@ -62,6 +63,7 @@ public class RemoteRun {
         HttpResponse execute = HttpRequestPost.of("http://localhost:18801/888/groovy", jsonObject).execute();
         String string = execute.bodyString();
         System.out.println(string);
+
     }
 
     @Test
