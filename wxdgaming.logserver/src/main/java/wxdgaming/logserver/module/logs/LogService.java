@@ -190,16 +190,19 @@ public class LogService implements InitPrint {
                 Function<String, Object> stringObjectFunction = logMappingInfo.fieldValueFunction(whereFiled);
                 String and = jsonObject.getString("and");
                 String where;
+                Object whereValue = stringObjectFunction.apply(jsonObject.getString("whereValue"));
                 if ("uid".equals(whereFiled) || "createTime".equals(whereFiled)) {
                     where = whereFiled + " " + and + " ?";
                 } else {
-                    if (and.equals("<=") || and.equals("<") || and.equals(">=") || and.equals(">")) {
+                    if ("like".equalsIgnoreCase(and)) {
+                        where = "logdata::jsonb->>'%s' like ?".formatted(whereFiled);
+                        whereValue = "%" + whereValue + "%";
+                    } else if (and.equals("<=") || and.equals("<") || and.equals(">=") || and.equals(">")) {
                         where = "CAST(logdata::jsonb->>'%s' AS numeric) %s ?".formatted(whereFiled, and);
                     } else {
                         where = "logdata::jsonb @> jsonb_build_object('%s',?)".formatted(whereFiled);
                     }
                 }
-                Object whereValue = stringObjectFunction.apply(jsonObject.getString("whereValue"));
                 queryBuilder.pushWhereAnd(where, whereValue);
             }
         }

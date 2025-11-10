@@ -65,6 +65,7 @@ class PageView {
             postQuery.toString(),
             async (responseText) => {
                 if (responseText.code !== 1) {
+                    wxd.loading_close();
                     new wxd.message.Alert("异常：" + responseText.msg).show();
                     return
                 }
