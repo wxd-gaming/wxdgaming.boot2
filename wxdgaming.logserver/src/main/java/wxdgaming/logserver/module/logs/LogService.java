@@ -194,13 +194,19 @@ public class LogService implements InitPrint {
                 if ("uid".equals(whereFiled) || "createTime".equals(whereFiled)) {
                     where = whereFiled + " " + and + " ?";
                 } else {
-                    if ("like".equalsIgnoreCase(and)) {
-                        where = "logdata::jsonb->>'%s' like ?".formatted(whereFiled);
-                        whereValue = "%" + whereValue + "%";
-                    } else if (and.equals("<=") || and.equals("<") || and.equals(">=") || and.equals(">")) {
-                        where = "CAST(logdata::jsonb->>'%s' AS numeric) %s ?".formatted(whereFiled, and);
-                    } else {
-                        where = "logdata::jsonb @> jsonb_build_object('%s',?)".formatted(whereFiled);
+                    switch (and) {
+                        case "ilike" -> {
+                            where = "logdata::jsonb->>'%s' ILIKE ?".formatted(whereFiled);
+                            whereValue = "%" + whereValue + "%";
+                        }
+                        case "notilike" -> {
+                            where = "logdata::jsonb->>'%s' NOT ILIKE ?".formatted(whereFiled);
+                            whereValue = "%" + whereValue + "%";
+                        }
+                        case "<=", "<", ">=", ">" ->
+                                where = "CAST(logdata::jsonb->>'%s' AS numeric) %s ?".formatted(whereFiled, and);
+                        case null, default ->
+                                where = "logdata::jsonb @> jsonb_build_object('%s',?)".formatted(whereFiled);
                     }
                 }
                 queryBuilder.pushWhereAnd(where, whereValue);
