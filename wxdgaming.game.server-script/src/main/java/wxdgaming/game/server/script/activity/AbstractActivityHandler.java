@@ -2,9 +2,11 @@ package wxdgaming.game.server.script.activity;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.executor.HeartConst;
 import wxdgaming.game.server.bean.activity.ActivityData;
+import wxdgaming.game.server.event.EventConst;
 
 import java.util.Collection;
 
@@ -28,6 +30,13 @@ public abstract class AbstractActivityHandler<T extends ActivityData> extends Ho
     public abstract void start(T activityData);
 
     public abstract void end(T activityData);
+
+    @EventListener
+    public final void onRecharge(EventConst.PlayerRechargeEvent event) {
+        doRecharge(event);
+    }
+
+    public void doRecharge(EventConst.PlayerRechargeEvent event) {}
 
     public void heart(T activityData) {}
 

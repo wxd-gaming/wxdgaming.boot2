@@ -22,6 +22,16 @@ public interface EventConst {
 
     public record LevelUpEvent(Player player, int changeLv) implements Event {}
 
+    /**
+     * 充值事件
+     *
+     * @param player     充值的玩家
+     * @param rechargeId 充值表id
+     * @param count      购买次数
+     * @param amount     充值的金额，单位分
+     */
+    public record PlayerRechargeEvent(Player player, int rechargeId, int count, int amount) implements Event {}
+
     public interface MapNpcEvent extends Event {
 
         MapNpc mapNpc();
