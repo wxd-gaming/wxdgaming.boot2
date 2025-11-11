@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.event.InitEvent;
+import wxdgaming.boot2.core.reflect.MethodProvider;
 import wxdgaming.game.message.gm.GMBean;
 import wxdgaming.game.message.gm.GmGroup;
 import wxdgaming.game.message.gm.ResGmList;
@@ -33,7 +34,7 @@ public class GmService extends HoldApplicationContext {
 
     final GameServerProperties gameServerProperties;
     final TipsService tipsService;
-    Map<String, ApplicationContextProvider.ProviderMethod> gmMap = new HashMap<>();
+    Map<String, MethodProvider> gmMap = new HashMap<>();
     ResGmList resGmList = new ResGmList();
 
     public GmService(GameServerProperties gameServerProperties, TipsService tipsService) {
@@ -56,7 +57,7 @@ public class GmService extends HoldApplicationContext {
                 .sorted(Comparator.comparing(Map.Entry::getValue))
                 .forEach((entry) -> {
                     String cmd = entry.getKey();
-                    ApplicationContextProvider.ProviderMethod providerMethod = entry.getValue();
+                    MethodProvider providerMethod = entry.getValue();
                     Method method = providerMethod.getMethod();
                     GM annotation = method.getAnnotation(GM.class);
                     GMBean gmBean = new GMBean();
@@ -76,7 +77,7 @@ public class GmService extends HoldApplicationContext {
     public void doGm(Player player, String[] args) {
         JSONArray jsonArray = new JSONArray(List.of(args));
         String cmd = jsonArray.getString(0).toLowerCase();
-        ApplicationContextProvider.ProviderMethod providerMethod = gmMap.get(cmd);
+        MethodProvider providerMethod = gmMap.get(cmd);
         if (providerMethod == null) {
             tipsService.tips(player, "不存在的gm命令: " + cmd);
             return;

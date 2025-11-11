@@ -32,7 +32,7 @@ public class RpcListenerContent {
         this.rpcFilterList = applicationContextProvider.classWithSuperStream(RpcFilter.class).toList();
         this.applicationContextProvider.withMethodAnnotatedCache(RpcRequest.class)
                 .forEach(providerMethod -> {
-                    Object ins = providerMethod.getBean();
+                    Object ins = providerMethod.instance();
                     Method method = providerMethod.getMethod();
 
                     RequestMapping insRequestMapping = AnnUtil.ann(ins.getClass(), RequestMapping.class);
@@ -70,11 +70,11 @@ public class RpcListenerContent {
                     RpcMapping rpcMapping = new RpcMapping(methodRequestMapping, lowerCase, providerMethod);
 
                     RpcMapping old = rpcMappingMap.put(lowerCase, rpcMapping);
-                    if (old != null && !Objects.equals(old.providerMethod().getBean().getClass().getName(), ins.getClass().getName())) {
+                    if (old != null && !Objects.equals(old.providerMethod().instance().getClass().getName(), ins.getClass().getName())) {
                         String formatted = "重复路由监听 %s old = %s - new = %s"
                                 .formatted(
                                         lowerCase,
-                                        old.providerMethod().getBean().getClass().getName(),
+                                        old.providerMethod().instance().getClass().getName(),
                                         ins.getClass().getName()
                                 );
                         throw new RuntimeException(formatted);

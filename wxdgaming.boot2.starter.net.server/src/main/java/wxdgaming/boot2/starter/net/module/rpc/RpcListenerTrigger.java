@@ -53,7 +53,7 @@ public class RpcListenerTrigger extends ExecutorEvent {
     @Override public String getStack() {
         return "RpcListenerTrigger: %s; %s.%s()".formatted(
                 rpcMapping.path(),
-                rpcMapping.providerMethod().getBean().getClass().getName(),
+                rpcMapping.providerMethod().getInstance().getClass().getName(),
                 rpcMapping.providerMethod().getMethod().getName()
         );
     }

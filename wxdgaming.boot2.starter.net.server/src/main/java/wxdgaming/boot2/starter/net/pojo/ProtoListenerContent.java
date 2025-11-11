@@ -31,7 +31,7 @@ public class ProtoListenerContent {
         applicationContextProvider
                 .withMethodAnnotatedCache(ProtoRequest.class)
                 .forEach(providerMethod -> {
-                    Object ins = providerMethod.getBean();
+                    Object ins = providerMethod.getInstance();
                     Method method = providerMethod.getMethod();
 
                     ProtoRequest methodRequestMapping = AnnUtil.ann(method, ProtoRequest.class);
@@ -45,11 +45,11 @@ public class ProtoListenerContent {
                     ProtoMapping mapping = new ProtoMapping(methodRequestMapping, messageId, pojoClass, providerMethod);
 
                     ProtoMapping old = mappingMap.put(messageId, mapping);
-                    if (old != null && !Objects.equals(old.providerMethod().getBean().getClass().getName(), ins.getClass().getName())) {
+                    if (old != null && !Objects.equals(old.providerMethod().getInstance().getClass().getName(), ins.getClass().getName())) {
                         String formatted = "重复路由监听 %s, old = %s - new = %s"
                                 .formatted(
                                         messageId,
-                                        old.providerMethod().getBean().getClass().getName(),
+                                        old.providerMethod().getInstance().getClass().getName(),
                                         ins.getClass().getName()
                                 );
                         throw new RuntimeException(formatted);

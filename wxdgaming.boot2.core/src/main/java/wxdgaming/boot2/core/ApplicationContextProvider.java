@@ -9,20 +9,19 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.event.EventListener;
 import wxdgaming.boot2.core.ann.ThreadParam;
-import wxdgaming.boot2.core.assist.JavassistProxy;
 import wxdgaming.boot2.core.event.Event;
 import wxdgaming.boot2.core.event.InitEvent;
 import wxdgaming.boot2.core.event.StartEvent;
 import wxdgaming.boot2.core.executor.ThreadContext;
-import wxdgaming.boot2.core.reflect.AnnUtil;
-import wxdgaming.boot2.core.reflect.FieldUtil;
-import wxdgaming.boot2.core.reflect.MethodUtil;
-import wxdgaming.boot2.core.runtime.IgnoreRunTimeRecord;
-import wxdgaming.boot2.core.runtime.RunTimeUtil;
+import wxdgaming.boot2.core.reflect.FieldProvider;
+import wxdgaming.boot2.core.reflect.MethodProvider;
+import wxdgaming.boot2.core.reflect.ReflectObjectProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -41,13 +40,13 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     private ApplicationContext applicationContext;
     /** 所有的类 */
     private List<ProviderBean> beanList;
-    private final ConcurrentHashMap<String, List<ApplicationContextProvider.ProviderMethod>> eventMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, List<MethodProvider>> eventMap = new ConcurrentHashMap<>();
     /** 实现了某个注解的类 */
     private final ConcurrentHashMap<Class<? extends Annotation>, List<ProviderBean>> annotationCacheMap = new ConcurrentHashMap<>();
     /** 实现了某个注解的类 */
-    private final ConcurrentHashMap<Class<? extends Annotation>, List<ProviderField>> annotationFieldContentCacheMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Class<? extends Annotation>, List<FieldProvider>> annotationFieldContentCacheMap = new ConcurrentHashMap<>();
     /** 实现了某个注解的类 */
-    private final ConcurrentHashMap<Class<? extends Annotation>, List<ProviderMethod>> annotationMethodContentCacheMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Class<? extends Annotation>, List<MethodProvider>> annotationMethodContentCacheMap = new ConcurrentHashMap<>();
     /** 继承某个类接口或者实现某个接口 */
     private final ConcurrentHashMap<Class<?>, List<ProviderBean>> superCacheMap = new ConcurrentHashMap<>();
 
@@ -102,17 +101,17 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     public <U> U instance(Class<U> cls) {
         return classWithSuperCache(cls).stream()
                 .findFirst()
-                .map(provider -> cls.cast(provider.bean))
+                .map(provider -> cls.cast(provider.getReflectObjectProvider().getInstance()))
                 .orElse(null);
     }
 
     /** 父类或者接口 */
     public <U> Stream<U> classWithSuperStream(Class<U> cls) {
-        return classWithSuperCache(cls).stream().map(provider -> cls.cast(provider.bean));
+        return classWithSuperCache(cls).stream().map(provider -> cls.cast(provider.getReflectObjectProvider().getInstance()));
     }
 
     /** 所有bean里面的方法，添加了注解的 */
-    public Collection<ProviderField> withFieldAnnotatedCache(Class<? extends Annotation> annotation) {
+    public Collection<FieldProvider> withFieldAnnotatedCache(Class<? extends Annotation> annotation) {
         return annotationFieldContentCacheMap.computeIfAbsent(
                 annotation,
                 k -> stream()
@@ -123,7 +122,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     }
 
     /** 所有bean里面的方法，添加了注解的 */
-    public Collection<ProviderMethod> withMethodAnnotatedCache(Class<? extends Annotation> annotation) {
+    public Collection<MethodProvider> withMethodAnnotatedCache(Class<? extends Annotation> annotation) {
         return annotationMethodContentCacheMap.computeIfAbsent(
                 annotation,
                 k -> stream()
@@ -134,14 +133,14 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     }
 
     /** 所有的bean，函数的参数是指定类型 */
-    public Stream<ProviderMethod> withMethodParameters(Class<?>... args) {
+    public Stream<MethodProvider> withMethodParameters(Class<?>... args) {
         return stream()
                 .flatMap(provider -> provider.methodsEqualsParameters(args))
                 .sorted();
     }
 
     /** 所有的bean，函数的参数是指定类型继承关系 */
-    public Stream<ProviderMethod> withMethodAssignableFrom(Class<?>... args) {
+    public Stream<MethodProvider> withMethodAssignableFrom(Class<?>... args) {
         return stream()
                 .flatMap(provider -> provider.methodsAssignableFrom(args))
                 .sorted();
@@ -160,16 +159,16 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     public <K, V> Map<K, V> toMapWithAnnotated(Class<? extends Annotation> cls, Function<Object, K> convertKey, Function<Object, V> convertValue) {
         return toMap4Collection(
                 withFieldAnnotatedCache(cls),
-                pb -> convertKey.apply(pb.getBean()),
-                pb -> convertValue.apply(pb.getBean())
+                pb -> convertKey.apply(pb.getInstance()),
+                pb -> convertValue.apply(pb.getInstance())
         );
     }
 
     /** 针对方法添加注解的实例类转换成map对象 */
     public <K, V> Map<K, V> toMapWithMethodAnnotated(Class<? extends Annotation> cls,
-                                                     Function<ProviderMethod, K> convertKey,
-                                                     Function<ProviderMethod, V> convertValue) {
-        Collection<ProviderMethod> providerMethods = withMethodAnnotatedCache(cls);
+                                                     Function<MethodProvider, K> convertKey,
+                                                     Function<MethodProvider, V> convertValue) {
+        Collection<MethodProvider> providerMethods = withMethodAnnotatedCache(cls);
         return toMap4Collection(providerMethods, convertKey, convertValue);
     }
 
@@ -187,7 +186,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
         return Collections.unmodifiableMap(tmp);
     }
 
-    public synchronized List<ProviderMethod> findEventMap(Class<? extends Event> eventClass) {
+    public synchronized List<MethodProvider> findEventMap(Class<? extends Event> eventClass) {
         return eventMap.computeIfAbsent(
                 eventClass.getName(),
                 l -> withMethodAssignableFrom(eventClass)
@@ -202,7 +201,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
      * <p>如果事件执行需要先后顺序 {@link org.springframework.core.annotation.Order}
      */
     public ApplicationContextProvider postEvent(Event event) {
-        List<ProviderMethod> methods = findEventMap(event.getClass());
+        List<MethodProvider> methods = findEventMap(event.getClass());
         methods.forEach(providerMethod -> providerMethod.invoke(event));
         return this;
     }
@@ -212,12 +211,12 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
      * <p>如果事件执行需要先后顺序 {@link org.springframework.core.annotation.Order}
      */
     public ApplicationContextProvider postEventIgnoreException(Event event) {
-        List<ProviderMethod> methods = findEventMap(event.getClass());
-        for (ApplicationContextProvider.ProviderMethod providerMethod : methods) {
+        List<MethodProvider> methods = findEventMap(event.getClass());
+        for (MethodProvider providerMethod : methods) {
             try {
                 providerMethod.invoke(event);
             } catch (Throwable throwable) {
-                log.error("执行方法异常：{}-{}", providerMethod.getBean().getClass(), providerMethod.getMethod().getName(), throwable);
+                log.error("执行方法异常：{}-{}", providerMethod.getInstance().getClass(), providerMethod.getMethod().getName(), throwable);
             }
         }
         return this;
@@ -235,17 +234,23 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
 
     /** 执行循环过程中某一个函数执行失败中断执行 */
     public ApplicationContextProvider executeMethodWithAnnotated(Class<? extends Annotation> annotation, Object... args) {
-        Collection<ProviderMethod> providerMethodStream = withMethodAnnotatedCache(annotation);
-        providerMethodStream.forEach(providerMethod -> providerMethod.invokeInjectorParameters(args));
+        Collection<MethodProvider> providerMethodStream = withMethodAnnotatedCache(annotation);
+        providerMethodStream.forEach(providerMethod -> {
+            /* 会重新组织参数列表 */
+            Object[] objects = this.injectorParameters(providerMethod.getInstance(), providerMethod.getMethod(), args);
+            providerMethod.invoke(objects);
+        });
         return this;
     }
 
     /** 执行循环过程中某一个函数执行失败会继续执行其它函数 */
     public ApplicationContextProvider executeMethodWithAnnotatedException(Class<? extends Annotation> annotation, Object... args) {
-        Collection<ProviderMethod> providerMethodStream = withMethodAnnotatedCache(annotation);
-        for (ProviderMethod providerMethod : providerMethodStream) {
+        Collection<MethodProvider> providerMethodStream = withMethodAnnotatedCache(annotation);
+        for (MethodProvider providerMethod : providerMethodStream) {
             try {
-                providerMethod.invokeInjectorParameters(args);
+                /* 会重新组织参数列表 */
+                Object[] objects = this.injectorParameters(providerMethod.getInstance(), providerMethod.getMethod(), args);
+                providerMethod.invoke(objects);
             } catch (Throwable e) {
                 log.error("执行方法异常：{}-{}", providerMethod.getMethod(), providerMethod.getMethod().getName(), e);
             }
@@ -306,209 +311,65 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     @Getter
     public class ProviderBean implements Comparable<ProviderBean> {
 
-        private final Object bean;
-        /** 所有的字段 */
-        private Collection<ProviderField> fields;
-        /** 所有的方法 */
-        private Collection<ProviderMethod> methods;
+        private final ReflectObjectProvider reflectObjectProvider;
 
         ProviderBean(Object bean) {
-            this.bean = bean;
+            this.reflectObjectProvider = new ReflectObjectProvider(bean);
         }
 
         @Override public int compareTo(ProviderBean o) {
-            int o1Annotation = AnnUtil.orderValue(this.bean.getClass());
-            int o2Annotation = AnnUtil.orderValue(o.bean.getClass());
-            if (o1Annotation != o2Annotation) {
-                return Integer.compare(o1Annotation, o2Annotation);
-            }
-            return this.bean.getClass().getName().compareTo(o.bean.getClass().getName());
+            return this.reflectObjectProvider.compareTo(o.reflectObjectProvider);
         }
 
-        public Collection<ProviderField> getFields() {
-            if (fields == null) {
-                Map<String, Field> fieldMap = FieldUtil.getFields(false, bean.getClass());
-                this.fields = fieldMap.values().stream().map(f -> new ProviderField(bean, f)).toList();
-            }
-            return fields;
+        public Collection<FieldProvider> getFields() {
+            return reflectObjectProvider.getFieldProviderMap().values();
         }
 
-        public Collection<ProviderMethod> getMethods() {
-            if (methods == null) {
-                Map<String, Method> stringMethodMap = MethodUtil.readAllMethod(false, bean.getClass());
-                this.methods = stringMethodMap.values().stream().map(m -> new ProviderMethod(bean, m)).toList();
-            }
-            return methods;
+        public Collection<MethodProvider> getMethods() {
+            return reflectObjectProvider.getMethodMap().values();
         }
 
         /** 是否添加了注解 */
         public boolean hasAnn(Class<? extends Annotation> annotation) {
-            return AnnUtil.hasAnn(bean.getClass(), annotation);
+            return reflectObjectProvider.hasAnn(annotation);
         }
 
         /** 是否添加了注解 */
         public boolean withSuper(Class<?> cls) {
-            return cls.isAssignableFrom(bean.getClass());
+            return reflectObjectProvider.withSuper(cls);
         }
 
-        public Stream<ProviderMethod> methodStream() {
+        public Stream<MethodProvider> methodStream() {
             return getMethods().stream();
         }
 
         /** 所有添加了这个注解的方法 */
-        public Stream<ProviderMethod> methodsWithAnnotated(Class<? extends Annotation> annotation) {
+        public Stream<MethodProvider> methodsWithAnnotated(Class<? extends Annotation> annotation) {
             return methodStream().filter(provider -> provider.hasAnn(annotation));
         }
 
         /** 所有添加了这个注解的方法 */
-        public Stream<ProviderMethod> methodsEqualsParameters(Class<?>... args) {
+        public Stream<MethodProvider> methodsEqualsParameters(Class<?>... args) {
             return methodStream().filter(provider -> provider.equalsParameters(args));
         }
 
         /** 所有添加了这个注解的方法 */
-        public Stream<ProviderMethod> methodsAssignableFrom(Class<?>... args) {
+        public Stream<MethodProvider> methodsAssignableFrom(Class<?>... args) {
             return methodStream().filter(provider -> provider.isAssignableFrom(args));
         }
 
         /** 所有的字段 */
-        public Stream<ProviderField> fieldStream() {
+        public Stream<FieldProvider> fieldStream() {
             return getFields().stream();
         }
 
         /** 所有添加了这个注解的字段 */
-        public Stream<ProviderField> fieldWithAnnotated(Class<? extends Annotation> annotation) {
+        public Stream<FieldProvider> fieldWithAnnotated(Class<? extends Annotation> annotation) {
             return fieldStream().filter(provider -> provider.hasAnn(annotation));
         }
 
         @Override public String toString() {
-            return "ProviderBean{instance=%s}".formatted(bean);
-        }
-    }
-
-    @Getter
-    public class ProviderField implements Comparable<ProviderField> {
-
-        private final Object bean;
-        private final Field field;
-
-        public ProviderField(Object bean, Field field) {
-            this.bean = bean;
-            this.field = field;
-        }
-
-        /** 是否添加了注解 */
-        public boolean hasAnn(Class<? extends Annotation> annotation) {
-            return AnnUtil.hasAnn(field, annotation);
-        }
-
-        public void invoke(Object arg) {
-            try {
-                if (log.isTraceEnabled())
-                    log.trace("{}.{}", bean.getClass().getSimpleName(), this.field.getName());
-                field.set(bean, arg);
-            } catch (Throwable throwable) {
-                if (throwable instanceof InvocationTargetException) {
-                    throwable = throwable.getCause();
-                }
-                throw Throw.of(throwable);
-            }
-        }
-
-        @Override public int compareTo(ProviderField o) {
-
-            int o1Sort = AnnUtil.orderValue(field, () -> AnnUtil.orderValue(bean.getClass()));
-            int o2Sort = AnnUtil.orderValue(o.field, () -> AnnUtil.orderValue(o.bean.getClass()));
-
-            if (o1Sort == o2Sort) {
-                /*如果排序值相同，采用名字排序*/
-                return field.getName().compareTo(o.getField().getName());
-            }
-            return Integer.compare(o1Sort, o2Sort);
-        }
-
-        @Override public String toString() {
-            return "ProviderField{ins=%s, method=%s}".formatted(bean, field);
-        }
-    }
-
-    @Getter
-    public class ProviderMethod implements Comparable<ProviderMethod> {
-
-        private final Object bean;
-        private final Method method;
-        private int invokeCount = 0;
-        private JavassistProxy proxy = null;
-
-        public ProviderMethod(Object bean, Method method) {
-            this.bean = bean;
-            this.method = method;
-        }
-
-        /** 是否添加了注解 */
-        public boolean hasAnn(Class<? extends Annotation> annotation) {
-            return AnnUtil.hasAnn(method, annotation);
-        }
-
-        /** 参数类型强制匹配关系 */
-        public boolean equalsParameters(Class<?>... args) {
-            Class<?>[] parameterTypes = method.getParameterTypes();
-            return parameterTypes.length == args.length && Arrays.equals(parameterTypes, args);
-        }
-
-        /** 参数类型继承关系 */
-        public boolean isAssignableFrom(Class<?>... args) {
-            return MethodUtil.isAssignableFrom(method, args);
-        }
-
-        /** 会重新组织参数列表 */
-        public Object invokeInjectorParameters(Object... args) {
-            Object[] objects = ApplicationContextProvider.this.injectorParameters(bean, method, args);
-            return invoke(objects);
-        }
-
-        /** 直接调用 */
-        public Object invoke(Object... args) {
-            if (proxy == null && invokeCount++ > 5) {
-                proxy = JavassistProxy.of(bean, method);
-            }
-            try {
-                if (log.isTraceEnabled())
-                    log.trace("{}.{}", bean.getClass().getSimpleName(), this.method.getName());
-                long startTime = RunTimeUtil.start();
-                try {
-                    if (proxy != null)
-                        return proxy.proxyInvoke(args);
-                    else
-                        return method.invoke(bean, args);
-                } finally {
-                    if (!AnnUtil.hasAnn(method, IgnoreRunTimeRecord.class)) {
-                        RunTimeUtil.record(bean.getClass().getSimpleName() + "#" + method.getName(), startTime);
-                    }
-                }
-            } catch (Throwable throwable) {
-                if (throwable instanceof IllegalArgumentException assertException) {
-                    throw assertException;
-                }
-                if (throwable instanceof InvocationTargetException) {
-                    throwable = throwable.getCause();
-                }
-                throw Throw.of(bean.getClass().getName() + "#" + method.getName(), throwable);
-            }
-        }
-
-        @Override public int compareTo(ProviderMethod o) {
-            int o1Sort = AnnUtil.orderValue(method, () -> AnnUtil.orderValue(bean.getClass()));
-            int o2Sort = AnnUtil.orderValue(o.method, () -> AnnUtil.orderValue(o.bean.getClass()));
-
-            if (o1Sort == o2Sort) {
-                /*如果排序值相同，采用名字排序*/
-                return method.getName().compareTo(o.method.getName());
-            }
-            return Integer.compare(o1Sort, o2Sort);
-        }
-
-        @Override public String toString() {
-            return bean.getClass().getSimpleName() + "#" + method.getName();
+            return reflectObjectProvider.toString();
         }
     }
 

@@ -2,13 +2,24 @@ package wxdgaming.boot2.core.function;
 
 import com.alibaba.fastjson.JSONArray;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class FunctionUtil {
+
+    public static RuntimeException runtimeException(Throwable throwable) {
+        if (throwable instanceof InvocationTargetException targetException) {
+            RuntimeException runtimeException = new RuntimeException(targetException.getCause().getMessage());
+            runtimeException.setStackTrace(targetException.getCause().getStackTrace());
+            return runtimeException;
+        }
+        RuntimeException runtimeException = new RuntimeException(throwable.getMessage());
+        runtimeException.setStackTrace(throwable.getStackTrace());
+        return runtimeException;
+    }
 
     /** 当参数空 返回 默认值 */
     public static <R, T1> R nullDefaultValue(T1 t1, Function<T1, R> function, R defaultValue) {

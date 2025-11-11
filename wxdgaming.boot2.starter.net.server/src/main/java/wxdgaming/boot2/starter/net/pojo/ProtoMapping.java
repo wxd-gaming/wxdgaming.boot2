@@ -2,6 +2,7 @@ package wxdgaming.boot2.starter.net.pojo;
 
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.ApplicationContextProvider;
+import wxdgaming.boot2.core.reflect.MethodProvider;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 
 /**
@@ -17,6 +18,6 @@ import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 @Slf4j
 public record ProtoMapping(ProtoRequest protoRequest, int messageId,
         Class<? extends PojoBase> pojoClass,
-        ApplicationContextProvider.ProviderMethod providerMethod) {
+        MethodProvider providerMethod) {
 
 }

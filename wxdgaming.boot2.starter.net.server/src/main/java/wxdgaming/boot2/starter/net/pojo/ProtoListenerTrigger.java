@@ -2,8 +2,8 @@ package wxdgaming.boot2.starter.net.pojo;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.reflect.MethodProvider;
 
 /**
  * 事件触发器
@@ -22,8 +22,8 @@ public class ProtoListenerTrigger extends ExecutorEvent {
     }
 
     @Override public String getStack() {
-        ApplicationContextProvider.ProviderMethod providerMethod = protoEvent.getProtoMapping().providerMethod();
-        return providerMethod.getBean().getClass() + "#" + providerMethod.getMethod().getName();
+        MethodProvider providerMethod = protoEvent.getProtoMapping().providerMethod();
+        return providerMethod.getInstance().getClass() + "#" + providerMethod.getMethod().getName();
     }
 
     @Override public void onEvent() throws Exception {
