@@ -13,7 +13,6 @@ public class String2ByteArray {
         public byte[] apply(String trim) {
             byte[] arrays;
             if (StringUtils.isNotBlank(trim)) {
-                trim = trim.replace('|', ',');
                 if (trim.startsWith("[") && trim.endsWith("]")) {
                     arrays = FastJsonUtil.parse(trim, byte[].class);
                 } else {

@@ -10,7 +10,6 @@ public class String2BoolArray {
 
     public static boolean[] parse(String trim) {
         boolean[] arrays;
-        trim = trim.replace('|', ',');
         if (StringUtils.isNotBlank(trim)) {
             if (trim.startsWith("[") && trim.endsWith("]")) {
                 arrays = FastJsonUtil.parse(trim, boolean[].class);

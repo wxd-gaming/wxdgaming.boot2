@@ -14,7 +14,6 @@ public class String2BoolList {
         @Override
         public List<Boolean> apply(String trim) {
             List<Boolean> arrays;
-            trim = trim.replace('|', ',');
             if (StringUtils.isNotBlank(trim)) {
                 if (trim.startsWith("[") && trim.endsWith("]")) {
                     arrays = FastJsonUtil.parseArray(trim, Boolean.class);

@@ -11,12 +11,11 @@ public class String2BoolArrayList {
 
     public static List<boolean[]> parse(String trim) {
         List<boolean[]> arrays;
-        trim = trim.replace('|', ',');
         if (StringUtils.isNotBlank(trim)) {
             if (trim.startsWith("[") && trim.endsWith("]")) {
                 arrays = FastJsonUtil.parseArray(trim, boolean[].class);
             } else {
-                String[] split = trim.split("[;]");
+                String[] split = trim.split(";");
                 arrays = new ArrayList<>(split.length);
                 for (int i = 0; i < split.length; i++) {
                     String[] split2 = split[i].split("[,，|]");
