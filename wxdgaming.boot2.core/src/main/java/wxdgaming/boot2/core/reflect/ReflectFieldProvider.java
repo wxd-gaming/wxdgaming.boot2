@@ -38,8 +38,9 @@ public class ReflectFieldProvider {
         try {
             if (setMethod != null) {
                 setMethod.invoke(instance, value);
+            } else {
+                field.set(instance, value);
             }
-            field.set(instance, value);
         } catch (Exception e) {
             throw Throw.of(reflectClassProvider.getClazz().getSimpleName() + "." + field.getName(), e);
         }
