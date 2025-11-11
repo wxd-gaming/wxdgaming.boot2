@@ -2,16 +2,14 @@ package wxdgaming.boot2.core.reflect;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.lang3.reflect.MethodUtils;
-import wxdgaming.boot2.core.collection.MapOf;
+import wxdgaming.boot2.core.locks.Monitor;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.stream.Stream;
 
 /**
@@ -24,13 +22,31 @@ import java.util.stream.Stream;
 @Getter
 public class ReflectClassProvider {
 
+    private static final Monitor MONITOR = new Monitor();
+    private static final WeakHashMap<Class<?>, ReflectClassProvider> WEAK_HASH_MAP = new WeakHashMap<>();
+
+    /** 带过期缓存，避免同一个 class 多次反射 */
+    public static ReflectClassProvider build(Class<?> clazz) {
+        MONITOR.lock();
+        try {
+            return WEAK_HASH_MAP.computeIfAbsent(clazz, ReflectClassProvider::new);
+        } finally {
+            MONITOR.unlock();
+        }
+    }
+
     private final Class<?> clazz;
-    private Map<String, Field> fieldMap;
-    private final Map<Field, ReflectFieldProvider> fieldProviderMap = new HashMap<>();
+    private Map<String, ReflectFieldProvider> fieldMap = null;
+    private Map<Field, ReflectFieldProvider> fieldProviderMap = null;
     private Map<String, Method> methodMap;
 
     public ReflectClassProvider(Class<?> clazz) {
         this.clazz = clazz;
+    }
+
+    /** 是否添加了注解 */
+    public boolean hasAnn(Class<? extends Annotation> annotation) {
+        return AnnUtil.hasAnn(clazz, annotation);
     }
 
     public boolean isAssignableFrom(Class<?> cls) {
@@ -42,9 +58,18 @@ public class ReflectClassProvider {
         return (T) clazz.cast(obj);
     }
 
-    public Map<String, Field> getFieldMap() {
+    public Map<String, ReflectFieldProvider> getFieldMap() {
         if (fieldMap == null) {
-            this.fieldMap = FieldUtil.getFields(false, clazz);
+            Map<String, ReflectFieldProvider> tmpFieldMap = new LinkedHashMap<>();
+            Map<Field, ReflectFieldProvider> tmpFieldProviderMap = new LinkedHashMap<>();
+            Map<String, Field> fields = FieldUtil.getFields(false, clazz);
+            for (Map.Entry<String, Field> entry : fields.entrySet()) {
+                ReflectFieldProvider reflectFieldProvider = new ReflectFieldProvider(this.clazz, entry.getValue());
+                tmpFieldMap.put(entry.getKey(), reflectFieldProvider);
+                tmpFieldProviderMap.put(entry.getValue(), reflectFieldProvider);
+            }
+            fieldMap = tmpFieldMap;
+            fieldProviderMap = tmpFieldProviderMap;
         }
         return fieldMap;
     }
@@ -66,20 +91,18 @@ public class ReflectClassProvider {
 
     public Method findMethod(String methodName, Class<?>... parameters) {
         StringBuilder fullName = new StringBuilder(methodName);
-        for (int i = 0; i < parameters.length; i++) {
-            Class<?> parameter = parameters[i];
+        for (Class<?> parameter : parameters) {
             fullName.append("_").append(parameter.getSimpleName());
         }
         return getMethodMap().get(fullName.toString());
     }
 
     public ReflectFieldProvider getFieldContext(String fieldName) {
-        Field field = getFieldMap().get(fieldName);
-        return getFieldContext(field);
+        return getFieldMap().get(fieldName);
     }
 
     public ReflectFieldProvider getFieldContext(Field field) {
-        return fieldProviderMap.computeIfAbsent(field, l -> new ReflectFieldProvider(this, field));
+        return fieldProviderMap.computeIfAbsent(field, l -> new ReflectFieldProvider(this.clazz, field));
     }
 
 }

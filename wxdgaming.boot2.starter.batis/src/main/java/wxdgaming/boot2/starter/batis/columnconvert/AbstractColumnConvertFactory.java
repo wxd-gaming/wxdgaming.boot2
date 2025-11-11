@@ -28,7 +28,7 @@ public abstract class AbstractColumnConvertFactory {
 
         Object dbValue = fieldMapping.getFieldValue(bean);
 
-        Convert ann = AnnUtil.ann(fieldMapping.getField(), Convert.class);
+        Convert ann = AnnUtil.ann(fieldMapping.getFieldProvider().getField(), Convert.class);
         if (ann != null) {
             Class<? extends AbstractConverter> cls = ann.value();
             AbstractConverter<Object, Object> abstractConverter = ConvertFactory.getConverter(cls);
@@ -61,7 +61,7 @@ public abstract class AbstractColumnConvertFactory {
             return dbValue;
         }
 
-        Convert ann = AnnUtil.ann(fieldMapping.getField(), Convert.class);
+        Convert ann = AnnUtil.ann(fieldMapping.getFieldProvider().getField(), Convert.class);
         if (ann != null) {
             Class<? extends AbstractConverter> cls = ann.value();
             AbstractConverter<Object, Object> abstractConverter = ConvertFactory.getConverter(cls);
@@ -72,7 +72,7 @@ public abstract class AbstractColumnConvertFactory {
         }
 
         if (AtomicReference.class.isAssignableFrom(fieldMapping.getFileType())) {
-            Class<?> tType = ReflectProvider.getTType(fieldMapping.getField().getGenericType(), 0);
+            Class<?> tType = ReflectProvider.getTType(fieldMapping.getFieldProvider().getField().getGenericType(), 0);
             if (String.class.isAssignableFrom(tType)) {
                 return new AtomicReference<>(dbValue);
             }

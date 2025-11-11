@@ -49,9 +49,9 @@ public class BuildColumnFactory implements IColumnFactory {
     }
 
     public void buildColumn(TableMapping.FieldMapping fieldMapping) {
-        Class<?> type = fieldMapping.getField().getType();
+        Class<?> type = fieldMapping.getFieldProvider().getField().getType();
         if (AtomicReference.class.isAssignableFrom(type)) {
-            type = ReflectProvider.getTType(fieldMapping.getField().getGenericType(), 0);
+            type = ReflectProvider.getTType(fieldMapping.getFieldProvider().getField().getGenericType(), 0);
         }
         IBuildColumn orDefault = buildColumnMap.getOrDefault(type, buildColumnMap.get(String.class));
         orDefault.buildColumn(fieldMapping);

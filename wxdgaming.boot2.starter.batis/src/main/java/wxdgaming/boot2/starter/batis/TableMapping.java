@@ -2,8 +2,8 @@ package wxdgaming.boot2.starter.batis;
 
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.Throw;
 import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.json.ParameterizedTypeImpl;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.ReflectClassProvider;
@@ -12,7 +12,9 @@ import wxdgaming.boot2.starter.batis.ann.DbColumn;
 import wxdgaming.boot2.starter.batis.ann.DbTable;
 import wxdgaming.boot2.starter.batis.build.BuildColumnFactory;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -81,12 +83,11 @@ public class TableMapping {
         /*表名全小写*/
         this.tableName = tableName(cls);
         this.tableComment = tableComment(cls);
-        ReflectClassProvider reflectClassProvider = new ReflectClassProvider(cls);
-        Map<String, Field> fieldMap = reflectClassProvider.getFieldMap();
-        for (Map.Entry<String, Field> entry : fieldMap.entrySet()) {
-            Field field = entry.getValue();
-            ReflectFieldProvider fieldContext = reflectClassProvider.getFieldContext(field);
-            DbColumn dbColumn = AnnUtil.ann(field, DbColumn.class);
+        ReflectClassProvider reflectClassProvider = ReflectClassProvider.build(cls);
+        Map<String, ReflectFieldProvider> fieldMap = reflectClassProvider.getFieldMap();
+        for (Map.Entry<String, ReflectFieldProvider> entry : fieldMap.entrySet()) {
+            ReflectFieldProvider fieldContext = entry.getValue();
+            DbColumn dbColumn = AnnUtil.ann(fieldContext.getField(), DbColumn.class);
             if (dbColumn != null && dbColumn.ignore()) {
                 continue;
             }
@@ -105,14 +106,14 @@ public class TableMapping {
             }
 
             if (StringUtils.isBlank(fieldMapping.comment)) {
-                fieldMapping.comment = fieldMapping.field.getName();
+                fieldMapping.comment = fieldMapping.fieldProvider.getField().getName();
             }
 
             if (fieldMapping.isKey()) {
                 keyFields.add(fieldMapping);
             }
             if (StringUtils.isBlank(fieldMapping.columnName)) {
-                fieldMapping.columnName = field.getName();
+                fieldMapping.columnName = fieldContext.getField().getName();
             }
             /*数据库列名全小写*/
             fieldMapping.columnName = fieldMapping.columnName.toLowerCase();
@@ -139,11 +140,9 @@ public class TableMapping {
     @Setter
     public class FieldMapping {
 
-        private final Field field;
+        private final ReflectFieldProvider fieldProvider;
         private Class<?> fileType;
         private Type jsonType;
-        private final Method setMethod;
-        private final Method getMethod;
         private String columnName;
         private ColumnType columnType;
         private int length;
@@ -154,27 +153,14 @@ public class TableMapping {
         private String defaultValue;
 
         public FieldMapping(ReflectFieldProvider fieldContext) {
-            this.field = fieldContext.getField();
-            this.field.setAccessible(true);
-            this.fileType = this.field.getType();
-            this.jsonType = ParameterizedTypeImpl.genericFieldTypes(field);
-            this.setMethod = fieldContext.getSetMethod();
-            this.getMethod = fieldContext.getGetMethod();
+            this.fieldProvider = fieldContext;
+            this.fileType = this.fieldProvider.getField().getType();
+            this.jsonType = ParameterizedTypeImpl.genericFieldTypes(fieldProvider.getField());
         }
 
         /** 获取字段的值 */
         public Object getFieldValue(Object bean) {
-            try {
-                Object object;
-                if (getMethod == null) {
-                    object = field.get(bean);
-                } else {
-                    object = getMethod.invoke(bean);
-                }
-                return object;
-            } catch (Exception e) {
-                throw Throw.of(e);
-            }
+            return fieldProvider.getInvoke(bean);
         }
 
         /**
@@ -185,8 +171,8 @@ public class TableMapping {
         public void setValue(Object bean, Object colValue) {
             if (colValue == null) return;
             try {
-                if (setMethod == null) {
-                    if (Modifier.isFinal(field.getModifiers())) {
+                if (this.fieldProvider.getSetMethodLazy().get() == null) {
+                    if (Modifier.isFinal(fieldProvider.getField().getModifiers())) {
                         if (Map.class.isAssignableFrom(getFileType())) {
                             final Map<?, ?> fieldValue = (Map<?, ?>) getFieldValue(bean);
                             fieldValue.putAll((Map) colValue);
@@ -206,8 +192,8 @@ public class TableMapping {
                                     "映射表：%s \n字段：%s \n类型：%s \n数据库配置值：%s; 最终类型异常"
                                             .formatted(
                                                     TableMapping.this.tableName,
-                                                    field.getName(),
-                                                    field.getType(),
+                                                    fieldProvider.getField().getName(),
+                                                    fieldProvider.getField().getType(),
                                                     colValue.getClass()
                                             )
                             );
@@ -218,13 +204,13 @@ public class TableMapping {
                             fieldValue.set(colValue);
                         }
                     } else {
-                        field.set(bean, colValue);
+                        fieldProvider.setInvoke(bean, colValue);
                     }
                 } else {
-                    setMethod.invoke(bean, colValue);
+                    fieldProvider.setInvoke(bean, colValue);
                 }
             } catch (Exception e) {
-                throw Throw.of(this.getField().toString(), e);
+                throw Throw.of(this.getFieldProvider().toString(), e);
             }
         }
 

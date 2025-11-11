@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.net.module.rpc;
 
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.reflect.MethodProvider;
+import wxdgaming.boot2.core.reflect.InstanceMethodProvider;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;
 
 /**
@@ -14,6 +14,6 @@ import wxdgaming.boot2.starter.net.ann.RpcRequest;
  * @version 2025-04-08 14:25
  */
 @Slf4j
-public record RpcMapping(RpcRequest rpcRequest, String path, MethodProvider providerMethod) {
+public record RpcMapping(RpcRequest rpcRequest, String path, InstanceMethodProvider providerMethod) {
 
 }

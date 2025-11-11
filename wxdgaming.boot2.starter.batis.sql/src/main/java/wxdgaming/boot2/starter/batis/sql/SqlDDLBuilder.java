@@ -28,7 +28,7 @@ public abstract class SqlDDLBuilder extends DDLBuilder {
 
     @Override public TableMapping tableMapping(Class<? extends Entity> cls) {
         TableMapping tableMapping = super.tableMapping(cls);
-        long count = tableMapping.getColumns().values().stream().filter(v -> AnnUtil.ann(v.getField(), Partition.class) != null).count();
+        long count = tableMapping.getColumns().values().stream().filter(v -> AnnUtil.ann(v.getFieldProvider().getField(), Partition.class) != null).count();
         if (count > 1) {
             throw new RuntimeException("一个实体类只能有一个分区字段");
         }

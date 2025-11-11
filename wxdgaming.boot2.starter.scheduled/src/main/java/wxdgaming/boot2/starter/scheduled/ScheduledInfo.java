@@ -10,7 +10,7 @@ import wxdgaming.boot2.core.Const;
 import wxdgaming.boot2.core.executor.IExecutorQueue;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.AnnUtil;
-import wxdgaming.boot2.core.reflect.MethodProvider;
+import wxdgaming.boot2.core.reflect.InstanceMethodProvider;
 import wxdgaming.boot2.core.reflect.MethodUtil;
 import wxdgaming.boot2.core.timer.CronExpress;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
@@ -30,21 +30,21 @@ import java.util.concurrent.TimeUnit;
 public class ScheduledInfo extends AbstractCronTrigger implements Runnable, IExecutorQueue {
 
     protected String name;
-    final MethodProvider methodProvider;
+    final InstanceMethodProvider instanceMethodProvider;
     protected int index;
     /** 上一次执行尚未完成是否持续执行 默认false 不执行 */
     protected final boolean scheduleAtFixedRate;
 
-    public ScheduledInfo(MethodProvider methodProvider, Scheduled scheduled) {
-        super(methodProvider.getMethod(), new CronExpress(scheduled.value(), TimeUnit.SECONDS, 0));
-        this.methodProvider = methodProvider;
+    public ScheduledInfo(InstanceMethodProvider instanceMethodProvider, Scheduled scheduled) {
+        super(instanceMethodProvider.getMethod(), new CronExpress(scheduled.value(), TimeUnit.SECONDS, 0));
+        this.instanceMethodProvider = instanceMethodProvider;
         if (StringUtils.isNotBlank(scheduled.name())) {
             this.name = "[scheduled-job] " + scheduled.name();
         } else {
-            this.name = "[scheduled-job] " + methodProvider.toString();
+            this.name = "[scheduled-job] " + instanceMethodProvider.toString();
         }
 
-        final Order orderAnn = AnnUtil.ann(methodProvider.getMethod(), Order.class);
+        final Order orderAnn = AnnUtil.ann(instanceMethodProvider.getMethod(), Order.class);
         this.index = orderAnn == null ? Const.SORT_DEFAULT : orderAnn.value();
         this.scheduleAtFixedRate = scheduled.scheduleAtFixedRate();
     }
@@ -71,7 +71,7 @@ public class ScheduledInfo extends AbstractCronTrigger implements Runnable, IExe
 
     @Override public void onEvent() throws Exception {
         try {
-            methodProvider.invoke(Objects.ZERO_ARRAY);
+            instanceMethodProvider.invoke(Objects.ZERO_ARRAY);
         } catch (Throwable throwable) {
             String msg = "执行：" + this.name;
             log.error(msg, throwable);
@@ -85,13 +85,13 @@ public class ScheduledInfo extends AbstractCronTrigger implements Runnable, IExe
         if (o == null || getClass() != o.getClass()) return false;
 
         ScheduledInfo that = (ScheduledInfo) o;
-        return methodProvider.getInstance().getClass().getName().equals(that.methodProvider.getInstance().getClass().getName())
-               && MethodUtil.methodFullName(methodProvider.getMethod()).equals(MethodUtil.methodFullName(that.methodProvider.getMethod()));
+        return instanceMethodProvider.getInstance().getClass().getName().equals(that.instanceMethodProvider.getInstance().getClass().getName())
+               && MethodUtil.methodFullName(instanceMethodProvider.getMethod()).equals(MethodUtil.methodFullName(that.instanceMethodProvider.getMethod()));
     }
 
     @Override public int hashCode() {
-        int result = methodProvider.getInstance().hashCode();
-        result = 31 * result + methodProvider.getMethod().hashCode();
+        int result = instanceMethodProvider.getInstance().hashCode();
+        result = 31 * result + instanceMethodProvider.getMethod().hashCode();
         return result;
     }
 

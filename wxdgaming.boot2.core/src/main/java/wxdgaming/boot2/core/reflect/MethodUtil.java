@@ -168,6 +168,9 @@ public class MethodUtil {
 
             if (checked) {
                 String methodFullName = methodFullName(method);
+                try {
+                    method.setAccessible(true);
+                } catch (Throwable ignore) {}
                 /*非桥模式，也就是覆盖了父类或者实现了接口*/
                 fmmap.put(methodFullName, method);
             }

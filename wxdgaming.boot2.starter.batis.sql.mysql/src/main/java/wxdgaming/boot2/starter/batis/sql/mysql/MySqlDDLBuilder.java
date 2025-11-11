@@ -23,10 +23,10 @@ public class MySqlDDLBuilder extends SqlDDLBuilder {
         StringBuilder tableSql = super.buildTableSqlString(tableMapping, tableName, actionPartition);
         if (actionPartition) {
             tableMapping.getColumns().values().stream()
-                    .filter(v -> AnnUtil.ann(v.getField(), Partition.class) != null)
+                    .filter(v -> AnnUtil.ann(v.getFieldProvider().getField(), Partition.class) != null)
                     .findFirst()
                     .ifPresent(fieldMapping -> {
-                        Partition partition = AnnUtil.ann(fieldMapping.getField(), Partition.class);
+                        Partition partition = AnnUtil.ann(fieldMapping.getFieldProvider().getField(), Partition.class);
                         String minRangeValue = partition.mysqlInitMinRangeValue();
                         String[] strings = partition.initRangeArrays();
                         tableSql.append(" PARTITION BY RANGE")

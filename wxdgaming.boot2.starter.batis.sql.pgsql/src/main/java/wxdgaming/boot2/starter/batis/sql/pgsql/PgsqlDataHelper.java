@@ -142,10 +142,10 @@ public class PgsqlDataHelper extends SqlDataHelper {
         this.executeUpdate("COMMENT ON TABLE \"%s\" IS '%s';".formatted(tableName, comment));
         if (actionPartition) {
             tableMapping.getColumns().values().stream()
-                    .filter(v -> AnnUtil.ann(v.getField(), Partition.class) != null)
+                    .filter(v -> AnnUtil.ann(v.getFieldProvider().getField(), Partition.class) != null)
                     .findFirst()
                     .ifPresent(fieldMapping -> {
-                        Field field = fieldMapping.getField();
+                        Field field = fieldMapping.getFieldProvider().getField();
                         Partition partition = AnnUtil.ann(field, Partition.class);
                         String[] strings = partition.initRangeArrays();
                         if (strings != null && strings.length > 0 && StringUtils.isNotBlank(strings[0])) {

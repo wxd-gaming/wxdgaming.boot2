@@ -10,13 +10,13 @@ import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.ReflectClassProvider;
+import wxdgaming.boot2.core.reflect.ReflectFieldProvider;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.core.util.ConvertUtil;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,7 +40,7 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
 
     public DataTable() {
         this.tClass = ReflectProvider.getTClass(this.getClass());
-        this.reflectClassProvider = new ReflectClassProvider(tClass);
+        this.reflectClassProvider = ReflectClassProvider.build(tClass);
         this.dataMapping = AnnUtil.ann(tClass, DataMapping.class, true);
     }
 
@@ -151,14 +151,8 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
         streamWriter.writeRight("-", len * reflectClassProvider.getFieldMap().size(), '-').writeLn();
         for (E row : dataList) {
             streamWriter.writeLn();
-            for (Field entityField : reflectClassProvider.getFieldMap().values()) {
-                entityField.setAccessible(true);
-                Object value = null;
-                try {
-                    value = entityField.get(row);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
+            for (ReflectFieldProvider entityField : reflectClassProvider.getFieldMap().values()) {
+                Object value = entityField.getInvoke(row);
                 if (value == null) {
                     streamWriter.write("|").writeRight("-", len, ' ');
                 } else if (ConvertUtil.isBaseType(value.getClass())) {

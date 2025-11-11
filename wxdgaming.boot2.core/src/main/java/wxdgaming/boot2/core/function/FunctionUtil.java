@@ -11,6 +11,9 @@ import java.util.function.Function;
 public class FunctionUtil {
 
     public static RuntimeException runtimeException(Throwable throwable) {
+        if (throwable instanceof RuntimeException runtimeException) {
+            return runtimeException;
+        }
         if (throwable instanceof InvocationTargetException targetException) {
             RuntimeException runtimeException = new RuntimeException(targetException.getCause().getMessage());
             runtimeException.setStackTrace(targetException.getCause().getStackTrace());

@@ -25,7 +25,7 @@ public class PgSqlDDLBuilder extends SqlDDLBuilder {
         if (actionPartition) {
             tableMapping.getColumns().values()
                     .stream()
-                    .filter(v -> AnnUtil.ann(v.getField(), Partition.class) != null)
+                    .filter(v -> AnnUtil.ann(v.getFieldProvider().getField(), Partition.class) != null)
                     .findFirst()
                     .ifPresent(fieldMapping -> {
                         table.append(" PARTITION BY RANGE").append("(\"").append(fieldMapping.getColumnName()).append("\")");

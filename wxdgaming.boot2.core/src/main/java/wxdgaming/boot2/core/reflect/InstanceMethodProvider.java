@@ -10,14 +10,14 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
-public class MethodProvider implements Comparable<MethodProvider> {
+public class InstanceMethodProvider implements Comparable<InstanceMethodProvider> {
 
     private final Object instance;
     private final Method method;
     private final AtomicInteger invokeCount = new AtomicInteger(0);
     private JavassistProxy javassistProxy = null;
 
-    public MethodProvider(Object instance, Method method) {
+    public InstanceMethodProvider(Object instance, Method method) {
         this.instance = instance;
         this.method = method;
         try {
@@ -44,7 +44,7 @@ public class MethodProvider implements Comparable<MethodProvider> {
         }
     }
 
-    @Override public int compareTo(MethodProvider o) {
+    @Override public int compareTo(InstanceMethodProvider o) {
         int o1Sort = AnnUtil.orderValue(method, () -> AnnUtil.orderValue(instance().getClass()));
         int o2Sort = AnnUtil.orderValue(o.method, () -> AnnUtil.orderValue(o.instance().getClass()));
 

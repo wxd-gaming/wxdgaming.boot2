@@ -4,8 +4,10 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.Throw;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 /**
  * 字段
@@ -15,110 +17,110 @@ import java.lang.reflect.Method;
  */
 @Slf4j
 @Getter
-public class ReflectFieldProvider {
+public class ReflectFieldProvider implements Comparable<ReflectFieldProvider> {
 
-    private final ReflectClassProvider reflectClassProvider;
+    private final Class<?> cls;
     private final Field field;
-    private final Method setMethod;
-    private final Method getMethod;
+    private final LazyLoad<Method> setMethodLazy;
+    private final LazyLoad<Method> getMethodLazy;
 
-    public ReflectFieldProvider(ReflectClassProvider reflectClassProvider, Field field) {
-        this.reflectClassProvider = reflectClassProvider;
+    public ReflectFieldProvider(Class<?> cls, Field field) {
+        this.cls = cls;
         this.field = field;
-        this.setMethod = findSetMethod(reflectClassProvider.getClazz(), field);
-        this.getMethod = findGetMethod(reflectClassProvider.getClazz(), field);
+        try {
+            this.field.setAccessible(true);
+        } catch (Throwable ignore) {}
+        this.setMethodLazy = new LazyLoad<>(() -> findSetterMethod(field));
+        this.getMethodLazy = new LazyLoad<>(() -> findGetterMethod(field));
+    }
+
+    /** 是否添加了注解 */
+    public boolean hasAnn(Class<? extends Annotation> annotation) {
+        return AnnUtil.hasAnn(field, annotation);
+    }
+
+    @Override public final boolean equals(Object o) {
+        if (!(o instanceof ReflectFieldProvider that)) return false;
+
+        return Objects.equals(getCls(), that.getCls()) && Objects.equals(getField(), that.getField());
+    }
+
+    @Override public int hashCode() {
+        int result = Objects.hashCode(getCls());
+        result = 31 * result + Objects.hashCode(getField());
+        return result;
     }
 
     @Override public String toString() {
-        return "ReflectFieldContext{field=%s, setMethod=%s, getMethod=%s}"
-                .formatted(field, setMethod, getMethod);
+        return "ReflectFieldContext{field=%s}".formatted(field);
     }
 
     public void setInvoke(Object instance, Object value) {
         try {
-            if (setMethod != null) {
-                setMethod.invoke(instance, value);
+            if (setMethodLazy.get() != null) {
+                setMethodLazy.get().invoke(instance, value);
             } else {
                 field.set(instance, value);
             }
         } catch (Exception e) {
-            throw Throw.of(reflectClassProvider.getClazz().getSimpleName() + "." + field.getName(), e);
+            throw Throw.of(cls.getSimpleName() + "." + field.getName(), e);
         }
     }
 
     @SuppressWarnings("unchecked")
     public <R> R getInvoke(Object instance) {
         try {
-            if (getMethod != null) {
-                return (R) getMethod.invoke(instance);
+            if (getMethodLazy.get() != null) {
+                return (R) getMethodLazy.get().invoke(instance);
             }
             return (R) field.get(instance);
         } catch (Exception e) {
-            throw Throw.of(reflectClassProvider.getClazz().getSimpleName() + "." + field.getName(), e);
+            throw Throw.of(cls.getSimpleName() + "." + field.getName(), e);
         }
     }
 
-    /** 查找get方法 */
-    private Method findGetMethod(Class<?> clazz, Field field) {
-        Method method = findMethod(clazz, "get", field, 0);
-        if (method != null) return method;
-        method = findMethod(clazz, "is", field, 0);
-        if (method != null) return method;
-
-        if (field.getType().getSimpleName().equalsIgnoreCase(boolean.class.getSimpleName())) {
-            method = findMethod(clazz, "", field, 0);
-            if (method != null) return method;
-        }
-        return null;
-    }
-
-    /** 查找set方法 */
-    private Method findSetMethod(Class<?> clazz, Field field) {
-        return findMethod(clazz, "set", field, 1);
-    }
-
-    /** 查找方法 */
-    private Method findMethod(Class<?> clazz, String prefix, Field field, int parameterCount) {
-        return findMethod(clazz, field, prefix, field.getName(), parameterCount);
-    }
-
-    private Method findMethod(Class<?> clazz, Field field, String prefix, String fieldName, int parameterCount) {
-        for (Method method : reflectClassProvider.getMethodMap().values()) {
-            String methodName = method.getName();// 获取每一个方法名
-            if (methodName.equalsIgnoreCase(prefix + fieldName)) {
-                if (method.getParameterCount() != parameterCount) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(
-                                "类：{} {} method {} 是否有同名方法 当前方法有参数",
-                                clazz.getName(), prefix, methodName,
-                                new RuntimeException()
-                        );
-                    }
-                    continue;
-                }
-                if (parameterCount > 0) {
-                    Class<?> parameterType = method.getParameterTypes()[0];
-                    if (!field.getType().equals(parameterType)) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(
-                                    "类：{} set method {} 是否有同名方法 当前参数类型不一致 字段参数类型：{}, set 方法参数类型：{}",
-                                    clazz.getName(), methodName, field.getType(), parameterType,
-                                    new RuntimeException()
-                            );
-                        }
-                        continue;
-                    }
-                }
+    private Method findSetterMethod(Field field) {
+        String fieldName = field.getName();
+        String setterName = "set" + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+        try {
+            Method method = cls.getMethod(setterName, field.getType());
+            try {
                 method.setAccessible(true);
-                return method;
-            }
+            } catch (Throwable ignore) {}
+            return method; // 根据字段类型查找setter
+        } catch (NoSuchMethodException e) {
+            return null; // 找不到对应setter
         }
-        if (boolean.class.getSimpleName().equalsIgnoreCase(field.getType().getSimpleName().toLowerCase())) {
-            if (fieldName.startsWith("is")) {
-                return findMethod(clazz, field, prefix, fieldName.substring(2), parameterCount);
-            }
+    }
+
+    private Method findGetterMethod(Field field) {
+        String fieldName = field.getName();
+        String getterNamePrefix = "get";
+        if (field.getType() == boolean.class || field.getType() == Boolean.class) {
+            getterNamePrefix = "is"; // 如果字段是布尔类型，则使用is前缀
         }
-        return null;
+        String getterName = getterNamePrefix + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+        try {
+            Method method = cls.getMethod(getterName);
+            try {
+                method.setAccessible(true);
+            } catch (Throwable ignore) {}
+            return method; // 查找无参数的getter方法
+        } catch (NoSuchMethodException e) {
+            return null; // 找不到对应getter
+        }
+    }
+
+    @Override public int compareTo(ReflectFieldProvider o) {
+
+        int o1Sort = AnnUtil.orderValue(field, () -> AnnUtil.orderValue(cls));
+        int o2Sort = AnnUtil.orderValue(o.field, () -> AnnUtil.orderValue(cls));
+
+        if (o1Sort == o2Sort) {
+            /*如果排序值相同，采用名字排序*/
+            return field.getName().compareTo(o.field.getName());
+        }
+        return Integer.compare(o1Sort, o2Sort);
     }
 
 }
