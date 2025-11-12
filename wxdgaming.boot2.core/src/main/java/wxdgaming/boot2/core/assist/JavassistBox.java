@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.assist;
 
 import javassist.*;
 import lombok.Getter;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Throw;
 
 import java.io.IOException;
@@ -70,7 +71,7 @@ public class JavassistBox {
                 return classPool.get(name);
             } catch (NotFoundException e) {
 
-                throw Throw.of(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         }
 
@@ -104,7 +105,7 @@ public class JavassistBox {
                 call.accept(ctMethod);
                 return this;
             } catch (Exception e) {
-                throw Throw.of(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         }
 
@@ -128,7 +129,7 @@ public class JavassistBox {
                 ctClass.addMethod(ctMethod);
                 return this;
             } catch (Exception e) {
-                throw Throw.of(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         }
 
@@ -148,7 +149,7 @@ public class JavassistBox {
                 getCtClass().writeFile(directoryName);
                 return this;
             } catch (CannotCompileException | IOException e) {
-                throw Throw.of(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         }
 
@@ -156,7 +157,7 @@ public class JavassistBox {
             try {
                 return getCtClass().toBytecode();
             } catch (CannotCompileException | IOException e) {
-                throw Throw.of(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         }
 
@@ -167,7 +168,7 @@ public class JavassistBox {
                 call.accept(aClass);
                 return this;
             } catch (Exception e) {
-                throw Throw.of(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         }
 
@@ -176,7 +177,7 @@ public class JavassistBox {
             try {
                 return findClass(ctClass.getName());
             } catch (Exception e) {
-                throw Throw.of(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         }
 
@@ -186,7 +187,7 @@ public class JavassistBox {
                 byte[] b = ctClass.toBytecode();
                 return defineClass(name, b, 0, b.length);
             } catch (Exception e) {
-                throw Throw.of(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         }
 
@@ -195,7 +196,7 @@ public class JavassistBox {
             try {
                 return (R) loadClass().getDeclaredConstructor().newInstance();
             } catch (Exception e) {
-                throw Throw.of(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         }
     }
@@ -220,7 +221,7 @@ public class JavassistBox {
             CtClass tmp = classPool.get(clazzName);
             return new JavaAssist(classPool, tmp, classLoader);
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -232,7 +233,7 @@ public class JavassistBox {
             tmp.setSuperclass(classPool.get(superclass.getName()));
             return new JavaAssist(classPool, tmp, classLoader);
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -251,7 +252,7 @@ public class JavassistBox {
             }
             return new JavaAssist(classPool, tmp, classLoader);
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -267,7 +268,7 @@ public class JavassistBox {
             CtClass tmp = classPool.makeClass(className + "Impl" + ATOMIC_INTEGER.incrementAndGet());
             return new JavaAssist(classPool, tmp, classLoader);
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

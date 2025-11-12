@@ -3,6 +3,7 @@ package wxdgaming.boot2.starter.batis;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.json.ParameterizedTypeImpl;
 import wxdgaming.boot2.core.reflect.AnnUtil;
@@ -132,7 +133,7 @@ public class TableMapping {
             Constructor<?> constructor = cls.getConstructor();
             return (R) constructor.newInstance();
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

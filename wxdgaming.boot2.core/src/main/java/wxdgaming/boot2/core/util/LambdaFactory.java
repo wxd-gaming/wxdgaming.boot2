@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.util;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.function.*;
 import wxdgaming.boot2.core.reflect.MethodUtil;
@@ -16,7 +17,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * @author wxd-gaming(無心道, 15388152619)
@@ -196,8 +196,8 @@ public class LambdaFactory implements Serializable {
                     }
                 }
             }
-        } catch (Throwable throwable) {
-            throw Throw.of(throwable);
+        } catch (Throwable e) {
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

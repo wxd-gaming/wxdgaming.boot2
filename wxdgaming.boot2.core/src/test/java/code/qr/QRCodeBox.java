@@ -7,6 +7,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import lombok.Builder;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Throw;
 import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.io.FileUtil;
@@ -52,7 +53,7 @@ public class QRCodeBox {
             writeToStream(outStream);
             return this;
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -62,7 +63,7 @@ public class QRCodeBox {
             ImageIO.write(bufferedImage, format, outputStream);
             return this;
         } catch (IOException e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -71,7 +72,7 @@ public class QRCodeBox {
             writeToStream(byteArrayOutputStream);
             return byteArrayOutputStream.toByteArray();
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -108,7 +109,7 @@ public class QRCodeBox {
         try {
             return addLogo(new FileInputStream(logoPath));
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -136,7 +137,7 @@ public class QRCodeBox {
             }
             return this;
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.Const;
@@ -48,7 +49,7 @@ public class ReflectProvider {
             constructor.setAccessible(true);
             return constructor.newInstance(args);
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -266,7 +267,7 @@ public class ReflectProvider {
                     }
                 }
             } catch (Throwable e) {
-                throw Throw.of(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         }
 

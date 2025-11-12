@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.io.FileUtil;
 
@@ -39,7 +40,7 @@ public class ZipOutFile implements Serializable, Closeable {
             zos = new ZipOutputStream(outputStream);
             bufferedOutputStream = new BufferedOutputStream(zos);
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -55,7 +56,7 @@ public class ZipOutFile implements Serializable, Closeable {
             zos.putNextEntry(zipEntry);
             return this;
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -70,7 +71,7 @@ public class ZipOutFile implements Serializable, Closeable {
             bufferedOutputStream.flush();
             return this;
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

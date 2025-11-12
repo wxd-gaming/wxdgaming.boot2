@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.zip;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.io.FileReadUtil;
 
@@ -30,7 +31,7 @@ public class ZipReadFile implements Serializable, Closeable {
         try {
             zip = new ZipFile(new File(zipPath));
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -38,7 +39,7 @@ public class ZipReadFile implements Serializable, Closeable {
         try {
             zip = new ZipFile(zipPath);
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -90,7 +91,7 @@ public class ZipReadFile implements Serializable, Closeable {
                     try (InputStream inputStream = unzipFileStream(z)) {
                         call.accept(z.getName(), inputStream);
                     } catch (Throwable e) {
-                        throw Throw.of(e);
+                        throw ExceptionUtils.asRuntimeException(e);
                     }
                 });
     }
@@ -105,7 +106,7 @@ public class ZipReadFile implements Serializable, Closeable {
         try {
             return zip.getInputStream(zipEntry);
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

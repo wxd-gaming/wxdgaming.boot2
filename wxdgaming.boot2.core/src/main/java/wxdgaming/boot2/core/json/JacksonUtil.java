@@ -30,7 +30,7 @@
 //        try {
 //            return mapper.writeValueAsBytes(obj);
 //        } catch (Exception e) {
-//            throw Throw.of(e);
+//            throw ExceptionUtils.asRuntimeException(e);
 //        }
 //    }
 //
@@ -38,7 +38,7 @@
 //        try {
 //            return mapper.writeValueAsString(obj);
 //        } catch (Exception e) {
-//            throw Throw.of(e);
+//            throw ExceptionUtils.asRuntimeException(e);
 //        }
 //    }
 //
@@ -46,7 +46,7 @@
 //        try {
 //            return mapperFmt.writeValueAsString(obj);
 //        } catch (Exception e) {
-//            throw Throw.of(e);
+//            throw ExceptionUtils.asRuntimeException(e);
 //        }
 //    }
 //
@@ -54,7 +54,7 @@
 //        try {
 //            return mapper.readTree(json);
 //        } catch (Exception e) {
-//            throw Throw.of(e);
+//            throw ExceptionUtils.asRuntimeException(e);
 //        }
 //    }
 //
@@ -62,7 +62,7 @@
 //        try {
 //            return mapper.readValue(bytes, cls);
 //        } catch (Exception e) {
-//            throw Throw.of(e);
+//            throw ExceptionUtils.asRuntimeException(e);
 //        }
 //    }
 //
@@ -70,7 +70,7 @@
 //        try {
 //            return mapper.readValue(json, cls);
 //        } catch (Exception e) {
-//            throw Throw.of(e);
+//            throw ExceptionUtils.asRuntimeException(e);
 //        }
 //    }
 //
@@ -78,7 +78,7 @@
 //        try {
 //            return mapper.readValue(json, cls);
 //        } catch (Exception e) {
-//            throw Throw.of(e);
+//            throw ExceptionUtils.asRuntimeException(e);
 //        }
 //    }
 //
@@ -86,7 +86,7 @@
 //        try {
 //            return mapper.readValue(json, cls);
 //        } catch (Exception e) {
-//            throw Throw.of(e);
+//            throw ExceptionUtils.asRuntimeException(e);
 //        }
 //    }
 //
@@ -98,7 +98,7 @@
 //                }
 //            });
 //        } catch (Exception e) {
-//            throw Throw.of(e);
+//            throw ExceptionUtils.asRuntimeException(e);
 //        }
 //    }
 //
@@ -111,7 +111,7 @@
 //                }
 //            });
 //        } catch (Exception e) {
-//            throw Throw.of(e);
+//            throw ExceptionUtils.asRuntimeException(e);
 //        }
 //    }
 //}

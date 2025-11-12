@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.function;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.reflect.MethodUtil;
 
@@ -47,7 +48,7 @@ public interface SerializableLambda extends Serializable {
             Class<?> aClass = Thread.currentThread().getContextClassLoader().loadClass(implClass);
             return aClass;
         } catch (ClassNotFoundException e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -77,7 +78,7 @@ public interface SerializableLambda extends Serializable {
             }
             return field;
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

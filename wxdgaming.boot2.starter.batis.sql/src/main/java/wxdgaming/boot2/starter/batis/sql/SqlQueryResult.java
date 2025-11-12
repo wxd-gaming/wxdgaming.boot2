@@ -3,6 +3,7 @@ package wxdgaming.boot2.starter.batis.sql;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
@@ -53,7 +54,7 @@ public class SqlQueryResult implements AutoCloseable {
             statement.close();
             conn.close();
         } catch (SQLException e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -61,7 +62,7 @@ public class SqlQueryResult implements AutoCloseable {
         try {
             return resultSet.next();
         } catch (SQLException e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -124,7 +125,7 @@ public class SqlQueryResult implements AutoCloseable {
             }
             return jsonObject;
         } catch (SQLException e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -132,7 +133,7 @@ public class SqlQueryResult implements AutoCloseable {
         try {
             return resultSet.getObject(columnIndex);
         } catch (SQLException e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -140,7 +141,7 @@ public class SqlQueryResult implements AutoCloseable {
         try {
             return resultSet.getObject(columnName);
         } catch (SQLException e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -148,7 +149,7 @@ public class SqlQueryResult implements AutoCloseable {
         try {
             return resultSet.getString(columnIndex);
         } catch (SQLException e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -156,7 +157,7 @@ public class SqlQueryResult implements AutoCloseable {
         try {
             return resultSet.getString(columnName);
         } catch (SQLException e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -164,7 +165,7 @@ public class SqlQueryResult implements AutoCloseable {
         try {
             return resultSet.getInt(columnIndex);
         } catch (SQLException e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -172,7 +173,7 @@ public class SqlQueryResult implements AutoCloseable {
         try {
             return resultSet.getInt(columnName);
         } catch (SQLException e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -180,7 +181,7 @@ public class SqlQueryResult implements AutoCloseable {
         try {
             return resultSet.getLong(columnIndex);
         } catch (SQLException e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -188,7 +189,7 @@ public class SqlQueryResult implements AutoCloseable {
         try {
             return resultSet.getLong(columnName);
         } catch (SQLException e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

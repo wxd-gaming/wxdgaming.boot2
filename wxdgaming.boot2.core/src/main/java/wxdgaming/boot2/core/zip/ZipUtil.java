@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.zip;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.io.Objects;
@@ -87,7 +88,7 @@ public class ZipUtil {
             }
             return out.toByteArray();
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -147,7 +148,7 @@ public class ZipUtil {
             }
             return out.toByteArray();
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -205,7 +206,7 @@ public class ZipUtil {
                 }
             }
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

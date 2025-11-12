@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.io;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.function.ConsumerE1;
 
@@ -112,7 +113,7 @@ public class FileWriteUtil implements Serializable {
         try (OutputStream out = Files.newOutputStream(file.toPath(), openOptions)) {
             call.accept(out);
         } catch (Throwable e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

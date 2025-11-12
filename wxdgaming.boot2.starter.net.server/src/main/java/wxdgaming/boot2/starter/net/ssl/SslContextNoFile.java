@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.net.ssl;
 
 
-import wxdgaming.boot2.core.Throw;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -37,7 +37,7 @@ public class SslContextNoFile implements Serializable {
                         );
                         return sslContext;
                     } catch (Throwable throwable) {
-                        throw Throw.of(throwable);
+                        throw ExceptionUtils.asRuntimeException(throwable);
                     }
                 }
         );

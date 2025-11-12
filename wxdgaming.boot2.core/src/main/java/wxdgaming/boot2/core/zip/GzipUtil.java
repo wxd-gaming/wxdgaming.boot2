@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.zip;
 
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.util.Base64Util;
 import wxdgaming.boot2.core.io.FileReadUtil;
@@ -65,7 +66,7 @@ public class GzipUtil {
             }
             return out.toByteArray();
         } catch (IOException e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -103,7 +104,7 @@ public class GzipUtil {
             final byte[] bytes = primStr.getBytes(StandardCharsets.ISO_8859_1);
             return unGzip2String(bytes);
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -139,7 +140,7 @@ public class GzipUtil {
             }
             return out.toByteArray();
         } catch (IOException e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

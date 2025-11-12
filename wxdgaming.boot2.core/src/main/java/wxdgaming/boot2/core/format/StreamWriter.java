@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.format;
 
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Const;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.util.PatternUtil;
@@ -117,7 +118,7 @@ public class StreamWriter implements Closeable, AutoCloseable {
             }
             return this;
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -128,7 +129,7 @@ public class StreamWriter implements Closeable, AutoCloseable {
             }
             return this;
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

@@ -1,6 +1,7 @@
 package wxdgaming.boot2.starter.net.httpclient5;
 
 import lombok.Getter;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.hc.client5.http.cookie.Cookie;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.Header;
@@ -24,7 +25,7 @@ public class HttpResponse {
     ClassicHttpResponse classicHttpResponse;
     int code;
     byte[] content;
-    Throw exception;
+    Throwable exception;
     List<Cookie> cookieStore = null;
 
     public boolean isSuccess() {
@@ -42,7 +43,7 @@ public class HttpResponse {
                 }
                 exception = new Throw("请求失败, code: " + code + ", " + c);
             }
-            throw exception;
+            throw ExceptionUtils.asRuntimeException(exception);
         }
     }
 

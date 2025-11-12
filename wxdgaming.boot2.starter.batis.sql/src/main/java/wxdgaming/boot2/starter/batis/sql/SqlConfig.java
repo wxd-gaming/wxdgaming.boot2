@@ -6,6 +6,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.lang.ObjectBase;
 
@@ -120,7 +121,7 @@ public class SqlConfig extends ObjectBase {
                         statement.executeUpdate(databaseString);
                         log.info("mysql 数据库 {} 创建完成", dbName);
                     } catch (Exception e) {
-                        throw Throw.of(e);
+                        throw ExceptionUtils.asRuntimeException(e);
                     }
                 };
                 try {

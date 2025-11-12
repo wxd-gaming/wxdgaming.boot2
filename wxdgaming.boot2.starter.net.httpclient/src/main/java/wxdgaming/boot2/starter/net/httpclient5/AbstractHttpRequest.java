@@ -118,7 +118,7 @@ public abstract class AbstractHttpRequest {
         }
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.code = 500;
-        httpResponse.exception = Throw.of(exception);
+        httpResponse.exception = exception;
         return httpResponse;
     }
 

@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.io;
 
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.function.Consumer2;
 import wxdgaming.boot2.core.function.ConsumerE1;
@@ -73,7 +74,7 @@ public class FileReadUtil implements Serializable {
         try (final FileInputStream fileInputStream = new FileInputStream(file)) {
             return readString(fileInputStream, charset);
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -108,7 +109,7 @@ public class FileReadUtil implements Serializable {
         try {
             return Files.readAllLines(path, charset);
         } catch (Throwable e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -120,7 +121,7 @@ public class FileReadUtil implements Serializable {
                 call.accept(string);
             }
         } catch (Throwable e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -139,7 +140,7 @@ public class FileReadUtil implements Serializable {
                 call.accept(line);
             }
         } catch (Throwable e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -151,7 +152,7 @@ public class FileReadUtil implements Serializable {
         try {
             return Files.readAllBytes(path);
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -164,7 +165,7 @@ public class FileReadUtil implements Serializable {
             }
             return outputStream.toByteArray();
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         } finally {
             try {
                 inputStream.close();
@@ -177,7 +178,7 @@ public class FileReadUtil implements Serializable {
             byte[] bytes = readBytes(inputStream);
             outputStream.write(bytes);
         } catch (Exception e) {
-            throw Throw.of(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

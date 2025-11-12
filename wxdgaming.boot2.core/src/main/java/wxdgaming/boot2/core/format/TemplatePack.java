@@ -3,6 +3,7 @@ package wxdgaming.boot2.core.format;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.io.FileUtil;
 import wxdgaming.boot2.core.io.FileWriteUtil;
@@ -70,7 +71,7 @@ public class TemplatePack {
             try {
                 this.dirTemplatePack.setDirectoryForTemplateLoading(new File(dir));
             } catch (IOException e) {
-                throw Throw.of(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         } else {
             this.dirTemplatePack = null;
@@ -108,8 +109,8 @@ public class TemplatePack {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             ftl2OutputStream(ftlName, dataObj, outputStream);
             return outputStream.toByteArray();
-        } catch (Throwable throwable) {
-            throw Throw.of(throwable);
+        } catch (Throwable e) {
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
@@ -120,8 +121,8 @@ public class TemplatePack {
             try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
                 template.process(dataObj, outputStreamWriter);
             }
-        } catch (Throwable throwable) {
-            throw Throw.of(throwable);
+        } catch (Throwable e) {
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
