@@ -24,7 +24,7 @@
 
         .alertBoxBg .alertBox label {padding-left: 5px;padding-right: 5px;text-align: right;width: 80px;display: inline-block;}
 
-        .alertBoxBg .alertBox input {width: 180px;border: #8c8c8c 1px solid;}
+        .alertBoxBg .alertBox input[type=text], .alertBoxBg .alertBox select {width: 180px;border: #8c8c8c 1px solid;}
 
     </style>
     <script>
@@ -155,6 +155,16 @@
             }).send();
         }
 
+        function addValidation() {
+            let text = $("#validation").text().trim();
+            let v = ($("#validationKey").val() + "|let|" + $("#validationValue").val()).trim();
+            if (wxd.isNull(text)) {
+                $("#validation").text(v);
+            } else {
+                $("#validation").text(text + ";" + v);
+            }
+        }
+
         function editGiftCode(uid, code, rewards, comment, validation, startTime, endTime) {
 
             // language=HTML
@@ -169,8 +179,20 @@
                             <label for="rewards">奖励道具:</label><input id="rewards" type="text" value="${rewards}">
                         </li>
                         <li>
-                            <label for="validation">限制条件:</label><input id="validation" type="text" value="${validation}" placeholder="DayCount|lt|1 表示每天限制使用1个">
+                            <label>限制条件:</label>
+                            <select id="validationKey" style="width: 70px;">
+                                <option value="DayCount">每日</option>
+                                <option value="WeekCount">每周</option>
+                                <option value="MonthCount">每月</option>
+                                <option value="YearCount">每年</option>
+                                <option value="ForeverCount">终身</option>
+                            </select>
+                            <input id="validationValue" type="text" style="width: 100px;" value="" placeholder="最大使用次数">
+                            <input type="button" onclick="addValidation()" value="添加"/>
+                            <input type="button" onclick="$('#validation').text('')" value="清理">
                         </li>
+                        <li>
+                            <span id="validation">${validation}</span>
                         <li>
                             <label for="comment">备注:</label><input id="comment" type="text" value="${comment}">
                         </li>
@@ -193,7 +215,7 @@
                         uid: uid,
                         code: $("#code").val(),
                         rewards: $("#rewards").val(),
-                        validation: $("#validation").val(),
+                        validation: $("#validation").text(),
                         comment: $("#comment").val(),
                         startTime: $("#startTime").val(),
                         endTime: $("#endTime").val(),

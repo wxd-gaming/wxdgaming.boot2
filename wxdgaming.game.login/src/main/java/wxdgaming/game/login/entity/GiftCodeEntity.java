@@ -32,7 +32,7 @@ public class GiftCodeEntity extends EntityIntegerUID implements Serializable {
     protected String code;
     /** 备注说明 */
     protected String comment;
-    /** 条件 */
+    /** 条件 DayCount|lt|1;WeekCount|lt|1*/
     protected String validation;
     /** 奖励 */
     protected String rewards = "";

@@ -28,7 +28,7 @@ public enum CountValidationType implements IValidationType {
     ForeverCount(8, "永久计数", l -> true),
     ;
 
-    /**DayCount|lt|1*/
+    /** DayCount|lt|1 */
     public static final Function<String, List<Validation>> Parse = (string) -> {
         String[] split = string.split(";");
         List<Validation> list = new java.util.ArrayList<>();
