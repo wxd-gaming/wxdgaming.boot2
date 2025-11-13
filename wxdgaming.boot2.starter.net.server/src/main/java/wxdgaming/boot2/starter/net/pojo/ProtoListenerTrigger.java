@@ -18,6 +18,7 @@ public class ProtoListenerTrigger extends ExecutorEvent {
     private final ProtoEvent protoEvent;
 
     public ProtoListenerTrigger(ProtoEvent protoEvent) {
+        super(protoEvent.getProtoMapping().providerMethod().getMethod());
         this.protoEvent = protoEvent;
     }
 

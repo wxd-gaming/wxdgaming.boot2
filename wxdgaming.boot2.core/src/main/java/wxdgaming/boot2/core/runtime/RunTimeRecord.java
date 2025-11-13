@@ -18,18 +18,20 @@ public class RunTimeRecord {
     private final String name;
     private final AtomicLong count = new AtomicLong();
     /** 记录的时间是纳秒 */
-    private final AtomicLong totalRunTime = new AtomicLong();
+    private final AtomicLong totalRunTimeNs = new AtomicLong();
+    private long minRunTimeNs = Long.MAX_VALUE;
+    private long maxRunTimeNs = Long.MIN_VALUE;
     /** 平均耗时 */
-    private float avgMsRunTime = 0;
-    private float minMsRunTime = Long.MAX_VALUE;
-    private float maxMsRunTime = Long.MIN_VALUE;
+    private long avgRunTimeUs = 0;
+    private final AtomicLong avg500UsCount = new AtomicLong();
+    private final AtomicLong avg1000UsCount = new AtomicLong();
+    private final AtomicLong avg10MsCount = new AtomicLong();
     private final AtomicLong avg50MsCount = new AtomicLong();
     private final AtomicLong avg100MsCount = new AtomicLong();
-    private final AtomicLong avg200MsCount = new AtomicLong();
-    private final AtomicLong avg500MsCount = new AtomicLong();
-    private final AtomicLong avg1000MsCount = new AtomicLong();
-    private final AtomicLong avg5000MsCount = new AtomicLong();
-    private final AtomicLong avgMsCount = new AtomicLong();
+    private final AtomicLong avg1SCount = new AtomicLong();
+    private final AtomicLong avg5SCount = new AtomicLong();
+    private final AtomicLong avg10SCount = new AtomicLong();
+    private final AtomicLong avgOtherUsCount = new AtomicLong();
 
     public RunTimeRecord(String name) {
         this.name = name;
@@ -37,17 +39,19 @@ public class RunTimeRecord {
 
     public void record(long costTimeNs) {
         count.incrementAndGet();
-        totalRunTime.addAndGet(costTimeNs);
-        float costMs = costTimeNs / 10000 / 100f;
-        if (costMs < minMsRunTime) minMsRunTime = costMs;
-        if (costMs > maxMsRunTime) maxMsRunTime = costMs;
-        if (costMs < 50) avg50MsCount.incrementAndGet();
-        else if (costMs < 100) avg100MsCount.incrementAndGet();
-        else if (costMs < 200) avg200MsCount.incrementAndGet();
-        else if (costMs < 500) avg500MsCount.incrementAndGet();
-        else if (costMs < 1000) avg1000MsCount.incrementAndGet();
-        else if (costMs < 5000) avg5000MsCount.incrementAndGet();
-        else avgMsCount.incrementAndGet();
+        totalRunTimeNs.addAndGet(costTimeNs);
+        if (costTimeNs < minRunTimeNs) minRunTimeNs = costTimeNs;
+        if (costTimeNs > maxRunTimeNs) maxRunTimeNs = costTimeNs;
+        long costUs = costTimeNs / 1000;
+        if (costUs < 500) avg500UsCount.incrementAndGet();
+        else if (costUs < 1000) avg1000UsCount.incrementAndGet();
+        else if (costUs < 1000 * 10L) avg10MsCount.incrementAndGet();
+        else if (costUs < 1000 * 50L) avg50MsCount.incrementAndGet();
+        else if (costUs < 1000 * 100L) avg100MsCount.incrementAndGet();
+        else if (costUs < 1000 * 1000L) avg1SCount.incrementAndGet();
+        else if (costUs < 1000 * 1000L * 5) avg5SCount.incrementAndGet();
+        else if (costUs < 1000 * 1000L * 10) avg10SCount.incrementAndGet();
+        else avgOtherUsCount.incrementAndGet();
     }
 
 }

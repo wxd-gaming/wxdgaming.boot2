@@ -3,6 +3,7 @@ package wxdgaming.game.server.script.role;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.executor.ThreadStopWatch;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.common.slog.SlogService;
@@ -41,15 +42,19 @@ public class PlayerService extends HoldApplicationContext {
         ResLogin resLogin = new ResLogin();
         if (longs != null) {
             for (Long rid : longs) {
+                ThreadStopWatch.start("db load player " + rid);
                 Player player = dataCenterService.getPlayer(rid);
                 RoleBean roleBean = new RoleBean().setRid(rid).setName(player.getName()).setLevel(player.getLevel());
                 resLogin.getRoles().add(roleBean);
+                ThreadStopWatch.stop();
             }
         }
         resLogin.setSid(sid);
         resLogin.setAccount(account);
         resLogin.setUserId(account);
+        ThreadStopWatch.start("sendPlayerList");
         socketSession.write(resLogin);
+        ThreadStopWatch.stop();
         log.info("clientSession={}, sid={}, account={} 发送角色列表:{}", socketSession, sid, account, resLogin);
     }
 

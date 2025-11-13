@@ -25,7 +25,7 @@ public class TableFormatter {
         String[] row = new String[columns.length];
         for (int i = 0, columnsLength = columns.length; i < columnsLength; i++) {
             Object column = columns[i];
-            row[i]=String.valueOf(column);
+            row[i] = String.valueOf(column);
         }
         rows.add(row);
     }
@@ -53,6 +53,9 @@ public class TableFormatter {
         StringBuilder table = new StringBuilder();
 
         for (String[] row : rows) {
+            if (!table.isEmpty()) {
+                table.append("\n");
+            }
             for (int i = 0; i < row.length; i++) {
                 int columnWidth = columnWidths[i];
                 String cell = row[i];
@@ -62,7 +65,6 @@ public class TableFormatter {
                 table.append("| ").append(cell);
                 if (columnTs[i]) table.append("\t");
             }
-            table.append("\n");
         }
         return table.toString();
     }

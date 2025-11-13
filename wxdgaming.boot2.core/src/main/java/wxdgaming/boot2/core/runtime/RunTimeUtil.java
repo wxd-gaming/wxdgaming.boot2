@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
+import wxdgaming.boot2.core.format.TableFormatter;
 import wxdgaming.boot2.core.locks.MonitorReadWrite;
 
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
@@ -30,7 +30,7 @@ public class RunTimeUtil extends ExecutorEvent {
 
     public static void openRecord() {
         Open.set(true);
-        scheduledFuture = ExecutorFactory.getExecutorServiceBasic().scheduleAtFixedRate(new RunTimeUtil(), 15, 15, TimeUnit.MINUTES);
+        scheduledFuture = ExecutorFactory.getExecutorServiceBasic().scheduleAtFixedRate(new RunTimeUtil(), 1, 1, TimeUnit.MINUTES);
     }
 
     public static void closeRecord() {
@@ -65,53 +65,54 @@ public class RunTimeUtil extends ExecutorEvent {
             List<RunTimeRecord> list = runTimeRecordMap.values().stream()
                     .filter(r -> r.getCount().get() > 1)
                     .peek(r -> {
-                        long totalTime = r.getTotalRunTime().get() / 10000;
+                        long totalTime = r.getTotalRunTimeNs().get();
                         long totalCount = r.getCount().get();
-                        r.setAvgMsRunTime((totalTime / totalCount) / 100f);
+                        if (totalCount > 5) {
+                            totalCount -= 2;
+                            totalTime = totalTime - r.getMaxRunTimeNs() - r.getMinRunTimeNs();
+                        }
+                        r.setAvgRunTimeUs((totalTime / totalCount) / 1000);
                     })
                     .sorted((o1, o2) -> {
-                        if (o2.getCount().get() > 1 && o1.getCount().get() > 1) {
-                            if (o2.getTotalRunTime().get() != o1.getTotalRunTime().get()) {
-                                return Long.compare(o2.getTotalRunTime().get(), o1.getTotalRunTime().get());
-                            }
-                        }
                         if (o2.getCount().get() != o1.getCount().get()) {
                             return Long.compare(o2.getCount().get(), o1.getCount().get());
                         }
-                        if (o2.getAvgMsRunTime() != o1.getAvgMsRunTime()) {
-                            return Float.compare(o2.getAvgMsRunTime(), o1.getAvgMsRunTime());
+                        if (o2.getTotalRunTimeNs().get() != o1.getTotalRunTimeNs().get()) {
+                            return Long.compare(o2.getTotalRunTimeNs().get(), o1.getTotalRunTimeNs().get());
+                        }
+                        if (o2.getAvgRunTimeUs() != o1.getAvgRunTimeUs()) {
+                            return Float.compare(o2.getAvgRunTimeUs(), o1.getAvgRunTimeUs());
                         }
                         return o1.getName().compareTo(o2.getName());
                     }).toList();
 
-            StringBuilder sb = new StringBuilder();
-            String format = "|%60s|%20s|%16s|%12s|%12s|%12s|%12s|%12s|%12s|%12s|%12s|%12s|%12s|";
-            String title = format.formatted(
-                    "event", "totalTimeMs", "totalCount", "avg",
-                    "minMs", "maxMs",
-                    "avg50Ms", "avg100Ms", "avg200Ms", "avg500Ms", "avg1000Ms", "avg5000Ms", "avg>5000Ms"
+            TableFormatter tableFormatter = new TableFormatter();
+            tableFormatter.addRow(
+                    "event", "totalCount", "totalTimeUs", "avgUs",
+                    "minUs", "maxUs",
+                    "avg500Us", "avg1000Us", "avg10Ms", "avg50Ms", "avg100Ms", "avg1S", "avg5S", "avg10S", "avg>10S"
             );
-            sb.append(title).append("\n\n");
-            DecimalFormat df = new DecimalFormat("0.00");
             for (RunTimeRecord runTimeRecord : list) {
-                String line = format.formatted(
+                tableFormatter.addRow(
                         subName(runTimeRecord.getName()),
-                        df.format((runTimeRecord.getTotalRunTime().get() / 10000 / 100f)),
                         runTimeRecord.getCount().get(),
-                        df.format((runTimeRecord.getAvgMsRunTime())),
-                        df.format((runTimeRecord.getMinMsRunTime())),
-                        df.format((runTimeRecord.getMaxMsRunTime())),
+                        runTimeRecord.getTotalRunTimeNs().get() / 1000,
+                        runTimeRecord.getAvgRunTimeUs(),
+                        runTimeRecord.getMinRunTimeNs() / 1000,
+                        runTimeRecord.getMaxRunTimeNs() / 1000,
+                        runTimeRecord.getAvg500UsCount().get(),
+                        runTimeRecord.getAvg1000UsCount().get(),
+                        runTimeRecord.getAvg10MsCount().get(),
                         runTimeRecord.getAvg50MsCount().get(),
                         runTimeRecord.getAvg100MsCount().get(),
-                        runTimeRecord.getAvg200MsCount().get(),
-                        runTimeRecord.getAvg500MsCount().get(),
-                        runTimeRecord.getAvg1000MsCount().get(),
-                        runTimeRecord.getAvg5000MsCount().get(),
-                        runTimeRecord.getAvgMsCount().get()
+                        runTimeRecord.getAvg1SCount().get(),
+                        runTimeRecord.getAvg5SCount().get(),
+                        runTimeRecord.getAvg10SCount().get(),
+                        runTimeRecord.getAvgOtherUsCount().get()
                 );
-                sb.append(line).append("\n");
             }
-            log.info("\n执行耗时统计\n{}", sb);
+            String head = "===============================================";
+            log.info("\n{}\n执行耗时统计\n{}\n{}\n{}", head, head, tableFormatter.generateTable(), head);
         } finally {
             MONITOR_READ_WRITE.unWriteLock();
         }

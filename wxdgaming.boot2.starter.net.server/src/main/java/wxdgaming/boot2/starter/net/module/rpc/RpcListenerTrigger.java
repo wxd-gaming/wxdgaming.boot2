@@ -42,6 +42,7 @@ public class RpcListenerTrigger extends ExecutorEvent {
                               SocketSession socketSession,
                               long rpcId,
                               JSONObject paramObject) {
+        super(rpcMapping.providerMethod().getMethod());
         this.rpcMapping = rpcMapping;
         this.rpcService = rpcService;
         this.applicationContextProvider = applicationContextProvider;

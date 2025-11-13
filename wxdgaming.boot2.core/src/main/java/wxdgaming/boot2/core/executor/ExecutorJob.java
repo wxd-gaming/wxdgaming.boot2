@@ -16,7 +16,7 @@ public class ExecutorJob implements Runnable {
     public static final ExecutorLog EXECUTOR_LOG = new ExecutorLog() {
 
         @Override public boolean off() {
-            return true;
+            return false;
         }
 
         @Override public long logTime() {

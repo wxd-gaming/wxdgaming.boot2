@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.executor.ThreadStopWatch;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -108,19 +109,23 @@ public class ReqCreateRoleHandler extends HoldApplicationContext {
             player.setSex(sex);
             player.setJob(job);
             log.info("sid={}, account={}, 创建角色：{}", sid, account, player);
+            ThreadStopWatch.start("写入缓存");
             RoleEntity roleEntity = new RoleEntity().setUid(player.getUid()).setPlayer(player);
             roleEntity.setNewEntity(true);
             dataCenterService.putCache(roleEntity);
+            ThreadStopWatch.stop();
             dataCenterService.getAccount2RidsMap().computeIfAbsent(sid, account, l -> new HashSet<>()).add(player.getUid());
             dataCenterService.getNameRidMap().bind(name, player.getUid());
-
+            ThreadStopWatch.start("写入日志");
             RoleRegisterSlog roleLoginLog = new RoleRegisterSlog(player, userMapping.getClientIp(), JSON.toJSONString(userMapping.getClientParams()));
             slogService.pushLog(roleLoginLog);
-
+            ThreadStopWatch.stop();
         } finally {
             SingletonLockUtil.unlock("role_" + name);
         }
+        ThreadStopWatch.start("CreatePlayerEvent");
         applicationContextProvider.postEventIgnoreException(new EventConst.CreatePlayerEvent(player));
+        ThreadStopWatch.stop();
         playerService.sendPlayerList(socketSession, sid, account);
     }
 
