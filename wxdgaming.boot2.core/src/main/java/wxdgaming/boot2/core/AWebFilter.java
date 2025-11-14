@@ -10,6 +10,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import wxdgaming.boot2.core.executor.ThreadStopWatch;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * 过滤器
  *
@@ -26,7 +28,7 @@ public class AWebFilter implements HandlerInterceptor, WebMvcConfigurer {
     }
 
     @Override public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        ThreadStopWatch.nullInit(request.getRequestURI());
+        ThreadStopWatch.initNotPresent(TimeUnit.MICROSECONDS,request.getRequestURI());
         return true;
     }
 

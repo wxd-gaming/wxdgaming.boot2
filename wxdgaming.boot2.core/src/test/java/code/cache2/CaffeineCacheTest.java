@@ -81,11 +81,11 @@ public class CaffeineCacheTest {
                 //                .heartListener((key, value, cause) -> log.info("心跳处理 key: {}, value: {}, cause: {}", key, value, cause))
                 //                .removalListener((key, value, cause) -> log.info("移除过期 key: {}, value: {}, cause: {}", key, value, cause))
                 .build();
-        ThreadStopWatch.release();
+        ThreadStopWatch.releasePrint();
         ThreadStopWatch.init("缓存测试");
         singleThread(caffeineCacheImpl);
         multiThread(caffeineCacheImpl);
-        log.debug("{}", ThreadStopWatch.prettyPrint());
+        log.debug("{}", ThreadStopWatch.releasePrint());
     }
 
     public void singleThread(CaffeineCacheImpl<Long, Object> cache) {

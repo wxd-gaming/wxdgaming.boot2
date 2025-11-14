@@ -38,24 +38,24 @@ public class PlayerService extends HoldApplicationContext {
 
 
     public void sendPlayerList(SocketSession socketSession, Integer sid, String account) {
+        ThreadStopWatch.startIfPresent("sendPlayerList");
         HashSet<Long> longs = dataCenterService.getAccount2RidsMap().get(sid, account);
         ResLogin resLogin = new ResLogin();
         if (longs != null) {
             for (Long rid : longs) {
-                ThreadStopWatch.start("db load player " + rid);
+                ThreadStopWatch.startIfPresent("db load player " + rid);
                 Player player = dataCenterService.getPlayer(rid);
                 RoleBean roleBean = new RoleBean().setRid(rid).setName(player.getName()).setLevel(player.getLevel());
                 resLogin.getRoles().add(roleBean);
-                ThreadStopWatch.stop();
+                ThreadStopWatch.stopIfPresent();
             }
         }
         resLogin.setSid(sid);
         resLogin.setAccount(account);
         resLogin.setUserId(account);
-        ThreadStopWatch.start("sendPlayerList");
         socketSession.write(resLogin);
-        ThreadStopWatch.stop();
         log.info("clientSession={}, sid={}, account={} 发送角色列表:{}", socketSession, sid, account, resLogin);
+        ThreadStopWatch.stopIfPresent();
     }
 
     public void addExp(Player player, long exp, ReasonDTO reasonDTO) {

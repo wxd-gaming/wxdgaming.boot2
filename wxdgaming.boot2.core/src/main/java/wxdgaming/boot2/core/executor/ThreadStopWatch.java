@@ -1,10 +1,11 @@
 package wxdgaming.boot2.core.executor;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.StopWatch;
 import wxdgaming.boot2.core.util.AssertUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -16,84 +17,167 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ThreadStopWatch {
 
-    private static final ThreadLocal<StopWatch> THREAD_LOCAL = new ThreadLocal<>();
+    private static final ThreadLocal<RecordInfo> recordInfoThreadLocal = new ThreadLocal<>();
 
-    public static void init(String name) {
-        StopWatch stopWatch = THREAD_LOCAL.get();
-        AssertUtil.notNull(stopWatch, "上次资源未释放请检查代码");
-        stopWatch = new StopWatch(name);
-        THREAD_LOCAL.set(stopWatch);
+    /** 初始化上下文记录仪 */
+    public static void init(Object name) {
+        init(TimeUnit.MICROSECONDS, name);
     }
 
-    public static void nullInit(String name) {
-        StopWatch stopWatch = THREAD_LOCAL.get();
-        if (stopWatch == null) {
-            stopWatch = new StopWatch(name);
-            THREAD_LOCAL.set(stopWatch);
+    /** 初始化上下文记录仪 */
+    public static void init(TimeUnit timeUnit, Object name) {
+        RecordInfo recordInfo = recordInfoThreadLocal.get();
+        AssertUtil.notNull(recordInfo, "上次资源未释放请检查代码");
+        recordInfoThreadLocal.set(new RecordInfo(timeUnit, String.valueOf(name)));
+    }
+
+    /** 如果不存在记录仪则初始化 */
+    public static void initNotPresent(Object name) {
+        initNotPresent(TimeUnit.MICROSECONDS, name);
+    }
+
+    /** 如果不存在记录仪则初始化 */
+    public static void initNotPresent(TimeUnit timeUnit, Object name) {
+        RecordInfo recordInfo = recordInfoThreadLocal.get();
+        if (recordInfo == null) {
+            recordInfoThreadLocal.set(new RecordInfo(timeUnit, String.valueOf(name)));
         }
     }
 
-    public static String release() {
-        String info = "";
-        try {
-            StopWatch stopWatch = THREAD_LOCAL.get();
-            if (stopWatch != null) {
-                if (stopWatch.isRunning()) {
-                    stopWatch.stop();
-                }
-                if (stopWatch.getTaskCount() > 0) {
-                    info = stopWatch.prettyPrint(TimeUnit.MILLISECONDS);
-                }
-            }
-        } finally {
-            THREAD_LOCAL.remove();
-        }
-        return info;
+    /** 当前上下文不存在记录仪会抛异常 */
+    public static void start(Object name) {
+        RecordInfo recordInfo = recordInfoThreadLocal.get();
+        recordInfo.start(String.valueOf(name));
     }
 
-    public static void releasePrint() {
-        String release = release();
-        if (StringUtils.isNotBlank(release)) {
-            log.info("{}", release);
-        }
-    }
-
-    public static StopWatch get() {
-        StopWatch stopWatch = THREAD_LOCAL.get();
-        AssertUtil.isNull(stopWatch, "请先调用init方法进行初始化");
-        return stopWatch;
-    }
-
-    public static void start(String name) {
-        StopWatch stopWatch = get();
-        stopWatch.start(name);
-    }
-
+    /** 当前上下文不存在记录仪会抛异常 */
     public static void stop() {
-        StopWatch stopWatch = get();
-        AssertUtil.isTrue(stopWatch.isRunning(), "请先调用start()");
-        stopWatch.stop();
+        RecordInfo recordInfo = recordInfoThreadLocal.get();
+        recordInfo.stop();
     }
 
-    public static long getTotalTimeMillis() {
-        StopWatch stopWatch = get();
-        AssertUtil.isTrue(stopWatch.getTaskCount() > 0, "尚未执行过任务");
-        return stopWatch.getTotalTimeMillis();
+    /** 当前上下文不存在记录仪不会抛异常 */
+    public static void startIfPresent(Object name) {
+        RecordInfo recordInfo = recordInfoThreadLocal.get();
+        if (recordInfo == null) return;
+        recordInfo.start(String.valueOf(name));
     }
 
-    public static String prettyPrint() {
-        return prettyPrint(TimeUnit.MILLISECONDS);
+    /** 当前上下文不存在记录仪不会抛异常 */
+    public static void stopIfPresent() {
+        RecordInfo recordInfo = recordInfoThreadLocal.get();
+        if (recordInfo == null) return;
+        recordInfo.stop();
     }
 
-    public static String prettyPrintUs() {
-        return prettyPrint(TimeUnit.MICROSECONDS);
+    public static String releasePrint() {
+        RecordInfo recordInfo = recordInfoThreadLocal.get();
+        if (recordInfo == null) return null;
+        recordInfoThreadLocal.remove();
+        recordInfo.close();
+        List<FrameInfo> children = recordInfo.getCurFrameInfo().getChildren();
+        if (children.isEmpty()) return null;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append("name: ").append(recordInfo.getCurFrameInfo().getName())
+                .append(", ")
+                .append("cost: ").append(recordInfo.timeUnit.convert(recordInfo.getCurFrameInfo().getFlagTime(), TimeUnit.NANOSECONDS))
+                .append(" ")
+                .append(recordInfo.timeUnit)
+                .append("\n");
+        stringBuilder.append("-----------------------------------------------------------------------").append("\n");
+        for (FrameInfo child : children) {
+            child.toString(stringBuilder, recordInfo.timeUnit);
+        }
+        return stringBuilder.toString();
     }
 
-    public static String prettyPrint(TimeUnit timeUnit) {
-        StopWatch stopWatch = get();
-        AssertUtil.isTrue(stopWatch.getTaskCount() > 0, "尚未执行过任务");
-        return stopWatch.prettyPrint(timeUnit);
+    public static void release() {
+        recordInfoThreadLocal.remove();
     }
 
+    @Getter
+    private static class RecordInfo {
+
+        private final TimeUnit timeUnit;
+        private FrameInfo curFrameInfo;
+
+        public RecordInfo(TimeUnit timeUnit, String name) {
+            this.timeUnit = timeUnit;
+            curFrameInfo = new FrameInfo(null, name);
+        }
+
+        public void start(String name) {
+            FrameInfo parentFrameInfo = curFrameInfo;
+            FrameInfo newFrameInfo = new FrameInfo(parentFrameInfo, name);
+            if (parentFrameInfo != null) {
+                parentFrameInfo.children.add(newFrameInfo);
+            }
+            curFrameInfo = newFrameInfo;
+        }
+
+        public void stop() {
+            FrameInfo frameInfo = curFrameInfo;
+            if (frameInfo == null) {
+                return;
+            }
+            frameInfo.stop();
+            FrameInfo parent = frameInfo.getParent();
+            if (parent != null) {
+                curFrameInfo = parent;
+            }
+        }
+
+        public void close() {
+            do {
+                stop();
+            } while (curFrameInfo.parent != null);
+        }
+
+    }
+
+    @Getter
+    private static class FrameInfo {
+
+        private final FrameInfo parent;
+        private final String name;
+        private final long startTime = System.nanoTime();
+        private Long flagTime = null;
+        private final List<FrameInfo> children = new ArrayList<>();
+        private final int layer;
+
+        public FrameInfo(FrameInfo parent, String name) {
+            this.parent = parent;
+            this.name = name;
+            if (parent != null) {
+                layer = parent.layer + 1;
+            } else {
+                layer = -1;
+            }
+        }
+
+        public void stop() {
+            if (flagTime == null)
+                flagTime = System.nanoTime() - startTime;
+        }
+
+        public void toString(StringBuilder stringBuilder, TimeUnit timeUnit) {
+            if (layer > 0) {
+                if (layer > 1) {
+                    stringBuilder.append("    ".repeat(layer - 1));
+                }
+                stringBuilder.append("|---");
+            }
+            stringBuilder
+                    .append("name: ").append(name)
+                    .append(", ")
+                    .append("cost: ").append(timeUnit.convert(flagTime, TimeUnit.NANOSECONDS))
+                    .append("\n");
+            for (FrameInfo child : children) {
+                child.toString(stringBuilder, timeUnit);
+            }
+        }
+
+    }
 
 }

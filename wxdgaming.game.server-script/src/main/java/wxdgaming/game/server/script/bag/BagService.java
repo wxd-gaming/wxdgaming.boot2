@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.event.InitEvent;
+import wxdgaming.boot2.core.executor.ThreadStopWatch;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.cfg.QItemTable;
@@ -71,10 +72,15 @@ public class BagService extends HoldApplicationContext implements InitPrint {
     }
 
     public void onCreateRoleInitBag(Player player) {
-
+        ThreadStopWatch.startIfPresent("初始化背包信息");
         BagPack bagPack = player.getBagPack();
+        ThreadStopWatch.startIfPresent("背包");
         bagPack.getBagMap().computeIfAbsent(BagType.Bag, k -> new ItemBag(100).resetGrid());/*背包*/
+        ThreadStopWatch.stopIfPresent();
+        ThreadStopWatch.startIfPresent("仓库");
         bagPack.getBagMap().computeIfAbsent(BagType.Store, k -> new ItemBag(100).resetGrid());/*仓库*/
+        ThreadStopWatch.stopIfPresent();
+        ThreadStopWatch.stopIfPresent();
     }
 
     /** 创建角色之后创建背包 */

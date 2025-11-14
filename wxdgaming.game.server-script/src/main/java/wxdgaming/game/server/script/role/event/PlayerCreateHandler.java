@@ -3,6 +3,7 @@ package wxdgaming.game.server.script.role.event;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.executor.ThreadStopWatch;
 import wxdgaming.game.server.bean.goods.BagChangeDTO4ItemCfg;
 import wxdgaming.game.server.bean.goods.ItemCfg;
 import wxdgaming.game.server.bean.reason.ReasonConst;
@@ -35,6 +36,8 @@ public class PlayerCreateHandler {
     public void onCreateRoleInitGoods(EventConst.CreatePlayerEvent event) {
         Player player = event.player();
         log.info("角色创建:{}", player);
+        ThreadStopWatch.startIfPresent("创角赠送道具");
+        ThreadStopWatch.startIfPresent("构建道具");
         ItemCfg.ItemCfgBuilder builder = ItemCfg.builder();
         List<ItemCfg> rewards = new ArrayList<>();
         rewards.add(builder.cfgId(1).num(10000).build());
@@ -47,7 +50,11 @@ public class PlayerCreateHandler {
                 .setItemCfgList(rewards)
                 .setReasonDTO(reasonDTO)
                 .build();
+        ThreadStopWatch.stopIfPresent();
+        ThreadStopWatch.startIfPresent("放入背包");
         bagService.gainItemCfg(player, rewardArgs4ItemCfg);
+        ThreadStopWatch.stopIfPresent();
+        ThreadStopWatch.stopIfPresent();
     }
 
 }

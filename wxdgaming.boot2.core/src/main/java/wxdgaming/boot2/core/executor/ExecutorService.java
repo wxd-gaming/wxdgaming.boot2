@@ -10,6 +10,7 @@ public abstract class ExecutorService implements Executor {
 
     public CompletableFuture<Void> future(Runnable runnable) {
         ExecutorJobFutureVoid executorJobFuture = new ExecutorJobFutureVoid(runnable);
+        executorJobFuture.stack = StackUtils.stack(0, 1);
         executorJobFuture.threadContext = new ThreadContext(ThreadContext.context());
         execute(executorJobFuture);
         return executorJobFuture.getFuture();
@@ -17,6 +18,7 @@ public abstract class ExecutorService implements Executor {
 
     public <T> CompletableFuture<T> future(Supplier<T> supplier) {
         ExecutorJobFuture<T> executorJobFuture = new ExecutorJobFuture<>(supplier);
+        executorJobFuture.stack = StackUtils.stack(0, 1);
         executorJobFuture.threadContext = new ThreadContext(ThreadContext.context());
         execute(executorJobFuture);
         return executorJobFuture.getFuture();
