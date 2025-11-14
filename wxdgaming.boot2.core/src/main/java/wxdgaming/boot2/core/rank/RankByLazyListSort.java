@@ -3,10 +3,12 @@ package wxdgaming.boot2.core.rank;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.cache2.LRUIntCache;
+import wxdgaming.boot2.core.cache.Cache;
+import wxdgaming.boot2.core.cache.LRUCacheLock;
 import wxdgaming.boot2.core.locks.MonitorReadWrite;
 import wxdgaming.boot2.core.util.AssertUtil;
 
+import java.time.Duration;
 import java.util.*;
 
 /**
@@ -25,7 +27,7 @@ public class RankByLazyListSort extends MonitorReadWrite {
 
     private final HashMap<String, RankElement> map = new HashMap<>();
     @JSONField(serialize = false, deserialize = false)
-    private final transient LRUIntCache<RankElement[]> rankCache;
+    private final transient Cache<Integer, RankElement[]> rankCache;
 
     /**
      * 构造函数
@@ -33,9 +35,9 @@ public class RankByLazyListSort extends MonitorReadWrite {
      * @param lazyTimeMs 排行榜延迟刷新时间
      */
     public RankByLazyListSort(long lazyTimeMs) {
-        rankCache = LRUIntCache.<RankElement[]>builder()
-                .expireAfterWriteMs(lazyTimeMs)
-                .heartTimeMs(lazyTimeMs)
+        rankCache = LRUCacheLock.<Integer, RankElement[]>builder()
+                .expireAfterWrite(Duration.ofMillis(lazyTimeMs))
+                .heartExpireAfterWrite(Duration.ofMillis(lazyTimeMs))
                 .loader(k -> {
                     readLock.lock();
                     try {
@@ -46,7 +48,6 @@ public class RankByLazyListSort extends MonitorReadWrite {
                     }
                 })
                 .build();
-        rankCache.start();
     }
 
     /**

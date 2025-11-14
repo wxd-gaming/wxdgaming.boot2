@@ -1,4 +1,4 @@
-package code.cache;
+package wxdgaming.boot2.core.cache;
 
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 

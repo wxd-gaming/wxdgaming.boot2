@@ -2,15 +2,16 @@ package wxdgaming.boot2.starter.batis.sql;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.cache2.Cache;
-import wxdgaming.boot2.core.cache2.LRUCache;
+import wxdgaming.boot2.core.cache.Cache;
+import wxdgaming.boot2.core.cache.LRUCacheLock;
+import wxdgaming.boot2.core.cache.RemovalCause;
 import wxdgaming.boot2.core.executor.ThreadStopWatch;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
 
+import java.time.Duration;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 
 /**
  * jdbc cache, 仅仅支持单主键
@@ -54,24 +55,19 @@ public class SqlDataCache<E extends Entity, Key> {
         this.cls = cls;
         this.sqlDataHelper = sqlDataHelper;
         this.tableMapping = this.sqlDataHelper.tableMapping(cls);
-        this.cache = LRUCache.<Key, E>builder()
+        this.cache = LRUCacheLock.<Key, E>builder()
                 .cacheName("cache-" + tableMapping.getTableName())
-                .area(hashArea)
-                .expireAfterReadMs(TimeUnit.MINUTES.toMillis(expireAfterAccessM))
-                .heartTimeMs(TimeUnit.SECONDS.toMillis(10))
+                .blockSize(hashArea)
+                .expireAfterAccess(Duration.ofMinutes(expireAfterAccessM))
+                .heartExpireAfterWrite(Duration.ofSeconds(10))
                 .loader(this::loader)
                 .heartListener(this::heart)
                 .removalListener(this::removed)
                 .build();
-        this.start();
-    }
-
-    public void start() {
-        getCache().start();
     }
 
     public void stop() {
-        getCache().stop();
+        getCache().close();
     }
 
     protected E loader(Key key) {
@@ -87,14 +83,14 @@ public class SqlDataCache<E extends Entity, Key> {
         return byId;
     }
 
-    protected void heart(Key key, E e) {
+    protected void heart(Key key, E e, RemovalCause removalCause) {
         boolean checkHashCode = e.checkHashCode();
         if (checkHashCode) {
             sqlDataHelper.getDataBatch().save(e);
         }
     }
 
-    protected boolean removed(Key key, E e) {
+    protected boolean removed(Key key, E e, RemovalCause removalCause) {
         log.info("缓存移除：{}, {}, {}", cls, key, e);
         sqlDataHelper.getDataBatch().update(e);
         return true;
@@ -112,25 +108,19 @@ public class SqlDataCache<E extends Entity, Key> {
 
     /** 获取数据，如果没有数据返回null */
     public E getIfPresent(Key ID) {
-        return cache.getIfPresent(ID);
+        return cache.get(ID);
     }
 
     /** 如果数据不存在，不会加载数据库，返回null */
     public E find(Key ID) {
         if (!cache.has(ID)) return null;
-        return cache.getIfPresent(ID);
+        return cache.get(ID);
     }
 
     public void put(Key key, E value) {
         sqlDataHelper.save(value);
         value.setNewEntity(false);
         cache.put(key, value);
-    }
-
-    public E putIfAbsent(Key key, E value) {
-        sqlDataHelper.save(value);
-        value.setNewEntity(false);
-        return cache.putIfAbsent(key, value);
     }
 
     /** 强制缓存过期 */
@@ -147,15 +137,4 @@ public class SqlDataCache<E extends Entity, Key> {
         return cache.values();
     }
 
-    /** 丢弃所有缓存，操作非常危险 */
-    @Deprecated
-    public void discard(Key key) {
-        cache.discard(key);
-    }
-
-    /** 丢弃所有缓存，操作非常危险 */
-    @Deprecated
-    public void discardAll() {
-        cache.discardAll();
-    }
 }

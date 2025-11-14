@@ -51,12 +51,12 @@ public final class ExecutorMonitor extends Thread {
             if (diffMs > executorJob.getExecutorLog().warningTime()) {
                 log.error(
                         "执行耗时: {}ms, 线程: {}{}, 执行器: {}{}",
-                        thread.getName(), queueName, stack, diffMs, releasePrint
+                        diffMs, thread.getName(), queueName, stack, releasePrint
                 );
             } else {
                 log.info(
                         "执行耗时: {}ms, 线程: {}{}, 执行器: {}{}",
-                        thread.getName(), queueName, stack, diffMs, releasePrint
+                        diffMs, thread.getName(), queueName, stack, releasePrint
                 );
             }
         }

@@ -1,12 +1,14 @@
-package code.cache;
+package wxdgaming.boot2.core.cache;
 
 import lombok.Builder;
 import lombok.Getter;
 import wxdgaming.boot2.core.function.Consumer3;
 import wxdgaming.boot2.core.function.Predicate3;
+import wxdgaming.boot2.core.locks.MonitorReadWrite;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.function.Function;
 
 /**
@@ -16,11 +18,11 @@ import java.util.function.Function;
  * @version 2025-07-03 10:57
  **/
 @Getter
-public class LRUCacheLock<K, V> {
+public class LRUCacheLock<K, V> implements Cache<K, V> {
 
-    private LRUCacheHolderLock<K, V> cacheDriver;
+    private LRUCacheHolderLock<K, V> coreDriver;
     private LRUCacheHolderLock<K, V> heartDriver;
-    private LRUCacheHolderLock<K, Hold> outerDriver;
+    private LRUCacheHolderLock<K, Hold<V>> outerDriver;
 
     private final String cacheName;
     private final int blockSize;
@@ -34,6 +36,18 @@ public class LRUCacheLock<K, V> {
     private final Consumer3<K, V, RemovalCause> heartListener;
     private final Predicate3<K, V, RemovalCause> removalListener;
 
+    /**
+     * 构造器
+     *
+     * @param cacheName             缓存名字
+     * @param blockSize             分区
+     * @param heartExpireAfterWrite 心跳处理
+     * @param expireAfterAccess     滑动缓存，读取过期
+     * @param expireAfterWrite      固定缓存，写入过期
+     * @param loader                加载
+     * @param heartListener         心态监听
+     * @param removalListener       删除监听
+     */
     @Builder
     public LRUCacheLock(String cacheName, int blockSize,
                         Duration heartExpireAfterWrite,
@@ -65,7 +79,7 @@ public class LRUCacheLock<K, V> {
                 "心跳时间不得低于%s秒", CacheConst.minHeartDuration.toSeconds()
         );
 
-        cacheDriver = LRUCacheHolderLock.<K, V>builder()
+        coreDriver = LRUCacheHolderLock.<K, V>builder()
                 .loader(loader)
                 .blockSize(blockSize)
                 .removalListener(removalListener)
@@ -75,7 +89,7 @@ public class LRUCacheLock<K, V> {
 
         heartDriver = LRUCacheHolderLock.<K, V>builder()
                 .blockSize(blockSize)
-                .loader(key -> cacheDriver.get(key))
+                .loader(key -> coreDriver.get(key))
                 .expireAfterWrite(this.heartExpireAfterWrite)
                 .removalListener((k, v, removalCause) -> {
                     if (removalCause != RemovalCause.EXPIRE) return true;
@@ -85,9 +99,9 @@ public class LRUCacheLock<K, V> {
                 })
                 .build();
 
-        outerDriver = LRUCacheHolderLock.<K, Hold>builder()
+        outerDriver = LRUCacheHolderLock.<K, Hold<V>>builder()
                 .blockSize(blockSize)
-                .loader(key -> new Hold(heartDriver.get(key)))
+                .loader(key -> new Hold<V>(heartDriver.get(key)))
                 .expireAfterWrite(CacheConst.outerDuration)
                 .removalListener((k, v, removalCause) -> {
                     if (removalCause != RemovalCause.EXPIRE) {
@@ -100,55 +114,65 @@ public class LRUCacheLock<K, V> {
 
     }
 
+    public MonitorReadWrite getMonitorReadWrite() {
+        return coreDriver.blockList.getFirst();
+    }
+
+    @Override public void close() {
+        coreDriver.close();
+        heartDriver.close();
+        outerDriver.close();
+    }
+
     /** 计算内存大小 注意特别耗时，并且可能死循环 */
-    public long memorySize() {
+    @Override public long memorySize() {
         return 0;
     }
 
-    private class Hold {
-        final V v;
-
-        public Hold(V v) {
-            this.v = v;
-        }
+    @Override public long size() {
+        return coreDriver.size();
     }
 
-    public long size() {
-        return cacheDriver.size();
+    @Override public boolean has(K k) {
+        return coreDriver.has(k);
     }
 
-    public V get(K k) {
-        Hold hold = outerDriver.get(k);
-        return hold.v;
+    @Override public Collection<V> values() {
+        return coreDriver.values();
     }
 
-    public void put(K k, V v) {
+    @Override public V get(K k) {
+        Hold<V> hold = outerDriver.get(k);
+        return hold.v();
+    }
+
+    @Override public void put(K k, V v) {
         outerDriver.invalidate(k, RemovalCause.REPLACED);
         heartDriver.invalidate(k, RemovalCause.REPLACED);
-        cacheDriver.put(k, v);
+        coreDriver.put(k, v);
     }
 
-    public void invalidate(K k) {
+    @Override public void invalidate(K k) {
         outerDriver.invalidate(k, RemovalCause.EXPLICIT);
         heartDriver.invalidate(k, RemovalCause.EXPLICIT);
-        cacheDriver.invalidate(k, RemovalCause.EXPLICIT);
+        coreDriver.invalidate(k, RemovalCause.EXPLICIT);
     }
 
-    public void invalidateAll() {
+    @Override public void invalidateAll() {
         invalidateAll(RemovalCause.EXPLICIT);
     }
 
-    public void invalidateAll(RemovalCause cause) {
+    @Override public void invalidateAll(RemovalCause cause) {
         outerDriver.invalidateAll();
         heartDriver.invalidateAll();
-        cacheDriver.invalidateAll();
+        coreDriver.invalidateAll();
     }
 
     /** 强制刷新，定时清理过期数据可能出现延迟，所以也可以手动调用清理 */
-    public void refresh() {
+    @Override public void refresh() {
         outerDriver.cleanup();
         heartDriver.cleanup();
-        cacheDriver.cleanup();
+        coreDriver.cleanup();
     }
 
 }

@@ -1,4 +1,4 @@
-package code.cache;
+package wxdgaming.boot2.core.cache;
 
 import lombok.Builder;
 import wxdgaming.boot2.core.function.Predicate3;
@@ -21,7 +21,7 @@ import java.util.function.Function;
 class LRUCacheHolderLock<K, V> {
 
     protected final int blockSize;
-    protected List<CacheBlock> cacheAtomicReference;
+    protected List<CacheBlock> blockList;
     protected ScheduledFuture<?> scheduledFuture;
     /** 读取过期时间 */
     protected final Duration expireAfterAccess;
@@ -95,6 +95,14 @@ class LRUCacheHolderLock<K, V> {
             });
         }
 
+        public boolean has(K key) {
+            readLock();
+            try {
+                return nodeMap.containsKey(key);
+            } finally {
+                unReadLock();
+            }
+        }
 
         public V get(K key) {
             readLock();
@@ -158,9 +166,9 @@ class LRUCacheHolderLock<K, V> {
     }
 
     private void init() {
-        cacheAtomicReference = new ArrayList<>(blockSize);
+        blockList = new ArrayList<>(blockSize);
         for (int i = 0; i < this.blockSize; i++) {
-            cacheAtomicReference.add(new CacheBlock());
+            blockList.add(new CacheBlock());
         }
 
         if (expireAfterAccess != null || expireAfterWrite != null) {
@@ -168,7 +176,7 @@ class LRUCacheHolderLock<K, V> {
             if (delay < 1000)
                 throw new RuntimeException("expire < 1s");
             delay = delay / 100;
-            scheduledFuture = CacheConst.scheduledExecutorService.scheduleWithFixedDelay(() -> onCleanup(code.cache.RemovalCause.EXPIRE), delay, delay, TimeUnit.MILLISECONDS);
+            scheduledFuture = CacheConst.scheduledExecutorService.scheduleWithFixedDelay(() -> onCleanup(RemovalCause.EXPIRE), delay, delay, TimeUnit.MILLISECONDS);
         } else {
             AssertUtil.notNull(this.removalListener, "removalListener 非空 请配置过期时间");
         }
@@ -185,17 +193,26 @@ class LRUCacheHolderLock<K, V> {
     }
 
     public long size() {
-        return cacheAtomicReference.stream().mapToLong(CacheBlock::size).sum();
+        return blockList.stream().mapToLong(CacheBlock::size).sum();
     }
 
     public void put(K key, V value) {
         int blockIndex = getBlockIndex(key);
-        cacheAtomicReference.get(blockIndex).put(key, value);
+        blockList.get(blockIndex).put(key, value);
     }
 
     public V get(K key) {
         int blockIndex = getBlockIndex(key);
-        return cacheAtomicReference.get(blockIndex).get(key);
+        return blockList.get(blockIndex).get(key);
+    }
+
+    public Collection<V> values() {
+        return blockList.stream().flatMap(v -> v.values().stream()).toList();
+    }
+
+    public boolean has(K key) {
+        int blockIndex = getBlockIndex(key);
+        return blockList.get(blockIndex).has(key);
     }
 
     public void invalidate(K k) {
@@ -205,7 +222,7 @@ class LRUCacheHolderLock<K, V> {
     public void invalidate(K k, RemovalCause cause) {
         CacheConst.scheduledExecutorService.execute(() -> {
             int blockIndex = getBlockIndex(k);
-            CacheBlock cacheBlock = cacheAtomicReference.get(blockIndex);
+            CacheBlock cacheBlock = blockList.get(blockIndex);
             cacheBlock.syncWrite(() -> {
                 CacheNode remove = cacheBlock.nodeMap.remove(k);
                 if (remove != null) {
@@ -223,7 +240,7 @@ class LRUCacheHolderLock<K, V> {
 
     public void invalidateAll(RemovalCause removalCause) {
         CacheConst.scheduledExecutorService.execute(() -> {
-            for (CacheBlock cacheBlock : cacheAtomicReference) {
+            for (CacheBlock cacheBlock : blockList) {
                 cacheBlock.syncWrite(() -> {
                     Iterator<CacheNode> iterator = cacheBlock.expireSet.iterator();
                     while (iterator.hasNext()) {
@@ -239,15 +256,15 @@ class LRUCacheHolderLock<K, V> {
 
     /** 强制刷新，定时清理过期数据可能出现延迟，所以也可以手动调用清理 */
     public void cleanup() {
-        CacheConst.scheduledExecutorService.execute(() -> onCleanup(code.cache.RemovalCause.EXPIRE));
+        CacheConst.scheduledExecutorService.execute(() -> onCleanup(RemovalCause.EXPIRE));
     }
 
-    public void cleanup(code.cache.RemovalCause removalCause) {
+    public void cleanup(RemovalCause removalCause) {
         CacheConst.scheduledExecutorService.execute(() -> onCleanup(removalCause));
     }
 
-    private void onCleanup(code.cache.RemovalCause removalCause) {
-        for (CacheBlock cacheBlock : cacheAtomicReference) {
+    private void onCleanup(RemovalCause removalCause) {
+        for (CacheBlock cacheBlock : blockList) {
             cacheBlock.syncWrite(() -> {
                 Iterator<CacheNode> iterator = cacheBlock.expireSet.iterator();
                 while (iterator.hasNext()) {

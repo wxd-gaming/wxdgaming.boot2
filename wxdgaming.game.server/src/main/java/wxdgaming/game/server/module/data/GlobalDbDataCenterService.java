@@ -35,7 +35,7 @@ public class GlobalDbDataCenterService {
             if (playerSnap == null) {
                 Player player = dataCenterService.getPlayer(uid);
                 playerSnap = player.toPlayerSnap();
-                globalDbHelper.getCacheService().cache(PlayerSnap.class).putIfAbsent(uid, playerSnap);
+                globalDbHelper.getCacheService().cache(PlayerSnap.class).put(uid, playerSnap);
             }
             return playerSnap;
         } finally {

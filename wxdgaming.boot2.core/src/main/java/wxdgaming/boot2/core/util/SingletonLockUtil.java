@@ -1,11 +1,11 @@
 package wxdgaming.boot2.core.util;
 
-import wxdgaming.boot2.core.cache2.CacheLock;
-import wxdgaming.boot2.core.cache2.LRUCache;
+import wxdgaming.boot2.core.cache.LRUCacheLock;
+import wxdgaming.boot2.core.locks.MonitorReadWrite;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
 /**
@@ -17,31 +17,28 @@ import java.util.function.Supplier;
 public class SingletonLockUtil {
 
     /** 缓存锁 */
-    static final LRUCache<Object, LockObject> cache;
-    static final CacheLock cacheLock;
-    static final ReentrantReadWriteLock.WriteLock writeLock;
+    static final LRUCacheLock<Object, LockObject> cache;
+    static final MonitorReadWrite MONITOR_READ_WRITE;
 
     static {
-        cache = LRUCache.<Object, LockObject>builder()
-                .area(1)
-                .heartTimeMs(TimeUnit.MINUTES.toMillis(5))
-                .expireAfterReadMs(TimeUnit.MINUTES.toMillis(5))
+        cache = LRUCacheLock.<Object, LockObject>builder()
+                .blockSize(1)
+                .heartExpireAfterWrite(Duration.ofMinutes(1))
+                .expireAfterAccess(Duration.ofMinutes(5))
                 .loader(k -> new LockObject())
-                .removalListener((o, lockObject) -> lockObject.count <= 0)
+                .removalListener((o, lockObject, removalCause) -> lockObject.count <= 0)
                 .build();
-        cache.start();
-        cacheLock = cache.getReentrantLocks().getFirst();
-        writeLock = cacheLock.getWriteLock();
+        MONITOR_READ_WRITE = cache.getMonitorReadWrite();
     }
 
     private static LockObject getLockObject(Object key) {
         LockObject lockObject;
-        writeLock.lock();
+        MONITOR_READ_WRITE.writeLock();
         try {
             lockObject = cache.get(key);
             lockObject.count++;
         } finally {
-            writeLock.unlock();
+            MONITOR_READ_WRITE.unWriteLock();
         }
         return lockObject;
     }
@@ -78,12 +75,12 @@ public class SingletonLockUtil {
 
     public static void unlock(Object key) {
         LockObject lockObject;
-        writeLock.lock();
+        MONITOR_READ_WRITE.writeLock();
         try {
             lockObject = cache.get(key);
             lockObject.count--;
         } finally {
-            writeLock.unlock();
+            MONITOR_READ_WRITE.unWriteLock();
         }
         lockObject.reentrantLock.unlock();
     }

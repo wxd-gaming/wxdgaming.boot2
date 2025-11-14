@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import wxdgaming.boot2.core.BootstrapProperties;
-import wxdgaming.boot2.core.cache2.CASCache;
-import wxdgaming.boot2.core.cache2.Cache;
+import wxdgaming.boot2.core.cache.Cache;
+import wxdgaming.boot2.core.cache.LRUCacheCAS;
 import wxdgaming.boot2.core.format.HexId;
 import wxdgaming.boot2.core.util.Md5Util;
 import wxdgaming.boot2.core.zip.GzipUtil;
@@ -15,8 +15,8 @@ import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.message.inner.ReqRemote;
 import wxdgaming.boot2.starter.net.message.inner.ResRemote;
 
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * rpc 服务
@@ -38,17 +38,16 @@ public class RpcService {
         this.hexId = new HexId(bootstrapProperties.getSid());
         this.rpcToken = bootstrapProperties.getRpcToken();
         this.rpcListenerFactory = rpcListenerFactory;
-        this.rpcCache = CASCache.<Long, CompletableFuture<JSONObject>>builder()
+        this.rpcCache = LRUCacheCAS.<Long, CompletableFuture<JSONObject>>builder()
                 .cacheName("rpc-server")
-                .heartTimeMs(TimeUnit.SECONDS.toMillis(1))
-                .expireAfterWriteMs(TimeUnit.SECONDS.toMillis(60))
-                .removalListener((key, value) -> {
+                .heartExpireAfterWrite(Duration.ofSeconds(10))
+                .expireAfterWrite(Duration.ofSeconds(60))
+                .removalListener((key, value, removalCause) -> {
                     log.debug("rpcCache remove key:{}", key);
                     value.completeExceptionally(new RuntimeException("time out"));
                     return true;
                 })
                 .build();
-        this.rpcCache.start();
     }
 
     public String sign(long rpcId) {
@@ -56,7 +55,7 @@ public class RpcService {
     }
 
     public CompletableFuture<JSONObject> responseFuture(long rpcId) {
-        return rpcCache.getIfPresent(rpcId);
+        return rpcCache.get(rpcId);
     }
 
     public Mono<JSONObject> request(SocketSession socketSession, String cmd, JSONObject params) {

@@ -1,4 +1,4 @@
-package code.cache;
+package wxdgaming.boot2.core.cache;
 
 import lombok.Builder;
 import wxdgaming.boot2.core.function.Predicate3;
@@ -94,6 +94,9 @@ class LRUCacheHolderCAS<K, V> {
             expireSet.add(newNode);
         }
 
+        public boolean has(K key) {
+            return nodeMap.containsKey(key);
+        }
 
         public V get(K key) {
             CacheNode cacheNode = nodeMap.computeIfAbsent(key, l -> {
@@ -177,6 +180,15 @@ class LRUCacheHolderCAS<K, V> {
     public void put(K key, V value) {
         int blockIndex = getBlockIndex(key);
         blockList.get(blockIndex).put(key, value);
+    }
+
+    public Collection<V> values() {
+        return blockList.stream().flatMap(v -> v.values().stream()).toList();
+    }
+
+    public boolean has(K key) {
+        int blockIndex = getBlockIndex(key);
+        return blockList.get(blockIndex).has(key);
     }
 
     public V get(K key) {
