@@ -1,10 +1,11 @@
 package wxdgaming.boot2.core.reflect;
 
 import lombok.Getter;
+import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.assist.JavassistProxy;
-import wxdgaming.boot2.core.function.FunctionUtil;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,16 +31,28 @@ public class InstanceMethodProvider implements Comparable<InstanceMethodProvider
     }
 
     public Object invoke(Object... args) {
-        if (invokeCount.get() >= 10) {
-            if (javassistProxy == null) {
-                javassistProxy = JavassistProxy.of(instance, method);
-            }
-            return javassistProxy.proxyInvoke(args);
-        } else {
-            try {
+        try {
+            if (invokeCount.get() >= 10) {
+                if (javassistProxy == null) {
+                    javassistProxy = JavassistProxy.of(instance, method);
+                }
+                return javassistProxy.proxyInvoke(args);
+            } else {
                 return method.invoke(instance, args);
-            } catch (Exception e) {
-                throw FunctionUtil.runtimeException(e);
+            }
+        } catch (Exception e) {
+            String msg = """
+                    
+                     class: %s
+                    method: %s
+                      args: %s
+                    
+                    """.formatted(instance.getClass().getName(), method.getName(), Arrays.toString(args));
+            if (e instanceof InvocationTargetException invocationTargetException) {
+                Throwable cause = invocationTargetException.getCause();
+                throw Throw.of(msg, cause);
+            } else {
+                throw Throw.of(msg, e);
             }
         }
     }

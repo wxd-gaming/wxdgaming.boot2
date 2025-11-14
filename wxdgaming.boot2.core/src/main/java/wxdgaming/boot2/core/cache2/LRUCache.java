@@ -5,6 +5,7 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
+import wxdgaming.boot2.core.executor.ThreadStopWatch;
 import wxdgaming.boot2.core.format.data.Data2Size;
 import wxdgaming.boot2.core.timer.MyClock;
 
@@ -158,7 +159,9 @@ public class LRUCache<K, V> extends Cache<K, V> {
         int hashIndex = hashIndex(k);
         CacheHolder<V> cacheHolder = null;
         CacheLock cacheLock = reentrantLocks.get(hashIndex);
+        ThreadStopWatch.startIfPresent("cache lock");
         cacheLock.readLock.lock();
+        ThreadStopWatch.stopIfPresent();
         try {
             cacheHolder = nodes.get(hashIndex).get(k);
         } finally {
@@ -168,16 +171,20 @@ public class LRUCache<K, V> extends Cache<K, V> {
             /*双重锁确保正确命中*/
             if (LRUCache.this.loader == null)
                 return null;
+            ThreadStopWatch.startIfPresent("cache lock load");
             cacheLock.writeLock.lock();
             try {
                 cacheHolder = nodes.get(hashIndex).get(k);
                 if (cacheHolder == null) {
                     V apply = LRUCache.this.loader.apply(k);
                     /*TODO 即便是数据库 null 也要缓存, 防止缓存穿透*/
+                    ThreadStopWatch.startIfPresent("cache put map");
                     cacheHolder = newCacheHolder(apply);
                     nodes.get(hashIndex).put(k, cacheHolder);
+                    ThreadStopWatch.stopIfPresent();
                 }
             } finally {
+                ThreadStopWatch.stopIfPresent();
                 cacheLock.writeLock.unlock();
             }
         }

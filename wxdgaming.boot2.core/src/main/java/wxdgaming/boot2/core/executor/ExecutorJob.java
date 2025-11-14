@@ -60,8 +60,8 @@ public class ExecutorJob implements Runnable {
             log.error("{}", stack, throwable);
         } finally {
             this.threadContext = null;
-            ThreadContext.cleanup();
             ExecutorMonitor.release();
+            ThreadContext.cleanup();
             runAfter();
         }
     }

@@ -54,8 +54,8 @@ public abstract class ExecutorEvent extends ExecutorJob implements IExecutorQueu
             log.error("{}", getStack(), throwable);
         } finally {
             this.threadContext = null;
-            ThreadContext.cleanup();
             ExecutorMonitor.release();
+            ThreadContext.cleanup();
             runAfter();
         }
     }

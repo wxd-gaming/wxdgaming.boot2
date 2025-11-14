@@ -43,8 +43,8 @@ class ExecutorJobFuture<T> extends ExecutorJob implements Runnable, IExecutorQue
             future.completeExceptionally(throwable);
         } finally {
             this.threadContext = null;
-            ThreadContext.cleanup();
             ExecutorMonitor.release();
+            ThreadContext.cleanup();
             runAfter();
         }
     }

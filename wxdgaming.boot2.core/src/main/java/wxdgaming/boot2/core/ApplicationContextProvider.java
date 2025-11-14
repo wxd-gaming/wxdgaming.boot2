@@ -202,7 +202,9 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
      */
     public ApplicationContextProvider postEvent(Event event) {
         List<InstanceMethodProvider> methods = findEventMap(event.getClass());
-        methods.forEach(providerMethod -> providerMethod.invoke(event));
+        methods.forEach(providerMethod -> {
+            providerMethod.invoke(event);
+        });
         return this;
     }
 

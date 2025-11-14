@@ -12,3 +12,4 @@ db:
     maxPoolSize: 20                                           #最大连接数
     batchSubmitSize: 500                                      #批量提交数量
     batchThreadSize: 4                                        #批量提交线程数
+    cacheArea: 64                                             #缓存分区

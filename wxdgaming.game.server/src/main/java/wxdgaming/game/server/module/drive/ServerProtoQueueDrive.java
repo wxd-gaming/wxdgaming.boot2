@@ -1,14 +1,12 @@
 package wxdgaming.game.server.module.drive;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.executor.ExecutorProperties;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerTrigger;
 import wxdgaming.boot2.starter.net.pojo.ServerProtoFilter;
-import wxdgaming.game.server.bean.MapKey;
 import wxdgaming.game.server.bean.UserMapping;
-import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
 
 /**
@@ -34,12 +32,10 @@ public class ServerProtoQueueDrive implements ServerProtoFilter {
     public boolean doFilter(ProtoListenerTrigger protoListenerTrigger) {
         UserMapping userMapping = protoListenerTrigger.getProtoEvent().getSocketSession().bindData("userMapping");
         protoListenerTrigger.getProtoEvent().bindData(userMapping);
-        if (userMapping != null && userMapping.getRid() > 0) {
-            Player player = dataCenterService.getPlayer(userMapping.getRid());
+        if (userMapping != null) {
             if (StringUtils.isBlank(protoListenerTrigger.getQueueName())) {
-                protoListenerTrigger.setQueueName("mapNpc-drive-" + (player.getUid() % executorProperties.getLogic().getCoreSize()));
+                protoListenerTrigger.setQueueName("mapNpc-drive-" + (userMapping.getUserHashCode() % executorProperties.getLogic().getCoreSize()));
             } else if ("map-drive".equalsIgnoreCase(protoListenerTrigger.getQueueName())) {
-                MapKey mapKey = player.getMapKey();
 
             }
         }

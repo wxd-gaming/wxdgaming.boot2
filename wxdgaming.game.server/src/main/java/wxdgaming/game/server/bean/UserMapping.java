@@ -23,6 +23,7 @@ import java.util.List;
 public class UserMapping {
 
     private final String account;
+    private final int userHashCode;
     private transient final DataCenterService dataCenterService;
     private UserDataVo userDataVo;
     private String clientIp;
@@ -35,6 +36,7 @@ public class UserMapping {
 
     public UserMapping(String account, DataCenterService dataCenterService) {
         this.account = account;
+        this.userHashCode = this.account.hashCode();
         this.dataCenterService = dataCenterService;
     }
 

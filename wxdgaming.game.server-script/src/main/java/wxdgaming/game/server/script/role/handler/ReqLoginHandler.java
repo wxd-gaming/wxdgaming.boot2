@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.executor.ExecutorLog;
+import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.core.executor.ThreadStopWatch;
 import wxdgaming.boot2.core.token.JsonToken;
 import wxdgaming.boot2.core.token.JsonTokenParse;
@@ -46,6 +47,7 @@ public class ReqLoginHandler extends HoldApplicationContext {
     }
 
     @ProtoRequest(ReqLogin.class)
+    @ExecutorWith(queueName = "login")
     @ExecutorLog(logTime = -1)
     public void reqLogin(ProtoEvent event) {
         SocketSession socketSession = event.getSocketSession();

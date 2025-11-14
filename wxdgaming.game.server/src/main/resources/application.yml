@@ -11,7 +11,7 @@ core:
       coreSize: 2                        #默认线程池的核心线程数
       maxQueueSize: 10000                #队列超过就会打印异常
     logic:
-      coreSize: 32                       #逻辑线程池
+      coreSize: 4                       #逻辑线程池
       maxQueueSize: 50000                #队列超过就会打印异常
     virtual:
       coreSize: 100                      #虚拟线程池

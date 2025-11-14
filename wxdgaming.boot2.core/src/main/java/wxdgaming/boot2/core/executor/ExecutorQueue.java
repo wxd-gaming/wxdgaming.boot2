@@ -96,8 +96,8 @@ public class ExecutorQueue extends ExecutorJob {
         } catch (Throwable throwable) {
             log.error("{}", stack, throwable);
         } finally {
-            ThreadContext.cleanup();
             ExecutorMonitor.release();
+            ThreadContext.cleanup();
             checkExecute(true);
         }
     }

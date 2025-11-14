@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.executor.ExecutorWith;
+import wxdgaming.boot2.core.executor.ThreadStopWatch;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
@@ -60,6 +62,7 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
 
     /** 选择角色 */
     @ProtoRequest(ReqChooseRole.class)
+    @ExecutorWith(queueName = "login")
     public void reqChooseRole(ProtoEvent event) {
         SocketSession socketSession = event.getSocketSession();
         ReqChooseRole req = event.buildMessage();
@@ -77,6 +80,7 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
 
         Player player = dataCenterService.getPlayer(rid);
         playerDriveService.executor(player, new ExecutorEvent() {
+
             @Override public void onEvent() throws Exception {
                 if (userMapping.getRid() > 0 && userMapping.getRid() != player.getUid()) {
                     /*角色切换*/
@@ -95,12 +99,18 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
 
                 /*绑定*/
                 log.info("sid={}, {} 触发登录之前校验事件", sid, player);
+                ThreadStopWatch.startIfPresent("LoginBeforePlayerEvent");
                 applicationContextProvider.postEvent(new EventConst.LoginBeforePlayerEvent(player));
+                ThreadStopWatch.stopIfPresent();
+                ThreadStopWatch.startIfPresent("ResChooseRole");
                 ResChooseRole resChooseRole = new ResChooseRole();
                 resChooseRole.setRid(rid);
                 socketSession.write(resChooseRole);
+                ThreadStopWatch.stopIfPresent();
                 log.info("sid={}, {} 触发登录事件", sid, player);
-                applicationContextProvider.postEvent(new EventConst.LoginPlayerEvent(player));
+                ThreadStopWatch.startIfPresent("LoginPlayerEvent");
+                applicationContextProvider.postEventIgnoreException(new EventConst.LoginPlayerEvent(player));
+                ThreadStopWatch.stopIfPresent();
                 log.info("sid={}, {} 选择角色成功", sid, player);
 
                 RoleLoginSlog roleLoginLog = new RoleLoginSlog(player, userMapping.getClientIp(), JSON.toJSONString(userMapping.getClientParams()));

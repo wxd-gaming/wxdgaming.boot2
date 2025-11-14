@@ -152,7 +152,9 @@ public class BagService extends HoldApplicationContext implements InitPrint {
 
     /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
     public boolean gainItemCfg(Player player, BagChangeDTO4ItemCfg rewardArgs4ItemCfg) {
+        ThreadStopWatch.startIfPresent("newItems");
         List<Item> items = newItems(rewardArgs4ItemCfg.getItemCfgList());
+        ThreadStopWatch.stop();
         return _gainItems(player, rewardArgs4ItemCfg, items);
     }
 

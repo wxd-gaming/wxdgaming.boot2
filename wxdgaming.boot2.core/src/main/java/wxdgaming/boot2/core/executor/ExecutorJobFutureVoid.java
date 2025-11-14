@@ -37,8 +37,8 @@ class ExecutorJobFutureVoid extends ExecutorJob implements Runnable, IExecutorQu
             future.completeExceptionally(throwable);
         } finally {
             this.threadContext = null;
-            ThreadContext.cleanup();
             ExecutorMonitor.release();
+            ThreadContext.cleanup();
             runAfter();
         }
     }

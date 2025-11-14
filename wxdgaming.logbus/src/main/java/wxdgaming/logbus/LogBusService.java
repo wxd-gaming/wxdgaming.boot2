@@ -14,6 +14,7 @@ import wxdgaming.boot2.core.event.StopBeforeEvent;
 import wxdgaming.boot2.core.event.StopEvent;
 import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.io.FileWriteUtil;
+import wxdgaming.boot2.core.locks.Monitor;
 import wxdgaming.boot2.core.util.Md5Util;
 import wxdgaming.boot2.starter.net.http.HttpDataAction;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
@@ -150,7 +151,7 @@ public class LogBusService implements InitPrint {
         saveUpdateLog2FileEvent.addLog(logEntity);
     }
 
-    private class SaveLog2FileEvent {
+    private class SaveLog2FileEvent extends Monitor {
 
         private final String type;
 
@@ -160,14 +161,24 @@ public class LogBusService implements InitPrint {
 
         private SplitCollection<LogEntity> logEntities = null;
 
-        private synchronized SplitCollection<LogEntity> reset() {
-            SplitCollection<LogEntity> tmpLogEntities = logEntities;
-            logEntities = new SplitCollection<>(logBusProperties.getSplitOrg());
-            return tmpLogEntities;
+        private SplitCollection<LogEntity> reset() {
+            lock();
+            try {
+                SplitCollection<LogEntity> tmpLogEntities = logEntities;
+                logEntities = new SplitCollection<>(logBusProperties.getSplitOrg());
+                return tmpLogEntities;
+            } finally {
+                unlock();
+            }
         }
 
-        private synchronized void addLog(LogEntity logEntity) {
-            logEntities.add(logEntity);
+        private void addLog(LogEntity logEntity) {
+            lock();
+            try {
+                logEntities.add(logEntity);
+            } finally {
+                unlock();
+            }
         }
 
         public void doEvent() throws Exception {

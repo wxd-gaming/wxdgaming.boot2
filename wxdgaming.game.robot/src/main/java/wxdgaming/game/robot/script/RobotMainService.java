@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.collection.ListOf;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.event.StartEvent;
+import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.RandomUtils;
@@ -104,6 +105,7 @@ public class RobotMainService {
 
     /** 1秒一次主循环 */
     @Scheduled("*/5")
+    @ExecutorWith()
     public void timer() {
         for (Robot robot : robotMap.values()) {
             SocketSession socketSession = robot.getSocketSession();

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.executor.ExecutorWith;
 import wxdgaming.boot2.core.executor.ThreadStopWatch;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.core.util.SingletonLockUtil;
@@ -48,6 +49,7 @@ public class ReqCreateRoleHandler extends HoldApplicationContext {
 
     /** 创建角色 */
     @ProtoRequest(ReqCreateRole.class)
+    @ExecutorWith(queueName = "login")
     public void reqCreateRole(ProtoEvent event) {
         SocketSession socketSession = event.getSocketSession();
         ReqCreateRole req = event.buildMessage();

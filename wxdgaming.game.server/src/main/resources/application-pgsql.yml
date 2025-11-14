@@ -12,6 +12,7 @@ db:
     maxPoolSize: 20                                           #最大连接数
     batchSubmitSize: 500                                      #批量提交数量
     batchThreadSize: 1                                        #批量提交线程数
+    cacheArea: 32                                             #缓存分区
   pgsql-second:
     debug: false                                                 #调试模式将会显示sql语句
     driverClassName: "org.postgresql.Driver"
@@ -25,3 +26,4 @@ db:
     maxPoolSize: 20                                           #最大连接数
     batchSubmitSize: 500                                      #批量提交数量
     batchThreadSize: 1                                        #批量提交线程数
+    cacheArea: 32                                             #缓存分区

@@ -3,13 +3,14 @@ package wxdgaming.game.server.script.attribute.impl.player;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.event.Event;
-import wxdgaming.game.server.bean.attr.AttrInfo;
+import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.cfg.QPlayerTable;
 import wxdgaming.game.cfg.bean.QPlayer;
 import wxdgaming.game.server.bean.MapNpc;
 import wxdgaming.game.server.bean.MapObject;
-import wxdgaming.game.server.script.attribute.AbstractCalculatorAction;
+import wxdgaming.game.server.bean.attr.AttrInfo;
 import wxdgaming.game.server.bean.attribute.CalculatorType;
+import wxdgaming.game.server.script.attribute.AbstractCalculatorAction;
 
 /**
  * 基础属性
@@ -31,6 +32,7 @@ public class PlayerBaseCalculatorActionImpl extends AbstractCalculatorAction {
 
     @Override public AttrInfo calculate(MapNpc mapNpc, Event event) {
         QPlayer qPlayer = dataRepository.dataTable(QPlayerTable.class, mapNpc.getLevel());
+        AssertUtil.isNull(qPlayer, "%s角色等级[%s]查找 QPlayer 配置失败是吧", mapNpc, mapNpc.getLevel());
         AttrInfo attr = qPlayer.getAttr();
         return new AttrInfo(attr);
     }

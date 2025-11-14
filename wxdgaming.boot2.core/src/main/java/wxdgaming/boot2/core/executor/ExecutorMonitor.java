@@ -44,15 +44,19 @@ public final class ExecutorMonitor extends Thread {
         else releasePrint = "";
         long diffMs = TimeUnit.NANOSECONDS.toMillis(diffNs);
         if (!executorJob.getExecutorLog().off() && diffMs > executorJob.getExecutorLog().logTime()) {
+            String queueName = ThreadContext.context("queueName");
+            if (StringUtils.isNotBlank(queueName))
+                queueName = ", 队列: " + queueName;
+            else queueName = "";
             if (diffMs > executorJob.getExecutorLog().warningTime()) {
                 log.error(
-                        "线程: {}, 执行器: {}, 执行耗时: {}ms{}",
-                        thread.getName(), stack, diffMs, releasePrint
+                        "执行耗时: {}ms, 线程: {}{}, 执行器: {}{}",
+                        thread.getName(), queueName, stack, diffMs, releasePrint
                 );
             } else {
                 log.info(
-                        "线程: {}, 执行器: {}, 执行耗时: {}ms{}",
-                        thread.getName(), stack, diffMs, releasePrint
+                        "执行耗时: {}ms, 线程: {}{}, 执行器: {}{}",
+                        thread.getName(), queueName, stack, diffMs, releasePrint
                 );
             }
         }
