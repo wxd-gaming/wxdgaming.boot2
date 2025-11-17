@@ -62,6 +62,7 @@ public class RunTimeUtil extends ExecutorEvent {
     @Override public void onEvent() throws Exception {
         MONITOR_READ_WRITE.writeLock();
         try {
+            if (runTimeRecordMap.isEmpty()) return;
             List<RunTimeRecord> list = runTimeRecordMap.values().stream()
                     .filter(r -> r.getCount().get() > 1)
                     .peek(r -> {
