@@ -80,7 +80,7 @@ public class RobotMainService {
         for (String key : keys) {
             allList.addAll(accountDayMap.get(key));
         }
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 30; i++) {
             if (allList.isEmpty()) break;
             String account = RandomUtils.randomRemove(allList);
             robotMap.put(account, new Robot().setAccount(account));

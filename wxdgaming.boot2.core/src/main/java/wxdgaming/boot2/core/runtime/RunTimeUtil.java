@@ -25,12 +25,12 @@ public class RunTimeUtil extends ExecutorEvent {
 
     private static final MonitorReadWrite MONITOR_READ_WRITE = new MonitorReadWrite();
     private static final AtomicBoolean Open = new AtomicBoolean(false);
-    private static ConcurrentHashMap<String, RunTimeRecord> runTimeRecordMap = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, RunTimeRecord> runTimeRecordMap = new ConcurrentHashMap<>();
     private static ScheduledFuture<?> scheduledFuture = null;
 
-    public static void openRecord() {
+    public static void openRecord(int outRunTimeDelay) {
         Open.set(true);
-        scheduledFuture = ExecutorFactory.getExecutorServiceBasic().scheduleAtFixedRate(new RunTimeUtil(), 1, 1, TimeUnit.MINUTES);
+        scheduledFuture = ExecutorFactory.getExecutorServiceBasic().scheduleAtFixedRate(new RunTimeUtil(), outRunTimeDelay, outRunTimeDelay, TimeUnit.MINUTES);
     }
 
     public static void closeRecord() {

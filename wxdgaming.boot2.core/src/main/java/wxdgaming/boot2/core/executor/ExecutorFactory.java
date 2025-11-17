@@ -42,7 +42,9 @@ public class ExecutorFactory implements InitPrint {
         EXECUTOR_SERVICE_BASIC = create("basic", executorProperties.getBasic());
         EXECUTOR_SERVICE_LOGIC = create("logic", executorProperties.getLogic());
         EXECUTOR_SERVICE_VIRTUAL = createVirtual("virtual", executorProperties.getVirtual());
-        RunTimeUtil.openRecord();
+        if (executorProperties.getOutRunTimeDelay() > 0) {
+            RunTimeUtil.openRecord(executorProperties.getOutRunTimeDelay());
+        }
     }
 
     public static ExecutorService getExecutor(String name) {
