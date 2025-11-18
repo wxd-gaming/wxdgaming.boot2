@@ -41,7 +41,7 @@ public abstract class SqlDataHelper extends DataHelper {
     protected final SqlConfig sqlConfig;
     protected final HikariDataSource hikariDataSource;
     protected SqlDataBatch dataBatch;
-    protected final SqlDataCacheService cacheService;
+    protected SqlDataCacheService cacheService;
 
     public SqlDataHelper(SqlConfig sqlConfig, SqlDDLBuilder ddl) {
         super(ddl);
@@ -51,7 +51,6 @@ public abstract class SqlDataHelper extends DataHelper {
         if (sqlConfig.getBatchThreadSize() > 0) {
             initDataBatch();
         }
-        cacheService = new SqlDataCacheService(this);
 
         if (sqlConfig.getScanPackage() != null && sqlConfig.getScanPackage().length > 0) {
             Map<String, LinkedHashMap<String, JSONObject>> tableStructMap = findTableStructMap();

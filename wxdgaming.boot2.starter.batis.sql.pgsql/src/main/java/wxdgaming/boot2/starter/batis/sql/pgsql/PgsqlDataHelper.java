@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.starter.batis.TableMapping;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
@@ -37,7 +36,11 @@ public class PgsqlDataHelper extends SqlDataHelper {
         this.dataBatch = new PgsqlDataBatch(this);
     }
 
-    @Override public SqlQueryBuilder queryBuilder() {
+    @Override public PgSqlDDLBuilder ddlBuilder() {
+        return (PgSqlDDLBuilder) super.ddlBuilder();
+    }
+
+    @Override public PgsqlQueryBuilder queryBuilder() {
         return new PgsqlQueryBuilder(this);
     }
 

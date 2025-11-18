@@ -1,6 +1,7 @@
 package wxdgaming.boot2.starter.batis.sql;
 
 import lombok.Getter;
+import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.starter.batis.Entity;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 2025-04-22 09:13
  **/
 @Getter
-public class SqlDataCacheService {
+public abstract class SqlDataCacheService implements InitPrint {
 
     protected SqlDataHelper sqlDataHelper;
     protected final ConcurrentHashMap<Class<?>, SqlDataCache<?, ?>> jdbcCacheMap = new ConcurrentHashMap<>();

@@ -13,7 +13,7 @@ public interface InitPrint {
 
     @PostConstruct
     default void ___initPrint() {
-        LogbackUtil.logger().debug("init print {}", this.getClass().getName());
+        LogbackUtil.logger().debug("init print {}, hashcode: {}", this.getClass().getName(), this.hashCode());
     }
 
 }

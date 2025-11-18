@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.event.EventListener;
+import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.event.StopEvent;
 
 import java.sql.Connection;
@@ -20,7 +21,7 @@ import java.util.function.Consumer;
  **/
 @Getter
 @Setter
-public abstract class DataHelper {
+public abstract class DataHelper implements InitPrint {
 
     protected DDLBuilder ddlBuilder;
 
