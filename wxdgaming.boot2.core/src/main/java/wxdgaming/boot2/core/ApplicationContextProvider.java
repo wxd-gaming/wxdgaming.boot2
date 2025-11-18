@@ -7,6 +7,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.event.Event;
@@ -54,6 +55,10 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
         log.info("{} setApplicationContext", this.getClass().getSimpleName());
+    }
+
+    public <T> T registerInstance(T instance) {
+        return SpringUtil.registerInstance((ConfigurableApplicationContext) this.getApplicationContext(), instance);
     }
 
     public synchronized List<ProviderBean> getBeanList() {

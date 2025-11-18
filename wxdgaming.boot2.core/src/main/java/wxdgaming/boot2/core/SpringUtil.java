@@ -309,8 +309,8 @@ public class SpringUtil implements InitPrint {
      * @author wxd-gaming(無心道, 15388152619)
      * @version 2024-07-26 17:30
      */
-    public static void registerInstance(ConfigurableApplicationContext context, Object instance) {
-        registerInstance(context, instance.getClass().getName(), instance);
+    public static <T> T registerInstance(ConfigurableApplicationContext context, T instance) {
+        return registerInstance(context, instance.getClass().getName(), instance);
     }
 
     /**
@@ -321,19 +321,19 @@ public class SpringUtil implements InitPrint {
      * @author wxd-gaming(無心道, 15388152619)
      * @version 2024-07-26 17:30
      */
-    public static <T> void registerInstance(ConfigurableApplicationContext context, String name, T instance) {
-        registerInstance(context, name, instance, true);
+    public static <T> T registerInstance(ConfigurableApplicationContext context, String name, T instance) {
+        return registerInstance(context, name, instance, true);
     }
 
-    public static <T> void registerInstance(ConfigurableApplicationContext context, String name, T instance, boolean removeOld) {
+    public static <T> T registerInstance(ConfigurableApplicationContext context, String name, T instance, boolean removeOld) {
         // 获取bean工厂并转换为DefaultListableBeanFactory
         DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) context.getBeanFactory();
         if (removeOld && defaultListableBeanFactory.containsBean(name)) {
             defaultListableBeanFactory.destroySingleton(name);
         }
         defaultListableBeanFactory.registerSingleton(name, instance);
-
         log.debug("register instance {}, {} {}", name, instance.hashCode(), instance.getClass().getName());
+        return (T) context.getBean(name);
     }
 
     public static void registerController(ApplicationContext context, String controllerBeanName) {
