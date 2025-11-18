@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -327,13 +328,31 @@ public class SpringUtil implements InitPrint {
 
     public static <T> T registerInstance(ConfigurableApplicationContext context, String name, T instance, boolean removeOld) {
         // 获取bean工厂并转换为DefaultListableBeanFactory
-        DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) context.getBeanFactory();
-        if (removeOld && defaultListableBeanFactory.containsBean(name)) {
-            defaultListableBeanFactory.destroySingleton(name);
+        DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) context.getBeanFactory();
+        if (removeOld && beanFactory.containsBean(name)) {
+            beanFactory.destroySingleton(name);
         }
-        defaultListableBeanFactory.registerSingleton(name, instance);
+        Object object;
+        try {
+            // 获取自动代理创建器（负责 AOP 代理生成）
+            AbstractAutoProxyCreator autoProxyCreator = beanFactory.getBean(
+                    "org.springframework.aop.config.internalAutoProxyCreator",
+                    AbstractAutoProxyCreator.class
+            );
+
+            // 对原始对象进行代理增强（如果符合切面条件）
+            object = autoProxyCreator.postProcessAfterInitialization(
+                    instance,       // 原始对象
+                    name          // Bean 名称
+            );
+        } catch (Exception e) {
+            object = instance;
+            log.debug("aop 切面代理异常", e);
+        }
+
+        beanFactory.registerSingleton(name, object);
         log.debug("register instance {}, {} {}", name, instance.hashCode(), instance.getClass().getName());
-        return (T) context.getBean(name);
+        return (T) object;
     }
 
     public static void registerController(ApplicationContext context, String controllerBeanName) {

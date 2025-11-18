@@ -7,6 +7,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import wxdgaming.boot2.core.MainApplicationContextProvider;
+import wxdgaming.boot2.starter.batis.sql.SqlDataBatch;
 
 /**
  * pgsql 模块
@@ -18,16 +20,22 @@ import org.springframework.context.annotation.Primary;
 @EnableConfigurationProperties(PgsqlProperties.class)
 public class PgsqlConfiguration {
 
+    final MainApplicationContextProvider mainApplicationContextProvider;
     final PgsqlProperties pgsqlProperties;
 
-    public PgsqlConfiguration(PgsqlProperties pgsqlProperties) {
+    public PgsqlConfiguration(MainApplicationContextProvider mainApplicationContextProvider, PgsqlProperties pgsqlProperties) {
+        this.mainApplicationContextProvider = mainApplicationContextProvider;
         this.pgsqlProperties = pgsqlProperties;
     }
 
     @Bean
     @Primary
     public PgsqlDataHelper pgsqlDataHelper() {
-        return new PgsqlDataHelper(pgsqlProperties.getPgsql());
+        PgsqlDataHelper pgsqlDataHelper = new PgsqlDataHelper(pgsqlProperties.getPgsql());
+        SqlDataBatch dataBatch = pgsqlDataHelper.getDataBatch();
+        SqlDataBatch sqlDataBatch = mainApplicationContextProvider.registerInstance(dataBatch);
+        pgsqlDataHelper.setDataBatch(sqlDataBatch);
+        return pgsqlDataHelper;
     }
 
     @Bean

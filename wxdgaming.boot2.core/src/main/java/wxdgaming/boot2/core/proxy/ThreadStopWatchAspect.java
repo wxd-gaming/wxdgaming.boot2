@@ -8,9 +8,15 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.executor.ThreadStopWatch;
 
+/**
+ * 通过aop切面管理，线程运行上下文的方法耗时记录仪
+ *
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2025-11-18 19:30
+ */
 @Aspect // 标记为切面
 @Component // 纳入 Spring 容器管理
-public class CustomAspect {
+public class ThreadStopWatchAspect {
 
     // 定义切点：匹配 UserService 中所有方法
     @Pointcut("(execution(* wxdgaming..*(..)))&& !execution(* java.lang.Object.*(..))")
