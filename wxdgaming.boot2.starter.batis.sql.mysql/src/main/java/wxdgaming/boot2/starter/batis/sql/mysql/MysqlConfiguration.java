@@ -25,19 +25,19 @@ public class MysqlConfiguration {
     @Bean
     @Primary
     public MysqlDataHelper mysqlDataHelper() {
-        return new MysqlDataHelper(mysqlProperties.mysql);
+        return new MysqlDataHelper(mysqlProperties.getMysql());
     }
 
     @Bean("db.mysql-second")
     @ConditionalOnProperty(name = "db.mysql-second.url")
     public MysqlDataHelper mysqlDataHelper2() {
-        return new MysqlDataHelper(mysqlProperties.mysqlSecond);
+        return new MysqlDataHelper(mysqlProperties.getMysqlSecond());
     }
 
     @Bean("db.mysql-third")
     @ConditionalOnProperty(name = "db.mysql-third.url")
     public MysqlDataHelper mysqlDataHelper3() {
-        return new MysqlDataHelper(mysqlProperties.mysqlThird);
+        return new MysqlDataHelper(mysqlProperties.getMysqlThird());
     }
 
 }

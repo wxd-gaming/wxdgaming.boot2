@@ -107,49 +107,57 @@ public class SqlConfig extends ObjectBase {
     public void createDatabase() {
         if (url.contains("jdbc:mysql")) {
             String dbName = dbName();
-            try (Connection connection = connection("INFORMATION_SCHEMA"); Statement statement = connection.createStatement()) {
-                String formatted = "SHOW DATABASES LIKE '%s';".formatted(dbName);
-                ResultSet resultSet = statement.executeQuery(formatted);
-                if (resultSet.next()) {
-                    log.debug("mysql 数据库 {} 已经存在", dbName);
-                    return;
-                }
-                Consumer<String> stringConsumer = (character) -> {
-                    String databaseString = "CREATE DATABASE IF NOT EXISTS `%s` DEFAULT CHARACTER SET %s COLLATE %s_unicode_ci"
-                            .formatted(dbName.toLowerCase(), character, character);
+            try (Connection connection = connection("INFORMATION_SCHEMA");) {
+                try (Statement statement = connection.createStatement()) {
+                    String formatted = "SHOW DATABASES LIKE '%s';".formatted(dbName);
+                    ResultSet resultSet = statement.executeQuery(formatted);
+                    if (resultSet.next()) {
+                        log.debug("mysql 数据库 {} 已经存在", dbName);
+                        return;
+                    }
+                    Consumer<String> stringConsumer = (character) -> {
+                        String databaseString = "CREATE DATABASE IF NOT EXISTS `%s` DEFAULT CHARACTER SET %s COLLATE %s_unicode_ci"
+                                .formatted(dbName.toLowerCase(), character, character);
+                        try {
+                            statement.executeUpdate(databaseString);
+                            log.info("mysql 数据库 {} 创建完成", dbName);
+                        } catch (Exception e) {
+                            throw ExceptionUtils.asRuntimeException(e);
+                        }
+                    };
                     try {
-                        statement.executeUpdate(databaseString);
-                        log.info("mysql 数据库 {} 创建完成", dbName);
-                    } catch (Exception e) {
-                        throw ExceptionUtils.asRuntimeException(e);
+                        stringConsumer.accept("utf8mb4");
+                    } catch (Throwable t) {
+                        if (t.getMessage().contains("utf8mb4")) {
+                            log.warn("mysql 数据库 {} 不支持 utf8mb4 格式 重新用 utf8 字符集创建数据库", dbName, new RuntimeException());
+                            stringConsumer.accept("utf8");
+                        } else {
+                            log.error("mysql 创建数据库 {}", dbName, t);
+                        }
                     }
-                };
-                try {
-                    stringConsumer.accept("utf8mb4");
-                } catch (Throwable t) {
-                    if (t.getMessage().contains("utf8mb4")) {
-                        log.warn("mysql 数据库 {} 不支持 utf8mb4 格式 重新用 utf8 字符集创建数据库", dbName, new RuntimeException());
-                        stringConsumer.accept("utf8");
-                    } else {
-                        log.error("mysql 创建数据库 {}", dbName, t);
-                    }
+                } catch (Exception e) {
+                    log.error("mysql 创建数据库 {}", dbName, e);
                 }
             } catch (Exception e) {
-                log.error("mysql 创建数据库 {}", dbName, e);
+                log.error("mysql 数据库连接失败 {}", dbName, e);
             }
         } else if (url.contains("jdbc:postgresql:")) {
             String dbName = dbName();
-            try (Connection connection = connection("postgres"); Statement statement = connection.createStatement()) {
-                String formatted = "SELECT 1 as t FROM pg_database WHERE datname = '%s'".formatted(dbName);
-                ResultSet resultSet = statement.executeQuery(formatted);
-                if (resultSet.next()) {
-                    log.debug("pgsql 数据库 {} 已经存在", dbName);
-                    return;
+            try (Connection connection = connection("postgres")) {
+                try (Statement statement = connection.createStatement()) {
+                    String formatted = "SELECT 1 as t FROM pg_database WHERE datname = '%s'".formatted(dbName);
+                    ResultSet resultSet = statement.executeQuery(formatted);
+                    if (resultSet.next()) {
+                        log.debug("pgsql 数据库 {} 已经存在", dbName);
+                        return;
+                    }
+                    statement.execute("CREATE DATABASE %s".formatted(dbName));
+                    log.info("pgsql 数据库 {} 创建完成", dbName);
+                } catch (Exception e) {
+                    log.error("pgsql 创建数据库 {}", dbName, e);
                 }
-                statement.execute("CREATE DATABASE %s".formatted(dbName));
-                log.info("pgsql 数据库 {} 创建完成", dbName);
             } catch (Exception e) {
-                log.error("pgsql 创建数据库 {}", dbName, e);
+                log.error("pgsql 数据库连接失败 {}", dbName, e);
             }
         }
     }

@@ -14,7 +14,7 @@ import wxdgaming.boot2.core.util.JvmUtil;
  **/
 @Slf4j
 @Component
-public final class MainApplicationContextProvider extends ApplicationContextProvider {
+public class MainApplicationContextProvider extends ApplicationContextProvider {
 
     public static SpringApplicationBuilder builder(Class<?>... sources) {
         Class<?>[] merge = ArrayUtils.add(sources, MainApplicationContextProvider.class);

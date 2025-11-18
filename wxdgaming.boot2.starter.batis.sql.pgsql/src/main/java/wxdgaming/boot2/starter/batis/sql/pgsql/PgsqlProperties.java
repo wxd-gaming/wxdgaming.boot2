@@ -16,8 +16,8 @@ import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 @ConfigurationProperties(prefix = "db")
 public class PgsqlProperties {
 
-    SqlConfig pgsql;
-    SqlConfig pgsqlSecond;
-    SqlConfig pgsqlThird;
+    private SqlConfig pgsql;
+    private SqlConfig pgsqlSecond;
+    private SqlConfig pgsqlThird;
 
 }

@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.reflect;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.proxy.ProxyUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -29,7 +30,8 @@ public class InstanceProvider implements Comparable<InstanceProvider> {
 
     public InstanceProvider(Object instance) {
         this.instance = instance;
-        this.reflectClassProvider = ReflectClassProvider.build(instance.getClass());
+        Object targetObject = ProxyUtil.getTargetObject(instance);
+        this.reflectClassProvider = ReflectClassProvider.build(targetObject.getClass());
     }
 
     @Override public int compareTo(InstanceProvider o) {

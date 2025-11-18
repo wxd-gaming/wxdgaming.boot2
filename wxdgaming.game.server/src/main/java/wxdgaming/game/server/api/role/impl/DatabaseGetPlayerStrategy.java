@@ -50,7 +50,7 @@ public class DatabaseGetPlayerStrategy implements GetPlayerStrategy {
     }
 
     @Override public void putCache(RoleEntity roleEntity) {
-        sqlDataHelper.getCacheService().cache(RoleEntity.class).put(roleEntity.getUid(), roleEntity);
+        sqlDataHelper.getCacheService().cachePut(RoleEntity.class, roleEntity.getUid(), roleEntity);
     }
 
     @Override public void save(RoleEntity roleEntity) {

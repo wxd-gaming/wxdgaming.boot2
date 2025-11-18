@@ -3,7 +3,6 @@ package wxdgaming.boot2.starter.batis.sql.mysql;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 
 /**
@@ -17,8 +16,8 @@ import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 @ConfigurationProperties(prefix = "db")
 public class MysqlProperties {
 
-    SqlConfig mysql;
-    SqlConfig mysqlSecond;
-    SqlConfig mysqlThird;
+    private SqlConfig mysql;
+    private SqlConfig mysqlSecond;
+    private SqlConfig mysqlThird;
 
 }

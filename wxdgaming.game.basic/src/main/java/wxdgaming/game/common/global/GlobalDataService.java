@@ -1,6 +1,7 @@
 package wxdgaming.game.common.global;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.BootstrapProperties;
@@ -28,7 +29,7 @@ public class GlobalDataService implements InitPrint {
 
     final BootstrapProperties bootstrapProperties;
     final SqlDataHelper sqlDataHelper;
-    final ConcurrentTable<BanType, String, BanVO> banVOTable = new ConcurrentTable<>();
+    @Setter ConcurrentTable<BanType, String, BanVO> banVOTable = new ConcurrentTable<>();
 
     public GlobalDataService(BootstrapProperties bootstrapProperties, PgsqlDataHelper pgsqlDataHelper) {
         this.bootstrapProperties = bootstrapProperties;

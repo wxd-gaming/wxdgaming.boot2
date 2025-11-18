@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.collection.concurrent.ConcurrentTable;
 import wxdgaming.boot2.core.event.InitEvent;
 import wxdgaming.boot2.core.executor.ExecutorLog;
 import wxdgaming.boot2.core.executor.ExecutorWith;
@@ -19,6 +20,7 @@ import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
 import wxdgaming.boot2.starter.net.server.SocketServer;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import wxdgaming.game.authority.SignUtil;
+import wxdgaming.game.common.bean.ban.BanType;
 import wxdgaming.game.common.bean.ban.BanVO;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 import wxdgaming.game.common.global.GlobalDataService;
@@ -156,10 +158,13 @@ public class GameTimerScript extends HoldApplicationContext {
             RunResult runResult = execute.bodyRunResult();
             if (runResult.isOk()) {
                 String string = runResult.getString("data");
+                ConcurrentTable<BanType, String, BanVO> banVOTable = new ConcurrentTable<>();
                 List<String> data = FastJsonUtil.parseArray(string, String.class);
                 for (String datum : data) {
-                    globalDataService.editBanVOTable(FastJsonUtil.parse(datum, BanVO.class));
+                    BanVO banVO = FastJsonUtil.parse(datum, BanVO.class);
+                    banVOTable.put(banVO.getBanType(), banVO.getKey(), banVO);
                 }
+                globalDataService.setBanVOTable(banVOTable);
             }
         } catch (Exception e) {
             log.error("请求登陆服务封禁列表异常", e);

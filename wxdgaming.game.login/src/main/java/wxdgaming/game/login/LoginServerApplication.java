@@ -3,6 +3,7 @@ package wxdgaming.game.login;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.util.JvmUtil;
@@ -21,6 +22,7 @@ import wxdgaming.logbus.LogBusService;
  * @version 2025-05-27 20:56
  **/
 @Slf4j
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 @SpringBootApplication(
         scanBasePackageClasses = {
                 CoreScan.class,

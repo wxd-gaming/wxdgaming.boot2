@@ -25,19 +25,19 @@ public class PgsqlConfiguration {
     @Bean
     @Primary
     public PgsqlDataHelper pgsqlDataHelper() {
-        return new PgsqlDataHelper(pgsqlProperties.pgsql);
+        return new PgsqlDataHelper(pgsqlProperties.getPgsql());
     }
 
     @Bean("db.pgsql-second")
     @ConditionalOnProperty(name = "db.pgsql-second.url")
     public PgsqlDataHelper pgsqlDataHelper2() {
-        return new PgsqlDataHelper(pgsqlProperties.pgsqlSecond);
+        return new PgsqlDataHelper(pgsqlProperties.getPgsqlSecond());
     }
 
     @Bean("db.pgsql-third")
     @ConditionalOnProperty(name = "db.pgsql-third.url")
     public PgsqlDataHelper pgsqlDataHelper3() {
-        return new PgsqlDataHelper(pgsqlProperties.pgsqlThird);
+        return new PgsqlDataHelper(pgsqlProperties.getPgsqlThird());
     }
 
 }
