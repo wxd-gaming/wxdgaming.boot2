@@ -9,7 +9,7 @@ import org.springframework.aop.support.AopUtils;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-11-18 09:47
  **/
-public abstract class ProxyUtil {
+public abstract class AopProxyUtil {
 
     public static boolean isProxy(Object bean) {
         // JDK 动态代理：类名包含 "$Proxy"
@@ -22,7 +22,8 @@ public abstract class ProxyUtil {
             return proxyBean; // 不是代理对象，直接返回自身
         }
         // Spring 工具类：获取原始目标对象
-        return AopProxyUtils.getSingletonTarget(proxyBean);
+        Object singletonTarget = AopProxyUtils.getSingletonTarget(proxyBean);
+        return singletonTarget == null ? proxyBean : singletonTarget;
     }
 
 }
