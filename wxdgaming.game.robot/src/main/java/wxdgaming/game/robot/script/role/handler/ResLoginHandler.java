@@ -36,7 +36,7 @@ public class ResLoginHandler {
             log.info("没有角色--开始创建角色");
 
             ReqCreateRole reqCreateRole = new ReqCreateRole();
-            reqCreateRole.setName(RandomStringUtils.secure().next(12, true, true));
+            reqCreateRole.setName(RandomStringUtils.random(12, true, true));
             reqCreateRole.setSex(1);
             reqCreateRole.setJob(1);
             socketSession.write(reqCreateRole);

@@ -11,13 +11,13 @@ import org.junit.jupiter.api.Test;
 public class RandomUtilTest {
 
     @Test
-    public void r1(){
-        System.out.println(RandomStringUtils.secure().next(50,true,true));
+    public void r1() {
+        System.out.println(RandomStringUtils.random(50, true, true));
     }
 
     @RepeatedTest(10)
-    public void randomNumber(){
-        System.out.println(RandomStringUtils.secure().next(14,false,true));
+    public void randomNumber() {
+        System.out.println(RandomStringUtils.random(14, false, true));
     }
 
 }

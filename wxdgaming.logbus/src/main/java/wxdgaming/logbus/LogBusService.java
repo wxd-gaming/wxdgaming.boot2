@@ -136,9 +136,9 @@ public class LogBusService implements InitPrint {
     @EventListener
     public void stopEvent(StopEvent event) throws Exception {
         close.set(true);
-        saveLog2FileThread.join();
-        postPushLogThread.join();
-        postUpdateLogThread.join();
+        if (saveLog2FileThread != null) saveLog2FileThread.join();
+        if (postPushLogThread != null) postPushLogThread.join();
+        if (postUpdateLogThread != null) postUpdateLogThread.join();
     }
 
     /** 推送日志 */
@@ -186,7 +186,7 @@ public class LogBusService implements InitPrint {
             while (!tmpLogEntities.isEmpty()) {
                 List<LogEntity> logEntities1 = tmpLogEntities.removeFirst();
                 try {
-                    Path path = Path.of(logBusProperties.getFilePath(), type, "log_" + RandomStringUtils.secure().next(8, true, true) + "_" + System.nanoTime() + ".dat");
+                    Path path = Path.of(logBusProperties.getFilePath(), type, "log_" + RandomStringUtils.random(8, true, true) + "_" + System.nanoTime() + ".dat");
                     FileWriteUtil.writeString(path.toFile(), JSON.toJSONString(logEntities1, SerializerFeature.MapSortField, SerializerFeature.SortField));
                 } catch (Exception e) {
                     log.error("LogBusService error", e);

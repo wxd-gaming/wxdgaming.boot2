@@ -70,7 +70,7 @@ public class RobotMainService {
         if (!accountDayMap.containsKey(dayString)) {
             List<String> al = new ArrayList<>();
             for (int i = 0; i < 50; i++) {
-                String account = dayString + "-" + RandomStringUtils.secure().next(16, false, true);
+                String account = dayString + "-" + RandomStringUtils.random(16, false, true);
                 al.add(account);
             }
             accountDayMap.put(dayString, al);

@@ -24,7 +24,6 @@ scheduled:
   executor:
     coreSize: 1
     maxQueueSize: 500
-
 http:
   client:
     routeMaxSize: 20                    #连接池的核心连接数
@@ -54,6 +53,8 @@ server:
 spring:
   profiles:
     active: [ pgsql ]
+  freemarker:
+    enabled: false
   web:
     resources:
       static-locations: classpath:/public/,file:./target/out/

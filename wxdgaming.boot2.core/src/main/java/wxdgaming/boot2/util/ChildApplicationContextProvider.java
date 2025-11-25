@@ -10,7 +10,7 @@ import wxdgaming.boot2.core.ApplicationContextProvider;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-02-14 16:55
  **/
-public final class ChildApplicationContextProvider extends ApplicationContextProvider {
+public class ChildApplicationContextProvider extends ApplicationContextProvider {
 
     @Override public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         super.setApplicationContext(applicationContext);

@@ -30,6 +30,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
+import wxdgaming.boot2.core.proxy.AopProxyUtil;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.util.ChildApplicationContextProvider;
@@ -332,19 +333,22 @@ public class SpringUtil implements InitPrint {
         if (removeOld && beanFactory.containsBean(name)) {
             beanFactory.destroySingleton(name);
         }
-        Object object;
+        Object object = instance;
         try {
             // 获取自动代理创建器（负责 AOP 代理生成）
-            AbstractAutoProxyCreator autoProxyCreator = beanFactory.getBean(
-                    "org.springframework.aop.config.internalAutoProxyCreator",
-                    AbstractAutoProxyCreator.class
-            );
-
-            // 对原始对象进行代理增强（如果符合切面条件）
-            object = autoProxyCreator.postProcessAfterInitialization(
-                    instance,       // 原始对象
-                    name          // Bean 名称
-            );
+            AbstractAutoProxyCreator autoProxyCreator = beanFactory.getBean(AbstractAutoProxyCreator.class);
+            autoProxyCreator.setBeanClassLoader(instance.getClass().getClassLoader());
+            if (!AopProxyUtil.isProxy(instance)) {
+                // 对原始对象进行代理增强（如果符合切面条件）
+                object = autoProxyCreator.postProcessAfterInitialization(
+                        instance,       // 原始对象
+                        name          // Bean 名称
+                );
+                if (object == null) {
+                    object = instance;
+                }
+                log.debug("aop 切面代理成功 {} -> {}", instance.getClass(), object.getClass());
+            }
         } catch (Exception e) {
             object = instance;
             log.debug("aop 切面代理异常", e);

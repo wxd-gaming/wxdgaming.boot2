@@ -23,7 +23,7 @@ public class GiftCodeUtil {
         AssertUtil.isTrue(giftCodeId < 4095, "GiftCodeId 最大 4095");
         HashSet<String> list = new HashSet<>();
         while (num > 0) {
-            long random = Long.parseLong("1" + RandomStringUtils.secure().next(14, false, true));
+            long random = Long.parseLong("1" + RandomStringUtils.random(14, false, true));
             AssertUtil.isTrue(random < randomMax, "random 错误");
             long randomKey = random << 12 | giftCodeId;
             BigInteger bigInteger = new BigInteger(String.valueOf(randomKey));

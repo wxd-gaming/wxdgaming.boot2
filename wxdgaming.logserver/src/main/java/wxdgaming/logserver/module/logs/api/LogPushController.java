@@ -140,7 +140,7 @@ public class LogPushController {
                 "slog",
                 path,
                 MyClock.formatDate(MyClock.SDF_YYYYMMDD),
-                RandomStringUtils.secure().next(128, true, true) + ".dat"
+                RandomStringUtils.random(128, true, true) + ".dat"
         );
         FileWriteUtil.writeString(slog.toFile(), FastJsonUtil.toJSONString(logEntityList));
     }
