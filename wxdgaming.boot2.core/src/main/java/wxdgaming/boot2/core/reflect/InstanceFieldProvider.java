@@ -70,7 +70,7 @@ public class InstanceFieldProvider implements Comparable<InstanceFieldProvider> 
     }
 
     @Override public String toString() {
-        return "FieldProvider{instance=%s, field=%s}".formatted(instance, fieldProvider);
+        return "FieldProvider{instance=%s, field=%s}".formatted(instance.getClass(), fieldProvider);
     }
 
 }

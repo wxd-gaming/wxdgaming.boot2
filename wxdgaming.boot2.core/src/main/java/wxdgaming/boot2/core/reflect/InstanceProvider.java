@@ -116,6 +116,6 @@ public class InstanceProvider implements Comparable<InstanceProvider> {
     }
 
     @Override public String toString() {
-        return "ReflectObjectProvider{instance=%s}".formatted(instance);
+        return "ReflectObjectProvider{instance=%s}".formatted(instance.getClass());
     }
 }

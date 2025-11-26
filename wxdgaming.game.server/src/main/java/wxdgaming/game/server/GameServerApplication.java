@@ -26,6 +26,7 @@ import wxdgaming.logbus.LogBusService;
 import java.io.File;
 
 @Slf4j
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 @SpringBootApplication(scanBasePackageClasses = {
         CoreScan.class,
         DataExcelScan.class,
@@ -91,6 +92,8 @@ public class GameServerApplication {
         log.info("加载脚本模块完成");
     }
 
+
+    @EnableAspectJAutoProxy(proxyTargetClass = true)
     @ComponentScan("wxdgaming.game.server.script")
     public static class ScriptScan {}
 

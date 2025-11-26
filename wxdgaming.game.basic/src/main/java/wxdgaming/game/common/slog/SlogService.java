@@ -30,6 +30,7 @@ public class SlogService implements InitPrint {
     public SlogService(BootstrapProperties bootstrapProperties, LogBusService logBusService) {
         this.bootstrapProperties = bootstrapProperties;
         this.logBusService = logBusService;
+        log.debug("this.logBusService:{}", this.logBusService.getClass());
     }
 
     public long newLogId(String logType) {

@@ -16,7 +16,7 @@ import wxdgaming.boot2.core.executor.ThreadStopWatch;
  */
 @Aspect // 标记为切面
 @Component // 纳入 Spring 容器管理
-public class ThreadStopWatchAspect {
+public class MainThreadStopWatchAspect {
 
     // 定义切点：匹配 UserService 中所有方法
     @Pointcut("(execution(* wxdgaming..*(..)))&& !execution(* java.lang.Object.*(..))")

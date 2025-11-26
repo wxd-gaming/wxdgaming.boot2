@@ -18,6 +18,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
@@ -34,6 +35,7 @@ import wxdgaming.boot2.core.proxy.AopProxyUtil;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.util.ChildApplicationContextProvider;
+import wxdgaming.boot2.util.ChildThreadStopWatchAspect;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -218,15 +220,20 @@ public class SpringUtil implements InitPrint {
         childContext.setApplicationStartup(parent.getApplicationStartup());
         childContext.setServletContext(parent.getBean(ServletContext.class));
         childContext.setClassLoader(classLoader);
+
+        // 获取bean工厂并转换为DefaultListableBeanFactory
+        DefaultListableBeanFactory parentBeanFactory = (DefaultListableBeanFactory) parent.getBeanFactory();
+        // 获取自动代理创建器（负责 AOP 代理生成）
+        AbstractAutoProxyCreator autoProxyCreator = parentBeanFactory.getBean(AbstractAutoProxyCreator.class);
+        autoProxyCreator.setBeanClassLoader(classLoader);
+        childContext.registerBean(ChildThreadStopWatchAspect.class);
+        childContext.registerBean(ChildApplicationContextProvider.class);
         // 设置扫描类
         childContext.register(scan);
         // 刷新子容器以完成初始化
         childContext.refresh();
 
-        ChildApplicationContextProvider childApplicationContextProvider = new ChildApplicationContextProvider();
-        childApplicationContextProvider.setApplicationContext(childContext);
-        SpringUtil.registerInstance(childContext, childApplicationContextProvider.getClass().getSimpleName(), childApplicationContextProvider, true);
-        return childApplicationContextProvider;
+        return childContext.getBean(ChildApplicationContextProvider.class);
     }
 
     public static void newChildAfter(ConfigurableApplicationContext parent, ConfigurableApplicationContext childContext, Class<?> scan, ClassDirLoader classLoader) {
@@ -337,7 +344,7 @@ public class SpringUtil implements InitPrint {
         try {
             // 获取自动代理创建器（负责 AOP 代理生成）
             AbstractAutoProxyCreator autoProxyCreator = beanFactory.getBean(AbstractAutoProxyCreator.class);
-            autoProxyCreator.setBeanClassLoader(instance.getClass().getClassLoader());
+//            autoProxyCreator.setBeanClassLoader(instance.getClass().getClassLoader());
             if (!AopProxyUtil.isProxy(instance)) {
                 // 对原始对象进行代理增强（如果符合切面条件）
                 object = autoProxyCreator.postProcessAfterInitialization(
@@ -347,7 +354,6 @@ public class SpringUtil implements InitPrint {
                 if (object == null) {
                     object = instance;
                 }
-                log.debug("aop 切面代理成功 {} -> {}", instance.getClass(), object.getClass());
             }
         } catch (Exception e) {
             object = instance;
@@ -355,7 +361,7 @@ public class SpringUtil implements InitPrint {
         }
 
         beanFactory.registerSingleton(name, object);
-        log.debug("register instance {}, {} {}", name, instance.hashCode(), instance.getClass().getName());
+        log.debug("register instance {}, {} {}", name, object.hashCode(), object.getClass().getName());
         return (T) object;
     }
 

@@ -85,6 +85,6 @@ public class InstanceMethodProvider implements Comparable<InstanceMethodProvider
     }
 
     @Override public String toString() {
-        return "MethodProvider{instance=%s, method=%s}".formatted(instance, method);
+        return "MethodProvider{instance=%s, method=%s}".formatted(instance.getClass(), method);
     }
 }
