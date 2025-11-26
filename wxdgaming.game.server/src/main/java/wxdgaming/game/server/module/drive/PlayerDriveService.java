@@ -111,7 +111,7 @@ public class PlayerDriveService extends HoldApplicationContext {
                             "sid={}, account={} 角色下线 rid={} -> {}",
                             userMapping.getSid(), userMapping.getAccount(), userMapping.getRid(), player.getUid()
                     );
-                    applicationContextProvider.postEventIgnoreException(new EventConst.LogoutPlayerEvent(player));
+                    executor(player, () -> applicationContextProvider.postEventIgnoreException(new EventConst.LogoutPlayerEvent(player)));
                 }
             }
         });

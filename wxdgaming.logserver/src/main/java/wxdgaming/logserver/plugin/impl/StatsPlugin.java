@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.ApplicationContextProvider;
+import wxdgaming.boot2.core.executor.ExecutorLog;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.logserver.bean.LogEntity;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
  * @version 2025-08-18 18:28
  **/
 @Slf4j
+@ExecutorLog(logTime = 30000, warningTime = 100000)
 @Component
 public class StatsPlugin extends AbstractPlugin {
 

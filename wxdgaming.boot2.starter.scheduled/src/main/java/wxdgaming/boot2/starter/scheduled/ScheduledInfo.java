@@ -58,7 +58,7 @@ public class ScheduledInfo extends AbstractCronTrigger implements Runnable, IExe
     }
 
     public boolean isAsync() {
-        return executorWith != null;
+        return getExecutorWith() != null;
     }
 
     @Override public boolean isIgnoreRunTimeRecord() {

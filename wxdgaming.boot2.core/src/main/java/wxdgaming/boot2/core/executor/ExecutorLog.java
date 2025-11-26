@@ -8,6 +8,7 @@ import java.lang.annotation.*;
 @Inherited
 @Documented
 @Target({
+        ElementType.TYPE, /*方法*/
         ElementType.METHOD, /*方法*/
         ElementType.LOCAL_VARIABLE/*局部变量*/
 })

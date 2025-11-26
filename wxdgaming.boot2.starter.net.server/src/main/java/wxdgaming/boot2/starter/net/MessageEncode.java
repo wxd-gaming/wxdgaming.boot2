@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
 import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
-import wxdgaming.boot2.starter.net.pojo.SerializerUtil;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,36 +50,40 @@ public abstract class MessageEncode extends ChannelOutboundHandlerAdapter {
     }
 
     @Override public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        SocketSession session = ChannelUtil.session(ctx.channel());
+        SocketSession socketSession = ChannelUtil.session(ctx.channel());
         switch (msg) {
             case String str -> {
-                if (!session.isWebSocket()) {
-                    log.warn("{} ", session, new RuntimeException("不是 websocket 不允许发送 string 类型"));
+                if (!socketSession.isWebSocket()) {
+                    log.warn("{} ", socketSession, new RuntimeException("不是 websocket 不允许发送 string 类型"));
                     return;
                 }
+                socketSession.addSendFlowByte(str.length());
                 TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(str);
                 super.write(ctx, textWebSocketFrame, promise);
             }
             case PojoBase pojoBase -> {
                 int msgId = pojoBase.msgId();
                 byte[] bytes = pojoBase.encode();
-                Object build = build(session, msgId, bytes);
+                socketSession.addSendFlowByte(bytes.length);
+                Object build = build(socketSession, msgId, bytes);
                 super.write(ctx, build, promise);
                 if (log.isDebugEnabled()) {
-                    log.debug("发送消息：{} msgId={}, {}", session, msgId, pojoBase);
+                    log.debug("发送消息：{} msgId={}, {}", socketSession, msgId, pojoBase);
                 }
             }
             case byte[] bytes -> {
+                socketSession.addSendFlowByte(bytes.length);
                 ByteBuf byteBuf = ByteBufUtil.pooledByteBuf(bytes.length);
                 byteBuf.writeBytes(bytes);
-                if (session.isWebSocket()) {
+                if (socketSession.isWebSocket()) {
                     super.write(ctx, new BinaryWebSocketFrame(byteBuf), promise);
                 } else {
                     super.write(ctx, byteBuf, promise);
                 }
             }
             case ByteBuf byteBuf -> {
-                if (session.isWebSocket()) {
+                socketSession.addSendFlowByte(byteBuf.readableBytes());
+                if (socketSession.isWebSocket()) {
                     super.write(ctx, new BinaryWebSocketFrame(byteBuf), promise);
                 } else {
                     super.write(ctx, byteBuf, promise);

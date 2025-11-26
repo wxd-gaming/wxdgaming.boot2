@@ -6,6 +6,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.server.bean.StatusConst;
 import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
@@ -34,10 +35,11 @@ public class PlayerLogoutHandler {
     @EventListener
     public void onLogout(EventConst.LogoutPlayerEvent event) {
         Player player = event.player();
-        log.info("玩家下线: {} {}", ThreadContext.context().queueName(), player);
         player.getStatus().addFlags(StatusConst.Offline);
         player.getOnlineInfo().setLastLogoutTime(MyClock.millis());
         UserMapping clientSessionMapping = player.getUserMapping();
+        SocketSession socketSession = clientSessionMapping.getSocketSession();
+        log.info("玩家下线: {} {}, \n{}", ThreadContext.context().queueName(), player, socketSession.flowString());
         clientSessionMapping.setRid(0);
         clientSessionMapping.setSocketSession(null);
         player.setUserMapping(null);

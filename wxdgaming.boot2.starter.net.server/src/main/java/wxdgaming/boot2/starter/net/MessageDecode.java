@@ -83,6 +83,7 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
                     if (!session.checkReceiveMessage(request.length())) {
                         return;
                     }
+                    session.addReceiveFlowByte(request.length());
                     dispatch(session, request);
                 }
                 default -> log.warn("无法处理：{}", frame.getClass().getName());
@@ -137,6 +138,7 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
                 /*读取报文类容*/
                 byteBuf.readBytes(messageBytes);
                 SocketSession socketSession = ChannelUtil.session(ctx.channel());
+                socketSession.addReceiveFlowByte(messageBytes.length);
                 if (!socketSession.checkReceiveMessage(messageBytes.length)) {
                     return;
                 }

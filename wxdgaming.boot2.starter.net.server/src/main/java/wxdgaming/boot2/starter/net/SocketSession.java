@@ -6,14 +6,15 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import wxdgaming.boot2.core.lang.TickCount;
 
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 /**
  * socket session
@@ -52,6 +53,10 @@ public class SocketSession {
     private long maxFrameBytes = -1;
     private final TickCount receiveMessageTick = new TickCount(1000);
     private final JSONObject bindData = new JSONObject();
+    @Getter(AccessLevel.PRIVATE) private final AtomicLong receiveCount = new AtomicLong();
+    @Getter(AccessLevel.PRIVATE) private final AtomicLong receiveBytes = new AtomicLong();
+    @Getter(AccessLevel.PRIVATE) private final AtomicLong sendCount = new AtomicLong();
+    @Getter(AccessLevel.PRIVATE) private final AtomicLong sendBytes = new AtomicLong();
 
     public SocketSession(Type type, Channel channel, Boolean webSocket, boolean enabledScheduledFlush) {
         this.uid = ATOMIC_LONG.incrementAndGet();
@@ -131,6 +136,16 @@ public class SocketSession {
         ChannelUtil.closeSession(channel, toString() + " " + string);
     }
 
+    public void addReceiveFlowByte(long len) {
+        receiveCount.incrementAndGet();
+        receiveBytes.addAndGet(len);
+    }
+
+    public void addSendFlowByte(long len) {
+        sendCount.incrementAndGet();
+        sendBytes.addAndGet(len);
+    }
+
     /** 增加接受消息的次数 */
     public boolean checkReceiveMessage(int c) {
         if (getMaxFrameBytes() > 0 && getMaxFrameBytes() < c) {
@@ -154,6 +169,19 @@ public class SocketSession {
 
     @Override public int hashCode() {
         return Long.hashCode(getUid());
+    }
+
+    public String flowString() {
+        String receiveFlowString = FileUtils.byteCountToDisplaySize(receiveBytes.get());
+        String sendFlowString = FileUtils.byteCountToDisplaySize(sendBytes.get());
+        return """
+                %s
+                接收 次数: %s, 流量: %s
+                发送 次数: %s, 流量: %s""".formatted(
+                this.toString(),
+                receiveCount.get(), receiveFlowString,
+                sendCount.get(), sendFlowString
+        );
     }
 
     @Override public String toString() {

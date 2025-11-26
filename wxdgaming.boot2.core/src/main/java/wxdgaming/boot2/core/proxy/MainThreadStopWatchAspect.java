@@ -25,8 +25,9 @@ public class MainThreadStopWatchAspect {
     // 前置通知：目标方法执行前执行
     @Before("allPointcut()")
     public void beforeAdvice(JoinPoint joinPoint) {
+        String declaringTypeName = joinPoint.getSignature().getDeclaringType().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
-        ThreadStopWatch.startIfPresent(methodName);
+        ThreadStopWatch.startIfPresent(declaringTypeName + "." + methodName);
     }
 
     // 后置通知：目标方法执行后执行（无论是否异常）
