@@ -1,6 +1,8 @@
 package wxdgaming.logserver.plugin;
 
 import wxdgaming.boot2.core.ApplicationContextProvider;
+import wxdgaming.boot2.core.executor.ExecutorLog;
+import wxdgaming.boot2.core.reflect.AnnUtil;
 
 /**
  * 插件
@@ -9,6 +11,10 @@ import wxdgaming.boot2.core.ApplicationContextProvider;
  * @version 2025-08-18 16:49
  */
 public abstract class AbstractPlugin {
+
+    public ExecutorLog getExecutorLog() {
+        return AnnUtil.ann(this.getClass(), ExecutorLog.class);
+    }
 
     /** 执行间隔时间 */
     public abstract String cron();

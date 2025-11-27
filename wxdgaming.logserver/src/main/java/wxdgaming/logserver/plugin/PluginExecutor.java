@@ -3,7 +3,6 @@ package wxdgaming.logserver.plugin;
 import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.executor.ExecutorLog;
 import wxdgaming.boot2.core.executor.ExecutorWith;
-import wxdgaming.boot2.core.proxy.AopProxyUtil;
 import wxdgaming.boot2.starter.scheduled.AbstractCronTrigger;
 
 import java.lang.annotation.Annotation;
@@ -44,8 +43,7 @@ public class PluginExecutor extends AbstractCronTrigger {
     }
 
     @Override public ExecutorLog getExecutorLog() {
-        Object targetObject = AopProxyUtil.getTargetObject(abstractPlugin);
-        ExecutorLog annotation = targetObject.getClass().getAnnotation(ExecutorLog.class);
+        ExecutorLog annotation = abstractPlugin.getExecutorLog();
         if (annotation != null) return annotation;
         return super.getExecutorLog();
     }

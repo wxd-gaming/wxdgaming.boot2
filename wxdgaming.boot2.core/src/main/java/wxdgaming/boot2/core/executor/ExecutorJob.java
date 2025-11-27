@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.executor;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import wxdgaming.boot2.core.reflect.AnnUtil;
 
 import java.lang.annotation.Annotation;
 
@@ -41,6 +42,10 @@ public class ExecutorJob implements Runnable {
     public ExecutorJob(Runnable runnable) {
         this.runnable = runnable;
         this.stack = StackUtils.stack(0, 1);
+        ExecutorLog executorLog1 = AnnUtil.ann(this.getClass(), ExecutorLog.class);
+        if (executorLog1 != null) {
+            this.executorLog = executorLog1;
+        }
     }
 
     public ExecutorJob(Runnable runnable, ExecutorLog executorLog) {

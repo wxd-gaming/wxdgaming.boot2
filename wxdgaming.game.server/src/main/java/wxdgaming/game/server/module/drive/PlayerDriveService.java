@@ -160,6 +160,7 @@ public class PlayerDriveService extends HoldApplicationContext {
                 });
     }
 
+    @ExecutorLog()
     public class PlayerDriveContent extends ExecutorEvent implements HeartDriveHandler {
 
         ScheduledFuture<?> timerJob;
@@ -167,6 +168,7 @@ public class PlayerDriveService extends HoldApplicationContext {
         final ConcurrentSkipListMap<Long, Player> playerMap = new ConcurrentSkipListMap<>();
 
         public PlayerDriveContent(String queueName) {
+            super();
             this.queueName = queueName;
             this.heartDrive = new HeartDrive(this.queueName);
             this.heartDrive.setDriveHandler(this);
