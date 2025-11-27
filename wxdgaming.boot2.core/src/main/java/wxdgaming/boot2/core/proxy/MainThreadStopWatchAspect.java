@@ -19,7 +19,7 @@ import wxdgaming.boot2.core.executor.ThreadStopWatch;
 public class MainThreadStopWatchAspect {
 
     // 定义切点：匹配 UserService 中所有方法
-    @Pointcut("(execution(* wxdgaming..*(..)))&& !execution(* java.lang.Object.*(..))")
+    @Pointcut("(execution(* wxdgaming..*(..))) && !execution(* java.lang.Object.*(..)) && !@annotation(wxdgaming.boot2.core.proxy.IgnoreAspect)")
     public void allPointcut() {}
 
     // 前置通知：目标方法执行前执行
