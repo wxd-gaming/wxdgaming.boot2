@@ -73,7 +73,7 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
         // HttpServerCodec：将请求和应答消息解码为HTTP消息
         ctx.pipeline().addBefore("device-handler", "http-codec", new HttpServerCodec());
         // 添加HTTP内容解压缩器，用于处理Gzip压缩的请求
-        ctx.pipeline().addBefore("device-handler", "Http-Content-Decompressor", new HttpContentDecompressor());
+        ctx.pipeline().addBefore("device-handler", "Http-Content-Decompressor", new HttpContentDecompressor(maxContentLength));
         /*接受完整的http消息 64mb*/
         ctx.pipeline().addBefore("device-handler", "http-object-aggregator", new HttpObjectAggregator(maxContentLength));
         // ChunkedWriteHandler：向客户端发送HTML5文件,文件过大会将内存撑爆
