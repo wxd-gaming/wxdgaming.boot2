@@ -5,6 +5,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.net.InetSocketAddress;
@@ -19,6 +20,7 @@ public class ChannelUtil implements Serializable {
     public static final AttributeKey<SocketSession> SOCKET_SESSION_KEY = AttributeKey.valueOf("__socket_session_key__");
 
     public static final AttributeKey<Boolean> WEB_SOCKET_SESSION_KEY = AttributeKey.valueOf("__web_socket_session_key__");
+    public static final AttributeKey<String> WEB_SOCKET_IP_KEY = AttributeKey.valueOf("__web_socket_ip_key__");
 
     static public String ctxTostring(ChannelHandlerContext ctx) {
         return ctxTostring(ctx.channel());
@@ -57,6 +59,10 @@ public class ChannelUtil implements Serializable {
      */
     static public String getIP(Channel session) {
         try {
+            String attr = attr(session, WEB_SOCKET_IP_KEY);
+            if (StringUtils.isNotBlank(attr)) {
+                return attr;
+            }
             InetSocketAddress insocket = (InetSocketAddress) session.remoteAddress();
             return insocket.getAddress().getHostAddress();
         } catch (Throwable ignore) {}
@@ -67,7 +73,11 @@ public class ChannelUtil implements Serializable {
     static public String getRemoteAddress(Channel session) {
         try {
             InetSocketAddress insocket = (InetSocketAddress) session.remoteAddress();
-            return insocket.getAddress().getHostAddress() + ":" + insocket.getPort();
+            String attr = attr(session, WEB_SOCKET_IP_KEY);
+            if (StringUtils.isBlank(attr)) {
+                attr = insocket.getAddress().getHostAddress();
+            }
+            return attr + ":" + insocket.getPort();
         } catch (Throwable ignore) {}
         return null;
     }

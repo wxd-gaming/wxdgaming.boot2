@@ -78,6 +78,7 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
         ctx.pipeline().addBefore("device-handler", "http-object-aggregator", new HttpObjectAggregator(maxContentLength));
         // ChunkedWriteHandler：向客户端发送HTML5文件,文件过大会将内存撑爆
         ctx.pipeline().addBefore("device-handler", "http-chunked", new ChunkedWriteHandler());
+        ctx.pipeline().addBefore("device-handler", "http-remote-ip", new WebSocketRemoteIp());
         /*接受完整的websocket消息 64mb*/
         ctx.pipeline().addBefore("device-handler", "WebSocketAggregator", new WebSocketFrameAggregator(maxContentLength));
         // 用于处理websocket, /ws为访问websocket时的uri

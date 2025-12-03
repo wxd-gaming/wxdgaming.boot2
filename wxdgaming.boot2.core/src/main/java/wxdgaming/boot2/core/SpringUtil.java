@@ -18,7 +18,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
@@ -45,6 +44,8 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -173,21 +174,31 @@ public class SpringUtil implements InitPrint {
     }
 
     public static String getClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
+        return getClientIp(request::getHeader, request::getRemoteAddr);
+    }
+
+    public static String getClientIp(Function<String, String> request, Supplier<String> defaultIp) {
+        String ip = request.apply("X-Forwarded-For");
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
+            ip = request.apply("Proxy-Client-IP");
         }
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
+            ip = request.apply("WL-Proxy-Client-IP");
         }
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
+            ip = request.apply("HTTP_CLIENT_IP");
         }
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+            ip = request.apply("HTTP_X_FORWARDED_FOR");
         }
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
+            ip = defaultIp.get();
+        }
+        if (StringUtils.isNotBlank(ip)) {
+            int endIndex = ip.indexOf(",");
+            if (endIndex > 0) {
+                ip = ip.substring(0, endIndex);
+            }
         }
         return ip;
     }
