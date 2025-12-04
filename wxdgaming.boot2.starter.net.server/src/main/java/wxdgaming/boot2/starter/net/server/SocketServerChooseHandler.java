@@ -7,11 +7,9 @@ import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketFrameAggregator;
-import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.util.BytesUnit;
-import wxdgaming.boot2.starter.net.ChannelUtil;
 
 import java.util.List;
 import java.util.Set;
@@ -26,7 +24,7 @@ import java.util.Set;
 public class SocketServerChooseHandler extends ByteToMessageDecoder {
 
     /** 默认暗号长度为23 */
-    private static final int MAX_LENGTH = 23;
+    private static final int MAX_LENGTH = 1024;
     /** WebSocket握手的协议前缀 */
     private static final Set<String> WEB_PREFIX = Set.of(
             "GET /",
@@ -78,22 +76,9 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
         ctx.pipeline().addBefore("device-handler", "http-object-aggregator", new HttpObjectAggregator(maxContentLength));
         // ChunkedWriteHandler：向客户端发送HTML5文件,文件过大会将内存撑爆
         ctx.pipeline().addBefore("device-handler", "http-chunked", new ChunkedWriteHandler());
-        ctx.pipeline().addBefore("device-handler", "http-remote-ip", new WebSocketRemoteIp());
         /*接受完整的websocket消息 64mb*/
         ctx.pipeline().addBefore("device-handler", "WebSocketAggregator", new WebSocketFrameAggregator(maxContentLength));
-        // 用于处理websocket, /ws为访问websocket时的uri
-        WebSocketServerProtocolHandler webSocketServerProtocolHandler = new WebSocketServerProtocolHandler(socketServerConfig.getWebSocketPrefix(), null, false, maxContentLength) {
-
-            @Override public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-                log.debug("{} websocket event triggered {}", ctx.channel(), evt);
-                if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
-                    ChannelUtil.session(ctx.channel()).setHandshake_complete(true);
-                }
-                super.userEventTriggered(ctx, evt);
-            }
-        };
-        ctx.pipeline().addBefore("device-handler", "ProtocolHandler", webSocketServerProtocolHandler);
-        ChannelUtil.session(ctx.channel()).setWebSocket(true);
+        ctx.pipeline().addBefore("device-handler", "http-remote-ip", new WebSocketRemoteIp(maxContentLength));
     }
 
 }
