@@ -86,14 +86,15 @@ public class SocketServer {
                                 pipeline.addLast("logging", new LoggingHandler("DEBUG"));// 设置log监听器，并且日志级别为debug，方便观察运行流程
                             }
 
+                            /*处理链接*/
+                            pipeline.addLast("device-handler", socketServerDeviceHandler);
+
                             pipeline.addFirst(new WxdOptionalSslHandler(sslContext));
 
                             /*设置读取空闲*/
                             pipeline.addLast("idleHandler", config.idleStateHandler());
                             /* socket 选择器 区分是tcp websocket http*/
                             pipeline.addLast("socket-choose-handler", new SocketServerChooseHandler(config));
-                            /*处理链接*/
-                            pipeline.addLast("device-handler", socketServerDeviceHandler);
                             /*解码消息*/
                             pipeline.addLast("decode", socketServerMessageDecode);
                             /*解码消息*/

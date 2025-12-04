@@ -28,7 +28,6 @@ public class SocketServerDeviceHandler extends SocketDeviceHandler {
     }
 
     @Override public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        super.channelActive(ctx);
         log.debug(
                 "channel open {}",
                 ChannelUtil.getLocalAddress(ctx.channel()) + " : " + ChannelUtil.getRemoteAddress(ctx.channel())
@@ -37,7 +36,7 @@ public class SocketServerDeviceHandler extends SocketDeviceHandler {
         SocketSession socketSession = new SocketSession(
                 SocketSession.Type.server,
                 ctx.channel(),
-                ChannelUtil.attr(ctx.channel(), ChannelUtil.WEB_SOCKET_SESSION_KEY),
+                false,
                 socketServerConfig.isEnabledScheduledFlush()
         );
         if (socketServerConfig.getMaxFrameBytes() >= 0) {
@@ -45,6 +44,7 @@ public class SocketServerDeviceHandler extends SocketDeviceHandler {
         }
         socketSession.setMaxFrameLength(socketServerConfig.getMaxFrameLength());
         sessionGroup.add(socketSession);
+        super.channelActive(ctx);
     }
 
 }

@@ -19,7 +19,6 @@ public class ChannelUtil implements Serializable {
 
     public static final AttributeKey<SocketSession> SOCKET_SESSION_KEY = AttributeKey.valueOf("__socket_session_key__");
 
-    public static final AttributeKey<Boolean> WEB_SOCKET_SESSION_KEY = AttributeKey.valueOf("__web_socket_session_key__");
     public static final AttributeKey<String> WEB_SOCKET_IP_KEY = AttributeKey.valueOf("__web_socket_ip_key__");
 
     static public String ctxTostring(ChannelHandlerContext ctx) {
