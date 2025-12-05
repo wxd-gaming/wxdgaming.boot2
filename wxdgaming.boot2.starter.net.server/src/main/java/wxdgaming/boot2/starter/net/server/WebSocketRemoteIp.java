@@ -43,7 +43,7 @@ public class WebSocketRemoteIp extends ChannelInboundHandlerAdapter {
 
                     @Override public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
                         log.debug("{} websocket event triggered {}", ctx.channel(), evt);
-                        if (evt == WebSocketServerProtocolHandler.ServerHandshakeStateEvent.HANDSHAKE_COMPLETE) {
+                        if (evt instanceof WebSocketServerProtocolHandler.HandshakeComplete) {
                             ChannelUtil.session(ctx.channel()).setHandshake_complete(true);
                         }
                         super.userEventTriggered(ctx, evt);
