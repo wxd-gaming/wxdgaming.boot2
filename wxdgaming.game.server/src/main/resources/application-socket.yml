@@ -5,7 +5,7 @@ socket:
     enabledHttp: true                                        #是否启用http
     enabledTcp: true                                         #是否启用tcp
     enabledScheduledFlush: true                             # 开启定时器flush
-    scheduledFlushMs: 10                                    #定时调用flush的频率单位是ms
+    scheduledFlushMs: 3                                     #定时调用flush的频率单位是ms
     enabledWebSocket: false                                  #是否启用websocket
     webSocketPrefix: "/ws"                                   #websocket前缀
     maxAggregatorLength: 64                                  #聚合器最大长度
@@ -25,11 +25,11 @@ socket:
     host: 127.0.0.1
     port: 8000
     connectTimeout: 500                                       #创建链接的超时时间
-    enabledScheduledFlush: true                             # 开启定时器flush
-    scheduledFlushMs: 10                                    #定时调用flush的频率单位是ms
-    enabledWebSocket: false                                    #是否启用websocket
+    enabledScheduledFlush: true                               # 开启定时器flush
+    scheduledFlushMs: 3                                       #定时调用flush的频率单位是ms
+    enabledWebSocket: false                                   #是否启用websocket
     webSocketPrefix: "/ws"                                    #websocket前缀
-    enabledReconnection: false                                  #是否启用重连
+    enabledReconnection: false                                #是否启用重连
     enabledSSL: false
     maxAggregatorLength: 64                                    #聚合器最大长度
     maxConnectionCount: 1

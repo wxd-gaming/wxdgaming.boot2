@@ -1,20 +1,16 @@
 package wxdgaming.boot2.starter.net;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
+import io.netty.channel.*;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.util.concurrent.ScheduledFuture;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.starter.net.pojo.PojoBase;
-import wxdgaming.boot2.starter.net.pojo.ProtoListenerFactory;
 
+import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 消息编码
@@ -24,25 +20,36 @@ import java.util.concurrent.atomic.AtomicInteger;
  **/
 @Slf4j
 @Getter
+@ChannelHandler.Sharable
 public abstract class MessageEncode extends ChannelOutboundHandlerAdapter {
 
-    protected final ProtoListenerFactory protoListenerFactory;
-    protected final AtomicInteger writeUpdate = new AtomicInteger(0);
-    protected int lastUpdateTime = 0;
+    private final boolean scheduledFlush;
+    private final long scheduledDelayMs;
 
-    public MessageEncode(boolean scheduledFlush, long scheduledDelayMs, Channel channel, ProtoListenerFactory protoListenerFactory) {
-        this.protoListenerFactory = protoListenerFactory;
-        if (scheduledFlush) {
-            /*采用定时器flush，调用 write 而非 writAndFlush 减少网络io开销*/
-            ScheduledFuture<?> scheduledFuture = channel.eventLoop().scheduleAtFixedRate(() -> {
-                if (lastUpdateTime != writeUpdate.get()) {
-                    lastUpdateTime = writeUpdate.get();
-                    channel.flush();
-                }
-            }, scheduledDelayMs, scheduledDelayMs, TimeUnit.MILLISECONDS);
-            /*注册事件。 如果连接断开，关闭定时器*/
-            channel.closeFuture().addListener(future -> scheduledFuture.cancel(false));
+    private final ConcurrentHashMap<EventLoop, HashSet<Channel>> eventLoopFlushChannelMap = new ConcurrentHashMap<>();
+
+    private void addFlushChannel(Channel channel) {
+        if (!scheduledFlush) {
+            return;
         }
+        eventLoopFlushChannelMap.computeIfAbsent(channel.eventLoop(), k -> {
+                    HashSet<Channel> objects = new HashSet<>();
+                    channel.eventLoop().scheduleWithFixedDelay(
+                            () -> {
+                                objects.forEach(Channel::flush);
+                                objects.clear();
+                            },
+                            scheduledDelayMs, scheduledDelayMs,
+                            TimeUnit.MILLISECONDS
+                    );
+                    return objects;
+                })
+                .add(channel);
+    }
+
+    public MessageEncode(boolean scheduledFlush, long scheduledDelayMs) {
+        this.scheduledFlush = scheduledFlush;
+        this.scheduledDelayMs = scheduledDelayMs;
     }
 
     @Override public void deregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
@@ -73,7 +80,7 @@ public abstract class MessageEncode extends ChannelOutboundHandlerAdapter {
             }
             case byte[] bytes -> {
                 socketSession.addSendFlowByte(bytes.length);
-                ByteBuf byteBuf = ByteBufUtil.pooledByteBuf(bytes.length);
+                ByteBuf byteBuf = socketSession.getChannel().alloc().buffer(bytes.length);
                 byteBuf.writeBytes(bytes);
                 if (socketSession.isWebSocket()) {
                     super.write(ctx, new BinaryWebSocketFrame(byteBuf), promise);
@@ -91,11 +98,11 @@ public abstract class MessageEncode extends ChannelOutboundHandlerAdapter {
             }
             case null, default -> super.write(ctx, msg, promise);
         }
-        writeUpdate.incrementAndGet();
+        addFlushChannel(ctx.channel());
     }
 
     public static Object build(SocketSession session, int messageId, byte[] bytes) {
-        ByteBuf byteBuf = ByteBufUtil.pooledByteBuf(bytes.length + 10);
+        ByteBuf byteBuf = session.getChannel().alloc().buffer(bytes.length + 10);
         byteBuf.writeInt(bytes.length + 4);
         byteBuf.writeInt(messageId);
         byteBuf.writeBytes(bytes);

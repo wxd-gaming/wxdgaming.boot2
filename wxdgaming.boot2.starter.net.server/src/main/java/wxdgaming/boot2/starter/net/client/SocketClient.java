@@ -80,6 +80,8 @@ public class SocketClient {
     public void init() {
         SocketClientDeviceHandler socketClientDeviceHandler = new SocketClientDeviceHandler();
         ClientMessageDecode clientMessageDecode = new ClientMessageDecode(config, protoListenerFactory);
+        ClientMessageEncode handler = new ClientMessageEncode(config.isEnabledScheduledFlush(), config.getScheduledDelayMs());
+
         SSLContext sslContext = config.sslContext();
 
         int writeBytes = (int) BytesUnit.Mb.toBytes(config.getWriteByteBufM());
@@ -118,13 +120,7 @@ public class SocketClient {
                         /*解码消息*/
                         pipeline.addLast("decode", clientMessageDecode);
                         /*解码消息*/
-                        pipeline.addLast(
-                                "encode",
-                                new ClientMessageEncode(
-                                        config.isEnabledScheduledFlush(), config.getScheduledDelayMs(),
-                                        socketChannel, protoListenerFactory
-                                )
-                        );
+                        pipeline.addLast("encode", handler);
 
                         if (config.isEnabledWebSocket()) {
 

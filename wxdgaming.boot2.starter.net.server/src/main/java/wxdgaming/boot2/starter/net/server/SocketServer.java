@@ -56,11 +56,14 @@ public class SocketServer {
 
         SocketServerDeviceHandler socketServerDeviceHandler = new SocketServerDeviceHandler(config, sessionGroup);
         SocketServerMessageDecode socketServerMessageDecode = new SocketServerMessageDecode(config, protoListenerFactory);
+        SocketServerMessageEncode serverMessageEncode = new SocketServerMessageEncode(config.isEnabledScheduledFlush(), config.getScheduledDelayMs());
+
         SSLContext sslContext = config.sslContext();
 
         int writeBytes = (int) BytesUnit.Mb.toBytes(config.getWriteByteBufM());
         int recvBytes = (int) BytesUnit.Mb.toBytes(config.getRecvByteBufM());
-        bootstrap = new ServerBootstrap().group(NioFactory.bossThreadGroup(), NioFactory.workThreadGroup())
+        EventLoopGroup childGroup = NioFactory.workThreadGroup();
+        bootstrap = new ServerBootstrap().group(NioFactory.bossThreadGroup(), childGroup)
                 /*channel方法用来创建通道实例(NioServerSocketChannel类来实例化一个进来的链接)*/
                 .channel(NioFactory.serverSocketChannelClass())
                 /*方法用于设置监听套接字*/
@@ -98,15 +101,7 @@ public class SocketServer {
                             /*解码消息*/
                             pipeline.addLast("decode", socketServerMessageDecode);
                             /*解码消息*/
-                            pipeline.addLast(
-                                    "encode",
-                                    new SocketServerMessageEncode(
-                                            config.isEnabledScheduledFlush(),
-                                            config.getScheduledDelayMs(),
-                                            socketChannel,
-                                            protoListenerFactory
-                                    )
-                            );
+                            pipeline.addLast("encode", serverMessageEncode);
                             addChanelHandler(socketChannel, pipeline);
                         } catch (Exception e) {
                             log.error("SocketServer init fail port: {}", config.getPort(), e);
