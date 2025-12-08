@@ -110,7 +110,7 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
         readBytes0(ctx, tmpByteBuf);
 
         if (tmpByteBuf.readableBytes() > 0) {
-            tmpByteBuf.discardReadBytes();
+            tmpByteBuf.discardSomeReadBytes();
             ChannelUtil.attr(ctx.channel(), byteBufAttributeKey, tmpByteBuf);
         } else {
             ByteBufUtil.release(tmpByteBuf);
