@@ -104,7 +104,7 @@ public class DataCenterService extends HoldApplicationContext implements GetPlay
     }
 
     @Override public void save(RoleEntity roleEntity) {
-        getPlayerStrategyFactory.putCache(roleEntity);
+        getPlayerStrategyFactory.save(roleEntity);
     }
 
     public void kickAccountAll() {
