@@ -11,6 +11,7 @@ import wxdgaming.boot2.starter.batis.mapdb.MapDBScan;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
 import wxdgaming.boot2.starter.net.httpclient5.HttpClientScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
+import wxdgaming.boot2.starter.tailf.TailfScan;
 import wxdgaming.game.common.global.GlobalDataService;
 import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.logbus.LogBusService;
@@ -33,6 +34,7 @@ import wxdgaming.logbus.LogBusService;
                 SlogService.class,
                 GlobalDataService.class,
                 LogBusService.class,
+                TailfScan.class,
                 LoginServerApplication.class
         }
 )

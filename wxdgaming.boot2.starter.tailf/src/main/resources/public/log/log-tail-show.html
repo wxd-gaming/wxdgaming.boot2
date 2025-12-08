@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实时日志监控</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #444;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input, button {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background-color: #2d2d30;
+            color: #d4d4d4;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #007acc;
+            color: white;
+        }
+
+        button:hover {
+            background-color: #005a9e;
+        }
+
+        .log-container {
+            height: 70vh;
+            overflow-y: auto;
+            background-color: #1e1e1e;
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .log-line {
+            margin: 2px 0;
+            padding: 2px 4px;
+            word-break: break-all;
+            line-height: 1.4;
+        }
+
+        .log-info {
+            color: #569cd6;
+        }
+
+        .log-error {
+            color: #f48771;
+        }
+
+        .log-warn {
+            color: #d7ba7d;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .connected {
+            background-color: #2d7c2d;
+            color: white;
+        }
+
+        .disconnected {
+            background-color: #c23535;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>实时日志监控 (Tail -f)</h1>
+        <div id="status" class="status disconnected">未连接</div>
+    </div>
+
+    <div class="controls">
+        <input type="text" id="fileName" placeholder="日志文件名" value="application.log">
+        <input type="number" id="lines" placeholder="初始行数" value="100" min="1" max="1000">
+        <button id="connectBtn">连接</button>
+        <button id="clearBtn">清屏</button>
+        <label>
+            <input type="checkbox" id="autoScroll" checked> 自动滚动
+        </label>
+    </div>
+
+    <div id="logContainer" class="log-container"></div>
+</div>
+
+<script>
+    class LogTailer {
+        constructor() {
+            this.eventSource = null;
+            this.isConnected = false;
+
+            this.fileNameInput = document.getElementById('fileName');
+            this.linesInput = document.getElementById('lines');
+            this.connectBtn = document.getElementById('connectBtn');
+            this.clearBtn = document.getElementById('clearBtn');
+            this.statusEl = document.getElementById('status');
+            this.logContainer = document.getElementById('logContainer');
+            this.autoScrollCheckbox = document.getElementById('autoScroll');
+
+            this.initEventListeners();
+        }
+
+        initEventListeners() {
+            this.connectBtn.addEventListener('click', () => {
+                if (this.isConnected) {
+                    this.disconnect();
+                } else {
+                    this.connect();
+                }
+            });
+
+            this.clearBtn.addEventListener('click', () => {
+                this.logContainer.innerHTML = '';
+            });
+        }
+
+        connect() {
+            const fileName = this.fileNameInput.value || 'application.log';
+            const lines = this.linesInput.value || 100;
+
+            if (this.eventSource) {
+                this.eventSource.close();
+            }
+
+            const url = `/log/sse`;
+            this.eventSource = new EventSource(url);
+
+            this.eventSource.onopen = () => {
+                this.isConnected = true;
+                this.updateStatus('已连接', 'connected');
+                this.connectBtn.textContent = '断开';
+            };
+
+            this.eventSource.onerror = (event) => {
+                console.error('SSE连接错误:', event);
+                this.disconnect();
+            };
+
+            this.eventSource.addEventListener('log', (event) => {
+                this.addLogLine(event.data, 'log');
+            });
+
+            this.eventSource.addEventListener('info', (event) => {
+                this.addLogLine(event.data, 'info');
+            });
+
+            this.eventSource.addEventListener('error', (event) => {
+                this.addLogLine(event.data, 'error');
+            });
+        }
+
+        disconnect() {
+            if (this.eventSource) {
+                this.eventSource.close();
+                this.eventSource = null;
+            }
+            this.isConnected = false;
+            this.updateStatus('未连接', 'disconnected');
+            this.connectBtn.textContent = '连接';
+        }
+
+        addLogLine(message, type) {
+            const lineDiv = document.createElement('div');
+            lineDiv.className = `log-line log-${type}`;
+            lineDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+
+            this.logContainer.appendChild(lineDiv);
+
+            if (this.autoScrollCheckbox.checked) {
+                this.logContainer.scrollTop = this.logContainer.scrollHeight;
+            }
+        }
+
+        updateStatus(text, className) {
+            this.statusEl.textContent = text;
+            this.statusEl.className = `status ${className}`;
+        }
+    }
+
+    // 初始化应用
+    document.addEventListener('DOMContentLoaded', () => {
+        new LogTailer();
+    });
+</script>
+</body>
+</html>

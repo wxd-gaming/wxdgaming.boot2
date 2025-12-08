@@ -30,6 +30,7 @@
         <module>wxdgaming.boot2.starter.net.httpclient</module>
         <module>wxdgaming.boot2.starter.net.server</module>
         <module>wxdgaming.boot2.starter.scheduled</module>
+        <module>wxdgaming.boot2.starter.tailf</module>
         <module>wxdgaming.boot2.starter.validation</module>
         <module>wxdgaming.game.authority</module>
         <module>wxdgaming.game.basic</module>
@@ -37,9 +38,9 @@
         <module>wxdgaming.game.robot</module>
         <module>wxdgaming.game.server</module>
         <module>wxdgaming.game.server-script</module>
+        <module>wxdgaming.kotlin.test</module>
         <module>wxdgaming.logbus</module>
         <module>wxdgaming.logserver</module>
-        <module>wxdgaming.kotlin.test</module>
     </modules>
 
     <properties>
