@@ -38,6 +38,7 @@ public class InstanceMethodProvider implements Comparable<InstanceMethodProvider
                 }
                 return javassistProxy.proxyInvoke(args);
             } else {
+                invokeCount.incrementAndGet();
                 return method.invoke(instance, args);
             }
         } catch (Exception e) {
