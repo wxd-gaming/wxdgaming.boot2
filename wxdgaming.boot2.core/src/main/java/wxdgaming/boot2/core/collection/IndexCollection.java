@@ -43,16 +43,16 @@ public class IndexCollection<E> {
             Function<E, Object> objectFunction = entry.getValue();
             Object indexKey = objectFunction.apply(e);
             Map<Object, E> objectEMap = indexDataMap.get(entry.getKey());
-            if (objectEMap == null) {
-                continue;
-            }
+            if (objectEMap == null) continue;
             objectEMap.remove(indexKey);
         }
         return this;
     }
 
     public E get(String indexName, Object indexKey) {
-        return indexDataMap.get(indexName).get(indexKey);
+        Map<Object, E> objectEMap = indexDataMap.get(indexName);
+        if (objectEMap == null) return null;
+        return objectEMap.get(indexKey);
     }
 
 }
