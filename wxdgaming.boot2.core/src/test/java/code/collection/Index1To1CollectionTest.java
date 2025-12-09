@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import wxdgaming.boot2.core.collection.IndexCollection;
+import wxdgaming.boot2.core.collection.Index1To1Collection;
 
 /**
  * 索引测试
@@ -13,7 +13,7 @@ import wxdgaming.boot2.core.collection.IndexCollection;
  * @version 2025-12-08 20:50
  **/
 @Slf4j
-public class IndexCollectionTest {
+public class Index1To1CollectionTest {
 
     @Data
     @AllArgsConstructor
@@ -25,20 +25,20 @@ public class IndexCollectionTest {
 
     @Test
     public void test() {
-        IndexCollection<Usr> indexCollection = new IndexCollection<>();
-        indexCollection
+        Index1To1Collection<Usr> index1To1Collection = new Index1To1Collection<>();
+        index1To1Collection
                 .registerIndex("uid", Usr::getUid)
                 .registerIndex("loginName", Usr::getLoginName);
         Usr abc = new Usr(1, "abc");
-        indexCollection.add(abc);
+        index1To1Collection.add(abc);
 
-        log.info("{}", indexCollection.get("uid", 1L));
-        log.info("{}", indexCollection.get("loginName", "abc"));
+        log.info("{}", index1To1Collection.get("uid", 1L));
+        log.info("{}", index1To1Collection.get("loginName", "abc"));
 
-        indexCollection.remove(abc);
+        index1To1Collection.remove(abc);
 
-        log.info("{}", indexCollection.get("uid", 1L));
-        log.info("{}", indexCollection.get("loginName", "abc"));
+        log.info("{}", index1To1Collection.get("uid", 1L));
+        log.info("{}", index1To1Collection.get("loginName", "abc"));
 
     }
 
