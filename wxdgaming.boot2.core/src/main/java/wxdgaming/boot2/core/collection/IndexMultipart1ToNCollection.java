@@ -1,5 +1,7 @@
 package wxdgaming.boot2.core.collection;
 
+import wxdgaming.boot2.core.lang.ComboKey;
+
 import java.util.*;
 import java.util.function.Function;
 
@@ -11,17 +13,17 @@ import java.util.function.Function;
  **/
 public class IndexMultipart1ToNCollection<E> {
 
-    private final Map<String, Function<E, Keys>> indexMap = new HashMap<>();
-    private final Map<String, Map<Keys, List<E>>> indexDataMap = new HashMap<>();
+    private final Map<String, Function<E, ComboKey>> indexMap = new HashMap<>();
+    private final Map<String, Map<ComboKey, List<E>>> indexDataMap = new HashMap<>();
 
     @SafeVarargs public final IndexMultipart1ToNCollection<E> registerIndex(String name, Function<E, Object>... indexFunctions) {
-        Function<E, Keys> indexFunction = new Function<E, Keys>() {
-            @Override public Keys apply(E e) {
+        Function<E, ComboKey> indexFunction = new Function<E, ComboKey>() {
+            @Override public ComboKey apply(E e) {
                 Object[] keys = new Object[indexFunctions.length];
                 for (int i = 0; i < indexFunctions.length; i++) {
                     keys[i] = indexFunctions[i].apply(e);
                 }
-                return new Keys(keys);
+                return new ComboKey(keys);
             }
         };
         indexMap.put(name, indexFunction);
@@ -29,10 +31,10 @@ public class IndexMultipart1ToNCollection<E> {
     }
 
     public IndexMultipart1ToNCollection<E> add(E e) {
-        for (Map.Entry<String, Function<E, Keys>> entry : indexMap.entrySet()) {
-            Function<E, Keys> objectFunction = entry.getValue();
-            Keys indexKey = objectFunction.apply(e);
-            Map<Keys, List<E>> objectListMap = indexDataMap.computeIfAbsent(entry.getKey(), l -> new HashMap<>());
+        for (Map.Entry<String, Function<E, ComboKey>> entry : indexMap.entrySet()) {
+            Function<E, ComboKey> objectFunction = entry.getValue();
+            ComboKey indexKey = objectFunction.apply(e);
+            Map<ComboKey, List<E>> objectListMap = indexDataMap.computeIfAbsent(entry.getKey(), l -> new HashMap<>());
             List<E> es = objectListMap.computeIfAbsent(indexKey, l -> new ArrayList<>());
             if (es.contains(e)) continue;
             es.add(e);
@@ -41,10 +43,10 @@ public class IndexMultipart1ToNCollection<E> {
     }
 
     public IndexMultipart1ToNCollection<E> remove(E e) {
-        for (Map.Entry<String, Function<E, Keys>> entry : indexMap.entrySet()) {
-            Function<E, Keys> objectFunction = entry.getValue();
-            Keys indexKey = objectFunction.apply(e);
-            Map<Keys, List<E>> objectEMap = indexDataMap.get(entry.getKey());
+        for (Map.Entry<String, Function<E, ComboKey>> entry : indexMap.entrySet()) {
+            Function<E, ComboKey> objectFunction = entry.getValue();
+            ComboKey indexKey = objectFunction.apply(e);
+            Map<ComboKey, List<E>> objectEMap = indexDataMap.get(entry.getKey());
             if (objectEMap == null) continue;
             List<E> es = objectEMap.get(indexKey);
             if (es == null) continue;
@@ -54,9 +56,9 @@ public class IndexMultipart1ToNCollection<E> {
     }
 
     public List<E> get(String indexName, Object... indexKeys) {
-        Map<Keys, List<E>> objectEMap = indexDataMap.get(indexName);
+        Map<ComboKey, List<E>> objectEMap = indexDataMap.get(indexName);
         if (objectEMap == null) return null;
-        return objectEMap.get(new Keys(indexKeys));
+        return objectEMap.get(new ComboKey(indexKeys));
     }
 
     public E getFist(String indexName, Object... indexKeys) {
@@ -69,22 +71,6 @@ public class IndexMultipart1ToNCollection<E> {
         List<E> es = get(indexName, indexKeys);
         if (es == null) return null;
         return es.getLast();
-    }
-
-    private record Keys(Object... keys) {
-
-        @Override public final boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            Keys keys1 = (Keys) o;
-            return Arrays.equals(keys, keys1.keys);
-        }
-
-        @Override public int hashCode() {
-            return Arrays.hashCode(keys);
-        }
-
     }
 
 }
