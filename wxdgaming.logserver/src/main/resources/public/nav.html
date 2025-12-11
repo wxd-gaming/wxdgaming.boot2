@@ -1,96 +1,284 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script charset="utf-8" type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
     <script charset="utf-8" type="text/javascript" src="/js/com.wxd.js"></script>
     <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
-    <title>nav</title>
+    <title>导航栏</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         html, body {
-            display: block;overflow: auto;width: 100%;height: 100%;
-            background-color: rgba(2, 82, 115, 0.82);
+            width: 100%;
+            min-width: 200px;
+            height: 100%;
+            /* 方案1：深蓝色专业风格 */
+            /*background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);*/
+            /* 方案2：科技蓝风格 */
+            /* background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); */
+            /* 方案3：简约灰色风格 */
+             background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            /* 方案4：商务蓝风格 */
+            /* background: linear-gradient(135deg, #2980b9 0%, #2c3e50 100%); */
             font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
             color: #ffffff;
+            overflow: hidden;
         }
 
-        ul, li {width: 100%;}
+        .nav-container {
+            width: 200px;
+            min-width: 200px;
+            height: 100%;
+            padding: 15px 0;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            overflow: visible;
+            /* 添加内阴影增强层次感 */
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+        }
 
-        li {cursor: pointer;}
+        .nav-header {
+            padding: 0 15px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
-        .title_box {border: 1px solid #888888;border-right: 0;}
+        .nav-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            text-align: center;
+            padding: 8px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            /* 添加文字阴影增强可读性 */
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
 
-        .title_box.ul_left {border-left: #01d390 3px solid;}
+        .nav-menu {
+            list-style: none;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+        }
 
-        .title_one {height: 34px;line-height: 32px;padding-left: 3px; font-size: 14px;font-weight: bold;}
+        .menu-item {
+            position: relative;
+            width: 100%;
+        }
 
-        .title_one strong {float: right;margin-right: 5px;}
+        .menu-main {
+            height: 40px;
+            line-height: 40px;
+            padding: 0 15px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid transparent;
+            width: 100%;
+            box-sizing: border-box;
+            /* 优化文字颜色和阴影 */
+            color: #ecf0f1;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        }
 
-        .title_one.check {background-color: rgba(2, 82, 115, 0.7);}
+        .menu-main:hover {
+            background: rgba(52, 152, 219, 0.3);
+            border-left-color: #3498db;
+            transform: translateX(2px);
+        }
 
-        .title_one:hover {background-color: #1a78d6;}
+        .menu-main.active {
+            background: rgba(52, 152, 219, 0.4);
+            border-left-color: #3498db;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
 
-        /*.title_one {border-bottom: 1px solid #888888;}*/
+        .menu-main .arrow {
+            font-size: 12px;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+            margin-left: 5px;
+            color: #bdc3c7;
+        }
 
-        .title_sub_box {}
+        .menu-main.active .arrow {
+            transform: rotate(180deg);
+            color: #3498db;
+        }
 
-        .title_sub {font-size: 12px;}
+        .menu-main .text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-        .title_sub li {padding-left: 12px;height: 26px;line-height: 22px;}
+        .sub-menu {
+            list-style: none;
+            background: rgba(0, 0, 0, 0.15);
+            border-left: 3px solid #3498db;
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.4s ease;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+        }
 
-        .title_sub li.check {background-color: #cf7e47;height: 32px;line-height: 32px;}
+        .sub-menu.open {
+            max-height: 500px;
+            overflow-y: auto;
+        }
 
-        .title_sub li:hover {background-color: #0f7e77;height: 32px;line-height: 32px;}
+        .sub-item {
+            height: 35px;
+            line-height: 35px;
+            padding: 0 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            box-sizing: border-box;
+            color: #ecf0f1;
+        }
+
+        .sub-item:hover {
+            background: rgba(52, 152, 219, 0.25);
+            border-left-color: #2980b9;
+            padding-left: 25px;
+        }
+
+        .sub-item.active {
+            background: rgba(46, 204, 113, 0.3);
+            border-left-color: #27ae60;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        /* 滚动条样式 */
+        .sub-menu.open::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sub-menu.open::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sub-menu.open::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+
+        .sub-menu.open::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 确保内容不会超出容器 */
+        .nav-container * {
+            max-width: 100%;
+        }
+
+        /* 添加微妙的动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-container {
+            animation: fadeIn 0.5s ease-out;
+        }
     </style>
     <script>
-        function selectNav(self) {
-            // 移除所有 title_one 的 check 类，然后给当前元素添加 check 类
-            $(".title_one").removeClass("check");
-            $(".title_one").parent("ul").removeClass("check");
-            $(self).addClass("check");
-            $(self).parent("ul").addClass("ul_left");
-            let next = $(self).next("li");
-            $(".title_sub_box").each(function () {
-                if (this === next[0]) {
-                    $(this).slideDown(500);
-                    return;
-                }
-                $(this).slideUp(200);
-            });
+        function toggleMenu(self) {
+            const $self = $(self);
+            const $subMenu = $self.next('.sub-menu');
+            
+            // 切换当前菜单状态
+            $self.toggleClass('active');
+            
+            // 切换子菜单显示
+            $subMenu.toggleClass('open');
+            
+            // 关闭其他打开的菜单
+            $('.menu-main').not($self).removeClass('active');
+            $('.sub-menu').not($subMenu).removeClass('open');
         }
 
-        function selectNav2(self, url) {
-            $(".title_sub li").removeClass("check");
-            $(self).addClass("check");
+        function selectSubMenu(self, url) {
+            // 移除所有激活状态
+            $('.sub-item').removeClass('active');
+            // 添加当前激活状态
+            $(self).addClass('active');
+            // 调用父窗口方法
             window.parent.changeContent(url);
         }
 
-        $(() => {
+        $(document).ready(function() {
+            // 加载导航数据
             let url = "/admin/log/nav";
             new wxd.netty.PostRequest(url, "", (response) => {
                 if (response.code === 1) {
                     let data = response.data;
-                    for (let i = 0; i < data.length; i++) {
-                        let item = data[i];
-
-                        let l = `<li onclick="selectNav2(this, '${item.routing}?tableName=${item.name}')">${item.comment}</li>`;
-
-                        $(".log_nav").append(l);
-                    }
+                    const $subMenu = $('.log-nav-items');
+                    
+                    data.forEach(item => {
+                        let listItem = `<li class="sub-item" onclick="selectSubMenu(this, '${item.routing}?tableName=${item.name}')" title="${item.comment}">${item.comment}</li>`;
+                        $subMenu.append(listItem);
+                    });
+                    
+                    // 默认展开第一个菜单
+                    $('.menu-main').first().addClass('active');
+                    $('.sub-menu').first().addClass('open');
                 }
             }).send();
-        });
 
+            // 点击空白处关闭菜单
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.menu-main').length && !$(e.target).closest('.sub-item').length) {
+                    $('.menu-main').removeClass('active');
+                    $('.sub-menu').removeClass('open');
+                }
+            });
+        });
     </script>
 </head>
 <body>
-<ul class="title_box ul_left">
-    <li class="title_one check" onclick="selectNav(this)">日志系统<strong>↓</strong></li>
-    <li class="title_sub_box">
-        <ul class="title_sub log_nav"></ul>
-    </li>
-</ul>
+    <div class="nav-container">
+        <div class="nav-header">
+            <div class="nav-title">日志管理系统</div>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="menu-item">
+                <div class="menu-main active" onclick="toggleMenu(this)">
+                    <span class="text">日志系统</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <ul class="sub-menu open log-nav-items">
+                    <!-- 动态加载的日志菜单项 -->
+                </ul>
+            </li>
+        </ul>
+    </div>
 </body>
 </html>
