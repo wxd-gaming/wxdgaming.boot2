@@ -1,29 +1,278 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script charset="utf-8" type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
     <script charset="utf-8" type="text/javascript" src="/js/com.wxd.js"></script>
     <script charset="utf-8" type="text/javascript" src="/js/pageview.js"></script>
-    <title>b</title>
+    <title>日志查询系统</title>
     <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
-    <link rel="stylesheet" type="text/css" href="/style/table.css"/>
     <style>
-        .box {display: flex;flex-direction: column;}
+        :root {
+            --primary-color: #1890ff;
+            --border-color: #d9d9d9;
+            --hover-color: #f5f5f5;
+            --success-color: #52c41a;
+            --warning-color: #faad14;
+        }
+        
+        .root.box {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
 
-        .root_box_top {height: 200px;}
+        .root_box_top {
+            background: #fafafa;
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 20px;
+            flex-shrink: 0;
+        }
 
-        .root_box_center {flex: 1;}
+        .root_box_center {
+            flex: 1;
+            overflow: auto;
+            background: white;
+        }
 
-        .root_box_bottom {height: 38px;}
+        .root_box_bottom {
+            height: auto; /* 改为自动高度以适应分页组件 */
+            min-height: 40px;
+            background: #f0f2f5;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center; /* 居中显示分页组件 */
+            padding: 8px 20px; /* 增加内边距 */
+            flex-shrink: 0;
+            position: relative; /* 为分页组件定位提供上下文 */
+        }
 
-        .root_box_bottom label {padding-left: 5px;padding-right: 5px;}
+        /* 分页组件样式优化 */
+        .root_box_bottom > div {
+            width: 100%;
+            text-align: center;
+            padding: 4px 0;
+        }
 
+        .root_box_bottom label {
+            margin: 0 4px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .root_box_bottom select {
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            margin: 0 4px;
+        }
+
+        .root_box_bottom a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .root_box_bottom a:hover {
+            background-color: var(--hover-color);
+            text-decoration: underline;
+        }
+
+        .root_box_bottom #lab_row_count,
+        .root_box_bottom #lab_page_index,
+        .root_box_bottom #lab_page_max {
+            display: inline-block;
+            min-width: 40px;
+            text-align: center;
+            border: 1px solid #d9d9d9;
+            background-color: white;
+            padding: 2px 4px;
+            border-radius: 2px;
+            margin: 0 2px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .form-group label {
+            min-width: 80px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        input[type="date"], input[type="text"], select {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="date"]:focus, input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+
+        .btn {
+            padding: 6px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            margin-right: 8px;
+        }
+
+        .btn:hover {
+            background: var(--hover-color);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background: #40a9ff;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background: #73d13d;
+        }
+
+        .tableDom {
+            margin: 0;
+            border-radius: 0;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1400px;
+        }
+
+        th {
+            background: #fafafa;
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #f0f0f0;
+            word-wrap: break-word;
+            max-width: 300px;
+        }
+
+        tr:hover td {
+            background: var(--hover-color);
+        }
+
+        .condition-display {
+            background: #f0f8ff;
+            border: 1px solid #91d5ff;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .condition-item {
+            display: inline-block;
+            background: #e6f7ff;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-right: 8px;
+            margin-bottom: 4px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        @media (max-width: 768px) {
+            .form-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .form-group label {
+                min-width: auto;
+                margin-bottom: 4px;
+            }
+            
+            .btn {
+                margin-bottom: 8px;
+            }
+
+            /* 移动端分页样式优化 */
+            .root_box_bottom > div {
+                font-size: 12px;
+            }
+
+            .root_box_bottom a {
+                margin: 0 4px;
+                padding: 2px 4px;
+            }
+
+            .root_box_bottom label {
+                font-size: 12px;
+                margin: 0 2px;
+            }
+        }
     </style>
     <script>
-
         let pageView = null;
+        let whereJsonArray = [];
+        let orderByJsonArray = [];
 
         function search() {
             wxd.loading();
@@ -56,12 +305,12 @@
             }).send();
         }
 
-        // 用于显示的格式化版本
+        // 优化格式化函数
         function formatForDisplay(str) {
             if (typeof str === "string") {
                 return str;
             }
-            return JSON.stringify(str, null, 2); // 会保留换行和缩进
+            return JSON.stringify(str, null, 2);
         }
 
         function formatJsonWithNewlines(obj) {
@@ -69,11 +318,9 @@
                 try {
                     obj = JSON.parse(obj);
                 } catch (e) {
-                    // 如果解析失败，直接格式化字符串
                     return obj;
                 }
             }
-            // 使用2个空格进行缩进，自动包含换行符
             return JSON.stringify(obj, null, 2);
         }
 
@@ -86,8 +333,9 @@
                 .replace(/\t/g, "\\t");
         }
 
+        // 优化行创建函数
         function createRow(number, row, index) {
-            let tr = `<tr ondblclick="alertShow2(${index})">`;
+            let tr = `<tr ondblclick="alertShow2(${index})" style="cursor: pointer;">`;
             for (const key in pageView.columns) {
                 let column = pageView.columns[key];
                 let columnName = column.name;
@@ -95,9 +343,16 @@
                 let columnStyle = column.style;
                 let columntitle = column.title;
                 let rowValue = row[columnName];
+                
                 if (rowValue === null || rowValue === undefined) {
                     rowValue = "";
                 }
+                
+                // 添加文本截断处理
+                if (typeof rowValue === 'string' && rowValue.length > 50) {
+                    rowValue = `<span title="${rowValue}">${rowValue.substring(0, 50)}...</span>`;
+                }
+                
                 tr += `<td style="${columnStyle}" title="${columntitle}">${rowValue}</td>`;
             }
             tr += `</tr>`;
@@ -107,8 +362,78 @@
         function alertShow2(index) {
             let content = pageView.items[index];
             content = formatJsonWithNewlines(content);
-            console.log(typeof content, content);
-            new wxd.message.Alert(`<pre>${content}</pre>`, "详情").show();
+            new wxd.message.Alert(`<pre style="max-height: 400px; overflow: auto;">${content}</pre>`, "详情").show();
+        }
+
+        // 新增功能：快速设置日期范围
+        function setDateRange(days) {
+            const end = new Date();
+            const start = new Date();
+            start.setDate(start.getDate() - days);
+            
+            $("#minTime").val(start.toISOString().split('T')[0]);
+            $("#maxTime").val(end.toISOString().split('T')[0]);
+        }
+
+        // 新增功能：清除所有条件
+        function clearAll() {
+            $("#minTime").val("");
+            $("#maxTime").val("");
+            clearWhere();
+            clearOrder();
+        }
+
+        // 优化条件显示
+        function updateConditionDisplay() {
+            let whereHtml = "";
+            whereJsonArray.forEach((item, index) => {
+                whereHtml += `<span class="condition-item">${item.where} ${item.and} "${item.whereValue}"</span>`;
+            });
+            $("#whereDisplay").html(whereHtml || "无查询条件");
+            
+            let orderHtml = "";
+            orderByJsonArray.forEach((item, index) => {
+                orderHtml += `<span class="condition-item">${item.orderField} ${item.orderOption}</span>`;
+            });
+            $("#orderDisplay").html(orderHtml || "无排序条件");
+        }
+
+        function addWhere() {
+            let whereJson = {};
+            whereJson["where"] = $("#where").val();
+            whereJson["and"] = $("#and").val();
+            whereJson["whereValue"] = $("#whereValue").val();
+            
+            if (!whereJson.whereValue) {
+                alert("请输入查询值");
+                return;
+            }
+            
+            whereJsonArray.push(whereJson);
+            $("#labWhere").text(JSON.stringify(whereJsonArray));
+            $("#whereValue").val("");
+            updateConditionDisplay();
+        }
+
+        function clearWhere() {
+            whereJsonArray = [];
+            $("#labWhere").text("");
+            updateConditionDisplay();
+        }
+
+        function addOrder() {
+            let orderJson = {};
+            orderJson["orderField"] = $("#orderField").val();
+            orderJson["orderOption"] = $("#orderOption").val();
+            orderByJsonArray.push(orderJson);
+            $("#labOrderBy").text(JSON.stringify(orderByJsonArray));
+            updateConditionDisplay();
+        }
+
+        function clearOrder() {
+            orderByJsonArray = [];
+            $("#labOrderBy").text("");
+            updateConditionDisplay();
         }
 
         $(() => {
@@ -117,6 +442,8 @@
             pageView = new PageView("/admin/log/page", search, createRow);
             pageView.gameId = urlQuery.get("gameId");
 
+            // 设置默认日期为最近7天
+            setDateRange(7);
 
             let url = "/admin/log/title";
             let map = new wxd.Map();
@@ -139,103 +466,76 @@
             }).send();
 
         });
-
-        let whereJsonArray = [];
-
-        function addWhere() {
-            let whereJson = {};
-            whereJson["where"] = $("#where").val();
-            whereJson["and"] = $("#and").val();
-            whereJson["whereValue"] = $("#whereValue").val();
-            whereJsonArray[whereJsonArray.length] = whereJson;
-            $("#labWhere").text(JSON.stringify(whereJsonArray));
-            $("#whereValue").val("")
-            $("#and").val("=");
-        }
-
-        function clearWhere() {
-            whereJsonArray = [];
-            $("#labWhere").text("");
-        }
-
-        let orderByJsonArray = [];
-
-        function addOrder() {
-            let orderJson = {};
-            orderJson["orderField"] = $("#orderField").val();
-            orderJson["orderOption"] = $("#orderOption").val();
-            orderByJsonArray[orderByJsonArray.length] = orderJson;
-            $("#labOrderBy").text(JSON.stringify(orderByJsonArray));
-        }
-
-        function clearOrder() {
-            orderByJsonArray = [];
-            $("#labOrderBy").text("");
-        }
-
     </script>
 </head>
 <body>
 <div class="root box">
-    <div class="root_box_top btn_box" style="padding-left: 20px; padding-top: 8px; text-align: left;vertical-align: center;">
-        <label for="minTime">开始日期: </label><input id="minTime" type="date"/>
-        <label for="maxTime">结束日期: </label><input id="maxTime" type="date"/>
-        <br>
-        <label for="where">查询条件:</label>
+    <div class="root_box_top">
+        <div class="form-group">
+            <label for="minTime">开始日期:</label>
+            <input id="minTime" type="date"/>
+            <label for="maxTime">结束日期:</label>
+            <input id="maxTime" type="date"/>
+            <button class="btn" onclick="setDateRange(1)">今天</button>
+            <button class="btn" onclick="setDateRange(7)">近7天</button>
+            <button class="btn" onclick="setDateRange(30)">近30天</button>
+        </div>
 
-        <select id="where">
+        <div class="form-group">
+            <label>查询条件:</label>
+            <select id="where"></select>
+            <select id="and" style="width: 80px;">
+                <option value="=">=</option>
+                <option value="<="><=</option>
+                <option value="<"><</option>
+                <option value=">=">>=</option>
+                <option value=">">></option>
+                <option value="ilike">包含</option>
+                <option value="notilike">不包含</option>
+            </select>
+            <input id="whereValue" type="text" placeholder="输入查询值"/>
+            <button class="btn" onclick="addWhere()">添加条件</button>
+            <button class="btn" onclick="clearWhere()">清除条件</button>
+        </div>
 
-        </select>
+        <div class="condition-display">
+            <strong>当前查询条件:</strong> <span id="whereDisplay">无查询条件</span>
+        </div>
 
-        <select id="and" style="width: 60px;">
-            <option value="=">=</option>
-            <option value="<="><=</option>
-            <option value="<"><</option>
-            <option value=">=">>=</option>
-            <option value=">">></option>
-            <option value="ilike">包含</option>
-            <option value="notilike">不包含</option>
-        </select>
+        <div class="form-group">
+            <label>排序条件:</label>
+            <select id="orderField"></select>
+            <select id="orderOption" style="width: 80px;">
+                <option value="DESC">降序</option>
+                <option value="ASC">升序</option>
+            </select>
+            <button class="btn" onclick="addOrder()">添加排序</button>
+            <button class="btn" onclick="clearOrder()">清除排序</button>
+        </div>
 
-        <input id="whereValue" type="text"/>
-        <input type="button" onclick="addWhere();" value="添加"/>
-        <input type="button" onclick="clearWhere();" value="清理"/>
-        <br>
-        <label for="labWhere">查询条件:</label><label id="labWhere"></label>
-        <br>
-        <label for="orderField">排序条件:</label>
+        <div class="condition-display">
+            <strong>当前排序条件:</strong> <span id="orderDisplay">无排序条件</span>
+        </div>
 
-        <select id="orderField">
-
-        </select>
-
-        <select id="orderOption" style="width: 60px;">
-            <option value="DESC">降序</option>
-            <option value="ASC">升序</option>
-        </select>
-
-        <input type="button" onclick="addOrder();" value="添加"/>
-        <input type="button" onclick="clearOrder();" value="清理"/>
-        <br>
-        <label for="labOrderBy">排序条件:</label><label id="labOrderBy"></label>
-        <br>
-        <br>
-        <button onclick="search();">🔍 查询</button>
-        <button onclick="excel();">📊 Excel</button>
+        <div class="form-group">
+            <button class="btn btn-primary" onclick="search()">🔍 查询</button>
+            <button class="btn btn-success" onclick="excel()">📊 导出Excel</button>
+            <button class="btn" onclick="clearAll()">🗑️ 清除所有</button>
+        </div>
     </div>
-    <div class="root_box_center tableDom" style="margin: 10px; padding-right: 10px;border-radius: 0; overflow-x: auto;">
-        <table style="min-width: 1400px;">
+    
+    <div class="root_box_center tableDom">
+        <table>
             <thead>
-            <tr class="table_head">
-            </tr>
+            <tr class="table_head"></tr>
             </thead>
             <tbody class="tbody">
             </tbody>
         </table>
     </div>
-    <div class="root_box_bottom">
-
-    </div>
+    
+    <!-- 分页组件将由 pageview.js 自动插入到这里 -->
+    <div class="root_box_bottom"></div>
 </div>
 </body>
 </html>

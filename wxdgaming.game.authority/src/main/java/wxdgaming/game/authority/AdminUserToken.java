@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.SpringUtil;
+import wxdgaming.boot2.core.executor.StackUtils;
 import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.core.token.JsonToken;
@@ -38,7 +39,9 @@ public class AdminUserToken extends ObjectBase {
             JsonToken parse = JsonTokenParse.parse(jwtKey, token);
             return parse.getObject("user", AdminUserToken.class);
         } catch (Exception e) {
-            log.error("token解析错误", e);
+            if (log.isDebugEnabled()) {
+                log.debug("token解析错误 {}", StackUtils.stack(e.getStackTrace()));
+            }
             return null;
         }
     }

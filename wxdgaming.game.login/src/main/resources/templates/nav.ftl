@@ -8,35 +8,153 @@
     <link rel="stylesheet" type="text/css" href="/style/com.wxd.css"/>
     <title>nav</title>
     <style>
-        body {overflow: auto;}
+        body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: linear-gradient(135deg, #2c3e50 0%, #1a1a2e 100%);
+            color: #ecf0f1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+        }
 
-        ul, li {width: 180px;box-sizing: border-box;margin: 0;padding: 0;}
+        ul, li {
+            width: 200px;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
 
-        .title_box {border: 1px solid #888888;border-right: 0;}
+        .title_box {
+            border: 1px solid #34495e;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: rgba(30, 30, 46, 0.7);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
 
-        .title_box li {cursor: pointer;}
+        .title_box:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
 
-        .title_box.ul_left {border-left: #01d390 3px solid;}
+        .title_box li {
+            cursor: pointer;
+        }
 
-        .title_one {height: 34px;line-height: 32px;padding-left: 3px; font-size: 14px;font-weight: bold;position: relative;}
+        .title_box.ul_left {
+            border-left: 4px solid #3498db;
+        }
 
-        .title_one strong {position: absolute;right: 8px;font-weight: bold;font-size: 16px;}
+        .title_one {
+            height: 45px;
+            line-height: 45px;
+            padding: 0 15px;
+            font-size: 15px;
+            font-weight: 600;
+            position: relative;
+            border-bottom: 1px solid #34495e;
+            background: rgba(44, 62, 80, 0.5);
+            color: #ecf0f1;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+        }
 
-        .title_one.check {background-color: rgba(2, 82, 115, 0.7);}
+        .title_one:last-child {
+            border-bottom: none;
+            border-radius: 8px;
+        }
 
-        .title_one:hover {background-color: #1a78d6;}
+        .title_one strong {
+            position: absolute;
+            right: 15px;
+            font-weight: bold;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
 
-        /*.title_one {border-bottom: 1px solid #888888;}*/
+        .title_one.check {
+            background: linear-gradient(90deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
 
-        .title_sub_box {}
+        .title_one.check strong {
+            transform: rotate(180deg);
+        }
 
-        .title_sub {font-size: 12px;}
+        .title_one:hover {
+            background: linear-gradient(90deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
 
-        .title_sub li {padding-left: 12px;height: 26px;line-height: 22px;}
+        .title_sub_box {
+            overflow: hidden;
+        }
 
-        .title_sub li.check {background-color: #cf7e47;height: 32px;line-height: 32px;}
+        .title_sub {
+            font-size: 14px;
+            background: rgba(44, 62, 80, 0.3);
+        }
 
-        .title_sub li:hover {background-color: #0f7e77;height: 32px;line-height: 32px;}
+        .title_sub li {
+            padding: 12px 20px;
+            height: auto;
+            line-height: 1.4;
+            border-bottom: 1px solid #34495e;
+            transition: all 0.2s ease;
+            color: #bdc3c7;
+        }
+
+        .title_sub li:last-child {
+            border-bottom: none;
+        }
+
+        .title_sub li.check {
+            background: rgba(52, 152, 219, 0.3);
+            color: #3498db;
+            font-weight: 500;
+            padding-left: 25px;
+            border-left: 3px solid #3498db;
+        }
+
+        .title_sub li:hover {
+            background: rgba(52, 152, 219, 0.2);
+            color: #ecf0f1;
+            padding-left: 25px;
+        }
+
+        .logout-btn {
+            background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 200px;
+            margin: 0 0 20px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(90deg, #c0392b 0%, #e74c3c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #3498db;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #34495e;
+            margin-bottom: 20px;
+        }
     </style>
     <script>
         function selectNav(self) {
@@ -73,9 +191,9 @@
     </script>
 </head>
 <body>
-<div style="height: 80px;">
-    <button onclick="logout();">退出</button>
-</div>
+<div class="logo">管理系统</div>
+<button class="logout-btn" onclick="logout();">退出登录</button>
+
 <ul class="title_box ul_left">
     <li class="title_one check" onclick="selectNav(this)">导航<strong>∨</strong></li>
     <li class="title_sub_box">

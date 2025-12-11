@@ -41,10 +41,7 @@
             <charset>utf-8</charset>
         </encoder>
         <!-- 过滤重设时间，一般是当调试服务器或者调试活动的时候手动改时间需要触发 -->
-        <filter class="ch.qos.logback.core.LogbackResetTimeFilter">
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
+  <filter class="ch.qos.logback.core.LogbackResetTimeFilter"/>
         <!-- 日志记录器的滚动策略，按日期记录 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/logback/app-%d{yyyyMMdd}-%i.log.gz</fileNamePattern>
