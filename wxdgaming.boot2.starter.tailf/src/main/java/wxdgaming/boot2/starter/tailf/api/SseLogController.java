@@ -1,11 +1,13 @@
 package wxdgaming.boot2.starter.tailf.api;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import wxdgaming.boot2.core.InitPrint;
+import wxdgaming.boot2.core.util.NumberUtil;
 import wxdgaming.boot2.starter.tailf.LastAccessFile;
 
 import java.io.IOException;
@@ -27,14 +29,19 @@ public class SseLogController implements InitPrint {
 
     @GetMapping("/index")
     public String index() {
-        return "/log/log-tail-show";
+        return "redirect:/log/log-tail-show.html";
     }
 
     @GetMapping("/sse")
-    public SseEmitter sse() {
+    public SseEmitter sse(HttpServletRequest request) {
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         AtomicReference<LastAccessFile> lastAccessFile = new AtomicReference<>();
-        lastAccessFile.set(new LastAccessFile("target/logs/login.log", (line) -> {
+        String fileName = request.getParameter("fileName");
+        int lines = NumberUtil.parseInt(request.getParameter("lastLines"), 10);
+        if (lines < 1 || lines > 1000) {
+            lines = 10;
+        }
+        lastAccessFile.set(new LastAccessFile("target/logs/" + fileName, lines, (line) -> {
             try {
                 emitter.send(SseEmitter.event().name("log").data(line));
             } catch (IOException e) {
@@ -63,6 +70,7 @@ public class SseLogController implements InitPrint {
             log.warn("SSE connection error: {}", throwable.getMessage());
             lastAccessFile.get().close();
         });
+        lastAccessFile.get().start();
         return emitter;
     }
 

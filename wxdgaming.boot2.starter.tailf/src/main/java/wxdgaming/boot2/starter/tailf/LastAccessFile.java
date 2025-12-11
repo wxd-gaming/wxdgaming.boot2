@@ -32,9 +32,9 @@ public class LastAccessFile extends Thread {
     private final AtomicLong filePointer = new AtomicLong();
     private final AtomicLong fileLastModified = new AtomicLong();
     private final AtomicBoolean runing = new AtomicBoolean(true);
-    private int n;
+    private int lastLines;
 
-    public LastAccessFile(String path, Consumer<String> consumer) {
+    public LastAccessFile(String path, int lastLines, Consumer<String> consumer) {
         this.filePath = Paths.get(path);
         this.consumer = consumer;
 
@@ -55,14 +55,13 @@ public class LastAccessFile extends Thread {
         if (!Files.exists(absolutePath.getParent())) {
             throw new RuntimeException("需要监听的文件夹: " + absolutePath + " 异常");
         }
+        this.lastLines = lastLines;
 
         try {
             skipped();
-            readLastLine();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        this.start();
     }
 
     @Override public void run() {
@@ -96,14 +95,14 @@ public class LastAccessFile extends Thread {
             try (RandomAccessFile file = new RandomAccessFile(filePath.toFile(), "r")) {
                 // 记录文件的末尾处
                 findFilePointer = file.length();
-                while (n > 0 && findFilePointer > 0) {
+                while (lastLines > 0 && findFilePointer > 0) {
                     findFilePointer--;
                     /*把指针移动到上次读取的位置*/
                     file.seek(findFilePointer);
                     int read = file.read();
                     if (read != -1) {
                         if ((char) read == '\n') {
-                            n--;
+                            lastLines--;
                         }
                     }
                 }

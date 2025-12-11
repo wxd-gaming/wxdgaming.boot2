@@ -5,17 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>实时日志监控</title>
     <style>
+        html, body, div {box-sizing: border-box;padding: 0;margin: 0;}
+
+        html, body { height: 100%; /* 添加这行 */}
         body {
             font-family: 'Courier New', monospace;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background-color: #1e1e1e;
             color: #d4d4d4;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            margin: 5px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .header {
@@ -50,14 +59,37 @@
         }
 
         .log-container {
-            height: 70vh;
             overflow-y: auto;
             background-color: #1e1e1e;
             border: 1px solid #444;
             padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            flex: 1;
+
+            /* 美化滚动条 */
+            scrollbar-width: thin;
+            scrollbar-color: #444 #2d2d30;
+        }
+
+        /* Webkit浏览器滚动条样式 */
+        .log-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .log-container::-webkit-scrollbar-track {
+            background: #2d2d30;
             border-radius: 4px;
         }
 
+        .log-container::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+
+        .log-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
         .log-line {
             margin: 2px 0;
             padding: 2px 4px;
@@ -103,7 +135,7 @@
     </div>
 
     <div class="controls">
-        <input type="text" id="fileName" placeholder="日志文件名" value="application.log">
+        <input type="text" id="fileName" placeholder="日志文件名" value="login.log">
         <input type="number" id="lines" placeholder="初始行数" value="100" min="1" max="1000">
         <button id="connectBtn">连接</button>
         <button id="clearBtn">清屏</button>
@@ -154,7 +186,7 @@
                 this.eventSource.close();
             }
 
-            const url = `/log/sse`;
+            const url = `/log/sse?fileName=${fileName}&lines=${lines}`;
             this.eventSource = new EventSource(url);
 
             this.eventSource.onopen = () => {
