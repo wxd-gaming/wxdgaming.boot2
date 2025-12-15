@@ -143,7 +143,7 @@ public class AnnUtil {
      * @return 返回注册的所有注解
      */
     public static <A extends Annotation> Stream<A> annStream(Class<?> source, Class<A> annClass) {
-        if (source == null) return null;
+        if (source == null) return Stream.of();
         A[] annotationsByType = source.getAnnotationsByType(annClass);
         if (annotationsByType.length > 0) return Stream.of(annotationsByType);
         return Stream.of();
@@ -159,7 +159,7 @@ public class AnnUtil {
      * @return 返回注册的所有注解
      */
     public static <A extends Annotation> Stream<A> annStream(Class<?> source, Class<A> annClass, boolean findSuperClass) {
-        if (source == null) return null;
+        if (source == null) return Stream.of();
         A[] annotationsByType = source.getAnnotationsByType(annClass);
         if (annotationsByType.length > 0) return Stream.of(annotationsByType);
         if (findSuperClass) {
@@ -180,7 +180,7 @@ public class AnnUtil {
      * @return 返回符合条件的注解
      */
     public static <A extends Annotation> Stream<A> annStream(Field source, Class<A> annClass) {
-        if (source == null) return null;
+        if (source == null) return Stream.of();
         A[] annotationsByType = source.getAnnotationsByType(annClass);
         if (annotationsByType.length > 0) return Stream.of(annotationsByType);
         return Stream.of();
@@ -195,7 +195,7 @@ public class AnnUtil {
      * @return 返回符合条件的注解
      */
     public static <A extends Annotation> Stream<A> annStream(Method source, Class<A> annClass) {
-        if (source == null) return null;
+        if (source == null) return Stream.of();
         A[] annotationsByType = source.getAnnotationsByType(annClass);
         if (annotationsByType.length > 0) return Stream.of(annotationsByType);
         return Stream.of();

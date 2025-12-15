@@ -3,6 +3,8 @@ package wxdgaming.boot2.core.lang;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
@@ -13,7 +15,9 @@ import java.util.Arrays;
  **/
 @Getter
 @ToString
-public final class ComboKey {
+public final class ComboKey extends ObjectBase implements Serializable {
+
+    @Serial private static final long serialVersionUID = 1L;
 
     private final Object[] ks;
 

@@ -10,14 +10,24 @@ import java.lang.annotation.*;
  */
 @Inherited
 @Documented
+@Repeatable(Indexes.List.class)
 @Target({ElementType.TYPE/*类*/})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Keys {
-
-    /** 默认切割字符串 */
-    String split() default "#";
+public @interface Indexes {
 
     /** key值 */
     String[] value() default {};
+
+    /**
+     * 容器注解，用于支持重复注解
+     */
+    @Inherited
+    @Documented
+    @Target({ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface List {
+        Indexes[] value();
+    }
+
 
 }
