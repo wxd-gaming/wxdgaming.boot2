@@ -17,7 +17,7 @@ import java.util.Map;
  * @version 2025-06-15 10:24:13
  **/
 @Getter
-@Index({"buffId", "lv"})
+@Index(value = {"buffId", "lv"}, single = true)
 public class QBuffTable extends DataTable<QBuff> implements Serializable {
 
     @Override public void initDb() {
