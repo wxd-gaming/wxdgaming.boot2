@@ -33,7 +33,7 @@ public class ResSubmitTaskHandler {
         }
 
         QTaskTable taskTable = DataRepository.getIns().dataTable(QTaskTable.class);
-        log.info("{} 完成任务: {}", robot, taskTable.get(taskBean.getTaskId()).getInnerTaskDetail());
+        log.info("{} 完成任务: {}", robot, taskTable.getByKey(taskBean.getTaskId()).getInnerTaskDetail());
 
         taskBean.setReward(true);
         if (req.isRemove()) {

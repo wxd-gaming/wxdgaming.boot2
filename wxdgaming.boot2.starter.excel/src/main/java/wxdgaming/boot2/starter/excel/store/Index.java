@@ -10,10 +10,13 @@ import java.lang.annotation.*;
  */
 @Inherited
 @Documented
-@Repeatable(Indexes.List.class)
+@Repeatable(Index.List.class)
 @Target({ElementType.TYPE/*类*/})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Indexes {
+public @interface Index {
+
+    /** 是不是唯一索引 */
+    boolean single() default false;
 
     /** key值 */
     String[] value() default {};
@@ -26,7 +29,7 @@ public @interface Indexes {
     @Target({ElementType.TYPE})
     @Retention(RetentionPolicy.RUNTIME)
     @interface List {
-        Indexes[] value();
+        Index[] value();
     }
 
 

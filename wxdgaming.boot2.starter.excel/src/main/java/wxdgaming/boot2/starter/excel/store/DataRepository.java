@@ -49,7 +49,7 @@ public class DataRepository {
     }
 
     public <E extends DataKey, T extends DataTable<E>> E dataTable(Class<T> dataTableClass, Object key) {
-        E e = dataTable(dataTableClass).get(key);
+        E e = dataTable(dataTableClass).getByKey(key);
         if (e == null) {
             log.debug("table: {}, key: {} 查找失败", dataTableClass, key);
         }

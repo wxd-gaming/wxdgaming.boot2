@@ -3,7 +3,7 @@ package wxdgaming.game.cfg;
 
 import lombok.Getter;
 import wxdgaming.boot2.starter.excel.store.DataTable;
-import wxdgaming.boot2.starter.excel.store.Indexes;
+import wxdgaming.boot2.starter.excel.store.Index;
 import wxdgaming.game.cfg.bean.QBuff;
 
 import java.io.Serializable;
@@ -17,7 +17,7 @@ import java.util.Map;
  * @version 2025-06-15 10:24:13
  **/
 @Getter
-@Indexes({"buffId", "lv"})
+@Index({"buffId", "lv"})
 public class QBuffTable extends DataTable<QBuff> implements Serializable {
 
     @Override public void initDb() {

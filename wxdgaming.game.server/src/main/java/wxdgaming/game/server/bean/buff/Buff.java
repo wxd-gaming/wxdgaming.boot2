@@ -70,7 +70,7 @@ public class Buff extends ObjectLong {
 
     public QBuff qBuff() {
         QBuffTable qBuffTable = DataRepository.getIns().dataTable(QBuffTable.class);
-        return qBuffTable.getIdLvTable().get(buffCfgId, lv);
+        return qBuffTable.getByIndex(buffCfgId, lv);
     }
 
 }

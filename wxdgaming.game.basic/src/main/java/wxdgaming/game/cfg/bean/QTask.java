@@ -47,8 +47,8 @@ public class QTask extends QTaskMapping implements Serializable, DataChecked {
         innerTaskDetail = innerTaskName + "{" + innerTaskDescription + "}";
 
         DataTable<?> dataTable = store.get(QTaskTable.class);
-        qTaskBefore = (QTask) dataTable.get(getBefore());
-        qTaskAfter = (QTask) dataTable.get(getAfter());
+        qTaskBefore = (QTask) dataTable.getByKey(getBefore());
+        qTaskAfter = (QTask) dataTable.getByKey(getAfter());
 
     }
 

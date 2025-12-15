@@ -83,7 +83,7 @@ public class AchieveService implements InitPrint {
 
     public void rewards(Player player, int achieveId) {
         QAchieveTable qAchieveTable = this.dataRepository.dataTable(QAchieveTable.class);
-        QAchieve qAchieve = qAchieveTable.get(achieveId);
+        QAchieve qAchieve = qAchieveTable.getByKey(achieveId);
         if (qAchieve == null) {
             tipsService.tips(player, "成就不存在");
             return;

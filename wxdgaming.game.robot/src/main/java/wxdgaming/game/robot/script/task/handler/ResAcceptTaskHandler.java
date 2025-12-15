@@ -28,7 +28,7 @@ public class ResAcceptTaskHandler {
         Robot robot = socketSession.bindData("robot");
 
         QTaskTable taskTable = DataRepository.getIns().dataTable(QTaskTable.class);
-        log.info("{} 接取任务: {}", robot, taskTable.get(req.getTaskId()).getInnerTaskDetail());
+        log.info("{} 接取任务: {}", robot, taskTable.getByKey(req.getTaskId()).getInnerTaskDetail());
 
         robot.getTasks().put(req.getTaskId(), req.getTask());
     }

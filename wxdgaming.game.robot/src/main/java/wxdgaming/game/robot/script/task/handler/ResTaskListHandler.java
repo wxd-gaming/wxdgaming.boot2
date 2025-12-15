@@ -33,7 +33,7 @@ public class ResTaskListHandler {
         QTaskTable taskTable = DataRepository.getIns().dataTable(QTaskTable.class);
         for (TaskBean task : tasks) {
             robot.getTasks().put(task.getTaskId(), task);
-            log.info("{} 任务: {}", robot, taskTable.get(task.getTaskId()).getInnerTaskDetail());
+            log.info("{} 任务: {}", robot, taskTable.getByKey(task.getTaskId()).getInnerTaskDetail());
         }
     }
 

@@ -81,7 +81,7 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
             ActivityData selfActivityData = activityDataMap.get(type);
             if (selfActivityData != null) {
                 boolean over = selfActivityData.getEndTime() < nowMillis;
-                QActivity qActivity = qActivityTable.get(selfActivityData.getActivityId());
+                QActivity qActivity = qActivityTable.getByKey(selfActivityData.getActivityId());
                 if (qActivity != null) {
                     /* 查找一个可以的时间，会先向过去时间查询，如果时间戳符合范围条件，如果不合法会向未来时间查询 */
                     CronDuration cronDuration = qActivity.getOpenTime().findValidateTime();

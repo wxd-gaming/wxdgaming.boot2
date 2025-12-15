@@ -18,10 +18,7 @@ import wxdgaming.boot2.core.util.ConvertUtil;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -39,6 +36,7 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
     final ReflectClassProvider reflectClassProvider;
     private List<E> dataList;
     private Map<Object, E> dataMap;
+    private Map<ComboKey, List<E>> indexesDataMap;
 
     public DataTable() {
         this.tClass = ReflectProvider.getTClass(this.getClass());
@@ -64,15 +62,16 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
         }
         /*不可变列表*/
         final Map<Object, E> modeMap = new LinkedHashMap<>();
+        final Map<ComboKey, List<E>> tmpIndexesDataMap = new LinkedHashMap<>();
         modelList.forEach((dbModel) -> {
             try {
                 Object keyValue = dbModel.key();
-                if (modeMap.put(new ComboKey(keyValue), dbModel) != null) {
+                if (modeMap.put(keyValue, dbModel) != null) {
                     throw new IllegalArgumentException("数据 主键 【" + keyValue + "】 重复");
                 }
-                Stream<Indexes> indexesStream = AnnUtil.annStream(DataTable.this.getClass(), Indexes.class);
-                indexesStream.forEach(indexes -> {
-                    String[] ks = indexes.value();
+                Stream<Index> indexesStream = AnnUtil.annStream(DataTable.this.getClass(), Index.class);
+                indexesStream.forEach(index -> {
+                    String[] ks = index.value();
                     Object[] kvs = new Object[ks.length];
                     for (int i = 0; i < ks.length; i++) {
                         String k = ks[i];
@@ -80,9 +79,12 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
                     }
                     ComboKey comboKey = new ComboKey(kvs);
                     /*添加自定义索引*/
-                    if (modeMap.put(comboKey, dbModel) != null) {
-                        throw new IllegalArgumentException("数据 自定义索引 【" + comboKey + "】 【" + keyValue + "】 重复 ");
+                    List<E> es = tmpIndexesDataMap.computeIfAbsent(comboKey, k -> new ArrayList<>());
+                    if (index.single()) {
+                        if (!es.isEmpty())
+                            throw new IllegalArgumentException("数据 自定义索引 【" + comboKey + "】 【" + keyValue + "】 不唯一");
                     }
+                    es.add(dbModel);
                 });
             } catch (Throwable e) {
                 throw Throw.of("数据：" + FastJsonUtil.toJSONString(dbModel), e);
@@ -98,13 +100,21 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
     /**
      * 根据key值获取参数
      *
-     * @param indexes 多条件 key
+     * @param key 多条件 key
      */
-    public E get(Object... indexes) {
+    public E getByKey(Object key) {
+        return dataMap.get(key);
+    }
+
+    public boolean containsByKey(Object... key) {
+        return dataMap.containsKey(key);
+    }
+
+    public E getByIndex(Object... indexes) {
         return dataMap.get(new ComboKey(indexes));
     }
 
-    public boolean containsKey(Object... indexes) {
+    public boolean containsByIndex(Object... indexes) {
         return dataMap.containsKey(new ComboKey(indexes));
     }
 
