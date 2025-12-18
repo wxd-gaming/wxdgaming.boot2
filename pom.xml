@@ -41,6 +41,7 @@
         <module>wxdgaming.kotlin.test</module>
         <module>wxdgaming.logbus</module>
         <module>wxdgaming.logserver</module>
+        <module>wxdgaming.boot2.starter.batis.rocksdb</module>
     </modules>
 
     <properties>
