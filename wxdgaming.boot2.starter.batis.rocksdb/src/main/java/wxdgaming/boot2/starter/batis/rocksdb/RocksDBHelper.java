@@ -3,6 +3,7 @@ package wxdgaming.boot2.starter.batis.rocksdb;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.google.common.base.Joiner;
 import lombok.Getter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.rocksdb.*;
@@ -112,6 +113,15 @@ public class RocksDBHelper {
         }
     }
 
+    public void putByComboKey(Object obj, Object... ks) {
+        try {
+            String key = Joiner.on(":").join(ks);
+            db.put(key.getBytes(StandardCharsets.UTF_8), serialize(obj));
+        } catch (RocksDBException e) {
+            throw ExceptionUtils.asRuntimeException(e);
+        }
+    }
+
     public void putAll(Map<String, ?> map) {
         try {
             // 批量写操作（提升多写性能）
@@ -124,6 +134,19 @@ public class RocksDBHelper {
         } catch (RocksDBException e) {
             throw ExceptionUtils.asRuntimeException(e);
         }
+    }
+
+    public byte[] getByComboKey(Object... ks) {
+        String key = Joiner.on(":").join(ks);
+        return get(key);
+    }
+
+    public <R> R getObjectByComboKey(Class<R> clazz, Object... ks) {
+        byte[] bytes = getByComboKey(ks);
+        if (bytes == null) {
+            return null;
+        }
+        return deserialize(bytes, clazz);
     }
 
     public byte[] get(String key) {
