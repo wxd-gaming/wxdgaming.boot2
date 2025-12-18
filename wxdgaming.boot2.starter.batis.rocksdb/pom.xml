@@ -22,6 +22,11 @@
             <artifactId>rocksdbjni</artifactId>
             <!-- 推荐使用稳定版，最新版可查 Maven 中央仓库 -->
             <version>8.11.3</version>
+        </dependency><!-- Kryo 核心依赖 -->
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
+            <version>5.6.2</version> <!-- 最新稳定版，兼容 JDK 8+ -->
         </dependency>
     </dependencies>
 
