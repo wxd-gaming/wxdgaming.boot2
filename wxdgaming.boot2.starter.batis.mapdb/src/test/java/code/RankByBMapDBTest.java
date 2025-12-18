@@ -2,6 +2,7 @@ package code;
 
 import org.junit.jupiter.api.*;
 import org.springframework.util.StopWatch;
+import wxdgaming.boot2.core.executor.ThreadStopWatch;
 import wxdgaming.boot2.core.format.data.Data2Size;
 import wxdgaming.boot2.core.rank.RankElement;
 import wxdgaming.boot2.core.util.RandomUtils;
@@ -40,18 +41,19 @@ public class RankByBMapDBTest {
     @RepeatedTest(10)
     public void b1treeSet() {
 
-        StopWatch diffTime = new StopWatch();
+        ThreadStopWatch.init("xxx");
         ArrayList<Object> objects = new ArrayList<>(holdMap.values());
-        diffTime.start("读取耗时");
+        ThreadStopWatch.start("读取耗时");
         TreeSet<RankElement> rankElements = new TreeSet<>();
         for (Object value : objects) {
             RankElement rankElement = (RankElement) value;
             rankElements.add(rankElement);
         }
-        diffTime.start("排序耗时" + holdMap.size());
+        ThreadStopWatch.stop();
+        ThreadStopWatch.start("排序耗时" + holdMap.size());
         List<RankElement> list = rankElements.stream().limit(20).toList();
-
-        System.out.println(diffTime);
+        ThreadStopWatch.stop();
+        System.out.println(ThreadStopWatch.releasePrint());
         System.out.println("==============================");
         //        float v = diffTime.diffMs5();
         //        for (RankScore rankScore : list) {

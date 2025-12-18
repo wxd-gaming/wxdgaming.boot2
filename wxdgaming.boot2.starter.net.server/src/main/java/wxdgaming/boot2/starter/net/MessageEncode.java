@@ -34,7 +34,7 @@ public abstract class MessageEncode extends ChannelOutboundHandlerAdapter {
         }
         eventLoopFlushChannelMap.computeIfAbsent(channel.eventLoop(), k -> {
                     HashSet<Channel> objects = new HashSet<>();
-                    channel.eventLoop().scheduleWithFixedDelay(
+                    k.scheduleWithFixedDelay(
                             () -> {
                                 objects.forEach(Channel::flush);
                                 objects.clear();
