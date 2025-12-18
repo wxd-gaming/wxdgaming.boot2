@@ -53,6 +53,14 @@
             <artifactId>guava</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.protostuff</groupId>
+            <artifactId>protostuff-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.protostuff</groupId>
+            <artifactId>protostuff-runtime</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

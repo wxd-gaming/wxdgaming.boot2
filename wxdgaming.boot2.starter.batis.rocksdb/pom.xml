@@ -13,10 +13,15 @@
 
     <dependencies>
         <dependency>
+            <groupId>wxdgaming.boot2</groupId>
+            <artifactId>wxdgaming.boot2.core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.rocksdb</groupId>
             <artifactId>rocksdbjni</artifactId>
             <!-- 推荐使用稳定版，最新版可查 Maven 中央仓库 -->
-            <version>10.4.2</version>
+            <version>8.11.3</version>
         </dependency>
     </dependencies>
 

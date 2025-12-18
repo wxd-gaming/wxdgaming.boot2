@@ -23,12 +23,12 @@ public abstract class PojoBase extends ObjectBase implements Serializable {
 
     /** 编码 */
     public byte[] encode() {
-        return SerializerUtil.encode(this);
+        return wxdgaming.boot2.core.io.SerializerUtil.encode(this);
     }
 
     /** 解码 */
     public void decode(byte[] bytes) {
-        SerializerUtil.decode(bytes, this);
+        wxdgaming.boot2.core.io.SerializerUtil.decode(bytes, this);
     }
 
     @Override public String toString() {
