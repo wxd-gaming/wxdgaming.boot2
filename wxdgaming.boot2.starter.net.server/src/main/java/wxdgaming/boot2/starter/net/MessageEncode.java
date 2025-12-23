@@ -36,8 +36,15 @@ public abstract class MessageEncode extends ChannelOutboundHandlerAdapter {
                     HashSet<Channel> objects = new HashSet<>();
                     k.scheduleWithFixedDelay(
                             () -> {
-                                objects.forEach(Channel::flush);
-                                objects.clear();
+                                try {
+                                    if (objects.isEmpty()) {
+                                        return;
+                                    }
+                                    objects.forEach(Channel::flush);
+                                    objects.clear();
+                                } catch (Exception e) {
+                                    log.error("flush error");
+                                }
                             },
                             scheduledDelayMs, scheduledDelayMs,
                             TimeUnit.MILLISECONDS
