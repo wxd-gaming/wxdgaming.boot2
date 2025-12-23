@@ -247,6 +247,11 @@
                 <artifactId>reactor-core</artifactId>
                 <version>3.7.4</version>
             </dependency>
+            <dependency>
+                <groupId>com.esotericsoftware</groupId>
+                <artifactId>kryo</artifactId>
+                <version>5.6.2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -344,6 +349,10 @@
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
         </dependency>
     </dependencies>
 

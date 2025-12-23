@@ -1,18 +1,13 @@
 package wxdgaming.boot2.starter.batis.rocksdb;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 import com.google.common.base.Joiner;
 import lombok.Getter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.rocksdb.*;
+import wxdgaming.boot2.core.io.kryoPool;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -24,19 +19,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class RocksDBHelper {
 
-    private static final ArrayBlockingQueue<Kryo> KRYO_THREAD_LOCAL;
+    private static final kryoPool kryoPool = new kryoPool();
 
     static {
         // 初始化 RocksDB 库（建议在程序启动时调用）
         RocksDB.loadLibrary();
-        int availableProcessors = Runtime.getRuntime().availableProcessors();
-        KRYO_THREAD_LOCAL = new ArrayBlockingQueue<>(availableProcessors);
-        for (int i = 0; i < availableProcessors; i++) {
-            Kryo e = new Kryo();
-            /*开放式序列化*/
-            e.setRegistrationRequired(false);
-            KRYO_THREAD_LOCAL.add(e);
-        }
     }
 
     private final RocksDB db;
@@ -65,41 +52,9 @@ public class RocksDBHelper {
         }
     }
 
-    // 序列化：Object → byte[]
-    public static <T> byte[] serialize(T obj) {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-             Output output = new Output(baos)) { // Output 实现 AutoCloseable
-            Kryo kryo = KRYO_THREAD_LOCAL.take();
-            try {
-                kryo.writeObject(output, obj);
-                output.flush();
-            } finally {
-                KRYO_THREAD_LOCAL.add(kryo);
-            }
-            return baos.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException("Kryo 序列化失败", e);
-        }
-    }
-
-    // 反序列化：byte[] → Object
-    public static <T> T deserialize(byte[] bytes, Class<T> clazz) {
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-             Input input = new Input(bais)) { // Input 实现 AutoCloseable
-            Kryo kryo = KRYO_THREAD_LOCAL.take();
-            try {
-                return kryo.readObject(input, clazz);
-            } finally {
-                KRYO_THREAD_LOCAL.add(kryo);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Kryo 反序列化失败", e);
-        }
-    }
-
     public void putMap(String key, Map<?, ?> map) {
         try {
-            db.put(key.getBytes(StandardCharsets.UTF_8), serialize(map));
+            db.put(key.getBytes(StandardCharsets.UTF_8), kryoPool.serialize(map));
         } catch (RocksDBException e) {
             throw ExceptionUtils.asRuntimeException(e);
         }
@@ -107,7 +62,7 @@ public class RocksDBHelper {
 
     public void put(String key, Object obj) {
         try {
-            db.put(key.getBytes(StandardCharsets.UTF_8), serialize(obj));
+            db.put(key.getBytes(StandardCharsets.UTF_8), kryoPool.serialize(obj));
         } catch (RocksDBException e) {
             throw ExceptionUtils.asRuntimeException(e);
         }
@@ -116,7 +71,7 @@ public class RocksDBHelper {
     public void putByComboKey(Object obj, Object... ks) {
         try {
             String key = Joiner.on(":").join(ks);
-            db.put(key.getBytes(StandardCharsets.UTF_8), serialize(obj));
+            db.put(key.getBytes(StandardCharsets.UTF_8), kryoPool.serialize(obj));
         } catch (RocksDBException e) {
             throw ExceptionUtils.asRuntimeException(e);
         }
@@ -127,7 +82,7 @@ public class RocksDBHelper {
             // 批量写操作（提升多写性能）
             WriteBatch writeBatch = new WriteBatch();
             for (Map.Entry<String, ?> entry : map.entrySet()) {
-                writeBatch.put(entry.getKey().getBytes(StandardCharsets.UTF_8), serialize(entry.getValue()));
+                writeBatch.put(entry.getKey().getBytes(StandardCharsets.UTF_8), kryoPool.serialize(entry.getValue()));
             }
             // 执行批量写
             db.write(new WriteOptions(), writeBatch);
@@ -146,7 +101,7 @@ public class RocksDBHelper {
         if (bytes == null) {
             return null;
         }
-        return deserialize(bytes, clazz);
+        return kryoPool.deserialize(bytes, clazz);
     }
 
     public byte[] get(String key) {
@@ -162,7 +117,7 @@ public class RocksDBHelper {
         if (bytes == null) {
             return null;
         }
-        return deserialize(bytes, clazz);
+        return kryoPool.deserialize(bytes, clazz);
     }
 
     public Map<?, ?> getMap(String key) {
@@ -178,7 +133,7 @@ public class RocksDBHelper {
         if (bytes == null) {
             return null;
         }
-        return deserialize(bytes, String.class);
+        return kryoPool.deserialize(bytes, String.class);
     }
 
     public Integer getInteger(String key) {
@@ -186,7 +141,7 @@ public class RocksDBHelper {
         if (bytes == null) {
             return null;
         }
-        return deserialize(bytes, Integer.class);
+        return kryoPool.deserialize(bytes, Integer.class);
     }
 
     public int getIntValue(String key) {
@@ -194,7 +149,7 @@ public class RocksDBHelper {
         if (bytes == null) {
             return 0;
         }
-        return deserialize(bytes, Integer.class);
+        return kryoPool.deserialize(bytes, Integer.class);
     }
 
     public void close() {
