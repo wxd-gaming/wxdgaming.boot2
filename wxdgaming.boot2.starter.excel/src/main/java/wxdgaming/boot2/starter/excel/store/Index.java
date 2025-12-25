@@ -18,6 +18,8 @@ public @interface Index {
     /** 是不是唯一索引 */
     boolean single() default false;
 
+    String name() default "";
+
     /** key值 */
     String[] value() default {};
 

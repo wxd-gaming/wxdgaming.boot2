@@ -72,12 +72,17 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
                 Stream<Index> indexesStream = AnnUtil.annStream(DataTable.this.getClass(), Index.class);
                 indexesStream.forEach(index -> {
                     String[] ks = index.value();
-                    Object[] kvs = new Object[ks.length];
-                    for (int i = 0; i < ks.length; i++) {
-                        String k = ks[i];
-                        kvs[i] = reflectClassProvider.getFieldContext(k).getInvoke(dbModel);
+                    ArrayList<Object> kvList = new ArrayList<>(ks.length + 1);
+                    if (StringUtils.isNotBlank(index.name())) {
+                        kvList.add(index.name());
                     }
-                    ComboKey comboKey = new ComboKey(kvs);
+
+                    for (String k : ks) {
+                        kvList.add(reflectClassProvider.getFieldContext(k).getInvoke(dbModel));
+                    }
+
+                    ComboKey comboKey = new ComboKey(kvList.toArray());
+
                     /*添加自定义索引*/
                     List<E> es = tmpIndexesDataMap.computeIfAbsent(comboKey, k -> new ArrayList<>());
                     if (index.single()) {
