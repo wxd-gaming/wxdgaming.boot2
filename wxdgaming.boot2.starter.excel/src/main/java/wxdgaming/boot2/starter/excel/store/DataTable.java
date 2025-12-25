@@ -4,7 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.Throw;
-import wxdgaming.boot2.core.format.StreamWriter;
+import wxdgaming.boot2.core.format.TableFormatter;
 import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.ComboKey;
@@ -145,45 +145,31 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
     }
 
     public String toDataString() {
-        return toDataString(50);
-    }
-
-    public String toDataString(int len) {
-        StreamWriter streamWriter = new StreamWriter();
-        toDataString(streamWriter, len);
-        return streamWriter.toString();
-    }
-
-    public void toDataString(StreamWriter streamWriter) {
-        toDataString(streamWriter, 50);
-    }
-
-    public void toDataString(StreamWriter streamWriter, int len) {
-        streamWriter.write("解析：").write(tClass.getName()).writeLn();
-        streamWriter.write("表名：").write(dataMapping.name()).writeLn();
-
-        streamWriter.writeRight("-", len * reflectClassProvider.getFieldMap().size(), '-').writeLn();
-        for (String columnName : reflectClassProvider.getFieldMap().keySet()) {
-            streamWriter.write("|").writeRight(columnName, len, ' ');
-        }
-
-        streamWriter.writeLn();
-
-        streamWriter.writeRight("-", len * reflectClassProvider.getFieldMap().size(), '-').writeLn();
+        TableFormatter tableFormatter = new TableFormatter();
+        Object[] array = reflectClassProvider.getFieldMap().keySet().toArray();
+        tableFormatter.addRow(array);
         for (E row : dataList) {
-            streamWriter.writeLn();
+            Object[] rowArray = new Object[array.length];
+            int index = 0;
             for (ReflectFieldProvider entityField : reflectClassProvider.getFieldMap().values()) {
                 Object value = entityField.getInvoke(row);
                 if (value == null) {
-                    streamWriter.write("|").writeRight("-", len, ' ');
+                    value = "-";
                 } else if (ConvertUtil.isBaseType(value.getClass())) {
-                    streamWriter.write("|").writeRight(String.valueOf(value), len, ' ');
+                    value = String.valueOf(value);
                 } else {
-                    streamWriter.write("|").writeRight(FastJsonUtil.toJSONString(value), len, ' ');
+                    value = FastJsonUtil.toJSONString(value);
                 }
+                rowArray[index++] = value;
             }
+            tableFormatter.addRow(rowArray);
         }
-        streamWriter.writeLn();
+        String s = tableFormatter.generateTable();
+        return """
+                解析：%s
+                表名：%s
+                %s
+                """.formatted(tClass.getName(), dataMapping.name(), s);
     }
 
 }

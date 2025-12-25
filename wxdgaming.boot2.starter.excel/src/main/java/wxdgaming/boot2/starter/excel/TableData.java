@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import wxdgaming.boot2.core.format.TableFormatter;
 import wxdgaming.boot2.core.util.PatternUtil;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.ConfigString;
@@ -290,37 +291,26 @@ public class TableData {
 
 
     public String showData() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(this.getTableName()).append("\n");
-        stringBuilder.append(this.getTableComment()).append("\n");
-        String format = "";
-        for (int i = 0; i < cellInfo4IndexMap.size(); i++) {
-            format += "|%-40s\t";
-        }
+        TableFormatter tableFormatter = new TableFormatter();
         {
             Object[] array = cellInfo4IndexMap.values().stream().map(CellInfo::getFieldBelong).toArray();
-            String formatted = String.format(format, array);
-            stringBuilder.append(formatted).append("\n");
+            tableFormatter.addRow( array);
         }
         {
             Object[] array = cellInfo4IndexMap.values().stream().map(CellInfo::getFieldName).toArray();
-            String formatted = String.format(format, array);
-            stringBuilder.append(formatted).append("\n");
+            tableFormatter.addRow( array);
         }
         {
             Object[] array = cellInfo4IndexMap.values().stream().map(v -> v.getFieldType().getSimpleName()).toArray();
-            String formatted = String.format(format, array);
-            stringBuilder.append(formatted).append("\n");
+            tableFormatter.addRow( array);
         }
         {
             Object[] array = cellInfo4IndexMap.values().stream().map(CellInfo::getCellType).toArray();
-            String formatted = String.format(format, array);
-            stringBuilder.append(formatted).append("\n");
+            tableFormatter.addRow( array);
         }
         {
             Object[] array = cellInfo4IndexMap.values().stream().map(CellInfo::getFieldComment).toArray();
-            String formatted = String.format(format, array);
-            stringBuilder.append(formatted).append("\n");
+            tableFormatter.addRow( array);
         }
         {
             for (JSONObject row : rows.values()) {
@@ -333,11 +323,16 @@ public class TableData {
                         return FastJsonUtil.toJSONString(value);
                     }
                 }).toArray();
-                String formatted = String.format(format, array);
-                stringBuilder.append(formatted).append("\n");
+                tableFormatter.addRow( array);
             }
         }
-        return stringBuilder.toString();
+        String s = tableFormatter.generateTable();
+
+        return """
+                解析：%s
+                表名：%s
+                %s
+                """.formatted(this.getTableName(), this.getTableComment(), s);
     }
 
     @Override public String toString() {
