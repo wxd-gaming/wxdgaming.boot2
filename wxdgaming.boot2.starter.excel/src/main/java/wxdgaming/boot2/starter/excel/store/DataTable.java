@@ -93,9 +93,13 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
         /*不可变的列表*/
         this.dataList = Collections.unmodifiableList(modelList);
         this.dataMap = Collections.unmodifiableMap(modeMap);
+        this.indexesDataMap = Collections.unmodifiableMap(tmpIndexesDataMap);
         this.initDb();
     }
 
+    public boolean containsByKey(Object key) {
+        return dataMap.containsKey(key);
+    }
 
     /**
      * 根据key值获取参数
@@ -106,16 +110,18 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
         return dataMap.get(key);
     }
 
-    public boolean containsByKey(Object... key) {
-        return dataMap.containsKey(key);
-    }
-
-    public E getByIndex(Object... indexes) {
-        return dataMap.get(new ComboKey(indexes));
-    }
-
     public boolean containsByIndex(Object... indexes) {
-        return dataMap.containsKey(new ComboKey(indexes));
+        return indexesDataMap.containsKey(new ComboKey(indexes));
+    }
+
+    public List<E> getByIndex(Object... indexes) {
+        return indexesDataMap.get(new ComboKey(indexes));
+    }
+
+    public E getSingleByIndex(Object... indexes) {
+        List<E> es = indexesDataMap.get(new ComboKey(indexes));
+        if (es == null || es.isEmpty()) return null;
+        return es.getFirst();
     }
 
     @JSONField(serialize = false, deserialize = false)

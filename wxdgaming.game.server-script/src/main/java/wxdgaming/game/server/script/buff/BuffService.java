@@ -77,7 +77,7 @@ public class BuffService extends HoldApplicationContext {
         boolean needExecuteAttrCalculator = false;
         while (iterator.hasNext()) {
             Buff buff = iterator.next();
-            QBuff qBuff = qBuffTable.getByIndex(buff.getBuffCfgId(), buff.getLv());
+            QBuff qBuff = qBuffTable.getSingleByIndex(buff.getBuffCfgId(), buff.getLv());
             if (qBuff == null) {
                 log.warn("buff不存在 {}, {} {}", mapNpc, buff.getBuffCfgId(), buff.getLv());
                 continue;
@@ -155,7 +155,7 @@ public class BuffService extends HoldApplicationContext {
 
     public void addBuff(MapNpc sender, MapNpc targetMapNpc, int buffCfgId, int lv, ReasonDTO reasonDTO) {
         QBuffTable qBuffTable = DataRepository.getIns().dataTable(QBuffTable.class);
-        QBuff qBuff = qBuffTable.getByIndex(buffCfgId, lv);
+        QBuff qBuff = qBuffTable.getSingleByIndex(buffCfgId, lv);
         addBuff(sender, targetMapNpc, qBuff, reasonDTO);
     }
 
