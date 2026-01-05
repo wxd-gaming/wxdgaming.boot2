@@ -5,6 +5,7 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.util.AssertUtil;
 
@@ -153,7 +154,7 @@ public class GuavaCacheImpl<Key, Value> {
             Hold hold = outerDataCache.get(key);
             return hold.value();
         } catch (ExecutionException e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.executor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.Throw;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -65,7 +66,7 @@ public enum QueuePolicyConst implements QueuePolicy {
             try {
                 queue.put(task);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         }
     },

@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.lang;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import wxdgaming.boot2.core.format.data.Data2Json;
 import wxdgaming.boot2.core.format.data.Data2Size;
 import wxdgaming.boot2.core.json.FastJsonUtil;
@@ -22,7 +23,7 @@ public abstract class ObjectBase implements Serializable, Cloneable, Data2Json, 
         try {
             return super.clone();
         } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

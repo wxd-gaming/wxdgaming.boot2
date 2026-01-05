@@ -1,6 +1,7 @@
 package code.reactor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
@@ -66,7 +67,7 @@ public class ReactorTest {
                             try {
                                 sink.next(stack.take());
                             } catch (InterruptedException e) {
-                                throw new RuntimeException(e);
+                                throw ExceptionUtils.asRuntimeException(e);
                             }
                         }
                     });

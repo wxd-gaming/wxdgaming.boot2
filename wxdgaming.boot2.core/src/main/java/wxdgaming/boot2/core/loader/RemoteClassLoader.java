@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.loader;
 
 import lombok.Getter;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import javax.tools.JavaFileObject;
 import java.io.InputStream;
@@ -64,7 +65,7 @@ public class RemoteClassLoader extends URLClassLoader {
             );
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

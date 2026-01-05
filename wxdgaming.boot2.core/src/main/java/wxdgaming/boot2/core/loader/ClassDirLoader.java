@@ -3,6 +3,7 @@ package wxdgaming.boot2.core.loader;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
@@ -172,7 +173,7 @@ public class ClassDirLoader extends URLClassLoader implements Serializable {
                     });
 
         } catch (Throwable e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

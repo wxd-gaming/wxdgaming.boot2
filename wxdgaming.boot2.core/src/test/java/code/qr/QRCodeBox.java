@@ -91,7 +91,7 @@ public class QRCodeBox {
                 }
             }
         } catch (WriterException e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

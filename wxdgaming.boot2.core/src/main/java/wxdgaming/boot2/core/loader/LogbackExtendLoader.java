@@ -5,6 +5,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
@@ -30,7 +31,7 @@ public class LogbackExtendLoader extends ExtendLoader {
         try {
             configurator.doConfigure(resourceAsStream);
         } catch (JoranException e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
         LoggerFactory.getLogger("root").info("--------------- init end ---------------");
     }

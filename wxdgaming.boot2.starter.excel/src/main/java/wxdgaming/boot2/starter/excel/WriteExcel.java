@@ -2,6 +2,7 @@ package wxdgaming.boot2.starter.excel;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -89,13 +90,13 @@ public class WriteExcel {
             try {
                 Files.createDirectories(parent);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         }
         try (FileOutputStream fileOutputStream = new FileOutputStream(path.toFile(), false)) {
             workbook.write(fileOutputStream);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

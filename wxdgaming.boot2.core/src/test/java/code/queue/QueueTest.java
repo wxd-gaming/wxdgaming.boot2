@@ -1,5 +1,6 @@
 package code.queue;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.RepeatedTest;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -38,7 +39,7 @@ public class QueueTest {
                         queue.take();
                         countDownLatch.countDown();
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                        throw ExceptionUtils.asRuntimeException(e);
                     }
                 }
             });
@@ -65,7 +66,7 @@ public class QueueTest {
                         queue.take();
                         countDownLatch.countDown();
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                        throw ExceptionUtils.asRuntimeException(e);
                     }
                 }
             });

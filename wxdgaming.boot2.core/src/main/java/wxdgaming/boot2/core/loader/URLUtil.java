@@ -1,5 +1,7 @@
 package wxdgaming.boot2.core.loader;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -69,7 +71,7 @@ public class URLUtil {
                         .map(URLUtil::toURL)
                         .forEach(list::add);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         }
         return list;
@@ -147,7 +149,7 @@ public class URLUtil {
             out.write(bytes);
             out.flush();
         } catch (Throwable e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

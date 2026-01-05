@@ -3,6 +3,7 @@ package code.cache2;
 import com.alibaba.fastjson.JSON;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
@@ -128,7 +129,7 @@ public class CaffeineCacheTest {
                     try {
                         Thread.sleep(30000);
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                        throw ExceptionUtils.asRuntimeException(e);
                     }
                 },
                 ExecutorFactory.getExecutorServiceLogic()

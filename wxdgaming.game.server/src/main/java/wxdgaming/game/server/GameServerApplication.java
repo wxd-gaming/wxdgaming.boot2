@@ -1,6 +1,7 @@
 package wxdgaming.game.server;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -64,7 +65,7 @@ public class GameServerApplication {
             try {
                 classDirLoader = new ClassDirLoader(classDir);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         } else {
             try {
@@ -73,7 +74,7 @@ public class GameServerApplication {
                         .outPutFile("target/bin", true);
                 classDirLoader = new ClassDirLoader("target/bin");
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw ExceptionUtils.asRuntimeException(e);
             }
         }
 

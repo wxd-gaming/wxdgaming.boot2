@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import wxdgaming.boot2.core.Throw;
@@ -231,7 +232,7 @@ public abstract class SqlDataHelper extends DataHelper {
         try {
             return hikariDataSource.getConnection();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

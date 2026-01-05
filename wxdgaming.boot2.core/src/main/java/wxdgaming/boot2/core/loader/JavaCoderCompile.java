@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.loader;
 
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import javax.tools.*;
 import java.io.File;
@@ -81,7 +82,7 @@ public class JavaCoderCompile {
                     .toList();
             compilerJava(sourceDir, sourceFileList);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
         return this;
     }

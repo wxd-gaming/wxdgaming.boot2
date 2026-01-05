@@ -235,7 +235,7 @@ public class FileUtil implements Serializable {
                                             byte[] byteArray = FileReadUtil.readBytes(resourceAsStream);
                                             return new Tuple2<>(Paths.get(v), byteArray);
                                         } catch (IOException e) {
-                                            throw new RuntimeException(e);
+                                            throw ExceptionUtils.asRuntimeException(e);
                                         }
                                     })
                                     .forEach(list::add);

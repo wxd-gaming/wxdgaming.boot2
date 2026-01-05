@@ -2,6 +2,7 @@ package wxdgaming.boot2.starter.net.httpclient5;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -98,7 +99,7 @@ public class HttpClientConfiguration implements InitPrint {
             closeableHttpClient = httpClientBuilder.build();
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

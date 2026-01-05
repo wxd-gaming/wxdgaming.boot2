@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
@@ -96,7 +97,7 @@ public class DataRepository {
         try {
             dataTable = (DataTable<?>) dataTableClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
         dataTable.loadJson(dataRepositoryProperties.getPath());
         log.info("load data table 文件：{}, 数据：{}, 行数：{}", dataTable.getDataMapping().excelPath(), dataTable.getDataMapping().name(), dataTable.dbSize());

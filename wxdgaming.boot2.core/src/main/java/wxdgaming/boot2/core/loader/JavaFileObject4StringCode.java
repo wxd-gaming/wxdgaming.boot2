@@ -1,6 +1,8 @@
 package wxdgaming.boot2.core.loader;
 
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import javax.tools.SimpleJavaFileObject;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -58,7 +60,7 @@ public class JavaFileObject4StringCode extends SimpleJavaFileObject {
                 throw new UnsupportedOperationException("并未找到的 类名");
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

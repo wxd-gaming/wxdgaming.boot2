@@ -60,7 +60,7 @@ public class LastAccessFile extends Thread {
         try {
             skipped();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
