@@ -29,7 +29,7 @@ public enum HeartConst {
 
     public static HeartConst ofOrException(int value) {
         HeartConst tmp = static_map.get(value);
-        if (tmp == null) throw new RuntimeException("查找失败 " + value);
+        if (tmp == null) throw new IllegalArgumentException("查找失败 " + value);
         return tmp;
     }
 

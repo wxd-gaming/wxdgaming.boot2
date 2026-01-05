@@ -74,7 +74,7 @@ public interface SerializableLambda extends Serializable {
                 field = ofField(declaredFields, methodName);
             }
             if (field == null) {
-                throw new RuntimeException("类：" + ofClass.getName() + "." + methodName + "() 没有对应的 字段");
+                throw new IllegalArgumentException("类：" + ofClass.getName() + "." + methodName + "() 没有对应的 字段");
             }
             return field;
         } catch (Exception e) {

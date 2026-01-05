@@ -135,7 +135,7 @@ public class JvmUtil {
      */
     public static TimeZone setTimeZone(String zoneId) {
         if (zoneId == null || zoneId.isBlank()) {
-            throw new RuntimeException("zoneId = " + zoneId);
+            throw new IllegalArgumentException("zoneId = " + zoneId);
         }
         TimeZone timeZone = TimeZone.getTimeZone(zoneId);
         TimeZone.setDefault(timeZone);

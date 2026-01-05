@@ -40,7 +40,7 @@ public class ThreadContext extends HashMap<String, Object> {
             throw Throw.of("threadParam 参数：" + name, e);
         }
         if (threadParam.required() && r == null) {
-            throw new RuntimeException("threadParam:" + name + " is null");
+            throw new IllegalArgumentException("threadParam:" + name + " is null");
         }
         return r;
     }

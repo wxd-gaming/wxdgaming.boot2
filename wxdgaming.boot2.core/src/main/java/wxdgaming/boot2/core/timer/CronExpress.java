@@ -80,7 +80,7 @@ public class CronExpress extends ObjectBase {
             String[] split = cron.split(" ");
             for (int i = 0; i < split.length; i++) {
                 if (StringUtils.isBlank(split[i])) {
-                    throw new RuntimeException("cron 表达式异常 [" + cron + "] 第 " + (i + 1) + " 个参数 空 不合法");
+                    throw new IllegalArgumentException("cron 表达式异常 [" + cron + "] 第 " + (i + 1) + " 个参数 空 不合法");
                 }
                 values[i] = split[i];
             }
@@ -103,19 +103,19 @@ public class CronExpress extends ObjectBase {
             int start = Integer.parseInt(split[0]);
             int end = Integer.parseInt(split[1]);
             if (start < min) {
-                throw new RuntimeException(actionStr + " 起始值 小于最小值：" + min);
+                throw new IllegalArgumentException(actionStr + " 起始值 小于最小值：" + min);
             }
             if (max < start) {
-                throw new RuntimeException(actionStr + " 起始值 超过最大值：" + max);
+                throw new IllegalArgumentException(actionStr + " 起始值 超过最大值：" + max);
             }
             if (end < min) {
-                throw new RuntimeException(actionStr + " 结束值 小于最小值：" + min);
+                throw new IllegalArgumentException(actionStr + " 结束值 小于最小值：" + min);
             }
             if (max < end) {
-                throw new RuntimeException(actionStr + " 结束值 超过最大值：" + max);
+                throw new IllegalArgumentException(actionStr + " 结束值 超过最大值：" + max);
             }
             if (start > end) {
-                throw new RuntimeException(actionStr + " 起始值 大于 结束值" + max);
+                throw new IllegalArgumentException(actionStr + " 起始值 大于 结束值" + max);
             }
             for (int i = start; i < end; i++) {
                 set.add(i);

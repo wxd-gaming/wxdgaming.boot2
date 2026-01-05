@@ -66,7 +66,7 @@ public class MapOf implements Serializable {
         Map<Integer, Integer> map = new LinkedHashMap<>();
         for (int[] t : ts) {
             if (map.containsKey(t[0])) {
-                throw new RuntimeException("数据重复：" + t[0]);
+                throw new IllegalArgumentException("数据重复：" + t[0]);
             }
             map.put(t[0], t[1]);
         }
@@ -89,7 +89,7 @@ public class MapOf implements Serializable {
 
         for (long[] t : ts) {
             if (map.containsKey(t[0])) {
-                throw new RuntimeException("数据重复：" + t[0]);
+                throw new IllegalArgumentException("数据重复：" + t[0]);
             }
             map.put(t[0], t[1]);
         }
@@ -112,7 +112,7 @@ public class MapOf implements Serializable {
 
         for (T[] t : ts) {
             if (map.containsKey(t[0])) {
-                throw new RuntimeException("数据重复：" + t[0]);
+                throw new IllegalArgumentException("数据重复：" + t[0]);
             }
             map.put(t[0], t[1]);
         }

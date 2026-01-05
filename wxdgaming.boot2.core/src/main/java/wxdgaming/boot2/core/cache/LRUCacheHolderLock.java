@@ -174,7 +174,7 @@ class LRUCacheHolderLock<K, V> {
         if (expireAfterAccess != null || expireAfterWrite != null) {
             long delay = expireAfterAccess != null ? expireAfterAccess.toMillis() : expireAfterWrite.toMillis();
             if (delay < 1000)
-                throw new RuntimeException("expire < 1s");
+                throw new IllegalArgumentException("expire < 1s");
             delay = delay / 100;
             scheduledFuture = CacheConst.scheduledExecutorService.scheduleWithFixedDelay(() -> onCleanup(RemovalCause.EXPIRE), delay, delay, TimeUnit.MILLISECONDS);
         } else {

@@ -30,8 +30,8 @@ public class NewId implements Serializable {
 
     public NewId(int hexId, int type) {
 
-        if (hexId > Offset20) throw new RuntimeException("hexId 不能大于 " + Offset20);
-        if (type > Offset8) throw new RuntimeException("type 不能大于 " + Offset8);
+        if (hexId > Offset20) throw new IllegalArgumentException("hexId 不能大于 " + Offset20);
+        if (type > Offset8) throw new IllegalArgumentException("type 不能大于 " + Offset8);
 
         this.hexId = hexId;
         this.type = type;

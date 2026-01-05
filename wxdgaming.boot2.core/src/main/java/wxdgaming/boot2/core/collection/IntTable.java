@@ -42,7 +42,7 @@ public class IntTable<V> implements Serializable {
 
     /** 如果原来已经存在，会抛出异常 */
     public V putEx(int r, int c, V v) {
-        optional(r, c).ifPresent(old -> {throw new RuntimeException("插入重复项 " + r + " - " + c + " - " + v);});
+        optional(r, c).ifPresent(old -> {throw new IllegalArgumentException("插入重复项 " + r + " - " + c + " - " + v);});
         return putIfAbsent(r, c, v);
     }
 
