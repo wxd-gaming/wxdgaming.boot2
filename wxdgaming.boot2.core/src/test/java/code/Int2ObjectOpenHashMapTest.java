@@ -1,6 +1,6 @@
 package code;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +33,6 @@ public class Int2ObjectOpenHashMapTest {
         String jsonString = FastJsonUtil.toJSONStringAsWriteType(this);
         System.out.println(jsonString);
         Int2ObjectOpenHashMapTest map1 = FastJsonUtil.parseSupportAutoType(jsonString, this.getClass());
-        System.out.println(JSON.toJSONString(map1, FastJsonUtil.Writer_Features_Type_Name));
+        System.out.println(FastJsonUtil.toJSONStringAsWriteType(map1));
     }
 }

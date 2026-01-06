@@ -1,6 +1,6 @@
 package wxdgaming.boot2.core.collection;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.io.Serializable;
@@ -46,16 +46,12 @@ public class MapOf implements Serializable {
         return new JSONObject();
     }
 
-    public static JSONObject newJSONObjectLinked() {
-        return new JSONObject(true);
-    }
-
     public static JSONObject newJSONObject(String key, Object value) {
-        return MapOf.newJSONObject().fluentPut(key, value);
+        return new JSONObject().fluentPut(key, value);
     }
 
     public static JSONObject newJSONObject(Map<String, Object> map) {
-        return MapOf.newJSONObject().fluentPutAll(map);
+        return new JSONObject(map);
     }
 
     public static <K, V> Map<K, V> of(K k1, V v1) {

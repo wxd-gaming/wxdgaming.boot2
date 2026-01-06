@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.net.httpclient5;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONWriter;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.Getter;
 import lombok.Setter;
@@ -105,7 +105,7 @@ public class HttpRequestPost extends AbstractHttpRequest {
     }
 
     public HttpRequestPost setParamsJson(Map<String, ?> params) {
-        return setParamsJson(JSON.toJSONString(params, SerializerFeature.SortField, SerializerFeature.MapSortField));
+        return setParamsJson(JSON.toJSONString(params, JSONWriter.Feature.SortMapEntriesByKeys));
     }
 
     public HttpRequestPost setParamsJson(String params) {

@@ -1,6 +1,6 @@
 package remote.code;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.game.server.script.http.gm.dynamiccode.IGmDynamic;
 

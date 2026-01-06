@@ -1,11 +1,8 @@
 package wxdgaming.game.server.module.inner;
 
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.json.FastJsonUtil;
-import wxdgaming.boot2.core.util.Md5Util;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 
 /**

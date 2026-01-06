@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.net.module.inner.handler;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.json.FastJsonUtil;

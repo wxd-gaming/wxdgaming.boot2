@@ -31,7 +31,7 @@ public class ColumnConvertJson implements IColumnConvert {
             long[] longArray = bitSet.toLongArray();
             return FastJsonUtil.toJSONString(longArray);
         } else if (!(fieldValue instanceof String)) {
-            return FastJsonUtil.toJSONString(fieldValue, FastJsonUtil.Writer_Features_Type_Name);
+            return FastJsonUtil.toJSONStringAsWriteType(fieldValue);
         }
         return fieldValue;
     }

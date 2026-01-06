@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.excel.store;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.Throw;
@@ -87,7 +87,7 @@ public abstract class DataTable<E extends DataKey> extends ObjectBase implements
                     List<E> es = tmpIndexesDataMap.computeIfAbsent(comboKey, k -> new ArrayList<>());
                     if (index.single()) {
                         if (!es.isEmpty())
-                            throw new IllegalArgumentException("数据 自定义索引 【" + comboKey + "】 【" + keyValue + "】 不唯一");
+                            throw new IllegalArgumentException(this.getClass() + ", " + dbModel.getClass() + " 数据 自定义索引 【" + comboKey + "】 【" + keyValue + "】 不唯一");
                     }
                     es.add(dbModel);
                 });

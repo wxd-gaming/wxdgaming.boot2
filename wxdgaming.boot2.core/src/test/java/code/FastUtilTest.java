@@ -1,7 +1,7 @@
 package code;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -34,7 +34,7 @@ public class FastUtilTest {
     public void f100() {
         Int2ObjectOpenHashMap<Object> map = new Int2ObjectOpenHashMap<>();
         //        map.put(1, "2");
-        String jsonString = JSON.toJSONString(map, FastJsonUtil.Writer_Features_Type_Name);
+        String jsonString = FastJsonUtil.toJSONStringAsWriteType(map);
         System.out.println(jsonString);
         Int2ObjectOpenHashMap map1 = JSON.parseObject(jsonString, new TypeReference<Int2ObjectOpenHashMap<Object>>() {});
         System.out.println(map1);

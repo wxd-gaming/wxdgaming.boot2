@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.net.http;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.google.common.base.Joiner;
 
 import java.net.URLDecoder;
@@ -69,7 +69,7 @@ public class HttpDataAction {
     }
 
     public static JSONObject httpDataDecoder(String data) {
-        JSONObject jsonObject = new JSONObject(true);
+        JSONObject jsonObject = new JSONObject();
         httpDataDecoder(jsonObject, data);
         return jsonObject;
     }

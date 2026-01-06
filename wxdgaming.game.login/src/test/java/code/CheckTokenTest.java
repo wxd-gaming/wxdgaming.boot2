@@ -1,6 +1,6 @@
 package code;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import wxdgaming.boot2.core.collection.MapOf;

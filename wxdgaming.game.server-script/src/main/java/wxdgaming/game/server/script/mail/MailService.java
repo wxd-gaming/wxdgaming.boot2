@@ -1,6 +1,6 @@
 package wxdgaming.game.server.script.mail;
 
-import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson2.TypeReference;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;

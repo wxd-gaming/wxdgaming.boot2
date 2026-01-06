@@ -1,6 +1,6 @@
 package wxdgaming.boot2.core.collection.ints;
 
-import com.alibaba.fastjson.annotation.JSONType;
+import com.alibaba.fastjson2.annotation.JSONType;
 import lombok.Getter;
 import lombok.Setter;
 import wxdgaming.boot2.core.lang.ObjectBase;

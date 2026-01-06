@@ -183,7 +183,7 @@ public class ExcelRepository {
                 for (int rowIndex = 5; rowIndex <= lastRowNum; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
                     if (row == null) continue;
-                    RowData rowData = new RowData(true);
+                    RowData rowData = new RowData();
                     for (int cellIndex = 0; cellIndex < lastCellNum; cellIndex++) {
                         CellInfo cellInfo = tableData.getCellInfo4IndexMap().get(cellIndex);
                         if (cellInfo == null) continue;

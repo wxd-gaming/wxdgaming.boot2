@@ -1,6 +1,6 @@
 package wxdgaming.logserver.plugin.impl;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
@@ -43,7 +43,7 @@ public class StatsPlugin extends AbstractPlugin {
                 int registerRoleCount = registerRoleCount(sqlDataHelper, dataKey);
                 int registerAccountCount = registerAccountCount(sqlDataHelper, dataKey);
                 int activeAccountCount = activeAccountCount(sqlDataHelper, dataKey);
-                JSONObject jsonObject = new JSONObject(true);
+                JSONObject jsonObject = new JSONObject();
                 jsonObject.put("registerAccountCount", registerAccountCount);
                 jsonObject.put("registerRoleCount", registerRoleCount);
                 jsonObject.put("activeAccountCount", activeAccountCount);
@@ -234,7 +234,7 @@ public class StatsPlugin extends AbstractPlugin {
                 }
             }
         }
-        JSONObject integerHashMap = new JSONObject(true);
+        JSONObject integerHashMap = new JSONObject();
         for (Map.Entry<Integer, Integer> entry : treeMap.entrySet()) {
             integerHashMap.put(entry.getKey() + "m", entry.getValue());
         }

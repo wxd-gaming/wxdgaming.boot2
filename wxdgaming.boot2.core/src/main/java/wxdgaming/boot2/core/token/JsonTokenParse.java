@@ -1,13 +1,12 @@
 package wxdgaming.boot2.core.token;
 
+import com.alibaba.fastjson2.JSONWriter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.util.AesUtil;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.core.util.Base64Util;
 import wxdgaming.boot2.core.util.Md5Util;
-
-import java.util.Objects;
 
 /**
  * 构建器
@@ -23,10 +22,12 @@ public class JsonTokenParse {
         token = Base64Util.decode(token);
         JsonToken jsonToken = FastJsonUtil.parse(token, JsonToken.class);
         AssertUtil.isTrue(jsonToken.getExpire() > System.currentTimeMillis(), "token已过期");
-        String string = jsonToken.getData().toString(FastJsonUtil.Writer_Features);
+        String string = jsonToken.getData().toString(JSONWriter.Feature.SortMapEntriesByKeys);
         String join = String.join("#", string, key);
-        log.debug("md5join: {}", join);
-        AssertUtil.isTrue(!Objects.equals(Md5Util.md5(join), jsonToken.getSignature()), "token错误");
+        String selfSign = Md5Util.md5(join);
+        String targetSign = jsonToken.getSignature();
+        log.debug("md5join: {}, selfSign={}, targetSign={}", join, selfSign, targetSign);
+        AssertUtil.isEquals(selfSign, targetSign, "token 错误");
         return jsonToken;
     }
 

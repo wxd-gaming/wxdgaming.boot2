@@ -1,6 +1,6 @@
 package wxdgaming.boot2.core.format.data;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
 /**

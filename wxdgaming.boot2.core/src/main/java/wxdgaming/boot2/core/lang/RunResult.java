@@ -1,6 +1,6 @@
 package wxdgaming.boot2.core.lang;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
 import java.util.Collections;
@@ -35,7 +35,7 @@ public class RunResult extends JSONObject {
     }
 
     public RunResult() {
-        super(true);
+        super();
     }
 
     public RunResult(Map<String, Object> map) {
@@ -100,8 +100,8 @@ public class RunResult extends JSONObject {
         return this;
     }
 
-    @Override public RunResult fluentPutAll(Map<? extends String, ?> m) {
-        super.fluentPutAll(m);
+    public RunResult fluentPutAll(Map<? extends String, ?> m) {
+        super.putAll(m);
         return this;
     }
 }

@@ -1,8 +1,7 @@
 package code;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.parser.Feature;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONReader;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.Getter;
@@ -27,7 +26,7 @@ public class FastJsonTypeStringTest {
     public void e1(){
         System.out.println(FastJsonUtil.toJSONString(TaskType.Main));
         System.out.println(TaskType.valueOf(TaskType.Main.name()));
-        TaskType taskType = JSON.parseObject(String.valueOf("Main"), TaskType.class, Feature.SupportAutoType,Feature.ErrorOnEnumNotMatch);
+        TaskType taskType = FastJsonUtil.parse("\"Main\"", TaskType.class, JSONReader.Feature.ErrorOnEnumNotMatch);
         System.out.println(taskType);
     }
 
@@ -40,11 +39,12 @@ public class FastJsonTypeStringTest {
         player.setExp(100);
         RoleEntity roleEntity = new RoleEntity().setUid(1).setPlayer(player);
         roleEntity.saveRefresh();
-        String jsonStringAllAsString = FastJsonUtil.toJSONStringWriteTypeAllAsString(roleEntity);
+        String jsonStringAllAsString = FastJsonUtil.toJSONStringAsWriteType(roleEntity);
         System.out.println(jsonStringAllAsString);
 
         RoleEntity parse = FastJsonUtil.parse(jsonStringAllAsString, RoleEntity.class);
-        System.out.println(parse);
+        System.out.println(parse.toString());
+        System.out.println(FastJsonUtil.toJSONStringAsWriteType(parse));
     }
 
     @Test
@@ -54,16 +54,15 @@ public class FastJsonTypeStringTest {
         globalDataEntity.setSid(1);
         globalDataEntity.setData(new YunyingData());
 
-        System.out.println(FastJsonUtil.toJSONString(globalDataEntity, FastJsonUtil.Writer_Features_Type_Name));
-        System.out.println(FastJsonUtil.toJSONString(globalDataEntity, FastJsonUtil.Writer_Features_Type_Name_NOT_ROOT));
-        System.out.println(FastJsonUtil.toJSONString(globalDataEntity, FastJsonUtil.Writer_Type_Name_Features_K_V_String));
+        System.out.println(FastJsonUtil.toJSONStringAsWriteType(globalDataEntity));
+        System.out.println(FastJsonUtil.toJSONStringWriteTypeAllAsString(globalDataEntity));
     }
 
     @Test
     public void t3() {
         HashMap<Integer, ArrayList<Integer>> map = new HashMap<>();
         map.put(1, Lists.newArrayList(1));
-        System.out.println(FastJsonUtil.toJSONString(map, FastJsonUtil.Writer_Type_Name_Features_K_V_String));
+        System.out.println(FastJsonUtil.toJSONStringWriteTypeAllAsString(map));
     }
 
     @Test
@@ -72,8 +71,8 @@ public class FastJsonTypeStringTest {
         taskPack.getTaskFinishList().put(TaskType.Main, Lists.newArrayList(1, 2, 3));
         taskPack.getTasks().put(TaskType.Main, 1, new TaskInfo().setCfgId(1));
         System.out.println(JSON.toJSONString(taskPack));
-        System.out.println(FastJsonUtil.toJSONString(taskPack, new SerializerFeature[0]));
-        System.out.println(taskPack.toString());
+        System.out.println(FastJsonUtil.toJSONString(taskPack));
+        System.out.println(taskPack);
         String jsonString = FastJsonUtil.toJsonFmtWriteType(taskPack);
         System.out.println(jsonString);
         TaskPack parse = FastJsonUtil.parse(jsonString, TaskPack.class);
@@ -88,12 +87,12 @@ public class FastJsonTypeStringTest {
         pack.intIntObjectTable.put(1, 1, 1);
         pack.table.put(1, value);
         System.out.println(JSON.toJSONString(pack));
-        System.out.println(FastJsonUtil.toJSONString(pack, new SerializerFeature[0]));
-        System.out.println(pack.toString());
-        String jsonString = FastJsonUtil.toJSONString(pack, FastJsonUtil.Writer_Type_Name_Features_K_V_String);
+        System.out.println(FastJsonUtil.toJSONString(pack));
+        System.out.println(pack);
+        String jsonString = FastJsonUtil.toJSONStringAsWriteType(pack);
         System.out.println(jsonString);
-        Pack parse = FastJsonUtil.parse(jsonString, Pack.class);
-        System.out.println(parse.toString());
+        Pack parse = FastJsonUtil.parseSupportAutoType(jsonString, Pack.class);
+        System.out.println(parse.toJSONStringAsWriteType());
     }
 
     @Getter

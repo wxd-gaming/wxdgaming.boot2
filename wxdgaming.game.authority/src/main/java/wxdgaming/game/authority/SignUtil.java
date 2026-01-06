@@ -1,5 +1,6 @@
 package wxdgaming.game.authority;
 
+import com.alibaba.fastjson2.JSONWriter;
 import com.google.common.base.Joiner;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.json.FastJsonUtil;
@@ -30,7 +31,7 @@ public class SignUtil {
         if (data instanceof String s) {
             dataString = s;
         } else {
-            dataString = FastJsonUtil.toJSONString(data, FastJsonUtil.Writer_Features_Sort);
+            dataString = FastJsonUtil.toJSONString(data, JSONWriter.Feature.SortMapEntriesByKeys);
         }
         String string = dataString + key;
         String sign = Md5Util.md5(string);

@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.excel;
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.format.TableFormatter;

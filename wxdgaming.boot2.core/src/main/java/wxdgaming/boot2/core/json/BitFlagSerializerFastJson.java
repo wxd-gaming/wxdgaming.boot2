@@ -1,45 +1,32 @@
 package wxdgaming.boot2.core.json;
 
-import com.alibaba.fastjson.parser.DefaultJSONParser;
-import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
-import com.alibaba.fastjson.serializer.JSONSerializer;
-import com.alibaba.fastjson.serializer.ObjectSerializer;
+import com.alibaba.fastjson2.JSONReader;
+import com.alibaba.fastjson2.JSONWriter;
+import com.alibaba.fastjson2.reader.ObjectReader;
+import com.alibaba.fastjson2.writer.ObjectWriter;
 import wxdgaming.boot2.core.lang.bit.BitFlag;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2022-04-21 10:11
  **/
-public class BitFlagSerializerFastJson implements ObjectSerializer, ObjectDeserializer {
+public class BitFlagSerializerFastJson implements ObjectWriter<BitFlag>, ObjectReader<BitFlag> {
 
     public static final BitFlagSerializerFastJson default_instance = new BitFlagSerializerFastJson();
 
-    @Override
-    public void write(JSONSerializer serializer,
-                      Object object,
-                      Object fieldName,
-                      Type fieldType,
-                      int features) throws IOException {
-        BitFlag bitFlag = (BitFlag) object;
-        serializer.write(bitFlag.getLongs());
-    }
-
-    /** 由于集合序列化后为子类,再进行反序列化时,无法还原原对象,需要修改反序列化方法,手动修改反序列化逻辑 */
-    @Override
-    public Object deserialze(DefaultJSONParser parser, Type type, Object fieldName) {
-        long[] ls = parser.parseObject(long[].class);
-        return new BitFlag(ls);
-    }
-
-    @Override
-    public int getFastMatchToken() {
+    @Override public long getFeatures() {
         return 0;
     }
 
-    @Override public long getFeatures() {
-        return ObjectSerializer.super.getFeatures();
+    @Override public void write(JSONWriter jsonWriter, Object object, Object fieldName, Type fieldType, long features) {
+        jsonWriter.writeInt64(((BitFlag) object).getLongs());
+    }
+
+    @Override
+    public BitFlag readObject(JSONReader jsonReader, Type fieldType, Object fieldName, long features) {
+        long[] ls = jsonReader.read(long[].class);
+        return new BitFlag(ls);
     }
 }

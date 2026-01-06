@@ -1,6 +1,6 @@
 package wxdgaming.game.server.script.gm.impl;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson2.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.game.message.task.ResUpdateTaskList;

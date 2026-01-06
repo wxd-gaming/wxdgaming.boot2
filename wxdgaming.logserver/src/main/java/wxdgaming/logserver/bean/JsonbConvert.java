@@ -1,6 +1,6 @@
 package wxdgaming.logserver.bean;
 
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson2.JSONWriter;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.starter.batis.convert.AbstractConverter;
 
@@ -15,7 +15,7 @@ import java.lang.reflect.Type;
 public class JsonbConvert extends AbstractConverter<Object, String> {
 
     @Override public String toDb(Object o) {
-        return FastJsonUtil.toJSONString(o, SerializerFeature.SortField, SerializerFeature.MapSortField, SerializerFeature.WriteNonStringKeyAsString);
+        return FastJsonUtil.toJSONString(o, JSONWriter.Feature.SortMapEntriesByKeys, JSONWriter.Feature.WriteNonStringKeyAsString);
     }
 
     @Override public Object fromDb(Type type, String json) {

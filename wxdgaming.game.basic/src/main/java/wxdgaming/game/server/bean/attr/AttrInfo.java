@@ -1,7 +1,7 @@
 package wxdgaming.game.server.bean.attr;
 
 
-import com.alibaba.fastjson.annotation.JSONType;
+import com.alibaba.fastjson2.annotation.JSONType;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
 import java.util.HashMap;

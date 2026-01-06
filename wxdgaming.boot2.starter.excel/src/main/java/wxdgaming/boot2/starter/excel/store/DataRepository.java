@@ -39,9 +39,14 @@ public class DataRepository {
     private final DataRepositoryProperties dataRepositoryProperties;
 
     public DataRepository(DataRepositoryProperties dataRepositoryProperties) {
-        this.dataRepositoryProperties = dataRepositoryProperties;
-        loadAll();
-        Lazy.ins = this;
+        try {
+            this.dataRepositoryProperties = dataRepositoryProperties;
+            loadAll();
+            Lazy.ins = this;
+        } catch (Exception e) {
+            log.error("数据仓库异常：{}", ExceptionUtils.getStackTrace(e));
+            throw new RuntimeException(e);
+        }
     }
 
     @SuppressWarnings("unchecked")

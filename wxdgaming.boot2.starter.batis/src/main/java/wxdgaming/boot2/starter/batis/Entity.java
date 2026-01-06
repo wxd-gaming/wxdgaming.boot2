@@ -1,12 +1,12 @@
 package wxdgaming.boot2.starter.batis;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson2.JSONWriter;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
-import wxdgaming.boot2.core.util.PatternUtil;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.ObjectBase;
+import wxdgaming.boot2.core.util.PatternUtil;
 import wxdgaming.boot2.starter.batis.ann.DbColumn;
 
 /**
@@ -30,8 +30,7 @@ public abstract class Entity extends ObjectBase {
     public boolean checkHashCode() {
         String jsonString = FastJsonUtil.toJSONString(
                 this,
-                SerializerFeature.SortField,   /*排序*/
-                SerializerFeature.MapSortField
+                JSONWriter.Feature.SortMapEntriesByKeys   /*排序*/
         );
         int hashcode = PatternUtil.hashcode(jsonString);
         if (hashcode != oldHashCode) {

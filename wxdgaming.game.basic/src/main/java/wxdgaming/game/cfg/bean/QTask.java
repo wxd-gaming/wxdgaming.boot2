@@ -1,7 +1,7 @@
 package wxdgaming.game.cfg.bean;
 
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Getter;
 import org.apache.logging.log4j.message.ParameterizedMessage;
 import wxdgaming.boot2.core.lang.condition.Condition;

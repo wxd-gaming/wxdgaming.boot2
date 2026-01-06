@@ -1,12 +1,10 @@
 package wxdgaming.boot2.core.json;
 
-import com.alibaba.fastjson.parser.DefaultJSONParser;
-import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
-import com.alibaba.fastjson.serializer.JSONSerializer;
-import com.alibaba.fastjson.serializer.ObjectSerializer;
+import com.alibaba.fastjson2.JSONReader;
 import com.alibaba.fastjson2.JSONWriter;
+import com.alibaba.fastjson2.reader.ObjectReader;
+import com.alibaba.fastjson2.writer.ObjectWriter;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
@@ -15,32 +13,24 @@ import java.lang.reflect.Type;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-05-08 15:24
  **/
-public class LongSerializerFastJson implements ObjectSerializer, ObjectDeserializer {
+public class LongSerializerFastJson implements ObjectWriter<Long>, ObjectReader<Long> {
 
     public static final LongSerializerFastJson default_instance = new LongSerializerFastJson();
 
-    @Override public Long deserialze(DefaultJSONParser parser, Type type, Object fieldName) {
-        Object parse = parser.parse();
+    @Override public Long readObject(JSONReader jsonReader, Type type, Object o, long l) {
+        Object parse = jsonReader.readAny();
         if (parse instanceof Long) {
             return (Long) parse;
         }
         return Long.parseLong(parse.toString());
     }
 
-    @Override public void write(JSONWriter jsonWriter, Object object) {
-        ObjectSerializer.super.write(jsonWriter, object);
-    }
-
-    @Override public void writeJSONB(JSONWriter jsonWriter, Object object, Object fieldName, Type fieldType, long features) {
-        ObjectSerializer.super.writeJSONB(jsonWriter, object, fieldName, fieldType, features);
-    }
-
-    @Override public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType, int features) throws IOException {
+    @Override public void write(JSONWriter jsonWriter, Object object, Object fieldName, Type fieldType, long features) {
         long v = (Long) object;
-        serializer.writeLong(v);
+        jsonWriter.writeInt64(v);
     }
 
     @Override public long getFeatures() {
-        return ObjectSerializer.super.getFeatures();
+        return 0;
     }
 }

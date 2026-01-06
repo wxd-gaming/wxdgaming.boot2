@@ -1,7 +1,7 @@
 package wxdgaming.boot2.starter.excel.store;
 
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.util.PatternUtil;

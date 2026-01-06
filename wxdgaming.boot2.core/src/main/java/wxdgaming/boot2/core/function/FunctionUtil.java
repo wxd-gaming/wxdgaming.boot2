@@ -1,6 +1,6 @@
 package wxdgaming.boot2.core.function;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson2.JSONArray;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;

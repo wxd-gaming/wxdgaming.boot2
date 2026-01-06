@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.token;
 
+import com.alibaba.fastjson2.JSONWriter;
 import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.util.AesUtil;
@@ -80,7 +81,7 @@ public class JsonTokenBuilder {
 
     /** 生成加密字符串 */
     public String compact() {
-        String dataString = jsonToken.getData().toString(FastJsonUtil.Writer_Features);
+        String dataString = jsonToken.getData().toString(JSONWriter.Feature.SortMapEntriesByKeys);
         String join = String.join("#", dataString, key);
         log.debug("md5join: {}", join);
         jsonToken.setSignature(Md5Util.md5(join));

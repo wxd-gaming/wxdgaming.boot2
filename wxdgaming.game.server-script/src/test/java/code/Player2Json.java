@@ -1,8 +1,8 @@
 package code;
 
-import com.alibaba.fastjson.TypeReference;
-import com.alibaba.fastjson.annotation.JSONType;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson2.JSONWriter;
+import com.alibaba.fastjson2.TypeReference;
+import com.alibaba.fastjson2.annotation.JSONType;
 import com.google.common.collect.HashBasedTable;
 import lombok.Getter;
 import lombok.Setter;
@@ -45,7 +45,7 @@ public class Player2Json {
         String jsonStringAsWriteType = FastJsonUtil.toJSONStringAsWriteType(roleEntity);
         RoleEntity parse = FastJsonUtil.parse(jsonStringAsWriteType, RoleEntity.class);
         System.out.println(jsonStringAsWriteType);
-        System.out.println(FastJsonUtil.toJSONString(roleEntity, SerializerFeature.SortField, SerializerFeature.MapSortField, SerializerFeature.WriteClassName));
+        System.out.println(FastJsonUtil.toJSONString(roleEntity, JSONWriter.Feature.SortMapEntriesByKeys, JSONWriter.Feature.WriteClassName));
         boolean b = roleEntity.checkHashCode();
     }
 

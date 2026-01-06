@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.net;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.google.common.base.Joiner;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;

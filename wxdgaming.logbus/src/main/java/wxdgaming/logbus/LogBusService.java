@@ -1,7 +1,7 @@
 package wxdgaming.logbus;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.event.EventListener;
@@ -186,8 +186,8 @@ public class LogBusService implements InitPrint {
             while (!tmpLogEntities.isEmpty()) {
                 List<LogEntity> logEntities1 = tmpLogEntities.removeFirst();
                 try {
-                    Path path = Path.of(logBusProperties.getFilePath(), type, "log_" + RandomStringUtils.random(8, true, true) + "_" + System.nanoTime() + ".dat");
-                    FileWriteUtil.writeString(path.toFile(), JSON.toJSONString(logEntities1, SerializerFeature.MapSortField, SerializerFeature.SortField));
+                    Path path = Path.of(logBusProperties.getFilePath(), type, "log_" + RandomStringUtils.secureStrong().next(8, true, true) + "_" + System.nanoTime() + ".dat");
+                    FileWriteUtil.writeString(path.toFile(), JSON.toJSONString(logEntities1, JSONWriter.Feature.SortMapEntriesByKeys));
                 } catch (Exception e) {
                     log.error("LogBusService error", e);
                 }

@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.batis.sql;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -119,7 +119,7 @@ public class SqlQueryResult implements AutoCloseable {
 
     public JSONObject row() {
         try {
-            JSONObject jsonObject = new JSONObject(true);
+            JSONObject jsonObject = new JSONObject();
             for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
                 jsonObject.put(resultSet.getMetaData().getColumnName(i), resultSet.getObject(i));
             }

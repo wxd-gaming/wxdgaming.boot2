@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.batis.sql.mysql;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

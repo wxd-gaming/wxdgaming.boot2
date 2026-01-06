@@ -1,7 +1,7 @@
 package wxdgaming.logserver.module.logs;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -141,7 +141,7 @@ public class LogService implements InitPrint {
 
         List<JSONObject> list = logMappingInfo.getFieldList().stream()
                 .map(logField -> {
-                    JSONObject jsonObject = MapOf.newJSONObjectLinked();
+                    JSONObject jsonObject = MapOf.newJSONObject();
                     jsonObject.put("name", logField.getFieldName());
                     jsonObject.put("comment", logField.getFieldComment());
                     String fieldHtmlStyle = logField.getFieldHtmlStyle();

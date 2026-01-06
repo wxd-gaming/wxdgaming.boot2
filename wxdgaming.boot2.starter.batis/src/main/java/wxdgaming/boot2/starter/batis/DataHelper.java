@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.batis;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.event.EventListener;

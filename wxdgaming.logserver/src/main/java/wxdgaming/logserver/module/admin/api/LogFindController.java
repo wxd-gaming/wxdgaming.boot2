@@ -1,6 +1,6 @@
 package wxdgaming.logserver.module.admin.api;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -69,7 +69,7 @@ public class LogFindController extends HoldApplicationContext implements InitPri
         int registerRoleCount = statsPlugin.registerRoleCount(sqlDataHelper, dataKey);
         int registerAccountCount = statsPlugin.registerAccountCount(sqlDataHelper, dataKey);
         int activeAccountCount = statsPlugin.activeAccountCount(sqlDataHelper, dataKey);
-        JSONObject jsonObject = new JSONObject(true);
+        JSONObject jsonObject = new JSONObject();
         jsonObject.put("registerAccountCount", registerAccountCount);
         jsonObject.put("registerRoleCount", registerRoleCount);
         jsonObject.put("activeAccountCount", activeAccountCount);
@@ -133,7 +133,7 @@ public class LogFindController extends HoldApplicationContext implements InitPri
         Path yyyyMmDdHhMmSsSss = Path.of("./target/out/" + fileName);
         WriteExcel writeExcel = new WriteExcel(yyyyMmDdHhMmSsSss);
         writeExcel.createSheet(logMappingInfo.getLogComment());
-        JSONObject fieldComment = new JSONObject(true);
+        JSONObject fieldComment = new JSONObject();
         for (LogField logField : logMappingInfo.getFieldList()) {
             writeExcel.addTitle(logField.getFieldName());
             fieldComment.put(logField.getFieldName(), logField.getFieldComment());

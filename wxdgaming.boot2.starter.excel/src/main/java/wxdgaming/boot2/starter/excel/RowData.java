@@ -1,6 +1,6 @@
 package wxdgaming.boot2.starter.excel;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.util.ConvertUtil;
 
@@ -13,12 +13,8 @@ import wxdgaming.boot2.core.util.ConvertUtil;
 public class RowData extends JSONObject {
 
     public RowData() {
-        this(true);
     }
 
-    public RowData(boolean ordered) {
-        super(ordered);
-    }
 
     @Override public String getString(String key) {
         Object object = super.get(key);
