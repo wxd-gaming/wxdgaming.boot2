@@ -1,7 +1,9 @@
 package wxdgaming.boot2.core.assist;
 
+import javassist.ClassClassPath;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.support.AopUtils;
 
 import java.lang.reflect.Method;
 
@@ -57,6 +59,9 @@ public class JavassistProxy {
                 invokeClass.getClassLoader(),
                 invokeClass.getName() + "$" + method.getName()
         );
+        javaAssist.getClassPool().appendClassPath(new ClassClassPath(invokeClass));
+        Class<?> targetClass = AopUtils.getTargetClass(invokeInstance);
+        javaAssist.getClassPool().appendClassPath(new ClassClassPath(targetClass));
         javaAssist.createMethod(methodBody);
         if (log.isDebugEnabled()) {
             javaAssist.writeFile("target/bin");

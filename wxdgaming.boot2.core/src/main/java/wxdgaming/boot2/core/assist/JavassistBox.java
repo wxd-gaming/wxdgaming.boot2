@@ -33,11 +33,12 @@ public class JavassistBox {
     }
 
     public ClassPool build(ClassLoader classLoader) {
-        final ClassPool classPool = new ClassPool(null);
+        final ClassPool classPool = new ClassPool(true);
         classPool.appendSystemPath();
         try {
             classPool.insertClassPath("./class");
             classPool.appendClassPath(new LoaderClassPath(classLoader));
+            classPool.appendClassPath(new ClassClassPath(this.getClass()));
         } catch (Exception e) {
             e.printStackTrace();
         }

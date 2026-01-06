@@ -32,12 +32,14 @@ public class InstanceMethodProvider implements Comparable<InstanceMethodProvider
 
     public Object invoke(Object... args) {
         try {
-            if (invokeCount.get() >= 10) {
+            /* TODO spring aop 开启之后字节码增强会失效，无法创建字节码代理 */
+            /* if (invokeCount.get() >= 10) {
                 if (javassistProxy == null) {
                     javassistProxy = JavassistProxy.of(instance, method);
                 }
                 return javassistProxy.proxyInvoke(args);
-            } else {
+            } else */
+            {
                 invokeCount.incrementAndGet();
                 return method.invoke(instance, args);
             }
