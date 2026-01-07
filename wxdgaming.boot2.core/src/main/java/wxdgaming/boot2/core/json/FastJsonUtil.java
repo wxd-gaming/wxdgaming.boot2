@@ -4,10 +4,7 @@ import com.alibaba.fastjson2.*;
 import wxdgaming.boot2.core.function.SLFunction1;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -15,6 +12,36 @@ import java.util.function.Supplier;
  * @version 2022-04-21 10:09
  **/
 public class FastJsonUtil {
+
+    public static final class AutoTypeBeforeHandlerImpl implements JSONReader.AutoTypeBeforeHandler {
+
+        private static final AutoTypeBeforeHandlerImpl INSTANCE = new AutoTypeBeforeHandlerImpl();
+
+        public static AutoTypeBeforeHandlerImpl getInstance() {
+            return INSTANCE;
+        }
+
+        public final HashSet<String> PACKAGE_PREFIX = new HashSet<>();
+
+        private AutoTypeBeforeHandlerImpl() {
+            PACKAGE_PREFIX.add(Set.class.getPackageName());
+            PACKAGE_PREFIX.add(List.class.getPackageName());
+            PACKAGE_PREFIX.add(Map.class.getPackageName());
+            PACKAGE_PREFIX.add("wxdgaming.");
+        }
+
+        @Override
+        public Class<?> apply(String typeName, Class<?> expectClass, long features) {
+            if (PACKAGE_PREFIX.stream().anyMatch(typeName::startsWith)) {
+                try {
+                    return Class.forName(typeName);
+                } catch (ClassNotFoundException e) {
+                    throw new JSONException("Class not found: " + typeName);
+                }
+            }
+            throw new JSONException("Unauthorized class: " + typeName);
+        }
+    }
 
 
     /** 一般是js用的，所有 key 值都是字符串 格式化 */
