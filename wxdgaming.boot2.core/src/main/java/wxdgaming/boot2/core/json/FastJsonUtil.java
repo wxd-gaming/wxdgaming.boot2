@@ -178,14 +178,17 @@ public class FastJsonUtil {
         return JSON.parseObject(str, tTypeReference, features);
     }
 
+    /** 反序列化会使用自动类型推动 */
     public static <T> T parseSupportAutoType(String str, Class<T> clazz) {
         return JSON.parseObject(str, clazz, AutoTypeBeforeHandlerImpl.getInstance());
     }
 
+    /** 反序列化会使用自动类型推动 */
     public static <T> T parseSupportAutoType(String str, Type clazz) {
         return JSON.parseObject(str, clazz, AutoTypeBeforeHandlerImpl.getInstance());
     }
 
+    /** 反序列化会使用自动类型推动 */
     public static <T> T parseSupportAutoType(String str, TypeReference<T> tTypeReference) {
         return JSON.parseObject(str, tTypeReference, AutoTypeBeforeHandlerImpl.getInstance());
     }
