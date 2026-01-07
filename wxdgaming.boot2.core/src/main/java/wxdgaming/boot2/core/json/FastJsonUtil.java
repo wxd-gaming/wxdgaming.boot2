@@ -149,12 +149,12 @@ public class FastJsonUtil {
 
     /** 自带类型推断 */
     public static <T> T parseSupportAutoType(byte[] bytes, Class<T> clazz) {
-        return JSON.parseObject(bytes, clazz, JSONReader.Feature.SupportAutoType);
+        return JSON.parseObject(bytes, clazz, AutoTypeBeforeHandlerImpl.getInstance());
     }
 
     /** 自带类型推断 */
     public static <T> T parseSupportAutoType(byte[] bytes, Type clazz) {
-        return JSON.parseObject(bytes, clazz, JSONReader.Feature.SupportAutoType);
+        return JSON.parseObject(bytes, clazz, AutoTypeBeforeHandlerImpl.getInstance());
     }
 
     public static <T, F> T parse(String str, SLFunction1<F, ?> function) {
@@ -179,15 +179,15 @@ public class FastJsonUtil {
     }
 
     public static <T> T parseSupportAutoType(String str, Class<T> clazz) {
-        return JSON.parseObject(str, clazz, JSONReader.Feature.SupportAutoType);
+        return JSON.parseObject(str, clazz, AutoTypeBeforeHandlerImpl.getInstance());
     }
 
     public static <T> T parseSupportAutoType(String str, Type clazz) {
-        return JSON.parseObject(str, clazz, JSONReader.Feature.SupportAutoType);
+        return JSON.parseObject(str, clazz, AutoTypeBeforeHandlerImpl.getInstance());
     }
 
     public static <T> T parseSupportAutoType(String str, TypeReference<T> tTypeReference) {
-        return JSON.parseObject(str, tTypeReference, JSONReader.Feature.SupportAutoType);
+        return JSON.parseObject(str, tTypeReference, AutoTypeBeforeHandlerImpl.getInstance());
     }
 
     /**
