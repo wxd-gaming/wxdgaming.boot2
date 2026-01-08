@@ -11,9 +11,6 @@
           </option>
           <option name="goals">
             <list>
-              <option value="-T" />
-              <option value="1C" />
-              <option value="-o" />
               <option value="clean" />
               <option value="package" />
               <option value="install" />
