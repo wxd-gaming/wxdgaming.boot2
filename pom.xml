@@ -12,7 +12,7 @@
     </parent>
 
 
-    <groupId>io.github.wuxindao</groupId>
+    <groupId>io.github.wxd-gaming</groupId>
     <artifactId>wxdgaming.boot2</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
@@ -48,11 +48,11 @@
     <!-- 仓库中心地址 -->
     <distributionManagement>
         <snapshotRepository>
-            <id>ossrh</id>
+            <id>s01</id>
             <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
-            <id>ossrh</id>
+            <id>s01</id>
             <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
@@ -450,10 +450,10 @@
                 <plugin>
                     <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>1.6.13</version>
+                    <version>1.7.0</version>
                     <extensions>true</extensions>
                     <configuration>
-                        <serverId>ossrh</serverId>
+                        <serverId>s01</serverId>
                         <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
                         <autoReleaseAfterClose>true</autoReleaseAfterClose>
                     </configuration>
@@ -503,16 +503,21 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- Nexus Staging -->
+            <!-- 核心发布插件配置（1.7.0版本） -->
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.7.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <serverId>ossrh</serverId>
+                    <!-- 必须和settings.xml的server.id一致 -->
+                    <serverId>s01</serverId>
+                    <!-- 完整的nexus地址（带协议） -->
                     <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    <!-- 关闭自动发布（先手动验证） -->
+                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                    <!-- 可选：跳过签名检查（避免干扰） -->
+                    <skipStagingRepositoryClose>false</skipStagingRepositoryClose>
                 </configuration>
             </plugin>
             <plugin>
