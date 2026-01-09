@@ -26,24 +26,70 @@ public class GroovyService extends HoldApplicationContext {
     final ConcurrentHashMap<String, GroovyHandler> handlerCaches = new ConcurrentHashMap<>();
     final ConcurrentHashMap<String, Script> scriptCaches = new ConcurrentHashMap<>();
 
+    /**
+     * 执行并返回结果
+     *
+     * @param script 脚本源码
+     * @return 执行后的返回值
+     */
     public Object evaluate(String script) {
         return shell.evaluate(script);
     }
 
+    /**
+     * 从指定目录加载文件并且执行
+     *
+     * @param path 目录
+     * @return 执行后的返回值
+     */
+    public Object evaluateByResource(String path) {
+        String script = FileReadUtil.readString(path, StandardCharsets.UTF_8);
+        return shell.evaluate(script);
+    }
+
+    /**
+     * 从指定目录加载文件并且执行，主要这里会缓存加载的脚本
+     *
+     * @param path       文件目录
+     * @param methodName 需要执行的方法名
+     * @param args       方法参数
+     * @return 执行后的返回值
+     */
     public Object invokeMethodWithCacheByResource(String path, String methodName, Object... args) {
         Script script = parseScriptCacheByResource(path);
         return script.invokeMethod(methodName, args);
     }
 
-    public Script parseScriptCacheByResource(String path) {
-        return scriptCaches.computeIfAbsent(path, this::parseScriptByResource);
-    }
 
+    /**
+     * 从指定目录加载文件并且执行
+     *
+     * @param path       文件目录
+     * @param methodName 需要执行的方法名
+     * @param args       方法参数
+     * @return 执行后的返回值
+     */
     public Object invokeMethodWithByResource(String path, String methodName, Object... args) {
         Script script = parseScriptByResource(path);
         return script.invokeMethod(methodName, args);
     }
 
+    /**
+     * 根据资源读取缓存，如果缓存不存在加载一次
+     *
+     * @param path 文件目录
+     * @return script
+     */
+    public Script parseScriptCacheByResource(String path) {
+        return scriptCaches.computeIfAbsent(path, this::parseScriptByResource);
+    }
+
+    /**
+     * 根据资源读取加载成脚本
+     *
+     * @param path 文件目录
+     * @return script
+     */
     public Script parseScriptByResource(String path) {
         String script = FileReadUtil.readString(path, StandardCharsets.UTF_8);
         return shell.parse(script);
