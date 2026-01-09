@@ -5,11 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.github.wxd-gaming</groupId>
-        <artifactId>wxdgaming.boot2</artifactId>
+        <artifactId>wxd-gaming.boot2</artifactId>
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>wxdgaming.boot2.starter.net.httpclient</artifactId>
+    <name>wxd-gaming.boot2.starter.net.httpclient</name>
+    <artifactId>wxd-gaming.boot2.starter.net.httpclient</artifactId>
+    <description>wxd-gaming.boot2.starter.net.httpclient</description>
 
     <dependencies>
         <dependency>
@@ -22,12 +24,12 @@
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.core</artifactId>
+            <artifactId>wxd-gaming.boot2.core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.starter.net</artifactId>
+            <artifactId>wxd-gaming.boot2.starter.net</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

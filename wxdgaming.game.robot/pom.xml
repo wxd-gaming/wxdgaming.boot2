@@ -5,42 +5,44 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.github.wxd-gaming</groupId>
-        <artifactId>wxdgaming.boot2</artifactId>
+        <artifactId>wxd-gaming.boot2</artifactId>
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>wxdgaming.game.robot</artifactId>
+    <name>wxd-gaming.game.robot</name>
+    <artifactId>wxd-gaming.game.robot</artifactId>
+    <description>wxd-gaming.game.robot</description>
 
 
     <dependencies>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.core</artifactId>
+            <artifactId>wxd-gaming.boot2.core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.starter.net.httpclient</artifactId>
+            <artifactId>wxd-gaming.boot2.starter.net.httpclient</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.starter.net.server</artifactId>
+            <artifactId>wxd-gaming.boot2.starter.net.server</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.starter.scheduled</artifactId>
+            <artifactId>wxd-gaming.boot2.starter.scheduled</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.game.basic</artifactId>
+            <artifactId>wxd-gaming.game.basic</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.starter.batis.mapdb</artifactId>
+            <artifactId>wxd-gaming.boot2.starter.batis.mapdb</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

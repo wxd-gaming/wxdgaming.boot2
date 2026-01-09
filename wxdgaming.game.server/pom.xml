@@ -5,61 +5,63 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.github.wxd-gaming</groupId>
-        <artifactId>wxdgaming.boot2</artifactId>
+        <artifactId>wxd-gaming.boot2</artifactId>
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>wxdgaming.game.server</artifactId>
+    <name>wxd-gaming.game.server</name>
+    <artifactId>wxd-gaming.game.server</artifactId>
+    <description>wxd-gaming.game.server</description>
 
     <dependencies>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.core</artifactId>
+            <artifactId>wxd-gaming.boot2.core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.starter.batis.sql.pgsql</artifactId>
+            <artifactId>wxd-gaming.boot2.starter.batis.sql.pgsql</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.starter.net.httpclient</artifactId>
+            <artifactId>wxd-gaming.boot2.starter.net.httpclient</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.starter.excel</artifactId>
+            <artifactId>wxd-gaming.boot2.starter.excel</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.starter.groovy</artifactId>
+            <artifactId>wxd-gaming.boot2.starter.groovy</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.starter.net.server</artifactId>
+            <artifactId>wxd-gaming.boot2.starter.net.server</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.starter.scheduled</artifactId>
+            <artifactId>wxd-gaming.boot2.starter.scheduled</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.game.basic</artifactId>
+            <artifactId>wxd-gaming.game.basic</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.game.authority</artifactId>
+            <artifactId>wxd-gaming.game.authority</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.starter.validation</artifactId>
+            <artifactId>wxd-gaming.boot2.starter.validation</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

@@ -5,16 +5,18 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.github.wxd-gaming</groupId>
-        <artifactId>wxdgaming.boot2</artifactId>
+        <artifactId>wxd-gaming.boot2</artifactId>
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>wxdgaming.game.server-script</artifactId>
+    <name>wxd-gaming.game.server-script</name>
+    <artifactId>wxd-gaming.game.server-script</artifactId>
+    <description>wxd-gaming.game.server-script</description>
 
     <dependencies>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.game.server</artifactId>
+            <artifactId>wxd-gaming.game.server</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

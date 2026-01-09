@@ -5,21 +5,23 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.github.wxd-gaming</groupId>
-        <artifactId>wxdgaming.boot2</artifactId>
+        <artifactId>wxd-gaming.boot2</artifactId>
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>wxdgaming.boot2.starter.batis.sql</artifactId>
+    <name>wxd-gaming.boot2.starter.batis.sql</name>
+    <artifactId>wxd-gaming.boot2.starter.batis.sql</artifactId>
+    <description>wxd-gaming.boot2.starter.batis.sql</description>
 
     <dependencies>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.core</artifactId>
+            <artifactId>wxd-gaming.boot2.core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
-            <artifactId>wxdgaming.boot2.starter.batis</artifactId>
+            <artifactId>wxd-gaming.boot2.starter.batis</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

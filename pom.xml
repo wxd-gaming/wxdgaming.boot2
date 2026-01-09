@@ -13,12 +13,12 @@
 
 
     <groupId>io.github.wxd-gaming</groupId>
-    <artifactId>wxdgaming.boot2</artifactId>
+    <artifactId>wxd-gaming.boot2</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
     <!-- 项目信息 -->
-    <name>wxdgaming.boot2</name>
+    <name>wxd-gaming.boot2</name>
     <description>spring boot game server engine,log server engine</description>
     <url>https://github.com/wxd-gaming/wxdgaming.boot2</url>
 
@@ -79,7 +79,6 @@
         <module>wxdgaming.game.robot</module>
         <module>wxdgaming.game.server</module>
         <module>wxdgaming.game.server-script</module>
-        <module>wxdgaming.kotlin.test</module>
         <module>wxdgaming.logbus</module>
         <module>wxdgaming.logserver</module>
         <module>wxdgaming.boot2.starter.batis.rocksdb</module>
@@ -471,61 +470,7 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <!-- 取消查找本项目下的Main方法：为了解决Unable to find main class的问题 -->
-                    <mainClass>none</mainClass>
-                    <!-- 解决maven-plugin插件打的Jar包可以运行，但依赖方打包找不到此模块中的类或属性的问题(程序包xxx不存在) -->
-                    <classifier>execute</classifier>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+
         </plugins>
         <resources>
             <resource>
@@ -570,6 +515,106 @@
                 <db-user>postgres</db-user>
                 <db-pwd>test</db-pwd>
             </properties>
+        </profile>
+        <profile>
+            <id>deploy</id>
+            <build>
+                <plugins>
+                    <!-- Source JAR -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Javadoc JAR -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <!-- 忽略所有错误 -->
+                            <failOnError>false</failOnError>
+
+                            <!-- 忽略特定错误 -->
+                            <additionalOptions>
+                                <additionalOption>-Xdoclint:none</additionalOption>
+                            </additionalOptions>
+
+                            <!-- 或更细粒度的控制 -->
+                            <doclint>none</doclint>
+                        </configuration>
+                    </plugin>
+                    <!-- GPG 签名 -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>s01</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-clean-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                    </plugin>
+                    <!--            <plugin>-->
+                    <!--                <groupId>org.springframework.boot</groupId>-->
+                    <!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
+                    <!--                <configuration>-->
+                    <!--                    &lt;!&ndash; 取消查找本项目下的Main方法：为了解决Unable to find main class的问题 &ndash;&gt;-->
+                    <!--                    <mainClass>none</mainClass>-->
+                    <!--                    &lt;!&ndash; 解决maven-plugin插件打的Jar包可以运行，但依赖方打包找不到此模块中的类或属性的问题(程序包xxx不存在) &ndash;&gt;-->
+                    <!--                    <classifier>execute</classifier>-->
+                    <!--                    <excludes>-->
+                    <!--                        <exclude>-->
+                    <!--                            <groupId>org.projectlombok</groupId>-->
+                    <!--                            <artifactId>lombok</artifactId>-->
+                    <!--                        </exclude>-->
+                    <!--                    </excludes>-->
+                    <!--                </configuration>-->
+                    <!--                <executions>-->
+                    <!--                    <execution>-->
+                    <!--                        <goals>-->
+                    <!--                            <goal>repackage</goal>-->
+                    <!--                        </goals>-->
+                    <!--                    </execution>-->
+                    <!--                </executions>-->
+                    <!--            </plugin>-->
+                </plugins>
+            </build>
         </profile>
     </profiles>
 

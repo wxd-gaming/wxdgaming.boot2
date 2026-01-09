@@ -5,11 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.github.wxd-gaming</groupId>
-        <artifactId>wxdgaming.boot2</artifactId>
+        <artifactId>wxd-gaming.boot2</artifactId>
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>wxdgaming.boot2.core</artifactId>
+    <name>wxd-gaming.boot2.core</name>
+    <artifactId>wxd-gaming.boot2.core</artifactId>
+    <description>wxd-gaming.boot2.core</description>
 
     <dependencies>
         <dependency>
