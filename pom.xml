@@ -471,7 +471,6 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <!-- Source JAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -484,8 +483,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- Javadoc JAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -497,47 +494,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-
-            <!-- GPG 签名 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- 核心发布插件配置（1.7.0版本） -->
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.7.0</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <!-- 必须和settings.xml的server.id一致 -->
-                    <serverId>s01</serverId>
-                    <!-- 完整的nexus地址（带协议） -->
-                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                    <!-- 关闭自动发布（先手动验证） -->
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                    <!-- 可选：跳过签名检查（避免干扰） -->
-                    <skipStagingRepositoryClose>false</skipStagingRepositoryClose>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.central</groupId>
-                <artifactId>central-publishing-maven-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <publishingServerId>s01</publishingServerId>
-                    <autoPublish>true</autoPublish>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
