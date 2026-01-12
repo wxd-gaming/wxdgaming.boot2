@@ -156,6 +156,13 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
         protoListenerFactory.dispatch(socketSession, messageId, messageBytes);
     }
 
+    /**
+     * websocket 的 text 消息
+     *
+     * @param socketSession session
+     * @param messageBytes  消息
+     * @throws Exception 异常
+     */
     protected abstract void dispatch(SocketSession socketSession, String messageBytes) throws Exception;
 
 }

@@ -2,11 +2,11 @@ package wxdgaming.boot2.starter.net.pojo;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.event.InitEvent;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.client.IClientWebSocketStringListener;
@@ -49,11 +49,25 @@ public class ProtoListenerFactory extends HoldApplicationContext {
         return protoListenerContent.messageId(pojoClass);
     }
 
-    /** 这里是由netty的work线程触发 */
+    /**
+     * 这里是由 Netty 的 work 线程触发
+     *
+     * @param socketSession session
+     * @param messageId     消息 id
+     * @param data          消息报文
+     */
     public void dispatch(SocketSession socketSession, int messageId, byte[] data) {
         dispatch(socketSession, messageId, data, null);
     }
 
+    /**
+     * 这里是由 Netty 的 work 线程触发
+     *
+     * @param socketSession session
+     * @param messageId     消息 id
+     * @param data          消息报文
+     * @param queueSupplier 队列生成器
+     */
     public void dispatch(SocketSession socketSession, int messageId, byte[] data, Supplier<String> queueSupplier) {
         ProtoMapping mapping = protoListenerContent.getMappingMap().get(messageId);
         if (mapping == null) {
