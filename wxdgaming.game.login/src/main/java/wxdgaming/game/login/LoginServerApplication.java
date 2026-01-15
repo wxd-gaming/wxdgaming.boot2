@@ -2,10 +2,9 @@ package wxdgaming.game.login;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import wxdgaming.boot2.core.ApplicationStartBuilder;
 import wxdgaming.boot2.core.CoreScan;
-import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.util.JvmUtil;
 import wxdgaming.boot2.starter.batis.mapdb.MapDBScan;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
@@ -42,8 +41,8 @@ public class LoginServerApplication {
 
     public static void main(String[] args) {
         try {
-            new SpringApplicationBuilder(LoginServerApplication.class).run(args);
-            SpringUtil.mainApplicationContextProvider
+            ApplicationStartBuilder.builder(LoginServerApplication.class)
+                    .run(args)
                     .postInitEvent()
                     .startBootstrap();
         } catch (Exception e) {

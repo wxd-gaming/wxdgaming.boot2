@@ -2,8 +2,7 @@ package wxdgaming.logserver;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import wxdgaming.boot2.core.SpringUtil;
+import wxdgaming.boot2.core.ApplicationStartBuilder;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 import wxdgaming.game.authority.AuthorityScan;
@@ -29,8 +28,8 @@ public class LogServerApplication {
     public static void main(String[] args) {
         log.info("日志中心启动中...");
         try {
-            new SpringApplicationBuilder(LogServerApplication.class).run(args);
-            SpringUtil.mainApplicationContextProvider
+            ApplicationStartBuilder.builder(LogServerApplication.class)
+                    .run(args)
                     .postInitEvent()
                     .startBootstrap();
             log.info("日志中心启动完成...");

@@ -2,6 +2,7 @@ package wxdgaming.game.robot;
 
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import wxdgaming.boot2.core.ApplicationStartBuilder;
 import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.MainApplicationContextProvider;
 import wxdgaming.boot2.core.SpringUtil;
@@ -31,11 +32,11 @@ import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 public class RobotApplication {
 
     public static void main(String[] args) {
-        MainApplicationContextProvider.builder(RobotApplication.class).web(WebApplicationType.NONE).run(args);
-
-        SpringUtil.mainApplicationContextProvider
+        ApplicationStartBuilder.builder(RobotApplication.class)
+                .web(WebApplicationType.NONE)
+                .run(args)
                 .postInitEvent()
-                .postStartEvent();
+                .startBootstrap();
 
     }
 

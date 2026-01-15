@@ -1,8 +1,6 @@
 package wxdgaming.boot2.core;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.util.JvmUtil;
 
@@ -15,11 +13,6 @@ import wxdgaming.boot2.core.util.JvmUtil;
 @Slf4j
 @Component
 public class MainApplicationContextProvider extends ApplicationContextProvider {
-
-    public static SpringApplicationBuilder builder(Class<?>... sources) {
-        Class<?>[] merge = ArrayUtils.add(sources, MainApplicationContextProvider.class);
-        return new SpringApplicationBuilder(merge);
-    }
 
     public MainApplicationContextProvider() {
         SpringUtil.mainApplicationContextProvider = this;
@@ -37,14 +30,18 @@ public class MainApplicationContextProvider extends ApplicationContextProvider {
 
     public MainApplicationContextProvider startBootstrap() {
         postStartEvent();
-        log.info("""
+        BootstrapProperties bootstrapProperties = getBean(BootstrapProperties.class);
+        log.info(
+                """
                 
-                =========================================================
+                        ========================================================================================
                 
-                                  启动完成 PID:%s
+                                          启动完成 PID:{}, sid:{}, name:{}
                 
-                =========================================================
-                """.formatted(JvmUtil.processIDString()));
+                        ========================================================================================
+                        """,
+                JvmUtil.processIDString(), bootstrapProperties.getSid(), bootstrapProperties.getName()
+        );
         return this;
     }
 

@@ -7,8 +7,8 @@ import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebAp
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import wxdgaming.boot2.core.ApplicationStartBuilder;
 import wxdgaming.boot2.core.CoreScan;
-import wxdgaming.boot2.core.MainApplicationContextProvider;
 import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
@@ -46,8 +46,7 @@ public class GameServerApplication {
 
     public static void main(String[] args) throws Exception {
         try {
-            MainApplicationContextProvider.builder(GameServerApplication.class)
-                    .run(args);
+            ApplicationStartBuilder.builder(GameServerApplication.class).run(args);
             loadScript();
             SpringUtil.mainApplicationContextProvider.startBootstrap();
         } catch (Throwable throwable) {

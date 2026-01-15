@@ -337,6 +337,7 @@ public class ReflectProvider {
                 while (entrys.hasMoreElements()) {
                     JarEntry jarEntry = entrys.nextElement();
                     entryName = jarEntry.getName();
+                    if (entryName.startsWith("META-INF/")) continue;
                     if (entryName.endsWith(".class")) {
                         if (findChild) {
                             if (!entryName.startsWith(packagePath)) {

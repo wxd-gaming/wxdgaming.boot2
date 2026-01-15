@@ -247,6 +247,14 @@ public class SpringUtil implements InitPrint {
         return childContext.getBean(ChildApplicationContextProvider.class);
     }
 
+    /**
+     * 把子容器的 controller 注入到主容器
+     *
+     * @param parent       父容器
+     * @param childContext 当前容器
+     * @param scan         扫描类
+     * @param classLoader  类加载器
+     */
     public static void newChildAfter(ConfigurableApplicationContext parent, ConfigurableApplicationContext childContext, Class<?> scan, ClassDirLoader classLoader) {
         ComponentScan annotation = scan.getAnnotation(ComponentScan.class);
         String[] packageNames = Stream.concat(Arrays.stream(annotation.value()), Arrays.stream(annotation.basePackages())).distinct().toArray(String[]::new);

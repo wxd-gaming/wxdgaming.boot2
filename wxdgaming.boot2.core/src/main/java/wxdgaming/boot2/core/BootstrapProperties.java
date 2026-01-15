@@ -23,8 +23,8 @@ public abstract class BootstrapProperties implements InitPrint {
     boolean debug;
     int gid;
     int sid;
-    List<Integer> mergedSidList = Collections.emptyList();
     String name;
+    List<Integer> mergedSidList = Collections.emptyList();
     String rpcToken = "9w283rn123r90cszh$#%^%^*&#$csf0892354";
 
 }

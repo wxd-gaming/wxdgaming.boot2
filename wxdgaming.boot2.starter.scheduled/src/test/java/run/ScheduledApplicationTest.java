@@ -2,9 +2,8 @@ package run;
 
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import wxdgaming.boot2.core.ApplicationStartBuilder;
 import wxdgaming.boot2.core.CoreScan;
-import wxdgaming.boot2.core.MainApplicationContextProvider;
-import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 
 /**
@@ -19,12 +18,11 @@ import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 public class ScheduledApplicationTest {
 
     public static void main(String[] args) {
-        MainApplicationContextProvider.builder(ScheduledApplicationTest.class)
+        ApplicationStartBuilder.builder(ScheduledApplicationTest.class)
                 .web(WebApplicationType.NONE)
-                .run(args);
-
-        SpringUtil.mainApplicationContextProvider.postInitEvent().postStartEvent();
-
+                .run(args)
+                .postInitEvent()
+                .startBootstrap();
     }
 
 }
