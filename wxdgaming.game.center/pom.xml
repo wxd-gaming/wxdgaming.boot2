@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.wxd-gaming</groupId>
+        <artifactId>wxd-gaming.boot2</artifactId>
+        <version>1.0.1</version>
+    </parent>
+
+    <name>wxd-gaming.game.center</name>
+    <artifactId>wxd-gaming.game.center</artifactId>
+    <description>中心服务，在线工具，gm工具，充值回调</description>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.wxd-gaming</groupId>
+            <artifactId>wxd-gaming.boot2.core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.wxd-gaming</groupId>
+            <artifactId>wxd-gaming.boot2.starter.net.httpclient</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.wxd-gaming</groupId>
+            <artifactId>wxd-gaming.boot2.starter.tailf</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.wxd-gaming</groupId>
+            <artifactId>wxd-gaming.boot2.starter.scheduled</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.wxd-gaming</groupId>
+            <artifactId>wxd-gaming.boot2.starter.batis.sql.pgsql</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.wxd-gaming</groupId>
+            <artifactId>wxd-gaming.game.authority</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.wxd-gaming</groupId>
+            <artifactId>wxd-gaming.game.basic</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+
+</project>

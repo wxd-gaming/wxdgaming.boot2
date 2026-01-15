@@ -61,6 +61,7 @@
         <module>wxdgaming.boot2.core</module>
         <module>wxdgaming.boot2.starter.batis</module>
         <module>wxdgaming.boot2.starter.batis.mapdb</module>
+        <module>wxdgaming.boot2.starter.batis.rocksdb</module>
         <module>wxdgaming.boot2.starter.batis.sql</module>
         <module>wxdgaming.boot2.starter.batis.sql.mysql</module>
         <module>wxdgaming.boot2.starter.batis.sql.pgsql</module>
@@ -75,13 +76,13 @@
         <module>wxdgaming.boot2.starter.validation</module>
         <module>wxdgaming.game.authority</module>
         <module>wxdgaming.game.basic</module>
+        <module>wxdgaming.game.center</module>
         <module>wxdgaming.game.login</module>
         <module>wxdgaming.game.robot</module>
         <module>wxdgaming.game.server</module>
         <module>wxdgaming.game.server-script</module>
         <module>wxdgaming.logbus</module>
         <module>wxdgaming.logserver</module>
-        <module>wxdgaming.boot2.starter.batis.rocksdb</module>
     </modules>
 
     <properties>
