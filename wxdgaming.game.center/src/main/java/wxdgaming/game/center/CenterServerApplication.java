@@ -5,13 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import wxdgaming.boot2.core.ApplicationStartBuilder;
 import wxdgaming.boot2.core.CoreScan;
+import wxdgaming.boot2.starter.batis.rocksdb.RocksDBScan;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
 import wxdgaming.boot2.starter.net.httpclient5.HttpClientScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 import wxdgaming.boot2.starter.tailf.TailfScan;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
-import wxdgaming.game.common.slog.SlogService;
-import wxdgaming.logbus.LogBusService;
 
 /**
  * 中心服务启动
@@ -27,8 +26,7 @@ import wxdgaming.logbus.LogBusService;
                 HttpClientScan.class,
                 ScheduledScan.class,
                 PgsqlScan.class,
-                SlogService.class,
-                LogBusService.class,
+                RocksDBScan.class,
                 TailfScan.class,
                 ConnectLoginProperties.class,
                 CenterServerApplication.class

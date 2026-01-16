@@ -123,7 +123,7 @@ public abstract class MessageDecode extends ChannelInboundHandlerAdapter {
             // 读取消息长度
             byteBuf.markReaderIndex();
             int len = byteBuf.readInt();
-            if (len > BytesUnit.Mb.toBytes(64)) {
+            if (len > BytesUnit.MB.toBytes(64)) {
                 log.error("消息包超大，关闭连接 {} {}", ctx, len);
                 ctx.disconnect();
                 ctx.close();

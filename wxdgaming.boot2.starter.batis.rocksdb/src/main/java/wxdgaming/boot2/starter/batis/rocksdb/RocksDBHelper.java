@@ -2,8 +2,12 @@ package wxdgaming.boot2.starter.batis.rocksdb;
 
 import com.google.common.base.Joiner;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.rocksdb.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.io.kryoPool;
 
 import java.nio.charset.StandardCharsets;
@@ -16,8 +20,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-12-18 09:38
  **/
+@Slf4j
 @Getter
-public class RocksDBHelper {
+@Service
+public class RocksDBHelper implements InitPrint {
 
     private static final kryoPool kryoPool = new kryoPool();
 
@@ -27,6 +33,12 @@ public class RocksDBHelper {
     }
 
     private final RocksDB db;
+
+    @Autowired
+    public RocksDBHelper(RocksDBProperties rocksDBProperties) {
+        this(rocksDBProperties.options(), rocksDBProperties.getPath());
+        log.debug("RocksDBHelper init: {}", rocksDBProperties.getPath());
+    }
 
     public RocksDBHelper(String dbPath) {
         this(null, dbPath);
@@ -50,6 +62,10 @@ public class RocksDBHelper {
         } catch (RocksDBException e) {
             throw ExceptionUtils.asRuntimeException(e);
         }
+    }
+
+    public boolean exits(String key) {
+        return db.keyExists(key.getBytes(StandardCharsets.UTF_8));
     }
 
     public void putMap(String key, Map<?, ?> map) {

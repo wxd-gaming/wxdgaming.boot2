@@ -37,6 +37,11 @@
         </dependency>
         <dependency>
             <groupId>io.github.wxd-gaming</groupId>
+            <artifactId>wxd-gaming.boot2.starter.batis.rocksdb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.wxd-gaming</groupId>
             <artifactId>wxd-gaming.boot2.starter.batis.sql.pgsql</artifactId>
             <version>${project.version}</version>
         </dependency>

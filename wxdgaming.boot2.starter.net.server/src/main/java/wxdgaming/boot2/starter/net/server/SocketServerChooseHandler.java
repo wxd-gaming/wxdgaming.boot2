@@ -67,7 +67,7 @@ public class SocketServerChooseHandler extends ByteToMessageDecoder {
     }
 
     public void websocketAdd(ChannelHandlerContext ctx) {
-        int maxContentLength = (int) BytesUnit.Mb.toBytes(socketServerConfig.getMaxAggregatorLength());
+        int maxContentLength = (int) BytesUnit.MB.toBytes(socketServerConfig.getMaxAggregatorLength());
         // HttpServerCodec：将请求和应答消息解码为HTTP消息
         ctx.pipeline().addBefore("device-handler", "http-codec", new HttpServerCodec());
         // 添加HTTP内容解压缩器，用于处理Gzip压缩的请求

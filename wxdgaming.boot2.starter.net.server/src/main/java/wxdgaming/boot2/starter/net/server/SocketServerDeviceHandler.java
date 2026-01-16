@@ -40,7 +40,7 @@ public class SocketServerDeviceHandler extends SocketDeviceHandler {
                 socketServerConfig.isEnabledScheduledFlush()
         );
         if (socketServerConfig.getMaxFrameBytes() >= 0) {
-            socketSession.setMaxFrameBytes(BytesUnit.Kb.toBytes(socketServerConfig.getMaxFrameBytes()));
+            socketSession.setMaxFrameBytes(BytesUnit.KB.toBytes(socketServerConfig.getMaxFrameBytes()));
         }
         socketSession.setMaxFrameLength(socketServerConfig.getMaxFrameLength());
         sessionGroup.add(socketSession);

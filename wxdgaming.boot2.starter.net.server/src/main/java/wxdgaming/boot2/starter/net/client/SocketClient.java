@@ -72,7 +72,7 @@ public class SocketClient {
                 null,
                 false,
                 httpHeaders,
-                (int) BytesUnit.Mb.toBytes(config.getMaxAggregatorLength())/*64 mb*/
+                (int) BytesUnit.MB.toBytes(config.getMaxAggregatorLength())/*64 mb*/
         );
     }
 
@@ -84,9 +84,9 @@ public class SocketClient {
 
         SSLContext sslContext = config.sslContext();
 
-        int writeBytes = (int) BytesUnit.Mb.toBytes(config.getWriteByteBufM());
-        int recvBytes = (int) BytesUnit.Mb.toBytes(config.getRecvByteBufM());
-        int maxContentLength = (int) BytesUnit.Mb.toBytes(config.getMaxAggregatorLength());
+        int writeBytes = (int) BytesUnit.MB.toBytes(config.getWriteByteBufM());
+        int recvBytes = (int) BytesUnit.MB.toBytes(config.getRecvByteBufM());
+        int maxContentLength = (int) BytesUnit.MB.toBytes(config.getMaxAggregatorLength());
 
         bootstrap = new Bootstrap();
         bootstrap.group(NioFactory.clientThreadGroup())
@@ -214,7 +214,7 @@ public class SocketClient {
             Channel channel = future.channel();
             SocketSession socketSession = new SocketSession(SocketSession.Type.client, channel, false, config.isEnabledScheduledFlush());
             if (config.getMaxFrameBytes() > 0) {
-                socketSession.setMaxFrameBytes(BytesUnit.Kb.toBytes(getConfig().getMaxFrameBytes()));
+                socketSession.setMaxFrameBytes(BytesUnit.KB.toBytes(getConfig().getMaxFrameBytes()));
             }
 
             socketSession.setMaxFrameLength(getConfig().getMaxFrameLength());

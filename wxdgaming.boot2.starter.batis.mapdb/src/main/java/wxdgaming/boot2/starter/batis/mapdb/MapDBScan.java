@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-09-01 09:22
  **/
-@ComponentScan(basePackageClasses = {MapdbProperties.class, MapDBDataHelper.class})
+@ComponentScan(basePackageClasses = {MapDBProperties.class, MapDBDataHelper.class})
 @Component
 public class MapDBScan {
 }

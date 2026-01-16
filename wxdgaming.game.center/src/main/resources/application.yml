@@ -28,7 +28,7 @@ scheduled:
 
 spring:
   profiles:
-    active: [ pgsql,httpclient ]
+    active: [ pgsql,rocksdb,httpclient ]
   freemarker:
     enabled: true
     template-loader-path: classpath:/templates/

@@ -89,9 +89,9 @@ public class SocketDemo {
                     /*地址重用，socket链接断开后，立即可以被其他请求使用*/
                     .childOption(ChannelOption.SO_REUSEADDR, true)
                     /*发送缓冲区 影响 channel.isWritable()*/
-                    .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(1, (int) BytesUnit.Mb.toBytes(12)))
+                    .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(1, (int) BytesUnit.MB.toBytes(12)))
                     /*接收缓冲区，使用内存池*/
-                    .childOption(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(512, 2048, (int) BytesUnit.Mb.toBytes(12)))
+                    .childOption(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(512, 2048, (int) BytesUnit.MB.toBytes(12)))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {

@@ -60,8 +60,8 @@ public class SocketServer {
 
         SSLContext sslContext = config.sslContext();
 
-        int writeBytes = (int) BytesUnit.Mb.toBytes(config.getWriteByteBufM());
-        int recvBytes = (int) BytesUnit.Mb.toBytes(config.getRecvByteBufM());
+        int writeBytes = (int) BytesUnit.MB.toBytes(config.getWriteByteBufM());
+        int recvBytes = (int) BytesUnit.MB.toBytes(config.getRecvByteBufM());
         EventLoopGroup childGroup = NioFactory.workThreadGroup();
         bootstrap = new ServerBootstrap().group(NioFactory.bossThreadGroup(), childGroup)
                 /*channel方法用来创建通道实例(NioServerSocketChannel类来实例化一个进来的链接)*/
@@ -75,9 +75,9 @@ public class SocketServer {
                 /*方法用于设置和客户端链接的套接字*/
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 /*发送缓冲区 影响 channel.isWritable()*/
-                .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark((int) BytesUnit.Kb.toBytes(8), writeBytes))
+                .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark((int) BytesUnit.KB.toBytes(8), writeBytes))
                 /*接收缓冲区，使用内存池*/
-                .childOption(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator((int) BytesUnit.Kb.toBytes(1), (int) BytesUnit.Kb.toBytes(8), recvBytes))
+                .childOption(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator((int) BytesUnit.KB.toBytes(1), (int) BytesUnit.KB.toBytes(8), recvBytes))
                 /*为新链接到服务器的handler分配一个新的channel。ChannelInitializer用来配置新生成的channel。(如需其他的处理，继续ch.pipeline().addLast(新匿名handler对象)即可)*/
                 .childHandler(new ChannelInitializer<SocketChannel>() {
 

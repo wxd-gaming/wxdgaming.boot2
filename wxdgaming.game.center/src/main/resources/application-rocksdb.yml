@@ -1,0 +1,5 @@
+db:
+  rocksdb:
+    path: data-base/recharge-rocksdb
+    write-buffer-size: "16mb"
+    max-open-files: 512

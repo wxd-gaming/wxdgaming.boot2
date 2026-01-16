@@ -8,7 +8,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.event.StopBeforeEvent;
 import wxdgaming.boot2.core.event.StopEvent;
 import wxdgaming.boot2.core.io.FileUtil;
 
@@ -33,7 +32,7 @@ public class MapDBDataHelper implements InitPrint {
     final File dbFile;
 
     @Autowired
-    public MapDBDataHelper(MapdbProperties mapdbProperties) {
+    public MapDBDataHelper(MapDBProperties mapdbProperties) {
         this(new File(mapdbProperties.getPath()));
     }
 

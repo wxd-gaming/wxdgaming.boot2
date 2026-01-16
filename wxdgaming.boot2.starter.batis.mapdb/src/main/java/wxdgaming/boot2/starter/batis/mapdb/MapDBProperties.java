@@ -17,7 +17,7 @@ import wxdgaming.boot2.core.lang.ObjectBase;
 @Setter
 @Configuration
 @ConfigurationProperties(prefix = "db.mapdb")
-public class MapdbProperties extends ObjectBase implements InitPrint {
+public class MapDBProperties extends ObjectBase implements InitPrint {
 
     private String path;
 

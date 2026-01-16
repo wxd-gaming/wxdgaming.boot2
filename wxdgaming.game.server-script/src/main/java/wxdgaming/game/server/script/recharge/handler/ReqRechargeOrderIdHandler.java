@@ -16,6 +16,7 @@ import wxdgaming.game.server.bean.UserMapping;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.recharge.filter.IRechargeFilter;
+import wxdgaming.game.server.script.tips.TipsService;
 
 import java.util.List;
 import java.util.Map;
@@ -32,12 +33,14 @@ public class ReqRechargeOrderIdHandler extends HoldApplicationContext {
 
     private final GameServerProperties gameServerProperties;
     private final DataCenterService dataCenterService;
+    private final TipsService tipsService;
 
     Map<Integer, IRechargeFilter> rechargeFilterMap;
 
-    public ReqRechargeOrderIdHandler(GameServerProperties gameServerProperties, DataCenterService dataCenterService) {
+    public ReqRechargeOrderIdHandler(GameServerProperties gameServerProperties, DataCenterService dataCenterService, TipsService tipsService) {
         this.gameServerProperties = gameServerProperties;
         this.dataCenterService = dataCenterService;
+        this.tipsService = tipsService;
     }
 
     public Map<Integer, IRechargeFilter> getRechargeFilterMap() {
@@ -60,6 +63,7 @@ public class ReqRechargeOrderIdHandler extends HoldApplicationContext {
         IRechargeFilter iRechargeFilter = rechargeFilterMap.get(1);
         if (iRechargeFilter != null && !iRechargeFilter.filter(productID, count, true)) {
             /* TODO 检查购买条件，比如等级，功能开启，购买次数等 */
+            tipsService.tips(player, "请检查购买条件");
             return;
         }
 
@@ -77,9 +81,16 @@ public class ReqRechargeOrderIdHandler extends HoldApplicationContext {
         orderBean.setProductID(String.valueOf(productID));
         orderBean.setProductName(String.valueOf(productID));
 
-        HttpResponse execute = HttpRequestPost.ofJson(gameServerProperties.getCenterUrl(), orderBean.toJSONString()).execute();
+        HttpResponse execute = HttpRequestPost.ofJson(gameServerProperties.getCenterUrl() + "/order/create", orderBean.toJSONString()).execute();
         if (!execute.isSuccess()) {
-            log.error("访问中心服失败");
+            log.error("访问中心服失败, {}", execute);
+            tipsService.tips(player, "访问中心服失败");
+            return;
+        }
+
+        if (execute.bodyRunResult().isFail()) {
+            log.error("创建订单失败, {}", execute);
+            tipsService.tips(player, "创建订单失败");
             return;
         }
 
