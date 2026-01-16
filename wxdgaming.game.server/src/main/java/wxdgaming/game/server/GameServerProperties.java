@@ -1,6 +1,7 @@
 package wxdgaming.game.server;
 
 import com.alibaba.fastjson2.annotation.JSONField;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -25,11 +26,14 @@ public class GameServerProperties extends BootstrapProperties {
 
     private int serverType = 1;
     private String openTime = "2025-09-11 17:00:00";
+    private String centerUrl = "http://127.0.0.1:19600";
 
     @JSONField(serialize = false, deserialize = false)
+    @Setter(value = AccessLevel.PRIVATE)
+    @Getter(value = AccessLevel.PRIVATE)
     private transient LocalDateTime openTimeLocalDateTime;
 
-    public LocalDateTime getOpenTimeLocalDateTime() {
+    public LocalDateTime openTimeLocalDateTime() {
         if (openTimeLocalDateTime == null) {
             Date date = MyClock.parseDate(MyClock.SDF_YYYYMMDDHHMMSS_2, openTime);
             openTimeLocalDateTime = MyClock.localDateTime(date.getTime());
@@ -39,7 +43,7 @@ public class GameServerProperties extends BootstrapProperties {
 
     /** 从1 开始，开服当天是第一天 */
     public int openDay() {
-        return MyClock.countDays(getOpenTimeLocalDateTime(), MyClock.localDateTime()) + 1;
+        return MyClock.countDays(openTimeLocalDateTime(), MyClock.localDateTime()) + 1;
     }
 
 }

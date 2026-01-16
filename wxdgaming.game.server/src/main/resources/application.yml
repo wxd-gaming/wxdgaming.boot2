@@ -4,6 +4,7 @@ boot:
   sid: 1
   name: "游戏一服"
   serverType: 1
+  centerUrl: "http://127.0.0.1:19600"
 
 core:
   executor:

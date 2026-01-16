@@ -1,0 +1,18 @@
+syntax = "proto3";
+//把文件拆分
+option java_multiple_files = true;
+//导出包名
+option java_package = "wxdgaming.game.message";
+
+
+//请求下单
+message ReqRechargeOrderId {
+  int32 productID             = 1;//商品id
+  int32 count                 = 2;//购买数量
+}
+
+//响应订单号
+message ResRechargeOrderId {
+  string orderId              = 1;//订单号
+  string payUrl               = 2;//支付链接
+}

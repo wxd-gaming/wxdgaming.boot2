@@ -108,4 +108,12 @@ public class Player extends MapNpc {
         }
         getUserMapping().write(pojoBase);
     }
+
+    public void writeAndFlush(PojoBase pojoBase) {
+        if (!checkOnline()) {
+            return;
+        }
+        getUserMapping().writeAndFlush(pojoBase);
+    }
+
 }

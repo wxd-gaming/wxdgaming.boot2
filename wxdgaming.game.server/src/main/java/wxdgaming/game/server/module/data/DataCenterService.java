@@ -46,6 +46,7 @@ public class DataCenterService extends HoldApplicationContext implements GetPlay
     final HexId itemHexid;
     final HexId mailHexid;
     final HexId buffHexid;
+    final HexId orderHexid;
     final ConcurrentHashMap<String, UserMapping> userMappingMap = new ConcurrentHashMap<>();
     /** key:serverID, key:account, value: 角色id列表 */
     final ConcurrentTable<Integer, String, HashSet<Long>> account2RidsMap = new ConcurrentTable<>();
@@ -64,7 +65,7 @@ public class DataCenterService extends HoldApplicationContext implements GetPlay
         itemHexid = new HexId(sid);
         mailHexid = new HexId(sid);
         buffHexid = new HexId(sid);
-
+        orderHexid = new HexId(sid);
     }
 
     @EventListener
