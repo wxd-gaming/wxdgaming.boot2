@@ -11,6 +11,7 @@ import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.io.kryoPool;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -64,35 +65,35 @@ public class RocksDBHelper implements InitPrint {
         }
     }
 
+    /** 模拟 redis 方式格式化 */
+    byte[] comboKey(Object... ks) {
+        String key = Joiner.on(":").join(ks);
+        return key.getBytes(StandardCharsets.UTF_8);
+    }
+
     public boolean exits(String key) {
         return db.keyExists(key.getBytes(StandardCharsets.UTF_8));
     }
 
-    public void putMap(String key, Map<?, ?> map) {
+    /** 写入单个数据 */
+    public void put(String key, Object value) {
         try {
-            db.put(key.getBytes(StandardCharsets.UTF_8), kryoPool.serialize(map));
+            db.put(key.getBytes(StandardCharsets.UTF_8), kryoPool.serialize(value));
         } catch (RocksDBException e) {
             throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
-    public void put(String key, Object obj) {
+    /** 用复合主键的形式写入日志 */
+    public void putByComboKey(Object value, Object... ks) {
         try {
-            db.put(key.getBytes(StandardCharsets.UTF_8), kryoPool.serialize(obj));
+            db.put(comboKey(ks), kryoPool.serialize(value));
         } catch (RocksDBException e) {
             throw ExceptionUtils.asRuntimeException(e);
         }
     }
 
-    public void putByComboKey(Object obj, Object... ks) {
-        try {
-            String key = Joiner.on(":").join(ks);
-            db.put(key.getBytes(StandardCharsets.UTF_8), kryoPool.serialize(obj));
-        } catch (RocksDBException e) {
-            throw ExceptionUtils.asRuntimeException(e);
-        }
-    }
-
+    /** 批量写入数据 */
     public void putAll(Map<String, ?> map) {
         try {
             // 批量写操作（提升多写性能）
@@ -107,41 +108,44 @@ public class RocksDBHelper implements InitPrint {
         }
     }
 
+    /**
+     * 通过复合主键获取一个值
+     *
+     * @param ks 复合主键
+     * @return 值，如果值不存在，则返回 null
+     */
     public byte[] getByComboKey(Object... ks) {
-        String key = Joiner.on(":").join(ks);
-        return get(key);
+        byte[] bytes = comboKey(ks);
+        return get(bytes);
     }
 
-    public <R> R getObjectByComboKey(Class<R> clazz, Object... ks) {
+    /**
+     * 通过复合主键获取一个值
+     *
+     * @param valueType 值的类型
+     * @param ks        复合主键
+     * @param <R>       值类型
+     * @return 值，如果值不存在，则返回 null
+     */
+    public <R> R getObjectByComboKey(Class<R> valueType, Object... ks) {
         byte[] bytes = getByComboKey(ks);
         if (bytes == null) {
             return null;
         }
-        return kryoPool.deserialize(bytes, clazz);
+        return kryoPool.deserialize(bytes, valueType);
     }
 
+    /** 获取一个值 */
     public byte[] get(String key) {
+        return get(key.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public byte[] get(byte[] key) {
         try {
-            return db.get(key.getBytes(StandardCharsets.UTF_8));
+            return db.get(key);
         } catch (RocksDBException e) {
             throw ExceptionUtils.asRuntimeException(e);
         }
-    }
-
-    public <R> R getObject(String key, Class<R> clazz) {
-        byte[] bytes = get(key);
-        if (bytes == null) {
-            return null;
-        }
-        return kryoPool.deserialize(bytes, clazz);
-    }
-
-    public Map<?, ?> getMap(String key) {
-        return getObject(key, Map.class);
-    }
-
-    public ConcurrentHashMap<?, ?> getConcurrentHashMap(String key) {
-        return getObject(key, ConcurrentHashMap.class);
     }
 
     public String getString(String key) {
@@ -152,20 +156,52 @@ public class RocksDBHelper implements InitPrint {
         return kryoPool.deserialize(bytes, String.class);
     }
 
-    public Integer getInteger(String key) {
+    /** 获取一个对象 */
+    public <R> R getObject(String key, Class<R> clazz) {
         byte[] bytes = get(key);
         if (bytes == null) {
             return null;
         }
-        return kryoPool.deserialize(bytes, Integer.class);
+        return kryoPool.deserialize(bytes, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <K, V> Map<K, V> getMap(String key) {
+        return getObject(key, Map.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <R> List<R> getList(String key) {
+        return getObject(key, List.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <K, V> ConcurrentHashMap<K, V> getConcurrentHashMap(String key) {
+        return getObject(key, ConcurrentHashMap.class);
+    }
+
+    public Integer getInteger(String key) {
+        return getObject(key, Integer.class);
     }
 
     public int getIntValue(String key) {
-        byte[] bytes = get(key);
-        if (bytes == null) {
+        Integer integer = getInteger(key);
+        if (integer == null) {
             return 0;
         }
-        return kryoPool.deserialize(bytes, Integer.class);
+        return integer;
+    }
+
+    public Long getLong(String key) {
+        return getObject(key, Long.class);
+    }
+
+    public long getLongValue(String key) {
+        Long l = getLong(key);
+        if (l == null) {
+            return 0;
+        }
+        return l;
     }
 
     public void close() {
