@@ -16,6 +16,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.simpleframework</groupId>
+            <artifactId>simple-xml</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.github.wxd-gaming</groupId>
             <artifactId>wxd-gaming.boot2.core</artifactId>
             <version>${project.version}</version>

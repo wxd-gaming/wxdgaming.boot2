@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.RunResult;
-import wxdgaming.boot2.starter.batis.rocksdb.RocksDBHelper;
 import wxdgaming.game.center.entity.order.OrderBean;
+import wxdgaming.game.center.modules.recharge.RechargeService;
 
 /**
  * 订单号
@@ -22,23 +22,22 @@ import wxdgaming.game.center.entity.order.OrderBean;
 @RequestMapping("/order")
 public class OrderController implements InitPrint {
 
-    private final RocksDBHelper rocksDBHelper;
+    private final RechargeService rechargeService;
 
     @Autowired
-    public OrderController(RocksDBHelper rocksDBHelper) {
-        this.rocksDBHelper = rocksDBHelper;
+    public OrderController(RechargeService rechargeService) {
+        this.rechargeService = rechargeService;
     }
 
     @RequestMapping("/create")
     @ResponseBody
     public Object create(@RequestBody OrderBean orderBean) {
-        log.info("创建订单: {}", orderBean);
-        String orderId = orderBean.getOrderId();
-        if (rocksDBHelper.exits(orderId)) {
-            return RunResult.fail("订单号已存在");
+        boolean b = rechargeService.addRechargeOrder(orderBean);
+        if (!b) {
+            return RunResult.fail("订单已存在");
         }
-        rocksDBHelper.put(orderId, orderBean);
         return RunResult.ok();
     }
+
 
 }
