@@ -11,6 +11,7 @@ import java.util.function.Function;
  **/
 public class SingletonUtil {
 
+    @SuppressWarnings("rawtypes")
     static final Function identity = Function.identity();
     static final ConcurrentHashMap<Object, Object> map = new ConcurrentHashMap<>();
 
