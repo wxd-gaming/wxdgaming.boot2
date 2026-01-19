@@ -36,11 +36,11 @@ public class AppPlatformParams extends ObjectBase {
     public static final AppPlatformParams LOCAL;
 
     static {
-        LOCAL = AppPlatformParams.builder().appId(1).platform(Platform.LOCAL).loginKey("local").build();
-        register(LOCAL);
+        LOCAL = AppPlatformParams.builder().appId(1).appName("local").platform(Platform.LOCAL).loginKey("local").build();
     }
 
     private final int appId;
+    private final String appName;
     private final Platform platform;
     private final String appKey;
     private final String appParams;
@@ -50,8 +50,9 @@ public class AppPlatformParams extends ObjectBase {
     private final String url;
 
     @Builder
-    public AppPlatformParams(int appId, Platform platform, String appKey, String appParams, String loginKey, String payKey, String otherKey, String url) {
+    public AppPlatformParams(int appId, String appName, Platform platform, String appKey, String appParams, String loginKey, String payKey, String otherKey, String url) {
         this.appId = appId;
+        this.appName = appName;
         this.platform = platform;
         this.appKey = appKey;
         this.appParams = appParams;
@@ -59,6 +60,11 @@ public class AppPlatformParams extends ObjectBase {
         this.payKey = payKey;
         this.otherKey = otherKey;
         this.url = url;
+        register(LOCAL);
+    }
+
+    @Override public String toString() {
+        return "AppPlatformParams{appId=%d, appName='%s', platform=%s}".formatted(appId, appName, platform);
     }
 
     public static void main(String[] args) {
