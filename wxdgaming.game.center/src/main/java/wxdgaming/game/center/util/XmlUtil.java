@@ -18,13 +18,12 @@ import java.io.StringWriter;
  **/
 public class XmlUtil {
 
-
     private static final ObjectFactory<Serializer> SIMPLE_XM_LOCAL = new ObjectFactory<>(
             20,
             () -> {
-                String formatHead = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
-                formatHead += "\n";
-                formatHead += "<!-- @author wxd-gaming(無心道, 15388152619) -->";
+                String formatHead = """
+                        <?xml version="1.0" encoding="utf-8"?>
+                        <!-- @author wxd-gaming(無心道, 15388152619) -->""";
                 Format format = new Format(formatHead);
                 return new Persister(format);
             }
@@ -39,10 +38,10 @@ public class XmlUtil {
     /**
      * simpleXml
      *
-     * @param <T>
-     * @param source
-     * @param type
-     * @return
+     * @param <T> 泛型类型
+     * @param source xml
+     * @param type 类型
+     * @return 类
      */
     public static <T> T fromXml(String source, Class<T> type) {
         return SIMPLE_XM_LOCAL.apply(serializer -> serializer.read(type, source, false));
@@ -51,10 +50,10 @@ public class XmlUtil {
     /**
      * simpleXml
      *
-     * @param <T>
-     * @param source
-     * @param type
-     * @return
+     * @param <T> 泛型类型
+     * @param source xml
+     * @param type 类型
+     * @return 类
      */
     public static <T> T fromXml(byte[] source, Class<T> type) {
         try (InputStream inputStream = new ByteArrayInputStream(source)) {
@@ -67,8 +66,8 @@ public class XmlUtil {
     /**
      * simpleXml
      *
-     * @param obj
-     * @return
+     * @param obj 对象
+     * @return xml 字符串
      */
     public static String toXml(Object obj) {
         try (StringWriter writer = new StringWriter()) {

@@ -1,20 +1,18 @@
 package wxdgaming.boot2.core.timer;
 
 
-import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.io.FileUtil;
+import wxdgaming.boot2.core.io.ObjectFactory;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -26,17 +24,23 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class MyClock {
 
-    public static final ThreadLocal<Map<String, SimpleDateFormat>> THREAD_LOCAL_SimpleDateFormat = ThreadLocal.withInitial(HashMap::new);
+    private static final ConcurrentHashMap<String, ObjectFactory<SimpleDateFormat>> sdfPool = new ConcurrentHashMap<>();
 
     /** 获取一个线程安全的格式化对象， */
-    public static SimpleDateFormat simpleDateFormat(String formatter) {
-        return THREAD_LOCAL_SimpleDateFormat.get().computeIfAbsent(formatter, SimpleDateFormat::new);
+    public static ObjectFactory<SimpleDateFormat> simpleDateFormat(String formatter) {
+        return sdfPool.computeIfAbsent(formatter, l -> new ObjectFactory<>(
+                10,
+                () -> new SimpleDateFormat(l)
+        ));
     }
 
-    public static final ThreadLocal<Map<String, DateTimeFormatter>> THREAD_LOCAL_DateTimeFormatter = ThreadLocal.withInitial(HashMap::new);
+    private static final ConcurrentHashMap<String, ObjectFactory<DateTimeFormatter>> dtfPool = new ConcurrentHashMap<>();
 
-    public static DateTimeFormatter dateTimeFormatter(String pattern) {
-        return THREAD_LOCAL_DateTimeFormatter.get().computeIfAbsent(pattern, DateTimeFormatter::ofPattern);
+    public static ObjectFactory<DateTimeFormatter> dateTimeFormatter(String pattern) {
+        return dtfPool.computeIfAbsent(pattern, l -> new ObjectFactory<>(
+                10,
+                () -> DateTimeFormatter.ofPattern(l)
+        ));
     }
 
 
@@ -190,27 +194,34 @@ public class MyClock {
 
     /** 获取日期的时间格式 */
     public static String formatDate(String formatter, Date date) {
-        return simpleDateFormat(formatter).format(date);
+        return simpleDateFormat(formatter).apply(sdf -> sdf.format(date));
+    }
+
+    /** 把指定格式的字符串还原成 Date */
+    public static Date parseDate(String formatter, String date) {
+        return simpleDateFormat(formatter).apply(sdf -> sdf.parse(date));
+    }
+
+    /** 把指定格式的字符串还原成 LocalDateTime */
+    public static LocalDateTime parseLocalDateTime(String formatter, String date) {
+        return dateTimeFormatter(formatter).apply(dtf -> LocalDateTime.parse(date, dtf));
+    }
+
+    /** 把指定格式的字符串还原成 LocalDate */
+    public static LocalDate parseLocalDate(String formatter, String date) {
+        return dateTimeFormatter(formatter).apply(dtf -> LocalDate.parse(date, dtf));
     }
 
     /** 获取日期的时间格式 */
     public static String formatDate(String formatter, LocalDateTime localDateTime) {
-        return localDateTime.format(dateTimeFormatter(formatter));
+        return dateTimeFormatter(formatter).apply(localDateTime::format);
     }
 
     /** 获取日期的时间格式 */
     public static String formatDate(String formatter, LocalDate localDate) {
-        return localDate.format(dateTimeFormatter(formatter));
+        return dateTimeFormatter(formatter).apply(localDate::format);
     }
 
-    /** 把指定格式的字符串还原成date */
-    public static Date parseDate(String formatter, String date) {
-        try {
-            return simpleDateFormat(formatter).parse(date);
-        } catch (ParseException e) {
-            throw Throw.of("配置异常, 格式：" + formatter + ", 输入：" + date, e);
-        }
-    }
 
     /** 获取昨天时间格式,yyyy-MM-dd */
     public static String upDayString() {
@@ -220,7 +231,7 @@ public class MyClock {
     /** 获取昨天时间格式 */
     public static String upDayString(String format) {
         LocalDateTime localDateTime = localDateTime().plusDays(-1);
-        return localDateTime.format(dateTimeFormatter(format));
+        return dateTimeFormatter(format).apply(localDateTime::format);
     }
 
     /** 得到当前本地系统时间 周期天数 1970 年开始 */
