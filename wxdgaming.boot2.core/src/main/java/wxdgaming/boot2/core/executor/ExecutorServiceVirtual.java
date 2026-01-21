@@ -113,10 +113,12 @@ public class ExecutorServiceVirtual extends ExecutorService {
                     this.ofVirtual.start(task);
                 }
             } else {
-                this.queuePolicy.execute(queue, executorJobVirtual);
-                int size = queue.size();
-                if (size > warnSize) {
-                    log.warn("ExecutorService {} queueSize:{}, {}", ExecutorServiceVirtual.this.namePrefix, warnSize, executorJobVirtual.getRunnable());
+                if (executorJobVirtual != null) {
+                    this.queuePolicy.execute(queue, executorJobVirtual);
+                    int size = queue.size();
+                    if (size > warnSize) {
+                        log.warn("ExecutorService {} queueSize:{}, {}", ExecutorServiceVirtual.this.namePrefix, warnSize, executorJobVirtual.getRunnable());
+                    }
                 }
             }
         } finally {

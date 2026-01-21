@@ -107,9 +107,9 @@ public class CaffeineCacheTest {
         cache.invalidateAll();
         ThreadStopWatch.start("循环 " + readSize + " 次数");
         AtomicReference<Object> string = new AtomicReference<>();
-        ThreadExecutorLatch.threadLocalInit();
+        ThreadExecutorLatch.threadLocalInit(ExecutorFactory.getExecutorServiceLogic());
         for (long i = 0; i < readSize; i++) {
-            ThreadExecutorLatch.executor(() -> string.set(cache.get(RandomUtils.random(maxSize))), ExecutorFactory.getExecutorServiceLogic());
+            ThreadExecutorLatch.executor(() -> string.set(cache.get(RandomUtils.random(maxSize))));
         }
         ThreadExecutorLatch.await();
         ThreadExecutorLatch.release();
