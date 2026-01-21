@@ -8,11 +8,11 @@ import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.boot2.starter.net.ann.ProtoRequest;
 import wxdgaming.boot2.starter.net.message.inner.ResRemote;
+import wxdgaming.boot2.starter.net.module.rpc.RpcCallBackContext;
 import wxdgaming.boot2.starter.net.module.rpc.RpcService;
 import wxdgaming.boot2.starter.net.pojo.ProtoEvent;
 
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * @author wxd-gaming(無心道, 15388152619)
@@ -46,13 +46,13 @@ public class ResRemoteHandler {
         }
         JSONObject jsonObject = FastJsonUtil.parse(params);
         int code = jsonObject.getIntValue("code");
-        CompletableFuture<JSONObject> stringCompletableFuture = rpcService.responseFuture(rpcId);
+        RpcCallBackContext rpcCallBackContext = rpcService.responseFuture(rpcId);
         if (code == 1) {
-            stringCompletableFuture.complete(jsonObject);
+            rpcCallBackContext.complete(jsonObject);
         } else {
             RuntimeException ex = new RuntimeException(params);
             ex.setStackTrace(new StackTraceElement[0]);
-            stringCompletableFuture.completeExceptionally(ex);
+            rpcCallBackContext.completeExceptionally(ex);
         }
     }
 

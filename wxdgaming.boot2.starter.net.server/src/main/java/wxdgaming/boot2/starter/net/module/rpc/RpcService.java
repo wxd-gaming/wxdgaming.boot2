@@ -32,19 +32,19 @@ public class RpcService {
     final HexId hexId;
     final String rpcToken;
     final RpcListenerFactory rpcListenerFactory;
-    final Cache<Long, CompletableFuture<JSONObject>> rpcCache;
+    final Cache<Long, RpcCallBackContext> rpcCache;
 
     public RpcService(BootstrapProperties bootstrapProperties, RpcListenerFactory rpcListenerFactory) {
         this.hexId = new HexId(bootstrapProperties.getSid());
         this.rpcToken = bootstrapProperties.getRpcToken();
         this.rpcListenerFactory = rpcListenerFactory;
-        this.rpcCache = LRUCacheCAS.<Long, CompletableFuture<JSONObject>>builder()
+        this.rpcCache = LRUCacheCAS.<Long, RpcCallBackContext>builder()
                 .cacheName("rpc-server")
                 .heartExpireAfterWrite(Duration.ofSeconds(10))
                 .expireAfterWrite(Duration.ofSeconds(60))
-                .removalListener((key, value, removalCause) -> {
+                .removalListener((key, rpcCallBackContext, removalCause) -> {
                     log.debug("rpcCache remove key:{}", key);
-                    value.completeExceptionally(new RuntimeException("time out"));
+                    rpcCallBackContext.getCompletableFuture().completeExceptionally(new RuntimeException("time out"));
                     return true;
                 })
                 .build();
@@ -54,7 +54,7 @@ public class RpcService {
         return Md5Util.md5DigestEncode0("#", String.valueOf(rpcId), rpcToken);
     }
 
-    public CompletableFuture<JSONObject> responseFuture(long rpcId) {
+    public RpcCallBackContext responseFuture(long rpcId) {
         return rpcCache.get(rpcId);
     }
 
@@ -74,9 +74,9 @@ public class RpcService {
             reqRemote.setGzip(1);
             reqRemote.setParams(GzipUtil.gzip2String(reqRemote.getParams()));
         }
-        CompletableFuture<JSONObject> completableFuture = new CompletableFuture<>();
-        Mono<JSONObject> jsonObjectMono = Mono.fromCompletionStage(completableFuture);
-        rpcCache.put(reqRemote.getUid(), completableFuture);
+        RpcCallBackContext rpcCallBackContext = new RpcCallBackContext();
+        Mono<JSONObject> jsonObjectMono = Mono.fromCompletionStage(rpcCallBackContext.getCompletableFuture());
+        rpcCache.put(reqRemote.getUid(), rpcCallBackContext);
         if (immediate)
             socketSession.writeAndFlush(reqRemote);
         else
