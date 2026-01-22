@@ -2,9 +2,9 @@ package wxdgaming.boot2.core.executor;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.ThreadParam;
-import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 
 import java.lang.reflect.Type;
@@ -141,14 +141,14 @@ public class ThreadContext extends HashMap<String, Object> {
         super.putAll(m);
     }
 
-    /** 获取当前任务所在队列 */
-    public ExecutorQueue queue() {
-        return (ExecutorQueue) get("queue");
-    }
-
-    /** 获取当然任务队列名 */
-    public String queueName() {
-        return (String) get("queueName");
+    /** 当前线程详情 */
+    public ThreadVO threadVO() {
+        Object threadVO = get("threadVO");
+        if (threadVO == null) {
+            threadVO = new ThreadVO();
+            put("threadVO", threadVO);
+        }
+        return (ThreadVO) threadVO;
     }
 
     public String getString(String key) {

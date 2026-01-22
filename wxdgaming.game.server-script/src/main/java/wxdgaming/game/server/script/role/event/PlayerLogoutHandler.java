@@ -39,7 +39,7 @@ public class PlayerLogoutHandler {
         player.getOnlineInfo().setLastLogoutTime(MyClock.millis());
         UserMapping clientSessionMapping = player.getUserMapping();
         SocketSession socketSession = clientSessionMapping.getSocketSession();
-        log.info("玩家下线: {} {}, \n{}", ThreadContext.context().queueName(), player, socketSession.flowString());
+        log.info("玩家下线: {} {}, \n{}", ThreadContext.context().threadVO().getQueueName(), player, socketSession.flowString());
         clientSessionMapping.setRid(0);
         clientSessionMapping.setSocketSession(null);
         player.setUserMapping(null);

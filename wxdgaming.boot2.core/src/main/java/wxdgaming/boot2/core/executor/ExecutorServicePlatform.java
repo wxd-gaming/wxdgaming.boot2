@@ -48,8 +48,12 @@ public class ExecutorServicePlatform extends ExecutorService {
             if (!(command instanceof ExecutorJobScheduled.ScheduledExecutorJob) && executorJob.threadContext == null) {
                 /*TODO 任务添加线程上下文*/
                 executorJob.threadContext = new ThreadContext(ThreadContext.context());
-                executorJob.threadContext.remove("queue");
-                executorJob.threadContext.remove("queueName");
+                executorJob.threadContext.threadVO().setExecutorQueue(null);
+                executorJob.threadContext.threadVO().setQueueName(null);
+            }
+
+            if (executorJob.threadContext != null) {
+                executorJob.threadContext.threadVO().setExecutor(this);
             }
 
             if (executorJob instanceof IExecutorQueue iExecutorQueue) {
@@ -60,6 +64,7 @@ public class ExecutorServicePlatform extends ExecutorService {
                     return;
                 }
             }
+
         } else {
             executorJob = (ExecutorJob) command;
         }

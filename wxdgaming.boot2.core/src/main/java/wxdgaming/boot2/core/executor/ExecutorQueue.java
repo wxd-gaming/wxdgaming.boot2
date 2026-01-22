@@ -89,8 +89,10 @@ public class ExecutorQueue extends ExecutorJob {
             if (task != null) {
                 stack = task.getStack();
                 ExecutorMonitor.put(task);
-                ThreadContext.putContent("queue", this);
-                ThreadContext.putContent("queueName", getQueueName());
+                ThreadVO threadVO = ThreadContext.context().threadVO();
+                threadVO.setExecutor(this.getExecutor());
+                threadVO.setExecutorQueue(this);
+                threadVO.setQueueName(this.getQueueName());
                 task.run();
             }
         } catch (Throwable throwable) {

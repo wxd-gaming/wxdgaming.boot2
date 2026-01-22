@@ -54,13 +54,13 @@ public class ScriptApi {
 
     @RpcRequest
     public JSONObject rpcIndex(@RequestParam(value = "a", defaultValue = "2") String a, JSONObject paramData) {
-        log.info("{} {} {}", a, paramData, ThreadContext.context().queueName());
+        log.info("{} {} {}", a, paramData, ThreadContext.context().threadVO().getQueueName());
         return paramData;
     }
 
     @RpcRequest
     public JSONObject rpcIndex2(JSONObject paramData) {
-        log.info("{} {}", paramData, ThreadContext.context().queueName());
+        log.info("{} {}", paramData, ThreadContext.context().threadVO().getQueueName());
         return paramData;
     }
 

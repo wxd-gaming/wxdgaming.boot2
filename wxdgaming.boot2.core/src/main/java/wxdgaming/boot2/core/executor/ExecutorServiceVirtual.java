@@ -86,6 +86,11 @@ public class ExecutorServiceVirtual extends ExecutorService {
             super(runnable);
         }
 
+        @Override public void run() {
+            ThreadContext.context().threadVO().setExecutor(ExecutorServiceVirtual.this);
+            super.run();
+        }
+
         @Override protected void runAfter() {
             reentrantLock.lock();
             try {

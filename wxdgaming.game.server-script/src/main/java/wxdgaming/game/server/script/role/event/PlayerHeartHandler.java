@@ -80,19 +80,19 @@ public class PlayerHeartHandler extends HoldApplicationContext {
     @EventListener
     public void onHeartMinute(EventConst.MapNpcHeartMinuteEvent event) {
         Player player = event.player();
-        log.info("onHeartMinute:{} {}", player, ThreadContext.context().queueName());
+        log.info("onHeartMinute:{} {}", player, ThreadContext.context().threadVO().getQueueName());
     }
 
     @EventListener
     public void onHeartHour(EventConst.MapNpcHeartHourEvent event) {
         Player player = event.player();
-        log.info("onHeartHour:{} {}", player, ThreadContext.context().queueName());
+        log.info("onHeartHour:{} {}", player, ThreadContext.context().threadVO().getQueueName());
     }
 
     @EventListener
     public void onHeartDay(EventConst.MapNpcHeartDayEvent event) {
         Player player = event.player();
-        log.info("onHeartDay:{} {}", player, ThreadContext.context().queueName());
+        log.info("onHeartDay:{} {}", player, ThreadContext.context().threadVO().getQueueName());
     }
 
 }
