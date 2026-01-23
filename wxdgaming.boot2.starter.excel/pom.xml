@@ -31,10 +31,6 @@
             <artifactId>xmlbeans</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.github.wxd-gaming</groupId>
             <artifactId>wxd-gaming.boot2.core</artifactId>
             <version>${project.version}</version>
