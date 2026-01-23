@@ -29,17 +29,6 @@ public class ExecutorServiceTest {
     }
 
     @Test
-    public void cron() {
-        CronExpression cronExpression = CronExpression.parse("*/5 * * * * ?");
-        LocalDateTime now = LocalDateTime.now();
-        for (int i = 0; i < 10; i++) {
-            now = cronExpression.next(now);
-            System.out.println(now);
-            if (now == null) break;
-        }
-    }
-
-    @Test
     public void t1() {
         AbstractExecutorService executorServicePlatform = new ExecutorServicePlatform("platform", 4, 1000, QueuePolicyConst.AbortPolicy);
         test(executorServicePlatform);

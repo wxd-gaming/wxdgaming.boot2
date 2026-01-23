@@ -25,19 +25,31 @@ class ScheduledRunnable implements Runnable, Comparable<ScheduledRunnable> {
                 long now = MyClock.millis();
                 ArrayList<ScheduledRunnable> scheduledRunnables = new ArrayList<>(scheduledRunnableSet);
                 for (ScheduledRunnable scheduledRunnable : scheduledRunnables) {
-                    if (scheduledRunnable.nextRunTime <= now) {
-                        /*时间到了可以运行*/
+                    if (scheduledRunnable.cancelHolding.isCancel()) {
+                        /* TODO 如果任务已经取消本次不再执行，并且不再继续添加 */
                         scheduledRunnableSet.remove(scheduledRunnable);
-                        if (scheduledRunnable.scheduledFuture.cancel.get())
-                            /* TODO 如果任务已经取消本次不再执行，并且不再继续添加 */
-                            continue;
-                        scheduledRunnable.run();
-                        if (!scheduledRunnable.withFixedDelay && scheduledRunnable.delay > 0) {
-                            /*表示需要继续运行*/
-                            scheduledRunnable.resetNextRunTime();
-                            scheduledRunnableSet.add(scheduledRunnable);
-                        }
+                        continue;
                     }
+                    if (scheduledRunnable.nextRunTime > now) {
+                        /* TODO 因为有序的，如果当前任务都还没有到达指定运行周期，那么后面的也不需要检查了 */
+                        break;
+                    }
+                    /*时间到了可以运行*/
+                    scheduledRunnableSet.remove(scheduledRunnable);
+                    scheduledRunnable.run();
+                    if (scheduledRunnable.cancelHolding.isCancel())
+                        /* TODO 已经取消*/
+                        continue;
+                    if (scheduledRunnable.withFixedDelay)
+                        /* TODO 需要等到当前执行完成 */
+                        continue;
+                    if (scheduledRunnable.delay < 1) {
+                        /*TODO 表示单纯任务*/
+                        continue;
+                    }
+                    /*表示需要继续运行*/
+                    scheduledRunnable.resetNextRunTime();
+                    scheduledRunnableSet.add(scheduledRunnable);
                 }
             }
         });
@@ -81,7 +93,7 @@ class ScheduledRunnable implements Runnable, Comparable<ScheduledRunnable> {
     protected final long delay;
     protected final TimeUnit unit;
     protected long nextRunTime;
-    protected final ScheduledFuture scheduledFuture = new ScheduledFuture();
+    protected final CancelHolding cancelHolding = new CancelHolding();
 
     private ScheduledRunnable(Executor executor, Runnable runnable, boolean withFixedDelay, long initialDelay, long delay, TimeUnit unit) {
         this.executor = executor;
@@ -122,7 +134,7 @@ class ScheduledRunnable implements Runnable, Comparable<ScheduledRunnable> {
             try {
                 this.runnable.run();
             } finally {
-                if (!scheduledFuture.cancel.get()) {
+                if (!cancelHolding.isCancel()) {
                     if (ScheduledRunnable.this.withFixedDelay) {
                         /*表示需要继续运行*/
                         ScheduledRunnable.this.resetNextRunTime();

@@ -57,7 +57,7 @@ public class ExecutorServicePlatform extends AbstractExecutorService {
                 getThreads().remove(Thread.currentThread());
             }
         };
-        thread.setName(getNamePrefix() + "-" + getThreads().size());
+        thread.setName(getNamePrefix() + "-" + (getThreads().size() + 1));
         thread.start();
         getThreads().add(thread);
     }

@@ -44,9 +44,9 @@ public abstract class AbstractExecutorService implements Executor {
      * @param unit     时间单位
      * @return 返回任务挂载，可以执行取消
      */
-    public ScheduledFuture schedule(Runnable runnable, long delay, TimeUnit unit) {
+    public CancelHolding schedule(Runnable runnable, long delay, TimeUnit unit) {
         ScheduledRunnable schedule = ScheduledRunnable.schedule(this, runnable, delay, unit);
-        return schedule.scheduledFuture;
+        return schedule.cancelHolding;
     }
 
     /**
@@ -58,9 +58,9 @@ public abstract class AbstractExecutorService implements Executor {
      * @param unit         时间单位
      * @return 返回任务挂载，可以执行取消
      */
-    public ScheduledFuture scheduleAtFixedRate(Runnable runnable, long initialDelay, long delay, TimeUnit unit) {
+    public CancelHolding scheduleAtFixedRate(Runnable runnable, long initialDelay, long delay, TimeUnit unit) {
         ScheduledRunnable scheduledRunnable = ScheduledRunnable.scheduleAtFixedRate(this, runnable, initialDelay, delay, unit);
-        return scheduledRunnable.scheduledFuture;
+        return scheduledRunnable.cancelHolding;
     }
 
     /**
@@ -72,9 +72,9 @@ public abstract class AbstractExecutorService implements Executor {
      * @param unit         时间单位
      * @return 返回任务挂载，可以执行取消
      */
-    public ScheduledFuture scheduleWithFixedDelay(Runnable runnable, long initialDelay, long delay, TimeUnit unit) {
+    public CancelHolding scheduleWithFixedDelay(Runnable runnable, long initialDelay, long delay, TimeUnit unit) {
         ScheduledRunnable scheduledRunnable = ScheduledRunnable.scheduleWithFixedDelay(this, runnable, initialDelay, delay, unit);
-        return scheduledRunnable.scheduledFuture;
+        return scheduledRunnable.cancelHolding;
     }
 
     /** 异步 */

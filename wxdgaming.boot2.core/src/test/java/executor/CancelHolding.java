@@ -3,17 +3,21 @@ package executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 取消
+ * 取消状态代持
  *
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2026-01-23 09:11
  **/
-public class ScheduledFuture {
+public class CancelHolding {
 
-    protected final AtomicBoolean cancel;
+    private final AtomicBoolean cancel;
 
-    protected ScheduledFuture() {
+    protected CancelHolding() {
         this.cancel = new AtomicBoolean(false);
+    }
+
+    public boolean isCancel() {
+        return cancel.get();
     }
 
     public void cancel() {
