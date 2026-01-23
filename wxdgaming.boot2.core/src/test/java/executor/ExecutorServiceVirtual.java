@@ -39,17 +39,21 @@ public class ExecutorServiceVirtual extends AbstractExecutorService {
     }
 
     @Override protected void newThread() {
-        Runnable poll = getQueue().poll();
-        if (poll == null) return;
+        Runnable task = getQueue().poll();
+        if (task == null) return;
         threadNum.incrementAndGet();
         ofVirtual.start(() -> {
+            ExecutorMonitorContext executorMonitorContext = ExecutorMonitor.threadContext();
+            executorMonitorContext.setExecutorService(ExecutorServiceVirtual.this);
+            executorMonitorContext.setRunnable(task);
             ExecutorVO executorVO = ExecutorVO.threadLocal();
             executorVO.setExecutor(ExecutorServiceVirtual.this);
             try {
-                poll.run();
+                task.run();
             } catch (Throwable e) {
-                log.error("{} {} error", poll.getClass(), poll, e);
+                log.error("{} {} error", task.getClass(), task, e);
             } finally {
+                ExecutorMonitor.cleanup();
                 ExecutorVO.cleanup();
                 threadNum.decrementAndGet();
                 checkExecute();

@@ -61,6 +61,9 @@ public class ExecutorQueue implements Executor, Runnable {
         try {
             currentRunnable = queue.poll();
             if (currentRunnable != null) {
+                ExecutorMonitorContext executorMonitorContext = ExecutorMonitor.threadContext();
+                executorMonitorContext.setExecutorQueue(this);
+                executorMonitorContext.setRunnable(currentRunnable);
                 ExecutorVO executorVO = ExecutorVO.threadLocal();
                 executorVO.setExecutorQueue(this);
                 currentRunnable.run();
@@ -83,7 +86,7 @@ public class ExecutorQueue implements Executor, Runnable {
     }
 
     @Override public String toString() {
-        return "ExecutorQueue{queueName='%s', currentRunnable=%s, %s}"
-                .formatted(queueName, currentRunnable == null ? "null" : currentRunnable.getClass(), currentRunnable);
+        return "ExecutorQueue{queueName='%s'}"
+                .formatted(queueName);
     }
 }

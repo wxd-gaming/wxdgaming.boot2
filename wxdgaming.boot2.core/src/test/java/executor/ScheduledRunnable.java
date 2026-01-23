@@ -144,6 +144,9 @@ class ScheduledRunnable implements Runnable, Comparable<ScheduledRunnable> {
             }
         }
 
+        @Override public String toString() {
+            return String.valueOf(runnable);
+        }
     }
 
 }

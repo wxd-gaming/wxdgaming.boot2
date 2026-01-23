@@ -107,7 +107,7 @@ public class FastJsonUtil {
 
     /** 格式化 */
     public static String toJSONStringAsFmt(Object object) {
-        return JSON.toJSONString(object, JSONWriter.Feature.PrettyFormat);
+        return JSON.toJSONString(object,JSONWriter.Feature.WriteNonStringValueAsString, JSONWriter.Feature.PrettyFormat);
     }
 
     /** 格式化,包含数据类型 {@code @class} */

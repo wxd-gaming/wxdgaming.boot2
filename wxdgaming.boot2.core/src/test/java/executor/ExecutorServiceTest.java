@@ -39,8 +39,16 @@ public class ExecutorServiceTest {
 
     public void test(AbstractExecutorService executorServicePlatform) {
         for (int i = 0; i < 10; i++) {
-            executorServicePlatform.execute(() -> {
-                System.out.println("1");
+            executorServicePlatform.execute(new AbstractEventRunnable() {
+
+                @Override public String queueName() {
+                    return "ddd";
+                }
+
+                @Override public void run() {
+                    System.out.println("1");
+                    LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
+                }
             });
             executorServicePlatform.execute(() -> {
                 ExecutorVO executorVO = ExecutorVO.threadLocal();
@@ -53,9 +61,13 @@ public class ExecutorServiceTest {
             log.debug("schedule");
         }, 1, TimeUnit.SECONDS);
 
-        ScheduledRunnable.scheduleAtFixedRate(executorServicePlatform, () -> {
-            log.debug("scheduleAtFixedRate");
-            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
+        ScheduledRunnable.scheduleAtFixedRate(executorServicePlatform, new AbstractEventRunnable() {
+            @Override public void run() {
+                log.debug("scheduleAtFixedRate");
+                ExecutorMonitor.threadContext().startWatch("scheduleAtFixedRate");
+                LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
+                ExecutorMonitor.threadContext().stopWatch();
+            }
         }, 0, 1, TimeUnit.SECONDS);
 
         ScheduledRunnable.scheduleWithFixedDelay(executorServicePlatform, () -> {
