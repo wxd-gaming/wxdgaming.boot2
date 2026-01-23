@@ -42,4 +42,32 @@ public class CronTest {
         LockSupport.parkNanos(TimeUnit.MINUTES.toNanos(10));
     }
 
+    @Test
+    public void cron3() {
+        CronService cronService = new CronService(5);
+        AtomicInteger taskIdFactory = new AtomicInteger(0);
+        for (int i = 0; i < 5; i++) {
+            final int taskId = taskIdFactory.incrementAndGet();
+            cronService.addJob("*/5 * * ? * *", new CronQueue(taskId));
+        }
+        LockSupport.parkNanos(TimeUnit.MINUTES.toNanos(10));
+    }
+
+    public static class CronQueue implements Runnable, RunnableQueue {
+
+        private final int taskId;
+
+        public CronQueue(int taskId) {
+            this.taskId = taskId;
+        }
+
+        @Override public String queueName() {
+            return "abc";
+        }
+
+        @Override public void run() {
+            log.info("taskId:{}, Thread:{} {}", taskId, Thread.currentThread().getName(), "执行任务");
+        }
+    }
+
 }

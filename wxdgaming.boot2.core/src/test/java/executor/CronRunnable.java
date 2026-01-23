@@ -22,7 +22,7 @@ class CronRunnable implements Runnable {
     static {
         Thread thread = new Thread(() -> {
             while (true) {
-                LockSupport.parkNanos(TimeUnit.MICROSECONDS.toNanos(100));
+                LockSupport.parkNanos(TimeUnit.MICROSECONDS.toNanos(200));
                 long now = MyClock.millis();
                 ArrayList<CronRunnable> runnables = new ArrayList<>(CONCURRENT_HASH_SET);
                 for (CronRunnable cronRunnable : runnables) {
