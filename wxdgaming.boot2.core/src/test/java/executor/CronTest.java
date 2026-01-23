@@ -3,6 +3,7 @@ package executor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.scheduling.support.CronExpression;
+import wxdgaming.boot2.core.executor.QueuePolicyConst;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
@@ -31,11 +32,11 @@ public class CronTest {
 
     @Test
     public void cron2() {
-        CronService cronService = new CronService(1);
+        AbstractExecutorService cronService = new ExecutorServicePlatform("cron", 1, 500, QueuePolicyConst.AbortPolicy);
         AtomicInteger taskIdFactory = new AtomicInteger(0);
         for (int i = 0; i < 5; i++) {
             final int taskId = taskIdFactory.incrementAndGet();
-            cronService.addJob("*/5 * * ? * *", () -> {
+            cronService.addCronJob("*/5 * * ? * *", () -> {
                 log.info("taskId:{}, Thread:{} {}", taskId, Thread.currentThread().getName(), "执行任务");
             });
         }
@@ -44,18 +45,21 @@ public class CronTest {
 
     @Test
     public void cron3() {
-        CronService cronService = new CronService(5);
+        AbstractExecutorService cronService = new ExecutorServicePlatform("cron", 5, 500, QueuePolicyConst.AbortPolicy);
         AtomicInteger taskIdFactory = new AtomicInteger(0);
         for (int i = 0; i < 5; i++) {
             final int taskId = taskIdFactory.incrementAndGet();
-            cronService.addJob("*/5 * * ? * *", new CronQueue(taskId));
+            CronQueue cronQueue = new CronQueue(taskId);
+            cronQueue.cancelHolding = cronService.addCronJob("*/5 * * ? * *", cronQueue);
         }
         LockSupport.parkNanos(TimeUnit.MINUTES.toNanos(10));
     }
 
     public static class CronQueue implements Runnable, RunnableQueue {
 
+        private CancelHolding cancelHolding = null;
         private final int taskId;
+        private int runCount = 0;
 
         public CronQueue(int taskId) {
             this.taskId = taskId;
@@ -67,6 +71,10 @@ public class CronTest {
 
         @Override public void run() {
             log.info("taskId:{}, Thread:{} {}", taskId, Thread.currentThread().getName(), "执行任务");
+            runCount++;
+            if (runCount >= taskId) {
+                cancelHolding.cancel();
+            }
         }
     }
 

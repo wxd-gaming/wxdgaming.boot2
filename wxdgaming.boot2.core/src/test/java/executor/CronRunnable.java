@@ -6,6 +6,7 @@ import wxdgaming.boot2.core.timer.MyClock;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
@@ -53,14 +54,14 @@ class CronRunnable implements Runnable {
         thread.start();
     }
 
-    final AbstractExecutorService executorService;
+    final Executor executor;
     final CronExpression cronExpression;
     final Runnable runnable;
     final CancelHolding cancelHolding = new CancelHolding();
     long nextRunTime;
 
-    public CronRunnable(AbstractExecutorService executorService, CronExpression cronExpression, Runnable runnable) {
-        this.executorService = executorService;
+    public CronRunnable(Executor executor, CronExpression cronExpression, Runnable runnable) {
+        this.executor = executor;
         this.cronExpression = cronExpression;
         this.runnable = runnable;
         resetNextRunTime();
@@ -77,7 +78,7 @@ class CronRunnable implements Runnable {
     }
 
     @Override public void run() {
-        executorService.execute(runnable);
+        executor.execute(runnable);
     }
 
 }

@@ -37,6 +37,18 @@ public abstract class AbstractExecutorService implements Executor {
     }
 
     /**
+     * 根据 cron 表达式增加定时任务
+     *
+     * @param cron     表达式
+     * @param runnable 任务
+     * @return 可以取消当前任务的状态持有对象
+     */
+    public CancelHolding addCronJob(String cron, Runnable runnable) {
+        CronRunnable cronRunnable = new CronRunnable(this, CronExpressionUtil.parse(cron), runnable);
+        return cronRunnable.cancelHolding;
+    }
+
+    /**
      * 延迟执行一次的任务
      *
      * @param runnable 需要执行
