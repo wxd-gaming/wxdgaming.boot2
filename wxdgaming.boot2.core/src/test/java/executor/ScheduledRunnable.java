@@ -21,7 +21,7 @@ class ScheduledRunnable implements Runnable, Comparable<ScheduledRunnable> {
     static {
         Thread thread = new Thread(() -> {
             while (true) {
-                LockSupport.parkNanos(TimeUnit.MICROSECONDS.toNanos(200));
+                LockSupport.parkNanos(TimeUnit.MICROSECONDS.toNanos(500));
                 long now = MyClock.millis();
                 ArrayList<ScheduledRunnable> scheduledRunnables = new ArrayList<>(scheduledRunnableSet);
                 for (ScheduledRunnable scheduledRunnable : scheduledRunnables) {
