@@ -13,10 +13,12 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 class FutureRunnable implements Runnable, RunnableQueue {
 
+    final ExecutorContext.Content content;
     final Runnable runnable;
     final CompletableFuture<Void> completableFuture = new CompletableFuture<>();
 
-    public FutureRunnable(Runnable runnable) {
+    public FutureRunnable(ExecutorContext.Content content, Runnable runnable) {
+        this.content = content;
         this.runnable = runnable;
     }
 
@@ -29,6 +31,7 @@ class FutureRunnable implements Runnable, RunnableQueue {
 
     @Override public void run() {
         try {
+            ExecutorContext.context().getData().putAll(content.getData());
             runnable.run();
             completableFuture.complete(null);
         } catch (Throwable e) {

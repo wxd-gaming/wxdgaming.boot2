@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 @Setter
 public class ExecutorMonitorContext {
 
-    private final Thread thread;
+    private Thread thread;
     private AbstractExecutorService executorService;
     private ExecutorQueue executorQueue;
     private Runnable runnable;
@@ -20,8 +20,7 @@ public class ExecutorMonitorContext {
     private ExecutorMonitorContextStopWatch stopWatch = null;
 
 
-    public ExecutorMonitorContext(Thread thread) {
-        this.thread = thread;
+    public ExecutorMonitorContext() {
         this.startTime = System.nanoTime();
         this.actualStartTime = MyClock.millis();
     }

@@ -13,12 +13,12 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 class CoroutineRunnable implements Runnable, RunnableQueue {
 
-    final ExecutorVO executorVO;
+    final ExecutorContext.Content content;
     final Runnable runnable;
     final CompletableFuture<Void> completableFuture = new CompletableFuture<>();
 
-    public CoroutineRunnable(ExecutorVO executorVO, Runnable runnable) {
-        this.executorVO = executorVO;
+    public CoroutineRunnable(ExecutorContext.Content content, Runnable runnable) {
+        this.content = content;
         this.runnable = runnable;
     }
 
@@ -31,11 +31,12 @@ class CoroutineRunnable implements Runnable, RunnableQueue {
 
     @Override public void run() {
         try {
+            ExecutorContext.context().getData().putAll(content.getData());
             runnable.run();
-            executorVO.execute(() -> completableFuture.complete(null));
+            content.execute(() -> completableFuture.complete(null));
         } catch (Throwable e) {
             log.error("{} {} error", runnable.getClass(), runnable.toString(), e);
-            executorVO.execute(() -> completableFuture.completeExceptionally(e));
+            content.execute(() -> completableFuture.completeExceptionally(e));
         }
     }
 

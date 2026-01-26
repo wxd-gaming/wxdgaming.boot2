@@ -2,6 +2,7 @@ package executor;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import wxdgaming.boot2.core.executor.QueuePolicyConst;
 
 import java.util.ArrayList;
@@ -19,63 +20,68 @@ import java.util.concurrent.locks.ReentrantLock;
  **/
 @Slf4j
 @Getter
-public class ExecutorQueue implements Executor, Runnable {
+public class ExecutorQueue extends RunnableWrapper implements Executor, Runnable {
 
     protected transient final ReentrantLock reentrantLock = new ReentrantLock();
-    private final Executor executor;
+    private final AbstractExecutorService abstractExecutorService;
     private final String queueName;
     private final List<Thread> threads = Collections.synchronizedList(new ArrayList<>());
-    private final ArrayBlockingQueue<Runnable> queue;
+    private final ArrayBlockingQueue<RunnableWrapper> queue;
+    private final int maxQueueSize;
     private final QueuePolicyConst queuePolicy;
     private boolean addExecutor = false;
 
-    public ExecutorQueue(Executor executor, String queueName, int maxQueueSize, QueuePolicyConst queuePolicy) {
-        this.executor = executor;
+    public ExecutorQueue(AbstractExecutorService abstractExecutorService, String queueName, int maxQueueSize, QueuePolicyConst queuePolicy) {
+        this.abstractExecutorService = abstractExecutorService;
         this.queueName = queueName;
         this.queue = new ArrayBlockingQueue<>(maxQueueSize);
+        this.maxQueueSize = maxQueueSize;
         this.queuePolicy = queuePolicy;
     }
 
 
-    @Override public void execute(Runnable command) {
+    @Override public void execute(@NonNull Runnable command) {
         _execute(command);
     }
 
     private void _execute(Runnable command) {
-        queuePolicy.execute(queue, command);
+        RunnableWrapper runnableWrapper = new RunnableWrapper();
+        runnableWrapper.setRunnable(command);
+        ExecutorContext.Content context = ExecutorContext.context();
+        runnableWrapper.getExecutorContent().getData().putAll(context.getData());
+        queuePolicy.execute(queue, runnableWrapper);
         reentrantLock.lock();
         try {
             if (queue.isEmpty()) return;
             if (!addExecutor) {
                 addExecutor = true;
-                executor.execute(this);
+                abstractExecutorService.execute(this);
             }
         } finally {
             reentrantLock.unlock();
         }
     }
 
-    Runnable currentRunnable = null;
-
     @Override public void run() {
         try {
-            currentRunnable = queue.poll();
-            if (currentRunnable != null) {
-                ExecutorMonitorContext executorMonitorContext = ExecutorMonitor.threadContext();
-                executorMonitorContext.setExecutorQueue(this);
-                executorMonitorContext.setRunnable(currentRunnable);
-                ExecutorVO executorVO = ExecutorVO.threadLocal();
-                executorVO.setExecutorQueue(this);
-                currentRunnable.run();
+            RunnableWrapper runnableWrapper = queue.poll();
+            this.runnable = runnableWrapper;
+            if (this.runnable != null) {
+                ExecutorContext.Content content = ExecutorContext.context();
+                content.newTime = runnableWrapper.newTime;
+                content.executorQueue = this;
+                content.runnable = this.runnable;
+                content.getData().putAll(runnableWrapper.getExecutorContent().getData());
+                this.runnable.run();
             }
         } catch (Throwable e) {
-            log.error("ExecutorQueue error {} {}", currentRunnable.getClass(), currentRunnable, e);
+            log.error("ExecutorQueue error {}", this.runnable, e);
         } finally {
-            currentRunnable = null;
+            this.runnable = null;
             reentrantLock.lock();
             try {
                 if (!queue.isEmpty()) {
-                    executor.execute(this);
+                    abstractExecutorService.execute(this);
                 } else {
                     addExecutor = false;
                 }
@@ -86,7 +92,6 @@ public class ExecutorQueue implements Executor, Runnable {
     }
 
     @Override public String toString() {
-        return "ExecutorQueue{queueName='%s'}"
-                .formatted(queueName);
+        return "ExecutorQueue{queueName='%s', maxQueueSize=%d}".formatted(queueName, maxQueueSize);
     }
 }

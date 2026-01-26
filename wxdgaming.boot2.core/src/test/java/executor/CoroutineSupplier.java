@@ -14,12 +14,12 @@ import java.util.function.Supplier;
 @Slf4j
 class CoroutineSupplier<R> implements Runnable, RunnableQueue {
 
-    final ExecutorVO executorVO;
+    final ExecutorContext.Content content;
     final Supplier<R> runnable;
     final CompletableFuture<R> completableFuture = new CompletableFuture<>();
 
-    public CoroutineSupplier(ExecutorVO executorVO, Supplier<R> runnable) {
-        this.executorVO = executorVO;
+    public CoroutineSupplier(ExecutorContext.Content content, Supplier<R> runnable) {
+        this.content = content;
         this.runnable = runnable;
     }
 
@@ -32,11 +32,12 @@ class CoroutineSupplier<R> implements Runnable, RunnableQueue {
 
     @Override public void run() {
         try {
+            ExecutorContext.context().getData().putAll(content.getData());
             R r = runnable.get();
-            executorVO.execute(() -> completableFuture.complete(r));
+            content.execute(() -> completableFuture.complete(r));
         } catch (Throwable e) {
             log.error("{} {} error", runnable.getClass(), runnable.toString(), e);
-            executorVO.execute(() -> completableFuture.completeExceptionally(e));
+            content.execute(() -> completableFuture.completeExceptionally(e));
         }
     }
 

@@ -27,17 +27,17 @@ public class ExecutorServiceFutureCallBackTest {
 
         executorServicePlatform.execute(() -> {
             int taskId = taskIdFactory.incrementAndGet();
-            ExecutorVO executorVO = ExecutorVO.threadLocal();
-            log.debug("taskId:{} 发起异步 {}", taskId, executorVO);
+            ExecutorContext.Content context = ExecutorContext.context();
+            context.getData().put("async", "d");
+            log.debug("taskId:{} 发起异步 {}", taskId, context);
             CompletableFuture<Void> future = executorServiceVirtual.future(() -> {
-                ExecutorVO executorVO1 = ExecutorVO.threadLocal();
-                log.debug("taskId:{} 异步执行中 {}", taskId, executorVO1);
+
+                log.debug("taskId:{} 异步执行中 {}", taskId, ExecutorContext.context());
                 LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
-                log.debug("taskId:{} 异步执行结束 {}", taskId, executorVO1);
+                log.debug("taskId:{} 异步执行结束 {}", taskId, ExecutorContext.context());
             });
             future.whenComplete((v, e) -> {
-                ExecutorVO whenComplete = ExecutorVO.threadLocal();
-                log.debug("taskId:{} 异步回调 {}", taskId, whenComplete);
+                log.debug("taskId:{} 异步回调 {}", taskId, ExecutorContext.context());
             });
         });
 
@@ -47,15 +47,16 @@ public class ExecutorServiceFutureCallBackTest {
 
                 int taskId = taskIdFactory.incrementAndGet();
 
-                log.debug("taskId:{} 发起异步队列 queue:{}", taskId, ExecutorVO.threadLocal().queueName());
+                ExecutorContext.Content context = ExecutorContext.context();
+                context.getData().put("async", "d");
+                log.debug("taskId:{} 发起异步队列 queue:{}", taskId, ExecutorContext.context().queueName());
                 CompletableFuture<Void> future = executorServiceVirtual.future(() -> {
                     log.debug("taskId:{} 异步队列执行中", taskId);
                     LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
                     log.debug("taskId:{} 异步队列执行结束", taskId);
                 });
                 future.whenComplete((v, e) -> {
-                    ExecutorVO whenComplete = ExecutorVO.threadLocal();
-                    log.debug("taskId:{} 异步队列 回调 queue:{}", taskId, whenComplete.queueName());
+                    log.debug("taskId:{} 异步队列 回调 queue:{}", taskId, ExecutorContext.context().queueName());
                 });
             }
 
@@ -64,17 +65,18 @@ public class ExecutorServiceFutureCallBackTest {
         executorServicePlatform.execute(new Run1() {
 
             @Override public void run() {
+
+                ExecutorContext.Content context = ExecutorContext.context();
+                context.getData().put("async", "d");
                 int taskId = taskIdFactory.incrementAndGet();
-                ExecutorVO executorVO = ExecutorVO.threadLocal();
-                log.debug("taskId:{} 发起协程队列 queue:{}", taskId, executorVO.queueName());
+                log.debug("taskId:{} 发起协程队列 queue:{}", taskId, ExecutorContext.context().queueName());
                 CompletableFuture<Void> coroutine = executorServiceVirtual.coroutine(() -> {
                     log.debug("taskId:{} 协程队列执行中", taskId);
                     LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
                     log.debug("taskId:{} 协程队列执行结束", taskId);
                 });
                 coroutine.whenComplete((v, e) -> {
-                    ExecutorVO whenComplete = ExecutorVO.threadLocal();
-                    log.debug("taskId:{} 协程队列回调 queue:{}", taskId, whenComplete.queueName());
+                    log.debug("taskId:{} 协程队列回调 queue:{}", taskId, ExecutorContext.context().queueName());
                 });
             }
 
@@ -84,19 +86,16 @@ public class ExecutorServiceFutureCallBackTest {
 
             @Override public void run() {
                 int taskId = taskIdFactory.incrementAndGet();
-                ExecutorVO executorVO = ExecutorVO.threadLocal();
-                log.debug("taskId:{} 队列任务发起协程仍然是队列任务 queue:{}", taskId, executorVO.queueName());
+                log.debug("taskId:{} 队列任务发起协程仍然是队列任务 queue:{}", taskId, ExecutorContext.context().queueName());
                 CompletableFuture<Void> coroutine = executorServiceVirtual.coroutine(new Run1() {
                     @Override public void run() {
-                        ExecutorVO executorVO1 = ExecutorVO.threadLocal();
-                        log.debug("taskId:{} 队列任务发起协程仍然是队列任务 协程队列执行中 queue:{}", taskId, executorVO1.queueName());
+                        log.debug("taskId:{} 队列任务发起协程仍然是队列任务 协程队列执行中 queue:{}", taskId, ExecutorContext.context().queueName());
                         LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
-                        log.debug("taskId:{} 队列任务发起协程仍然是队列任务 协程队列执行结束 queue:{}", taskId, executorVO1.queueName());
+                        log.debug("taskId:{} 队列任务发起协程仍然是队列任务 协程队列执行结束 queue:{}", taskId, ExecutorContext.context().queueName());
                     }
                 });
                 coroutine.whenComplete((v, e) -> {
-                    ExecutorVO whenComplete = ExecutorVO.threadLocal();
-                    log.debug("taskId:{} 队列任务发起协程仍然是队列任务 回调 queue:{}", taskId, whenComplete.queueName());
+                    log.debug("taskId:{} 队列任务发起协程仍然是队列任务 回调 queue:{}", taskId, ExecutorContext.context().queueName());
                 });
             }
 

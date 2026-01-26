@@ -24,7 +24,7 @@ public abstract class AbstractExecutorService implements Executor {
     private final int threadSize;
     private final int queueSize;
     private final QueuePolicyConst queuePolicy;
-    private final ArrayBlockingQueue<Runnable> queue;
+    private final ArrayBlockingQueue<RunnableWrapper> queue;
     private final ConcurrentHashMap<String, ExecutorQueue> executorQueues = new ConcurrentHashMap<>();
     private final AtomicBoolean stoping = new AtomicBoolean(false);
 
@@ -91,21 +91,23 @@ public abstract class AbstractExecutorService implements Executor {
 
     /** 异步 */
     public CompletableFuture<Void> future(Runnable runnable) {
-        FutureRunnable futureRunnable = new FutureRunnable(runnable);
+        ExecutorContext.Content context = ExecutorContext.context();
+        FutureRunnable futureRunnable = new FutureRunnable(context, runnable);
         execute(futureRunnable);
         return futureRunnable.completableFuture;
     }
 
     /** 异步 */
     public <R> CompletableFuture<R> future(Supplier<R> supplier) {
-        FutureSupplier<R> futureSupplier = new FutureSupplier<>(supplier);
+        ExecutorContext.Content context = ExecutorContext.context();
+        FutureSupplier<R> futureSupplier = new FutureSupplier<>(context, supplier);
         execute(futureSupplier);
         return futureSupplier.completableFuture;
     }
 
     /** 异步 协程(coroutine) 会回到当前调用线程 */
     public CompletableFuture<Void> coroutine(Runnable runnable) {
-        ExecutorVO executorVO = ExecutorVO.threadLocal();
+        ExecutorContext.Content executorVO = ExecutorContext.context();
         CoroutineRunnable coroutineRunnable = new CoroutineRunnable(executorVO, runnable);
         execute(coroutineRunnable);
         return coroutineRunnable.completableFuture;
@@ -113,7 +115,7 @@ public abstract class AbstractExecutorService implements Executor {
 
     /** 异步 协程(coroutine) 会回到当前调用线程 */
     public <R> CompletableFuture<R> coroutine(Supplier<R> supplier) {
-        ExecutorVO executorVO = ExecutorVO.threadLocal();
+        ExecutorContext.Content executorVO = ExecutorContext.context();
         CoroutineSupplier<R> coroutineSupplier = new CoroutineSupplier<>(executorVO, supplier);
         execute(coroutineSupplier);
         return coroutineSupplier.completableFuture;
@@ -135,8 +137,28 @@ public abstract class AbstractExecutorService implements Executor {
     }
 
     protected void _execute(Runnable command) {
-        queuePolicy.execute(queue, command);
+        RunnableWrapper runnableWrapper;
+        if (command instanceof RunnableWrapper) {
+            runnableWrapper = (RunnableWrapper) command;
+        } else {
+            runnableWrapper = new RunnableWrapper();
+            runnableWrapper.setRunnable(command);
+            ExecutorContext.Content context = ExecutorContext.context();
+            runnableWrapper.getExecutorContent().getData().putAll(context.getData());
+        }
+        queuePolicy.execute(queue, runnableWrapper);
         checkExecute();
+    }
+
+    void setExecutorContext(RunnableWrapper task) {
+        ExecutorContext.Content executorContent = task.getExecutorContent();
+        executorContent.newTime = task.newTime;
+        executorContent.actualNewTime = task.actualNewTime;
+        executorContent.thread = Thread.currentThread();
+        executorContent.executorService = this;
+        executorContent.runnable = task;
+        executorContent.running();
+        ExecutorContext.setContext(executorContent);
     }
 
     protected abstract void checkExecute();
@@ -144,7 +166,7 @@ public abstract class AbstractExecutorService implements Executor {
     protected abstract void newThread();
 
     @Override public String toString() {
-        return "%s{namePrefix='%s', threadSize=%d, queueSize=%d, queuePolicy=%s, stoping=%s}"
+        return "%s{name='%s', threadSize=%d, queueSize=%d, queuePolicy=%s, stoping=%s}"
                 .formatted(this.getClass().getSimpleName(), namePrefix, threadSize, queueSize, queuePolicy, stoping);
     }
 

@@ -38,20 +38,15 @@ public class ExecutorServicePlatform extends AbstractExecutorService {
             @Override
             public void run() {
                 while (!getStoping().get()) {
-                    Runnable task = null;
+                    RunnableWrapper task = null;
                     try {
                         task = getQueue().poll(10, TimeUnit.MILLISECONDS);
                         if (task != null) {
-                            ExecutorMonitorContext executorMonitorContext = ExecutorMonitor.threadContext();
-                            executorMonitorContext.setExecutorService(ExecutorServicePlatform.this);
-                            executorMonitorContext.setRunnable(task);
-                            ExecutorVO executorVO = ExecutorVO.threadLocal();
-                            executorVO.setExecutor(ExecutorServicePlatform.this);
+                            setExecutorContext(task);
                             try {
                                 task.run();
                             } finally {
-                                ExecutorMonitor.cleanup();
-                                ExecutorVO.cleanup();
+                                ExecutorContext.cleanup();
                             }
                         }
                     } catch (InterruptedException e) {

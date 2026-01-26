@@ -14,10 +14,12 @@ import java.util.function.Supplier;
 @Slf4j
 class FutureSupplier<R> implements Runnable, RunnableQueue {
 
+    final ExecutorContext.Content content;
     final Supplier<R> runnable;
     final CompletableFuture<R> completableFuture = new CompletableFuture<>();
 
-    public FutureSupplier(Supplier<R> runnable) {
+    public FutureSupplier(ExecutorContext.Content content, Supplier<R> runnable) {
+        this.content = content;
         this.runnable = runnable;
     }
 
@@ -30,6 +32,7 @@ class FutureSupplier<R> implements Runnable, RunnableQueue {
 
     @Override public void run() {
         try {
+            ExecutorContext.context().getData().putAll(content.getData());
             completableFuture.complete(runnable.get());
         } catch (Throwable e) {
             log.error("{} {} error", runnable.getClass(), runnable.toString(), e);
