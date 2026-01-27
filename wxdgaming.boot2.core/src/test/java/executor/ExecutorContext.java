@@ -36,17 +36,17 @@ public class ExecutorContext {
 
     public static void cleanup() {
         Content content = CONTEXT.remove(Thread.currentThread());
-        if (content != null && content.getNewTime() > 0 && content.getStartTime() > 0) {
+        if (content != null && !content.offWarnLog()) {
             long costMillis = content.costMillis();
             long newMillis = content.newMillis();
-            if (costMillis > 30 || newMillis > 30) {
+            if (costMillis > content.getExecutorWarnTime() || newMillis > content.getSubmitWarnTime()) {
                 log.error("线程执行耗时过大：\n{}", content.costString());
             }
         }
     }
 
     @Getter
-    public static class Content {
+    public static class Content implements RunnableWarnTime {
 
         Thread thread;
         AbstractExecutorService executorService;
@@ -63,6 +63,27 @@ public class ExecutorContext {
             this.startTime = System.nanoTime();
             this.actualStartTime = MyClock.millis();
             this.stopWatch = new ExecutorMonitorContextStopWatch(TimeUnit.MICROSECONDS, String.valueOf(this.runnable));
+        }
+
+        @Override public boolean offWarnLog() {
+            if (runnable instanceof RunnableWarnTime runnableWarnTime) {
+                return runnableWarnTime.offWarnLog();
+            }
+            return RunnableWarnTime.super.offWarnLog();
+        }
+
+        @Override public long getExecutorWarnTime() {
+            if (runnable instanceof RunnableWarnTime runnableWarnTime) {
+                return runnableWarnTime.getExecutorWarnTime();
+            }
+            return RunnableWarnTime.super.getExecutorWarnTime();
+        }
+
+        @Override public long getSubmitWarnTime() {
+            if (runnable instanceof RunnableWarnTime runnableWarnTime) {
+                return runnableWarnTime.getSubmitWarnTime();
+            }
+            return RunnableWarnTime.super.getSubmitWarnTime();
         }
 
         public void startWatch(Object name) {
