@@ -75,7 +75,7 @@ public class ExecutorContext {
     /** 清理变量的同时判定耗时达到条件会输出日志 */
     public static void cleanup() {
         Content content = CONTEXT.remove(Thread.currentThread());
-        if (content != null && !content.offWarnLog()) {
+        if (content != null && content.stopWatch != null && !content.offWarnLog()) {
             long costMillis = content.costMillis();
             long newMillis = content.newMillis();
             if (costMillis > content.getExecutorWarnTime() || newMillis > content.getSubmitWarnTime()) {

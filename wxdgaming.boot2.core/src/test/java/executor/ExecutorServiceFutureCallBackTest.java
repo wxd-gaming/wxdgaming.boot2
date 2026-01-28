@@ -26,42 +26,42 @@ public class ExecutorServiceFutureCallBackTest {
 
         AtomicInteger taskIdFactory = new AtomicInteger(0);
 
-        executorServicePlatform.execute(() -> {
-            int taskId = taskIdFactory.incrementAndGet();
-            ExecutorContext.Content context = ExecutorContext.context();
-            context.getData().put("async", "d");
-            log.debug("taskId:{} 发起异步 {}", taskId, context);
-            CompletableFuture<Void> future = executorServiceVirtual.future(() -> {
-
-                log.debug("taskId:{} 异步执行中 {}", taskId, ExecutorContext.context());
-                LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
-                log.debug("taskId:{} 异步执行结束 {}", taskId, ExecutorContext.context());
-            });
-            future.whenComplete((v, e) -> {
-                log.debug("taskId:{} 异步回调 {}", taskId, ExecutorContext.context());
-            });
-        });
-
-        executorServicePlatform.execute(new Run1() {
-
-            @Override public void run() {
-
-                int taskId = taskIdFactory.incrementAndGet();
-
-                ExecutorContext.Content context = ExecutorContext.context();
-                context.getData().put("async", "d");
-                log.debug("taskId:{} 发起异步队列 queue:{}", taskId, ExecutorContext.context().queueName());
-                CompletableFuture<Void> future = executorServiceVirtual.future(() -> {
-                    log.debug("taskId:{} 异步队列执行中", taskId);
-                    LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
-                    log.debug("taskId:{} 异步队列执行结束", taskId);
-                });
-                future.whenComplete((v, e) -> {
-                    log.debug("taskId:{} 异步队列 回调 queue:{}", taskId, ExecutorContext.context().queueName());
-                });
-            }
-
-        });
+//        executorServicePlatform.execute(() -> {
+//            int taskId = taskIdFactory.incrementAndGet();
+//            ExecutorContext.Content context = ExecutorContext.context();
+//            context.getData().put("async", "d");
+//            log.debug("taskId:{} 发起异步 {}", taskId, context);
+//            CompletableFuture<Void> future = executorServiceVirtual.future(() -> {
+//
+//                log.debug("taskId:{} 异步执行中 {}", taskId, ExecutorContext.context());
+//                LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
+//                log.debug("taskId:{} 异步执行结束 {}", taskId, ExecutorContext.context());
+//            });
+//            future.whenComplete((v, e) -> {
+//                log.debug("taskId:{} 异步回调 {}", taskId, ExecutorContext.context());
+//            });
+//        });
+//
+//        executorServicePlatform.execute(new Run1() {
+//
+//            @Override public void run() {
+//
+//                int taskId = taskIdFactory.incrementAndGet();
+//
+//                ExecutorContext.Content context = ExecutorContext.context();
+//                context.getData().put("async", "d");
+//                log.debug("taskId:{} 发起异步队列 queue:{}", taskId, ExecutorContext.context().queueName());
+//                CompletableFuture<Void> future = executorServiceVirtual.future(() -> {
+//                    log.debug("taskId:{} 异步队列执行中", taskId);
+//                    LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
+//                    log.debug("taskId:{} 异步队列执行结束", taskId);
+//                });
+//                future.whenComplete((v, e) -> {
+//                    log.debug("taskId:{} 异步队列 回调 queue:{}", taskId, ExecutorContext.context().queueName());
+//                });
+//            }
+//
+//        });
 
         executorServicePlatform.execute(new Run1() {
 
