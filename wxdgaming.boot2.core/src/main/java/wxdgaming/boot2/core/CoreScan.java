@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core;
 
+import lombok.Getter;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.executor.ExecutorProperties;
@@ -14,6 +15,14 @@ import wxdgaming.boot2.core.executor.ExecutorProperties;
         ExecutorProperties.class,
         CoreScan.class,
 })
+@Getter
 @Component
 public class CoreScan {
+
+    private final ExecutorProperties executorProperties;
+
+    public CoreScan(ExecutorProperties executorProperties) {
+        this.executorProperties = executorProperties;
+    }
+
 }
