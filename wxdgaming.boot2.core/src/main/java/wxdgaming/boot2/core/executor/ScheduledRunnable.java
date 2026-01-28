@@ -1,4 +1,4 @@
-package executor;
+package wxdgaming.boot2.core.executor;
 
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentHashSet;
 import wxdgaming.boot2.core.timer.MyClock;

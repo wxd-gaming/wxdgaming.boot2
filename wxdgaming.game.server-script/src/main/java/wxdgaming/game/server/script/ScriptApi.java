@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;
 
@@ -54,13 +54,13 @@ public class ScriptApi {
 
     @RpcRequest
     public JSONObject rpcIndex(@RequestParam(value = "a", defaultValue = "2") String a, JSONObject paramData) {
-        log.info("{} {} {}", a, paramData, ThreadContext.context().threadVO().getQueueName());
+        log.info("{} {} {}", a, paramData, ExecutorContext.context().queueName());
         return paramData;
     }
 
     @RpcRequest
     public JSONObject rpcIndex2(JSONObject paramData) {
-        log.info("{} {}", paramData, ThreadContext.context().threadVO().getQueueName());
+        log.info("{} {}", paramData, ExecutorContext.context().queueName());
         return paramData;
     }
 

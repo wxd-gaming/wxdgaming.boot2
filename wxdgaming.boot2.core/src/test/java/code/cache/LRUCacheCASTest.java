@@ -31,12 +31,6 @@ public class LRUCacheCASTest {
 
     @BeforeEach
     void beforeEach() {
-        if (ExecutorFactory.Lazy.instance != null) return;
-        ExecutorProperties executorProperties = new ExecutorProperties();
-        ExecutorConfig logic = new ExecutorConfig();
-        logic.setCoreSize(threadSize).setMaxQueueSize(500000).setWarnSize(500000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
-        executorProperties.setLogic(logic);
-        new ExecutorFactory(executorProperties);
     }
 
     @Test

@@ -2,7 +2,7 @@ package code;
 
 import org.junit.jupiter.api.*;
 import org.springframework.util.StopWatch;
-import wxdgaming.boot2.core.executor.ThreadStopWatch;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.format.data.Data2Size;
 import wxdgaming.boot2.core.rank.RankElement;
 import wxdgaming.boot2.core.util.RandomUtils;
@@ -41,19 +41,19 @@ public class RankByBMapDBTest {
     @RepeatedTest(10)
     public void b1treeSet() {
 
-        ThreadStopWatch.init("xxx");
+        ExecutorContext.context().running("xxx");
         ArrayList<Object> objects = new ArrayList<>(holdMap.values());
-        ThreadStopWatch.start("读取耗时");
+        ExecutorContext.context().startWatch("读取耗时");
         TreeSet<RankElement> rankElements = new TreeSet<>();
         for (Object value : objects) {
             RankElement rankElement = (RankElement) value;
             rankElements.add(rankElement);
         }
-        ThreadStopWatch.stop();
-        ThreadStopWatch.start("排序耗时" + holdMap.size());
+        ExecutorContext.context().stopWatch();
+        ExecutorContext.context().startWatch("排序耗时" + holdMap.size());
         List<RankElement> list = rankElements.stream().limit(20).toList();
-        ThreadStopWatch.stop();
-        System.out.println(ThreadStopWatch.releasePrint());
+        ExecutorContext.context().stopWatch();
+        System.out.println(ExecutorContext.context().costString());
         System.out.println("==============================");
         //        float v = diffTime.diffMs5();
         //        for (RankScore rankScore : list) {

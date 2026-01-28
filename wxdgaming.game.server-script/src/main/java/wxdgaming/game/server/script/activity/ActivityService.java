@@ -39,7 +39,7 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
     final DataRepository dataRepository;
     final ValidationService validationService;
     Map<Integer, AbstractActivityHandler> activityHandlerMap;
-    Map<HeartConst, List<ActivityData>> heartHandlerMap;
+    Map<HeartConst, List<ActivityData>> heartHandlerMap = Map.of();
 
     public ActivityService(GameService gameService, GlobalDataService globalDataService, DataRepository dataRepository, ValidationService validationService) {
         this.gameService = gameService;
@@ -71,6 +71,7 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
         boolean changed = false;
         for (Map.Entry<Integer, Map<Integer, QActivity>> mapEntry : activityType2IdCfgMap.entrySet()) {
             Integer type = mapEntry.getKey();
+            @SuppressWarnings("unchecked")
             AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(type);
             if (abstractActivityHandler == null) {
                 log.warn("{}", "活动处理器不存在：activityType=%5s".formatted(type));

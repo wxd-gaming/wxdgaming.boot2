@@ -6,7 +6,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.core.executor.ThreadStopWatch;
+import wxdgaming.boot2.core.executor.ExecutorContext;
+
 
 /**
  * 通过aop切面管理，线程运行上下文的方法耗时记录仪
@@ -27,12 +28,12 @@ public class MainThreadStopWatchAspect {
     public void beforeAdvice(JoinPoint joinPoint) {
         String declaringTypeName = joinPoint.getSignature().getDeclaringType().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
-        ThreadStopWatch.startIfPresent(declaringTypeName + "." + methodName);
+        ExecutorContext.context().startWatch(declaringTypeName + "." + methodName);
     }
 
     // 后置通知：目标方法执行后执行（无论是否异常）
     @After("allPointcut()")
     public void afterAdvice() {
-        ThreadStopWatch.stopIfPresent();
+        ExecutorContext.context().stopWatch();
     }
 }

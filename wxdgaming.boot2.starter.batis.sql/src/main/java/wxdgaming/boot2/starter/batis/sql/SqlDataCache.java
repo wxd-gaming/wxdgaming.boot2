@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.cache.Cache;
 import wxdgaming.boot2.core.cache.LRUCacheLock;
 import wxdgaming.boot2.core.cache.RemovalCause;
-import wxdgaming.boot2.core.executor.ThreadStopWatch;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.reflect.ReflectProvider;
 import wxdgaming.boot2.starter.batis.Entity;
 import wxdgaming.boot2.starter.batis.TableMapping;
@@ -71,15 +71,15 @@ public class SqlDataCache<E extends Entity, Key> {
     }
 
     protected E loader(Key key) {
-        ThreadStopWatch.startIfPresent("db  findByKey");
+        ExecutorContext.context().startWatch("db  findByKey");
         E byId = (E) sqlDataHelper.findByKey(cls, key);
         if (byId != null) {
             byId.setNewEntity(false);
-            ThreadStopWatch.startIfPresent("hash code");
+            ExecutorContext.context().startWatch("hash code");
             byId.checkHashCode();
-            ThreadStopWatch.stopIfPresent();
+            ExecutorContext.context().stopWatch();
         }
-        ThreadStopWatch.stopIfPresent();
+        ExecutorContext.context().stopWatch();
         return byId;
     }
 

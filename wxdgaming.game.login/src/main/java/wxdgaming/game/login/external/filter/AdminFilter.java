@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.WebFilter;
-import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.authority.AdminUserToken;
 import wxdgaming.game.login.LoginServerProperties;
@@ -40,7 +40,7 @@ public class AdminFilter implements WebFilter {
     @Override public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         AdminUserToken adminUserToken = AdminUserToken.parse(request, loginServerProperties.getAdminKey());
         AssertUtil.isTrue(adminUserToken != null, "token过期");
-        ThreadContext.putContent("adminUserToken", adminUserToken);
+        ExecutorContext.context().getData().put("adminUserToken", adminUserToken);
         String currentUrl = SpringUtil.getCurrentUrl(request);
         String body = SpringUtil.readBody(request);
         Map<String, String> stringStringMap = SpringUtil.readParameterMap(request);

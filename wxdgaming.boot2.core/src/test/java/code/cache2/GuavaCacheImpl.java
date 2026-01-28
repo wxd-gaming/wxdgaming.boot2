@@ -11,6 +11,7 @@ import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.time.Duration;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -29,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 @Getter
 public class GuavaCacheImpl<Key, Value> {
 
-    static final ScheduledExecutorService scheduledExecutorService = ExecutorFactory.newSingleThreadScheduledExecutor("GuavaCacheImpl");
+    static final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     static final Duration minHeartDuration = Duration.ofSeconds(5);
     static final Duration outerDuration = Duration.ofSeconds(2);
     static final Duration removeDurationDefault = Duration.ofMinutes(5);

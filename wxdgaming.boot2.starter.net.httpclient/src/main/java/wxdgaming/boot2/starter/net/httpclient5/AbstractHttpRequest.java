@@ -15,8 +15,8 @@ import org.apache.hc.core5.http.NoHttpResponseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.util.Timeout;
 import reactor.core.publisher.Mono;
-import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
+import wxdgaming.boot2.core.executor.RunnableWarnTime;
 import wxdgaming.boot2.core.util.AssertUtil;
 
 import java.io.InterruptedIOException;
@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * 请求
@@ -49,8 +50,25 @@ public abstract class AbstractHttpRequest {
     protected abstract HttpUriRequestBase buildRequest();
 
     public Mono<HttpResponse> executeAsync() {
-        CompletableFuture<HttpResponse> future = ExecutorFactory.getExecutorServiceVirtual().future(this::execute);
+        CompletableFuture<HttpResponse> future = ExecutorFactory.getExecutorServiceVirtual().future(new HttpRequestAsync(this));
         return Mono.fromFuture(future);
+    }
+
+    private class HttpRequestAsync implements RunnableWarnTime, Supplier<HttpResponse> {
+
+        private AbstractHttpRequest proxy;
+
+        private HttpRequestAsync(AbstractHttpRequest proxy) {
+            this.proxy = proxy;
+        }
+
+        @Override public HttpResponse get() {
+            return this.proxy.execute();
+        }
+
+        @Override public boolean offWarnLog() {
+            return true;
+        }
     }
 
     public HttpResponse execute() {

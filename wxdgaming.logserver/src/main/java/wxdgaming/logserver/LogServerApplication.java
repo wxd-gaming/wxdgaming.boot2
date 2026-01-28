@@ -3,6 +3,7 @@ package wxdgaming.logserver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import wxdgaming.boot2.core.ApplicationStartBuilder;
+import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 import wxdgaming.game.authority.AuthorityScan;
@@ -16,6 +17,7 @@ import wxdgaming.game.authority.AuthorityScan;
 @Slf4j
 @SpringBootApplication(
         scanBasePackageClasses = {
+                CoreScan.class,
                 PgsqlScan.class,
                 ScheduledScan.class,
                 AuthorityScan.class,

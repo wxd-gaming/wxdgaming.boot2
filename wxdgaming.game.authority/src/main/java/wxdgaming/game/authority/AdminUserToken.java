@@ -6,8 +6,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.SpringUtil;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.executor.StackUtils;
-import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.ObjectBase;
 import wxdgaming.boot2.core.token.JsonToken;
 import wxdgaming.boot2.core.token.JsonTokenParse;
@@ -27,7 +27,11 @@ import java.util.List;
 public class AdminUserToken extends ObjectBase {
 
     public static AdminUserToken threadContext() {
-        return ThreadContext.context("adminUserToken");
+        return ExecutorContext.contextT("adminUserToken");
+    }
+
+    public static void threadContext(AdminUserToken adminUserToken) {
+        ExecutorContext.context().getData().put("adminUserToken", adminUserToken);
     }
 
     public static AdminUserToken parse(HttpServletRequest request, String jwtKey) {

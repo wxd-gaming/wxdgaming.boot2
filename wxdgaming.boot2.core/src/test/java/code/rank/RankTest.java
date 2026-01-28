@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StopWatch;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
+import wxdgaming.boot2.core.executor.QueuePolicyConst;
 import wxdgaming.boot2.core.rank.RankByGroupMap;
 import wxdgaming.boot2.core.rank.RankElement;
 import wxdgaming.boot2.core.util.RandomUtils;
@@ -26,7 +27,7 @@ public class RankTest {
 
     public static void main(String[] args) {
         RankByGroupMap rankByGroupMap = new RankByGroupMap();
-        ExecutorServicePlatform executorService = ExecutorFactory.create("map", 3);
+        ExecutorServicePlatform executorService = ExecutorFactory.createPlatform("map", 3, 1000, QueuePolicyConst.AbortPolicy);
         for (int k = 0; k < 10; k++) {
             executorService.execute(() -> {
 

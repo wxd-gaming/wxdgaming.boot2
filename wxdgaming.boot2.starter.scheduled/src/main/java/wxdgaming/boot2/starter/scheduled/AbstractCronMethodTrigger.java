@@ -4,16 +4,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.support.CronExpression;
 import wxdgaming.boot2.core.Const;
-import wxdgaming.boot2.core.executor.ExecutorEvent;
-import wxdgaming.boot2.core.executor.IExecutorQueue;
+import wxdgaming.boot2.core.executor.AbstractMethodRunnable;
+import wxdgaming.boot2.core.executor.CronExpressionUtil;
 import wxdgaming.boot2.core.executor.StackUtils;
 import wxdgaming.boot2.core.locks.Monitor;
-import wxdgaming.boot2.core.timer.CronExpress;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -26,22 +25,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Getter
 @Setter
 @Accessors(chain = true)
-public abstract class AbstractCronTrigger extends ExecutorEvent implements Runnable, IExecutorQueue, Comparable<AbstractCronTrigger> {
+public abstract class AbstractCronMethodTrigger extends AbstractMethodRunnable implements Runnable, Comparable<AbstractCronMethodTrigger> {
 
-    protected final CronExpress cronExpress;
+    protected final CronExpression cronExpress;
     /** 上一次执行尚未完成是否持续执行 默认false 不执行 */
     protected final Monitor monitor = new Monitor();
     protected final AtomicBoolean runEnd = new AtomicBoolean(true);
     protected long nextRunTime = -1;
 
-    public AbstractCronTrigger(Method method, CronExpress cronExpress) {
+    public AbstractCronMethodTrigger(Method method, CronExpression cronExpress) {
         super(method);
-        this.stack = StackUtils.stack(0, 1);
+        this.sourceLine = StackUtils.stack(0, 1);
         this.cronExpress = cronExpress;
-    }
-
-    public AbstractCronTrigger(String cron) {
-        this.cronExpress = new CronExpress(cron, TimeUnit.SECONDS, 0);
     }
 
     public int index() {
@@ -52,9 +47,14 @@ public abstract class AbstractCronTrigger extends ExecutorEvent implements Runna
         return false;
     }
 
+    /** 查询当前时间的下一次开启时间 */
+    public long nowNextTime() {
+        return CronExpressionUtil.nextMillis(cronExpress);
+    }
+
     public long getNextRunTime() {
         if (nextRunTime == -1) {
-            this.nextRunTime = this.cronExpress.validateTimeAfterMillis();
+            this.nextRunTime = nowNextTime();
         }
         return nextRunTime;
     }
@@ -65,12 +65,14 @@ public abstract class AbstractCronTrigger extends ExecutorEvent implements Runna
     }
 
     public boolean isAsync() {
-        return false;
+        return getExecutorWith() != null;
     }
 
     @Override public void run() {
         try {
             super.run();
+        } catch (Exception e) {
+            log.error("执行：{}", this, e);
         } finally {
             /*标记为执行完成*/
             monitor.sync(() -> runEnd.set(true));
@@ -78,7 +80,7 @@ public abstract class AbstractCronTrigger extends ExecutorEvent implements Runna
     }
 
     @Override
-    public int compareTo(AbstractCronTrigger o) {
+    public int compareTo(AbstractCronMethodTrigger o) {
         if (this.index() != o.index())
             return Integer.compare(this.index(), o.index());
         if (!Objects.equals(this.getClass().getName(), o.getClass().getName())) {

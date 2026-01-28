@@ -104,7 +104,7 @@ public class RobotMainService {
     }
 
     /** 1秒一次主循环 */
-    @Scheduled("*/5")
+    @Scheduled("*/5 * * * * ?")
     @ExecutorWith()
     public void timer() {
         for (Robot robot : robotMap.values()) {
@@ -151,7 +151,7 @@ public class RobotMainService {
     }
 
     /** 1秒一次主循环 */
-    @Scheduled("*/30")
+    @Scheduled("*/30 * * * * ?")
     public void timer30() {
         for (Robot robot : robotMap.values()) {
             if (robot.isLoginEnd() && robot.getLevel() > 10) {
@@ -167,7 +167,7 @@ public class RobotMainService {
     }
 
     /** 1秒一次主循环 */
-    @Scheduled("*/5")
+    @Scheduled("*/5 * * * * ?")
     public void timerTask() {
         for (Robot robot : robotMap.values()) {
             if (robot.isLoginEnd()) {
@@ -197,7 +197,7 @@ public class RobotMainService {
     }
 
     /** 1秒一次主循环 */
-    @Scheduled(value = "*/5")
+    @Scheduled(value = "*/5 * * * * ?")
     public void timer60() {
         for (Robot robot : robotMap.values()) {
             if (robot.isLoginEnd()) {

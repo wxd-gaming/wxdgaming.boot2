@@ -2,7 +2,7 @@ package executor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import wxdgaming.boot2.core.executor.QueuePolicyConst;
+import wxdgaming.boot2.core.executor.*;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
@@ -13,7 +13,7 @@ public class HeartDriveHandlerTest implements HeartDriveHandler {
     @Test
     public void t1() {
         AbstractExecutorService executorServicePlatform = new ExecutorServicePlatform("platform", 4, 1000, QueuePolicyConst.AbortPolicy);
-        HeartDriveRunnable heartDriveRunnable = new HeartDriveRunnable(executorServicePlatform, "heart", 30, TimeUnit.MILLISECONDS);
+        HeartDriveRunnable heartDriveRunnable = new HeartDriveRunnable(executorServicePlatform, "heart", "heart", 30, TimeUnit.MILLISECONDS);
         heartDriveRunnable.setDriveHandler(this);
         LockSupport.parkNanos(TimeUnit.MINUTES.toNanos(3));
     }

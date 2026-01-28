@@ -25,6 +25,7 @@ public class PluginService extends HoldApplicationContext {
 
     @EventListener
     public void start(StartEvent event) {
+        log.info("插件服务启动");
         applicationContextProvider.classWithSuperStream(AbstractPlugin.class)
                 .forEach(abstractPlugin -> {
                     log.info("插件: {} 加载成功", abstractPlugin.getClass().getName());

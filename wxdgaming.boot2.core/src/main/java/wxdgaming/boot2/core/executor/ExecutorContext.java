@@ -1,11 +1,17 @@
-package executor;
+package wxdgaming.boot2.core.executor;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import wxdgaming.boot2.core.Throw;
+import wxdgaming.boot2.core.ann.ThreadParam;
+import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.timer.MyClock;
 
+import java.lang.reflect.Type;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -30,10 +36,43 @@ public class ExecutorContext {
         return CONTEXT.get(Thread.currentThread());
     }
 
-    static void setContext(Content content) {
+    public static void setContext(Content content) {
         CONTEXT.put(Thread.currentThread(), content);
     }
 
+    @SuppressWarnings("unchecked")
+    public static <R> R context(ThreadParam threadParam, Type type) {
+        String name = threadParam.path();
+        if (StringUtils.isBlank(name)) {
+            name = type.getTypeName();
+        }
+        R r;
+        try {
+            Content context = context();
+            r = (R) context.getData().get(name);
+            if (r == null && StringUtils.isNotBlank(threadParam.defaultValue())) {
+                r = FastJsonUtil.parse(threadParam.defaultValue(), type);
+            }
+        } catch (Exception e) {
+            throw Throw.of("threadParam 参数：" + name, e);
+        }
+        if (threadParam.required() && r == null) {
+            throw new IllegalArgumentException("threadParam:" + name + " is null");
+        }
+        return r;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <R> R contextT(String key) {
+        return (R) context().getData().get(key);
+    }
+
+    /** 只会释放当前变量 */
+    public static void release() {
+        CONTEXT.remove(Thread.currentThread());
+    }
+
+    /** 清理变量的同时判定耗时达到条件会输出日志 */
     public static void cleanup() {
         Content content = CONTEXT.remove(Thread.currentThread());
         if (content != null && !content.offWarnLog()) {
@@ -46,51 +85,40 @@ public class ExecutorContext {
     }
 
     @Getter
-    public static class Content implements RunnableWarnTime {
+    public static class Content implements RunnableWrapperProxy {
 
-        Thread thread;
+        @Setter Thread thread;
         AbstractExecutorService executorService;
         ExecutorQueue executorQueue;
         Runnable runnable;
-        long newTime = 0;
-        long actualNewTime = 0;
+        @Setter long newTime = 0;
+        @Setter long actualNewTime = 0;
         private long startTime;
         private long actualStartTime; // 用于记录实际开始时间
         private ExecutorMonitorContextStopWatch stopWatch = null;
         final JSONObject data = new JSONObject();
 
-        void running() {
+        public void running() {
+            running(String.valueOf(this.runnable));
+        }
+
+        public void running(String stack) {
             this.startTime = System.nanoTime();
             this.actualStartTime = MyClock.millis();
-            this.stopWatch = new ExecutorMonitorContextStopWatch(TimeUnit.MICROSECONDS, String.valueOf(this.runnable));
+            this.stopWatch = new ExecutorMonitorContextStopWatch(TimeUnit.MICROSECONDS, stack);
         }
 
-        @Override public boolean offWarnLog() {
-            if (runnable instanceof RunnableWarnTime runnableWarnTime) {
-                return runnableWarnTime.offWarnLog();
-            }
-            return RunnableWarnTime.super.offWarnLog();
-        }
-
-        @Override public long getExecutorWarnTime() {
-            if (runnable instanceof RunnableWarnTime runnableWarnTime) {
-                return runnableWarnTime.getExecutorWarnTime();
-            }
-            return RunnableWarnTime.super.getExecutorWarnTime();
-        }
-
-        @Override public long getSubmitWarnTime() {
-            if (runnable instanceof RunnableWarnTime runnableWarnTime) {
-                return runnableWarnTime.getSubmitWarnTime();
-            }
-            return RunnableWarnTime.super.getSubmitWarnTime();
+        @Override public Runnable getRunnable() {
+            return runnable;
         }
 
         public void startWatch(Object name) {
+            if (stopWatch == null) return;
             this.stopWatch.start(String.valueOf(name));
         }
 
         public void stopWatch() {
+            if (stopWatch == null) return;
             this.stopWatch.stop();
         }
 
@@ -145,7 +173,7 @@ public class ExecutorContext {
                     DurationFormatUtils.formatDuration(newMillis(), "HH:mm:ss.SSS"),
                     DurationFormatUtils.formatDuration(costMillis(), "HH:mm:ss.SSS"),
                     data,
-                    stopWatch.toString()
+                    String.valueOf(stopWatch)
             );
         }
 

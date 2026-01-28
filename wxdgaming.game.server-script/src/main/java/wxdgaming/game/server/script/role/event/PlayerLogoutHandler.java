@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.server.bean.StatusConst;
@@ -39,7 +39,7 @@ public class PlayerLogoutHandler {
         player.getOnlineInfo().setLastLogoutTime(MyClock.millis());
         UserMapping clientSessionMapping = player.getUserMapping();
         SocketSession socketSession = clientSessionMapping.getSocketSession();
-        log.info("玩家下线: {} {}, \n{}", ThreadContext.context().threadVO().getQueueName(), player, socketSession.flowString());
+        log.info("玩家下线: {} {}, \n{}", ExecutorContext.context().queueName(), player, socketSession.flowString());
         clientSessionMapping.setRid(0);
         clientSessionMapping.setSocketSession(null);
         player.setUserMapping(null);

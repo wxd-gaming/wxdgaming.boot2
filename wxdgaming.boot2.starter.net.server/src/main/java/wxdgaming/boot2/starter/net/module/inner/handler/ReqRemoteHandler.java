@@ -2,9 +2,10 @@ package wxdgaming.boot2.starter.net.module.inner.handler;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.ThreadContext;
 import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.json.FastJsonUtil;
-import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.core.zip.GzipUtil;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -63,7 +64,7 @@ public class ReqRemoteHandler {
                 return;
             }
 
-            ThreadContext.cleanup();
+            ExecutorContext.cleanup();
             RpcListenerTrigger rpcListenerTrigger = new RpcListenerTrigger(
                     rpcMapping,
                     rpcService,

@@ -6,16 +6,13 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
+import org.springframework.scheduling.support.CronExpression;
 import wxdgaming.boot2.core.Const;
-import wxdgaming.boot2.core.executor.IExecutorQueue;
 import wxdgaming.boot2.core.io.Objects;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.reflect.InstanceMethodProvider;
 import wxdgaming.boot2.core.reflect.MethodUtil;
-import wxdgaming.boot2.core.timer.CronExpress;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * cron 表达式时间触发器
@@ -27,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class ScheduledInfo extends AbstractCronTrigger implements Runnable, IExecutorQueue {
+public class ScheduledInfo extends AbstractCronMethodTrigger implements Runnable {
 
     protected String name;
     final InstanceMethodProvider instanceMethodProvider;
@@ -36,14 +33,14 @@ public class ScheduledInfo extends AbstractCronTrigger implements Runnable, IExe
     protected final boolean scheduleAtFixedRate;
 
     public ScheduledInfo(InstanceMethodProvider instanceMethodProvider, Scheduled scheduled) {
-        super(instanceMethodProvider.getMethod(), new CronExpress(scheduled.value(), TimeUnit.SECONDS, 0));
+        super(instanceMethodProvider.getMethod(), CronExpression.parse(scheduled.value()));
         this.instanceMethodProvider = instanceMethodProvider;
         if (StringUtils.isNotBlank(scheduled.name())) {
             this.name = "[scheduled-job] " + scheduled.name();
         } else {
             this.name = "[scheduled-job] " + instanceMethodProvider.toString();
         }
-
+        this.sourceLine = this.name;
         final Order orderAnn = AnnUtil.ann(instanceMethodProvider.getMethod(), Order.class);
         this.index = orderAnn == null ? Const.SORT_DEFAULT : orderAnn.value();
         this.scheduleAtFixedRate = scheduled.scheduleAtFixedRate();
@@ -57,27 +54,16 @@ public class ScheduledInfo extends AbstractCronTrigger implements Runnable, IExe
         return isScheduleAtFixedRate();
     }
 
-    public boolean isAsync() {
-        return getExecutorWith() != null;
-    }
-
     @Override public boolean isIgnoreRunTimeRecord() {
         return true;
     }
 
-    @Override public String getStack() {
-        return this.name;
-    }
-
-    @Override public void onEvent() throws Exception {
+    @Override public void onEvent() {
         try {
             instanceMethodProvider.invoke(Objects.ZERO_ARRAY);
         } catch (Throwable throwable) {
             String msg = "执行：" + this.name;
             log.error(msg, throwable);
-        } finally {
-            /*标记为执行完成*/
-            monitor.sync(() -> runEnd.set(true));
         }
     }
 

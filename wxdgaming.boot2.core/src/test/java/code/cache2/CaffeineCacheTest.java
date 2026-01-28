@@ -8,7 +8,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-import wxdgaming.boot2.core.executor.*;
+import wxdgaming.boot2.core.executor.ExecutorContext;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
+import wxdgaming.boot2.core.executor.ExecutorLatch;
+import wxdgaming.boot2.core.executor.ThreadExecutorLatch;
 import wxdgaming.boot2.core.util.RandomUtils;
 
 import java.time.Duration;
@@ -26,12 +29,6 @@ public class CaffeineCacheTest {
 
     @BeforeEach
     void beforeEach() {
-        if (ExecutorFactory.Lazy.instance != null) return;
-        ExecutorProperties executorProperties = new ExecutorProperties();
-        ExecutorConfig logic = new ExecutorConfig();
-        logic.setCoreSize(threadSize).setMaxQueueSize(500000).setWarnSize(500000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
-        executorProperties.setLogic(logic);
-        new ExecutorFactory(executorProperties);
     }
 
     @Test
@@ -82,21 +79,21 @@ public class CaffeineCacheTest {
                 //                .heartListener((key, value, cause) -> log.info("心跳处理 key: {}, value: {}, cause: {}", key, value, cause))
                 //                .removalListener((key, value, cause) -> log.info("移除过期 key: {}, value: {}, cause: {}", key, value, cause))
                 .build();
-        ThreadStopWatch.releasePrint();
-        ThreadStopWatch.init("缓存测试");
+        ExecutorContext.context().costString();
+        ExecutorContext.context().running("缓存测试");
         singleThread(caffeineCacheImpl);
         multiThread(caffeineCacheImpl);
-        log.debug("{}", ThreadStopWatch.releasePrint());
+        log.debug("{}", ExecutorContext.context().costString());
     }
 
     public void singleThread(CaffeineCacheImpl<Long, Object> cache) {
         cache.invalidateAll();
-        ThreadStopWatch.start("循环 " + readSize + " 次数");
+        ExecutorContext.context().startWatch("循环 " + readSize + " 次数");
         AtomicReference<Object> string = new AtomicReference<>();
         for (long i = 0; i < readSize; i++) {
             string.set(cache.get(RandomUtils.random(maxSize)));
         }
-        ThreadStopWatch.stop();
+        ExecutorContext.context().stopWatch();
         log.info(
                 "{} 单线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}",
                 cache.getCacheName(), readSize, cache.size(), JSON.toJSONString(string)
@@ -105,7 +102,7 @@ public class CaffeineCacheTest {
 
     public void multiThread(CaffeineCacheImpl<Long, Object> cache) throws Exception {
         cache.invalidateAll();
-        ThreadStopWatch.start("循环 " + readSize + " 次数");
+        ExecutorContext.context().startWatch("循环 " + readSize + " 次数");
         AtomicReference<Object> string = new AtomicReference<>();
         ThreadExecutorLatch.threadLocalInit(ExecutorFactory.getExecutorServiceLogic());
         for (long i = 0; i < readSize; i++) {
@@ -113,7 +110,7 @@ public class CaffeineCacheTest {
         }
         ThreadExecutorLatch.await();
         ThreadExecutorLatch.release();
-        ThreadStopWatch.stop();
+        ExecutorContext.context().stopWatch();
         log.info(
                 "{} 多线程随机访问：{} 次, 缓存数量：{}, 最后一次访问结果：{}",
                 cache.getCacheName(), readSize, cache.size(), JSON.toJSONString(string.get())

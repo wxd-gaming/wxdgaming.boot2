@@ -75,9 +75,9 @@ public class GameTimerScript extends HoldApplicationContext {
     }
 
     /** 向登陆服务器注册 */
-    @Scheduled(value = "*/5")
+    @Scheduled(value = "*/5 * * * * ?")
     @ExecutorWith(useVirtualThread = true)
-    @ExecutorLog(logTime = 100)
+    @ExecutorLog(executorWarnTime = 100)
     public void registerLoginServer() {
 
         ServerInfoDTO serverInfoDTO = new ServerInfoDTO();
@@ -100,9 +100,9 @@ public class GameTimerScript extends HoldApplicationContext {
     }
 
     /** 向登陆服务器注册 */
-    @Scheduled(value = "0 * * * ?")
+    @Scheduled(value = "0 * * * * ?")
     @ExecutorWith(useVirtualThread = true)
-    @ExecutorLog(logTime = 100)
+    @ExecutorLog(executorWarnTime = 100)
     public void recordOnlineSlog() {
         ServerData serverData = globalDataService.get(GlobalDataConst.SERVERDATA);
         OnlineRecord onlineRecord = serverData.getOnlineRecord();
@@ -138,9 +138,9 @@ public class GameTimerScript extends HoldApplicationContext {
     }
 
     /** 向登陆服务器注册 */
-    @Scheduled(value = "0 */5 * * ?")
+    @Scheduled(value = "0 */5 * * * ?")
     @ExecutorWith(useVirtualThread = true)
-    @ExecutorLog(logTime = 100)
+    @ExecutorLog(executorWarnTime = 100)
     public void remoteBanList() {
         try {
             String json = "{}";

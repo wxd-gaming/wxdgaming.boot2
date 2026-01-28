@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.WebFilter;
-import wxdgaming.boot2.core.executor.ThreadContext;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.game.authority.AdminUserToken;
 import wxdgaming.logserver.LogServerProperties;
@@ -37,7 +36,7 @@ public class AdminLogFilter implements WebFilter {
     @Override public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         AdminUserToken adminUserToken = AdminUserToken.parse(request, logServerProperties.getAdminKey());
         AssertUtil.isTrue(adminUserToken != null, "token过期");
-        ThreadContext.putContent("adminUserToken", adminUserToken);
+        AdminUserToken.threadContext(adminUserToken);
         return true;
     }
 

@@ -5,27 +5,35 @@ import lombok.extern.slf4j.Slf4j;
 import wxdgaming.boot2.core.timer.MyClock;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 /**
- * 主线程 驱动
+ * 心跳驱动
  *
  * @author wxd-gaming(無心道, 15388152619)
- * @version 2025-09-12 14:49
+ * @version 2026-01-23 17:17
  **/
 @Slf4j
-public class HeartDrive {
-
-    private final HeartDriveHandlerProxy driveHandlerProxy = new HeartDriveHandlerProxy();
+public class HeartDriveRunnable implements Runnable, RunnableQueue {
 
     @Getter final String name;
+    String queueName;
+    @Getter CancelHolding cancelHolding;
+    HeartDriveHandlerProxy driveHandlerProxy = new HeartDriveHandlerProxy();
+    final long delay;
+    final TimeUnit unit;
     int s;
     int m;
     int h;
     int dayOfYear;
     long w;
 
-    public HeartDrive(String name) {
+    public HeartDriveRunnable(AbstractExecutorService abstractExecutorService, String name, String queueName, long delay, TimeUnit unit) {
         this.name = name;
+        this.queueName = queueName;
+        this.delay = delay;
+        this.unit = unit;
+
         long millis = MyClock.millis();
         LocalDateTime localDateTime = MyClock.localDateTime(millis);
         s = localDateTime.getSecond();
@@ -33,13 +41,18 @@ public class HeartDrive {
         h = localDateTime.getHour();
         dayOfYear = localDateTime.getDayOfYear();
         w = MyClock.weekMinTime(millis);
+        cancelHolding = abstractExecutorService.scheduleWithFixedDelay(this, delay, delay, unit);
+    }
+
+    @Override public String getQueueName() {
+        return queueName;
     }
 
     public void setDriveHandler(HeartDriveHandler driveHandler) {
-        this.driveHandlerProxy.setDriveHandler(driveHandler);
+        driveHandlerProxy.setDriveHandler(driveHandler);
     }
 
-    public void doHeart() {
+    @Override public void run() {
         try {
             if (driveHandlerProxy.getDriveHandler() == null) return;
             long millis = MyClock.millis();
@@ -66,8 +79,8 @@ public class HeartDrive {
                 w = tw;
                 driveHandlerProxy.heartWeek(w);
             }
-        } catch (Throwable throwable) {
-            log.error("{}", this.getName(), throwable);
+        } catch (Exception e) {
+            log.error("{}", this.getName(), e);
         }
     }
 

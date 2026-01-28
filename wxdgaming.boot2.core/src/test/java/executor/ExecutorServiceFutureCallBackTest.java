@@ -2,6 +2,7 @@ package executor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import wxdgaming.boot2.core.executor.*;
 import wxdgaming.boot2.core.executor.QueuePolicyConst;
 
 import java.util.concurrent.CompletableFuture;
@@ -106,7 +107,7 @@ public class ExecutorServiceFutureCallBackTest {
 
     public abstract class Run1 implements Runnable, RunnableQueue {
 
-        @Override public String queueName() {
+        @Override public String getQueueName() {
             return "abc";//RandomStringUtils.secure().next(4, true, true);
         }
 

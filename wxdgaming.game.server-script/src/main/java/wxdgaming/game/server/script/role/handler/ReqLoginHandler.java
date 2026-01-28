@@ -3,9 +3,9 @@ package wxdgaming.game.server.script.role.handler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.executor.ExecutorLog;
 import wxdgaming.boot2.core.executor.ExecutorWith;
-import wxdgaming.boot2.core.executor.ThreadStopWatch;
 import wxdgaming.boot2.core.token.JsonToken;
 import wxdgaming.boot2.core.token.JsonTokenParse;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -48,7 +48,7 @@ public class ReqLoginHandler extends HoldApplicationContext {
 
     @ProtoRequest(ReqLogin.class)
     @ExecutorWith(queueName = "login")
-    @ExecutorLog(logTime = -1)
+    @ExecutorLog(executorWarnTime = -1)
     public void reqLogin(ProtoEvent event) {
         SocketSession socketSession = event.getSocketSession();
         ReqLogin req = event.buildMessage();
@@ -57,10 +57,10 @@ public class ReqLoginHandler extends HoldApplicationContext {
         try {
             int sid = req.getSid();
             String token = req.getToken();
-            ThreadStopWatch.start("token解码");
+            ExecutorContext.context().startWatch("token解码");
             JsonToken jsonToken = JsonTokenParse.parse(connectLoginProperties.getJwtKey(), token);
             UserDataVo userDataVo = jsonToken.getObject("user", UserDataVo.class);
-            ThreadStopWatch.stop();
+            ExecutorContext.context().stopWatch();
 
             if (globalDataService.checkBan(BanType.AccountLogin, userDataVo.getAccount())) {
                 tipsService.tips(socketSession, "账号被封禁");

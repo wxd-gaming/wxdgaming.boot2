@@ -1,7 +1,9 @@
 package wxdgaming.boot2.core;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import wxdgaming.boot2.core.executor.ExecutorProperties;
 import wxdgaming.boot2.core.util.JvmUtil;
 
 /**
@@ -14,7 +16,8 @@ import wxdgaming.boot2.core.util.JvmUtil;
 @Component
 public class MainApplicationContextProvider extends ApplicationContextProvider {
 
-    public MainApplicationContextProvider() {
+    @Autowired
+    public MainApplicationContextProvider(ExecutorProperties executorProperties) {
         SpringUtil.mainApplicationContextProvider = this;
     }
 

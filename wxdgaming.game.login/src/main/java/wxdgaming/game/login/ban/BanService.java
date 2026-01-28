@@ -58,7 +58,7 @@ public class BanService extends HoldApplicationContext {
     }
 
     /** 定时清理过期的 */
-    @Scheduled("0 * * * ?")
+    @Scheduled("0 * * * * ?")
     public void timerDelExpire() {
         HashSet<Long> longs = new HashSet<>();
         Collection<BanEntity> list = this.banEntityDbDataTable.getList();

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.event.StartEvent;
-import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.executor.AbstractEventRunnable;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.io.FileReadUtil;
 import wxdgaming.boot2.core.io.FileWriteUtil;
@@ -145,7 +145,7 @@ public class LogPushController {
         FileWriteUtil.writeString(slog.toFile(), FastJsonUtil.toJSONString(logEntityList));
     }
 
-    private class PostLog2FileEvent extends ExecutorEvent {
+    private class PostLog2FileEvent extends AbstractEventRunnable {
 
         private final String type;
         private final Consumer<List<LogEntity>> consumer;
@@ -153,10 +153,7 @@ public class LogPushController {
         public PostLog2FileEvent(String type, Consumer<List<LogEntity>> consumer) {
             this.type = type;
             this.consumer = consumer;
-        }
-
-        @Override public String getStack() {
-            return "log-push-db";
+            this.sourceLine = "log-push-db";
         }
 
         @Override public void onEvent() throws Exception {

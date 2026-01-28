@@ -1,7 +1,7 @@
 package wxdgaming.game.server.api.role.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.executor.ThreadStopWatch;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.starter.batis.sql.SqlDataCache;
 import wxdgaming.boot2.starter.batis.sql.SqlDataHelper;
 import wxdgaming.game.server.api.role.GetPlayerStrategy;
@@ -26,11 +26,11 @@ public class DatabaseGetPlayerStrategy implements GetPlayerStrategy {
     }
 
     @Override public RoleEntity roleEntity(long rid) {
-        ThreadStopWatch.startIfPresent("cache load");
+        ExecutorContext.context().startWatch("cache load");
         try {
             return sqlDataHelper.getCacheService().cacheIfPresent(RoleEntity.class, rid);
         } finally {
-            ThreadStopWatch.stopIfPresent();
+            ExecutorContext.context().stopWatch();
         }
     }
 

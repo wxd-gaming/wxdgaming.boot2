@@ -1,11 +1,12 @@
 package wxdgaming.logserver.plugin;
 
 import wxdgaming.boot2.core.ApplicationContextProvider;
+import wxdgaming.boot2.core.executor.CronExpressionUtil;
 import wxdgaming.boot2.core.executor.ExecutorLog;
 import wxdgaming.boot2.core.executor.ExecutorWith;
-import wxdgaming.boot2.starter.scheduled.AbstractCronTrigger;
+import wxdgaming.boot2.core.runtime.IgnoreRunTimeRecord;
+import wxdgaming.boot2.starter.scheduled.AbstractCronMethodTrigger;
 
-import java.lang.annotation.Annotation;
 import java.util.function.Supplier;
 
 /**
@@ -14,53 +15,38 @@ import java.util.function.Supplier;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-08-18 16:54
  **/
-public class PluginExecutor extends AbstractCronTrigger {
+public class PluginExecutor extends AbstractCronMethodTrigger {
 
     private final Supplier<ApplicationContextProvider> applicationProvider;
     private final AbstractPlugin abstractPlugin;
 
     public PluginExecutor(Supplier<ApplicationContextProvider> applicationProvider, AbstractPlugin abstractPlugin) {
-        super(abstractPlugin.cron());
+        super(null, CronExpressionUtil.parse(abstractPlugin.cron()));
         this.applicationProvider = applicationProvider;
         this.abstractPlugin = abstractPlugin;
-        this.setExecutorWith(new ExecutorWith(){
-            @Override public Class<? extends Annotation> annotationType() {
-                return ExecutorWith.class;
-            }
-
-            @Override public String queueName() {
-                return "PluginExecutor";
-            }
-
-            @Override public String threadName() {
-                return "";
-            }
-
-            @Override public boolean useVirtualThread() {
-                return true;
-            }
-        });
     }
 
     @Override public ExecutorLog getExecutorLog() {
-        ExecutorLog annotation = abstractPlugin.getExecutorLog();
-        if (annotation != null) return annotation;
-        return super.getExecutorLog();
+        return abstractPlugin.getExecutorLog();
     }
 
-    @Override public boolean isIgnoreRunTimeRecord() {
-        return super.isIgnoreRunTimeRecord();
+    @Override public ExecutorWith getExecutorWith() {
+        return abstractPlugin.getExecutorWith();
+    }
+
+    @Override public IgnoreRunTimeRecord getIgnoreRunTimeRecord() {
+        return abstractPlugin.getIgnoreRunTimeRecord();
     }
 
     @Override public boolean isAsync() {
-        return true;
+        return getExecutorWith() != null;
     }
 
     @Override public void onEvent() throws Exception {
         abstractPlugin.trigger(applicationProvider.get());
     }
 
-    @Override public String getStack() {
+    @Override public String getSourceLine() {
         return abstractPlugin.getClass().getSimpleName() + "#trigger()";
     }
 }

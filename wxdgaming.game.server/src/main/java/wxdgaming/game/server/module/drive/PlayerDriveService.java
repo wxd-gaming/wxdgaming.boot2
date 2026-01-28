@@ -19,7 +19,6 @@ import wxdgaming.game.server.event.EventConst;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -47,9 +46,12 @@ public class PlayerDriveService extends HoldApplicationContext {
     public void start(StartEvent event) {
 
         for (int i = 0; i < logicCoreSize; i++) {
-            PlayerDriveContent driveContent = new PlayerDriveContent("mapNpc-drive-" + i);
+            String queueName = "map-npc-drive-" + i;
+            PlayerDriveContent driveContent = new PlayerDriveContent();
             playerDriveContentMap.put(i, driveContent);
-            driveContent.timerJob = ExecutorFactory.getExecutorServiceLogic().scheduleAtFixedRate(driveContent, 33, 33, TimeUnit.MILLISECONDS);
+            HeartDriveRunnable driveRunnable = new HeartDriveRunnable(ExecutorFactory.getExecutorServiceLogic(), queueName, queueName, 33, TimeUnit.MILLISECONDS);
+            driveRunnable.setDriveHandler(driveContent);
+            driveContent.cancelHolding = driveRunnable.getCancelHolding();
         }
     }
 
@@ -72,8 +74,7 @@ public class PlayerDriveService extends HoldApplicationContext {
     /** 提交到玩家队列处理任务 */
     public void executor(Player player, Runnable runnable) {
 
-        ExecutorEvent executorEvent = new ExecutorEvent() {
-
+        AbstractEventRunnable executorEvent = new AbstractEventRunnable() {
             @Override public void onEvent() throws Exception {
                 runnable.run();
             }
@@ -82,7 +83,7 @@ public class PlayerDriveService extends HoldApplicationContext {
         executor(player, executorEvent);
     }
 
-    public void executor(Player player, ExecutorEvent event) {
+    public void executor(Player player, AbstractEventRunnable event) {
         String playerDriveName = getPlayerDriveName(player.getUid());
         event.setQueueName(playerDriveName);
         ExecutorFactory.getExecutorServiceLogic().execute(event);
@@ -149,7 +150,7 @@ public class PlayerDriveService extends HoldApplicationContext {
     @Order(Integer.MIN_VALUE)
     @EventListener
     public void stopBefore(StopBeforeEvent event) {
-        playerDriveContentMap.values().forEach(v -> v.timerJob.cancel(true));
+        playerDriveContentMap.values().forEach(v -> v.cancelHolding.cancel());
         playerDriveContentMap.values().stream()
                 .flatMap(v -> v.playerMap.values().stream())
                 .forEach(player -> {
@@ -161,29 +162,12 @@ public class PlayerDriveService extends HoldApplicationContext {
     }
 
     @ExecutorLog()
-    public class PlayerDriveContent extends ExecutorEvent implements HeartDriveHandler {
+    public class PlayerDriveContent implements HeartDriveHandler {
 
-        ScheduledFuture<?> timerJob;
-        final HeartDrive heartDrive;
+        CancelHolding cancelHolding;
         final ConcurrentSkipListMap<Long, Player> playerMap = new ConcurrentSkipListMap<>();
 
-        public PlayerDriveContent(String queueName) {
-            super();
-            this.queueName = queueName;
-            this.heartDrive = new HeartDrive(this.queueName);
-            this.heartDrive.setDriveHandler(this);
-        }
-
-        @Override public String getStack() {
-            return this.queueName;
-        }
-
-        @Override public boolean isIgnoreRunTimeRecord() {
-            return true;
-        }
-
-        @Override public void onEvent() throws Exception {
-            heartDrive.doHeart();
+        public PlayerDriveContent() {
         }
 
         @Override public void heart(long millis) {

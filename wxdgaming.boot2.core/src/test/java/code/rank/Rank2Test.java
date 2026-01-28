@@ -2,8 +2,9 @@ package code.rank;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StopWatch;
+import wxdgaming.boot2.core.executor.AbstractExecutorService;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
-import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
+import wxdgaming.boot2.core.executor.QueuePolicyConst;
 import wxdgaming.boot2.core.rank.RankByTreeSet;
 import wxdgaming.boot2.core.rank.RankElement;
 import wxdgaming.boot2.core.util.RandomUtils;
@@ -22,7 +23,7 @@ public class Rank2Test {
 
     public static void main(String[] args) {
         RankByTreeSet rankMap = new RankByTreeSet();
-        ExecutorServicePlatform executorService = ExecutorFactory.create("map", 3);
+        AbstractExecutorService executorService = ExecutorFactory.createPlatform("map", 3, 100, QueuePolicyConst.AbortPolicy);
         for (int k = 0; k < 10; k++) {
             executorService.execute(() -> {
                 StopWatch stopWatch = new StopWatch("rank test");

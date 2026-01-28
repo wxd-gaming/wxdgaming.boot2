@@ -3,12 +3,10 @@ package wxdgaming.boot2.core.timer;
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import wxdgaming.boot2.core.executor.CronExpressionUtil;
 import wxdgaming.boot2.core.lang.ObjectBase;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,16 +28,6 @@ public class CronExpress extends ObjectBase {
     @JSONField(ordinal = 3)
     @Getter long duration;
 
-    private transient int curSecond = -1;
-    /** 配合持续时间使用 */
-    private final transient long offsetTime;
-    private final transient TreeSet<Integer> secondSet = new TreeSet<>();
-    private final transient TreeSet<Integer> minuteSet = new TreeSet<>();
-    private final transient TreeSet<Integer> hourSet = new TreeSet<>();
-    private final transient TreeSet<Integer> dayOfWeekSet = new TreeSet<>();
-    private final transient TreeSet<Integer> dayOfMonthSet = new TreeSet<>();
-    private final transient TreeSet<Integer> monthSet = new TreeSet<>();
-    private final transient TreeSet<Integer> yearSet = new TreeSet<>();
 
 
     /**
@@ -68,267 +56,36 @@ public class CronExpress extends ObjectBase {
         this.cron = cron;
         this.timeUnit = timeUnit;
         this.duration = duration;
-        action(cron);
-        this.offsetTime = timeUnit.toMillis(duration);
     }
 
-    protected void action(String cron) {
-        String[] values = new String[7];
-        Arrays.fill(values, "*");
-
-        if (StringUtils.isNotBlank(cron)) {
-            String[] split = cron.split(" ");
-            for (int i = 0; i < split.length; i++) {
-                if (StringUtils.isBlank(split[i])) {
-                    throw new IllegalArgumentException("cron 表达式异常 [" + cron + "] 第 " + (i + 1) + " 个参数 空 不合法");
-                }
-                values[i] = split[i];
-            }
-        }
-
-        action(secondSet, values[0], 0, 59);
-        action(minuteSet, values[1], 0, 59);
-        action(hourSet, values[2], 0, 23);
-        action(dayOfMonthSet, values[3], 1, 31);
-        action(monthSet, values[4], 1, 12);
-        action(dayOfWeekSet, values[5], 1, 7);
-        action(yearSet, values[6], 1970, 2199);
-    }
-
-    protected void action(TreeSet<Integer> set, String actionStr, int min, int max) {
-
-        if ("*".equals(actionStr) || "?".equals(actionStr)) {
-        } else if (actionStr.contains("-")) {
-            String[] split = actionStr.split("-");
-            int start = Integer.parseInt(split[0]);
-            int end = Integer.parseInt(split[1]);
-            if (start < min) {
-                throw new IllegalArgumentException(actionStr + " 起始值 小于最小值：" + min);
-            }
-            if (max < start) {
-                throw new IllegalArgumentException(actionStr + " 起始值 超过最大值：" + max);
-            }
-            if (end < min) {
-                throw new IllegalArgumentException(actionStr + " 结束值 小于最小值：" + min);
-            }
-            if (max < end) {
-                throw new IllegalArgumentException(actionStr + " 结束值 超过最大值：" + max);
-            }
-            if (start > end) {
-                throw new IllegalArgumentException(actionStr + " 起始值 大于 结束值" + max);
-            }
-            for (int i = start; i < end; i++) {
-                set.add(i);
-            }
-        } else if (actionStr.contains("/")) {
-            String[] split = actionStr.split("/");
-            if (!"*".equals(split[0]) && !"?".equals(split[0])) {
-                min = Integer.parseInt(split[0]);
-            }
-
-            int intv = Integer.parseInt(split[1]);
-
-            for (int i = min; i <= max; i++) {
-                if (i % intv == 0) {
-                    set.add(i);
-                }
-            }
-
-        } else if (actionStr.contains(",") || actionStr.contains("，")) {
-            String[] split = actionStr.split("[,，]");
-            for (String s : split) {
-                final int of = Integer.parseInt(s);
-                if (min > of) {
-                    throw new RuntimeException(actionStr + " 起始值 " + of + " 小于最小值：" + min);
-                }
-                if (of > max) {
-                    throw new RuntimeException(actionStr + " 起始值 " + of + " 超过最大值：" + max);
-                }
-                set.add(of);
-            }
-        } else {
-            set.add(Integer.valueOf(actionStr));
-        }
-
-    }
-
-    /** 取下一次执行时间戳 */
-    public long validateTimeAfterMillis() {
-        return validateTimeAfterMillis(MyClock.millis());
-    }
-
-    /** 取下一次执行时间戳 */
-    public long validateTimeAfterMillis(long time) {
-        CronDuration longs = validateTimeAfter(time);
-        if (longs == null) return -1;
-        return longs.getStart();
-    }
-
-    /** 取下一次可用的时间 */
-    public CronDuration validateTimeAfter() {
-        return validateTimeAfter(MyClock.millis());
-    }
-
-    /** 取下一次可用的时间 */
-    public CronDuration validateTimeAfter(long time) {
-        return findValidateTime(time, ChangeAbs.After);
-    }
-
-
-    /** 取下一次可用的时间 */
-    public CronDuration validateOverTimeAfter() {
-        return validateTimeAfter(MyClock.millis());
-    }
-
-    /** 取下一次可用的时间 */
-    public CronDuration validateOverTimeAfter(long time) {
-        return validateTimeAfter(time);
-    }
-
-    /** 取上一次执行时间戳 */
-    public long validateTimeBeforeMillis() {
-        CronDuration longs = validateTimeBefore(MyClock.millis());
-        if (longs == null) return -1;
-        return longs.getStart();
-    }
-
-    /** 获取上一次可用的时间 */
-    public CronDuration validateTimeBefore() {
-        return validateTimeBefore(MyClock.millis());
-    }
-
-    /** 获取上一次可用的时间 */
-    public CronDuration validateTimeBefore(long time) {
-        return findValidateTime(time, ChangeAbs.Before);
-    }
-
-
-    /** 获取上一次可用时间 持续结束时间 */
-    public long validateOverTimeBefore() {
-        return validateOverTimeBefore(MyClock.millis());
-    }
-
-    /** 获取上一次可用时间 持续结束时间 */
-    public long validateOverTimeBefore(long time) {
-        CronDuration validateTime = findValidateTime(time, ChangeAbs.Before);
-        if (validateTime == null) {
-            return -1;
-        }
-        return validateTime.getEnd();
-    }
-
-    /** 查找一个可以的时间，会先向过去时间查询，如果时间戳符合范围条件，如果不合法会向未来时间查询 */
     public CronDuration findValidateTime() {
-        long now = MyClock.millis();
-        return findValidateTime(now);
+        LocalDateTime localDateTime = CronExpressionUtil.validityTime(cron, timeUnit.toMillis(duration));
+        if (localDateTime == null) {
+            return null;
+        }
+        long start = MyClock.time2Milli(localDateTime);
+        long end = start + timeUnit.toMillis(duration);
+        return new CronDuration(cron, start, end);
     }
 
-    /** 查找一个可以的时间，会先向过去时间查询，如果时间戳符合范围条件，如果不合法会向未来时间查询 */
-    public CronDuration findValidateTime(long now) {
-        CronDuration validateTime = findValidateTime(now, ChangeAbs.Before);
-        if (validateTime != null) {
-            if (validateTime.valid(now)) {
-                return validateTime;
-            }
+    public CronDuration validateTimeBefore() {
+        LocalDateTime localDateTime = CronExpressionUtil.up(cron);
+        if (localDateTime == null) {
+            return null;
         }
-        return findValidateTime(now, ChangeAbs.After);
+        long start = MyClock.time2Milli(localDateTime);
+        long end = start + timeUnit.toMillis(duration);
+        return new CronDuration(cron, start, end);
     }
 
-    /**
-     * 获取开启时间
-     *
-     * @param time      时间磋
-     * @param changeAbs 每一次变更的时间差查找上一次就是 只能是
-     * @return
-     */
-    private CronDuration findValidateTime(long time, ChangeAbs changeAbs) {
-        LocalDateTime localDateTime = MyClock.localDateTime(time);
-        for (int i = 0; i < changeAbs.getForCount(); i++) {
-            int second = localDateTime.getSecond();
-            int minute = localDateTime.getMinute();
-            int hour = localDateTime.getHour();
-            int dayOfWeek = localDateTime.getDayOfWeek().getValue();
-            int dayOfMonth = localDateTime.getDayOfMonth();
-            int month = localDateTime.getMonth().getValue();
-            int year = localDateTime.getYear();
-            if (checkJob(second, minute, hour, dayOfWeek, dayOfMonth, month, year)) {
-                time = time / 1000 * 1000;/* 转换整秒 */
-                return new CronDuration(cron, time, time + offsetTime);
-            }
-            time += changeAbs.getChange();
-            localDateTime = MyClock.localDateTime(time);
+    public CronDuration validateTimeAfter() {
+        LocalDateTime localDateTime = CronExpressionUtil.next(cron);
+        if (localDateTime == null) {
+            return null;
         }
-        return null;
-    }
-
-    @Getter
-    private enum ChangeAbs {
-
-        Before(-TimeUnit.SECONDS.toMillis(1), TimeUnit.DAYS.toSeconds(30)),
-        After(TimeUnit.SECONDS.toMillis(1), TimeUnit.DAYS.toSeconds(30));
-
-        private final long change;
-        private final long forCount;
-
-        ChangeAbs(long change, long forCount) {
-            this.change = change;
-            this.forCount = forCount;
-        }
-
-    }
-
-    public boolean checkJob(int second, int minute, int hour, int dayOfWeek, int dayOfMonth, int month, int year) {
-
-        if (curSecond == second) {
-            /*保证一秒内只执行一次*/
-            return false;
-        }
-
-        curSecond = second;
-
-        if (!secondSet.isEmpty()) {
-            if (!secondSet.contains(second)) {
-                return false;
-            }
-        }
-
-        if (!minuteSet.isEmpty()) {
-            if (!minuteSet.contains(minute)) {
-                return false;
-            }
-        }
-
-        if (!hourSet.isEmpty()) {
-            if (!hourSet.contains(hour)) {
-                return false;
-            }
-        }
-
-        if (!dayOfWeekSet.isEmpty()) {
-            if (!dayOfWeekSet.contains(dayOfWeek)) {
-                return false;
-            }
-        }
-
-        if (!dayOfMonthSet.isEmpty()) {
-            if (!dayOfMonthSet.contains(dayOfMonth)) {
-                return false;
-            }
-        }
-
-        if (!monthSet.isEmpty()) {
-            if (!monthSet.contains(month)) {
-                return false;
-            }
-        }
-
-        if (!yearSet.isEmpty()) {
-            if (!yearSet.contains(year)) {
-                return false;
-            }
-        }
-
-        return true;
+        long start = MyClock.time2Milli(localDateTime);
+        long end = start + timeUnit.toMillis(duration);
+        return new CronDuration(cron, start, end);
     }
 
 }

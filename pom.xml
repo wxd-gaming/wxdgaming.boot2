@@ -14,7 +14,7 @@
 
     <groupId>io.github.wxd-gaming</groupId>
     <artifactId>wxd-gaming.boot2</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <packaging>pom</packaging>
 
     <!-- 项目信息 -->

@@ -2,6 +2,7 @@ boot:
   debug: true
   gid: 1
   sid: 1
+  name: "login"
   jwtKey: "123456789012345678901234567890123456789012345678901234567890"
   adminKey: "eeeeeeeeeeeeeeeee"
   adminName: "admin"

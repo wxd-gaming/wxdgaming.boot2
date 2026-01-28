@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.event.InitEvent;
-import wxdgaming.boot2.core.executor.ThreadStopWatch;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.util.AssertUtil;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.cfg.QItemTable;
@@ -72,15 +72,15 @@ public class BagService extends HoldApplicationContext implements InitPrint {
     }
 
     public void onCreateRoleInitBag(Player player) {
-        ThreadStopWatch.startIfPresent("初始化背包信息");
+        ExecutorContext.context().startWatch("初始化背包信息");
         BagPack bagPack = player.getBagPack();
-        ThreadStopWatch.startIfPresent("背包");
+        ExecutorContext.context().startWatch("背包");
         bagPack.getBagMap().computeIfAbsent(BagType.Bag, k -> new ItemBag(100).resetGrid());/*背包*/
-        ThreadStopWatch.stopIfPresent();
-        ThreadStopWatch.startIfPresent("仓库");
+        ExecutorContext.context().stopWatch();
+        ExecutorContext.context().startWatch("仓库");
         bagPack.getBagMap().computeIfAbsent(BagType.Store, k -> new ItemBag(100).resetGrid());/*仓库*/
-        ThreadStopWatch.stopIfPresent();
-        ThreadStopWatch.stopIfPresent();
+        ExecutorContext.context().stopWatch();
+        ExecutorContext.context().stopWatch();
     }
 
     /** 创建角色之后创建背包 */
@@ -152,9 +152,9 @@ public class BagService extends HoldApplicationContext implements InitPrint {
 
     /** 默认是往背包添加 背包已满 不要去关心能不能叠加 只要没有空格子就不操作 */
     public boolean gainItemCfg(Player player, BagChangeDTO4ItemCfg rewardArgs4ItemCfg) {
-        ThreadStopWatch.startIfPresent("newItems");
+        ExecutorContext.context().startWatch("newItems");
         List<Item> items = newItems(rewardArgs4ItemCfg.getItemCfgList());
-        ThreadStopWatch.stop();
+        ExecutorContext.context().stopWatch();
         return _gainItems(player, rewardArgs4ItemCfg, items);
     }
 

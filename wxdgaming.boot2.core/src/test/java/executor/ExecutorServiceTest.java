@@ -2,7 +2,7 @@ package executor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import wxdgaming.boot2.core.executor.QueuePolicyConst;
+import wxdgaming.boot2.core.executor.*;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
@@ -17,8 +17,7 @@ public class ExecutorServiceTest {
     @Test
     public void stack() {
         AbstractEventRunnable abstractEventRunnable = new AbstractEventRunnable() {
-            @Override
-            public void run() {
+            @Override public void onEvent() throws Exception {
                 log.debug("ddd: {}", ExecutorContext.context());
             }
         };
@@ -40,11 +39,11 @@ public class ExecutorServiceTest {
             ExecutorContext.context().getData().put("local-data", i);
             executorServicePlatform.execute(new AbstractEventRunnable() {
 
-                @Override public String queueName() {
+                @Override public String getQueueName() {
                     return "ddd";
                 }
 
-                @Override public void run() {
+                @Override public void onEvent() throws Exception {
                     System.out.println("1");
                     LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
                 }
@@ -59,12 +58,12 @@ public class ExecutorServiceTest {
             ExecutorContext.cleanup();
         }
 
-        ScheduledRunnable.schedule(executorServicePlatform, () -> {
+        executorServicePlatform.schedule(() -> {
             log.debug("schedule");
         }, 1, TimeUnit.SECONDS);
 
-        ScheduledRunnable.scheduleAtFixedRate(executorServicePlatform, new AbstractEventRunnable() {
-            @Override public void run() {
+        executorServicePlatform.scheduleAtFixedRate(new AbstractEventRunnable() {
+            @Override public void onEvent() throws Exception {
                 log.debug("scheduleAtFixedRate");
                 ExecutorContext.context().startWatch("scheduleAtFixedRate");
                 LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
@@ -72,7 +71,7 @@ public class ExecutorServiceTest {
             }
         }, 0, 1, TimeUnit.SECONDS);
 
-        ScheduledRunnable.scheduleWithFixedDelay(executorServicePlatform, () -> {
+        executorServicePlatform.scheduleWithFixedDelay(() -> {
             log.debug("scheduleWithFixedDelay");
             LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
         }, 0, 1, TimeUnit.SECONDS);
@@ -80,7 +79,7 @@ public class ExecutorServiceTest {
 
     public static class Run1 implements Runnable, RunnableQueue {
 
-        @Override public String queueName() {
+        @Override public String getQueueName() {
             return "abc";//RandomStringUtils.secure().next(4, true, true);
         }
 
@@ -95,16 +94,14 @@ public class ExecutorServiceTest {
 
         public TestEventRunnable() {
             AbstractEventRunnable abstractEventRunnable = new AbstractEventRunnable() {
-                @Override
-                public void run() {
+                @Override public void onEvent() throws Exception {
                     log.debug("ddd: {}", ExecutorContext.context());
                 }
             };
             System.out.println(abstractEventRunnable);
         }
 
-        @Override
-        public void run() {
+        @Override public void onEvent() throws Exception {
             log.debug("ddd: {}", ExecutorContext.context());
         }
 

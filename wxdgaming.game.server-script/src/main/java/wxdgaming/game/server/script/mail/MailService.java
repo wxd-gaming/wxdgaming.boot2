@@ -61,7 +61,7 @@ public class MailService extends HoldApplicationContext {
         this.bagService = bagService;
     }
 
-    @Scheduled("0 * *")
+    @Scheduled("0 * * * * ?")
     public void requestServerMail() {
         String url = connectLoginProperties.getUrl() + "/inner/game/serverMail/query";
         HashMap<String, String> stringHashMap = new HashMap<>();

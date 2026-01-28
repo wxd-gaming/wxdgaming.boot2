@@ -16,12 +16,12 @@ import java.lang.annotation.*;
 public @interface ExecutorLog {
 
     /** 可以选择关闭或者显示 */
-    boolean off() default false;
+    boolean offWarnLog() default false;
 
-    /** 执行日志记录时间 */
-    long logTime() default 33;
+    /** 执行耗时超过33ms 告警日志 */
+    long executorWarnTime() default 33;
 
-    /** 执行报警时间 */
-    long warningTime() default 1000;
+    /** 任务new出来提交到线程池队列超过 1000 ms 告警日志 */
+    long submitWarnTime() default 1000;
 
 }

@@ -13,7 +13,7 @@ import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.event.Event;
 import wxdgaming.boot2.core.event.InitEvent;
 import wxdgaming.boot2.core.event.StartEvent;
-import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.reflect.InstanceFieldProvider;
 import wxdgaming.boot2.core.reflect.InstanceMethodProvider;
 import wxdgaming.boot2.core.reflect.InstanceProvider;
@@ -284,7 +284,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
             {
                 ThreadParam threadParam = parameter.getAnnotation(ThreadParam.class);
                 if (threadParam != null) {
-                    params[i] = ThreadContext.context(threadParam, parameterizedType);
+                    params[i] = ExecutorContext.context(threadParam, parameterizedType);
                     continue;
                 }
             }

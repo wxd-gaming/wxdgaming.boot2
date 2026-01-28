@@ -6,12 +6,14 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.event.InitEvent;
 import wxdgaming.boot2.core.event.StartEvent;
 import wxdgaming.boot2.core.event.StopBeforeEvent;
-import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.executor.AbstractEventRunnable;
+import wxdgaming.boot2.core.executor.AbstractExecutorService;
+import wxdgaming.boot2.core.executor.CancelHolding;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
-import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
 import wxdgaming.boot2.core.runtime.IgnoreRunTimeRecord;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
@@ -19,7 +21,6 @@ import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,36 +34,40 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class ScheduledService extends HoldApplicationContext {
 
-    protected ScheduledFuture<?> future;
+    protected CancelHolding future;
     /*                          类名字                  方法名    实例 */
-    protected List<AbstractCronTrigger> jobList = new ArrayList<>();
+    protected List<AbstractCronMethodTrigger> jobList = new ArrayList<>();
 
-    protected ExecutorServicePlatform executorServicePlatform;
+    protected AbstractExecutorService executorServicePlatform;
 
-    public ScheduledService(ExecutorFactory executorFactory, ScheduledConfiguration executorProperties) {
-        executorServicePlatform = ExecutorFactory.create("scheduled-executor", executorProperties.getExecutor());
+    public ScheduledService(ScheduledConfiguration scheduledConfiguration) {
+        executorServicePlatform = ExecutorFactory.create("scheduled-executor", scheduledConfiguration.getExecutor());
     }
 
     @EventListener
     public void init(InitEvent initEvent) {
         log.debug("------------------------------初始化定时任务调度器------------------------------");
-        List<AbstractCronTrigger> tmpJobList = new ArrayList<>();
+        List<AbstractCronMethodTrigger> tmpJobList = new ArrayList<>();
         applicationContextProvider.withMethodAnnotatedCache(Scheduled.class)
                 .forEach(providerMethod -> {
-                    ScheduledInfo scheduledInfo = new ScheduledInfo(
-                            providerMethod,
-                            providerMethod.getMethod().getAnnotation(Scheduled.class)
-                    );
-                    log.debug("Scheduled job {}", providerMethod.getMethod());
-                    tmpJobList.add(scheduledInfo);
+                    try {
+                        ScheduledInfo scheduledInfo = new ScheduledInfo(
+                                providerMethod,
+                                providerMethod.getMethod().getAnnotation(Scheduled.class)
+                        );
+                        log.debug("Scheduled job {}", providerMethod.getMethod());
+                        tmpJobList.add(scheduledInfo);
+                    } catch (Exception e) {
+                        throw Throw.of(providerMethod.getMethod().toString(), e);
+                    }
                 });
         sort(tmpJobList);
         jobList = tmpJobList;
     }
 
-    public void addJob(AbstractCronTrigger abstractCronTrigger) {
-        List<AbstractCronTrigger> tmpJobList = new ArrayList<>(jobList);
-        tmpJobList.add(abstractCronTrigger);
+    public void addJob(AbstractCronMethodTrigger abstractCronMethodTrigger) {
+        List<AbstractCronMethodTrigger> tmpJobList = new ArrayList<>(jobList);
+        tmpJobList.add(abstractCronMethodTrigger);
         sort(tmpJobList);
         jobList = tmpJobList;
     }
@@ -85,18 +90,18 @@ public class ScheduledService extends HoldApplicationContext {
     public void stopBefore(StopBeforeEvent event) {
         log.info("线程 Scheduled 调度器 退出");
         if (future != null) {
-            future.cancel(true);
+            future.cancel();
             future = null;
         }
     }
 
-    public void sort(List<AbstractCronTrigger> jobs) {
-        jobs.sort(Comparator.comparingLong(AbstractCronTrigger::getNextRunTime));
+    public void sort(List<AbstractCronMethodTrigger> jobs) {
+        jobs.sort(Comparator.comparingLong(AbstractCronMethodTrigger::getNextRunTime));
     }
 
 
     /** 触发器 */
-    protected class ScheduleTrigger extends ExecutorEvent {
+    protected class ScheduleTrigger extends AbstractEventRunnable {
 
         public ScheduleTrigger() {
             super();
@@ -110,10 +115,6 @@ public class ScheduledService extends HoldApplicationContext {
             return true;
         }
 
-        @Override public String getStack() {
-            return this.getQueueName();
-        }
-
         int curSecond = -1;
 
         @Override public void onEvent() {
@@ -124,7 +125,7 @@ public class ScheduledService extends HoldApplicationContext {
             }
             curSecond = second;
             boolean needSort = false;
-            for (AbstractCronTrigger cronTrigger : jobList) {
+            for (AbstractCronMethodTrigger cronTrigger : jobList) {
                 if (!cronTrigger.checkRunTime(millis)) {
                     break;
                 }
@@ -137,27 +138,30 @@ public class ScheduledService extends HoldApplicationContext {
             }
         }
 
-        public boolean runJob(AbstractCronTrigger scheduledInfo, long millis) {
-            scheduledInfo.monitor.lock();
+        public boolean runJob(AbstractCronMethodTrigger cronMethodTrigger, long millis) {
+            cronMethodTrigger.monitor.lock();
             try {
-                if (!scheduledInfo.scheduleAtFixedRate() && !scheduledInfo.runEnd.get())
+                if (!cronMethodTrigger.scheduleAtFixedRate() && !cronMethodTrigger.runEnd.get())
                     return false;
                 /*标记为正在执行*/
-                scheduledInfo.runEnd.set(false);
-                scheduledInfo.nextRunTime = scheduledInfo.getCronExpress().validateTimeAfterMillis();
+                cronMethodTrigger.runEnd.set(false);
+                cronMethodTrigger.nextRunTime = cronMethodTrigger.nowNextTime();
             } finally {
-                scheduledInfo.monitor.unlock();
+                cronMethodTrigger.monitor.unlock();
             }
 
-            if (scheduledInfo.isAsync()) {
+            if (cronMethodTrigger.isAsync()) {
                 /*异步执行*/
-                scheduledInfo.submit();
+                cronMethodTrigger.submit();
             } else {
                 /*同步执行*/
-                scheduledInfo.run();
+                cronMethodTrigger.run();
             }
             return true;
         }
 
+        @Override public String toString() {
+            return getQueueName();
+        }
     }
 }

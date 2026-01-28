@@ -1,5 +1,6 @@
 package wxdgaming.boot2.core.executor;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -23,9 +24,9 @@ import java.util.function.Supplier;
 @ConfigurationProperties(prefix = "core.executor")
 public class ExecutorProperties extends ObjectBase implements InitPrint {
 
-    static final Supplier<ExecutorConfig> BASIC_INSTANCE = () -> new ExecutorConfig().setCoreSize(2).setMaxQueueSize(5000).setWarnSize(500).setQueuePolicy(QueuePolicyConst.AbortPolicy);
-    static final Supplier<ExecutorConfig> LOGIC_INSTANCE = () -> new ExecutorConfig().setCoreSize(8).setMaxQueueSize(50000).setWarnSize(5000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
-    static final Supplier<ExecutorConfig> VIRTUAL_INSTANCE = () -> new ExecutorConfig().setCoreSize(200).setMaxQueueSize(50000).setWarnSize(500).setQueuePolicy(QueuePolicyConst.AbortPolicy);
+    static final Supplier<ExecutorConfig> BASIC_INSTANCE = () -> new ExecutorConfig().setCoreSize(2).setMaxQueueSize(5000).setWarnQueueSize(500).setQueuePolicy(QueuePolicyConst.AbortPolicy);
+    static final Supplier<ExecutorConfig> LOGIC_INSTANCE = () -> new ExecutorConfig().setCoreSize(8).setMaxQueueSize(50000).setWarnQueueSize(5000).setQueuePolicy(QueuePolicyConst.AbortPolicy);
+    static final Supplier<ExecutorConfig> VIRTUAL_INSTANCE = () -> new ExecutorConfig().setCoreSize(200).setMaxQueueSize(50000).setWarnQueueSize(500).setQueuePolicy(QueuePolicyConst.AbortPolicy);
 
     /** 输出运行日志间隔时间，单位分钟 */
     private int outRunTimeDelay = 15;
@@ -53,4 +54,10 @@ public class ExecutorProperties extends ObjectBase implements InitPrint {
         }
         return virtual;
     }
+
+    @PostConstruct
+    public void init() {
+        ExecutorFactory.init(this);
+    }
+
 }

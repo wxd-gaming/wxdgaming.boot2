@@ -1,5 +1,7 @@
 package wxdgaming.boot2.core.executor;
 
+import java.util.Set;
+
 /**
  * 驱动执行器
  *
@@ -7,6 +9,11 @@ package wxdgaming.boot2.core.executor;
  * @version 2025-09-12 16:30
  **/
 public interface HeartDriveHandler {
+
+    /** 返回需要执行的心跳类型 空的话表示无限制 */
+    default Set<HeartConst> heartConst() {
+        return Set.of();
+    }
 
     default void heart(long millis) {}
 

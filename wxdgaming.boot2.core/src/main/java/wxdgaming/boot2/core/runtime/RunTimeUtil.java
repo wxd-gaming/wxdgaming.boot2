@@ -2,7 +2,8 @@ package wxdgaming.boot2.core.runtime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.executor.AbstractEventRunnable;
+import wxdgaming.boot2.core.executor.CancelHolding;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.format.TableFormatter;
 import wxdgaming.boot2.core.locks.MonitorReadWrite;
@@ -19,14 +20,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-09-12 09:34
  **/
-public class RunTimeUtil extends ExecutorEvent {
+public class RunTimeUtil extends AbstractEventRunnable {
 
     private static final Logger log = LoggerFactory.getLogger("RunTimeRecord");
 
     private static final MonitorReadWrite MONITOR_READ_WRITE = new MonitorReadWrite();
     private static final AtomicBoolean Open = new AtomicBoolean(false);
     private static final ConcurrentHashMap<String, RunTimeRecord> runTimeRecordMap = new ConcurrentHashMap<>();
-    private static ScheduledFuture<?> scheduledFuture = null;
+    private static CancelHolding scheduledFuture = null;
 
     public static void openRecord(int outRunTimeDelay) {
         Open.set(true);
@@ -36,7 +37,7 @@ public class RunTimeUtil extends ExecutorEvent {
     public static void closeRecord() {
         Open.set(false);
         if (scheduledFuture != null) {
-            scheduledFuture.cancel(true);
+            scheduledFuture.cancel();
         }
     }
 

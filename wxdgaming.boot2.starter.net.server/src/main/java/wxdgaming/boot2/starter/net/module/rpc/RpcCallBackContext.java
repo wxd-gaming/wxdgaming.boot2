@@ -4,9 +4,9 @@ import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.executor.AbstractEventRunnable;
+import wxdgaming.boot2.core.executor.AbstractExecutorService;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
-import wxdgaming.boot2.core.executor.ExecutorService;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @Getter
 @Setter
-public class RpcCallBackContext extends ExecutorEvent {
+public class RpcCallBackContext extends AbstractEventRunnable {
 
     private String threadName;
     private final CompletableFuture<JSONObject> completableFuture = new CompletableFuture<>();
@@ -46,11 +46,8 @@ public class RpcCallBackContext extends ExecutorEvent {
         completableFuture.complete(responseParams);
     }
 
-    @Override public void submit() {
-        ExecutorService executorService = ExecutorFactory.getExecutorServiceLogic();
-        if (StringUtils.isNotBlank(getThreadName())) {
-            executorService = ExecutorFactory.getExecutor(getThreadName());
-        }
+    public void submit() {
+        AbstractExecutorService executorService = ExecutorFactory.getExecutorServiceLogic();
         executorService.execute(this);
     }
 

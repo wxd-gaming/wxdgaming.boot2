@@ -2,15 +2,15 @@ package wxdgaming.boot2.core;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import wxdgaming.boot2.core.executor.ThreadStopWatch;
-
-import java.util.concurrent.TimeUnit;
+import wxdgaming.boot2.core.executor.ExecutorContext;
+import wxdgaming.boot2.core.timer.MyClock;
 
 /**
  * 过滤器
@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-08-12 13:44
  **/
+@Slf4j
 @Component
 public class AWebFilter implements HandlerInterceptor, WebMvcConfigurer {
 
@@ -28,15 +29,28 @@ public class AWebFilter implements HandlerInterceptor, WebMvcConfigurer {
     }
 
     @Override public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        ThreadStopWatch.initNotPresent(TimeUnit.MICROSECONDS,request.getRequestURI());
+        ExecutorContext.Content context = new ExecutorContext.Content() {
+            @Override public long getExecutorWarnTime() {
+                return 1000;
+            }
+
+            @Override public long getSubmitWarnTime() {
+                return 3000;
+            }
+        };
+        context.setThread(Thread.currentThread());
+        context.setNewTime(System.nanoTime());
+        context.setActualNewTime(MyClock.millis());
+        context.running(request.getRequestURI());
+        ExecutorContext.setContext(context);
         return true;
     }
 
     @Override public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        ThreadStopWatch.releasePrint();
+        ExecutorContext.cleanup();
     }
 
     @Override public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        ThreadStopWatch.release();
+        ExecutorContext.release();
     }
 }

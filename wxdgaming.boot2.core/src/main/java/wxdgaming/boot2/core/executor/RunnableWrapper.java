@@ -1,4 +1,4 @@
-package executor;
+package wxdgaming.boot2.core.executor;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -29,4 +29,7 @@ class RunnableWrapper implements Runnable {
         this.runnable.run();
     }
 
+    @Override public String toString() {
+        return String.valueOf(runnable);
+    }
 }

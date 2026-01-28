@@ -22,14 +22,14 @@ public class ExecutorConfig extends ObjectBase {
     @JSONField(ordinal = 2)
     private int maxQueueSize;
     @JSONField(ordinal = 3)
-    private int warnSize;
+    private int warnQueueSize;
     @JSONField(ordinal = 4)
     private QueuePolicyConst queuePolicy = QueuePolicyConst.AbortPolicy;
 
-    public int getWarnSize() {
-        if (warnSize <= 0) {
-            warnSize = (int) (maxQueueSize * 0.3);
+    public int getWarnQueueSize() {
+        if (warnQueueSize <= 0) {
+            warnQueueSize = (int) (maxQueueSize * 0.3);
         }
-        return warnSize;
+        return warnQueueSize;
     }
 }

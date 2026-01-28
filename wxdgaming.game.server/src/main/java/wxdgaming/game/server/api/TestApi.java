@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.ann.RpcRequest;
@@ -55,17 +55,17 @@ public class TestApi extends HoldApplicationContext {
 
     @RpcRequest
     public JSONObject rpcIndex(JSONObject paramData) {
-        log.debug("{} {}", paramData, ThreadContext.context().threadVO().getQueueName());
+        log.debug("{} {}", paramData, ExecutorContext.context());
         return paramData;
     }
 
     @RpcRequest
     public JSONObject rpcIndex2(JSONObject paramData, @RequestParam(value = "a") String a) {
-        log.debug("{} {} {}", a, paramData, ThreadContext.context().threadVO().getQueueName());
+        log.debug("{} {} {}", a, paramData, ExecutorContext.context());
         return paramData;
     }
 
-    @Scheduled("0 0")
+    @Scheduled("0 0 * * * ?")
     public void timer() {
         log.debug("{}", "timer()");
         getApplicationContextProvider().executeMethodWithAnnotated(RunTest.class, 1, 2);

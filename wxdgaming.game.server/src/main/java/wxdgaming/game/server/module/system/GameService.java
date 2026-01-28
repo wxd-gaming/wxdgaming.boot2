@@ -6,7 +6,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.event.StartEvent;
-import wxdgaming.boot2.core.executor.HeartDriveThread;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
+import wxdgaming.boot2.core.executor.HeartDriveRunnable;
 import wxdgaming.boot2.core.lang.Tick;
 import wxdgaming.game.server.GameServerApplication;
 
@@ -24,17 +25,18 @@ import java.util.concurrent.TimeUnit;
 public class GameService implements InitPrint {
 
     /** 控制一下，5分钟才能加载一次 */
-    private final Tick loadScriptTick = new Tick(5, TimeUnit.SECONDS);
-    final HeartDriveThread mainThreadDrive = new HeartDriveThread("MainThread");
-    final HeartDriveThread activityThreadDrive = new HeartDriveThread("ActivityThread");
+    final Tick loadScriptTick = new Tick(5, TimeUnit.SECONDS);
+    final HeartDriveRunnable mainThreadDrive;
+    final HeartDriveRunnable activityThreadDrive;
 
     public GameService() {
+        mainThreadDrive = new HeartDriveRunnable(ExecutorFactory.getExecutorServiceBasic(), "MainThread", "MainThread", 33, TimeUnit.MILLISECONDS);
+        activityThreadDrive = new HeartDriveRunnable(ExecutorFactory.getExecutorServiceBasic(), "ActivityThread", "ActivityThread", 33, TimeUnit.MILLISECONDS);
     }
 
     @EventListener
     public void start(StartEvent event) {
-        mainThreadDrive.start();
-        activityThreadDrive.start();
+
     }
 
     public String reloadScript() {

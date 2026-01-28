@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import wxdgaming.boot2.core.ApplicationContextProvider;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.ThreadParam;
-import wxdgaming.boot2.core.executor.ExecutorEvent;
-import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.executor.AbstractMethodRunnable;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.net.SocketSession;
@@ -27,7 +27,7 @@ import java.lang.reflect.Type;
  * @version 2025-02-18 09:15
  **/
 @Slf4j
-public class RpcListenerTrigger extends ExecutorEvent {
+public class RpcListenerTrigger extends AbstractMethodRunnable {
 
     private final RpcMapping rpcMapping;
     private final RpcService rpcService;
@@ -49,17 +49,14 @@ public class RpcListenerTrigger extends ExecutorEvent {
         this.socketSession = socketSession;
         this.rpcId = rpcId;
         this.paramObject = paramObject;
-    }
-
-    @Override public String getStack() {
-        return "RpcListenerTrigger: %s; %s.%s()".formatted(
+        this.sourceLine = "RpcListenerTrigger: %s; %s.%s()".formatted(
                 rpcMapping.path(),
                 rpcMapping.providerMethod().getInstance().getClass().getName(),
                 rpcMapping.providerMethod().getMethod().getName()
         );
     }
 
-    @Override public void onEvent() {
+    @Override public void onEvent() throws Exception {
         try {
             Object invoke = rpcMapping.providerMethod().invoke(injectorParameters());
             if (rpcMapping.providerMethod().getMethod().getReturnType() == void.class) {
@@ -112,7 +109,7 @@ public class RpcListenerTrigger extends ExecutorEvent {
             {
                 ThreadParam threadParam = parameter.getAnnotation(ThreadParam.class);
                 if (threadParam != null) {
-                    params[i] = ThreadContext.context(threadParam, parameterizedType);
+                    params[i] = ExecutorContext.context(threadParam, parameterizedType);
                     continue;
                 }
             }

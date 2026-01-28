@@ -1,4 +1,4 @@
-package executor;
+package wxdgaming.boot2.core.executor;
 
 import org.springframework.scheduling.support.CronExpression;
 import wxdgaming.boot2.core.collection.concurrent.ConcurrentHashSet;
@@ -16,7 +16,7 @@ import java.util.concurrent.locks.LockSupport;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2026-01-23 14:34
  **/
-class CronRunnable implements Runnable {
+class CronRunnable implements Runnable, RunnableWrapperProxy {
 
     private static final ConcurrentHashSet<CronRunnable> CONCURRENT_HASH_SET = new ConcurrentHashSet<>();
 
@@ -77,8 +77,16 @@ class CronRunnable implements Runnable {
         this.nextRunTime = MyClock.time2Milli(localDateTime);
     }
 
+    @Override public Runnable getRunnable() {
+        return runnable;
+    }
+
     @Override public void run() {
         executor.execute(runnable);
+    }
+
+    @Override public String toString() {
+        return String.valueOf(runnable);
     }
 
 }

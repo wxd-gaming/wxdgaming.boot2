@@ -7,6 +7,7 @@ import org.springframework.util.StopWatch;
 import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
+import wxdgaming.boot2.core.executor.QueuePolicyConst;
 import wxdgaming.boot2.core.rank.RankByLazyListSort;
 import wxdgaming.boot2.core.rank.RankElement;
 import wxdgaming.boot2.core.util.RandomUtils;
@@ -27,7 +28,7 @@ public class RankLazyTest {
     @Test
     public void l1() {
         RankByLazyListSort rankMap = new RankByLazyListSort(1000);
-        ExecutorServicePlatform executorService = ExecutorFactory.create("map", 2);
+        ExecutorServicePlatform executorService = ExecutorFactory.createPlatform("map", 2, 2000, QueuePolicyConst.AbortPolicy);
         for (int k = 0; k < 10; k++) {
             executorService.execute(() -> {
 

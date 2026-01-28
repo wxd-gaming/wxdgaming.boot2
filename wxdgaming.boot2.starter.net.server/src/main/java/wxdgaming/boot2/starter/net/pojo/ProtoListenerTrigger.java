@@ -2,7 +2,8 @@ package wxdgaming.boot2.starter.net.pojo;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.executor.ExecutorEvent;
+import wxdgaming.boot2.core.executor.AbstractEventRunnable;
+import wxdgaming.boot2.core.executor.AbstractMethodRunnable;
 import wxdgaming.boot2.core.reflect.InstanceMethodProvider;
 
 /**
@@ -13,18 +14,15 @@ import wxdgaming.boot2.core.reflect.InstanceMethodProvider;
  **/
 @Slf4j
 @Getter
-public class ProtoListenerTrigger extends ExecutorEvent {
+public class ProtoListenerTrigger extends AbstractMethodRunnable {
 
     private final ProtoEvent protoEvent;
 
     public ProtoListenerTrigger(ProtoEvent protoEvent) {
         super(protoEvent.getProtoMapping().providerMethod().getMethod());
         this.protoEvent = protoEvent;
-    }
-
-    @Override public String getStack() {
         InstanceMethodProvider providerMethod = protoEvent.getProtoMapping().providerMethod();
-        return providerMethod.getInstance().getClass() + "#" + providerMethod.getMethod().getName();
+        this.sourceLine = providerMethod.getInstance().getClass() + "#" + providerMethod.getMethod().getName();
     }
 
     @Override public void onEvent() throws Exception {

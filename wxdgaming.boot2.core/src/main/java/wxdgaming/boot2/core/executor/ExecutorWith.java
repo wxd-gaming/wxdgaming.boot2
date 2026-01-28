@@ -6,7 +6,7 @@ import java.lang.annotation.*;
  * 指定运行的线程池
  */
 @Documented
-@Target({ElementType.METHOD/*方法*/})
+@Target({ElementType.TYPE, ElementType.METHOD/*方法*/})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ExecutorWith {
 

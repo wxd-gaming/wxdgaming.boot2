@@ -11,7 +11,7 @@ import wxdgaming.boot2.starter.scheduled.ann.Scheduled;
 public class ScheduledTest {
 
 
-    @Scheduled("*")
+    @Scheduled("* * * * * ?")
     public void s1() {
         System.out.println("s1");
     }

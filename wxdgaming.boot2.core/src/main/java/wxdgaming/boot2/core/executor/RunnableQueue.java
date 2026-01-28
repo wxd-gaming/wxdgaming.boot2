@@ -1,4 +1,4 @@
-package executor;
+package wxdgaming.boot2.core.executor;
 
 /**
  * 运行队列
@@ -8,6 +8,6 @@ package executor;
  **/
 public interface RunnableQueue {
 
-    String queueName();
+    default String getQueueName() {return null;}
 
 }

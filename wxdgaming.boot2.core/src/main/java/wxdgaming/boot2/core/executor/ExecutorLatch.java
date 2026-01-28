@@ -33,9 +33,13 @@ public class ExecutorLatch {
 
     public void executor(Runnable runnable, Executor targetExecutor) {
         atomicInteger.incrementAndGet();
-        ExecutorJob executorJob = new ExecutorJob(runnable) {
-            @Override protected void runAfter() {
-                atomicInteger.decrementAndGet();
+        AbstractEventRunnable executorJob = new AbstractEventRunnable() {
+            @Override public void onEvent() throws Exception {
+                try {
+                    runnable.run();
+                } finally {
+                    atomicInteger.decrementAndGet();
+                }
             }
         };
         targetExecutor.execute(executorJob);
@@ -49,9 +53,13 @@ public class ExecutorLatch {
 
     public void executorAwait(Runnable runnable, Executor targetExecutor) throws InterruptedException {
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        ExecutorJob executorJob = new ExecutorJob(runnable) {
-            @Override protected void runAfter() {
-                countDownLatch.countDown();
+        AbstractEventRunnable executorJob = new AbstractEventRunnable() {
+            @Override public void onEvent() throws Exception {
+                try {
+                    runnable.run();
+                } finally {
+                    atomicInteger.decrementAndGet();
+                }
             }
         };
         targetExecutor.execute(executorJob);

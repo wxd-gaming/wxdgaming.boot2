@@ -3,7 +3,11 @@ package executor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.scheduling.support.CronExpression;
+import wxdgaming.boot2.core.executor.AbstractExecutorService;
+import wxdgaming.boot2.core.executor.CancelHolding;
+import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
 import wxdgaming.boot2.core.executor.QueuePolicyConst;
+import wxdgaming.boot2.core.executor.RunnableQueue;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +69,7 @@ public class CronTest {
             this.taskId = taskId;
         }
 
-        @Override public String queueName() {
+        @Override public String getQueueName() {
             return "abc";
         }
 

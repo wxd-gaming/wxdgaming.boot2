@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.cache;
 
 import lombok.Builder;
+import wxdgaming.boot2.core.executor.CancelHolding;
 import wxdgaming.boot2.core.function.Predicate3;
 import wxdgaming.boot2.core.util.AssertUtil;
 
@@ -8,7 +9,6 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -22,7 +22,7 @@ class LRUCacheHolderCAS<K, V> {
 
     protected final int blockSize;
     protected List<CacheBlock> blockList;
-    protected ScheduledFuture<?> scheduledFuture;
+    protected CancelHolding scheduledFuture;
     /** 读取过期时间 */
     protected final Duration expireAfterAccess;
     /** 写入过期时间 */
@@ -166,7 +166,9 @@ class LRUCacheHolderCAS<K, V> {
     }
 
     public void close() {
-        scheduledFuture.cancel(true);
+        if (scheduledFuture == null)
+            return;
+        scheduledFuture.cancel();
     }
 
     private int getBlockIndex(K key) {

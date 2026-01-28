@@ -1,122 +1,108 @@
 package wxdgaming.boot2.core.executor;
 
-import lombok.Getter;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.runtime.RunTimeUtil;
-import wxdgaming.boot2.core.util.AssertUtil;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.Timer;
 
 /**
- * 线程执行器工厂
+ * 线程池工厂
  *
  * @author wxd-gaming(無心道, 15388152619)
- * @version 2025-05-15 11:20
+ * @version 2026-01-27 09:23
  **/
-@Order(value = Integer.MIN_VALUE)
-@Configuration
-public class ExecutorFactory implements InitPrint {
+@Slf4j
+public class ExecutorFactory {
 
-    public static class Lazy {
-        public static ExecutorFactory instance = null;
-    }
+    private static class Lazy {
 
-    @Getter private final ExecutorMonitor EXECUTOR_MONITOR;
-    private final ScheduledExecutorService scheduledExecutorService;
-    private final ConcurrentHashMap<String, ExecutorService> EXECUTOR_MAP;
+        private static final Timer TIMER;
+        private static AbstractExecutorService executorServiceBase;
+        private static AbstractExecutorService executorServiceLogic;
+        private static AbstractExecutorService executorServiceVirtual;
 
-    private final ExecutorService EXECUTOR_SERVICE_BASIC;
-    private final ExecutorService EXECUTOR_SERVICE_LOGIC;
-    private final ExecutorService EXECUTOR_SERVICE_VIRTUAL;
+        static {
+            TIMER = new Timer("ExecutorFactory-Timer");
 
-    public ExecutorFactory(ExecutorProperties executorProperties) {
-        AssertUtil.isTrue(Lazy.instance == null, "ExecutorFactory is already exists");
-        Lazy.instance = this;
-        EXECUTOR_MAP = new ConcurrentHashMap<>();
-        EXECUTOR_MONITOR = new ExecutorMonitor();
-        scheduledExecutorService = newSingleThreadScheduledExecutor("core.scheduled");
-        EXECUTOR_SERVICE_BASIC = create("basic", executorProperties.getBasic());
-        EXECUTOR_SERVICE_LOGIC = create("logic", executorProperties.getLogic());
-        EXECUTOR_SERVICE_VIRTUAL = createVirtual("virtual", executorProperties.getVirtual());
-        if (executorProperties.getOutRunTimeDelay() > 0) {
-            RunTimeUtil.openRecord(executorProperties.getOutRunTimeDelay());
+        }
+
+        public static AbstractExecutorService getExecutorServiceBase() {
+            if (executorServiceBase == null) {
+                executorServiceBase = new ExecutorServicePlatform(
+                        "base",
+                        4, 5000,
+                        QueuePolicyConst.AbortPolicy
+                );
+            }
+            return executorServiceBase;
+        }
+
+        public static AbstractExecutorService getExecutorServiceLogic() {
+            if (executorServiceLogic == null) {
+                executorServiceLogic = new ExecutorServicePlatform(
+                        "logic",
+                        16, 5000,
+                        QueuePolicyConst.AbortPolicy
+                );
+            }
+            return executorServiceLogic;
+        }
+
+        public static AbstractExecutorService getExecutorServiceVirtual() {
+            if (executorServiceVirtual == null) {
+                executorServiceVirtual = new ExecutorServiceVirtual(
+                        "virtual",
+                        32, 5000,
+                        QueuePolicyConst.AbortPolicy
+                );
+            }
+            return executorServiceVirtual;
         }
     }
 
-    public static ExecutorService getExecutor(String name) {
-        return getExecutorMap().get(name);
+    public static void init(ExecutorProperties executorProperties) {
+        log.debug("初始化线程池... base {}", executorProperties.getBasic());
+        Lazy.executorServiceBase = new ExecutorServicePlatform(
+                "base",
+                executorProperties.getBasic()
+        );
+        log.debug("初始化线程池... logic {}", executorProperties.getLogic());
+        Lazy.executorServiceLogic = new ExecutorServicePlatform(
+                "logic",
+                executorProperties.getLogic()
+        );
+        log.debug("初始化线程池... virtual {}", executorProperties.getVirtual());
+        Lazy.executorServiceLogic = new ExecutorServicePlatform(
+                "virtual",
+                executorProperties.getVirtual()
+        );
     }
 
-    public static ScheduledExecutorService newSingleThreadScheduledExecutor(String name) {
-        return Executors.newSingleThreadScheduledExecutor(new NameThreadFactory(name, true));
+    public static void exit() {
+        Lazy.TIMER.cancel();
     }
 
-    public static ExecutorServicePlatform create(String name, ExecutorConfig executorConfig) {
-        return create(name, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getWarnSize(), executorConfig.getQueuePolicy());
+    public static AbstractExecutorService getExecutorServiceBasic() {
+        return Lazy.getExecutorServiceBase();
     }
 
-    /**
-     * 创建一个平台线程池，默认队列长度是5000，默认拒绝策略是AbortPolicy
-     *
-     * @param name         名
-     * @param corePoolSize 核心线程数
-     */
-    public static ExecutorServicePlatform create(String name, int corePoolSize) {
-        return create(name, corePoolSize, 5000, 500, QueuePolicyConst.AbortPolicy);
+    public static AbstractExecutorService getExecutorServiceLogic() {
+        return Lazy.getExecutorServiceLogic();
     }
 
-    public static ExecutorServicePlatform create(String name, int corePoolSize, int queueSize, int warnSize, QueuePolicy queuePolicy) {
-        ExecutorServicePlatform executorServicePlatform = new ExecutorServicePlatform(name, corePoolSize, queueSize, warnSize, queuePolicy);
-        getExecutorMap().put(name, executorServicePlatform);
-        return executorServicePlatform;
+    public static AbstractExecutorService getExecutorServiceVirtual() {
+        return Lazy.getExecutorServiceVirtual();
     }
 
-    public static ExecutorServiceVirtual createVirtual(String name, ExecutorConfig executorConfig) {
-        return createVirtual(name, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getWarnSize(), executorConfig.getQueuePolicy());
+    public static AbstractExecutorService create(String name, ExecutorConfig executorConfig) {
+        return new ExecutorServicePlatform(name, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getQueuePolicy());
     }
 
-    /**
-     * 创建一个虚拟线程池，默认队列长度是5000，默认拒绝策略是AbortPolicy
-     *
-     * @param name         名
-     * @param corePoolSize 核心线程数
-     */
-    public static ExecutorServiceVirtual createVirtual(String name, int corePoolSize) {
-        return createVirtual(name, corePoolSize, 5000, 500, QueuePolicyConst.AbortPolicy);
+    public static ExecutorServicePlatform createPlatform(String namePrefix, int threadSize, int queueSize, QueuePolicyConst queuePolicy) {
+        return new ExecutorServicePlatform(namePrefix, threadSize, queueSize, queuePolicy);
     }
 
-    public static ExecutorServiceVirtual createVirtual(String name, int corePoolSize, int queueSize, int warnSize, QueuePolicy queuePolicy) {
-        ExecutorServiceVirtual executorServiceVirtual = new ExecutorServiceVirtual(name, corePoolSize, queueSize, warnSize, queuePolicy);
-        getExecutorMap().put(name, executorServiceVirtual);
-        return executorServiceVirtual;
+    public static ExecutorServiceVirtual createVirtual(String namePrefix, int threadSize, int queueSize, QueuePolicyConst queuePolicy) {
+        return new ExecutorServiceVirtual(namePrefix, threadSize, queueSize, queuePolicy);
     }
 
-    public static ScheduledExecutorService getScheduledExecutorService() {
-        return Lazy.instance.scheduledExecutorService;
-    }
-
-    public static ConcurrentHashMap<String, ExecutorService> getExecutorMap() {
-        return Lazy.instance.EXECUTOR_MAP;
-    }
-
-    public static ExecutorService getExecutorServiceBasic() {
-        return Lazy.instance.EXECUTOR_SERVICE_BASIC;
-    }
-
-    public static ExecutorService getExecutorServiceLogic() {
-        return Lazy.instance.EXECUTOR_SERVICE_LOGIC;
-    }
-
-    /** 虚拟线程池 */
-    public static ExecutorService getExecutorServiceVirtual() {
-        return Lazy.instance.EXECUTOR_SERVICE_VIRTUAL;
-    }
-
-    public static ExecutorMonitor getExecutorMonitor() {
-        return Lazy.instance.EXECUTOR_MONITOR;
-    }
 }

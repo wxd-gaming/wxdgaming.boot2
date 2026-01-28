@@ -2,7 +2,6 @@ package wxdgaming.boot2.core;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
-import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.ExecutorProperties;
 
 /**
@@ -12,9 +11,8 @@ import wxdgaming.boot2.core.executor.ExecutorProperties;
  * @version 2025-02-17 13:36
  **/
 @ComponentScan(basePackageClasses = {
-        CoreScan.class,
         ExecutorProperties.class,
-        ExecutorFactory.class,
+        CoreScan.class,
 })
 @Component
 public class CoreScan {

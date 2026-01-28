@@ -1,4 +1,4 @@
-package executor;
+package wxdgaming.boot2.core.executor;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

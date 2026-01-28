@@ -5,7 +5,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.lang.bit.BitFlag;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.timer.MyClock;
@@ -32,7 +32,7 @@ public class PlayerLoginHandler extends HoldApplicationContext {
     @EventListener
     public void onLoginBefore(EventConst.LoginBeforePlayerEvent event) {
         Player player = event.player();
-        log.info("玩家上线:{} {}", ThreadContext.context().threadVO().getQueueName(), player);
+        log.info("玩家上线:{} {}", ExecutorContext.context().queueName(), player);
         player.setStatus(new BitFlag());
         /*触发任务登录次数*/
         applicationContextProvider.executeMethodWithAnnotatedException(OnTask.class, player, new Condition("login", 1));
@@ -54,7 +54,7 @@ public class PlayerLoginHandler extends HoldApplicationContext {
     @EventListener
     public void onLogin(EventConst.LoginPlayerEvent event) {
         Player player = event.player();
-        log.info("玩家上线:{} {}", ThreadContext.context().threadVO().getQueueName(), player);
+        log.info("玩家上线:{} {}", ExecutorContext.context().queueName(), player);
         player.getStatus().addFlags(StatusConst.Online);
         player.getOnlineInfo().setLastLoginTime(MyClock.millis());
         player.getOnlineInfo().setLoginCount(player.getOnlineInfo().getLoginCount() + 1);

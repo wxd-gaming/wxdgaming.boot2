@@ -15,8 +15,10 @@ public class CronExpressTest {
 
     @Test
     public void t1() {
-        CronExpress cronExpress = new CronExpress("0 0 * * * ?", TimeUnit.MINUTES, 30);
+        CronExpress cronExpress = new CronExpress("*/5 * * * * ?", TimeUnit.MINUTES, 30);
         System.out.println(cronExpress.validateTimeBefore());
+        System.out.println(cronExpress.validateTimeAfter());
+        System.out.println(cronExpress.validateTimeAfter());
         System.out.println(cronExpress.validateTimeAfter());
 
     }

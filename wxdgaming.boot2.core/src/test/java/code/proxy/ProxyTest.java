@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import wxdgaming.boot2.core.CoreScan;
-import wxdgaming.boot2.core.executor.ThreadStopWatch;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.proxy.MainThreadStopWatchAspect;
 
 /**
@@ -22,9 +22,9 @@ public class ProxyTest {
     @Test
     public void testProxy() {
         System.out.println("dddddd");
-        ThreadStopWatch.init("d");
+        ExecutorContext.context().running("d");
         userService.addUser("张三");
-        String string = ThreadStopWatch.releasePrint();
+        String string = ExecutorContext.context().costString();
         System.out.println(string);
     }
 

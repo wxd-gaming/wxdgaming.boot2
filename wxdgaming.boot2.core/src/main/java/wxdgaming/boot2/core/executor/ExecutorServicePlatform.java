@@ -1,83 +1,72 @@
 package wxdgaming.boot2.core.executor;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
- * 执行器
+ * 平台线程
  *
  * @author wxd-gaming(無心道, 15388152619)
- * @version 2025-05-15 09:03
+ * @version 2026-01-22 14:21
  **/
 @Slf4j
-public class ExecutorServicePlatform extends ExecutorService {
+@Getter
+public class ExecutorServicePlatform extends AbstractExecutorService {
 
-    private final String namePrefix;
-    private final int queueSize;
-    private final int warnSize;
-    private final QueuePolicy queuePolicy;
-    protected ThreadPoolExecutor threadPoolExecutor;
-    protected ConcurrentMap<String, ExecutorQueue> queueMap = new ConcurrentHashMap<>();
+    private final List<Thread> threads = Collections.synchronizedList(new ArrayList<>());
 
-    /** 如果队列已经达到上限默认是拒绝添加任务的 */
-    ExecutorServicePlatform(String namePrefix, int threadSize, int queueSize, int warnSize, QueuePolicy queuePolicy) {
-        this.namePrefix = namePrefix;
-        this.queueSize = queueSize;
-        this.warnSize = warnSize;
-        this.queuePolicy = queuePolicy;
-        threadPoolExecutor = new ThreadPoolExecutor(
-                threadSize, threadSize,
-                0L, TimeUnit.MILLISECONDS,
-                new ArrayBlockingQueue<>(queueSize),
-                new NameThreadFactory(namePrefix, false),
-                queuePolicy.getRejectedExecutionHandler()
-        );
+
+    public ExecutorServicePlatform(String namePrefix, ExecutorConfig executorConfig) {
+        super(namePrefix, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getQueuePolicy());
+        newThread();
     }
 
-    @Override public void execute(Runnable command) {
-        ExecutorJob executorJob;
-        if (!(command instanceof ExecutorQueue)) {
-            if (!(command instanceof ExecutorJob)) {
-                executorJob = new ExecutorJob(command);
-            } else {
-                executorJob = (ExecutorJob) command;
-            }
+    public ExecutorServicePlatform(String namePrefix, int threadSize, int queueSize, QueuePolicyConst queuePolicy) {
+        super(namePrefix, threadSize, queueSize, queuePolicy);
+        newThread();
+    }
 
-            if (!(command instanceof ExecutorJobScheduled.ScheduledExecutorJob) && executorJob.threadContext == null) {
-                /*TODO 任务添加线程上下文*/
-                executorJob.threadContext = new ThreadContext(ThreadContext.context());
-                executorJob.threadContext.threadVO().setExecutorQueue(null);
-                executorJob.threadContext.threadVO().setQueueName(null);
-            }
+    @Override protected synchronized void checkExecute() {
+        int size = threads.size();
+        if (size < getThreadSize()) {
+            newThread();
+        }
+    }
 
-            if (executorJob.threadContext != null) {
-                executorJob.threadContext.threadVO().setExecutor(this);
-            }
-
-            if (executorJob instanceof IExecutorQueue iExecutorQueue) {
-                if (StringUtils.isNotBlank(iExecutorQueue.getQueueName())) {
-                    queueMap
-                            .computeIfAbsent(iExecutorQueue.getQueueName(), k -> new ExecutorQueue(k, this, this.queueSize, warnSize, this.queuePolicy))
-                            .execute(executorJob);
-                    return;
+    @Override protected void newThread() {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                while (!getStoping().get()) {
+                    RunnableWrapper task = null;
+                    try {
+                        task = getQueue().poll(10, TimeUnit.MILLISECONDS);
+                        if (task != null) {
+                            setExecutorContext(task);
+                            try {
+                                task.run();
+                            } finally {
+                                ExecutorContext.cleanup();
+                            }
+                        }
+                    } catch (InterruptedException e) {
+                        break;
+                    } catch (Throwable e) {
+                        log.error("{} {} error", task == null ? "null" : task.getClass(), task, e);
+                    }
                 }
+                log.error("{} {} stop", this.getClass(), Thread.currentThread().getName());
+                getThreads().remove(Thread.currentThread());
             }
-
-        } else {
-            executorJob = (ExecutorJob) command;
-        }
-        int size = threadPoolExecutor.getQueue().size();
-        if (size > warnSize) {
-            log.warn("ExecutorService {} queueSize:{}, {}", namePrefix, warnSize, command);
-        }
-        threadPoolExecutor.execute(executorJob);
+        };
+        thread.setName(getNamePrefix() + "-" + (getThreads().size() + 1));
+        thread.start();
+        getThreads().add(thread);
     }
-
-    @Override public void stop() {
-        threadPoolExecutor.shutdown();
-    }
-
 
 }

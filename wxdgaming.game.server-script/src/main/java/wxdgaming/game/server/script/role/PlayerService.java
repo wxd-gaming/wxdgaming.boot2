@@ -3,7 +3,7 @@ package wxdgaming.game.server.script.role;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.executor.ThreadStopWatch;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.starter.net.SocketSession;
 import wxdgaming.game.common.slog.SlogService;
@@ -38,16 +38,16 @@ public class PlayerService extends HoldApplicationContext {
 
 
     public void sendPlayerList(SocketSession socketSession, Integer sid, String account) {
-        ThreadStopWatch.startIfPresent("sendPlayerList");
+        ExecutorContext.context().startWatch("sendPlayerList");
         HashSet<Long> longs = dataCenterService.getAccount2RidsMap().get(sid, account);
         ResLogin resLogin = new ResLogin();
         if (longs != null) {
             for (Long rid : longs) {
-                ThreadStopWatch.startIfPresent("db load player " + rid);
+                ExecutorContext.context().startWatch("db load player " + rid);
                 Player player = dataCenterService.getPlayer(rid);
                 RoleBean roleBean = new RoleBean().setRid(rid).setName(player.getName()).setLevel(player.getLevel());
                 resLogin.getRoles().add(roleBean);
-                ThreadStopWatch.stopIfPresent();
+                ExecutorContext.context().stopWatch();
             }
         }
         resLogin.setSid(sid);
@@ -55,7 +55,7 @@ public class PlayerService extends HoldApplicationContext {
         resLogin.setUserId(account);
         socketSession.write(resLogin);
         log.info("clientSession={}, sid={}, account={} 发送角色列表:{}", socketSession, sid, account, resLogin);
-        ThreadStopWatch.stopIfPresent();
+        ExecutorContext.context().stopWatch();
     }
 
     public void addExp(Player player, long exp, ReasonDTO reasonDTO) {

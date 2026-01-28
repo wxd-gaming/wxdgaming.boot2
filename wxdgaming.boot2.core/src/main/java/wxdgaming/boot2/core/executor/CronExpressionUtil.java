@@ -1,6 +1,7 @@
-package executor;
+package wxdgaming.boot2.core.executor;
 
 import org.springframework.scheduling.support.CronExpression;
+import wxdgaming.boot2.core.timer.MyClock;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -54,9 +55,27 @@ public class CronExpressionUtil {
         return next(cronString, targetStart);
     }
 
+    public static LocalDateTime next(String cronString) {
+        return next(cronString, LocalDateTime.now());
+    }
+
     public static LocalDateTime next(String cronString, LocalDateTime now) {
         CronExpression cronExpression = parse(cronString);
         return cronExpression.next(now);
+    }
+
+    public static long nextMillis(CronExpression cronExpression) {
+        return nextMillis(cronExpression, LocalDateTime.now());
+    }
+
+    public static long nextMillis(CronExpression cronExpression, LocalDateTime now) {
+        LocalDateTime next = cronExpression.next(now);
+        if (next == null) return 0;
+        return MyClock.time2Milli(next);
+    }
+
+    public static LocalDateTime up(String cronString) {
+        return up(cronString, LocalDateTime.now());
     }
 
     public static LocalDateTime up(String cronString, LocalDateTime now) {

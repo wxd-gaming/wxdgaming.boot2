@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.executor.ThreadContext;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.lang.condition.Condition;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.game.server.bean.MapNpc;
@@ -80,19 +80,19 @@ public class PlayerHeartHandler extends HoldApplicationContext {
     @EventListener
     public void onHeartMinute(EventConst.MapNpcHeartMinuteEvent event) {
         Player player = event.player();
-        log.info("onHeartMinute:{} {}", player, ThreadContext.context().threadVO().getQueueName());
+        log.info("onHeartMinute:{} {}", player, ExecutorContext.context().queueName());
     }
 
     @EventListener
     public void onHeartHour(EventConst.MapNpcHeartHourEvent event) {
         Player player = event.player();
-        log.info("onHeartHour:{} {}", player, ThreadContext.context().threadVO().getQueueName());
+        log.info("onHeartHour:{} {}", player, ExecutorContext.context().queueName());
     }
 
     @EventListener
     public void onHeartDay(EventConst.MapNpcHeartDayEvent event) {
         Player player = event.player();
-        log.info("onHeartDay:{} {}", player, ThreadContext.context().threadVO().getQueueName());
+        log.info("onHeartDay:{} {}", player, ExecutorContext.context().queueName());
     }
 
 }

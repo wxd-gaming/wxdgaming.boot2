@@ -1,10 +1,9 @@
-package executor;
+package wxdgaming.boot2.core.executor;
 
+import jakarta.annotation.Nonnull;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jspecify.annotations.NonNull;
-import wxdgaming.boot2.core.executor.QueuePolicyConst;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -121,9 +120,9 @@ public abstract class AbstractExecutorService implements Executor {
         return coroutineSupplier.completableFuture;
     }
 
-    @Override public void execute(@NonNull Runnable command) {
+    @Override public void execute(@Nonnull Runnable command) {
         if (command instanceof RunnableQueue runnableQueue) {
-            String queueName = runnableQueue.queueName();
+            String queueName = runnableQueue.getQueueName();
             if (StringUtils.isNotBlank(queueName)) {
                 ExecutorQueue executorQueue = executorQueues.computeIfAbsent(
                         queueName,
@@ -156,7 +155,7 @@ public abstract class AbstractExecutorService implements Executor {
         executorContent.actualNewTime = task.actualNewTime;
         executorContent.thread = Thread.currentThread();
         executorContent.executorService = this;
-        executorContent.runnable = task;
+        executorContent.runnable = task.getRunnable();
         executorContent.running();
         ExecutorContext.setContext(executorContent);
     }

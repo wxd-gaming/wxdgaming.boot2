@@ -1,4 +1,4 @@
-package executor;
+package wxdgaming.boot2.core.executor;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

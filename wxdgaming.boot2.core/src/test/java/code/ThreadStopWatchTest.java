@@ -1,7 +1,7 @@
 package code;
 
 import org.junit.jupiter.api.Test;
-import wxdgaming.boot2.core.executor.ThreadStopWatch;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.util.RandomUtils;
 
 import java.util.concurrent.TimeUnit;
@@ -15,43 +15,44 @@ public class ThreadStopWatchTest {
 
     @Test
     public void t1() {
-        ThreadStopWatch.init(TimeUnit.MICROSECONDS, "t1");
+        ExecutorContext.Content context = ExecutorContext.context();
+        context.running("t1");
         c1();
         c2();
         c3();
         c4();
-        String release = ThreadStopWatch.releasePrint();
+        String release = context.costString();
         System.out.println(release);
     }
 
     public void c1() {
-        ThreadStopWatch.start("c1");
+        ExecutorContext.context().startWatch("c1");
         c2();
         c3();
         c4();
         LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(RandomUtils.random(10, 50)));
-        ThreadStopWatch.stop();
+        ExecutorContext.context().stopWatch();
     }
 
     public void c2() {
-        ThreadStopWatch.start("c2");
+        ExecutorContext.context().startWatch("c2");
         c3();
         c4();
         LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(RandomUtils.random(10, 50)));
-        ThreadStopWatch.stop();
+        ExecutorContext.context().stopWatch();
     }
 
     public void c3() {
-        ThreadStopWatch.start("c3");
+        ExecutorContext.context().startWatch("c3");
         c4();
         LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(RandomUtils.random(10, 50)));
-        ThreadStopWatch.stop();
+        ExecutorContext.context().stopWatch();
     }
 
     public void c4() {
-        ThreadStopWatch.start("c4");
+        ExecutorContext.context().startWatch("c4");
         LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(RandomUtils.random(10, 50)));
-        ThreadStopWatch.stop();
+        ExecutorContext.context().stopWatch();
     }
 
 }
