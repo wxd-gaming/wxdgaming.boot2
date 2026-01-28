@@ -30,7 +30,7 @@ ExecutorFactory.init("executor.properties");
 // 通过获取当前线程上下文方式，然后put参数
 ExecutorContext.context().getData().put("local-data", i);
 
-// 如果不担心污染数据，在获取当前线程池的数据的时候可以选择调用一次clear()
+// 如果担心污染数据，在获取当前线程池的数据的时候可以选择调用一次clear()
 
 // 像线程池提交任务的时候会自动存储，data的内容会传递给线程，然后通过getData()方法获取
 executorServicePlatform.execute(() -> {
@@ -39,7 +39,7 @@ executorServicePlatform.execute(() -> {
 
 ```
 
-## 如果你的当前任务执行耗时很大，需要排除怎么办呢》？
+## 如果你的当前任务执行耗时很大，需要排查怎么办呢》？
 ### 1. 线程池配置，通过springboot开启aop会自动实现监控
 ```code
 
