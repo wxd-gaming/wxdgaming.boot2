@@ -1,5 +1,16 @@
 # 线程池4.x版本
 
+## maven 引用
+```code
+<!-- Source: https://mvnrepository.com/artifact/io.github.wxd-gaming/wxd-gaming.boot2.core -->
+<dependency>
+    <groupId>io.github.wxd-gaming</groupId>
+    <artifactId>wxd-gaming.boot2.core</artifactId>
+    <version>1.0.2</version>
+    <scope>compile</scope>
+</dependency>
+```
+
 ## 初始化
 线程池初始化代码如下：
 
