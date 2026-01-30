@@ -14,12 +14,12 @@ import java.util.function.Supplier;
 @Slf4j
 class FutureSupplier<R> implements Runnable, RunnableWrapperProxy {
 
-    final ExecutorContext.Content content;
+    final ExecutorContext.ExecutorDTO executorDTO;
     final Supplier<R> runnable;
     final CompletableFuture<R> completableFuture = new CompletableFuture<>();
 
-    public FutureSupplier(ExecutorContext.Content content, Supplier<R> runnable) {
-        this.content = content;
+    public FutureSupplier(ExecutorContext.ExecutorDTO executorDTO, Supplier<R> runnable) {
+        this.executorDTO = executorDTO;
         this.runnable = runnable;
     }
 
@@ -29,7 +29,7 @@ class FutureSupplier<R> implements Runnable, RunnableWrapperProxy {
 
     @Override public void run() {
         try {
-            ExecutorContext.context().getData().putAll(content.getData());
+            ExecutorContext.context().getData().putAll(executorDTO.getData());
             completableFuture.complete(runnable.get());
         } catch (Throwable e) {
             log.error("{} {} error", runnable.getClass(), runnable.toString(), e);

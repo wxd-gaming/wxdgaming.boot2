@@ -54,7 +54,7 @@ public class ExecutorQueue extends RunnableWrapper implements Executor, Runnable
             if (queue.isEmpty()) return;
             if (!addExecutor) {
                 addExecutor = true;
-                abstractExecutorService.execute(this);
+                abstractExecutorService._execute(this);
             }
         } finally {
             reentrantLock.unlock();

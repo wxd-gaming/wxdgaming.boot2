@@ -14,7 +14,4 @@ public interface RunnableWarnTime {
     /** 执行耗时超过33ms 告警日志 */
     default long getExecutorWarnTime() {return 33;}
 
-    /** 任务new出来提交到线程池队列超过 1000 ms 告警日志 */
-    default long getSubmitWarnTime() {return 1000;}
-
 }

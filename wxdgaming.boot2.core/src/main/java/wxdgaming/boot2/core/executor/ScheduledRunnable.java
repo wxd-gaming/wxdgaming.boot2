@@ -58,7 +58,7 @@ class ScheduledRunnable implements Runnable, Comparable<ScheduledRunnable> {
         thread.start();
     }
 
-    public static ScheduledRunnable schedule(Executor executor, Runnable runnable, long delay, TimeUnit unit) {
+    public static ScheduledRunnable schedule(AbstractExecutorService executor, Runnable runnable, long delay, TimeUnit unit) {
         return new ScheduledRunnable(executor, runnable, false, delay, 0, unit);
     }
 
@@ -70,7 +70,7 @@ class ScheduledRunnable implements Runnable, Comparable<ScheduledRunnable> {
      * @param delay        间隔时间
      * @param unit         时间单位
      */
-    public static ScheduledRunnable scheduleAtFixedRate(Executor executor, Runnable runnable, long initialDelay, long delay, TimeUnit unit) {
+    public static ScheduledRunnable scheduleAtFixedRate(AbstractExecutorService executor, Runnable runnable, long initialDelay, long delay, TimeUnit unit) {
         return new ScheduledRunnable(executor, runnable, false, initialDelay, delay, unit);
     }
 
@@ -82,11 +82,11 @@ class ScheduledRunnable implements Runnable, Comparable<ScheduledRunnable> {
      * @param delay        间隔时间
      * @param unit         时间单位
      */
-    public static ScheduledRunnable scheduleWithFixedDelay(Executor executor, Runnable runnable, long initialDelay, long delay, TimeUnit unit) {
+    public static ScheduledRunnable scheduleWithFixedDelay(AbstractExecutorService executor, Runnable runnable, long initialDelay, long delay, TimeUnit unit) {
         return new ScheduledRunnable(executor, runnable, true, initialDelay, delay, unit);
     }
 
-    protected final Executor executor;
+    protected final AbstractExecutorService abstractExecutorService;
     protected final RunnableProxy runnableProxy;
     /** true 如果本次执行卡组了尚未完成，不会执行下一次 */
     protected final boolean withFixedDelay;
@@ -95,8 +95,8 @@ class ScheduledRunnable implements Runnable, Comparable<ScheduledRunnable> {
     protected long nextRunTime;
     protected final CancelHolding cancelHolding = new CancelHolding();
 
-    private ScheduledRunnable(Executor executor, Runnable runnable, boolean withFixedDelay, long initialDelay, long delay, TimeUnit unit) {
-        this.executor = executor;
+    private ScheduledRunnable(AbstractExecutorService abstractExecutorService, Runnable runnable, boolean withFixedDelay, long initialDelay, long delay, TimeUnit unit) {
+        this.abstractExecutorService = abstractExecutorService;
         this.runnableProxy = new RunnableProxy(runnable);
         this.withFixedDelay = withFixedDelay;
         this.delay = delay;
@@ -110,7 +110,7 @@ class ScheduledRunnable implements Runnable, Comparable<ScheduledRunnable> {
     }
 
     @Override public void run() {
-        executor.execute(this.runnableProxy);
+        abstractExecutorService.execute(this.runnableProxy);
     }
 
     @Override public int compareTo(ScheduledRunnable o) {

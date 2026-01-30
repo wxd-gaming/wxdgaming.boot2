@@ -1,6 +1,7 @@
 package wxdgaming.boot2.core.executor;
 
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.reflect.AnnUtil;
 import wxdgaming.boot2.core.runtime.IgnoreRunTimeRecord;
 
@@ -43,11 +44,6 @@ public abstract class AbstractMethodRunnable extends AbstractEventRunnable {
         return super.offWarnLog();
     }
 
-    @Override public long getSubmitWarnTime() {
-        if (getExecutorLog() != null) return getExecutorLog().submitWarnTime();
-        return super.getSubmitWarnTime();
-    }
-
     @Override public long getExecutorWarnTime() {
         if (getExecutorLog() != null) return getExecutorLog().executorWarnTime();
         return super.getExecutorWarnTime();
@@ -59,6 +55,8 @@ public abstract class AbstractMethodRunnable extends AbstractEventRunnable {
         if (__executorWith != null) {
             if (__executorWith.useVirtualThread()) {
                 executorService = ExecutorFactory.getExecutorServiceVirtual();
+            } else if (StringUtils.isNotBlank(__executorWith.threadName())) {
+                executorService = ExecutorFactory.find(__executorWith.threadName());
             }
         }
         executorService.execute(this);

@@ -13,18 +13,18 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 class FutureRunnable implements Runnable, RunnableWrapperProxy {
 
-    final ExecutorContext.Content content;
+    final ExecutorContext.ExecutorDTO executorDTO;
     final Runnable runnable;
     final CompletableFuture<Void> completableFuture = new CompletableFuture<>();
 
-    public FutureRunnable(ExecutorContext.Content content, Runnable runnable) {
-        this.content = content;
+    public FutureRunnable(ExecutorContext.ExecutorDTO executorDTO, Runnable runnable) {
+        this.executorDTO = executorDTO;
         this.runnable = runnable;
     }
 
     @Override public void run() {
         try {
-            ExecutorContext.context().getData().putAll(content.getData());
+            ExecutorContext.context().getData().putAll(executorDTO.getData());
             runnable.run();
             completableFuture.complete(null);
         } catch (Throwable e) {

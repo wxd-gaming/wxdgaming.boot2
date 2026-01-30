@@ -38,6 +38,8 @@ public class ExecutorServiceVirtual extends AbstractExecutorService {
     }
 
     @Override protected void newThread() {
+        if (getShutdown().get())
+            return;
         RunnableWrapper task = getQueue().poll();
         if (task == null) return;
         threadNum.incrementAndGet();
@@ -48,6 +50,7 @@ public class ExecutorServiceVirtual extends AbstractExecutorService {
             } catch (Throwable e) {
                 log.error("{} {} error", task.getClass(), task, e);
             } finally {
+                getTaskCount().decrementAndGet();
                 ExecutorFactory.Lazy.runnableMonitorMap.remove(Thread.currentThread());
                 ExecutorContext.cleanup();
                 threadNum.decrementAndGet();

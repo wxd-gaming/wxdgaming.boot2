@@ -21,7 +21,4 @@ public @interface ExecutorLog {
     /** 执行耗时超过33ms 告警日志 */
     long executorWarnTime() default 33;
 
-    /** 任务new出来提交到线程池队列超过 1000 ms 告警日志 */
-    long submitWarnTime() default 1000;
-
 }

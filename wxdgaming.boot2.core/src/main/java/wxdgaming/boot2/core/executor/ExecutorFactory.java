@@ -2,6 +2,7 @@ package wxdgaming.boot2.core.executor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import wxdgaming.boot2.core.runtime.RunTimeUtil;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -40,13 +41,13 @@ public class ExecutorFactory {
                                         continue;
                                     }
                                     long cost = System.nanoTime() - startTime;
-                                    if (TimeUnit.NANOSECONDS.toSeconds(cost) < 5) {
+                                    long millis = TimeUnit.NANOSECONDS.toMillis(cost);
+                                    if (millis < executorContent.getExecutorWarnTime()) {
                                         continue;
                                     }
                                     Thread thread = executorContent.getThread();
                                     StackTraceElement[] stackTrace = thread.getStackTrace();
                                     String stack = StackUtils.stack(stackTrace);
-                                    long millis = TimeUnit.NANOSECONDS.toMillis(cost);
                                     String s = DurationFormatUtils.formatDuration(millis, "HH:mm:ss.SSS");
                                     log.error("线程卡住 {} 运行: {}, stack: {}", executorContent.toString(), s, stack);
                                 }
@@ -101,20 +102,32 @@ public class ExecutorFactory {
         createPlatform("base", executorProperties.getLogic());
         log.debug("初始化线程池... virtual {}", executorProperties.getVirtual());
         createVirtual("virtual", executorProperties.getVirtual());
+        RunTimeUtil.openRecord(executorProperties.getOutRunTimeDelay());
     }
 
     public static void exit() {
         Lazy.TIMER.cancel();
     }
 
+    public static AbstractExecutorService find(String name) {
+        AbstractExecutorService abstractExecutorService = Lazy.executorServiceMap.get(name);
+        if (abstractExecutorService == null) {
+            throw new RuntimeException("线程池不存在: " + name);
+        }
+        return abstractExecutorService;
+    }
+
+    /** 获取默认的基础线程池 */
     public static AbstractExecutorService getExecutorServiceBasic() {
         return Lazy.getExecutorServiceBase();
     }
 
+    /** 获取默认的基础线程池 */
     public static AbstractExecutorService getExecutorServiceLogic() {
         return Lazy.getExecutorServiceLogic();
     }
 
+    /** 获取默认的基础线程池 */
     public static AbstractExecutorService getExecutorServiceVirtual() {
         return Lazy.getExecutorServiceVirtual();
     }
@@ -123,16 +136,35 @@ public class ExecutorFactory {
         return createPlatform(name, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getQueuePolicy());
     }
 
+    /**
+     * 创建平台线程池集合
+     *
+     * @param namePrefix  线程名称前缀
+     * @param threadSize  线程池大小
+     * @param queueSize   队列大小
+     * @param queuePolicy 队列策略
+     * @return 平台线程池集合
+     */
     public static ExecutorServicePlatform createPlatform(String namePrefix, int threadSize, int queueSize, QueuePolicyConst queuePolicy) {
         ExecutorServicePlatform executorServicePlatform = new ExecutorServicePlatform(namePrefix, threadSize, queueSize, queuePolicy);
         ExecutorFactory.Lazy.executorServiceMap.put(namePrefix, executorServicePlatform);
         return executorServicePlatform;
     }
 
+    /** 创建虚拟线程池集合 */
     public static AbstractExecutorService createVirtual(String name, ExecutorConfig executorConfig) {
         return createVirtual(name, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getQueuePolicy());
     }
 
+    /**
+     * 创建虚拟线程池集合
+     *
+     * @param namePrefix  线程名称前缀
+     * @param threadSize  线程池大小
+     * @param queueSize   队列大小
+     * @param queuePolicy 队列策略
+     * @return 虚拟线程池集合
+     */
     public static ExecutorServiceVirtual createVirtual(String namePrefix, int threadSize, int queueSize, QueuePolicyConst queuePolicy) {
         ExecutorServiceVirtual executorServiceVirtual = new ExecutorServiceVirtual(namePrefix, threadSize, queueSize, queuePolicy);
         ExecutorFactory.Lazy.executorServiceMap.put(namePrefix, executorServiceVirtual);

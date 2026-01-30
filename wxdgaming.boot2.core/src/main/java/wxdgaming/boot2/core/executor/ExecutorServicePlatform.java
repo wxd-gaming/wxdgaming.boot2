@@ -37,7 +37,9 @@ public class ExecutorServicePlatform extends AbstractExecutorService {
         Thread thread = new Thread() {
             @Override
             public void run() {
-                while (!getStoping().get()) {
+                while (true) {
+                    if (getShutdown().get())
+                        break;
                     RunnableWrapper task = null;
                     try {
                         task = getQueue().poll(10, TimeUnit.MILLISECONDS);
@@ -46,6 +48,7 @@ public class ExecutorServicePlatform extends AbstractExecutorService {
                             try {
                                 task.run();
                             } finally {
+                                getTaskCount().decrementAndGet();
                                 ExecutorContext.cleanup();
                                 ExecutorFactory.Lazy.runnableMonitorMap.remove(Thread.currentThread());
                             }
@@ -56,7 +59,7 @@ public class ExecutorServicePlatform extends AbstractExecutorService {
                         log.error("{} {} error", task == null ? "null" : task.getClass(), task, e);
                     }
                 }
-                log.error("{} {} stop", this.getClass(), Thread.currentThread().getName());
+                log.error("{} {} close:{}, shutdown:{}", this.getClass(), Thread.currentThread().getName(), getClosing(), getShutdown());
                 getThreads().remove(Thread.currentThread());
             }
         };

@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @IgnoreRunTimeRecord
 @ExecutorWith(useVirtualThread = true)
-@ExecutorLog(executorWarnTime = 30000, submitWarnTime = 100000)
+@ExecutorLog(executorWarnTime = 30000)
 public class StatsPlugin extends AbstractPlugin {
 
     @Override public String cron() {

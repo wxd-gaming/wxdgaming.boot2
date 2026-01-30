@@ -7,6 +7,10 @@ import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.collection.ConvertCollection;
 import wxdgaming.boot2.core.collection.SplitCollection;
 import wxdgaming.boot2.core.collection.Table;
+import wxdgaming.boot2.core.executor.AbstractEventRunnable;
+import wxdgaming.boot2.core.executor.AbstractExecutorService;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
+import wxdgaming.boot2.core.executor.QueuePolicyConst;
 import wxdgaming.boot2.core.io.FileWriteUtil;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.Tick;
@@ -20,7 +24,6 @@ import java.sql.PreparedStatement;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -33,29 +36,28 @@ import java.util.concurrent.locks.ReentrantLock;
 public abstract class SqlDataBatch extends DataBatch {
 
     protected final SqlDataHelper sqlDataHelper;
-    protected final List<BatchThread> batchThreads = new ArrayList<>();
+    protected final List<BatchQueue> queueList;
+    protected final AbstractExecutorService batchExecutorService;
 
     public SqlDataBatch(SqlDataHelper sqlDataHelper) {
         this.sqlDataHelper = sqlDataHelper;
         int batchThreadSize = sqlDataHelper.getSqlConfig().getBatchThreadSize();
+        this.queueList = new ArrayList<>(batchThreadSize);
+        this.batchExecutorService = ExecutorFactory.createPlatform("Sql-Batch-" + sqlDataHelper.getDbName(), batchThreadSize, 20000, QueuePolicyConst.AbortPolicy);
         log.info("{} 数据库: {} 创建 {} 个 sql 批量线程", sqlDataHelper.getClass().getSimpleName(), sqlDataHelper.getDbName(), batchThreadSize);
         for (int i = 1; i <= batchThreadSize; i++) {
-            batchThreads.add(new BatchThread(i, "Sql-Batch-" + sqlDataHelper.getDbName() + "-" + i, sqlDataHelper.getSqlConfig().getBatchSubmitSize()));
+            String queueName = "Sql-Batch-" + sqlDataHelper.getDbName() + "-" + i;
+            BatchQueue batchQueue = new BatchQueue(i, queueName, sqlDataHelper.getSqlConfig().getBatchSubmitSize());
+            this.queueList.add(batchQueue);
+            this.batchExecutorService.scheduleWithFixedDelay(batchQueue, 200, 200, TimeUnit.MILLISECONDS);
         }
     }
 
     @Override public void stop() {
-        for (BatchThread batchThread : batchThreads) {
-            log.info("准备关闭线程 {}", batchThread);
-            batchThread.closed.set(true);
-        }
-        for (BatchThread batchThread : batchThreads) {
-            try {
-                batchThread.join();
-            } catch (InterruptedException ignored) {}
-        }
+        batchExecutorService.closeAndWait();
     }
 
+    @SuppressWarnings("unchecked")
     public <SDH extends SqlDataHelper> SDH dataHelper() {
         return (SDH) sqlDataHelper;
     }
@@ -65,28 +67,28 @@ public abstract class SqlDataBatch extends DataBatch {
         if (newEntity == null) {
             newEntity = !this.sqlDataHelper.existBean(entity);
         }
-        if (Boolean.TRUE.equals(newEntity))
+        if (newEntity)
             insert(entity);
         else
             update(entity);
         entity.setNewEntity(false);
     }
 
-    BatchThread batchThread(Entity entity) {
+    BatchQueue batchQueue(Entity entity) {
         int hashCode = entity.hashCode();
-        int index = Math.abs(hashCode) % batchThreads.size();
-        return batchThreads.get(index);
+        int index = Math.abs(hashCode) % queueList.size();
+        return queueList.get(index);
     }
 
     @Override public void insert(Entity entity) {
-        batchThread(entity).insert(entity);
+        batchQueue(entity).insert(entity);
     }
 
     @Override public void update(Entity entity) {
-        batchThread(entity).update(entity);
+        batchQueue(entity).update(entity);
     }
 
-    public class BatchThread extends Thread {
+    public class BatchQueue extends AbstractEventRunnable {
 
         protected final ReentrantLock lock = new ReentrantLock();
         protected AtomicBoolean closed = new AtomicBoolean();
@@ -101,12 +103,14 @@ public abstract class SqlDataBatch extends DataBatch {
         protected long executeCount = 0;
         protected Tick ticket = new Tick(1, TimeUnit.MINUTES);
 
-        public BatchThread(int threadId, String name, int batchSubmitSize) {
-            super(name);
+        public BatchQueue(int threadId, String name, int batchSubmitSize) {
+            this.setQueueName(name);
             this.threadId = threadId;
             this.batchSubmitSize = batchSubmitSize;
-            this.setPriority(MAX_PRIORITY);
-            this.start();
+        }
+
+        @Override public long getExecutorWarnTime() {
+            return 30 * 1000;
         }
 
         public void insert(Entity entity) {
@@ -169,25 +173,9 @@ public abstract class SqlDataBatch extends DataBatch {
             }
         }
 
-        @Override public void run() {
-
-            while (true) {
-                try {
-                    if (!closed.get() && !SpringUtil.exiting.get()) {
-                        LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(200));
-                    }
-                    insertBach();
-                    updateBach();
-                    if (closed.get()) {
-                        if (batchInsertMap.isEmpty() && batchUpdateMap.isEmpty())
-                            break;
-                        log.info("停服等待数据落地 sql batch {}", Thread.currentThread());
-                    }
-                } catch (Throwable throwable) {
-                    log.error("sqlDataBatch error", throwable);
-                }
-            }
-            log.info("线程 {} 退出", Thread.currentThread());
+        @Override public void onEvent() throws Exception {
+            insertBach();
+            updateBach();
         }
 
         protected void insertBach() {

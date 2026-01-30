@@ -9,6 +9,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.ann.ThreadParam;
 import wxdgaming.boot2.core.json.FastJsonUtil;
+import wxdgaming.boot2.core.runtime.RunTimeUtil;
 import wxdgaming.boot2.core.timer.MyClock;
 
 import java.lang.reflect.Type;
@@ -69,17 +70,19 @@ public class ExecutorContext {
     }
 
     /** 只会释放当前变量 */
-    public static void release() {
-        CONTEXT.remove(Thread.currentThread());
+    public static Content release() {
+        Content content = CONTEXT.remove(Thread.currentThread());
+        RunTimeUtil.record(String.valueOf(content.runnable), content.getStartTime());
+        return content;
     }
 
     /** 清理变量的同时判定耗时达到条件会输出日志 */
     public static void cleanup() {
-        Content content = CONTEXT.remove(Thread.currentThread());
+        Content content = release();
         if (content != null && content.stopWatch != null && !content.offWarnLog()) {
             long costMillis = content.costMillis();
             long newMillis = content.newMillis();
-            if (costMillis > content.getExecutorWarnTime() || newMillis > content.getSubmitWarnTime()) {
+            if (costMillis > content.getExecutorWarnTime() || newMillis > content.getExecutorWarnTime()) {
                 log.error("线程执行耗时过大：\n{}", content.costString());
             }
         }

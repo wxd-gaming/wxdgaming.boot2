@@ -30,13 +30,11 @@ public class AWebFilter implements HandlerInterceptor, WebMvcConfigurer {
 
     @Override public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         ExecutorContext.Content context = new ExecutorContext.Content() {
+
             @Override public long getExecutorWarnTime() {
                 return 1000;
             }
 
-            @Override public long getSubmitWarnTime() {
-                return 3000;
-            }
         };
         context.setThread(Thread.currentThread());
         context.setNewTime(System.nanoTime());

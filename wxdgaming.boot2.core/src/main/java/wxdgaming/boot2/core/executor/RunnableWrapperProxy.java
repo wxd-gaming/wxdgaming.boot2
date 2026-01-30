@@ -24,13 +24,6 @@ interface RunnableWrapperProxy extends RunnableWarnTime, RunnableQueue {
         return RunnableWarnTime.super.getExecutorWarnTime();
     }
 
-    default long getSubmitWarnTime() {
-        if (getRunnable() instanceof RunnableWarnTime runnableWarnTime) {
-            return runnableWarnTime.getSubmitWarnTime();
-        }
-        return RunnableWarnTime.super.getSubmitWarnTime();
-    }
-
     default String getQueueName() {
         if (getRunnable() instanceof RunnableQueue runnableQueue) {
             return runnableQueue.getQueueName();

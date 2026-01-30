@@ -13,12 +13,12 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 class CoroutineRunnable implements Runnable, RunnableWrapperProxy {
 
-    final ExecutorContext.Content content;
+    final ExecutorContext.ExecutorDTO executorDTO;
     final Runnable runnable;
     final CompletableFuture<Void> completableFuture = new CompletableFuture<>();
 
-    public CoroutineRunnable(ExecutorContext.Content content, Runnable runnable) {
-        this.content = content;
+    public CoroutineRunnable(ExecutorContext.ExecutorDTO executorDTO, Runnable runnable) {
+        this.executorDTO = executorDTO;
         this.runnable = runnable;
     }
 
@@ -28,12 +28,12 @@ class CoroutineRunnable implements Runnable, RunnableWrapperProxy {
 
     @Override public void run() {
         try {
-            ExecutorContext.context().getData().putAll(content.getData());
+            ExecutorContext.context().getData().putAll(executorDTO.getData());
             runnable.run();
-            content.execute(() -> completableFuture.complete(null));
+            executorDTO.execute(() -> completableFuture.complete(null));
         } catch (Throwable e) {
             log.error("{} {} error", runnable.getClass(), runnable.toString(), e);
-            content.execute(() -> completableFuture.completeExceptionally(e));
+            executorDTO.execute(() -> completableFuture.completeExceptionally(e));
         }
     }
 

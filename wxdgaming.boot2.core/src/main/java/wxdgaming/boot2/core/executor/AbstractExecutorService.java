@@ -7,6 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.LockSupport;
 import java.util.function.Supplier;
 
 /**
@@ -25,7 +27,9 @@ public abstract class AbstractExecutorService implements Executor {
     private final QueuePolicyConst queuePolicy;
     private final ArrayBlockingQueue<RunnableWrapper> queue;
     private final ConcurrentHashMap<String, ExecutorQueue> executorQueues = new ConcurrentHashMap<>();
-    private final AtomicBoolean stoping = new AtomicBoolean(false);
+    private final AtomicLong taskCount = new AtomicLong();
+    private final AtomicBoolean closing = new AtomicBoolean(false);
+    private final AtomicBoolean shutdown = new AtomicBoolean(false);
 
     AbstractExecutorService(String namePrefix, int threadSize, int queueSize, QueuePolicyConst queuePolicy) {
         this.namePrefix = namePrefix;
@@ -90,37 +94,41 @@ public abstract class AbstractExecutorService implements Executor {
 
     /** 异步 */
     public CompletableFuture<Void> future(Runnable runnable) {
-        ExecutorContext.Content context = ExecutorContext.context();
-        FutureRunnable futureRunnable = new FutureRunnable(context, runnable);
+        ExecutorContext.ExecutorDTO executorDTO = ExecutorContext.context().buildExecutorDTO();
+        FutureRunnable futureRunnable = new FutureRunnable(executorDTO, runnable);
         execute(futureRunnable);
         return futureRunnable.completableFuture;
     }
 
     /** 异步 */
     public <R> CompletableFuture<R> future(Supplier<R> supplier) {
-        ExecutorContext.Content context = ExecutorContext.context();
-        FutureSupplier<R> futureSupplier = new FutureSupplier<>(context, supplier);
+        ExecutorContext.ExecutorDTO executorDTO = ExecutorContext.context().buildExecutorDTO();
+        FutureSupplier<R> futureSupplier = new FutureSupplier<>(executorDTO, supplier);
         execute(futureSupplier);
         return futureSupplier.completableFuture;
     }
 
     /** 异步 协程(coroutine) 会回到当前调用线程 */
     public CompletableFuture<Void> coroutine(Runnable runnable) {
-        ExecutorContext.Content executorVO = ExecutorContext.context();
-        CoroutineRunnable coroutineRunnable = new CoroutineRunnable(executorVO, runnable);
+        ExecutorContext.ExecutorDTO executorDTO = ExecutorContext.context().buildExecutorDTO();
+        CoroutineRunnable coroutineRunnable = new CoroutineRunnable(executorDTO, runnable);
         execute(coroutineRunnable);
         return coroutineRunnable.completableFuture;
     }
 
     /** 异步 协程(coroutine) 会回到当前调用线程 */
     public <R> CompletableFuture<R> coroutine(Supplier<R> supplier) {
-        ExecutorContext.Content executorVO = ExecutorContext.context();
-        CoroutineSupplier<R> coroutineSupplier = new CoroutineSupplier<>(executorVO, supplier);
+        ExecutorContext.ExecutorDTO executorDTO = ExecutorContext.context().buildExecutorDTO();
+        CoroutineSupplier<R> coroutineSupplier = new CoroutineSupplier<>(executorDTO, supplier);
         execute(coroutineSupplier);
         return coroutineSupplier.completableFuture;
     }
 
     @Override public void execute(@Nonnull Runnable command) {
+        if (closing.get() || shutdown.get()) {
+            throw new RejectedExecutionException("ExecutorService is closing or shutdown");
+        }
+        taskCount.incrementAndGet();
         if (command instanceof RunnableQueue runnableQueue) {
             String queueName = runnableQueue.getQueueName();
             if (StringUtils.isNotBlank(queueName)) {
@@ -148,6 +156,7 @@ public abstract class AbstractExecutorService implements Executor {
         checkExecute();
     }
 
+    /** 设置线程上下文状态 */
     void setExecutorContext(RunnableWrapper task) {
         ExecutorContext.Content executorContent = new ExecutorContext.Content();
         executorContent.newTime = task.newTime;
@@ -161,13 +170,31 @@ public abstract class AbstractExecutorService implements Executor {
         ExecutorFactory.Lazy.runnableMonitorMap.put(Thread.currentThread(), executorContent);
     }
 
+    /** 标记关闭状态，并且不在接收新任务 */
+    public void close() {
+        closing.set(true);
+    }
+
+    /** 标记关闭状态，等待现有的任务处理结束，并且不在接收新任务 */
+    public void closeAndWait() {
+        closing.set(true);
+        while (taskCount.get() > 0) {
+            LockSupport.parkNanos(TimeUnit.MICROSECONDS.toNanos(200));
+        }
+    }
+
+    /** 关闭了就直接结束了 不会等待 */
+    public void shutdown() {
+        shutdown.set(true);
+    }
+
     protected abstract void checkExecute();
 
     protected abstract void newThread();
 
     @Override public String toString() {
         return "%s{name='%s', threadSize=%d, queueSize=%d, queuePolicy=%s, stoping=%s}"
-                .formatted(this.getClass().getSimpleName(), namePrefix, threadSize, queueSize, queuePolicy, stoping);
+                .formatted(this.getClass().getSimpleName(), namePrefix, threadSize, queueSize, queuePolicy, closing);
     }
 
 }
