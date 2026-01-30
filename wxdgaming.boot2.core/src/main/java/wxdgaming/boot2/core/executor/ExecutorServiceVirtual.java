@@ -1,7 +1,6 @@
 package wxdgaming.boot2.core.executor;
 
 import lombok.extern.slf4j.Slf4j;
-import wxdgaming.boot2.core.executor.QueuePolicyConst;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
@@ -19,7 +18,7 @@ public class ExecutorServiceVirtual extends AbstractExecutorService {
     final AtomicInteger threadNum = new AtomicInteger(0);
     final ReentrantLock lock = new ReentrantLock();
 
-    public ExecutorServiceVirtual(String namePrefix, int threadSize, int queueSize, QueuePolicyConst queuePolicy) {
+    protected ExecutorServiceVirtual(String namePrefix, int threadSize, int queueSize, QueuePolicyConst queuePolicy) {
         super(namePrefix, threadSize, queueSize, queuePolicy);
         ofVirtual = Thread.ofVirtual().name(namePrefix + "-", 0);
     }

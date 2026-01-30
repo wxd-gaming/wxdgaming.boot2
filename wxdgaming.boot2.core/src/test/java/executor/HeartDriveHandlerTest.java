@@ -12,7 +12,7 @@ public class HeartDriveHandlerTest implements HeartDriveHandler {
 
     @Test
     public void t1() {
-        AbstractExecutorService executorServicePlatform = new ExecutorServicePlatform("platform", 4, 1000, QueuePolicyConst.AbortPolicy);
+        AbstractExecutorService executorServicePlatform = ExecutorFactory.createPlatform("platform", 4, 1000, QueuePolicyConst.AbortPolicy);
         HeartDriveRunnable heartDriveRunnable = new HeartDriveRunnable(executorServicePlatform, "heart", "heart", 30, TimeUnit.MILLISECONDS);
         heartDriveRunnable.setDriveHandler(this);
         LockSupport.parkNanos(TimeUnit.MINUTES.toNanos(3));

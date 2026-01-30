@@ -3,11 +3,7 @@ package executor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.scheduling.support.CronExpression;
-import wxdgaming.boot2.core.executor.AbstractExecutorService;
-import wxdgaming.boot2.core.executor.CancelHolding;
-import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
-import wxdgaming.boot2.core.executor.QueuePolicyConst;
-import wxdgaming.boot2.core.executor.RunnableQueue;
+import wxdgaming.boot2.core.executor.*;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +32,7 @@ public class CronTest {
 
     @Test
     public void cron2() {
-        AbstractExecutorService cronService = new ExecutorServicePlatform("cron", 1, 500, QueuePolicyConst.AbortPolicy);
+        AbstractExecutorService cronService = ExecutorFactory.createPlatform("cron", 1, 500, QueuePolicyConst.AbortPolicy);
         AtomicInteger taskIdFactory = new AtomicInteger(0);
         for (int i = 0; i < 5; i++) {
             final int taskId = taskIdFactory.incrementAndGet();
@@ -49,7 +45,7 @@ public class CronTest {
 
     @Test
     public void cron3() {
-        AbstractExecutorService cronService = new ExecutorServicePlatform("cron", 5, 500, QueuePolicyConst.AbortPolicy);
+        AbstractExecutorService cronService = ExecutorFactory.createPlatform("cron", 5, 500, QueuePolicyConst.AbortPolicy);
         AtomicInteger taskIdFactory = new AtomicInteger(0);
         for (int i = 0; i < 5; i++) {
             final int taskId = taskIdFactory.incrementAndGet();

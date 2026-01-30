@@ -18,15 +18,10 @@ import java.util.concurrent.TimeUnit;
 @Getter
 public class ExecutorServicePlatform extends AbstractExecutorService {
 
-    private final List<Thread> threads = Collections.synchronizedList(new ArrayList<>());
+    final List<Thread> threads = Collections.synchronizedList(new ArrayList<>());
 
 
-    public ExecutorServicePlatform(String namePrefix, ExecutorConfig executorConfig) {
-        super(namePrefix, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getQueuePolicy());
-        newThread();
-    }
-
-    public ExecutorServicePlatform(String namePrefix, int threadSize, int queueSize, QueuePolicyConst queuePolicy) {
+    ExecutorServicePlatform(String namePrefix, int threadSize, int queueSize, QueuePolicyConst queuePolicy) {
         super(namePrefix, threadSize, queueSize, queuePolicy);
         newThread();
     }

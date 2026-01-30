@@ -16,7 +16,7 @@
 
 ```angular2html
 // 直接 new 初始化
-AbstractExecutorService executorServicePlatform = new ExecutorServicePlatform("platform", 4, 1000, QueuePolicyConst.AbortPolicy);
+AbstractExecutorService executorServicePlatform = ExecutorFactory.createPlatform("platform", 4, 1000, QueuePolicyConst.AbortPolicy);
 
 // springboot 通过配置文件初始化
 wxdgaming.boot2.core.executor.ExecutorProperties.init
@@ -92,7 +92,7 @@ name: HttpClientProperties.getKeepAliveTimeout, cost: 12
 比如说我们执行一个任务需要向跨服服务器执行 rpc 请求获取数据，并且我们希望数据回来后处理线程依然是当前线程
 ```code
 AbstractExecutorService executorServiceVirtual = new ExecutorServiceVirtual("virtual", 100, 1000, QueuePolicyConst.AbortPolicy);
-AbstractExecutorService executorServicePlatform = new ExecutorServicePlatform("platform", 4, 1000, QueuePolicyConst.AbortPolicy);
+AbstractExecutorService executorServicePlatform = ExecutorFactory.createPlatform("platform", 4, 1000, QueuePolicyConst.AbortPolicy);
 
 executorServicePlatform.execute(new Run1() {
 

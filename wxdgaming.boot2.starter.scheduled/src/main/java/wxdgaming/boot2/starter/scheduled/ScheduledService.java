@@ -41,7 +41,7 @@ public class ScheduledService extends HoldApplicationContext {
     protected AbstractExecutorService executorServicePlatform;
 
     public ScheduledService(ScheduledConfiguration scheduledConfiguration) {
-        executorServicePlatform = ExecutorFactory.create("scheduled-executor", scheduledConfiguration.getExecutor());
+        executorServicePlatform = ExecutorFactory.createPlatform("scheduled-executor", scheduledConfiguration.getExecutor());
     }
 
     @EventListener

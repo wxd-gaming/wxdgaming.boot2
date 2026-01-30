@@ -17,7 +17,7 @@ class RunnableWrapper implements Runnable {
     protected final long newTime;
     protected final long actualNewTime;
     protected Runnable runnable;
-    protected ExecutorContext.Content executorContent = new ExecutorContext.Content();
+    protected ExecutorContext.ExecutorDTO executorDTO;
 
     public RunnableWrapper() {
         this.newTime = System.nanoTime();

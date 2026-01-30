@@ -3,7 +3,6 @@ package executor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import wxdgaming.boot2.core.executor.*;
-import wxdgaming.boot2.core.executor.QueuePolicyConst;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -21,8 +20,8 @@ public class ExecutorServiceFutureCallBackTest {
 
     @Test
     public void t2() {
-        AbstractExecutorService executorServiceVirtual = new ExecutorServiceVirtual("virtual", 100, 1000, QueuePolicyConst.AbortPolicy);
-        AbstractExecutorService executorServicePlatform = new ExecutorServicePlatform("platform", 4, 1000, QueuePolicyConst.AbortPolicy);
+        AbstractExecutorService executorServiceVirtual = ExecutorFactory.createVirtual("virtual", 100, 1000, QueuePolicyConst.AbortPolicy);
+        AbstractExecutorService executorServicePlatform = ExecutorFactory.createPlatform("platform", 4, 1000, QueuePolicyConst.AbortPolicy);
 
         AtomicInteger taskIdFactory = new AtomicInteger(0);
 

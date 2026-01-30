@@ -27,9 +27,9 @@ public class ExecutorServiceTest {
 
     @Test
     public void t1() {
-        AbstractExecutorService executorServicePlatform = new ExecutorServicePlatform("platform", 4, 1000, QueuePolicyConst.AbortPolicy);
+        AbstractExecutorService executorServicePlatform = ExecutorFactory.createPlatform("platform", 4, 1000, QueuePolicyConst.AbortPolicy);
         test(executorServicePlatform);
-        AbstractExecutorService executorServiceVirtual = new ExecutorServiceVirtual("virtual", 4, 1000, QueuePolicyConst.AbortPolicy);
+        AbstractExecutorService executorServiceVirtual = ExecutorFactory.createVirtual("virtual", 4, 1000, QueuePolicyConst.AbortPolicy);
         test(executorServiceVirtual);
         LockSupport.parkNanos(TimeUnit.MINUTES.toNanos(3));
     }
@@ -44,8 +44,12 @@ public class ExecutorServiceTest {
                 }
 
                 @Override public void onEvent() throws Exception {
-                    System.out.println("1");
+                    log.debug("LLL {}", this.toString());
                     LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
+                }
+
+                @Override public String toString() {
+                    return super.toString();
                 }
             });
 
@@ -88,6 +92,9 @@ public class ExecutorServiceTest {
             log.debug("ddd: {}", ExecutorContext.context());
         }
 
+        @Override public String toString() {
+            return "Run1";
+        }
     }
 
     public static class TestEventRunnable extends AbstractEventRunnable {

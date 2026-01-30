@@ -3,9 +3,8 @@ package wxdgaming.boot2.starter.net.module.rpc;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import wxdgaming.boot2.core.executor.AbstractEventRunnable;
-import wxdgaming.boot2.core.executor.AbstractExecutorService;
+import wxdgaming.boot2.core.executor.ExecutorContext;
 import wxdgaming.boot2.core.executor.ExecutorFactory;
 
 import java.util.concurrent.CompletableFuture;
@@ -20,12 +19,13 @@ import java.util.concurrent.CompletableFuture;
 @Setter
 public class RpcCallBackContext extends AbstractEventRunnable {
 
-    private String threadName;
+    private ExecutorContext.ExecutorDTO executorDTO;
     private final CompletableFuture<JSONObject> completableFuture = new CompletableFuture<>();
     private JSONObject responseParams;
     private Throwable responseThrowable;
 
     public RpcCallBackContext() {
+        executorDTO = ExecutorContext.getContext().buildExecutorDTO();
     }
 
     public void complete(JSONObject jsonObject) {
@@ -47,8 +47,11 @@ public class RpcCallBackContext extends AbstractEventRunnable {
     }
 
     public void submit() {
-        AbstractExecutorService executorService = ExecutorFactory.getExecutorServiceLogic();
-        executorService.execute(this);
+        if (executorDTO == null) {
+            ExecutorFactory.getExecutorServiceLogic().execute(this);
+            return;
+        }
+        executorDTO.execute(this);
     }
 
 }

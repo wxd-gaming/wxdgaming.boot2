@@ -27,7 +27,7 @@ public abstract class AbstractExecutorService implements Executor {
     private final ConcurrentHashMap<String, ExecutorQueue> executorQueues = new ConcurrentHashMap<>();
     private final AtomicBoolean stoping = new AtomicBoolean(false);
 
-    public AbstractExecutorService(String namePrefix, int threadSize, int queueSize, QueuePolicyConst queuePolicy) {
+    AbstractExecutorService(String namePrefix, int threadSize, int queueSize, QueuePolicyConst queuePolicy) {
         this.namePrefix = namePrefix;
         this.threadSize = threadSize;
         this.queueSize = queueSize;
@@ -142,20 +142,20 @@ public abstract class AbstractExecutorService implements Executor {
         } else {
             runnableWrapper = new RunnableWrapper();
             runnableWrapper.setRunnable(command);
-            ExecutorContext.Content context = ExecutorContext.context();
-            runnableWrapper.getExecutorContent().getData().putAll(context.getData());
+            runnableWrapper.setExecutorDTO(ExecutorContext.context().buildExecutorDTO());
         }
         queuePolicy.execute(queue, runnableWrapper);
         checkExecute();
     }
 
     void setExecutorContext(RunnableWrapper task) {
-        ExecutorContext.Content executorContent = task.getExecutorContent();
+        ExecutorContext.Content executorContent = new ExecutorContext.Content();
         executorContent.newTime = task.newTime;
         executorContent.actualNewTime = task.actualNewTime;
         executorContent.thread = Thread.currentThread();
         executorContent.executorService = this;
         executorContent.runnable = task.getRunnable();
+        executorContent.getData().putAll(task.getExecutorDTO().getData());
         executorContent.running();
         ExecutorContext.setContext(executorContent);
     }

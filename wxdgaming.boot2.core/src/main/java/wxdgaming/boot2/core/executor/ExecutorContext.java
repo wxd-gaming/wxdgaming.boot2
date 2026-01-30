@@ -13,6 +13,7 @@ import wxdgaming.boot2.core.timer.MyClock;
 
 import java.lang.reflect.Type;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -84,6 +85,51 @@ public class ExecutorContext {
         }
     }
 
+    /** 当前线程的 DTO */
+    @Getter
+    public static class ExecutorDTO implements Executor {
+
+        public static ExecutorDTO empty() {
+            return new ExecutorDTO();
+        }
+
+        final AbstractExecutorService executorService;
+        final ExecutorQueue executorQueue;
+        final JSONObject data = new JSONObject();
+
+        private ExecutorDTO() {
+            this.executorService = null;
+            this.executorQueue = null;
+        }
+
+        private ExecutorDTO(Content content) {
+            this.executorService = content.getExecutorService();
+            this.executorQueue = content.getExecutorQueue();
+            this.data.putAll(content.getData());
+        }
+
+        public ExecutorDTO(AbstractExecutorService executorService, ExecutorQueue executorQueue) {
+            this.executorService = executorService;
+            this.executorQueue = executorQueue;
+        }
+
+        public String queueName() {
+            if (executorQueue != null) {
+                return executorQueue.getQueueName();
+            }
+            return null;
+        }
+
+        @Override public void execute(Runnable command) {
+            if (executorQueue != null) {
+                executorQueue.execute(command);
+                return;
+            }
+            executorService.execute(command);
+        }
+
+    }
+
     @Getter
     public static class Content implements RunnableWrapperProxy {
 
@@ -97,6 +143,10 @@ public class ExecutorContext {
         private long actualStartTime; // 用于记录实际开始时间
         private ExecutorMonitorContextStopWatch stopWatch = null;
         final JSONObject data = new JSONObject();
+
+        public ExecutorDTO buildExecutorDTO() {
+            return new ExecutorDTO(this);
+        }
 
         public void running() {
             running(String.valueOf(this.runnable));

@@ -36,6 +36,7 @@ public class ExecutorQueue extends RunnableWrapper implements Executor, Runnable
         this.queue = new ArrayBlockingQueue<>(maxQueueSize);
         this.maxQueueSize = maxQueueSize;
         this.queuePolicy = queuePolicy;
+        this.executorDTO = ExecutorContext.ExecutorDTO.empty();
     }
 
 
@@ -46,8 +47,7 @@ public class ExecutorQueue extends RunnableWrapper implements Executor, Runnable
     private void _execute(Runnable command) {
         RunnableWrapper runnableWrapper = new RunnableWrapper();
         runnableWrapper.setRunnable(command);
-        ExecutorContext.Content context = ExecutorContext.context();
-        runnableWrapper.getExecutorContent().getData().putAll(context.getData());
+        runnableWrapper.setExecutorDTO(ExecutorContext.context().buildExecutorDTO());
         queuePolicy.execute(queue, runnableWrapper);
         reentrantLock.lock();
         try {
@@ -70,7 +70,7 @@ public class ExecutorQueue extends RunnableWrapper implements Executor, Runnable
                 content.newTime = runnableWrapper.newTime;
                 content.executorQueue = this;
                 content.runnable = runnableWrapper.getRunnable();
-                content.getData().putAll(runnableWrapper.getExecutorContent().getData());
+                content.getData().putAll(runnableWrapper.getExecutorDTO().getData());
                 this.runnable.run();
             }
         } catch (Throwable e) {

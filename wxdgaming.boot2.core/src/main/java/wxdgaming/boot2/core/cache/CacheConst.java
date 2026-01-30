@@ -1,7 +1,7 @@
 package wxdgaming.boot2.core.cache;
 
 import wxdgaming.boot2.core.executor.AbstractExecutorService;
-import wxdgaming.boot2.core.executor.ExecutorServicePlatform;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.core.executor.QueuePolicyConst;
 
 import java.time.Duration;
@@ -14,7 +14,7 @@ import java.time.Duration;
  **/
 public interface CacheConst {
 
-    AbstractExecutorService scheduledExecutorService = new ExecutorServicePlatform(
+    AbstractExecutorService scheduledExecutorService = ExecutorFactory.createPlatform(
             "cache-scheduled",
             1, 10000,
             QueuePolicyConst.AbortPolicy

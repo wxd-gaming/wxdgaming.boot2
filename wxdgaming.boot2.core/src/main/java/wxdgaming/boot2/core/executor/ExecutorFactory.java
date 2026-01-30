@@ -3,6 +3,7 @@ package wxdgaming.boot2.core.executor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Timer;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 线程池工厂
@@ -13,68 +14,58 @@ import java.util.Timer;
 @Slf4j
 public class ExecutorFactory {
 
-    private static class Lazy {
+    static class Lazy {
 
         private static final Timer TIMER;
-        private static AbstractExecutorService executorServiceBase;
-        private static AbstractExecutorService executorServiceLogic;
-        private static AbstractExecutorService executorServiceVirtual;
+
+        static final ConcurrentHashMap<String, AbstractExecutorService> executorServiceMap = new ConcurrentHashMap<>();
 
         static {
             TIMER = new Timer("ExecutorFactory-Timer");
-
         }
 
         public static AbstractExecutorService getExecutorServiceBase() {
-            if (executorServiceBase == null) {
-                executorServiceBase = new ExecutorServicePlatform(
+            return executorServiceMap.computeIfAbsent("base", l -> {
+                return new ExecutorServicePlatform(
                         "base",
-                        4, 5000,
+                        2, 5000,
                         QueuePolicyConst.AbortPolicy
                 );
-            }
-            return executorServiceBase;
+            });
         }
 
         public static AbstractExecutorService getExecutorServiceLogic() {
-            if (executorServiceLogic == null) {
-                executorServiceLogic = new ExecutorServicePlatform(
+            return executorServiceMap.computeIfAbsent("logic", l -> {
+                int availableProcessors = Runtime.getRuntime().availableProcessors();
+                return new ExecutorServicePlatform(
                         "logic",
-                        16, 5000,
+                        availableProcessors, availableProcessors * 100,
                         QueuePolicyConst.AbortPolicy
                 );
-            }
-            return executorServiceLogic;
+            });
         }
 
         public static AbstractExecutorService getExecutorServiceVirtual() {
-            if (executorServiceVirtual == null) {
-                executorServiceVirtual = new ExecutorServiceVirtual(
+            return executorServiceMap.computeIfAbsent("virtual", l -> {
+                /*最大值不得超过500*/
+                int availableProcessors = Math.min(Runtime.getRuntime().availableProcessors() * 50, 500);
+                return new ExecutorServiceVirtual(
                         "virtual",
-                        32, 5000,
+                        availableProcessors, availableProcessors * 100,
                         QueuePolicyConst.AbortPolicy
                 );
-            }
-            return executorServiceVirtual;
+            });
         }
+
     }
 
     public static void init(ExecutorProperties executorProperties) {
         log.debug("初始化线程池... base {}", executorProperties.getBasic());
-        Lazy.executorServiceBase = new ExecutorServicePlatform(
-                "base",
-                executorProperties.getBasic()
-        );
+        createPlatform("base", executorProperties.getBasic());
         log.debug("初始化线程池... logic {}", executorProperties.getLogic());
-        Lazy.executorServiceLogic = new ExecutorServicePlatform(
-                "logic",
-                executorProperties.getLogic()
-        );
+        createPlatform("base", executorProperties.getLogic());
         log.debug("初始化线程池... virtual {}", executorProperties.getVirtual());
-        Lazy.executorServiceLogic = new ExecutorServicePlatform(
-                "virtual",
-                executorProperties.getVirtual()
-        );
+        createVirtual("virtual", executorProperties.getVirtual());
     }
 
     public static void exit() {
@@ -93,16 +84,24 @@ public class ExecutorFactory {
         return Lazy.getExecutorServiceVirtual();
     }
 
-    public static AbstractExecutorService create(String name, ExecutorConfig executorConfig) {
-        return new ExecutorServicePlatform(name, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getQueuePolicy());
+    public static AbstractExecutorService createPlatform(String name, ExecutorConfig executorConfig) {
+        return createPlatform(name, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getQueuePolicy());
     }
 
     public static ExecutorServicePlatform createPlatform(String namePrefix, int threadSize, int queueSize, QueuePolicyConst queuePolicy) {
-        return new ExecutorServicePlatform(namePrefix, threadSize, queueSize, queuePolicy);
+        ExecutorServicePlatform executorServicePlatform = new ExecutorServicePlatform(namePrefix, threadSize, queueSize, queuePolicy);
+        ExecutorFactory.Lazy.executorServiceMap.put(namePrefix, executorServicePlatform);
+        return executorServicePlatform;
+    }
+
+    public static AbstractExecutorService createVirtual(String name, ExecutorConfig executorConfig) {
+        return createVirtual(name, executorConfig.getCoreSize(), executorConfig.getMaxQueueSize(), executorConfig.getQueuePolicy());
     }
 
     public static ExecutorServiceVirtual createVirtual(String namePrefix, int threadSize, int queueSize, QueuePolicyConst queuePolicy) {
-        return new ExecutorServiceVirtual(namePrefix, threadSize, queueSize, queuePolicy);
+        ExecutorServiceVirtual executorServiceVirtual = new ExecutorServiceVirtual(namePrefix, threadSize, queueSize, queuePolicy);
+        ExecutorFactory.Lazy.executorServiceMap.put(namePrefix, executorServiceVirtual);
+        return executorServiceVirtual;
     }
 
 }
