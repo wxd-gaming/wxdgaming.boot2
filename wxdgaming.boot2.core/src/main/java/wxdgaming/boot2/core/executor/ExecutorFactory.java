@@ -1,9 +1,14 @@
 package wxdgaming.boot2.core.executor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 
+import java.time.Duration;
+import java.util.Collection;
 import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 线程池工厂
@@ -19,9 +24,39 @@ public class ExecutorFactory {
         private static final Timer TIMER;
 
         static final ConcurrentHashMap<String, AbstractExecutorService> executorServiceMap = new ConcurrentHashMap<>();
+        static final ConcurrentHashMap<Thread, ExecutorContext.Content> runnableMonitorMap = new ConcurrentHashMap<>();
 
         static {
             TIMER = new Timer("ExecutorFactory-Timer");
+            long durationMillis = Duration.ofSeconds(10).toMillis();
+            TIMER.schedule(
+                    new TimerTask() {
+                        @Override public void run() {
+                            try {
+                                Collection<ExecutorContext.Content> values = runnableMonitorMap.values();
+                                for (ExecutorContext.Content executorContent : values) {
+                                    long startTime = executorContent.getStartTime();
+                                    if (startTime < Integer.MAX_VALUE) {
+                                        continue;
+                                    }
+                                    long cost = System.nanoTime() - startTime;
+                                    if (TimeUnit.NANOSECONDS.toSeconds(cost) < 5) {
+                                        continue;
+                                    }
+                                    Thread thread = executorContent.getThread();
+                                    StackTraceElement[] stackTrace = thread.getStackTrace();
+                                    String stack = StackUtils.stack(stackTrace);
+                                    long millis = TimeUnit.NANOSECONDS.toMillis(cost);
+                                    String s = DurationFormatUtils.formatDuration(millis, "HH:mm:ss.SSS");
+                                    log.error("线程卡住 {} 运行: {}, stack: {}", executorContent.toString(), s, stack);
+                                }
+                            } catch (Exception e) {
+                                log.info("定时任务异常", e);
+                            }
+                        }
+                    },
+                    durationMillis, durationMillis
+            );
         }
 
         public static AbstractExecutorService getExecutorServiceBase() {

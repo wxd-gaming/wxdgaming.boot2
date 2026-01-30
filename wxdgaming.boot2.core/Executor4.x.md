@@ -6,7 +6,7 @@
 <dependency>
     <groupId>io.github.wxd-gaming</groupId>
     <artifactId>wxd-gaming.boot2.core</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <scope>compile</scope>
 </dependency>
 ```

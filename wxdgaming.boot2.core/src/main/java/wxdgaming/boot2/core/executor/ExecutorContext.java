@@ -224,8 +224,8 @@ public class ExecutorContext {
                     String.valueOf(executorService),
                     String.valueOf(executorQueue),
                     String.valueOf(runnable),
-                    MyClock.formatDate(this.actualNewTime),
-                    MyClock.formatDate(this.actualStartTime),
+                    MyClock.formatDate(MyClock.SDF_YYYYMMDDHHMMSSSSS_1, this.actualNewTime),
+                    MyClock.formatDate(MyClock.SDF_YYYYMMDDHHMMSSSSS_1, this.actualStartTime),
                     DurationFormatUtils.formatDuration(newMillis(), "HH:mm:ss.SSS"),
                     DurationFormatUtils.formatDuration(costMillis(), "HH:mm:ss.SSS"),
                     data,
@@ -241,8 +241,8 @@ public class ExecutorContext {
                             executorQueue,
                             String.valueOf(runnable),
                             data,
-                            MyClock.formatDate(actualNewTime),
-                            MyClock.formatDate(actualStartTime)
+                            MyClock.formatDate(MyClock.SDF_YYYYMMDDHHMMSSSSS_1, actualNewTime),
+                            MyClock.formatDate(MyClock.SDF_YYYYMMDDHHMMSSSSS_1, actualStartTime)
                     );
         }
     }

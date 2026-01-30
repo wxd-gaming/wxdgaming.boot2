@@ -48,6 +48,7 @@ public class ExecutorServiceVirtual extends AbstractExecutorService {
             } catch (Throwable e) {
                 log.error("{} {} error", task.getClass(), task, e);
             } finally {
+                ExecutorFactory.Lazy.runnableMonitorMap.remove(Thread.currentThread());
                 ExecutorContext.cleanup();
                 threadNum.decrementAndGet();
                 checkExecute();

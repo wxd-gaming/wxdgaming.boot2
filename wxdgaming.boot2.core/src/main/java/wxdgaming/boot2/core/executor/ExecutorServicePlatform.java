@@ -47,6 +47,7 @@ public class ExecutorServicePlatform extends AbstractExecutorService {
                                 task.run();
                             } finally {
                                 ExecutorContext.cleanup();
+                                ExecutorFactory.Lazy.runnableMonitorMap.remove(Thread.currentThread());
                             }
                         }
                     } catch (InterruptedException e) {

@@ -158,6 +158,7 @@ public abstract class AbstractExecutorService implements Executor {
         executorContent.getData().putAll(task.getExecutorDTO().getData());
         executorContent.running();
         ExecutorContext.setContext(executorContent);
+        ExecutorFactory.Lazy.runnableMonitorMap.put(Thread.currentThread(), executorContent);
     }
 
     protected abstract void checkExecute();

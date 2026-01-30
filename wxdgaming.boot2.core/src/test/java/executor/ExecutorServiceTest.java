@@ -45,7 +45,7 @@ public class ExecutorServiceTest {
 
                 @Override public void onEvent() throws Exception {
                     log.debug("LLL {}", this.toString());
-                    LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
+                    LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(120));
                 }
 
                 @Override public String toString() {
