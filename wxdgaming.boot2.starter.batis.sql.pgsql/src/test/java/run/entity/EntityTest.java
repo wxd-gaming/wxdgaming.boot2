@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class EntityTest extends EntityLongUID {
 
     @DbColumn(key = true)
-    @Partition()
+    @Partition(initRangeArrays = {"1=2", "2=3"})
     private int day;
     @DbColumn(index = true)
     private boolean online;
