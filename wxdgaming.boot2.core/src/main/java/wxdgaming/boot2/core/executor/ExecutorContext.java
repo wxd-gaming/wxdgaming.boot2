@@ -123,9 +123,12 @@ public class ExecutorContext {
         @Override public void execute(Runnable command) {
             if (executorQueue != null) {
                 executorQueue.execute(command);
-                return;
+            } else if (executorService != null) {
+                executorService.execute(command);
+            } else {
+                log.warn("线程上下文的逻辑 nul 使用默认的 logic 线程池 stack={}", StackUtils.stackAll());
+                ExecutorFactory.getExecutorServiceLogic().execute(command);
             }
-            executorService.execute(command);
         }
 
     }
@@ -179,11 +182,14 @@ public class ExecutorContext {
             return null;
         }
 
-        void execute(Runnable command) {
+        public void execute(Runnable command) {
             if (executorQueue != null) {
                 executorQueue.execute(command);
-            } else {
+            } else if (executorService != null) {
                 executorService.execute(command);
+            } else {
+                log.warn("线程上下文的逻辑 nul 使用默认的 logic 线程池 stack={}", StackUtils.stackAll());
+                ExecutorFactory.getExecutorServiceLogic().execute(command);
             }
         }
 
