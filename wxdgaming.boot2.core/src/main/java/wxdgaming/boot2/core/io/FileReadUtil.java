@@ -2,7 +2,6 @@ package wxdgaming.boot2.core.io;
 
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import wxdgaming.boot2.core.Throw;
 import wxdgaming.boot2.core.function.Consumer2;
 import wxdgaming.boot2.core.function.ConsumerE1;
 import wxdgaming.boot2.core.lang.Tuple2;
@@ -66,12 +65,12 @@ public class FileReadUtil implements Serializable {
         return new String(inputStream.getRight(), charset);
     }
 
-    public static String readString(File file) {
-        return readString(file, StandardCharsets.UTF_8);
+    public static String readString(Path path) {
+        return readString(path, StandardCharsets.UTF_8);
     }
 
-    public static String readString(File file, Charset charset) {
-        try (final FileInputStream fileInputStream = new FileInputStream(file)) {
+    public static String readString(Path path, Charset charset) {
+        try (final InputStream fileInputStream = Files.newInputStream(path)) {
             return readString(fileInputStream, charset);
         } catch (Exception e) {
             throw ExceptionUtils.asRuntimeException(e);

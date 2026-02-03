@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import wxdgaming.boot2.core.ApplicationStartBuilder;
 import wxdgaming.boot2.core.CoreScan;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
+import wxdgaming.boot2.starter.groovy.GroovyScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
 import wxdgaming.game.authority.AuthorityScan;
 
@@ -21,6 +22,7 @@ import wxdgaming.game.authority.AuthorityScan;
                 PgsqlScan.class,
                 ScheduledScan.class,
                 AuthorityScan.class,
+                GroovyScan.class,
                 LogServerApplication.class
         }
 )

@@ -7,6 +7,7 @@ import wxdgaming.boot2.starter.js.plugin.JLog;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
 /**
  * js 容器
@@ -48,7 +49,7 @@ public class JSContext {
         return this.context.eval("js", script);
     }
 
-    public Value evalFile(File file) {
+    public Value evalFile(Path file) {
         String script = FileReadUtil.readString(file, StandardCharsets.UTF_8);
         return this.context.eval("js", script);
     }

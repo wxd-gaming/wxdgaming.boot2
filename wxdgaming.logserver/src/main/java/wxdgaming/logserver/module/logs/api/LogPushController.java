@@ -167,7 +167,7 @@ public class LogPushController {
                     .limit(50)
                     .filter(f -> f.toString().endsWith(".dat"))
                     .forEach(f -> {
-                        String json = FileReadUtil.readString(f);
+                        String json = FileReadUtil.readString(f.toPath());
                         List<LogEntity> objects = FastJsonUtil.parseArray(json, LogEntity.class);
                         consumer.accept(objects);
                         f.delete();

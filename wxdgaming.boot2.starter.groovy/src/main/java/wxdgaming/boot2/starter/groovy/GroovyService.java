@@ -4,6 +4,7 @@ import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
 import lombok.Getter;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.io.FileReadUtil;
@@ -21,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class GroovyService extends HoldApplicationContext {
 
-    private int version = 1;
+    int version = 1;
     final GroovyShell shell = new GroovyShell();
     final ConcurrentHashMap<String, GroovyHandler> handlerCaches = new ConcurrentHashMap<>();
     final ConcurrentHashMap<String, Script> scriptCaches = new ConcurrentHashMap<>();
@@ -105,20 +106,20 @@ public class GroovyService extends HoldApplicationContext {
 
     public GroovyHandler loadHandlerByResource(String path) {
         String script = FileReadUtil.readString(path, StandardCharsets.UTF_8);
-        return loadHandler(script);
+        return loadClass(script, GroovyHandler.class);
     }
 
-    public GroovyHandler loadHandler(String script) {
+    public <R> R loadClass(String script, Class<R> type) {
         try {
             GroovyClassLoader classLoader = new GroovyClassLoader();
             Class aClass = classLoader.parseClass(script);
             Object instance = aClass.getDeclaredConstructor().newInstance();
-            if (instance instanceof GroovyHandler handler) {
-                return handler;
+            if (type.isAssignableFrom(instance.getClass())) {
+                return type.cast(instance);
             }
-            throw new RuntimeException("not a GroovyHandler");
+            throw new IllegalArgumentException(aClass + " not convert " + type);
         } catch (Exception e) {
-            throw new RuntimeException("not a GroovyHandler", e);
+            throw ExceptionUtils.asRuntimeException(e);
         }
     }
 

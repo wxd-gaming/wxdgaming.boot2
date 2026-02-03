@@ -159,8 +159,8 @@ public class StatsPlugin extends AbstractPlugin {
     /** 充值金额分组统计 */
     public int[][] rechargeGroup(SqlDataHelper sqlDataHelper, int loginDataKey) {
         String sql = """
-                SELECT ((logdata->>'amount')::int) as amount,count(1) as count FROM rolerechargeslog\s
-                WHERE daykey= ?\s
+                SELECT ((logdata->>'amount')::int) as amount,count(1) as count FROM rolerechargeslog
+                WHERE daykey= ?
                 and uid in(SELECT min(uid) as uid FROM rolerechargeslog WHERE daykey= ? GROUP BY logdata->>'spOrderId')
                 GROUP BY logdata->>'amount';
                 """;

@@ -216,7 +216,7 @@ public class LogBusService implements InitPrint {
                     .limit(50)
                     .filter(f -> f.toString().endsWith(".dat"))
                     .forEach(f -> {
-                        String json = FileReadUtil.readString(f);
+                        String json = FileReadUtil.readString(f.toPath());
                         TreeMap<String, String> jsonObject = new TreeMap<>();
                         jsonObject.put("time", String.valueOf(System.currentTimeMillis()));
                         jsonObject.put("data", json);
