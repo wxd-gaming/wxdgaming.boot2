@@ -31,9 +31,11 @@ public class FastUtilHashSetTest {
         for (int i = 0; i < count; i++) {
             objSets.add("" + i);
         }
-        long all = 0;
-        for (String objSet : objSets) {
-            all += Long.parseLong(objSet);
+        for (int i = 0; i < 1000; i++) {
+            long all = 0;
+            for (String objSet : objSets) {
+                all += Long.parseLong(objSet);
+            }
         }
     }
 
@@ -43,9 +45,11 @@ public class FastUtilHashSetTest {
         for (int i = 0; i < count; i++) {
             objSets.add("" + i);
         }
-        long all = 0;
-        for (String objSet : objSets) {
-            all += Long.parseLong(objSet);
+        for (int i = 0; i < 1000; i++) {
+            long all = 0;
+            for (String objSet : objSets) {
+                all += Long.parseLong(objSet);
+            }
         }
     }
 
