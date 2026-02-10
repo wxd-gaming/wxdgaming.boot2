@@ -1,0 +1,96 @@
+<style>
+
+    .log_filter ul {
+        width: 100%;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: block;
+        align-items: center;
+        gap: 15px; /* 元素间距 */
+    }
+
+    .log_filter li {
+        width: 100%;
+        display: block;
+        margin-top: 5px;
+        gap: 8px; /* label 和 input 之间的间距 */
+    }
+
+    .log_filter input[type="text"] {
+        padding: 3px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        width: 220px;
+        font-size: 14px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .log_filter input[type="text"]:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 6px rgba(24, 144, 255, 0.3);
+    }
+
+    .log_filter button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+        align-items: center;
+        gap: 6px; /* 图标与文字间距 */
+    }
+
+    .log_filter .find {
+        background-color: var(--primary-color);
+        color: #ffffff;
+    }
+
+    .log_filter .find:hover {
+        background-color: #40a9ff;
+        transform: translateY(-2px); /* 悬停轻微上移 */
+        box-shadow: 0 4px 8px rgba(24, 144, 255, 0.3);
+    }
+
+    .log_filter .excel {
+        background-color: var(--success-color);
+        color: #ffffff;
+    }
+
+    .log_filter .excel:hover {
+        background-color: #73d13d;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(82, 196, 26, 0.3);
+    }
+
+    .log_filter .clean {
+        background-color: var(--warning-color);
+        color: #ffffff;
+    }
+
+    .log_filter .clean:hover {
+        background-color: #ffc53d;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(250, 173, 20, 0.3);
+    }
+</style>
+
+<ul>
+    <li>
+        <span>🔍 查询条件:</span>
+    </li>
+    <li>
+        <label for="txt_key">关键字: </label><input id="txt_key" type="text" placeholder="请输入关键字">
+    </li>
+    <li>
+        <label for="txt_key2">关键字: </label><input id="txt_key2" type="text" placeholder="请输入关键字">
+    </li>
+    <li>
+        <button class="find">🔍 查询</button>
+        <button class="excel">📊 导出Excel</button>
+        <button class="clean">🗑️ 清除所有</button>
+    </li>
+</ul>

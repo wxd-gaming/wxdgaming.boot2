@@ -1,0 +1,61 @@
+<style>
+
+    :root {
+        --primary-color: #1890ff;
+        --border-color: #d9d9d9;
+        --hover-color: #f5f5f5;
+        --success-color: #52c41a;
+        --warning-color: #faad14;
+    }
+
+    .log_content {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .log_filter {
+        height: auto; /* 固定高度 */
+        background-color: #e8e8e8; /* 过滤器区域背景色 */
+        border-bottom: 1px solid #ccc; /* 底部边框 */
+        padding-top: 15px;
+        padding-bottom: 10px;
+        padding-left: 5px;
+    }
+
+    .log_table {
+        flex: 1; /* 剩余空间填充 */
+        margin-top: 5px;
+        overflow-y: hidden; /* 允许垂直滚动 */
+    }
+
+</style>
+<div class="log_content">
+    <!--过滤器-->
+    <div class="log_filter">
+
+    </div>
+    <!--日志展示的tabl-->
+    <div class="log_table">
+
+    </div>
+</div>
+<script>
+    async function loading() {
+        /*先加载table*/
+        await loadTemplate('log/log-table.html', '.log_table', '正在加载展示栏...');
+        /*然后加载查询条件*/
+        await loadTemplate('log/log-filter.html', '.log_filter', '正在加载查询条件...');
+
+        addHead("时间", "width:200px;");
+        addHead("日志", "");
+        for (let i = 0; i < 100; i++) {
+            let row = [];
+            row.push({"content": new Date().toLocaleString(), "style": "width:200px;"});
+            row.push({"content": "日志" + i, "style": ""});
+            addRow(row);
+        }
+    }
+
+    loading();
+</script>

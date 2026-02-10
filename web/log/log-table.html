@@ -1,0 +1,132 @@
+<style>
+
+    .log_table table {
+        width: 100%;
+        height: 100%;
+        display: block;
+        table-layout: fixed; /* 固定表格布局，列宽由第一行决定 */
+        font-family: Arial, sans-serif; /* 使用更现代的字体 */
+        background-color: #f0f0f0; /* 亮灰色背景 */
+    }
+
+    .log_table table, .log_table td, .log_table th {
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    .log_table tr {table-layout: fixed; display: table; width: 100%; }
+
+    .log_table thead {
+        width: calc(100% - 10px);
+        display: block;
+        height: 44px; /* 增加表头高度 */
+        position: sticky;
+        top: 0;
+        color: #333; /* 深色文字，确保清晰可见 */
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 1;
+    }
+
+    .log_table tbody {
+        width: calc(100%);
+        display: block;
+        height: calc(100% - 44px); /* 减去 thead 的高度 */
+        overflow-y: auto;
+    }
+
+    .log_table th {
+        padding: 12px 12px; /* 增大内边距 */
+        text-align: left;
+        border: none; /* 更浅的边框颜色 */
+        white-space: nowrap;
+        overflow: hidden;
+        font-size: 14px; /* 统一字体大小 */
+    }
+    .log_table td {
+        padding: 7px 8px; /* 增大内边距 */
+        text-align: left;
+        border: none; /* 更浅的边框颜色 */
+        white-space: nowrap;
+        overflow: hidden;
+        font-size: 14px; /* 统一字体大小 */
+    }
+
+    .log_table tbody tr:nth-child(even) {
+        background-color: #f9f9f9; /* 偶数行浅灰色背景 */
+    }
+
+    .log_table tbody tr:nth-child(odd) {
+        background-color: #ffffff; /* 奇数行白色背景 */
+    }
+
+    .log_table tbody tr:hover {
+        background-color: #e3f2fd; /* 悬停时使用浅蓝色背景 */
+        /*transform: scale(1.01); !* 轻微放大效果 *!*/
+        transition: all 0.2s ease-in-out; /* 平滑过渡动画 */
+    }
+
+    /* 滚动条样式 */
+    .log_table tbody::-webkit-scrollbar {
+        width: 10px; /* 增宽滚动条 */
+    }
+
+    .log_table tbody::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px; /* 圆角轨道 */
+    }
+
+    .log_table tbody::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px; /* 圆角滑块 */
+    }
+
+    .log_table tbody::-webkit-scrollbar-thumb:hover {
+        background: #555; /* 悬停时更深的颜色 */
+    }
+
+</style>
+<script>
+
+    function cleanThead() {
+        $(".table-striped thead tr").empty();
+    }
+
+    function cleanTbody() {
+        $(".table-striped tbody").empty();
+    }
+
+    function addHead(content, style) {
+        if (style == null) {
+            style = "";
+        }
+        let th = `<th style="${style}">${content}</th>`;
+        $(".table-striped thead tr").append(th);
+    }
+
+    function addRow(row) {
+        let tr = "<tr>";
+        for (let i = 0; i < row.length; i++) {
+            let style = row[i].style;
+            let content = row[i].content;
+            if (style == null) {
+                style = "";
+            }
+            if (content == null) {
+                content = "-";
+            }
+            tr += `<td style="${style}">${content}</td>`;
+        }
+        tr += "</tr>";
+        $(".table-striped tbody").append(tr);
+    }
+
+</script>
+<table class="table table-striped">
+    <thead>
+    <tr>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>

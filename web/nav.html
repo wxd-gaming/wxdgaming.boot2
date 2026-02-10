@@ -1,0 +1,157 @@
+<!-- 引入 Font Awesome 图标库 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    /* 基础导航栏样式 */
+    .nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        color: white;
+        font-family: "Microsoft Yahei", sans-serif;
+    }
+
+    .nav ul li {
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .nav ul li:hover {
+        background-color: #34495e;
+    }
+
+    /* 二级菜单样式 */
+    .nav ul dl {
+        display: none;
+        background: linear-gradient(to bottom, #34495e, #2c3e50); /* 渐变背景 */
+        padding: 10px 0; /* 上下内边距 */
+        border-radius: 8px; /* 圆角 */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+        margin-top: 5px; /* 与主菜单项的间距 */
+    }
+
+    .nav ul dd {
+        padding: 10px 20px; /* 内边距 */
+        line-height: 1.6; /* 行高 */
+        transition: background-color 0.3s ease; /* 悬停过渡效果 */
+        border-bottom: 1px solid #4a5f7a; /* 添加底部边框作为分割线 */
+    }
+
+    /* 选中状态的 dd 样式 */
+    .nav ul dd.active {
+        background-color: #ff8c00; /* 淡橘色 */
+    }
+
+    /* 移除最后一个 dd 的分割线 */
+    .nav ul dd:last-child {
+        border-bottom: none;
+    }
+
+    .nav ul dd:hover {
+        background-color: #3498db; /* 悬停背景色 */
+    }
+
+    .nav ul dd a {
+        color: #ecf0f1;
+        text-decoration: none;
+        font-size: 14px;
+        display: block; /* 使链接占满整个 dd 区域 */
+        transition: color 0.3s ease; /* 颜色过渡效果 */
+    }
+
+    .nav ul dd a:hover {
+        color: #ffffff; /* 悬停文字颜色 */
+    }
+
+</style>
+<div class="nav">
+    <ul>
+        <li>
+            <i class="fas fa-cogs"></i> 管理
+            <dl>
+                <dd>
+                    <a href="javascript:void(0)" onclick="refreshContent('main')">
+                        <i class="fas fa-home"></i> 首页
+                    </a>
+                </dd>
+                <dd>
+                    <a href="javascript:void(0)" onclick="refreshContent('main')">
+                        <i class="fas fa-home"></i> 首页
+                    </a>
+                </dd>
+            </dl>
+        </li>
+    </ul>
+    <ul>
+        <li>
+            <i class="fas fa-file-alt"></i> 日志
+            <dl>
+                <dd>
+                    <a href="javascript:void(0)" onclick="refreshContent('log')">
+                        <i class="fas fa-home"></i> 日志
+                    </a>
+                </dd>
+                <dd>
+                    <a href="javascript:void(0)" onclick="refreshContent('log')">
+                        <i class="fas fa-home"></i> 日志
+                    </a>
+                </dd>
+            </dl>
+        </li>
+    </ul>
+</div>
+<script>
+    // 为每个 <ul> 分配独立的状态管理
+    document.querySelectorAll('.nav ul').forEach(menuGroup => {
+        let currentOpenMenu = null; // 当前组的展开菜单
+
+        // 展开/收起二级菜单
+        menuGroup.querySelectorAll(':scope > li').forEach(item => {
+            item.addEventListener('click', function (event) {
+                event.stopPropagation(); // 阻止事件冒泡
+                const subMenu = this.querySelector('dl');
+                if (subMenu) {
+                    // 如果点击的是当前已展开的菜单，则收起
+                    if (currentOpenMenu === subMenu) {
+                        subMenu.style.display = 'none';
+                        currentOpenMenu = null;
+                    } else {
+                        // 关闭同组其他菜单项的二级菜单
+                        menuGroup.querySelectorAll(':scope > li > dl').forEach(dl => {
+                            if (dl !== subMenu) {
+                                dl.style.display = 'none';
+                            }
+                        });
+                        // 展开当前菜单项
+                        subMenu.style.display = 'block';
+                        currentOpenMenu = subMenu;
+                    }
+                }
+            });
+        });
+
+        // 阻止 <a> 标签的默认行为，并延迟执行内容加载
+        menuGroup.querySelectorAll('dd a').forEach(link => {
+            link.addEventListener('click', function (event) {
+                event.preventDefault(); // 阻止跳转
+                event.stopPropagation(); // 阻止事件冒泡
+
+                // 移除所有 dd 的 active 类
+                document.querySelectorAll('.nav ul dd').forEach(dd => {
+                    dd.classList.remove('active');
+                });
+
+                // 为当前点击的 dd 添加 active 类
+                this.closest('dd').classList.add('active');
+
+                const target = this.getAttribute('onclick');
+                if (target) {
+                    // 延迟执行 refreshContent，确保菜单状态稳定
+                    setTimeout(() => {
+                        eval(target);
+                    }, 100); // 延迟 100ms
+                }
+            });
+        });
+    });
+</script>

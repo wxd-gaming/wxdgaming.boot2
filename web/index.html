@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页 - 我的网站</title>
+    <!-- 引入公共样式 -->
+    <link rel="stylesheet" href="css/common.css">
+    <!-- 引入jQuery（使用CDN，也可下载到本地） -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+<div id="root">
+    <div class="left">
+
+    </div>
+    <div class="right">
+        <!-- 头部容器 -->
+        <div id="header-container"></div>
+
+        <!-- 页面内容 -->
+        <div id="content-container" class="content">
+
+        </div>
+
+        <!-- 底部容器 -->
+        <div id="footer-container"></div>
+    </div>
+</div>
+</body>
+</html>
+<!-- 引入模板加载 JS -->
+<script src="js/template-loader.js"></script>
+<script>
+
+    function getUrlParam(name) {
+        const urlParams = new URLSearchParams(window.top.location.search);
+        return urlParams.get(name);
+    }
+
+    // 示例调用
+    let pageType = getUrlParam('pagetype');
+    if (pageType == null || pageType === "" || pageType === undefined) {
+        pageType = "main";
+    }
+
+    refreshContent(pageType);
+    loadTemplate('nav.html', '.left', '正在加载内容...', null);
+</script>
