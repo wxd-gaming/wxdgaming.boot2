@@ -34,16 +34,16 @@ class Notice {
     /**
      * 添加提示
      * @param message 提示内容
-     * @param type info | error | success | warning
+     * @param {NoticeTypeStyles} typeStyle info | error | success | warning
      * @param removeTime 移除时间
      * @returns {Notice}
      */
-    append(message, type = "info", removeTime) {
+    append(message, typeStyle, removeTime) {
         this.number++;
         const noticeItem = document.createElement("div");
 
         // 获取对应类型的样式
-        const style = typeStyles[type] || typeStyles.info;
+        const style = typeStyle || NoticeTypeStyles.info;
 
         // 设置基础样式
         noticeItem.style.cssText = `
@@ -226,7 +226,7 @@ class Alert {
 
 }
 
-const typeStyles = {
+const NoticeTypeStyles = {
     info: {
         backgroundColor: "#e3f2fd", // 更浅的蓝色背景
         borderColor: "#90caf9",     // 更鲜明的边框色

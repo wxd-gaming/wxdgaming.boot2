@@ -53,11 +53,11 @@
     }
 
     testAwaitAlert();
-    wxd.notice.append("这是一条普通信息", "info");
-    wxd.notice.append("操作失败，请重试！", "error");
-    wxd.notice.append("操作成功完成", "success");
-    wxd.notice.append("请注意潜在风险", "warning");
+    wxd.notice.append("这是一条普通信息", NoticeTypeStyles.info);
+    wxd.notice.append("操作失败，请重试！", NoticeTypeStyles.error);
+    wxd.notice.append("操作成功完成", NoticeTypeStyles.success);
+    wxd.notice.append("请注意潜在风险", NoticeTypeStyles.warning);
     setTimeout(() => {
-        wxd.notice.append("第二条提示", "info", 5000);
+        wxd.notice.append("第二条提示", NoticeTypeStyles.info, 5000);
     }, 1000);
 </script>
