@@ -6,7 +6,7 @@ function refreshContent(flag) {
     urlObj.searchParams.set('pagetype', flag);
     // 使用 replaceState 替换当前历史记录，不刷新页面
     history.replaceState({}, '', urlObj.toString());
-    loadTemplate(`${flag}.html`, '#content-container', '正在加载内容...')
+    loadTemplate(`${flag}.html`, '.content-container', '正在加载内容...')
     // 跳转到新的 URL
     // window.top.location.href = urlObj.toString();
 }
@@ -44,9 +44,3 @@ function loadTemplate(templateUrl, containerSelector, loadingText, successCall) 
         });
     });
 }
-
-// 加载头部模板
-loadTemplate('header.html', '#header-container', '正在加载头部...');
-
-// 加载底部模板
-loadTemplate('footer.html', '#footer-container', '正在加载底部...');

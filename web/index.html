@@ -7,24 +7,15 @@
     <!-- 引入公共样式 -->
     <link rel="stylesheet" href="css/common.css">
     <!-- 引入jQuery（使用CDN，也可下载到本地） -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/wxd.common.js"></script>
 </head>
 <body>
 <div id="root">
     <div class="left">
 
     </div>
-    <div class="right">
-        <!-- 头部容器 -->
-        <div id="header-container"></div>
-
-        <!-- 页面内容 -->
-        <div id="content-container" class="content">
-
-        </div>
-
-        <!-- 底部容器 -->
-        <!--<div id="footer-container"></div>-->
+    <div class="right content-container">
     </div>
 </div>
 </body>
@@ -46,4 +37,27 @@
 
     refreshContent(pageType);
     loadTemplate('nav.html', '.left', '正在加载内容...', null);
+
+    async function testAwaitAlert() {
+        let consumeAlert = new Alert()
+            .title("提示")
+            .content(`<h1>欢迎来到我的网站</h1>dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd`)
+            .confirmText("确定")
+            .confirmCall(() => {
+                console.log("ddd");
+            })
+            .cancelText("取消");
+        await consumeAlert.show();
+        console.log("阻塞的alert");
+        wxd.notice.append("阻塞的alert结束");
+    }
+
+    testAwaitAlert();
+    wxd.notice.append("这是一条普通信息", "info");
+    wxd.notice.append("操作失败，请重试！", "error");
+    wxd.notice.append("操作成功完成", "success");
+    wxd.notice.append("请注意潜在风险", "warning");
+    setTimeout(() => {
+        wxd.notice.append("第二条提示", "info", 5000);
+    }, 1000);
 </script>
