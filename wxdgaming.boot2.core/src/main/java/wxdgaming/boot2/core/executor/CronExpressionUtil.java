@@ -64,6 +64,11 @@ public class CronExpressionUtil {
         return cronExpression.next(now);
     }
 
+    public static long nextMillis(String cronString) {
+        CronExpression cronExpression = parse(cronString);
+        return nextMillis(cronExpression, LocalDateTime.now());
+    }
+
     public static long nextMillis(CronExpression cronExpression) {
         return nextMillis(cronExpression, LocalDateTime.now());
     }
