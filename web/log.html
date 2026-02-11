@@ -30,6 +30,7 @@
     }
 
     .log_bottom {
+        width: 100%;
         height: 40px;
         line-height: 42px;
         text-align: center;
@@ -48,7 +49,7 @@
 
     </div>
     <div class="log_bottom">
-ddd
+
     </div>
 </div>
 <script>
@@ -57,6 +58,8 @@ ddd
         await loadTemplate('log/log-table.html', '.log_table', '正在加载展示栏...');
         /*然后加载查询条件*/
         await loadTemplate('log/log-filter.html', '.log_filter', '正在加载查询条件...');
+        /*然后加载查询条件*/
+        await loadTemplate('log/log-page.html', '.log_bottom', '正在加载分页查询...');
 
         addHead("时间", "width:200px;");
         addHead("日志", "");

@@ -1,0 +1,41 @@
+<style>
+    .log_bottom ul {
+        display: inline-block;
+        list-style: none;
+    }
+
+    .log_bottom li {
+        display: inline-block;
+    }
+
+    .log_bottom a {
+        color: var(--primary-color); /* 使用主色调 */
+        text-decoration: none; /* 去除下划线 */
+        padding: 5px 10px; /* 增加内边距 */
+        border-radius: 4px; /* 圆角效果 */
+        transition: all 0.3s ease; /* 添加过渡动画 */
+    }
+
+    .log_bottom a:hover {
+        background-color: #d9d9d9; /* 更深的浅灰色背景 */
+        color: #333; /* 深灰色文字 */
+        transform: scale(1.05); /* 轻微放大 */
+    }
+
+    .log_bottom a:active {
+        transform: scale(0.98); /* 点击时缩小 */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 添加阴影 */
+    }
+
+    .log_bottom span {
+        padding: 2px 7px;
+        border: #d9d9d9 1px solid;
+    }
+</style>
+<ul>
+    <li><a href="javascript:void(0);">首页</a></li>
+    <li><a href="javascript:void(0);">上一页</a></li>
+    <li><span>1</span>&nbsp;&nbsp;/&nbsp;&nbsp;<span>1</span></li>
+    <li><a href="javascript:void(0);">下一页</a></li>
+    <li><a href="javascript:void(0);">尾页</a></li>
+</ul>
