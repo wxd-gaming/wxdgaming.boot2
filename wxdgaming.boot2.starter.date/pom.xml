@@ -11,7 +11,7 @@
 
     <name>wxd-gaming.boot2.starter.date</name>
     <artifactId>wxd-gaming.boot2.starter.date</artifactId>
-    <description>时间服务</description>
+    <description>时间解析器</description>
 
     <dependencies>
         <dependency>
