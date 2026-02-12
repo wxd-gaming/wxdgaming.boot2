@@ -6,6 +6,8 @@ import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.date.AbstractDateConvert;
 
+import java.util.Arrays;
+
 /**
  * 从当前时间开始
  *
@@ -23,7 +25,8 @@ public class CurrentConvertImpl extends AbstractDateConvert implements InitPrint
     @Override public long convert(String[] params) {
         long add = 0;
         if (params.length > 2) {
-            add = dateService.convert(params);
+            String[] newParams = Arrays.copyOfRange(params, 1, params.length - 1);
+            add = dateService.convert(newParams);
         }
         return MyClock.millis() + add;
     }
