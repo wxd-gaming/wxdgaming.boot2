@@ -3,7 +3,7 @@ package wxdgaming.boot2.starter.date.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.starter.date.IDateConvert;
+import wxdgaming.boot2.starter.date.AbstractDateConvert;
 
 import java.time.Duration;
 
@@ -15,7 +15,7 @@ import java.time.Duration;
  **/
 @Slf4j
 @Component
-public class HourConvertImpl implements InitPrint, IDateConvert {
+public class HourConvertImpl extends AbstractDateConvert implements InitPrint {
 
     public HourConvertImpl() {
     }
@@ -24,11 +24,11 @@ public class HourConvertImpl implements InitPrint, IDateConvert {
         return "Hour";
     }
 
-    @Override public long convert(String date) {
-        return Duration.ofHours(Integer.parseInt(date)).toMillis();
+    @Override public long convert(String[] params) {
+        return Duration.ofHours(Integer.parseInt(params[1])).toMillis();
     }
 
-    @Override public long convertEndTime(long startTime, String date) {
-        return startTime + convert(date);
+    @Override public long convertEndTime(long startTime, String[] params) {
+        return startTime + convert(params);
     }
 }

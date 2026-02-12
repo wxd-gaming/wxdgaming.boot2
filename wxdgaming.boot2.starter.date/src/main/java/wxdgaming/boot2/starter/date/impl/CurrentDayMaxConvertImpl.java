@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.boot2.starter.date.IDateConvert;
+import wxdgaming.boot2.starter.date.AbstractDateConvert;
 
 /**
  * 当天的最大时间，23:59:59
@@ -14,18 +14,20 @@ import wxdgaming.boot2.starter.date.IDateConvert;
  **/
 @Slf4j
 @Component
-public class CurrentDayMaxConvertImpl implements InitPrint, IDateConvert {
+public class CurrentDayMaxConvertImpl extends AbstractDateConvert implements InitPrint {
 
     @Override public String type() {
         return "CurrentDayMax";
     }
 
-    @Override public long convert(String date) {
-        return MyClock.dayMaxTime();
+    @Override public long convert(String[] params) {
+        int days = Integer.parseInt(params[1]);
+        long time = MyClock.addDayOfTime(days);
+        return MyClock.dayMaxTime(time);
     }
 
-    @Override public long convertEndTime(long startTime, String date) {
-        return convert(date);
+    @Override public long convertEndTime(long startTime, String[] params) {
+        return convert(params);
     }
 
 }

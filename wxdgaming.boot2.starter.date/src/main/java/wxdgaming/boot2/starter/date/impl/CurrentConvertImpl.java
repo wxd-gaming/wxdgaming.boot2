@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.boot2.starter.date.IDateConvert;
+import wxdgaming.boot2.starter.date.AbstractDateConvert;
 
 /**
  * 从当前时间开始
@@ -14,18 +14,22 @@ import wxdgaming.boot2.starter.date.IDateConvert;
  **/
 @Slf4j
 @Component
-public class CurrentConvertImpl implements InitPrint, IDateConvert {
+public class CurrentConvertImpl extends AbstractDateConvert implements InitPrint {
 
     @Override public String type() {
         return "Current";
     }
 
-    @Override public long convert(String date) {
-        return MyClock.millis();
+    @Override public long convert(String[] params) {
+        long add = 0;
+        if (params.length > 2) {
+            add = dateService.convert(params);
+        }
+        return MyClock.millis() + add;
     }
 
-    @Override public long convertEndTime(long startTime, String date) {
-        return convert(date);
+    @Override public long convertEndTime(long startTime, String[] params) {
+        return convert(params);
     }
 
 }

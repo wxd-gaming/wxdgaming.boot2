@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.boot2.starter.date.IDateConvert;
+import wxdgaming.boot2.starter.date.AbstractDateConvert;
 
 /**
  * 当前时间的凌晨时间 00:00:00
@@ -14,18 +14,20 @@ import wxdgaming.boot2.starter.date.IDateConvert;
  **/
 @Slf4j
 @Component
-public class CurrentDayMinConvertImpl implements InitPrint, IDateConvert {
+public class CurrentDayMinConvertImpl extends AbstractDateConvert implements InitPrint {
 
     @Override public String type() {
         return "CurrentDayMin";
     }
 
-    @Override public long convert(String date) {
-        return MyClock.dayMinTime();
+    @Override public long convert(String[] params) {
+        int days = Integer.parseInt(params[1]);
+        long time = MyClock.addDayOfTime(days);
+        return MyClock.dayMinTime(time);
     }
 
-    @Override public long convertEndTime(long startTime, String date) {
-        return convert(date);
+    @Override public long convertEndTime(long startTime, String[] params) {
+        return convert(params);
     }
 
 }

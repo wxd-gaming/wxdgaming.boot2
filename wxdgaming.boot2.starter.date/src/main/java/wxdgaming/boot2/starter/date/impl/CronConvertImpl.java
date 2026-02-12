@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.executor.CronExpressionUtil;
-import wxdgaming.boot2.starter.date.IDateConvert;
+import wxdgaming.boot2.starter.date.AbstractDateConvert;
 
 /**
  * cron 表达式转换
@@ -14,21 +14,18 @@ import wxdgaming.boot2.starter.date.IDateConvert;
  **/
 @Slf4j
 @Component
-public class CronConvertImpl implements InitPrint, IDateConvert {
-
-    public CronConvertImpl() {
-    }
+public class CronConvertImpl extends AbstractDateConvert implements InitPrint {
 
     @Override public String type() {
         return "cron";
     }
 
-    @Override public long convert(String date) {
-        return CronExpressionUtil.nextMillis(date);
+    @Override public long convert(String[] params) {
+        return CronExpressionUtil.nextMillis(params[1]);
     }
 
-    @Override public long convertEndTime(long startTime, String date) {
-        return convert(date);
+    @Override public long convertEndTime(long startTime, String[] params) {
+        return convert(params);
     }
 
 }

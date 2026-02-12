@@ -3,32 +3,30 @@ package wxdgaming.boot2.starter.date.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
-import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.date.AbstractDateConvert;
 
 /**
- * 具体的时间格式，精确到秒
+ * 毫秒
  *
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2026-02-11 19:23
  **/
 @Slf4j
 @Component
-public class YYYYMMDDHHmmssConvertImpl extends AbstractDateConvert implements InitPrint {
+public class MillisConvertImpl extends AbstractDateConvert implements InitPrint {
 
-    public YYYYMMDDHHmmssConvertImpl() {
+    public MillisConvertImpl() {
     }
 
     @Override public String type() {
-        return "yyyyMMddHHmmss";
+        return "Millis";
     }
 
     @Override public long convert(String[] params) {
-        return MyClock.parseDate("yyyyMMddHHmmss", params[1]).getTime();
+        return Long.parseLong(params[1]);
     }
 
     @Override public long convertEndTime(long startTime, String[] params) {
-        return convert(params);
+        return startTime + convert(params);
     }
-
 }

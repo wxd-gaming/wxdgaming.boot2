@@ -18,15 +18,15 @@ import java.util.Map;
 @Service
 public class DateService extends HoldApplicationContext {
 
-    private Map<String, IDateConvert> convertMap = null;
+    private Map<String, AbstractDateConvert> convertMap = null;
 
     public DateService() {
 
     }
 
-    public Map<String, IDateConvert> getConvertMap() {
+    public Map<String, AbstractDateConvert> getConvertMap() {
         if (convertMap == null) {
-            convertMap = getApplicationContextProvider().toMap(IDateConvert.class, i -> i.type().toUpperCase(), v -> v);
+            convertMap = getApplicationContextProvider().toMap(AbstractDateConvert.class, i -> i.type().toUpperCase(), v -> v);
         }
         return convertMap;
     }
@@ -40,7 +40,7 @@ public class DateService extends HoldApplicationContext {
      * @param cfgString cron#0 0 20 * * ?&cron#0 0 20 * * ?
      * @return bool 当前是否有效，开始时间，结束时间
      */
-    public Triple<Boolean, Long, Long> convertBeginEnd(String cfgString) {
+    public Triple<Boolean, Long, Long> convertBeginAndEnd(String cfgString) {
         String[] split = cfgString.split("&");
         String cfg1 = split[0];
         String cfg2 = split[1];
@@ -49,16 +49,14 @@ public class DateService extends HoldApplicationContext {
         {
             String[] split1 = cfg1.split("#");
             String type = split1[0];
-            String date = split1[1];
-            IDateConvert convert = getConvertMap().get(type.toUpperCase());
-            startTime = convert.convert(date);
+            AbstractDateConvert convert = getConvertMap().get(type.toUpperCase());
+            startTime = convert.convert(split1);
         }
         {
             String[] split1 = cfg2.split("#");
             String type = split1[0];
-            String date = split1[1];
-            IDateConvert convert = getConvertMap().get(type.toUpperCase());
-            endTime = convert.convertEndTime(startTime, date);
+            AbstractDateConvert convert = getConvertMap().get(type.toUpperCase());
+            endTime = convert.convertEndTime(startTime, split1);
         }
         long millis = MyClock.millis();
         boolean validTime = startTime <= millis && millis < endTime;
@@ -72,11 +70,14 @@ public class DateService extends HoldApplicationContext {
      * @return bool 当前是否有效，开始时间，结束时间
      */
     public long convert(String cfgString) {
-        String[] split1 = cfgString.split("#");
-        String type = split1[0];
-        String date = split1[1];
-        IDateConvert convert = getConvertMap().get(type.toUpperCase());
-        return convert.convert(date);
+        String[] params = cfgString.split("#");
+        return convert(params);
+    }
+
+    public long convert(String[] params) {
+        String type = params[0];
+        AbstractDateConvert convert = getConvertMap().get(type.toUpperCase());
+        return convert.convert(params);
     }
 
 }

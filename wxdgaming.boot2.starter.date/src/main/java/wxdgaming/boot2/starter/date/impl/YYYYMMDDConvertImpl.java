@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.boot2.starter.date.IDateConvert;
+import wxdgaming.boot2.starter.date.AbstractDateConvert;
 
 /**
  * 把分钟转换成毫秒
@@ -14,7 +14,7 @@ import wxdgaming.boot2.starter.date.IDateConvert;
  **/
 @Slf4j
 @Component
-public class YYYYMMDDConvertImpl implements InitPrint, IDateConvert {
+public class YYYYMMDDConvertImpl extends AbstractDateConvert implements InitPrint {
 
     public YYYYMMDDConvertImpl() {
     }
@@ -23,12 +23,12 @@ public class YYYYMMDDConvertImpl implements InitPrint, IDateConvert {
         return "yyyymmdd";
     }
 
-    @Override public long convert(String date) {
-        return MyClock.parseDate("yyyyMMdd", date).getTime();
+    @Override public long convert(String[] params) {
+        return MyClock.parseDate("yyyyMMdd", params[1]).getTime();
     }
 
-    @Override public long convertEndTime(long startTime, String date) {
-        return convert(date) - 1000;
+    @Override public long convertEndTime(long startTime, String[] params) {
+        return convert(params) - 1000;
     }
 
 }
