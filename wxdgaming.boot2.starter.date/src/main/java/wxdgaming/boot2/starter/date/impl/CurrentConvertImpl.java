@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter.date.impl;
 
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
@@ -22,17 +23,17 @@ public class CurrentConvertImpl extends AbstractDateConvert implements InitPrint
         return "Current";
     }
 
-    @Override public long convert(String[] params) {
+    @Override public long convert(JSONObject extendParams, String[] params) {
         long add = 0;
-        if (params.length > 2) {
+        if (params.length > 3) {
             String[] newParams = Arrays.copyOfRange(params, 1, params.length - 1);
-            add = dateService.convert(newParams);
+            add = dateService.convert(extendParams, newParams);
         }
         return MyClock.millis() + add;
     }
 
-    @Override public long convertEndTime(long startTime, String[] params) {
-        return convert(params);
+    @Override public long convertEndTime(JSONObject extendParams, long startTime, String[] params) {
+        return convert(extendParams, params);
     }
 
 }

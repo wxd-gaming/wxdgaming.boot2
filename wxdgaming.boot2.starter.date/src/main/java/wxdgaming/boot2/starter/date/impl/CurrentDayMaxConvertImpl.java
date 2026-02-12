@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter.date.impl;
 
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
@@ -20,14 +21,14 @@ public class CurrentDayMaxConvertImpl extends AbstractDateConvert implements Ini
         return "CurrentDayMax";
     }
 
-    @Override public long convert(String[] params) {
+    @Override public long convert(JSONObject extendParams, String[] params) {
         int days = Integer.parseInt(params[1]);
         long time = MyClock.addDayOfTime(days);
         return MyClock.dayMaxTime(time);
     }
 
-    @Override public long convertEndTime(long startTime, String[] params) {
-        return convert(params);
+    @Override public long convertEndTime(JSONObject extendParams, long startTime, String[] params) {
+        return convert(extendParams, params);
     }
 
 }

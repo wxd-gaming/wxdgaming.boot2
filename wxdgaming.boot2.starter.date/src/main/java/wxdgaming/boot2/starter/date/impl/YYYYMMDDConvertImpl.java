@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter.date.impl;
 
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
@@ -23,12 +24,12 @@ public class YYYYMMDDConvertImpl extends AbstractDateConvert implements InitPrin
         return "yyyymmdd";
     }
 
-    @Override public long convert(String[] params) {
+    @Override public long convert(JSONObject extendParams, String[] params) {
         return MyClock.parseDate("yyyyMMdd", params[1]).getTime();
     }
 
-    @Override public long convertEndTime(long startTime, String[] params) {
-        return convert(params) - 1000;
+    @Override public long convertEndTime(JSONObject extendParams, long startTime, String[] params) {
+        return convert(extendParams, params) - 1000;
     }
 
 }

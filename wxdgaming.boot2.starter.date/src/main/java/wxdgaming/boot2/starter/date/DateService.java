@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter.date;
 
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class DateService extends HoldApplicationContext {
      * @param cfgString cron#0 0 20 * * ?&cron#0 0 20 * * ?
      * @return bool 当前是否有效，开始时间，结束时间
      */
-    public Triple<Boolean, Long, Long> convertBeginAndEnd(String cfgString) {
+    public Triple<Boolean, Long, Long> convertBeginAndEnd(JSONObject extendParams, String cfgString) {
         String[] split = cfgString.split("&");
         String cfg1 = split[0];
         String cfg2 = split[1];
@@ -50,13 +51,13 @@ public class DateService extends HoldApplicationContext {
             String[] split1 = cfg1.split("#");
             String type = split1[0];
             AbstractDateConvert convert = getConvertMap().get(type.toUpperCase());
-            startTime = convert.convert(split1);
+            startTime = convert.convert(extendParams, split1);
         }
         {
             String[] split1 = cfg2.split("#");
             String type = split1[0];
             AbstractDateConvert convert = getConvertMap().get(type.toUpperCase());
-            endTime = convert.convertEndTime(startTime, split1);
+            endTime = convert.convertEndTime(extendParams, startTime, split1);
         }
         long millis = MyClock.millis();
         boolean validTime = startTime <= millis && millis < endTime;
@@ -69,15 +70,15 @@ public class DateService extends HoldApplicationContext {
      * @param cfgString cron#0 0 20 * * ?
      * @return bool 当前是否有效，开始时间，结束时间
      */
-    public long convert(String cfgString) {
+    public long convert(JSONObject extendParams, String cfgString) {
         String[] params = cfgString.split("#");
-        return convert(params);
+        return convert(extendParams, params);
     }
 
-    public long convert(String[] params) {
+    public long convert(JSONObject extendParams, String[] params) {
         String type = params[0];
         AbstractDateConvert convert = getConvertMap().get(type.toUpperCase());
-        return convert.convert(params);
+        return convert.convert(extendParams, params);
     }
 
 }

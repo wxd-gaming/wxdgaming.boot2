@@ -1,5 +1,6 @@
 package wxdgaming.boot2.starter.date.impl;
 
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
@@ -20,12 +21,12 @@ public class CronConvertImpl extends AbstractDateConvert implements InitPrint {
         return "cron";
     }
 
-    @Override public long convert(String[] params) {
+    @Override public long convert(JSONObject extendParams, String[] params) {
         return CronExpressionUtil.nextMillis(params[1]);
     }
 
-    @Override public long convertEndTime(long startTime, String[] params) {
-        return convert(params);
+    @Override public long convertEndTime(JSONObject extendParams, long startTime, String[] params) {
+        return convert(extendParams, params);
     }
 
 }

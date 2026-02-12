@@ -41,6 +41,12 @@ public class GameServerProperties extends BootstrapProperties {
         return openTimeLocalDateTime;
     }
 
+
+    public long openTimeToMillis() {
+        LocalDateTime localDateTime = openTimeLocalDateTime();
+        return MyClock.time2Milli(localDateTime);
+    }
+
     /** 从1 开始，开服当天是第一天 */
     public int openDay() {
         return MyClock.countDays(openTimeLocalDateTime(), MyClock.localDateTime()) + 1;
