@@ -37,18 +37,6 @@ html, body {width: 100%; height: 100%;overflow: hidden;}
     overflow: hidden;
 }
 
-/* 底部样式 */
-.right .footer {
-    width: 100%;
-    height: 40px;
-    background-color: #2c3e50;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-}
-
 /* 加载提示 */
 .right .loading {
     text-align: center;
