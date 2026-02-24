@@ -1,0 +1,1 @@
+rsync -aztv -e"ssh -p @port@" /data/game/file/@version@ root@@ip@:/data/game/@sid@
