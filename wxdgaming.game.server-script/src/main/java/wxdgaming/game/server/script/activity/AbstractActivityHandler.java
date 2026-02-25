@@ -23,12 +23,15 @@ public abstract class AbstractActivityHandler<T extends ActivityData> extends Ho
 
     public abstract int activityType();
 
+    /** 当前活动需要的心跳类型 */
     public abstract Collection<HeartConst> heartConst();
 
     public abstract T newData();
 
+    /** 活动开启时调用 */
     public abstract void start(T activityData);
 
+    /** 活动结束时调用 */
     public abstract void end(T activityData);
 
     @EventListener
@@ -38,8 +41,10 @@ public abstract class AbstractActivityHandler<T extends ActivityData> extends Ho
 
     public void doRecharge(EventConst.PlayerRechargeEvent event) {}
 
+    /** 心跳处理器大约33ms */
     public void heart(T activityData) {}
 
+    /**每秒*/
     public void heartSecond(T activityData) {}
 
     public void heartMinute(T activityData) {}

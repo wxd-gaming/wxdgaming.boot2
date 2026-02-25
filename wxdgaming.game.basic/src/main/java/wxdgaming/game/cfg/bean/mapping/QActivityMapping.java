@@ -26,10 +26,12 @@ public abstract class QActivityMapping extends ObjectBase implements Serializabl
     protected int type;
     /** 名称 */
     protected String name;
+    /** 是否循环 */
+    protected int poll;
     /** 限制条件 */
     protected wxdgaming.boot2.core.lang.ConfigString validation;
     /** 开启时间 */
-    protected wxdgaming.boot2.core.timer.CronExpress openTime;
+    protected String openTime;
 
     public Object key() {
         return id;

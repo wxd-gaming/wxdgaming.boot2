@@ -2,10 +2,8 @@ package wxdgaming.boot2.starter.date;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
-import wxdgaming.boot2.core.timer.MyClock;
 
 import java.util.Map;
 
@@ -41,7 +39,7 @@ public class DateService extends HoldApplicationContext {
      * @param cfgString cron#0 0 20 * * ?&cron#0 0 20 * * ?
      * @return bool 当前是否有效，开始时间，结束时间
      */
-    public Triple<Boolean, Long, Long> convertBeginAndEnd(JSONObject extendParams, String cfgString) {
+    public DateExpression convertBeginAndEnd(JSONObject extendParams, String cfgString) {
         String[] split = cfgString.split("&");
         String cfg1 = split[0];
         String cfg2 = split[1];
@@ -51,17 +49,17 @@ public class DateService extends HoldApplicationContext {
             String[] split1 = cfg1.split("#");
             String type = split1[0];
             AbstractDateConvert convert = getConvertMap().get(type.toUpperCase());
+            if (convert == null) throw new IllegalArgumentException(type + " not found");
             startTime = convert.convert(extendParams, split1);
         }
         {
             String[] split1 = cfg2.split("#");
             String type = split1[0];
             AbstractDateConvert convert = getConvertMap().get(type.toUpperCase());
+            if (convert == null) throw new IllegalArgumentException(type + " not found");
             endTime = convert.convertEndTime(extendParams, startTime, split1);
         }
-        long millis = MyClock.millis();
-        boolean validTime = startTime <= millis && millis < endTime;
-        return Triple.of(validTime, startTime, endTime);
+        return new DateExpression(startTime, endTime);
     }
 
     /**

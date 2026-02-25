@@ -10,5 +10,6 @@ public interface ActivityConst {
 
     /** 开服首充 */
     int OPEN_SERVER_RECHARGE = 1;
+    int OPEN_SERVER_RECHARGE2 = 2;
 
 }

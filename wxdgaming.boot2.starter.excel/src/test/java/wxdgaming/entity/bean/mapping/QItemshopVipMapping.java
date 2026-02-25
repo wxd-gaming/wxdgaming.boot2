@@ -31,7 +31,7 @@ public abstract class QItemshopVipMapping extends ObjectBase implements Serializ
     /** 服务器使用字段 */
     protected int show_viplv;
     /** cron表达式 */
-    protected wxdgaming.boot2.core.timer.CronExpress show_time;
+    protected String show_time;
     /** 是非类型 */
     protected boolean conditions_viplv;
     /** 小数类型 */

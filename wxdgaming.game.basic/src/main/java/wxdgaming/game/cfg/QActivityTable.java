@@ -21,6 +21,8 @@ import java.util.TreeMap;
 public class QActivityTable extends DataTable<QActivity> implements Serializable {
 
     private Map<Integer, Map<Integer, QActivity>> activityType2IdMap = new TreeMap<>();
+    /** 记录活动类型最大的活动id */
+    private Map<Integer, Integer> activityType2MaxIdMap = new TreeMap<>();
 
     @Override public void initDb() {
         /*todo 实现一些数据分组*/
@@ -28,6 +30,7 @@ public class QActivityTable extends DataTable<QActivity> implements Serializable
         for (QActivity qActivity : dataList) {
             Map<Integer, QActivity> idMap = activityType2IdMap.computeIfAbsent(qActivity.getType(), k -> new TreeMap<>());
             idMap.put(qActivity.getId(), qActivity);
+            activityType2MaxIdMap.merge(qActivity.getType(), qActivity.getId(), Math::max);
         }
 
     }
