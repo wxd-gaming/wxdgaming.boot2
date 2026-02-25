@@ -221,7 +221,7 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
 
     @SuppressWarnings("unchecked")
     @Override public void heartSecond(int second) {
-
+        check();
         List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.Second, Collections.emptyList());
         for (ActivityData activityData : activityDataList) {
             AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());
@@ -231,7 +231,7 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
 
     @SuppressWarnings("unchecked")
     @Override public void heartMinute(int minute) {
-        check();
+
         List<ActivityData> activityDataList = heartHandlerMap.getOrDefault(HeartConst.Minute, Collections.emptyList());
         for (ActivityData activityData : activityDataList) {
             AbstractActivityHandler<ActivityData> abstractActivityHandler = activityHandlerMap.get(activityData.getActivityType());
