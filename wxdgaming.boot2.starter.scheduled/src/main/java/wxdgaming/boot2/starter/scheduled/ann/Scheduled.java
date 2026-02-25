@@ -18,8 +18,8 @@ public @interface Scheduled {
     boolean scheduleAtFixedRate() default false;
 
     /**
-     * 秒 分 时 日 月 星期 年
-     * <p> {@code * * * * * * * }
+     * 秒 分 时 日 月 星期
+     * <p> {@code * * * * * * }
      * <p> 下面以 秒 配置举例
      * <p> * 或者 ? 无限制,
      * <p> 数字是 指定秒执行

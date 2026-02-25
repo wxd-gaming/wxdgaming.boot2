@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.starter.date.AbstractDateConvert;
+import wxdgaming.boot2.starter.date.DateService;
 import wxdgaming.game.server.GameServerProperties;
 
 import java.util.Arrays;
@@ -22,8 +23,8 @@ public class OpenServerTimeConvertImpl extends AbstractDateConvert implements In
 
     final GameServerProperties gameServerProperties;
 
-    @Autowired
-    public OpenServerTimeConvertImpl(GameServerProperties gameServerProperties) {
+    public OpenServerTimeConvertImpl(DateService dateService, GameServerProperties gameServerProperties) {
+        super(dateService);
         this.gameServerProperties = gameServerProperties;
     }
 

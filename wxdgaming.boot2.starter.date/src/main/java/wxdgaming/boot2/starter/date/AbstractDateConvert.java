@@ -2,7 +2,6 @@ package wxdgaming.boot2.starter.date;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 时间格式转换
@@ -13,7 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Getter
 public abstract class AbstractDateConvert {
 
-    @Autowired protected DateService dateService;
+    protected DateService dateService;
+
+    protected AbstractDateConvert(DateService dateService) {
+        this.dateService = dateService;
+    }
 
     public abstract String type();
 

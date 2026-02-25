@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.starter.date.AbstractDateConvert;
+import wxdgaming.boot2.starter.date.DateService;
 
 /**
  * 毫秒
@@ -16,7 +17,9 @@ import wxdgaming.boot2.starter.date.AbstractDateConvert;
 @Component
 public class MillisConvertImpl extends AbstractDateConvert implements InitPrint {
 
-    public MillisConvertImpl() {
+
+    public MillisConvertImpl(DateService dateService) {
+        super(dateService);
     }
 
     @Override public String type() {

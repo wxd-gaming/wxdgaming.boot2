@@ -2,10 +2,12 @@ package wxdgaming.boot2.starter.date.impl;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.date.AbstractDateConvert;
+import wxdgaming.boot2.starter.date.DateService;
 
 /**
  * 当前时间的凌晨时间 00:00:00
@@ -16,6 +18,12 @@ import wxdgaming.boot2.starter.date.AbstractDateConvert;
 @Slf4j
 @Component
 public class CurrentDayMinConvertImpl extends AbstractDateConvert implements InitPrint {
+
+
+    @Autowired
+    public CurrentDayMinConvertImpl(DateService dateService) {
+        super(dateService);
+    }
 
     @Override public String type() {
         return "CurrentDayMin";

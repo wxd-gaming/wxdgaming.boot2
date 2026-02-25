@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.starter.date.AbstractDateConvert;
+import wxdgaming.boot2.starter.date.DateService;
 
 import java.time.Duration;
 
@@ -18,7 +19,8 @@ import java.time.Duration;
 @Component
 public class SecondsConvertImpl extends AbstractDateConvert implements InitPrint {
 
-    public SecondsConvertImpl() {
+    public SecondsConvertImpl(DateService dateService) {
+        super(dateService);
     }
 
     @Override public String type() {

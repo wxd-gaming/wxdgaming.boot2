@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.date.AbstractDateConvert;
+import wxdgaming.boot2.starter.date.DateService;
 
 /**
  * 具体的时间格式，精确到秒
@@ -17,7 +18,8 @@ import wxdgaming.boot2.starter.date.AbstractDateConvert;
 @Component
 public class YYYYMMDDHHmmssConvertImpl extends AbstractDateConvert implements InitPrint {
 
-    public YYYYMMDDHHmmssConvertImpl() {
+    public YYYYMMDDHHmmssConvertImpl(DateService dateService) {
+        super(dateService);
     }
 
     @Override public String type() {

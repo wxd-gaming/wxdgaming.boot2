@@ -2,10 +2,12 @@ package wxdgaming.boot2.starter.date.impl;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.executor.CronExpressionUtil;
 import wxdgaming.boot2.starter.date.AbstractDateConvert;
+import wxdgaming.boot2.starter.date.DateService;
 
 /**
  * cron 表达式转换
@@ -16,6 +18,11 @@ import wxdgaming.boot2.starter.date.AbstractDateConvert;
 @Slf4j
 @Component
 public class CronConvertImpl extends AbstractDateConvert implements InitPrint {
+
+    @Autowired
+    public CronConvertImpl(DateService dateService) {
+        super(dateService);
+    }
 
     @Override public String type() {
         return "cron";
