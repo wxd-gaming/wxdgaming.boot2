@@ -20,6 +20,8 @@ import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.bag.BagPack;
 import wxdgaming.game.server.bean.bag.ItemBag;
 import wxdgaming.game.server.bean.goods.*;
+import wxdgaming.game.server.bean.reason.ReasonConst;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.event.EventConst;
 import wxdgaming.game.server.module.data.DataCenterService;
@@ -105,6 +107,32 @@ public class BagService extends HoldApplicationContext implements InitPrint {
         Player player = event.player();
         /*推送数据的*/
         sendBagInfo(player, BagType.Bag);
+    }
+
+    /** 处理道具过期 */
+    @EventListener
+    public void onPlayerHeartSecond(EventConst.PlayerHeartSecondEvent event) {
+        Player player = event.player();
+        HashMap<BagType, ItemBag> bagMap = player.getBagPack().getBagMap();
+        for (Map.Entry<BagType, ItemBag> bagEntry : bagMap.entrySet()) {
+            Map<ItemGrid, Long> itemGridMap = new HashMap<>();
+            BagType bagType = bagEntry.getKey();
+            ItemBag itemBag = bagEntry.getValue();
+            for (Item item : itemBag.getItemGrids()) {
+                if (item.checkExpire()) {
+                    ItemGrid itemGrid = itemBag.itemGridById(item.getUid());
+                    itemGridMap.put(itemGrid, item.getUid());
+                }
+            }
+            if (!itemGridMap.isEmpty()) continue;
+            BagChangeDTO4ItemGrid.BagChangeDTO4ItemGridBuilder<?, ?> builder = BagChangeDTO4ItemGrid.builder();
+            ReasonDTO reasonDTO = ReasonDTO.of(ReasonConst.Items_Expire);
+            builder.setReasonDTO(reasonDTO);
+            builder.setBagType(bagType);
+            builder.setItemMap(itemGridMap);
+            BagChangeDTO4ItemGrid bagChangeDTO = builder.build();
+            cost(player, bagChangeDTO);
+        }
     }
 
     /** 登录的时候推送背包 */
@@ -305,10 +333,10 @@ public class BagService extends HoldApplicationContext implements InitPrint {
             costScript.cost(player, bagChangesContext, qItem, change);
             long newCount = gainScript.getCount(player, itemBag, cfgId);
 
-            log.info("消耗道具：{}, {}, {} {}-{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeDTO.getReasonDTO());
+            log.info("扣除道具：{}, {}, {} {}-{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeDTO.getReasonDTO());
 
             ItemSlog itemLog = new ItemSlog(player, bagType.name(),
-                    "消耗",
+                    "扣除",
                     cfgId, qItem.getName(),
                     oldCount, change, newCount,
                     bagChangeDTO.getReasonDTO().getReasonConst().name(),
@@ -342,10 +370,10 @@ public class BagService extends HoldApplicationContext implements InitPrint {
             costScript.cost(player, bagChangesContext, itemGrid, change);
             long newCount = gainScript.getCount(player, itemBag, qItem.getId());
 
-            log.info("消耗道具：{}, {}, {} {}-{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeDTO.getReasonDTO());
+            log.info("扣除道具：{}, {}, {} {}-{}={}, {}", player, bagType, qItem.getToName(), oldCount, change, newCount, bagChangeDTO.getReasonDTO());
 
             ItemSlog itemLog = new ItemSlog(player, bagType.name(),
-                    "消耗",
+                    "扣除",
                     qItem.getId(), qItem.getName(),
                     oldCount, change, newCount,
                     bagChangeDTO.getReasonDTO().getReasonConst().name(),

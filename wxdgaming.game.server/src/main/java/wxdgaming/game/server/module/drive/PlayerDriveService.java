@@ -178,7 +178,7 @@ public class PlayerDriveService extends HoldApplicationContext {
 
         @Override public void heartSecond(int second) {
             for (Player player : playerMap.values()) {
-                applicationContextProvider.postEventIgnoreException(new EventConst.MapNpcHeartSecondEvent(player, second));
+                applicationContextProvider.postEventIgnoreException(new EventConst.PlayerHeartSecondEvent(player, second));
             }
         }
 

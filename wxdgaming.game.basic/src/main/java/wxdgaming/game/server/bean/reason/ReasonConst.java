@@ -18,6 +18,7 @@ public enum ReasonConst {
     Level,
     /** 使用道具 */
     USE_ITEM,
+    Items_Expire,
     /** 使用礼包码 */
     USE_GiftCode,
     /** 成就 */

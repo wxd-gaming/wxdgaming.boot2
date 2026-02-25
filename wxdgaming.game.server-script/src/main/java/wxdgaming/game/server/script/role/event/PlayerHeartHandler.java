@@ -55,7 +55,7 @@ public class PlayerHeartHandler extends HoldApplicationContext {
     final ReasonDTO reasonDTO = ReasonDTO.of(ReasonConst.Heart, "心跳回血");
 
     @EventListener
-    public void onHeartSecond(EventConst.MapNpcHeartSecondEvent event) {
+    public void onHeartSecond(EventConst.PlayerHeartSecondEvent event) {
         int second = event.second();
         MapNpc mapNpc = event.mapNpc();
         Player player = (Player) mapNpc;

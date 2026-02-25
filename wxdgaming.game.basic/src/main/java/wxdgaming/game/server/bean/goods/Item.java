@@ -38,6 +38,15 @@ public class Item extends ObjectLong {
         return itemBean;
     }
 
+    /**
+     * 检查是否过期
+     *
+     * @return true: 过期
+     */
+    public boolean checkExpire() {
+        return getExpireTime() > 0 && getExpireTime() < System.currentTimeMillis();
+    }
+
     public QItem qItem() {
         return DataRepository.getIns().dataTable(QItemTable.class, getCfgId());
     }

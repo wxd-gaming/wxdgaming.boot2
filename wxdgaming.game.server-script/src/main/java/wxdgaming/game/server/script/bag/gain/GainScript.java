@@ -4,16 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
-import wxdgaming.game.server.bean.goods.ItemCfg;
 import wxdgaming.game.cfg.QItemTable;
 import wxdgaming.game.cfg.bean.QItem;
-import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.message.bag.BagType;
 import wxdgaming.game.server.bean.bag.BagChangesContext;
 import wxdgaming.game.server.bean.bag.ItemBag;
-import wxdgaming.game.server.bean.goods.ItemGrid;
 import wxdgaming.game.server.bean.goods.Item;
+import wxdgaming.game.server.bean.goods.ItemCfg;
+import wxdgaming.game.server.bean.goods.ItemGrid;
+import wxdgaming.game.server.bean.reason.ReasonDTO;
 import wxdgaming.game.server.bean.role.Player;
 import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.script.bag.BagService;
@@ -58,7 +59,7 @@ public class GainScript extends HoldApplicationContext implements IBagScript {
                 count = 0;
             }
             item.setBind(itemCfg.isBind());
-            item.setExpireTime(itemCfg.getExpirationTime());
+            item.setExpireTime(MyClock.millis() + itemCfg.getExpirationTime());
             items.add(item);
         } while (count > 0);
     }

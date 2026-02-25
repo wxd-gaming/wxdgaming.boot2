@@ -48,7 +48,7 @@ public interface EventConst {
 
     public record MapNpcHeartEvent(MapNpc mapNpc) implements MapNpcEvent {}
 
-    public record MapNpcHeartSecondEvent(MapNpc mapNpc, int second) implements MapNpcEvent {}
+    public record PlayerHeartSecondEvent(Player mapNpc, int second) implements MapNpcEvent {}
 
     public record MapNpcHeartMinuteEvent(MapNpc mapNpc, int minute) implements MapNpcEvent {}
 
