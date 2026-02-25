@@ -60,16 +60,18 @@
         await loadTemplate('log/log-filter.html', '.log_filter', '正在加载查询条件...');
         /*然后加载查询条件*/
         await loadTemplate('log/log-page.html', '.log_bottom', '正在加载分页查询...');
-
+        cleanThead();
         addHead("时间", "width:200px;");
         addHead("日志", "");
+        cleanTbody();
         for (let i = 0; i < 100; i++) {
             let row = [];
             row.push({"content": new Date().toLocaleString(), "style": "width:200px;"});
-            row.push({"content": "日志" + i, "style": ""});
+            row.push({"content": `日志${i}<br>日志${i}`, "style": ""});
             addRow(row);
         }
     }
 
     loading();
+    console.log("log.html")
 </script>

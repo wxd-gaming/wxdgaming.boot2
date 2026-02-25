@@ -30,7 +30,7 @@ public class GameCfgFunction {
                 return Collections.emptyList();
             } else {
                 List<ItemCfg> itemCfgs = new ArrayList<>();
-                String[] split = value.split(",");
+                String[] split = value.split("#");
                 for (String one : split) {
                     String[] split1 = one.split("\\|");
                     ItemCfg.ItemCfgBuilder builder = ItemCfg.builder();
@@ -40,6 +40,14 @@ public class GameCfgFunction {
                         builder.bind("1".endsWith(split1[2]));
                     if (split1.length > 3)
                         builder.expirationTime(Long.parseLong(split1[3]));
+                    if (split1.length > 4)
+                        builder.job(Integer.valueOf(split1[4]));
+                    if (split1.length > 5)
+                        builder.lv(Integer.valueOf(split1[5]));
+                    if (split1.length > 6)
+                        builder.sex(Integer.valueOf(split1[6]));
+                    if (split1.length > 7)
+                        builder.weight(Integer.valueOf(split1[7]));
                     itemCfgs.add(builder.build());
                 }
                 return itemCfgs;

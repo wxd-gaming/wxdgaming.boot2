@@ -98,12 +98,12 @@
             <i class="fas fa-cogs"></i> 管理
             <dl>
                 <dd>
-                    <a href="javascript:void(0)" onclick="refreshContent('main')">
+                    <a href="javascript:void(0)" tag="main" onclick="refreshContent('main')">
                         <i class="fas fa-home"></i> 首页
                     </a>
                 </dd>
                 <dd>
-                    <a href="javascript:void(0)" onclick="refreshContent('main')">
+                    <a href="javascript:void(0)" tag="main" onclick="refreshContent('main')">
                         <i class="fas fa-home"></i> 首页
                     </a>
                 </dd>
@@ -115,12 +115,12 @@
             <i class="fas fa-file-alt"></i> 日志
             <dl>
                 <dd>
-                    <a href="javascript:void(0)" onclick="refreshContent('log')">
+                    <a href="javascript:void(0)" tag="log" onclick="refreshContent('log')">
                         <i class="fas fa-home"></i> 日志
                     </a>
                 </dd>
                 <dd>
-                    <a href="javascript:void(0)" onclick="refreshContent('log')">
+                    <a href="javascript:void(0)" tag="log" onclick="refreshContent('log')">
                         <i class="fas fa-home"></i> 日志
                     </a>
                 </dd>
@@ -177,14 +177,47 @@
                 // 为当前点击的 dd 添加 active 类
                 this.closest('dd').classList.add('active');
 
-                const target = this.getAttribute('onclick');
-                if (target) {
-                    // 延迟执行 refreshContent，确保菜单状态稳定
-                    setTimeout(() => {
-                        eval(target);
-                    }, 100); // 延迟 100ms
-                }
+                // const target = this.getAttribute('onclick');
+                // if (target) {
+                //     // 延迟执行 refreshContent，确保菜单状态稳定
+                //     setTimeout(() => {
+                //         eval(target);
+                //     }, 100); // 延迟 100ms
+                // }
             });
         });
+    });
+
+    function setActiveMenu() {
+        // 示例调用
+        let pageType = getUrlParam('pagetype');
+        console.log("pageType", pageType)
+        if (pageType == null || pageType === "" || pageType === undefined) {
+            return
+        }
+        let elementNodeListOf = document.querySelectorAll('.nav ul dd a');
+        for (const da of elementNodeListOf) {
+            if (da.getAttribute('tag') === pageType) {
+                // 正确获取父级元素的方法
+                const ddElement = da.parentElement; // 获取直接父级<dd>
+                const dlElement = ddElement.parentElement; // 获取<dd>的父级<dl>
+                const liElement = dlElement.parentElement; // 获取<dl>的父级<li>
+                console.log(liElement)
+                // 触发<li>元素的点击事件来展开菜单
+                if (liElement && typeof liElement.click === 'function') {
+                    // 展开当前菜单
+                    dlElement.style.display = 'block';
+                    console.log("菜单已展开")
+                }
+                da.click();
+                break;
+            }
+        }
+    }
+
+    // 页面加载完成后执行
+    $(() => {
+        // 延迟执行确保所有事件监听器都已绑定
+        setTimeout(setActiveMenu, 100);
     });
 </script>

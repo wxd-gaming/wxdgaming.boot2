@@ -5,11 +5,12 @@ import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import wxdgaming.boot2.core.format.TableFormatter;
-import wxdgaming.boot2.core.util.PatternUtil;
 import wxdgaming.boot2.core.json.FastJsonUtil;
 import wxdgaming.boot2.core.lang.ConfigString;
 import wxdgaming.boot2.core.util.ConvertUtil;
+import wxdgaming.boot2.core.util.PatternUtil;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -195,8 +196,19 @@ public class TableData {
 
     /** 把所有的数据，转化成json字符串 */
     public String data2Json() {
-        Object array = rows.values().stream().toList();
-        return FastJsonUtil.toJSONStringAsFmt(array);
+        List<String> list = rows.values().stream()
+                .map(v -> v.toJSONString())
+                .toList();
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        for (int i = 0; i < list.size(); i++) {
+            builder.append("\n").append("\t").append(list.get(i));
+            if (i != list.size() - 1){
+                builder.append(",");
+            }
+        }
+        builder.append("\n]");
+        return builder.toString();
     }
 
     /** 把所有的数据，转化成json字符串 */

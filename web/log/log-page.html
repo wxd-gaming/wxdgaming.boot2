@@ -29,13 +29,38 @@
 
     .log_bottom span {
         padding: 2px 7px;
+        background-color: white;
         border: #d9d9d9 1px solid;
     }
+
+    .log_bottom input[type=text] {
+        padding: 5px 7px;
+        display: inline-block;
+        box-sizing: border-box;
+        background-color: white;
+        border: #d9d9d9 1px solid;
+        width: 100px;
+    }
+
 </style>
+<script>
+
+    function nextPage() {
+
+    }
+
+    function prePage() {
+
+    }
+
+</script>
 <ul>
     <li><a href="javascript:void(0);">首页</a></li>
     <li><a href="javascript:void(0);">上一页</a></li>
-    <li><span>1</span>&nbsp;&nbsp;/&nbsp;&nbsp;<span>1</span></li>
+    <li><span id="page_current">1</span>&nbsp;&nbsp;/&nbsp;&nbsp;<span id="page_max">1</span></li>
     <li><a href="javascript:void(0);">下一页</a></li>
     <li><a href="javascript:void(0);">尾页</a></li>
+    <li>&nbsp;</li>
+    <li>&nbsp;</li>
+    <li><input id="txt_target_page" type="text" placeholder="跳转页"><a href="javascript:void(0);">跳转</a></li>
 </ul>

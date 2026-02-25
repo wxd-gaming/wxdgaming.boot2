@@ -20,26 +20,43 @@
 </div>
 </body>
 </html>
-<!-- 引入模板加载 JS -->
-<script src="js/template-loader.js"></script>
 <script>
 
-    function getUrlParam(name) {
-        const urlParams = new URLSearchParams(window.top.location.search);
-        return urlParams.get(name);
+    function refreshContent(flag) {
+        // 设置或覆盖 pagetype 参数
+        setUrlParam('pagetype', flag);
+        return wxd.loader
+            .containerSelector('.content-container')
+            .templateUrl(`${flag}.html`)
+            .loadingText('正在加载内容...')
+            .load();
     }
+
+    /**
+     * 加载模板并插入到指定容器
+     * @param {string} templateUrl 模板文件路径
+     * @param {string} containerSelector 容器选择器
+     * @param {string} loadingText 加载提示文本
+     */
+    function loadTemplate(templateUrl, containerSelector, loadingText) {
+        return wxd.loader
+            .templateUrl(templateUrl)
+            .containerSelector(containerSelector)
+            .loadingText(loadingText)
+            .load();
+    }
+
+    loadTemplate('nav.html', '.left', '正在加载内容...');
 
     // 示例调用
     let pageType = getUrlParam('pagetype');
     if (pageType == null || pageType === "" || pageType === undefined) {
-        pageType = "main";
+        refreshContent("main");
     }
 
-    refreshContent(pageType);
-    loadTemplate('nav.html', '.left', '正在加载内容...', null);
 
     async function testAwaitAlert() {
-        let consumeAlert = new Alert()
+        let consumeAlert = wxd.newAlert
             .title("提示")
             .content(`<h1>欢迎来到我的网站</h1>dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd`)
             .confirmText("确定")

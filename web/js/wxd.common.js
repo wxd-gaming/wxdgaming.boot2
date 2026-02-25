@@ -1,20 +1,175 @@
 /**
  * 判断值是否为空
- * @param value 需要判定的对象
+ * @param value {Object} 需要判定的对象
  * @returns {boolean} true 表示为空，false 表示非空
  */
 function isEmpty(value) {
-    return value === null || value === undefined || value.trim() === "";
+    // 处理null和undefined
+    if (value === null || value === undefined) {
+        return true;
+    }
+
+    // 处理字符串
+    if (typeof value === 'string') {
+        return value.trim() === "";
+    }
+
+    // 处理数组
+    if (Array.isArray(value)) {
+        return value.length === 0;
+    }
+
+    // 处理对象
+    if (typeof value === 'object') {
+        return Object.keys(value).length === 0;
+    }
+
+    // 其他情况（数字、布尔值等）
+    return false;
 }
 
 /**
  * 判断值是否为null
- * @param value
+ * @param value {Object} 需要判定的对象
  * @returns {boolean}
  */
 function isNull(value) {
     return value === null || value === undefined;
 }
+
+/**
+ *  获取URL参数
+ * @param name {string} 参数名
+ * @returns {string}
+ */
+function getUrlParam(name) {
+    const urlParams = new URLSearchParams(window.top.location.search);
+    return urlParams.get(name);
+}
+
+/**
+ * 设置URL参数
+ * @param k {string} 参数名
+ * @param v {string} 值
+ */
+function setUrlParam(k, v) {
+    // 创建一个 URL 对象以便操作
+    const urlObj = new URL(window.location.href);
+    urlObj.searchParams.set(k, v);
+    // 使用 replaceState 替换当前历史记录，不刷新页面
+    history.replaceState({}, '', urlObj.toString());
+}
+
+/**
+ * 加载文件
+ */
+class TemplateLoader {
+
+    _templateUrl;
+    _containerSelector;
+    _loadingText = "正在加载内容...";
+    _successCall;
+
+    constructor() {
+    }
+
+    load() {
+        let current = this;
+        console.log(`开始加载模板 ${current._templateUrl}`);
+        return new Promise((resolve, reject) => {
+            // 更新加载提示
+            $(current._containerSelector).html(`<div class="loading">${current._loadingText}</div>`);
+            // 使用jQuery的AJAX加载模板
+            $.ajax({
+                url: current._templateUrl,
+                type: 'GET',
+                dataType: 'html',
+                success: function (html) {
+                    // 请求成功，插入模板内容
+                    $(current._containerSelector).html(html);
+                    if (current._successCall != null) {
+                        current._successCall();
+                    }
+                    resolve(); // 成功时 resolve
+                },
+                error: function (xhr, status, error) {
+                    // 请求失败，显示错误信息
+                    $(current._containerSelector).html(`<div class="loading">加载失败: ${error} (状态: ${status})</div>`);
+                    console.error(`加载模板 ${current._templateUrl} 失败:`, error);
+                    reject(error); // 失败时 reject
+                }
+            });
+        });
+    }
+
+    /**
+     * 模板文件路径
+     * @param value {string} 模板文件路径
+     * @returns {TemplateLoader}
+     */
+    templateUrl(value) {
+        this._templateUrl = value;
+        return this;
+    }
+
+    /**
+     * 容器选择器
+     * @param value {string} 容器选择器
+     * @returns {TemplateLoader}
+     */
+    containerSelector(value) {
+        this._containerSelector = value;
+        return this;
+    }
+
+    /**
+     * 加载提示文本
+     * @param value {string} 加载提示文本
+     * @returns {TemplateLoader}
+     */
+    loadingText(value) {
+        this._loadingText = value;
+        return this;
+    }
+
+    /**
+     * 加载成功后的回调函数
+     * @param value {function} 回调函数
+     * @returns {TemplateLoader}
+     */
+    successCall(value) {
+        this._successCall = value;
+        return this;
+    }
+
+}
+
+/**
+ * 通知样式
+ * @type {{info: {backgroundColor: string, borderColor: string, icon: string}, error: {backgroundColor: string, borderColor: string, icon: string}, success: {backgroundColor: string, borderColor: string, icon: string}, warning: {backgroundColor: string, borderColor: string, icon: string}}}
+ */
+const NoticeTypeStyles = {
+    info: {
+        backgroundColor: "#e3f2fd", // 更浅的蓝色背景
+        borderColor: "#90caf9",     // 更鲜明的边框色
+        icon: "ℹ️"
+    },
+    error: {
+        backgroundColor: "#f8d7da",
+        borderColor: "#f5c6cb",
+        icon: "❌"
+    },
+    success: {
+        backgroundColor: "#d4edda",
+        borderColor: "#c3e6cb",
+        icon: "✅"
+    },
+    warning: {
+        backgroundColor: "#fff3cd",
+        borderColor: "#ffeaa7",
+        icon: "⚠️"
+    }
+};
 
 /**
  * 提示框
@@ -33,9 +188,9 @@ class Notice {
 
     /**
      * 添加提示
-     * @param message 提示内容
-     * @param {NoticeTypeStyles} typeStyle info | error | success | warning
-     * @param removeTime 移除时间
+     * @param message {string} 提示内容
+     * @param typeStyle {NoticeTypeStyles} info | error | success | warning
+     * @param removeTime {number} 移除时间
      * @returns {Notice}
      */
     append(message, typeStyle, removeTime) {
@@ -219,35 +374,17 @@ class Alert {
         return this;
     }
 
+    /**
+     * 取消回调
+     * @param value {function} 回调
+     * @returns {Alert}
+     */
     cancelCall(value) {
         this._cancelCall = value;
         return this;
     }
 
 }
-
-const NoticeTypeStyles = {
-    info: {
-        backgroundColor: "#e3f2fd", // 更浅的蓝色背景
-        borderColor: "#90caf9",     // 更鲜明的边框色
-        icon: "ℹ️"
-    },
-    error: {
-        backgroundColor: "#f8d7da",
-        borderColor: "#f5c6cb",
-        icon: "❌"
-    },
-    success: {
-        backgroundColor: "#d4edda",
-        borderColor: "#c3e6cb",
-        icon: "✅"
-    },
-    warning: {
-        backgroundColor: "#fff3cd",
-        borderColor: "#ffeaa7",
-        icon: "⚠️"
-    }
-};
 
 const wxd = {
     alertNumber: 0,
@@ -261,7 +398,12 @@ const wxd = {
         return this._noticeInstance;
     },
 
-    newAlert: function () {
+    get newAlert() {
         return new Alert();
-    }
+    },
+
+    get loader() {
+        return new TemplateLoader();
+    },
+
 }
