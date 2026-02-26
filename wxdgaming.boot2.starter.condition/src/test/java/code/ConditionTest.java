@@ -1,5 +1,6 @@
 package code;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,10 +23,13 @@ public class ConditionTest {
     @Autowired
     ConditionService conditionService;
 
+    @BeforeEach
+    public void before() {
+        provider.postInitEvent();
+    }
 
     @Test
     public void t1() {
-        provider.postInitEvent();
         SelfBean jsonObject = new SelfBean();
         TestBean value = new TestBean();
         value.setLevel(2);

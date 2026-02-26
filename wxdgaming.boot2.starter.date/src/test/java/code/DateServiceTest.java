@@ -1,16 +1,13 @@
-package run;
+package code;
 
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Triple;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
 import wxdgaming.boot2.core.ApplicationContextProvider;
-import wxdgaming.boot2.core.event.InitEvent;
-import wxdgaming.boot2.core.timer.MyClock;
 import wxdgaming.boot2.starter.date.DateExpression;
-import wxdgaming.boot2.starter.date.DateScan;
 import wxdgaming.boot2.starter.date.DateService;
 
 /**
@@ -18,7 +15,8 @@ import wxdgaming.boot2.starter.date.DateService;
  * @version 2026-02-11 19:51
  **/
 @Slf4j
-@SpringBootTest(classes = {DateScan.class})
+@SpringBootTest(classes = {DateServiceTest.class})
+@ComponentScan(basePackages = {"code", "wxdgaming"})
 public class DateServiceTest {
 
     @Autowired
@@ -26,9 +24,9 @@ public class DateServiceTest {
     @Autowired
     protected ApplicationContextProvider applicationContextProvider;
 
-    @PostConstruct
-    public void init() {
-        dateService.___initHold(new InitEvent(applicationContextProvider));
+    @BeforeEach
+    public void before() {
+        applicationContextProvider.postInitEvent();
     }
 
     @Test

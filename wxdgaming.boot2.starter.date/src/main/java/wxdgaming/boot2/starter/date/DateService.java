@@ -1,9 +1,12 @@
 package wxdgaming.boot2.starter.date;
 
 import com.alibaba.fastjson2.JSONObject;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.HoldApplicationContext;
+import wxdgaming.boot2.core.event.InitEvent;
 
 import java.util.Map;
 
@@ -13,6 +16,7 @@ import java.util.Map;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2026-02-11 19:12
  **/
+@Getter
 @Slf4j
 @Service
 public class DateService extends HoldApplicationContext {
@@ -23,11 +27,9 @@ public class DateService extends HoldApplicationContext {
 
     }
 
-    public Map<String, AbstractDateConvert> getConvertMap() {
-        if (convertMap == null) {
-            convertMap = getApplicationContextProvider().toMap(AbstractDateConvert.class, i -> i.type().toUpperCase(), v -> v);
-        }
-        return convertMap;
+    @EventListener
+    public void init(InitEvent event) {
+        convertMap = getApplicationContextProvider().toMap(AbstractDateConvert.class, i -> i.type().toUpperCase(), v -> v);
     }
 
     /**
