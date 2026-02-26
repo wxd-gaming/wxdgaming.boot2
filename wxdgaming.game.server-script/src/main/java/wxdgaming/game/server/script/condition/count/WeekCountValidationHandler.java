@@ -1,6 +1,8 @@
-package wxdgaming.game.server.script.validation.impl.count;
+package wxdgaming.game.server.script.condition.count;
 
 import org.springframework.stereotype.Component;
+import wxdgaming.boot2.starter.condition.Condition;
+import wxdgaming.game.server.bean.condition.ServerConditionDTO;
 import wxdgaming.game.server.bean.count.CountValidationType;
 
 /**
@@ -16,7 +18,7 @@ public class WeekCountValidationHandler extends AbstractCountValidationHandler {
         return CountValidationType.WeekCount;
     }
 
-    @Override public String tips() {
+    @Override public String tips(ServerConditionDTO self, Condition condition) {
         return "每周次数已达上限";
     }
 }

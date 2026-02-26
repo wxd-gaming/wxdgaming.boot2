@@ -7,15 +7,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.starter.condition.Condition;
+import wxdgaming.boot2.starter.condition.ConditionService;
 import wxdgaming.boot2.starter.net.httpclient5.HttpRequestPost;
 import wxdgaming.boot2.starter.net.httpclient5.HttpResponse;
-import wxdgaming.boot2.starter.validation.Validation;
 import wxdgaming.game.authority.SignUtil;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 import wxdgaming.game.login.bean.UseGiftCodeDTO;
 import wxdgaming.game.message.giftcode.ResUseGiftCode;
 import wxdgaming.game.server.GameServerProperties;
 import wxdgaming.game.server.bean.GameCfgFunction;
+import wxdgaming.game.server.bean.condition.ServerConditionDTO;
 import wxdgaming.game.server.bean.count.CountData;
 import wxdgaming.game.server.bean.count.CountMap;
 import wxdgaming.game.server.bean.count.CountValidationType;
@@ -29,7 +31,6 @@ import wxdgaming.game.server.module.data.DataCenterService;
 import wxdgaming.game.server.module.inner.ConnectLoginService;
 import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.tips.TipsService;
-import wxdgaming.game.server.script.validation.ValidationService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -51,19 +52,19 @@ public class GiftCodeService implements InitPrint {
     final TipsService tipsService;
     final BagService bagService;
     final ConnectLoginService connectLoginService;
-    final ValidationService validationService;
+    final ConditionService conditionService;
 
     public GiftCodeService(ConnectLoginProperties connectLoginProperties, GameServerProperties gameServerProperties,
                            DataCenterService dataCenterService,
                            TipsService tipsService, BagService bagService,
-                           ConnectLoginService connectLoginService, ValidationService validationService) {
+                           ConnectLoginService connectLoginService, ConditionService conditionService) {
         this.dataCenterService = dataCenterService;
         this.tipsService = tipsService;
         this.bagService = bagService;
         this.connectLoginProperties = connectLoginProperties;
         this.gameServerProperties = gameServerProperties;
         this.connectLoginService = connectLoginService;
-        this.validationService = validationService;
+        this.conditionService = conditionService;
     }
 
     public void use(Player player, String giftCode) {
@@ -97,14 +98,17 @@ public class GiftCodeService implements InitPrint {
         HashMap<Integer, CountMap> useGiftCodeCountMap = player.getUseGiftCodeCountMap();
         CountMap countMap = useGiftCodeCountMap.computeIfAbsent(cid, k -> new CountMap());
 
+
         String validateConfig = runResult.getString("validate");
         if (StringUtils.isNotBlank(validateConfig)) {
             /*配置检查，每天使用次数，每周使用次数，每月使用次数*/
-            List<Validation> apply = CountValidationType.Parse.apply(validateConfig);
-            boolean validate = validationService.validateAll(countMap, apply, (handler, validation) -> {
-                String tips = handler.tips();
-                tipsService.tips(player, tips);
-                log.info("条件验证不通过：{}, 使用礼包码：{} {} -> {}", player, giftCode, validation, countMap);
+            List<Condition> conditions = conditionService.parse(validateConfig);
+            ServerConditionDTO serverConditionDTO = new ServerConditionDTO();
+            serverConditionDTO.setPlayer(player);
+            serverConditionDTO.setCountMap(countMap);
+            boolean validate = conditionService.testAll(serverConditionDTO, conditions, (msg) -> {
+                tipsService.tips(player, msg);
+                log.info("条件验证不通过：{}, 使用礼包码：{} {} -> {}", player, giftCode, msg, countMap);
             });
             if (!validate) {
                 return;

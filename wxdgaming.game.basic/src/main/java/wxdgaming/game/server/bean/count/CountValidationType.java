@@ -3,13 +3,8 @@ package wxdgaming.game.server.bean.count;
 import lombok.Getter;
 import wxdgaming.boot2.core.collection.MapOf;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.boot2.starter.validation.IValidationType;
-import wxdgaming.boot2.starter.validation.Validation;
-import wxdgaming.boot2.starter.validation.ValidationEquals;
 
-import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -19,7 +14,7 @@ import java.util.function.Predicate;
  * @version 2025-09-11 11:19
  **/
 @Getter
-public enum CountValidationType implements IValidationType {
+public enum CountValidationType {
     DayCount(4, "每天计数", MyClock::isSameDay),
     WeekCount(5, "每周计数", MyClock::isSameWeek),
     MonthCount(6, "每月计数", MyClock::isSameMonth),
@@ -27,29 +22,6 @@ public enum CountValidationType implements IValidationType {
     /** 永久 */
     ForeverCount(8, "永久计数", l -> true),
     ;
-
-    /** DayCount|lt|1 */
-    public static final Function<String, List<Validation>> Parse = (string) -> {
-        String[] split = string.split(";");
-        List<Validation> list = new java.util.ArrayList<>();
-        for (String s : split) {
-            String[] vs = s.split("[|]");
-            Validation validation = new Validation(CountValidationType.valueOf(vs[0]), ValidationEquals.valueOf(vs[1]), Long.parseLong(vs[2]));
-            list.add(validation);
-        }
-        return list;
-    };
-
-    public static final Function<String, List<Validation>> Parse2 = (string) -> {
-        String[] split = string.split(";");
-        List<Validation> list = new java.util.ArrayList<>();
-        for (String s : split) {
-            String[] vs = s.split("[|]");
-            Validation validation = new Validation(CountValidationType.valueOf(vs[0]), ValidationEquals.of2OrException(vs[1]), Long.parseLong(vs[2]));
-            list.add(validation);
-        }
-        return list;
-    };
 
     private static final Map<Integer, CountValidationType> static_map = MapOf.ofMap(CountValidationType::getCode, CountValidationType.values());
 

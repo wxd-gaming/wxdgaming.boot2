@@ -1,4 +1,4 @@
-package wxdgaming.game.server.script.validation.impl.count;
+package wxdgaming.game.server.script.condition.count;
 
 import org.springframework.stereotype.Component;
 import wxdgaming.game.server.bean.count.CountValidationType;

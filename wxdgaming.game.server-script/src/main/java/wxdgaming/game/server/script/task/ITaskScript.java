@@ -6,12 +6,14 @@ import org.springframework.context.event.EventListener;
 import wxdgaming.boot2.core.HoldApplicationContext;
 import wxdgaming.boot2.core.collection.ListOf;
 import wxdgaming.boot2.core.lang.condition.Condition;
+import wxdgaming.boot2.starter.condition.ConditionService;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
 import wxdgaming.game.cfg.QTaskTable;
 import wxdgaming.game.cfg.bean.QTask;
 import wxdgaming.game.common.slog.SlogService;
 import wxdgaming.game.message.task.*;
 import wxdgaming.game.server.bean.GameCfgFunction;
+import wxdgaming.game.server.bean.condition.ServerConditionDTO;
 import wxdgaming.game.server.bean.goods.BagChangeDTO4ItemCfg;
 import wxdgaming.game.server.bean.goods.ItemCfg;
 import wxdgaming.game.server.bean.reason.ReasonConst;
@@ -24,7 +26,6 @@ import wxdgaming.game.server.script.bag.BagService;
 import wxdgaming.game.server.script.task.slog.AcceptTaskSlog;
 import wxdgaming.game.server.script.task.slog.SubmitTaskSlog;
 import wxdgaming.game.server.script.tips.TipsService;
-import wxdgaming.game.server.script.validation.ValidationService;
 
 import java.util.Collection;
 import java.util.List;
@@ -44,7 +45,7 @@ public abstract class ITaskScript extends HoldApplicationContext {
     @Autowired protected TaskService taskService;
     @Autowired protected TipsService tipsService;
     @Autowired protected SlogService slogService;
-    @Autowired protected ValidationService validationService;
+    @Autowired protected ConditionService conditionService;
 
     public abstract TaskType type();
 
@@ -109,8 +110,10 @@ public abstract class ITaskScript extends HoldApplicationContext {
             tipsService.tips(player, "任务不存在");
             return;
         }
-
-        if (!validationService.validateAll(player, qTask.getValidation(), true)) {
+        ServerConditionDTO serverConditionDTO = new ServerConditionDTO();
+        serverConditionDTO.setPlayer(player);
+        List<wxdgaming.boot2.starter.condition.Condition> conditionList = conditionService.parse(qTask.getValidation().getValue());
+        if (!conditionService.testAll(serverConditionDTO, conditionList, (msg) -> {})) {
             return;
         }
 

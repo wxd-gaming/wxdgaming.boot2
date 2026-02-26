@@ -14,18 +14,18 @@ import wxdgaming.boot2.starter.condition.Condition;
  * @version 2026-02-26 16:31
  **/
 @Component
-public class LevelConditionProcessor extends AbstractConditionProcessor {
+public class LevelConditionProcessor extends AbstractConditionProcessor<SelfBean> {
 
     @Override public String conditionKey() {
         return "level";
     }
 
-    @Override public String tips(JSONObject params, Condition condition) {
+    @Override public String tips(SelfBean params, Condition condition) {
         return "当前等级 %s级 不足 %s级".formatted(selfValue(params, condition), condition.targetValue());
     }
 
-    @Override public long selfValue(JSONObject params, Condition condition) {
-        TestBean player = ((SelfBean) params).getPlayer();
+    @Override public long selfValue(SelfBean params, Condition condition) {
+        TestBean player = params.getPlayer();
         return player.getLevel();
     }
 

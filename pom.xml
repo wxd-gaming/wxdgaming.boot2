@@ -75,7 +75,6 @@
         <module>wxdgaming.boot2.starter.net.server</module>
         <module>wxdgaming.boot2.starter.scheduled</module>
         <module>wxdgaming.boot2.starter.tailf</module>
-        <module>wxdgaming.boot2.starter.validation</module>
         <module>wxdgaming.game.authority</module>
         <module>wxdgaming.game.basic</module>
         <module>wxdgaming.game.center</module>

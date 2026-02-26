@@ -11,6 +11,8 @@ import wxdgaming.boot2.core.executor.HeartDriveHandler;
 import wxdgaming.boot2.core.format.TableFormatter;
 import wxdgaming.boot2.core.function.FunctionUtil;
 import wxdgaming.boot2.core.timer.MyClock;
+import wxdgaming.boot2.starter.condition.Condition;
+import wxdgaming.boot2.starter.condition.ConditionService;
 import wxdgaming.boot2.starter.date.DateExpression;
 import wxdgaming.boot2.starter.date.DateService;
 import wxdgaming.boot2.starter.excel.store.DataRepository;
@@ -21,7 +23,6 @@ import wxdgaming.game.server.bean.activity.ActivityData;
 import wxdgaming.game.server.bean.global.GlobalDataConst;
 import wxdgaming.game.server.bean.global.impl.ServerActivityData;
 import wxdgaming.game.server.module.system.GameService;
-import wxdgaming.game.server.script.validation.ValidationService;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,16 +40,16 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
     final GameService gameService;
     final GlobalDataService globalDataService;
     final DataRepository dataRepository;
-    final ValidationService validationService;
+    final ConditionService conditionService;
     final DateService dateService;
     Map<Integer, AbstractActivityHandler> activityHandlerMap;
     Map<HeartConst, List<ActivityData>> heartHandlerMap = Map.of();
 
-    public ActivityService(GameService gameService, GlobalDataService globalDataService, DataRepository dataRepository, ValidationService validationService, DateService dateService) {
+    public ActivityService(GameService gameService, GlobalDataService globalDataService, DataRepository dataRepository, ConditionService conditionService, DateService dateService) {
         this.gameService = gameService;
         this.globalDataService = globalDataService;
         this.dataRepository = dataRepository;
-        this.validationService = validationService;
+        this.conditionService = conditionService;
         this.dateService = dateService;
     }
 
@@ -148,7 +149,8 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
                     continue;
                 }
                 if (expression.valid()) {
-                    if (validationService.validateAll(null, qActivity.getValidation(), false)) {
+                    List<Condition> conditions = conditionService.parse(qActivity.getValidation().getValue());
+                    if (conditionService.testAll(null, conditions, (msg) -> {})) {
                         if (selfActivityData == null) {
                             selfActivityData = abstractActivityHandler.newData();
                         }

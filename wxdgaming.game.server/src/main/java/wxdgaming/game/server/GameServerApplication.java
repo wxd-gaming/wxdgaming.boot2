@@ -13,12 +13,12 @@ import wxdgaming.boot2.core.SpringUtil;
 import wxdgaming.boot2.core.loader.ClassDirLoader;
 import wxdgaming.boot2.core.loader.JavaCoderCompile;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlScan;
+import wxdgaming.boot2.starter.condition.ConditionService;
 import wxdgaming.boot2.starter.date.DateScan;
 import wxdgaming.boot2.starter.excel.DataExcelScan;
 import wxdgaming.boot2.starter.groovy.GroovyScan;
 import wxdgaming.boot2.starter.net.SocketScan;
 import wxdgaming.boot2.starter.scheduled.ScheduledScan;
-import wxdgaming.boot2.starter.validation.ValidationScan;
 import wxdgaming.boot2.util.ChildApplicationContextProvider;
 import wxdgaming.game.common.bean.login.ConnectLoginProperties;
 import wxdgaming.game.common.global.GlobalDataService;
@@ -40,7 +40,7 @@ import java.io.File;
         LogBusService.class,
         SlogService.class,
         GlobalDataService.class,
-        ValidationScan.class,
+        ConditionService.class,
         ConnectLoginProperties.class,
         GameServerApplication.class
 })
