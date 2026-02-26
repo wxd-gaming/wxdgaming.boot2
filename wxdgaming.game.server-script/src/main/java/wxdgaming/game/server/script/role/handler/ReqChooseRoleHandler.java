@@ -121,7 +121,7 @@ public class ReqChooseRoleHandler extends HoldApplicationContext {
         });
     }
 
-    public void playerHeartMinuteEvent(EventConst.MapNpcHeartMinuteEvent event) {
+    public void playerHeartMinuteEvent(EventConst.PlayerHeartMinuteEvent event) {
         reportPlayer2Login((Player) event.mapNpc(), event.minute());
     }
 

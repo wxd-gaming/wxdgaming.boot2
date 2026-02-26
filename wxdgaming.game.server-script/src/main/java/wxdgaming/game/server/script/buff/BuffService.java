@@ -58,7 +58,7 @@ public class BuffService extends HoldApplicationContext {
     }
 
     @EventListener
-    public void onHeartMinuteBuffActionTest(EventConst.MapNpcHeartMinuteEvent event) {
+    public void onHeartMinuteBuffActionTest(EventConst.PlayerHeartMinuteEvent event) {
 
         MapNpc mapNpc = event.mapNpc();
 

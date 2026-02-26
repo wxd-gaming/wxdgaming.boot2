@@ -32,7 +32,7 @@ public class RechargeService extends HoldApplicationContext {
     }
 
     @EventListener
-    public void onHeartMinute(EventConst.MapNpcHeartMinuteEvent event) {
+    public void onHeartMinute(EventConst.PlayerHeartMinuteEvent event) {
         MapNpc mapNpc = event.mapNpc();
         Player player = (Player) mapNpc;
         log.info("开始执行充值服务");

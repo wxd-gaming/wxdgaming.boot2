@@ -136,7 +136,7 @@ public class PlayerDriveService extends HoldApplicationContext {
     }
 
     @EventListener
-    public void playerHeartMinuteEvent(EventConst.MapNpcHeartMinuteEvent event) {
+    public void playerHeartMinuteEvent(EventConst.PlayerHeartMinuteEvent event) {
         if (event.mapNpc() instanceof Player player) {
             updateRoleInfoSlog(player);
         }
@@ -184,25 +184,25 @@ public class PlayerDriveService extends HoldApplicationContext {
 
         @Override public void heartMinute(int minute) {
             for (Player player : playerMap.values()) {
-                applicationContextProvider.postEventIgnoreException(new EventConst.MapNpcHeartMinuteEvent(player, minute));
+                applicationContextProvider.postEventIgnoreException(new EventConst.PlayerHeartMinuteEvent(player, minute));
             }
         }
 
         @Override public void heartHour(int hour) {
             for (Player player : playerMap.values()) {
-                applicationContextProvider.postEventIgnoreException(new EventConst.MapNpcHeartHourEvent(player, hour));
+                applicationContextProvider.postEventIgnoreException(new EventConst.PlayerHeartHourEvent(player, hour));
             }
         }
 
         @Override public void heartDayEnd(int dayOfYear) {
             for (Player player : playerMap.values()) {
-                applicationContextProvider.postEventIgnoreException(new EventConst.MapNpcHeartDayEvent(player, dayOfYear));
+                applicationContextProvider.postEventIgnoreException(new EventConst.PlayerHeartDayEvent(player, dayOfYear));
             }
         }
 
         @Override public void heartWeek(long weekFirstDayStartTime) {
             for (Player player : playerMap.values()) {
-                applicationContextProvider.postEventIgnoreException(new EventConst.MapNpcHeartWeekEvent(player, weekFirstDayStartTime));
+                applicationContextProvider.postEventIgnoreException(new EventConst.PlayerHeartWeekEvent(player, weekFirstDayStartTime));
             }
         }
     }

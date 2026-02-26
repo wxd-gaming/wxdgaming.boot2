@@ -50,15 +50,15 @@ public interface EventConst {
 
     public record PlayerHeartSecondEvent(Player mapNpc, int second) implements MapNpcEvent {}
 
-    public record MapNpcHeartMinuteEvent(MapNpc mapNpc, int minute) implements MapNpcEvent {}
+    public record PlayerHeartMinuteEvent(Player mapNpc, int minute) implements MapNpcEvent {}
 
-    public record MapNpcHeartHourEvent(MapNpc mapNpc, int hour) implements MapNpcEvent {}
+    public record PlayerHeartHourEvent(Player mapNpc, int hour) implements MapNpcEvent {}
 
     /** 跨天 */
-    public record MapNpcHeartDayEvent(MapNpc mapNpc, int dayOfYear) implements MapNpcEvent {}
+    public record PlayerHeartDayEvent(Player mapNpc, int dayOfYear) implements MapNpcEvent {}
 
     /** 跨周 */
-    public record MapNpcHeartWeekEvent(MapNpc mapNpc, long weekFirstDayStartTime) implements MapNpcEvent {}
+    public record PlayerHeartWeekEvent(Player mapNpc, long weekFirstDayStartTime) implements MapNpcEvent {}
 
     public record MapNpcAttributeCalculatorEvent(
             MapNpc mapNpc,

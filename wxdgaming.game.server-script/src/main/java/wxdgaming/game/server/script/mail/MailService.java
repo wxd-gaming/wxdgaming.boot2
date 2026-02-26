@@ -85,7 +85,7 @@ public class MailService extends HoldApplicationContext {
     }
 
     @EventListener
-    public void playerHeartMinute(EventConst.MapNpcHeartMinuteEvent event) {
+    public void playerHeartMinute(EventConst.PlayerHeartMinuteEvent event) {
         if (!event.isPlayer()) return;
         Player player = event.player();
         MailPack mailPack = player.getMailPack();
