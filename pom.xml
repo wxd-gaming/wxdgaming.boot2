@@ -65,6 +65,7 @@
         <module>wxdgaming.boot2.starter.batis.sql</module>
         <module>wxdgaming.boot2.starter.batis.sql.mysql</module>
         <module>wxdgaming.boot2.starter.batis.sql.pgsql</module>
+        <module>wxdgaming.boot2.starter.condition</module>
         <module>wxdgaming.boot2.starter.date</module>
         <module>wxdgaming.boot2.starter.excel</module>
         <module>wxdgaming.boot2.starter.groovy</module>
