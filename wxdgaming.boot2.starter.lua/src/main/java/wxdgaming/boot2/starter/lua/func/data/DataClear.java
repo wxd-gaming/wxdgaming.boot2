@@ -1,9 +1,9 @@
 package wxdgaming.boot2.starter.lua.func.data;
 
 import lombok.extern.slf4j.Slf4j;
-import party.iroiro.luajava.Lua;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.lua.LuaInvokeJavaFunction;
-import wxdgaming.boot2.starter.lua.bean.LuaData;
+import wxdgaming.boot2.starter.lua.LuaToJavaDTO;
 
 /**
  * 数据
@@ -12,16 +12,16 @@ import wxdgaming.boot2.starter.lua.bean.LuaData;
  * @version 2025-06-10 13:22
  **/
 @Slf4j
+@Component
 public class DataClear extends LuaInvokeJavaFunction {
 
     @Override public String cmd() {
         return "dataClear";
     }
 
-    @Override protected Object doAction(Lua L, Object[] args) {
-        LuaData luaData = (LuaData) args[0];
-        String row = args[1].toString();
-        luaData.getData().remove(row);
+    @Override public Object doAction(LuaToJavaDTO luaToJavaDTO) {
+        String row = luaToJavaDTO.getString(0);
+        luaToJavaDTO.luaData().getData().remove(row);
         return null;
     }
 

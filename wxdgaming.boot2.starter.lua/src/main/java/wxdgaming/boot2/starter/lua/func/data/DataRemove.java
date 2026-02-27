@@ -1,9 +1,9 @@
 package wxdgaming.boot2.starter.lua.func.data;
 
 import lombok.extern.slf4j.Slf4j;
-import party.iroiro.luajava.Lua;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.lua.LuaInvokeJavaFunction;
-import wxdgaming.boot2.starter.lua.bean.LuaData;
+import wxdgaming.boot2.starter.lua.LuaToJavaDTO;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,22 +14,21 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 2025-06-10 13:22
  **/
 @Slf4j
+@Component
 public class DataRemove extends LuaInvokeJavaFunction {
 
     @Override public String cmd() {
         return "dataRemove";
     }
 
-    @Override protected Object doAction(Lua L, Object[] args) {
-
-        LuaData luaData = (LuaData) args[0];
-        String row = args[1].toString();
-        ConcurrentHashMap<String, Object> stringObjectConcurrentHashMap = luaData.getData().get(row);
+    @Override public Object doAction(LuaToJavaDTO luaToJavaDTO) {
+        String row = luaToJavaDTO.getString(0);
+        ConcurrentHashMap<String, Object> stringObjectConcurrentHashMap = luaToJavaDTO.luaData().getData().get(row);
         if (stringObjectConcurrentHashMap != null) {
-            String cell = args[2].toString();
+            String cell = luaToJavaDTO.getString(1);
             stringObjectConcurrentHashMap.remove(cell);
             if (stringObjectConcurrentHashMap.isEmpty()) {
-                luaData.getData().remove(row);
+                luaToJavaDTO.luaData().getData().remove(row);
             }
         }
         return null;

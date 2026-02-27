@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import party.iroiro.luajava.Lua;
 import wxdgaming.boot2.core.HoldApplicationContext;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
@@ -28,8 +29,8 @@ public class LuaService extends HoldApplicationContext {
     }
 
     public void init(String paths, Supplier<Lua> luaFactory) {
-
-        LuaRuntime _luaRuntime = new LuaRuntime("root", paths, luaFactory);
+        Map<String, LuaInvokeJavaFunction> functionMap = getApplicationContextProvider().toMap(LuaInvokeJavaFunction.class, i -> i.cmd());
+        LuaRuntime _luaRuntime = new LuaRuntime("root", paths, luaFactory, functionMap);
         LuaRuntime old = luaRuntime.get();
         luaRuntime.set(_luaRuntime);
 

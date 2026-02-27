@@ -1,10 +1,14 @@
 package wxdgaming.boot2.starter.lua;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import party.iroiro.luajava.JFunction;
 import party.iroiro.luajava.Lua;
 import party.iroiro.luajava.value.LuaValue;
+import wxdgaming.boot2.starter.lua.bean.LuaData;
+
+import java.util.List;
 
 /**
  * JFun
@@ -26,7 +30,17 @@ public abstract class LuaInvokeJavaFunction implements JFunction {
                 _args[_args.length - i - 1] = javaObject;
             }
             L.setTop(oldTop);
-            Object results = doAction(L, _args);
+            JSONArray jsonArray = new JSONArray(_args);
+            LuaData luaData = null;
+            if (!jsonArray.isEmpty()) {
+                Object o = jsonArray.getFirst();
+                if (o instanceof LuaData) {
+                    luaData = (LuaData) o;
+                    jsonArray.removeFirst();
+                }
+            }
+            LuaToJavaDTO luaToJavaDTO = new LuaToJavaDTO(L, luaData, jsonArray);
+            Object results = doAction(luaToJavaDTO);
             if (results != null) {
                 LuaUtils.push(L, results);
             }
@@ -43,6 +57,6 @@ public abstract class LuaInvokeJavaFunction implements JFunction {
 
     public abstract String cmd();
 
-    protected abstract Object doAction(Lua L, Object[] args);
+    public abstract Object doAction(LuaToJavaDTO luaToJavaDTO);
 
 }

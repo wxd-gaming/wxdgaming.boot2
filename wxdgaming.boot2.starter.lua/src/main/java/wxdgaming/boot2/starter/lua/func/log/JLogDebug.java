@@ -1,10 +1,10 @@
 package wxdgaming.boot2.starter.lua.func.log;
 
 import lombok.extern.slf4j.Slf4j;
-import party.iroiro.luajava.Lua;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.lua.LuaInvokeJavaFunction;
+import wxdgaming.boot2.starter.lua.LuaToJavaDTO;
 
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 /**
@@ -14,15 +14,16 @@ import java.util.stream.Collectors;
  * @version 2024-12-26 16:00
  **/
 @Slf4j
+@Component
 public class JLogDebug extends LuaInvokeJavaFunction {
 
     @Override public String cmd() {
         return "ldebug";
     }
 
-    @Override public Object doAction(Lua L, Object[] args) {
+    @Override public Object doAction(LuaToJavaDTO luaToJavaDTO) {
         if (log.isDebugEnabled())
-            log.debug("{}", Arrays.stream(args).map(String::valueOf).collect(Collectors.joining(" ")));
+            log.debug("{}", luaToJavaDTO.args().stream().map(String::valueOf).collect(Collectors.joining(" ")));
         return null;
     }
 

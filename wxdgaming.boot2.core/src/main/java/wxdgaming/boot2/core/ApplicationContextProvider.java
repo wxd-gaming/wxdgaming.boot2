@@ -186,7 +186,7 @@ public abstract class ApplicationContextProvider implements InitPrint, Applicati
             V value = convertValue.apply(bean);
             V oldPut = tmp.put(key, value);
             AssertUtil.isTrue(oldPut == null, "重复类型：" + key);
-            log.debug("register {}: {}", key, value);
+            log.trace("register {}: {}", key, value);
         }
         return Collections.unmodifiableMap(tmp);
     }

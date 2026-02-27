@@ -1,10 +1,10 @@
 package wxdgaming.boot2.starter.lua.func.log;
 
 import lombok.extern.slf4j.Slf4j;
-import party.iroiro.luajava.Lua;
+import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.lua.LuaInvokeJavaFunction;
+import wxdgaming.boot2.starter.lua.LuaToJavaDTO;
 
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 /**
@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
  * @version 2024-12-26 16:00
  **/
 @Slf4j
+@Component
 public class JLogInfo extends LuaInvokeJavaFunction {
 
 
@@ -21,8 +22,8 @@ public class JLogInfo extends LuaInvokeJavaFunction {
         return "linfo";
     }
 
-    @Override public Object doAction(Lua L, Object[] args) {
-        log.info("{}", Arrays.stream(args).map(String::valueOf).collect(Collectors.joining(" ")));
+    @Override public Object doAction(LuaToJavaDTO luaToJavaDTO) {
+        log.info("{}", luaToJavaDTO.args().stream().map(String::valueOf).collect(Collectors.joining(" ")));
         return null;
     }
 

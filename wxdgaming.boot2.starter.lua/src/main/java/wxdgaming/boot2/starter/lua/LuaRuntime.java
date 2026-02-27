@@ -3,9 +3,9 @@ package wxdgaming.boot2.starter.lua;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import party.iroiro.luajava.Lua;
-import wxdgaming.boot2.core.reflect.ReflectProvider;
 
 import java.io.Closeable;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
@@ -22,42 +22,26 @@ public class LuaRuntime implements Closeable {
 
     final String name;
     final Supplier<Lua> luaFactory;
+    private final Map<String, LuaInvokeJavaFunction> functionMap;
     final LuaFileRequire luaFileRequire;
 
-    final ConcurrentHashMap<String, Object> globals = new ConcurrentHashMap<>();
     volatile ConcurrentHashMap<Thread, LuacContext> contexts = new ConcurrentHashMap<>();
 
-    public LuaRuntime(String name, String dir, Supplier<Lua> luaFactory) {
+    public LuaRuntime(String name, String dir, Supplier<Lua> luaFactory, Map<String, LuaInvokeJavaFunction> functionMap) {
         this.name = name;
         this.luaFactory = luaFactory;
+        this.functionMap = functionMap;
         LuaFileCache luaFileCache = new LuaFileCache(dir);
         luaFileRequire = new LuaFileRequire(luaFileCache);
         log.info("luaPath:{}", luaFileRequire.getLuaPath());
-
-        // 初始化扫描器（指定扫描包和扫描类型）
-        ReflectProvider reflectProvider = ReflectProvider
-                .Builder
-                .of(Thread.currentThread().getContextClassLoader(), LuaInvokeJavaFunction.class.getPackageName())
-                .setFilter(LuaInvokeJavaFunction.class::isAssignableFrom)
-                .build();
-        reflectProvider.classWithSuper(LuaInvokeJavaFunction.class).forEach(aClass -> {
-            try {
-                LuaInvokeJavaFunction luaInvokeJavaFunction = aClass.getDeclaredConstructor().newInstance();
-                Object put = globals.put(luaInvokeJavaFunction.cmd(), luaInvokeJavaFunction);
-                if (put != null) {
-                    log.error("重复注册 {}", luaInvokeJavaFunction.cmd());
-                }
-            } catch (Exception e) {
-                log.error("初始化失败", e);
-            }
-        });
     }
 
     public LuacContext context() {
         LuacContext luaContext = contexts.get(Thread.currentThread());
         if (luaContext == null || luaContext.isClosed()) {
-            luaContext = new LuacContext(this, luaFactory);
+            luaContext = new LuacContext(this, luaFactory, functionMap);
             contexts.put(Thread.currentThread(), luaContext);
+            log.info("thread: {} new lua context:{}", Thread.currentThread(), luaContext.hashCode());
         }
         return luaContext;
     }

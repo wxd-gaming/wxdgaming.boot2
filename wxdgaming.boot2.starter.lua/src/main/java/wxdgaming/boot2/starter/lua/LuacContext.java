@@ -36,7 +36,7 @@ public class LuacContext {
     HashMap<String, LuaValue> funcCache = new HashMap<>();
     HashMap<String, Boolean> checkFuncCache = new HashMap<>();
 
-    public LuacContext(LuaRuntime luacRuntime, Supplier<Lua> luaFactory) {
+    public LuacContext(LuaRuntime luacRuntime, Supplier<Lua> luaFactory, Map<String, LuaInvokeJavaFunction> functionMap) {
         L = luaFactory.get();
         this.name = luacRuntime.getName() + " - " + Thread.currentThread().getName();
         L.openLibraries();
@@ -53,8 +53,9 @@ public class LuacContext {
             L.set("paths", luaFileRequire.getLuaPath());
         }
 
-        for (Map.Entry<String, Object> entry : luacRuntime.getGlobals().entrySet()) {
+        for (Map.Entry<String, LuaInvokeJavaFunction> entry : functionMap.entrySet()) {
             L.set(entry.getKey(), entry.getValue());
+            log.trace("set function {}", entry.getKey());
         }
 
         List<String> modules = luaFileRequire.getModules();
@@ -74,33 +75,6 @@ public class LuacContext {
     }
 
     /**
-     * 通过文件字节加载
-     *
-     * @param list    需要配加载的文件列表
-     * @param fortune 加载权重，1为不重试，2为重试一次，3为重试两次，以此类推，默认为1
-     */
-    public boolean load(List<ImmutablePair<Path, byte[]>> list, int fortune) {
-        if (fortune < 1) return false;
-        List<ImmutablePair<Path, byte[]>> error = new ArrayList<>();
-        for (ImmutablePair<Path, byte[]> immutablePair : list) {
-            String string = immutablePair.getLeft().getFileName().toString();
-            try {
-                loadFile4Bytes(string, immutablePair.getRight(), fortune);
-            } catch (Exception e) {
-                if (fortune > 1) {
-                    error.add(immutablePair);
-                } else {
-                    log.error(string, e);
-                }
-            }
-        }
-        if (!error.isEmpty()) {
-            return load(error, fortune - 1);
-        }
-        return true;
-    }
-
-    /**
      * require 加载文件形式会缓存，只加载一次，dofile 调用一次加载一次，不会缓存，
      *
      * @param modules 需要加载模块
@@ -113,12 +87,11 @@ public class LuacContext {
             String luaScript = "require('" + module + "')";
             try {
                 L.run(luaScript);
-                log.debug("require load lua {}", module);
             } catch (Exception e) {
                 if (fortune > 1) {
                     error.add(module);
                 } else {
-                    throw new RuntimeException(luaScript, e);
+                    throw new RuntimeException(module + ".lua", e);
                 }
             }
         }
@@ -130,7 +103,7 @@ public class LuacContext {
     public void loadFile4Bytes(String fileName, byte[] bytes, int fortune) {
         Buffer flip = JuaAPI.allocateDirect(bytes.length).put(bytes).flip();
         L.run(flip, fileName);
-        log.debug("file byte load lua {}", fileName);
+        log.trace("file byte load lua {}", fileName);
     }
 
     public LuaValue findLuaValue(String name) {

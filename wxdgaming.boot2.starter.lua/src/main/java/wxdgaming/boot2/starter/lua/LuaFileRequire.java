@@ -2,11 +2,11 @@ package wxdgaming.boot2.starter.lua;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.io.File;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,6 +22,7 @@ import java.util.List;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2024-10-21 19:21
  **/
+@Slf4j
 @Getter
 public class LuaFileRequire {
 
@@ -62,7 +63,9 @@ public class LuaFileRequire {
                 if (!paths.contains(string)) {
                     paths.add(string);
                 }
-                tmpModules.add(fileName.replace(".lua", ""));
+                String module = fileName.replace(".lua", "");
+                tmpModules.add(module);
+                log.debug("require load lua {}", module);
             } else if (fileName.endsWith(".dll")) {
                 String string = loadPath.getParent().toFile().getCanonicalPath() + File.separator + "?.dll";
                 if (!paths.contains(string)) {

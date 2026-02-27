@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
+import wxdgaming.boot2.core.MainApplicationContextProvider;
+import wxdgaming.boot2.core.executor.AbstractExecutorService;
+import wxdgaming.boot2.core.executor.ExecutorFactory;
 import wxdgaming.boot2.starter.lua.LuaService;
 import wxdgaming.boot2.starter.lua.bean.LuaData;
 import wxdgaming.boot2.starter.lua.bean.LuaMap;
@@ -15,8 +18,6 @@ import wxdgaming.boot2.starter.lua.impl.Lua55Impl;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
@@ -25,17 +26,20 @@ import java.util.concurrent.locks.LockSupport;
 @SpringBootTest(classes = LuaService55Test.class)
 public class LuaService55Test {
 
-    static ScheduledExecutorService scheduledExecutorService;
+    static AbstractExecutorService scheduledExecutorService;
 
     static {
-        scheduledExecutorService = Executors.newScheduledThreadPool(1);
+        scheduledExecutorService = ExecutorFactory.getExecutorServiceBasic();
     }
 
     @Autowired
     LuaService luaService;
+    @Autowired
+    MainApplicationContextProvider mainApplicationContextProvider;
 
     @BeforeEach
     public void init() {
+        mainApplicationContextProvider.postInitEvent();
         luaService.init("src/test/lua", Lua55Impl::new);
     }
 
