@@ -19,8 +19,8 @@ import wxdgaming.boot2.starter.net.http.HttpHeadValueType;
 import java.nio.charset.StandardCharsets;
 
 /**
- * @author: wxd-gaming(無心道, 15388152619)
- * @version: 2023-08-25 09:50
+ * @author wxd-gaming(無心道, 15388152619)
+ * @version 2023-08-25 09:50
  **/
 @Slf4j
 @ChannelHandler.Sharable

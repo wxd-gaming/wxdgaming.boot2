@@ -17,6 +17,9 @@ B站 https://www.bilibili.com/list/316421251
 | starter.batis.sql      | 关系型数据库基础模块                       |
 | starter.batis.mysql    | mysql关系型数据库                      |
 | starter.batis.pgsql    | pgsql关系型数据库                      |
+| starter.condition      | 处理条件模块                           |
+| starter.date           | 处理时间计算的模块                        |
+| starter.excel          | excel 导出json文件，lua文件，java文件      |
 | starter.net            | 网络通信相关的基础模块                      |
 | starter.net.httpclient | 基于 apache http client 网络通信模块     |
 | starter.net.server     | 网络监听，端口同时支持 http, websocket, tcp |

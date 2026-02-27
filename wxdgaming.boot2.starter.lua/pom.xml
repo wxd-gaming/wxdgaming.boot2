@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.wxd-gaming</groupId>
+        <artifactId>wxd-gaming.boot2</artifactId>
+        <version>1.0.3</version>
+    </parent>
+
+    <name>wxd-gaming.boot2.starter.lua</name>
+    <artifactId>wxd-gaming.boot2.starter.lua</artifactId>
+    <description>wxd-gaming.boot2.starter.lua</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.wxd-gaming</groupId>
+            <artifactId>wxd-gaming.boot2.core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>party.iroiro.luajava</groupId>
+            <artifactId>luajava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>party.iroiro.luajava</groupId>
+            <artifactId>lua55</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>party.iroiro.luajava</groupId>
+            <artifactId>lua55-platform</artifactId>
+            <classifier>natives-desktop</classifier>
+        </dependency>
+    </dependencies>
+
+</project>

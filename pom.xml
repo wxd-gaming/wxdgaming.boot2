@@ -84,6 +84,7 @@
         <module>wxdgaming.game.server-script</module>
         <module>wxdgaming.logbus</module>
         <module>wxdgaming.logserver</module>
+        <module>wxdgaming.boot2.starter.lua</module>
     </modules>
 
     <properties>
@@ -97,6 +98,7 @@
         <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
         <protobuf-java.version>3.23.4</protobuf-java.version>
         <kotlin.version>2.0.0</kotlin.version>
+        <luajava-version>4.1.0</luajava-version>
     </properties>
 
 
@@ -293,6 +295,32 @@
                 <groupId>com.esotericsoftware</groupId>
                 <artifactId>kryo</artifactId>
                 <version>5.6.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>4.0.29</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-jsr223</artifactId>
+                <version>4.0.29</version>
+            </dependency>
+            <dependency>
+                <groupId>party.iroiro.luajava</groupId>
+                <artifactId>luajava</artifactId>
+                <version>${luajava-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>party.iroiro.luajava</groupId>
+                <artifactId>lua55</artifactId>
+                <version>${luajava-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>party.iroiro.luajava</groupId>
+                <artifactId>lua55-platform</artifactId>
+                <version>${luajava-version}</version>
+                <classifier>natives-desktop</classifier>
             </dependency>
         </dependencies>
     </dependencyManagement>
