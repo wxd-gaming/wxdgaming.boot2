@@ -36,7 +36,7 @@ public abstract class LuaInvokeJavaFunction implements JFunction {
             try {
                 jsonString = JSON.toJSONString(_args);
             } catch (Exception ignore) {}
-            log.error("call lua function error " + jsonString, e);
+            log.error("call lua function error {}", jsonString, e);
             throw new RuntimeException("call lua function error " + jsonString, e);
         }
     }

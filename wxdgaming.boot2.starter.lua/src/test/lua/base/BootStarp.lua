@@ -9,6 +9,36 @@ ldebug("loading Bootstrap.lua")
 
 require("LuaScan")
 
+local LOGLEVEL = {
+    DEBUG = 1,
+    INFO  = 2,
+    WARN  = 3,
+    ERROR = 4,
+}
+
+local logLevel = LOGLEVEL.DEBUG;
+
+function setLogLevel(lv)
+    logLevel = tonumber(lv)
+    gameDebug.printLine("logLevel: " .. logLevel)
+end
+
+function Bootstrap.isEnableDebug()
+    return logLevel >= LOGLEVEL.DEBUG
+end
+
+function Bootstrap.isEnableInfo()
+    return logLevel >= LOGLEVEL.INFO
+end
+
+function Bootstrap.isEnableWarn()
+    return logLevel >= LOGLEVEL.WARN
+end
+
+function Bootstrap.isEnableError()
+    return logLevel >= LOGLEVEL.ERROR
+end
+
 --- 顶级函数
 function checkHasEvent(event)
     return LuaScan.checkHasTopFunc(event)

@@ -2,7 +2,7 @@ package wxdgaming.boot2.starter.lua.func.map;
 
 import party.iroiro.luajava.Lua;
 import wxdgaming.boot2.starter.lua.LuaInvokeJavaFunction;
-import wxdgaming.boot2.starter.lua.bean.LuaMap;
+import wxdgaming.boot2.starter.lua.bean.LuaData;
 
 /**
  * 开启地图心跳
@@ -10,15 +10,15 @@ import wxdgaming.boot2.starter.lua.bean.LuaMap;
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2025-06-10 13:54
  **/
-public class OpenMapHeart extends LuaInvokeJavaFunction {
+public class CloseHeart extends LuaInvokeJavaFunction {
 
     @Override public String cmd() {
-        return "openHeart";
+        return "closeHeart";
     }
 
     @Override protected Object doAction(Lua L, Object[] args) {
-        LuaMap luaMap = (LuaMap) args[0];
-        luaMap.setOpenHeart(true);
+        LuaData luaData = (LuaData) args[0];
+        luaData.setOpenHeart(false);
         return null;
     }
 }

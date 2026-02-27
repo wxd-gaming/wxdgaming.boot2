@@ -15,8 +15,8 @@ local oneFunCache = {}
 local twoFunCache = {}
 
 --- 检查是否存在一级函数
-function LuaScan.checkHasTopFunc(event)
-    local func = this.findTopFunc(event)
+function LuaScan.checkHasTopFunc(name)
+    local func = this.findTopFunc(name)
     if func == nil then
         this.print("没有找到一级函数：", name)
         return false
@@ -25,8 +25,8 @@ function LuaScan.checkHasTopFunc(event)
 end
 
 ---  检查是否存在二级函数
-function LuaScan.checkHasTwoFunc(event)
-    local funList = this.findTwoFunc(event)
+function LuaScan.checkHasTwoFunc(name)
+    local funList = this.findTwoFunc(name)
     if funList == nil or #funList == 0 then
         this.print("没有找到二级函数：", name)
         return false
@@ -36,6 +36,7 @@ end
 
 --- 触发一级函数执行
 function LuaScan.triggerTopFunc(name, ...)
+    name = string.upper(name)
     local func = this.findTopFunc(name)
     if func == nil then
         this.print("没有找到一级函数：", name)
@@ -49,6 +50,7 @@ end
 
 --- 触发二级函数执行
 function LuaScan.triggerTwoFunc(name, ...)
+    name = string.upper(name)
     local funList = this.findTwoFunc(name)
     if funList == nil or #funList == 0 then
         this.print("没有找到二级函数：", name)
@@ -67,13 +69,14 @@ end
 --- 查找 全局table 中的指定函 二级函数，是 全局table 虚拟类 下面注册的函数
 --- @param name string 需要查找的函数名
 function this.findTwoFunc(name)
+    name = string.upper(name)
     local result = twoFunCache[name]
     if result == nil then
         result = {}
         local tables = this.GetTable()
         for fileName, fileTable in pairs(tables) do
             for methodName, v in pairs(fileTable) do
-                if type(v) == "function" and methodName == name then
+                if type(v) == "function" and string.upper(methodName) == name then
                     local infoMapping = {
                         ["fileName"]   = this.get_function_file(v),
                         ["methodName"] = fileName .. "." .. methodName,
@@ -93,10 +96,11 @@ end
 
 --- 查找一级函数 就是全局函数
 function this.findTopFunc(name)
+    name = string.upper(name)
     local result = oneFunCache[name]
     if result == nil then
         for methodName, v in pairs(_G) do
-            if type(v) == "function" and methodName == name then
+            if type(v) == "function" and string.upper(methodName) == name then
                 result = {
                     ["fileName"]   = this.get_function_file(v),
                     ["methodName"] = "_G." .. methodName,

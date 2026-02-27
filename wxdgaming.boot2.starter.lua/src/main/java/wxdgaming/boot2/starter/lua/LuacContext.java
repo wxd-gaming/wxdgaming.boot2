@@ -3,6 +3,7 @@ package wxdgaming.boot2.starter.lua;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.slf4j.event.Level;
 import party.iroiro.luajava.Consts;
 import party.iroiro.luajava.JuaAPI;
 import party.iroiro.luajava.Lua;
@@ -58,6 +59,18 @@ public class LuacContext {
 
         List<String> modules = luaFileRequire.getModules();
         requireLoad(modules, 1);
+
+        Level level;
+
+        if (log.isTraceEnabled()) level = Level.TRACE;
+        else if (log.isDebugEnabled()) level = Level.DEBUG;
+        else if (log.isInfoEnabled()) level = Level.INFO;
+        else if (log.isWarnEnabled()) level = Level.WARN;
+        else level = Level.ERROR;
+
+        int levelInt = level.toInt() / 10;
+        onEvent("setloglevel", levelInt);
+
     }
 
     /**
@@ -65,9 +78,6 @@ public class LuacContext {
      *
      * @param list    需要配加载的文件列表
      * @param fortune 加载权重，1为不重试，2为重试一次，3为重试两次，以此类推，默认为1
-     * @return
-     * @author wxd-gaming(無心道, 15388152619)
-     * @version 2024-11-07 15:24
      */
     public boolean load(List<ImmutablePair<Path, byte[]>> list, int fortune) {
         if (fortune < 1) return false;
@@ -95,8 +105,6 @@ public class LuacContext {
      *
      * @param modules 需要加载模块
      * @param fortune 加载权重，1为不重试，2为重试一次，3为重试两次，以此类推，默认为1
-     * @author wxd-gaming(無心道, 15388152619)
-     * @version 2024-11-07 15:22
      */
     void requireLoad(List<String> modules, int fortune) {
         if (fortune < 1) return;

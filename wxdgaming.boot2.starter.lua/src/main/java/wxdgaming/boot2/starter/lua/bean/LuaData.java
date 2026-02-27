@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 @Getter
 @Setter
-public class LuaData {
+public abstract class LuaData {
 
     /** true 表示开启心跳处理 */
     private boolean openHeart = false;
