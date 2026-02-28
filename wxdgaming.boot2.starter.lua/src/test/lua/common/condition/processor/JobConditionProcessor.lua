@@ -4,6 +4,8 @@
 --- DateTime: 2026/2/27 10:40
 ---
 
+require("ConditionService")
+
 local ConditionProcessor = {}
 ConditionProcessor.__index = ConditionProcessor
 

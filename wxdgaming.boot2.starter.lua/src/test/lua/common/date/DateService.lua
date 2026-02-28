@@ -7,43 +7,86 @@
 DateService = {}
 DateService.__index = DateService
 
+--- @class DateProcessor 时间转换
+--- @field convert function 时间转换函数
+--- @field convertEndTime function 结束时间转换函数
+local DateProcessor = {}
+
+--- 时间类型转换
+--- @type table<string, DateProcessor>
 local typeActionMap = {}
 
+--- @class DateExpression 时间表达式
+--- @field startTime number 开始时间
+--- @field endTime number 结束时间
+--- @field valid function true 表示当前时间匹配，false 不在时间范围内
+DateExpression = {}
+DateExpression.__index = DateExpression
+
+function DateExpression:new(startTime, endTime)
+    local o = {}
+    setmetatable(o, self)
+    self.__index = self
+    o.startTime = startTime
+    o.endTime = endTime
+    return o
+end
+
+function DateExpression:valid()
+    local nowMillis = os.time() * 1000
+    return self.startTime <= nowMillis and nowMillis <= self.endTime
+end
+
+function DateExpression:startTimeFormat()
+    return DateService.formatyyyyMMddHHmmss(self.startTime)
+end
+
+function DateExpression:endTimeFormat()
+    return DateService.formatyyyyMMddHHmmss(self.endTime)
+end
+
+function DateExpression:toString()
+    return string.format("开始时间: %s 结束时间: %s", self:startTimeFormat(), self:endTimeFormat())
+end
+
 --- 转换时间配置
+--- @param dto any 传递参数
 --- @param cfgString string 时间配置字符串
-function DateService.convertBeginAndEnd(extendParams, cfgString)
+--- @return DateExpression 时间
+function DateService.convertBeginAndEnd(dto, cfgString)
     local paramArray = string.split(cfgString, "&")
     local p1 = paramArray[1]
     local p2 = paramArray[2]
 
     local paramsStart = string.split(p1, "#")
-    local actionStart = typeActionMap[string.upper(paramsStart[1])]
-    if not actionStart then
+    --- @type DateProcessor
+    local startProcessor = typeActionMap[string.upper(paramsStart[1])]
+    if not startProcessor then
         error("类型异常: " .. paramsStart[1])
     end
-    local startTime = actionStart.convert(extendParams, paramsStart)
+    local startTime = startProcessor.convert(dto, paramsStart)
     local paramsEnd = string.split(p2, "#")
-    local actionEnd = typeActionMap[string.upper(paramsEnd[1])]
-    if not actionEnd then
+
+    --- @type DateProcessor
+    local endProcessor = typeActionMap[string.upper(paramsEnd[1])]
+    if not endProcessor then
         error("类型异常: " .. paramsEnd[1])
     end
-    local endTime = actionEnd.convertEndTime(extendParams, startTime, paramsEnd)
-    local nowMillis = os.time() * 1000
-    local match = startTime <= nowMillis and nowMillis <= endTime
-    return match, startTime, endTime
+    local endTime = endProcessor.convertEndTime(dto, startTime, paramsEnd)
+    return DateExpression:new(startTime, endTime)
 end
 
-function DateService.convertString(extendParams, cfgString)
+function DateService.convertString(dto, cfgString)
     local params = string.split(cfgString, "#")
-    return DateService.convertParams(extendParams, params)
+    return DateService.convertParams(dto, params)
 end
 
-function DateService.convertParams(extendParams, params)
-    local action = typeActionMap[string.upper(params[1])]
-    if not action then
+function DateService.convertParams(dto, params)
+    local dateProcessor = typeActionMap[string.upper(params[1])]
+    if not dateProcessor then
         error("类型异常: " .. params[1])
     end
-    return action.convert(extendParams, params)
+    return dateProcessor.convert(dto, params)
 end
 
 --- 拷贝数组
@@ -107,10 +150,13 @@ function DateService.register(type, convert, convertEndTime)
     if typeActionMap[typeUpper] then
         error("类型已存在: " .. typeUpper)
     end
-    local action = {};
-    action.convert = convert;
-    action.convertEndTime = convertEndTime;
-    typeActionMap[typeUpper] = action
+    typeActionMap[typeUpper] = setmetatable(
+            {
+                convert        = convert,
+                convertEndTime = convertEndTime
+            },
+            DateProcessor
+    )
 end
 
 function DateService.formatyyyyMMddHHmmss(time)
@@ -126,6 +172,7 @@ function DateService.format(format, time)
 end
 
 function testdate(actor, cfg)
-    local match, startTime, endTime = DateService.convertBeginAndEnd(actor, cfg)
-    print("testdate", cfg, match, DateService.formatyyyyMMddHHmmss(startTime), DateService.formatyyyyMMddHHmmss(endTime))
+    ---@type DateExpression
+    local dateExpression = DateService.convertBeginAndEnd(actor, cfg)
+    print("testdate", cfg, dateExpression:valid(), dateExpression:toString())
 end

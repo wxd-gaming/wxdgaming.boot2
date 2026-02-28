@@ -4,10 +4,14 @@
 --- DateTime: 2026/2/12 11:48
 ---
 
+
+require("DateService")
+
+
 local this = {}
 
 --- 转换时间
-function this.convert(extendParams, params)
+function this.convert(dto, params)
     local add = 0
     if #params > 3 then
         local newParams = DateService.copySubArray(params, 2, 3)
@@ -19,8 +23,8 @@ function this.convert(extendParams, params)
 end
 
 --- 计算结束时间戳
-function this.convertEndTime(extendParams, startTime, params)
-    return this.convert(extendParams, params)
+function this.convertEndTime(dto, startTime, params)
+    return this.convert(dto, params)
 end
 
 DateService.register("OpenServeTime", this.convert, this.convertEndTime)

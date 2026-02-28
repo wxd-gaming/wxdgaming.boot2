@@ -67,6 +67,14 @@ public class LuaService55Test {
             }, 5, 1, TimeUnit.SECONDS);
 
         });
+
+        luaService.onEvent("testdate", luaPlayer1, "current#0&minute#30");
+        luaService.onEvent("testdate", luaPlayer1, "daymin#0&minute#30");
+        luaService.onEvent("testdate", luaPlayer1, "yyyymmdd#20260212&day#1");
+        luaService.onEvent("testdate", luaPlayer1, "yyyymmdd#20260212&DayMax#1");
+        luaService.onEvent("testdate", luaPlayer1, "yyyymmdd#20260212&yyyymmdd#20260401");
+        luaService.onEvent("testdate", luaPlayer1, "hhmmss#090000&DayMax#0");
+
         LockSupport.parkNanos(TimeUnit.MINUTES.toNanos(1));
     }
 

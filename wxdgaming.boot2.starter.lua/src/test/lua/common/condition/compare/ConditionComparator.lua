@@ -3,6 +3,9 @@
 --- Created by 無心道(15388152619).
 --- DateTime: 2026/2/27 10:43
 ---
+
+require("ConditionService")
+
 local ConditionComparator = {}
 ConditionComparator.__index = ConditionComparator
 

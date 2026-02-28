@@ -4,18 +4,22 @@
 --- DateTime: 2026/2/12 10:23
 ---
 
+
+require("DateService")
+
+
 local this = {}
 
 --- 转换时间
-function this.convert(extendParams, params)
+function this.convert(dto, params)
     local hour = tonumber(params[2])
     -- 转换为时间戳
     return hour * 60 * 60 * 1000
 end
 
 --- 计算结束时间戳
-function this.convertEndTime(extendParams, startTime, params)
-    return startTime + this.convert(extendParams, params)
+function this.convertEndTime(dto, startTime, params)
+    return startTime + this.convert(dto, params)
 end
 
 

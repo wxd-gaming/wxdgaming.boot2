@@ -4,10 +4,14 @@
 --- DateTime: 2026/2/12 10:02
 ---
 
+
+require("DateService")
+
+
 local this = {}
 
 --- 转换时间为当天凌晨，并根据 addDay 增加或减少天数
-function this.convert(extendParams, params)
+function this.convert(dto, params)
     local addDay = tonumber(params[2]) or 0 -- 默认为 0 天
 
     -- 获取当前时间的时间戳
@@ -22,8 +26,8 @@ function this.convert(extendParams, params)
 end
 
 --- 计算结束时间戳
-function this.convertEndTime(extendParams, startTime, params)
-    return this.convert(extendParams, params)
+function this.convertEndTime(dto, startTime, params)
+    return this.convert(dto, params)
 end
 
 DateService.register("DayMin", this.convert, this.convertEndTime)
