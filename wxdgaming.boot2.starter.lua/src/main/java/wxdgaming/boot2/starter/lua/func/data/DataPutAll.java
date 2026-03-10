@@ -6,7 +6,6 @@ import wxdgaming.boot2.starter.lua.LuaInvokeJavaFunction;
 import wxdgaming.boot2.starter.lua.LuaToJavaDTO;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 数据
@@ -23,10 +22,10 @@ public class DataPutAll extends LuaInvokeJavaFunction {
     }
 
     @Override public Object doAction(LuaToJavaDTO luaToJavaDTO) {
-        String row = luaToJavaDTO.getString(0);
-        Map<String, Object> map = luaToJavaDTO.getMapStringObject(1);
-        luaToJavaDTO.luaData().getData().computeIfAbsent(row, k -> new ConcurrentHashMap<>()).putAll(map);
-        return null;
+        String tableName = luaToJavaDTO.getString(0);
+        Map<Object, Object> map = luaToJavaDTO.getMapObjectObject(1);
+        luaToJavaDTO.luaData().getVarDataTable().setTable(tableName, map);
+        return true;
     }
 
 }

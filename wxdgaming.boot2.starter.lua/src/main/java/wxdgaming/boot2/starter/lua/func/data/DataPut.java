@@ -5,8 +5,6 @@ import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.lua.LuaInvokeJavaFunction;
 import wxdgaming.boot2.starter.lua.LuaToJavaDTO;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * 数据
  *
@@ -22,10 +20,11 @@ public class DataPut extends LuaInvokeJavaFunction {
     }
 
     @Override public Object doAction(LuaToJavaDTO luaToJavaDTO) {
-        String row = luaToJavaDTO.getString(0);
-        String cell = luaToJavaDTO.getString(1);
+        String tableName = luaToJavaDTO.getString(0);
+        Object uid = luaToJavaDTO.getObject(1);
         Object data = luaToJavaDTO.getObject(2);
-        return luaToJavaDTO.luaData().getData().computeIfAbsent(row, k -> new ConcurrentHashMap<>()).put(cell, data);
+        luaToJavaDTO.luaData().getVarDataTable().setTableValue(tableName, uid, data);
+        return null;
     }
 
 }

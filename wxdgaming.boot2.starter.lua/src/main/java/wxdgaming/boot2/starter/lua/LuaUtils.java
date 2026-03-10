@@ -149,4 +149,8 @@ public class LuaUtils {
         return convertMap(object, String::valueOf, obj -> obj);
     }
 
+    public static Map<Object, Object> object2MapObjectObject(Object object) {
+        return convertMap(object, obj -> obj, obj -> obj);
+    }
+
 }

@@ -22,11 +22,11 @@ public class DataGet extends LuaInvokeJavaFunction {
     }
 
     @Override public Object doAction(LuaToJavaDTO luaToJavaDTO) {
-        ConcurrentHashMap<String, Object> stringObjectConcurrentHashMap = luaToJavaDTO.luaData().getData().get(luaToJavaDTO.getString(0));
-        if (stringObjectConcurrentHashMap == null) {
+        ConcurrentHashMap<Object, Object> map = luaToJavaDTO.luaData().getVarDataTable().get(luaToJavaDTO.getString(0));
+        if (map == null) {
             return null;
         }
-        return stringObjectConcurrentHashMap.get(luaToJavaDTO.getString(1));
+        return map.get(luaToJavaDTO.getObject(1));
     }
 
 }

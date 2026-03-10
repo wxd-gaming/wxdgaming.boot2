@@ -5,8 +5,6 @@ import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.lua.LuaInvokeJavaFunction;
 import wxdgaming.boot2.starter.lua.LuaToJavaDTO;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * 数据
  *
@@ -22,15 +20,9 @@ public class DataRemove extends LuaInvokeJavaFunction {
     }
 
     @Override public Object doAction(LuaToJavaDTO luaToJavaDTO) {
-        String row = luaToJavaDTO.getString(0);
-        ConcurrentHashMap<String, Object> stringObjectConcurrentHashMap = luaToJavaDTO.luaData().getData().get(row);
-        if (stringObjectConcurrentHashMap != null) {
-            String cell = luaToJavaDTO.getString(1);
-            stringObjectConcurrentHashMap.remove(cell);
-            if (stringObjectConcurrentHashMap.isEmpty()) {
-                luaToJavaDTO.luaData().getData().remove(row);
-            }
-        }
+        String tableName = luaToJavaDTO.getString(0);
+        Object uid = luaToJavaDTO.getObject(1);
+        luaToJavaDTO.luaData().getVarDataTable().removeTableValue(tableName, uid);
         return null;
     }
 

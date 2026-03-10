@@ -34,6 +34,10 @@ public record LuaToJavaDTO(Lua L, LuaData luaData, JSONArray args) {
         return args.get(index);
     }
 
+    public Map<Object, Object> getMapObjectObject(int index) {
+        return LuaUtils.object2MapObjectObject(args.get(index));
+    }
+
     public Map<String, Object> getMapStringObject(int index) {
         return LuaUtils.object2MapStringObject(args.get(index));
     }

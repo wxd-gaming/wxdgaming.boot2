@@ -21,7 +21,7 @@ public class DataClear extends LuaInvokeJavaFunction {
 
     @Override public Object doAction(LuaToJavaDTO luaToJavaDTO) {
         String row = luaToJavaDTO.getString(0);
-        luaToJavaDTO.luaData().getData().remove(row);
+        luaToJavaDTO.luaData().getVarDataTable().remove(row);
         return null;
     }
 

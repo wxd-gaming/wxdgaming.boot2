@@ -5,8 +5,9 @@ import org.springframework.stereotype.Component;
 import wxdgaming.boot2.starter.lua.LuaInvokeJavaFunction;
 import wxdgaming.boot2.starter.lua.LuaToJavaDTO;
 
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 /**
  * 数据
@@ -23,11 +24,12 @@ public class DataGetAll extends LuaInvokeJavaFunction {
     }
 
     @Override public Object doAction(LuaToJavaDTO luaToJavaDTO) {
-        ConcurrentHashMap<String, Object> stringObjectConcurrentHashMap = luaToJavaDTO.luaData().getData().get(luaToJavaDTO.getString(0));
-        if (stringObjectConcurrentHashMap == null) {
-            return null;
+        String tableName = luaToJavaDTO.getString(0);
+        Map<Object, Object> map = luaToJavaDTO.luaData().getVarDataTable().getTable(tableName);
+        if (map == null) {
+            return Collections.emptyMap();
         }
-        return new HashMap<>(stringObjectConcurrentHashMap);
+        return new HashMap<>(map);
     }
 
 }
