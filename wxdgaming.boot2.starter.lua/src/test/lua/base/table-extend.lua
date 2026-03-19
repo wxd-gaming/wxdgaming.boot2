@@ -47,21 +47,31 @@ function table.getKey(t, value)
 end
 
 function table.getValue(t, key)
-    for k, v in pairs(t) do
-        if k == key then
-            return v
-        end
+    if type(t) ~= "table" then
+        return nil
     end
-    return nil
+    return t[key]
 end
 
 function table.isArray(t)
-    for i = 1, table.count(t) do
-        if not t[i] then
+    if type(t) ~= "table" then
+        return false
+    end
+
+    local count = 0
+    local maxIndex = 0
+
+    for k, _ in pairs(t) do
+        if type(k) ~= "number" or k < 1 or k % 1 ~= 0 then
             return false
         end
+        count = count + 1
+        if k > maxIndex then
+            maxIndex = k
+        end
     end
-    return true
+
+    return count == maxIndex
 end
 
 ---创建代理table，实现table功能只读需求

@@ -6,17 +6,23 @@
 
 string.empty = ''
 function string.contains(str, subStr)
-    return string.find(str, subStr) ~= nil
+    if type(str) ~= "string" or type(subStr) ~= "string" then
+        return false
+    end
+    return string.find(str, subStr, 1, true) ~= nil
 end
 
 function string.endsWith(str, subStr)
+    if type(str) ~= "string" or type(subStr) ~= "string" then
+        return false
+    end
     local len1 = #str
     local len2 = #subStr
     if len1 < len2 then
         return false
     end
 
-    return string.find(str, subStr, len1 - len2 + 1) ~= nil
+    return string.find(str, subStr, len1 - len2 + 1, true) ~= nil
 end
 
 function string.isNullOrEmpty(str)
@@ -42,12 +48,28 @@ function string.replace(str, oldStr, newStr)
 end
 
 function string.split(str, sep)
+    if type(str) ~= "string" then
+        return {}
+    end
     sep = sep or " "
+    if type(sep) ~= "string" or sep == "" then
+        return { str }
+    end
+
     local items = {}
-    local pattern = string.format("([^%s]+)", sep)
-    string.gsub(str, pattern, function(c)
-        table.insert(items, c)
-    end)
+    local startIndex = 1
+    local sepLen = #sep
+
+    while true do
+        local index = string.find(str, sep, startIndex, true)
+        if index == nil then
+            table.insert(items, string.sub(str, startIndex))
+            break
+        end
+        table.insert(items, string.sub(str, startIndex, index - 1))
+        startIndex = index + sepLen
+    end
+
     return items
 end
 
@@ -192,11 +214,20 @@ function string.indexOf(s, pattern, init)
 end
 
 function string.lastIndexOf(s, pattern)
-    local i = s:match(".*" .. pattern .. "()")
-    if i == nil then
+    if type(s) ~= "string" or type(pattern) ~= "string" or pattern == "" then
         return nil
-    else
-        return i - 1
+    end
+
+    local lastIndex = nil
+    local startIndex = 1
+
+    while true do
+        local index = string.find(s, pattern, startIndex, true)
+        if index == nil then
+            return lastIndex
+        end
+        lastIndex = index
+        startIndex = index + 1
     end
 end
 

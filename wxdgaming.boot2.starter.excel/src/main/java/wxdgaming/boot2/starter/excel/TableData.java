@@ -218,8 +218,8 @@ public class TableData {
                 --- %s %s
                 --- %s %s
                 
-                --- @class %s
-                """.formatted(tableName, tableComment, filePath, sheetName, getCodeClassName()));
+                --- @class %s %s
+                """.formatted(tableName, tableComment, filePath, sheetName, getCodeClassName(), tableComment));
 
         for (CellInfo cellInfo : cellInfo4IndexMap.values()) {
             builder.append("---@field ").append(cellInfo.getFieldName()).append(" any ").append(cellInfo.getFieldComment()).append("\n");
@@ -267,7 +267,7 @@ public class TableData {
                 
                 
                 ---@param id string id
-                ---@return %s 道具配置
+                ---@return %s %s
                 function %sTable.get(id)
                     local cfg = %sTable[id]
                     if (cfg == nil) then
@@ -278,7 +278,7 @@ public class TableData {
                 
                 ---@param field string 字段名字
                 ---@param value any 字段值
-                ---@return %s 道具配置
+                ---@return %s %s
                 function %sTable.find(field, value)
                     for _, v in pairs(%sTable) do
                         if (v[field] == value) then
@@ -290,11 +290,13 @@ public class TableData {
                 
                 """.formatted(
                 getCodeClassName(),
+                getTableComment(),
                 getCodeClassName(),
                 getCodeClassName(),
                 getCodeClassName(),
                 getCodeClassName(),
                 getCodeClassName(),
+                getTableComment(),
                 getCodeClassName(),
                 getCodeClassName()
         ));
