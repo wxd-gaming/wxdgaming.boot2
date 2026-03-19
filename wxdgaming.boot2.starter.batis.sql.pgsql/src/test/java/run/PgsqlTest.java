@@ -2,15 +2,14 @@ package run;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
 import run.entity.EntityTest;
 import run.entity.Table2;
 import wxdgaming.boot2.core.timer.MyClock;
-import wxdgaming.boot2.starter.batis.TableMapping;
-import wxdgaming.boot2.starter.batis.sql.SqlConfig;
 import wxdgaming.boot2.starter.batis.sql.pgsql.PgsqlDataHelper;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -20,31 +19,37 @@ import java.util.List;
  * @version 2025-02-15 19:44
  **/
 @Slf4j
+@ComponentScan(basePackages = {"wxdgaming", "run"})
+@SpringBootTest(classes = PgsqlTest.class)
 public class PgsqlTest {
 
-    private static PgsqlDataHelper dataHelper;
 
+    private PgsqlDataHelper dataHelper;
 
-    static {
-        SqlConfig sqlConfig = new SqlConfig();
-        sqlConfig.setDebug(true);
-        sqlConfig.setDriverClassName("org.postgresql.Driver");
-        sqlConfig.setUrl("jdbc:postgresql://127.0.0.1:5432/test2");
-        sqlConfig.setUsername("postgres");
-        sqlConfig.setPassword("test");
-        sqlConfig.setScanPackage(new String[]{EntityTest.class.getPackageName()});
-        dataHelper = new PgsqlDataHelper(sqlConfig);
-        TableMapping tableMapping = dataHelper.tableMapping(EntityTest.class);
-        /*TODO 处理分区表 */
-        LocalDateTime localDate = LocalDateTime.now();
-        for (int i = 0; i < 5; i++) {
-            /*创建表分区*/
-            String form = MyClock.formatDate("yyyyMMdd", localDate);
-            localDate = localDate.plusDays(1);
-            String to = MyClock.formatDate("yyyyMMdd", localDate);
-            dataHelper.addPartition(tableMapping.getTableName(), form, to);
-        }
+    @Autowired
+    public PgsqlTest(PgsqlDataHelper dataHelper) {
+        this.dataHelper = dataHelper;
     }
+    //    static {
+    //        SqlConfig sqlConfig = new SqlConfig();
+    //        sqlConfig.setDebug(true);
+    //        sqlConfig.setDriverClassName("org.postgresql.Driver");
+    //        sqlConfig.setUrl("jdbc:postgresql://127.0.0.1:5432/test2");
+    //        sqlConfig.setUsername("postgres");
+    //        sqlConfig.setPassword("test");
+    //        sqlConfig.setScanPackage(new String[]{EntityTest.class.getPackageName()});
+    //        dataHelper = new PgsqlDataHelper(sqlConfig);
+    //        TableMapping tableMapping = dataHelper.tableMapping(EntityTest.class);
+    //        /*TODO 处理分区表 */
+    //        LocalDateTime localDate = LocalDateTime.now();
+    //        for (int i = 0; i < 5; i++) {
+    //            /*创建表分区*/
+    //            String form = MyClock.formatDate("yyyyMMdd", localDate);
+    //            localDate = localDate.plusDays(1);
+    //            String to = MyClock.formatDate("yyyyMMdd", localDate);
+    //            dataHelper.addPartition(tableMapping.getTableName(), form, to);
+    //        }
+    //    }
 
     @RepeatedTest(10)
     public void t1() {
