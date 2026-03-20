@@ -56,7 +56,9 @@ public class ExecutorServicePlatform extends AbstractExecutorService {
                     } catch (InterruptedException e) {
                         break;
                     } catch (Throwable e) {
-                        log.error("{} {} error", task == null ? "null" : task.getClass(), task, e);
+                        try {
+                            log.error("{} {} error", task == null ? "null" : task.getClass(), task, e);
+                        } catch (Throwable ignore) {}/*如果是 OutOfMemoryError 异常日志输出格式化的时候也会出现这个异常*/
                     }
                 }
                 log.error("{} {} close:{}, shutdown:{}", this.getClass(), Thread.currentThread().getName(), getClosing(), getShutdown());

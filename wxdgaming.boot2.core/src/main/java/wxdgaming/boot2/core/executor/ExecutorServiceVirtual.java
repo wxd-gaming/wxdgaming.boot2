@@ -48,7 +48,9 @@ public class ExecutorServiceVirtual extends AbstractExecutorService {
             try {
                 task.run();
             } catch (Throwable e) {
-                log.error("{} {} error", task.getClass(), task, e);
+                try {
+                    log.error("{} {} error", task.getClass(), task, e);
+                } catch (Throwable ignore) {}/*如果是 OutOfMemoryError 异常日志输出格式化的时候也会出现这个异常*/
             } finally {
                 getTaskCount().decrementAndGet();
                 ExecutorFactory.Lazy.runnableMonitorMap.remove(Thread.currentThread());
