@@ -121,6 +121,17 @@ public class SocketSession {
         channel.flush();
     }
 
+    /** 是否可以继续写入 */
+    public boolean isWritable() {
+        boolean b = channel.isRegistered() && channel.isWritable();
+        if (isWebSocket()) {
+            if (!isHandshake_complete()) {
+                b = false;
+            }
+        }
+        return b;
+    }
+
     /** 是否可用 */
     public boolean isOpen() {
         boolean b = channel.isRegistered() && channel.isOpen();

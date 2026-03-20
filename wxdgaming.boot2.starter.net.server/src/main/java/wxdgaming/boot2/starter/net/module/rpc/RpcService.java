@@ -16,7 +16,6 @@ import wxdgaming.boot2.starter.net.message.inner.ReqRemote;
 import wxdgaming.boot2.starter.net.message.inner.ResRemote;
 
 import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * rpc 服务
@@ -74,6 +73,11 @@ public class RpcService {
             reqRemote.setGzip(1);
             reqRemote.setParams(GzipUtil.gzip2String(reqRemote.getParams()));
         }
+
+        if (!socketSession.isWritable()) {
+            return Mono.error(new RuntimeException("channel not writable"));
+        }
+
         RpcCallBackContext rpcCallBackContext = new RpcCallBackContext();
         Mono<JSONObject> jsonObjectMono = Mono.fromCompletionStage(rpcCallBackContext.getCompletableFuture());
         rpcCache.put(reqRemote.getUid(), rpcCallBackContext);
