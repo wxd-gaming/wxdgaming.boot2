@@ -1,90 +1,126 @@
 <style>
+:root {
+    --log-bg: #f4f7fb;
+    --log-bg-alt: #edf3fb;
+    --log-head-bg: linear-gradient(180deg, #324a63 0%, #263a52 100%);
+    --log-head-color: #f6faff;
+    --log-text: #2f3e4d;
+    --log-text-muted: #5a6a7b;
+    --log-border: #d9e2ee;
+    --log-hover-bg: #dcecff;
+    --log-shadow: 0 10px 26px rgba(28, 45, 72, 0.16);
+}
 
-    .log_table table {
-        width: 100%;
-        height: 100%;
-        display: block;
-        table-layout: fixed; /* 固定表格布局，列宽由第一行决定 */
-        font-family: Arial, sans-serif; /* 使用更现代的字体 */
-        background-color: #f0f0f0; /* 亮灰色背景 */
-    }
+.log_table table {
+    width: 100%;
+    height: 100%;
+    display: block;
+    table-layout: fixed;
+    font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, #f6f9fe 0%, #eef3f9 100%);
+    color: var(--log-text);
+    border-radius: 10px;
+    box-shadow: var(--log-shadow);
+    border: 1px solid var(--log-border);
+    overflow: hidden;
+}
 
-    .log_table table, .log_table td, .log_table th {
-        border-collapse: collapse;
-        border-spacing: 0;
-    }
+.log_table table,
+.log_table td,
+.log_table th {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
 
-    .log_table tr {table-layout: fixed; display: table; width: 100%; }
+.log_table tr {
+    table-layout: fixed;
+    display: table;
+    width: 100%;
+}
 
-    .log_table thead {
-        width: calc(100% - 10px);
-        display: block;
-        height: 44px; /* 增加表头高度 */
-        position: sticky;
-        top: 0;
-        color: #333; /* 深色文字，确保清晰可见 */
-        font-weight: bold;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        z-index: 1;
-    }
+.log_table thead {
+    width: calc(100% - 10px);
+    display: block;
+    height: 46px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--log-head-bg);
+    color: var(--log-head-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
 
-    .log_table tbody {
-        width: calc(100%);
-        display: block;
-        height: calc(100% - 44px); /* 减去 thead 的高度 */
-        overflow-y: auto;
-    }
+.log_table tbody {
+    width: 100%;
+    display: block;
+    height: calc(100% - 46px);
+    overflow-y: auto;
+    background: #f8fbff;
+}
 
-    .log_table th {
-        padding: 12px 12px; /* 增大内边距 */
-        text-align: left;
-        border: none; /* 更浅的边框颜色 */
-        white-space: nowrap;
-        overflow: hidden;
-        font-size: 14px; /* 统一字体大小 */
-    }
+.log_table th {
+    padding: 12px 14px;
+    text-align: left;
+    border: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+.log_table td {
+    padding: 9px 14px;
+    text-align: left;
+    border: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    color: var(--log-text-muted);
+    border-bottom: 1px solid rgba(217, 226, 238, 0.65);
+}
+
+.log_table tbody tr:nth-child(odd) {
+    background-color: var(--log-bg);
+}
+
+.log_table tbody tr:nth-child(even) {
+    background-color: var(--log-bg-alt);
+}
+
+.log_table tbody tr:hover {
+    background-color: var(--log-hover-bg);
+    transition: background-color 0.18s ease-in-out;
+}
+
+.log_table tbody::-webkit-scrollbar {
+    width: 10px;
+}
+
+.log_table tbody::-webkit-scrollbar-track {
+    background: #e6edf6;
+    border-radius: 12px;
+}
+
+.log_table tbody::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #7a95b6 0%, #55718f 100%);
+    border-radius: 12px;
+    border: 2px solid #e6edf6;
+}
+
+.log_table tbody::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #6a86a9 0%, #46627e 100%);
+}
+
+@media (max-width: 768px) {
+    .log_table th,
     .log_table td {
-        padding: 7px 8px; /* 增大内边距 */
-        text-align: left;
-        border: none; /* 更浅的边框颜色 */
-        white-space: nowrap;
-        overflow: hidden;
-        font-size: 14px; /* 统一字体大小 */
+        padding: 8px 10px;
+        font-size: 12px;
     }
-
-    .log_table tbody tr:nth-child(even) {
-        background-color: #f9f9f9; /* 偶数行浅灰色背景 */
-    }
-
-    .log_table tbody tr:nth-child(odd) {
-        background-color: #ffffff; /* 奇数行白色背景 */
-    }
-
-    .log_table tbody tr:hover {
-        background-color: #e3f2fd; /* 悬停时使用浅蓝色背景 */
-        /*transform: scale(1.01); !* 轻微放大效果 *!*/
-        transition: all 0.2s ease-in-out; /* 平滑过渡动画 */
-    }
-
-    /* 滚动条样式 */
-    .log_table tbody::-webkit-scrollbar {
-        width: 10px; /* 增宽滚动条 */
-    }
-
-    .log_table tbody::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px; /* 圆角轨道 */
-    }
-
-    .log_table tbody::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 10px; /* 圆角滑块 */
-    }
-
-    .log_table tbody::-webkit-scrollbar-thumb:hover {
-        background: #555; /* 悬停时更深的颜色 */
-    }
-
+}
 </style>
 <script>
 

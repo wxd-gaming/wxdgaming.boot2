@@ -1,43 +1,80 @@
-<style>
-
+﻿<style>
     :root {
-        --primary-color: #1890ff;
-        --border-color: #d9d9d9;
-        --hover-color: #f5f5f5;
-        --success-color: #52c41a;
-        --warning-color: #faad14;
+        --primary-color: #1677ff;
+        --border-color: #d0d7e2;
+        --hover-color: #f3f7ff;
+        --success-color: #2ca24f;
+        --warning-color: #d98c07;
+        --page-bg-start: #f4f8ff;
+        --page-bg-end: #eef3fb;
+        --panel-bg: #ffffff;
+        --panel-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        --panel-radius: 12px;
     }
 
     .log_content {
         display: flex;
         flex-direction: column;
         height: 100%;
+        gap: 10px;
+        padding: 10px;
+        background: linear-gradient(135deg, var(--page-bg-start), var(--page-bg-end));
+    }
+
+    .log_filter,
+    .log_table,
+    .log_bottom {
+        background-color: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: var(--panel-radius);
+        box-shadow: var(--panel-shadow);
     }
 
     .log_filter {
-        height: auto; /* 固定高度 */
-        background-color: #e8e8e8; /* 过滤器区域背景色 */
-        border-bottom: 1px solid #ccc; /* 底部边框 */
-        padding-top: 15px;
-        padding-bottom: 10px;
-        padding-left: 5px;
+        min-height: 120px;
+        padding: 14px 16px;
     }
 
     .log_table {
-        flex: 1; /* 剩余空间填充 */
-        margin-top: 5px;
-        overflow-y: hidden; /* 允许垂直滚动 */
+        flex: 1;
+        min-height: 0;
+        padding: 10px;
+        overflow: hidden;
     }
 
     .log_bottom {
-        width: 100%;
-        height: 40px;
-        line-height: 42px;
-        text-align: center;
-        vertical-align: center;
-        background-color: #e8e8e8;
+        min-height: 52px;
+        padding: 10px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
+    @media (max-width: 900px) {
+        .log_content {
+            padding: 8px;
+            gap: 8px;
+        }
+
+        .log_filter,
+        .log_table,
+        .log_bottom {
+            border-radius: 10px;
+        }
+
+        .log_filter {
+            padding: 12px;
+        }
+
+        .log_table {
+            padding: 8px;
+        }
+
+        .log_bottom {
+            padding: 8px 10px;
+            min-height: 48px;
+        }
+    }
 </style>
 <div class="log_content">
     <!--过滤器-->

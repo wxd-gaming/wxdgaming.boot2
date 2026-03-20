@@ -1,95 +1,151 @@
-<!-- 引入 Font Awesome 图标库 -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+﻿<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
     .nav {
+        --nav-bg-1: #15324f;
+        --nav-bg-2: #1f4f75;
+        --nav-panel: rgba(255, 255, 255, 0.08);
+        --nav-panel-hover: rgba(255, 255, 255, 0.14);
+        --nav-text: #eaf4ff;
+        --nav-muted: #b6cee6;
+        --nav-active: #4db2ff;
+        --nav-active-2: #2f93e3;
+        --nav-border: rgba(255, 255, 255, 0.14);
+
         width: 100%;
         height: 100%;
         overflow: auto;
-        background-color: #3773ad;
         position: relative;
+        color: var(--nav-text);
+        background:
+            radial-gradient(circle at 20% 0%, rgba(77, 178, 255, 0.26) 0%, rgba(77, 178, 255, 0) 42%),
+            linear-gradient(170deg, var(--nav-bg-2), var(--nav-bg-1));
+        padding: 12px 10px 74px;
     }
-    /* 基础导航栏样式 */
+
+    .nav::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .nav::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.28);
+        border-radius: 8px;
+    }
+
     .nav ul {
         list-style: none;
-        padding: 0;
-        margin: 0;
-        color: white;
-        font-family: "Microsoft Yahei", sans-serif;
-        border-bottom: 1px solid #4a5f7a; /* 添加分割线 */
+        margin: 0 0 10px;
+        padding: 4px;
+        border: 1px solid var(--nav-border);
+        border-radius: 12px;
+        background-color: var(--nav-panel);
+        backdrop-filter: blur(3px);
     }
 
-    .nav ul:last-child {
-        border-bottom: none; /* 移除最后一个 ul 的分割线 */
+    .nav ul:last-of-type {
+        margin-bottom: 0;
     }
 
-    .nav ul li {
-        padding: 10px 20px;
+    .nav ul > li {
+        position: relative;
+        border-radius: 10px;
+        padding: 11px 12px;
         cursor: pointer;
-        transition: background-color 0.3s ease;
+        user-select: none;
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 1.4;
+        transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
-    .nav ul li:hover {
-        background-color: #34495e;
+    .nav ul > li:hover {
+        background-color: var(--nav-panel-hover);
     }
 
-    /* 二级菜单样式 */
+    .nav ul > li > i {
+        width: 18px;
+        margin-right: 8px;
+        color: #d4ebff;
+    }
+
+    .nav ul > li::after {
+        content: "\f078";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        position: absolute;
+        right: 12px;
+        top: 14px;
+        font-size: 12px;
+        color: var(--nav-muted);
+        transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .nav ul > li.menu-open::after {
+        transform: rotate(180deg);
+        color: #ffffff;
+    }
+
     .nav ul dl {
         display: none;
-        background: linear-gradient(to bottom, #34495e, #2c3e50); /* 渐变背景 */
-        padding: 10px 0; /* 上下内边距 */
-        border-radius: 8px; /* 圆角 */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 阴影效果 */
-        margin-top: 5px; /* 与主菜单项的间距 */
+        margin: 8px 0 2px;
+        padding: 0;
+        border-radius: 10px;
+        border: 1px solid var(--nav-border);
+        background: rgba(7, 32, 56, 0.34);
     }
 
     .nav ul dd {
-        padding: 10px 20px; /* 内边距 */
-        line-height: 1.6; /* 行高 */
-        transition: background-color 0.3s ease; /* 悬停过渡效果 */
-        border-bottom: 1px solid #4a5f7a; /* 添加底部边框作为分割线 */
+        margin: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    /* 选中状态的 dd 样式 */
-    .nav ul dd.active {
-        background-color: #ff8c00; /* 淡橘色 */
-    }
-
-    /* 移除最后一个 dd 的分割线 */
     .nav ul dd:last-child {
         border-bottom: none;
     }
 
-    .nav ul dd:hover {
-        background-color: #3498db; /* 悬停背景色 */
-    }
-
     .nav ul dd a {
-        color: #ecf0f1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--nav-text);
         text-decoration: none;
         font-size: 14px;
-        display: block; /* 使链接占满整个 dd 区域 */
-        transition: color 0.3s ease; /* 颜色过渡效果 */
+        padding: 10px 12px;
+        transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    .nav ul dd a:hover {
-        color: #ffffff; /* 悬停文字颜色 */
+    .nav ul dd a i {
+        width: 16px;
+        color: #9ec7ea;
     }
 
-    /* 底部样式 */
+    .nav ul dd:hover a {
+        background-color: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+    }
+
+    .nav ul dd.active a {
+        background: linear-gradient(90deg, var(--nav-active), var(--nav-active-2));
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+    .nav ul dd.active a i {
+        color: #ffffff;
+    }
+
     .nav .footer {
-        display: block;
         position: absolute;
-        width: 100%;
-        height: 40px;
-        background-color: #2c3e50;
-        color: white;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        border-radius: 10px;
+        border: 1px solid var(--nav-border);
+        background: rgba(0, 0, 0, 0.18);
+        color: var(--nav-muted);
         text-align: center;
-        align-items: center;
-        padding-top: 6px;
-        justify-content: center;
-        font-size: 11px;
-        left: 0;
-        bottom: 0;
+        line-height: 1.5;
+        font-size: 12px;
+        padding: 8px 6px;
     }
 </style>
 <div class="nav">
@@ -104,7 +160,7 @@
                 </dd>
                 <dd>
                     <a href="javascript:void(0)" tag="main" onclick="refreshContent('main')">
-                        <i class="fas fa-home"></i> 首页
+                        <i class="fas fa-house"></i> 控制台
                     </a>
                 </dd>
             </dl>
@@ -116,98 +172,86 @@
             <dl>
                 <dd>
                     <a href="javascript:void(0)" tag="log" onclick="refreshContent('log')">
-                        <i class="fas fa-home"></i> 日志
+                        <i class="fas fa-list"></i> 日志列表
                     </a>
                 </dd>
                 <dd>
                     <a href="javascript:void(0)" tag="log" onclick="refreshContent('log')">
-                        <i class="fas fa-home"></i> 日志
+                        <i class="fas fa-magnifying-glass"></i> 日志查询
                     </a>
                 </dd>
             </dl>
         </li>
     </ul>
     <div class="footer">
-        © 2026 我的网站 版权所有
+        © 2026 我的站点 保留所有权利
         <br>
         联系电话：15388152619
     </div>
 </div>
 <script>
-    // 为每个 <ul> 分配独立的状态管理
     document.querySelectorAll('.nav ul').forEach(menuGroup => {
-        let currentOpenMenu = null; // 当前组的展开菜单
+        let currentOpenMenu = null;
 
-        // 展开/收起二级菜单
         menuGroup.querySelectorAll(':scope > li').forEach(item => {
             item.addEventListener('click', function (event) {
-                event.stopPropagation(); // 阻止事件冒泡
+                event.stopPropagation();
                 const subMenu = this.querySelector('dl');
-                if (subMenu) {
-                    // 如果点击的是当前已展开的菜单，则收起
-                    if (currentOpenMenu === subMenu) {
-                        subMenu.style.display = 'none';
-                        currentOpenMenu = null;
-                    } else {
-                        // 关闭同组其他菜单项的二级菜单
-                        menuGroup.querySelectorAll(':scope > li > dl').forEach(dl => {
-                            if (dl !== subMenu) {
-                                dl.style.display = 'none';
-                            }
-                        });
-                        // 展开当前菜单项
-                        subMenu.style.display = 'block';
-                        currentOpenMenu = subMenu;
-                    }
+                if (!subMenu) {
+                    return;
+                }
+
+                if (currentOpenMenu === subMenu) {
+                    subMenu.style.display = 'none';
+                    this.classList.remove('menu-open');
+                    currentOpenMenu = null;
+                } else {
+                    menuGroup.querySelectorAll(':scope > li').forEach(li => {
+                        const dl = li.querySelector(':scope > dl');
+                        if (dl) {
+                            dl.style.display = 'none';
+                        }
+                        li.classList.remove('menu-open');
+                    });
+
+                    subMenu.style.display = 'block';
+                    this.classList.add('menu-open');
+                    currentOpenMenu = subMenu;
                 }
             });
         });
 
-        // 阻止 <a> 标签的默认行为，并延迟执行内容加载
         menuGroup.querySelectorAll('dd a').forEach(link => {
             link.addEventListener('click', function (event) {
-                event.preventDefault(); // 阻止跳转
-                event.stopPropagation(); // 阻止事件冒泡
+                event.preventDefault();
+                event.stopPropagation();
 
-                // 移除所有 dd 的 active 类
                 document.querySelectorAll('.nav ul dd').forEach(dd => {
                     dd.classList.remove('active');
                 });
 
-                // 为当前点击的 dd 添加 active 类
-                this.closest('dd').classList.add('active');
-
-                // const target = this.getAttribute('onclick');
-                // if (target) {
-                //     // 延迟执行 refreshContent，确保菜单状态稳定
-                //     setTimeout(() => {
-                //         eval(target);
-                //     }, 100); // 延迟 100ms
-                // }
+                const currentDd = this.closest('dd');
+                currentDd.classList.add('active');
             });
         });
     });
 
     function setActiveMenu() {
-        // 示例调用
         let pageType = getUrlParam('pagetype');
-        console.log("pageType", pageType)
-        if (pageType == null || pageType === "" || pageType === undefined) {
-            return
+        if (pageType == null || pageType === '' || pageType === undefined) {
+            return;
         }
+
         let elementNodeListOf = document.querySelectorAll('.nav ul dd a');
         for (const da of elementNodeListOf) {
             if (da.getAttribute('tag') === pageType) {
-                // 正确获取父级元素的方法
-                const ddElement = da.parentElement; // 获取直接父级<dd>
-                const dlElement = ddElement.parentElement; // 获取<dd>的父级<dl>
-                const liElement = dlElement.parentElement; // 获取<dl>的父级<li>
-                console.log(liElement)
-                // 触发<li>元素的点击事件来展开菜单
+                const ddElement = da.parentElement;
+                const dlElement = ddElement.parentElement;
+                const liElement = dlElement.parentElement;
+
                 if (liElement && typeof liElement.click === 'function') {
-                    // 展开当前菜单
                     dlElement.style.display = 'block';
-                    console.log("菜单已展开")
+                    liElement.classList.add('menu-open');
                 }
                 da.click();
                 break;
@@ -215,9 +259,7 @@
         }
     }
 
-    // 页面加载完成后执行
     $(() => {
-        // 延迟执行确保所有事件监听器都已绑定
         setTimeout(setActiveMenu, 100);
     });
 </script>
