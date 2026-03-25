@@ -272,13 +272,58 @@ function gameDebug.print0(isTraceback, appendYinhao, appendType, ...)
     print(printString)
 end
 
+--- 辅助调试 不会抛出异常，执行异常会返回 nil , 这个函数和debug函数的区别在于这个活实时检测运行，性能比较低
+--- @param ... any 如果调用 函数 异常后打印你需要显示的参数
+function gameDebug.debugHook(func, ...)
+    local start = os.clock() * 1000
+    local last_line_info = nil
+    local count = 0
+
+    debug.sethook(
+            function(event, line)
+                count = count + 1
+                -- 定期检查耗时
+                if count % 10 == 0 then
+                    local current = os.clock() * 1000
+                    -- 默认检查20秒卡死
+                    if current - start > 20000 then
+                        local error_msg = "\n========== 检测到卡顿 ==========\n" ..
+                                "最后执行的代码位置：" .. tostring(last_line_info) .. "\n" ..
+                                "当前堆栈：\n" ..
+                                debug.traceback()
+                        error(error_msg)
+                        start = current
+                    end
+                end
+
+                -- 记录最后执行的行信息
+                local info = debug.getinfo(2, "Sl")
+                if info and info.currentline > 0 then
+                    last_line_info = string.format("%s:%d", info.short_src, info.currentline)
+                end
+            end,
+            "l",
+            1
+    )  -- 每执行1行检查一次
+
+    local success, result = xpcall(func, debug.traceback, ...)
+    debug.sethook()  -- 清除钩子
+
+    if not success then
+        local params = gameDebug.toStrings(" ", ...)
+        error("执行异常", params, "\n", result)--把异常信息反馈java里面
+        return nil
+    end
+    return result
+end
+
 --- 辅助调试 不会抛出异常，执行异常会返回 nil
 --- @param ... any 如果调用 函数 异常后打印你需要显示的参数
 function gameDebug.debug(fun, ...)
     local s, e = xpcall(fun, debug.traceback, ...)
     if not s then
         local params = gameDebug.toStrings(" ", ...)
-        print("执行异常", params, "\n", e)--把异常信息反馈java里面
+        error("执行异常", params, "\n", e)--把异常信息反馈java里面
         return nil
     end
     return e;
