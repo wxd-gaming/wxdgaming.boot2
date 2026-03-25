@@ -60,7 +60,7 @@ public class AppPlatformParams extends ObjectBase {
         this.payKey = payKey;
         this.otherKey = otherKey;
         this.url = url;
-        register(LOCAL);
+        register(this);
     }
 
     @Override public String toString() {
