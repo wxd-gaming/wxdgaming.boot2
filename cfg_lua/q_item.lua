@@ -1,7 +1,7 @@
 --- q_item 任务集合
 --- src/main/cfg/道具.xlsx q_item
 
---- @class QItem
+--- @class QItem 任务集合
 ---@field id any 主键id
 ---@field itemType any 道具类型类型
 ---@field itemSubType any 道具类型类型
@@ -36,7 +36,7 @@ QItemTable = {
 }
 
 ---@param id string id
----@return QItem 道具配置
+---@return QItem 任务集合
 function QItemTable.get(id)
     local cfg = QItemTable[id]
     if (cfg == nil) then
@@ -47,8 +47,8 @@ end
 
 ---@param field string 字段名字
 ---@param value any 字段值
----@return QItem 道具配置
-function QItemTable.find(field, value)
+---@return QItem QItem
+function 任务集合Table.find(field, value)
     for _, v in pairs(QItemTable) do
         if (v[field] == value) then
             return setmetatable(v, QItem)

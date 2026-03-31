@@ -1,7 +1,7 @@
 --- q_map 怪物表
 --- src/main/cfg/地图信息.xlsx q_map
 
---- @class QMap
+--- @class QMap 怪物表
 ---@field id any 主键id
 ---@field crossType any 1是本服，2是跨服
 ---@field type any 地图类型1常规，2是副本
@@ -24,7 +24,7 @@ QMapTable = {
 }
 
 ---@param id string id
----@return QMap 道具配置
+---@return QMap 怪物表
 function QMapTable.get(id)
     local cfg = QMapTable[id]
     if (cfg == nil) then
@@ -35,8 +35,8 @@ end
 
 ---@param field string 字段名字
 ---@param value any 字段值
----@return QMap 道具配置
-function QMapTable.find(field, value)
+---@return QMap QMap
+function 怪物表Table.find(field, value)
     for _, v in pairs(QMapTable) do
         if (v[field] == value) then
             return setmetatable(v, QMap)

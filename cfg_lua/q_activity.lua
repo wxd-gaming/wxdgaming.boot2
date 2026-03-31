@@ -1,7 +1,7 @@
 --- q_activity 活动
 --- src/main/cfg/活动.xlsx q_activity
 
---- @class QActivity
+--- @class QActivity 活动
 ---@field id any 活动流水号
 ---@field type any 活动类型id
 ---@field name any 名称
@@ -23,7 +23,7 @@ QActivityTable = {
 }
 
 ---@param id string id
----@return QActivity 道具配置
+---@return QActivity 活动
 function QActivityTable.get(id)
     local cfg = QActivityTable[id]
     if (cfg == nil) then
@@ -34,8 +34,8 @@ end
 
 ---@param field string 字段名字
 ---@param value any 字段值
----@return QActivity 道具配置
-function QActivityTable.find(field, value)
+---@return QActivity QActivity
+function 活动Table.find(field, value)
     for _, v in pairs(QActivityTable) do
         if (v[field] == value) then
             return setmetatable(v, QActivity)

@@ -174,7 +174,8 @@ public class ActivityService extends HoldApplicationContext implements HeartDriv
                         }
                     }
                 } else {
-                    log.debug("活动时间未开始：{}({}), {}", qActivity.getId(), qActivity.getName(), expression.fmt());
+                    if (log.isTraceEnabled())
+                        log.trace("活动时间未开始：{}({}), {}", qActivity.getId(), qActivity.getName(), expression.fmt());
                 }
                 break;
             }

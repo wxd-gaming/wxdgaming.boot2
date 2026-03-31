@@ -1,7 +1,7 @@
 --- q_achieve 成就集合
 --- src/main/cfg/任务成就.xlsx q_achieve
 
---- @class QAchieve
+--- @class QAchieve 成就集合
 ---@field id any 主键id
 ---@field type any 成就类型
 ---@field name any 成就名称
@@ -37,7 +37,7 @@ QAchieveTable = {
 }
 
 ---@param id string id
----@return QAchieve 道具配置
+---@return QAchieve 成就集合
 function QAchieveTable.get(id)
     local cfg = QAchieveTable[id]
     if (cfg == nil) then
@@ -48,8 +48,8 @@ end
 
 ---@param field string 字段名字
 ---@param value any 字段值
----@return QAchieve 道具配置
-function QAchieveTable.find(field, value)
+---@return QAchieve QAchieve
+function 成就集合Table.find(field, value)
     for _, v in pairs(QAchieveTable) do
         if (v[field] == value) then
             return setmetatable(v, QAchieve)

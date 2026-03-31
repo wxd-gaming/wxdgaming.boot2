@@ -1,7 +1,7 @@
 --- q_buff buff
 --- src/main/cfg/buff.xlsx q_buff
 
---- @class QBuff
+--- @class QBuff buff
 ---@field id any 主键id 唯一id
 ---@field buffGroup any buff分组
 ---@field buffId any buff的id
@@ -34,7 +34,7 @@ QBuffTable = {
 }
 
 ---@param id string id
----@return QBuff 道具配置
+---@return QBuff buff
 function QBuffTable.get(id)
     local cfg = QBuffTable[id]
     if (cfg == nil) then
@@ -45,8 +45,8 @@ end
 
 ---@param field string 字段名字
 ---@param value any 字段值
----@return QBuff 道具配置
-function QBuffTable.find(field, value)
+---@return QBuff QBuff
+function buffTable.find(field, value)
     for _, v in pairs(QBuffTable) do
         if (v[field] == value) then
             return setmetatable(v, QBuff)
