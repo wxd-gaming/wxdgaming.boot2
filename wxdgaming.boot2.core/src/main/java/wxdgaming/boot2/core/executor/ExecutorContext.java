@@ -72,7 +72,9 @@ public class ExecutorContext {
     /** 只会释放当前变量 */
     public static Content release() {
         Content content = CONTEXT.remove(Thread.currentThread());
-        RunTimeUtil.record(String.valueOf(content.runnable), content.getStartTime());
+        if (content != null) {
+            RunTimeUtil.record(String.valueOf(content.runnable), content.getStartTime());
+        }
         return content;
     }
 

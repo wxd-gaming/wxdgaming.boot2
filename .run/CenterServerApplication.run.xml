@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="CenterServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-    <module name="wxdgaming.game.center" />
+    <module name="wxd-gaming.game.center" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="wxdgaming.game.center.CenterServerApplication" />
     <extension name="coverage">
       <pattern>

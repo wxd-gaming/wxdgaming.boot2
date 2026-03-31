@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="LoginServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-    <module name="wxdgaming.game.login" />
+    <module name="wxd-gaming.game.login" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="wxdgaming.game.login.LoginServerApplication" />
     <extension name="coverage">
       <pattern>

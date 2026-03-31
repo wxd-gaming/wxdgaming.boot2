@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="RobotApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-    <module name="wxdgaming.game.robot" />
+    <module name="wxd-gaming.game.robot" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="wxdgaming.game.robot.RobotApplication" />
     <extension name="coverage">
       <pattern>
