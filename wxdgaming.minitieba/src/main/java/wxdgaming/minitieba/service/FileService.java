@@ -1,17 +1,22 @@
 package wxdgaming.minitieba.service;
 
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
+import org.rocksdb.RocksDB;
+import org.rocksdb.RocksDBException;
 import org.springframework.stereotype.Service;
+import wxdgaming.boot2.starter.batis.rocksdb.RocksDBHelper;
 
-import java.io.File;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 文件服务
+ * 文件服务 - 支持图片压缩、视频上传，数据存储到 RocksDB（LZ4压缩）
  *
  * @author wxd-gaming(無心道, 15388152619)
  * @version 2026-04-26
@@ -20,30 +25,253 @@ import java.util.UUID;
 @Service
 public class FileService {
 
-    private static final String UPLOAD_DIR = "upload";
-    private static final String[] ALLOWED_IMAGE_EXT = {".jpg", ".jpeg", ".png", ".gif", ".webp"};
-    private static final String[] ALLOWED_VIDEO_EXT = {".mp4", ".webm", ".ogg"};
+    private final RocksDBHelper db;
+    private final RocksDB rawDb;
 
-    public FileService() {
-        File dir = new File(UPLOAD_DIR);
-        if (!dir.exists()) {
-            dir.mkdirs();
+    private static final String FILE_PREFIX = "file:";
+    private static final String FILE_ID_GENERATOR = "file_id_generator";
+
+    /** 图片压缩后的最大宽度 */
+    private static final int MAX_IMAGE_WIDTH = 1920;
+    /** 图片压缩后的最大高度 */
+    private static final int MAX_IMAGE_HEIGHT = 1080;
+    /** 图片压缩质量 (0.0-1.0) */
+    private static final float IMAGE_QUALITY = 0.85f;
+
+    /** 允许的图片扩展名 */
+    private static final String[] ALLOWED_IMAGE_EXT = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"};
+    /** 允许的视频扩展名 */
+    private static final String[] ALLOWED_VIDEO_EXT = {".mp4", ".webm", ".ogg", ".mov", ".avi"};
+
+    public FileService(RocksDBHelper db) {
+        this.db = db;
+        this.rawDb = db.getDb(); // 获取原生 RocksDB 实例
+    }
+
+    /** 生成文件ID */
+    private synchronized long nextFileId() {
+        long current = db.getLongValue(FILE_ID_GENERATOR);
+        long next = current + 1;
+        db.put(FILE_ID_GENERATOR, next);
+        return next;
+    }
+
+    /**
+     * 保存图片（自动压缩后存入 RocksDB）
+     * @param data 原始图片数据
+     * @param originalFileName 原始文件名
+     * @return 文件ID，格式: img_{id}.jpg（统一输出为 JPEG）
+     */
+    public String saveImage(byte[] data, String originalFileName) {
+        String ext = getExtension(originalFileName);
+        if (!isAllowedImageExt(ext)) {
+            log.warn("不支持的图片格式: {}", ext);
+            return null;
+        }
+
+        try {
+            // 压缩图片（统一输出为 JPEG）
+            byte[] compressedData = compressImage(data, ext);
+            if (compressedData == null || compressedData.length == 0) {
+                log.warn("图片压缩失败，使用原图: {}", originalFileName);
+                compressedData = data;
+            }
+
+            // 生成文件ID - 统一输出为 .jpg
+            long fileId = nextFileId();
+            String fileKey = "img_" + fileId + ".jpg";
+
+            // 直接存入 RocksDB（不经过 Kryo 序列化）
+            rawDb.put((FILE_PREFIX + fileKey).getBytes(StandardCharsets.UTF_8), compressedData);
+
+            log.info("图片保存成功: id={}, 原始大小={}KB, 压缩后={}KB",
+                    fileKey,
+                    data.length / 1024,
+                    compressedData.length / 1024);
+
+            return fileKey;
+        } catch (Exception e) {
+            log.error("图片保存失败", e);
+            return null;
         }
     }
 
-    /** 保存文件并返回访问URL */
-    public String saveFile(byte[] data, String originalFileName) {
+    /**
+     * 保存视频（直接存入 RocksDB）
+     * @param data 原始视频数据
+     * @param originalFileName 原始文件名
+     * @return 文件ID，格式: vid_{id}
+     */
+    public String saveVideo(byte[] data, String originalFileName) {
         String ext = getExtension(originalFileName);
-        String newFileName = UUID.randomUUID().toString().replace("-", "") + ext;
-        Path filePath = Paths.get(UPLOAD_DIR, newFileName);
-        try {
-            Files.write(filePath, data);
-            log.info("文件保存成功: {}", filePath);
-        } catch (IOException e) {
-            log.error("文件保存失败", e);
+        if (!isAllowedVideoExt(ext)) {
+            log.warn("不支持的视频格式: {}", ext);
             return null;
         }
-        return "/upload/" + newFileName;
+
+        // 视频大小限制 100MB
+        if (data.length > 100 * 1024 * 1024) {
+            log.warn("视频文件过大: {}MB", data.length / 1024 / 1024);
+            return null;
+        }
+
+        try {
+            // 生成文件ID
+            long fileId = nextFileId();
+            String fileKey = "vid_" + fileId + ext;
+
+            // 直接存入 RocksDB（不经过 Kryo 序列化）
+            rawDb.put((FILE_PREFIX + fileKey).getBytes(StandardCharsets.UTF_8), data);
+
+            log.info("视频保存成功: id={}, 大小={}MB", fileKey, data.length / 1024 / 1024);
+            return fileKey;
+        } catch (Exception e) {
+            log.error("视频保存失败", e);
+            return null;
+        }
+    }
+
+    /**
+     * 获取文件数据
+     * @param fileKey 文件ID
+     * @return 文件数据，如果不存在返回null
+     */
+    public byte[] getFile(String fileKey) {
+        try {
+            byte[] result = rawDb.get((FILE_PREFIX + fileKey).getBytes(StandardCharsets.UTF_8));
+            if (result != null) {
+                log.info("文件获取成功: fileKey={}, size={}KB", fileKey, result.length / 1024);
+            }
+            return result;
+        } catch (RocksDBException e) {
+            log.error("文件获取失败: fileKey={}", fileKey, e);
+            return null;
+        }
+    }
+
+    /**
+     * 根据文件ID判断类型
+     * 注意：所有图片统一存储为 JPEG 格式
+     */
+    public String getContentType(String fileKey) {
+        if (fileKey == null) return "application/octet-stream";
+
+        if (fileKey.startsWith("img_")) {
+            // 所有图片统一输出为 JPEG
+            return "image/jpeg";
+        } else if (fileKey.startsWith("vid_")) {
+            String ext = getExtension(fileKey);
+            switch (ext.toLowerCase()) {
+                case ".mp4":
+                    return "video/mp4";
+                case ".webm":
+                    return "video/webm";
+                case ".ogg":
+                    return "video/ogg";
+                case ".mov":
+                    return "video/quicktime";
+                case ".avi":
+                    return "video/x-msvideo";
+                default:
+                    return "video/mp4";
+            }
+        }
+        return "application/octet-stream";
+    }
+
+    /**
+     * 压缩图片
+     */
+    private byte[] compressImage(byte[] imageData, String ext) {
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(imageData);
+            BufferedImage originalImage = ImageIO.read(bais);
+            if (originalImage == null) {
+                return null;
+            }
+
+            int originalWidth = originalImage.getWidth();
+            int originalHeight = originalImage.getHeight();
+
+            // 如果图片已经在限制范围内，直接返回
+            if (originalWidth <= MAX_IMAGE_WIDTH && originalHeight <= MAX_IMAGE_HEIGHT) {
+                return compressToJpeg(imageData, ext, IMAGE_QUALITY);
+            }
+
+            // 计算缩放比例
+            double widthRatio = (double) MAX_IMAGE_WIDTH / originalWidth;
+            double heightRatio = (double) MAX_IMAGE_HEIGHT / originalHeight;
+            double ratio = Math.min(widthRatio, heightRatio);
+
+            int newWidth = (int) (originalWidth * ratio);
+            int newHeight = (int) (originalHeight * ratio);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            String outputFormat = getImageFormat(ext);
+            Thumbnails.Builder<BufferedImage> builder = Thumbnails.of(originalImage)
+                    .size(newWidth, newHeight)
+                    .outputQuality(IMAGE_QUALITY);
+
+            if ("jpg".equalsIgnoreCase(outputFormat) || "jpeg".equalsIgnoreCase(outputFormat)) {
+                builder.outputFormat(outputFormat);
+            } else {
+                // 非JPEG格式统一转为JPEG以获得更好的压缩效果
+                builder.outputFormat("jpeg");
+            }
+
+            builder.toOutputStream(baos);
+            return baos.toByteArray();
+
+        } catch (IOException e) {
+            log.error("图片压缩失败", e);
+            return null;
+        }
+    }
+
+    /**
+     * 将图片压缩为 JPEG 格式
+     */
+    private byte[] compressToJpeg(byte[] imageData, String originalExt, float quality) {
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(imageData);
+            BufferedImage image = ImageIO.read(bais);
+            if (image == null) {
+                return null;
+            }
+
+            // 统一输出为 JPEG 格式
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            BufferedImage outputImage = new BufferedImage(
+                    image.getWidth(),
+                    image.getHeight(),
+                    BufferedImage.TYPE_INT_RGB
+            );
+            outputImage.getGraphics().drawImage(image, 0, 0, null);
+
+            ImageIO.write(outputImage, "jpeg", baos);
+            return baos.toByteArray();
+
+        } catch (IOException e) {
+            log.error("JPEG转换失败", e);
+            return null;
+        }
+    }
+
+    private String getImageFormat(String ext) {
+        switch (ext.toLowerCase()) {
+            case ".jpg":
+            case ".jpeg":
+                return "jpeg";
+            case ".png":
+                return "png";
+            case ".gif":
+                return "gif";
+            case ".webp":
+                return "webp";
+            default:
+                return "jpeg";
+        }
     }
 
     private String getExtension(String fileName) {
@@ -55,4 +283,21 @@ public class FileService {
         return ".bin";
     }
 
+    private boolean isAllowedImageExt(String ext) {
+        for (String allowed : ALLOWED_IMAGE_EXT) {
+            if (allowed.equalsIgnoreCase(ext)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isAllowedVideoExt(String ext) {
+        for (String allowed : ALLOWED_VIDEO_EXT) {
+            if (allowed.equalsIgnoreCase(ext)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

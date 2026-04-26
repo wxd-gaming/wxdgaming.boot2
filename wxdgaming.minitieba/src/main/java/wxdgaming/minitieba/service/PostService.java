@@ -1,10 +1,12 @@
 package wxdgaming.minitieba.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.rocksdb.RocksIterator;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.boot2.starter.batis.rocksdb.RocksDBHelper;
+import wxdgaming.minitieba.bean.Notice;
 import wxdgaming.minitieba.bean.Post;
 import wxdgaming.minitieba.bean.Reply;
 import wxdgaming.minitieba.bean.UserLike;
@@ -37,6 +39,11 @@ public class PostService {
     private static final String POST_COUNT_KEY = "post_count";
     private static final String USER_POST_COUNT_PREFIX = "user:post:count:";
     private static final String USER_REPLY_COUNT_PREFIX = "user:reply:count:";
+    private static final String NOTICE_PREFIX = "notice:";
+    private static final String USER_NOTICE_INDEX_PREFIX = "user:notice:";
+    private static final String NOTICE_ID_GENERATOR = "notice_id_generator";
+    private static final String USER_NOTICE_COUNT_PREFIX = "user:notice:count:";
+    private static final String USER_NOTICE_UNREAD_PREFIX = "user:notice:unread:";
 
     public PostService(RocksDBHelper db) {
         this.db = db;
@@ -49,6 +56,8 @@ public class PostService {
         try {
             int total = 0;
             int fixed = 0;
+            int cleaned = 0;
+            int usernameFixed = 0;
             try (RocksIterator iterator = db.getDb().newIterator()) {
                 iterator.seek(POST_PREFIX.getBytes(StandardCharsets.UTF_8));
                 while (iterator.isValid()) {
@@ -67,29 +76,57 @@ public class PostService {
                         long postId = Long.parseLong(idStr);
                         Post post = db.getObject(POST_PREFIX + postId, Post.class);
                         log.info("检查帖子 postId={}, post={}, username={}", postId, post, post != null ? post.getUsername() : "null");
-                        if (post != null && post.getUsername() != null && !post.getUsername().isEmpty()) {
-                            // 检查是否已有用户索引
-                            long timestamp = post.getCreateTime();
-                            if (timestamp <= 0) {
-                                timestamp = System.currentTimeMillis();
-                                post.setCreateTime(timestamp);
-                                db.put(POST_PREFIX + postId, post);
+                        if (post != null) {
+                            // 修复username为空的帖子（使用author作为username）
+                            if (post.getUsername() == null || post.getUsername().isEmpty()) {
+                                if (post.getAuthor() != null && !post.getAuthor().isEmpty()) {
+                                    post.setUsername(post.getAuthor());
+                                    db.put(POST_PREFIX + postId, post);
+                                    usernameFixed++;
+                                    log.info("修复帖子username: postId={}, author={}", postId, post.getAuthor());
+                                }
                             }
-                            String userPostKey = USER_POST_PREFIX + post.getUsername() + ":" + buildTimeIndexKey(timestamp, postId);
-                            if (!db.exits(userPostKey)) {
-                                db.put(userPostKey, postId);
-                                fixed++;
-                                log.info("添加用户索引: username={}, postId={}", post.getUsername(), postId);
+                            // 检查是否已有用户索引
+                            if (post.getUsername() != null && !post.getUsername().isEmpty()) {
+                                long timestamp = post.getCreateTime();
+                                if (timestamp <= 0) {
+                                    timestamp = System.currentTimeMillis();
+                                    post.setCreateTime(timestamp);
+                                    db.put(POST_PREFIX + postId, post);
+                                }
+                                // 键格式必须与 createPost 一致: user:post:{username}:{倒序时间戳}:{postId}
+                                String userPostKey = USER_POST_PREFIX + post.getUsername() + ":" + (Long.MAX_VALUE - timestamp) + ":" + postId;
+                                if (!db.exits(userPostKey)) {
+                                    db.put(userPostKey, postId);
+                                    fixed++;
+                                    log.info("添加用户索引: username={}, postId={}", post.getUsername(), postId);
+                                }
                             }
                         }
                     } catch (NumberFormatException ignored) {}
                     iterator.next();
                 }
             }
-            log.info("fixOldData 完成: 共扫描 {} 条帖子, 修复了 {} 条", total, fixed);
-            if (fixed > 0) {
-                log.info("已修复 {} 条旧帖子的用户索引", fixed);
+
+            // 清理旧格式的索引（包含 post:idx: 的错误格式）
+            try (RocksIterator iterator = db.getDb().newIterator()) {
+                iterator.seek(USER_POST_PREFIX.getBytes(StandardCharsets.UTF_8));
+                while (iterator.isValid()) {
+                    String key = new String(iterator.key(), StandardCharsets.UTF_8);
+                    if (!key.startsWith(USER_POST_PREFIX)) {
+                        break;
+                    }
+                    // 检查是否是旧格式（包含 post:idx:）
+                    if (key.contains(":post:idx:")) {
+                        log.info("清理旧格式索引: {}", key);
+                        db.getDb().delete(key.getBytes(StandardCharsets.UTF_8));
+                        cleaned++;
+                    }
+                    iterator.next();
+                }
             }
+
+            log.info("fixOldData 完成: 共扫描 {} 条帖子, 修复了 {} 条username, 添加了 {} 条索引, 清理了 {} 条旧索引", total, usernameFixed, fixed, cleaned);
         } catch (Exception e) {
             log.error("修复旧数据失败", e);
         }
@@ -203,6 +240,10 @@ public class PostService {
                                 post.setAuthor("匿名用户");
                                 post.setUsername(null);
                             }
+                            // 设置当前用户的点赞状态
+                            if (currentUser != null) {
+                                post.setLikeStatus(getUserLikeStatus(currentUser, postId));
+                            }
                             posts.add(post);
                             collected++;
                         }
@@ -232,12 +273,20 @@ public class PostService {
         if (post.isPrivated() && (currentUser == null || !currentUser.equals(post.getUsername()))) {
             return null;
         }
-        // 匿名帖子隐藏作者信息
-        if (post.isAnonymous()) {
-            post.setAuthor("匿名用户");
-            post.setUsername(null);
+        // 匿名帖子返回脱敏副本，不修改原始对象
+        if (post.isAnonymous() && (currentUser == null || !currentUser.equals(post.getUsername()))) {
+            Post anonymousPost = new Post();
+            BeanUtils.copyProperties(post, anonymousPost);
+            anonymousPost.setAuthor("匿名用户");
+            anonymousPost.setUsername(null);
+            return anonymousPost;
         }
         return post;
+    }
+
+    /** 获取原始帖子（不隐藏匿名信息，用于发送通知） */
+    private Post getPostRaw(long postId) {
+        return db.getObject(POST_PREFIX + postId, Post.class);
     }
 
     /** 获取帖子详情（无用户上下文） */
@@ -247,10 +296,13 @@ public class PostService {
 
     /** 回复帖子 */
     public Reply createReply(long postId, String author, String username, String content, boolean anonymous) {
-        Post post = getPost(postId);
-        if (post == null) {
+        // 获取原始帖子用于发送通知
+        Post rawPost = getPostRaw(postId);
+        if (rawPost == null) {
             return null;
         }
+
+        Post post = getPost(postId);
 
         long replyId = nextId();
         long userReplyId = nextUserReplyId(username);
@@ -264,8 +316,8 @@ public class PostService {
         String userReplyKey = USER_REPLY_PREFIX + username + ":" + (Long.MAX_VALUE - createTime) + ":" + replyId;
         db.put(userReplyKey, replyId);
 
-        post.setReplyCount(post.getReplyCount() + 1);
-        db.put(POST_PREFIX + postId, post);
+        rawPost.setReplyCount(rawPost.getReplyCount() + 1);
+        db.put(POST_PREFIX + postId, rawPost);
 
         List<Long> replyIndex = db.getList(REPLY_INDEX + postId);
         if (replyIndex == null) {
@@ -273,6 +325,10 @@ public class PostService {
         }
         replyIndex.add(replyId);
         db.put(REPLY_INDEX + postId, replyIndex);
+
+        // 发送通知给帖子作者
+        String postContent = rawPost.getContent().length() > 50 ? rawPost.getContent().substring(0, 50) : rawPost.getContent();
+        sendNotice(rawPost.getUsername(), username, author, "reply", postId, postContent, content);
 
         log.info("回复成功: postId={}, replyId={}, userReplyId={}, author={}, anonymous={}", 
                 postId, replyId, userReplyId, author, anonymous);
@@ -307,9 +363,10 @@ public class PostService {
     }
 
     /** 点赞/点踩 */
-    public RunResult likePost(String username, long postId, String type) {
-        Post post = getPost(postId);
-        if (post == null) {
+    public RunResult likePost(String username, String nickname, long postId, String type) {
+        // 获取原始帖子用于发送通知
+        Post rawPost = getPostRaw(postId);
+        if (rawPost == null) {
             return RunResult.fail("帖子不存在");
         }
 
@@ -321,11 +378,11 @@ public class PostService {
             if (existing.getType().equals(type)) {
                 // 取消
                 if ("like".equals(type)) {
-                    post.setLikeCount(Math.max(0, post.getLikeCount() - 1));
+                    rawPost.setLikeCount(Math.max(0, rawPost.getLikeCount() - 1));
                 } else {
-                    post.setDislikeCount(Math.max(0, post.getDislikeCount() - 1));
+                    rawPost.setDislikeCount(Math.max(0, rawPost.getDislikeCount() - 1));
                 }
-                db.put(POST_PREFIX + postId, post);
+                db.put(POST_PREFIX + postId, rawPost);
                 try {
                     db.getDb().delete(likeKey.getBytes(StandardCharsets.UTF_8));
                 } catch (Exception e) {
@@ -335,29 +392,35 @@ public class PostService {
             } else {
                 // 切换
                 if ("like".equals(existing.getType())) {
-                    post.setLikeCount(Math.max(0, post.getLikeCount() - 1));
+                    rawPost.setLikeCount(Math.max(0, rawPost.getLikeCount() - 1));
                 } else {
-                    post.setDislikeCount(Math.max(0, post.getDislikeCount() - 1));
+                    rawPost.setDislikeCount(Math.max(0, rawPost.getDislikeCount() - 1));
                 }
                 if ("like".equals(type)) {
-                    post.setLikeCount(post.getLikeCount() + 1);
+                    rawPost.setLikeCount(rawPost.getLikeCount() + 1);
                 } else {
-                    post.setDislikeCount(post.getDislikeCount() + 1);
+                    rawPost.setDislikeCount(rawPost.getDislikeCount() + 1);
                 }
                 action = "set";
+                // 切换时发送通知
+                sendNotice(rawPost.getUsername(), username, nickname, type, postId,
+                        rawPost.getContent().length() > 50 ? rawPost.getContent().substring(0, 50) : rawPost.getContent(), null);
             }
         } else {
             // 新增
             if ("like".equals(type)) {
-                post.setLikeCount(post.getLikeCount() + 1);
+                rawPost.setLikeCount(rawPost.getLikeCount() + 1);
             } else {
-                post.setDislikeCount(post.getDislikeCount() + 1);
+                rawPost.setDislikeCount(rawPost.getDislikeCount() + 1);
             }
             action = "set";
+            // 发送通知
+            sendNotice(rawPost.getUsername(), username, nickname, type, postId,
+                    rawPost.getContent().length() > 50 ? rawPost.getContent().substring(0, 50) : rawPost.getContent(), null);
         }
 
         db.put(likeKey, new UserLike(username, postId, type));
-        db.put(POST_PREFIX + postId, post);
+        db.put(POST_PREFIX + postId, rawPost);
         return RunResult.ok().fluentPut("action", action);
     }
 
@@ -448,6 +511,99 @@ public class PostService {
             log.error("遍历用户跟帖索引失败", e);
         }
         return replies;
+    }
+
+    /** 生成通知ID */
+    private synchronized long nextNoticeId() {
+        long current = db.getLongValue(NOTICE_ID_GENERATOR);
+        long next = current + 1;
+        db.put(NOTICE_ID_GENERATOR, next);
+        return next;
+    }
+
+    /** 发送通知 */
+    private void sendNotice(String targetUser, String fromUser, String fromNickname, String type, long postId, String postContent, String replyContent) {
+        // 不能给自己发通知
+        if (targetUser.equals(fromUser)) {
+            return;
+        }
+        long noticeId = nextNoticeId();
+        Notice notice = new Notice(noticeId, targetUser, fromUser, fromNickname, type, postId);
+        notice.setPostContent(postContent);
+        notice.setReplyContent(replyContent);
+        notice.setCreateTime(System.currentTimeMillis());
+        notice.setReaded(false);
+
+        // 存储通知
+        db.put(NOTICE_PREFIX + noticeId, notice);
+
+        // 用户通知索引（按时间倒序）
+        String userNoticeKey = USER_NOTICE_INDEX_PREFIX + targetUser + ":" + (Long.MAX_VALUE - notice.getCreateTime()) + ":" + noticeId;
+        db.put(userNoticeKey, noticeId);
+
+        // 更新用户未读通知数
+        long unreadCount = db.getLongValue(USER_NOTICE_UNREAD_PREFIX + targetUser) + 1;
+        db.put(USER_NOTICE_UNREAD_PREFIX + targetUser, unreadCount);
+
+        log.info("发送通知: noticeId={}, targetUser={}, fromUser={}, type={}, postId={}", noticeId, targetUser, fromUser, type, postId);
+    }
+
+    /** 获取用户通知列表 */
+    public List<Notice> listNotices(String username, int page, int size) {
+        int offset = (page - 1) * size;
+        String startKey = USER_NOTICE_INDEX_PREFIX + username + ":";
+
+        List<Notice> notices = new ArrayList<>();
+        int skipped = 0;
+        int collected = 0;
+
+        try (RocksIterator iterator = db.getDb().newIterator()) {
+            iterator.seek(startKey.getBytes(StandardCharsets.UTF_8));
+            while (iterator.isValid() && collected < size) {
+                String key = new String(iterator.key(), StandardCharsets.UTF_8);
+                if (!key.startsWith(startKey)) {
+                    break;
+                }
+                String[] parts = key.substring(startKey.length()).split(":");
+                if (parts.length >= 2) {
+                    long noticeId = Long.parseLong(parts[parts.length - 1]);
+                    if (skipped < offset) {
+                        skipped++;
+                    } else {
+                        Notice notice = db.getObject(NOTICE_PREFIX + noticeId, Notice.class);
+                        if (notice != null) {
+                            notices.add(notice);
+                            collected++;
+                        }
+                    }
+                }
+                iterator.next();
+            }
+        } catch (Exception e) {
+            log.error("遍历用户通知失败", e);
+        }
+        return notices;
+    }
+
+    /** 获取用户未读通知数 */
+    public long getUnreadNoticeCount(String username) {
+        return db.getLongValue(USER_NOTICE_UNREAD_PREFIX + username);
+    }
+
+    /** 标记通知为已读 */
+    public int markNoticesAsRead(String username) {
+        List<Notice> notices = listNotices(username, 1, 100);
+        int count = 0;
+        for (Notice notice : notices) {
+            if (!notice.isReaded()) {
+                notice.setReaded(true);
+                db.put(NOTICE_PREFIX + notice.getId(), notice);
+                count++;
+            }
+        }
+        // 重置未读数
+        db.put(USER_NOTICE_UNREAD_PREFIX + username, 0L);
+        return count;
     }
 
 }

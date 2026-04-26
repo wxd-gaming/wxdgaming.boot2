@@ -29,6 +29,19 @@
             <artifactId>wxd-gaming.boot2.starter.batis.rocksdb</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- 图片压缩 -->
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.20</version>
+        </dependency>
+        <!-- Servlet API -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>

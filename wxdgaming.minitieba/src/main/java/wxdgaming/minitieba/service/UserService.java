@@ -168,9 +168,14 @@ public class UserService {
         if (user == null) {
             return RunResult.fail("用户不存在");
         }
+        // 确保 nickname 不为空
+        String displayName = user.getNickname();
+        if (displayName == null || displayName.isBlank()) {
+            displayName = user.getUsername();
+        }
         return RunResult.ok()
                 .fluentPut("username", user.getUsername())
-                .fluentPut("nickname", user.getNickname());
+                .fluentPut("nickname", displayName);
     }
 
 }

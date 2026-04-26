@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.minitieba.bean.Notice;
 import wxdgaming.minitieba.bean.Post;
 import wxdgaming.minitieba.bean.Reply;
 import wxdgaming.minitieba.service.PostService;
@@ -108,12 +109,13 @@ public class PostController {
     @RequestMapping("/like")
     public RunResult like(@RequestBody Map<String, Object> params, HttpServletRequest request) {
         String username = (String) request.getAttribute("currentUser");
+        String nickname = (String) request.getAttribute("currentNickname");
         long postId = Long.parseLong(params.get("postId").toString());
         String type = (String) params.get("type"); // like or dislike
         if (!"like".equals(type) && !"dislike".equals(type)) {
             return RunResult.fail("类型参数错误");
         }
-        return postService.likePost(username, postId, type);
+        return postService.likePost(username, nickname, postId, type);
     }
 
     /** 用户帖子列表 - 无需登录 */
@@ -128,6 +130,34 @@ public class PostController {
         data.put("replies", replies);
         data.put("username", username);
         return RunResult.ok().data(data);
+    }
+
+    /** 获取通知列表 - 需要登录 */
+    @RequestMapping("/notices")
+    public RunResult notices(@RequestParam(defaultValue = "1") int page,
+                             @RequestParam(defaultValue = "20") int size,
+                             HttpServletRequest request) {
+        String username = (String) request.getAttribute("currentUser");
+        if (username == null) {
+            return RunResult.fail("请先登录");
+        }
+        List<Notice> notices = postService.listNotices(username, page, size);
+        long unreadCount = postService.getUnreadNoticeCount(username);
+        Map<String, Object> data = new HashMap<>();
+        data.put("notices", notices);
+        data.put("unreadCount", unreadCount);
+        return RunResult.ok().data(data);
+    }
+
+    /** 标记通知为已读 - 需要登录 */
+    @RequestMapping("/notices/read")
+    public RunResult markNoticesRead(HttpServletRequest request) {
+        String username = (String) request.getAttribute("currentUser");
+        if (username == null) {
+            return RunResult.fail("请先登录");
+        }
+        int count = postService.markNoticesAsRead(username);
+        return RunResult.ok().fluentPut("count", count);
     }
 
 }

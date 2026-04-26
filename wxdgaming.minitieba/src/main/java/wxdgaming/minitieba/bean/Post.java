@@ -44,6 +44,8 @@ public class Post {
     private boolean anonymous;
     /** 是否私密（仅自己可见） */
     private boolean privated;
+    /** 当前用户点赞状态（none/like/dislike） - 仅用于前端展示 */
+    private String likeStatus;
 
     public Post(long id, String author, String username, String content) {
         this.id = id;

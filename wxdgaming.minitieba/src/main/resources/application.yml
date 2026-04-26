@@ -3,7 +3,7 @@ boot:
   gid: 1
   sid: 1
   name: "迷你贴吧"
-  jwtKey: "minitieba_jwt_secret_key_2026"
+  jwtKey: "minitieba_jwt_secret_key_20260426"
   tokenExpireHours: 24
 
 db:
