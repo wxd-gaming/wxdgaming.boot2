@@ -11,6 +11,10 @@ import wxdgaming.boot2.core.InitPrint;
 import wxdgaming.boot2.core.io.kryoPool;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,11 +30,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class RocksDBHelper implements InitPrint {
 
-    private static final kryoPool kryoPool = new kryoPool();
+    private static final class Lazy {
+        private static final kryoPool kryoPool = new kryoPool();
 
-    static {
-        // 初始化 RocksDB 库（建议在程序启动时调用）
-        RocksDB.loadLibrary();
+        static {
+            // 初始化 RocksDB 库（建议在程序启动时调用）
+            RocksDB.loadLibrary();
+        }
     }
 
     private final RocksDB db;
@@ -46,21 +52,23 @@ public class RocksDBHelper implements InitPrint {
     }
 
     public RocksDBHelper(Options options, String dbPath) {
-        if (options == null) {
-            // 1. 配置数据库选项
-            options = new Options();
-            // 数据库不存在则创建
-            options.setCreateIfMissing(true);
-            // 启用 LZ4 压缩（兼顾性能和压缩率）
-            options.setCompressionType(CompressionType.LZ4_COMPRESSION);
-            // 设置内存表（MemTable）大小上限（16MB）
-            options.setWriteBufferSize(16 * 1024 * 1024);
-            // 最大打开文件数（适配多 SSTable 场景）
-            options.setMaxOpenFiles(1000);
-        }
         try {
+            if (options == null) {
+                // 1. 配置数据库选项
+                options = new Options();
+                // 数据库不存在则创建
+                options.setCreateIfMissing(true);
+                // 启用 LZ4 压缩（兼顾性能和压缩率）
+                options.setCompressionType(CompressionType.LZ4_COMPRESSION);
+                // 设置内存表（MemTable）大小上限（16MB）
+                options.setWriteBufferSize(16 * 1024 * 1024);
+                // 最大打开文件数（适配多 SSTable 场景）
+                options.setMaxOpenFiles(1000);
+            }
+            Files.createDirectories(Paths.get(dbPath));
             db = RocksDB.open(options, dbPath);
-        } catch (RocksDBException e) {
+        } catch (Throwable e) {
+            log.error("RocksDBHelper init error: {}", dbPath, e);
             throw ExceptionUtils.asRuntimeException(e);
         }
     }
@@ -78,7 +86,7 @@ public class RocksDBHelper implements InitPrint {
     /** 写入单个数据 */
     public void put(String key, Object value) {
         try {
-            db.put(key.getBytes(StandardCharsets.UTF_8), kryoPool.serialize(value));
+            db.put(key.getBytes(StandardCharsets.UTF_8), Lazy.kryoPool.serialize(value));
         } catch (RocksDBException e) {
             throw ExceptionUtils.asRuntimeException(e);
         }
@@ -87,7 +95,7 @@ public class RocksDBHelper implements InitPrint {
     /** 用复合主键的形式写入日志 */
     public void putByComboKey(Object value, Object... ks) {
         try {
-            db.put(comboKey(ks), kryoPool.serialize(value));
+            db.put(comboKey(ks), Lazy.kryoPool.serialize(value));
         } catch (RocksDBException e) {
             throw ExceptionUtils.asRuntimeException(e);
         }
@@ -99,7 +107,7 @@ public class RocksDBHelper implements InitPrint {
             // 批量写操作（提升多写性能）
             WriteBatch writeBatch = new WriteBatch();
             for (Map.Entry<String, ?> entry : map.entrySet()) {
-                writeBatch.put(entry.getKey().getBytes(StandardCharsets.UTF_8), kryoPool.serialize(entry.getValue()));
+                writeBatch.put(entry.getKey().getBytes(StandardCharsets.UTF_8), Lazy.kryoPool.serialize(entry.getValue()));
             }
             // 执行批量写
             db.write(new WriteOptions(), writeBatch);
@@ -132,7 +140,7 @@ public class RocksDBHelper implements InitPrint {
         if (bytes == null) {
             return null;
         }
-        return kryoPool.deserialize(bytes, valueType);
+        return Lazy.kryoPool.deserialize(bytes, valueType);
     }
 
     /** 获取一个值 */
@@ -153,7 +161,7 @@ public class RocksDBHelper implements InitPrint {
         if (bytes == null) {
             return null;
         }
-        return kryoPool.deserialize(bytes, String.class);
+        return Lazy.kryoPool.deserialize(bytes, String.class);
     }
 
     /** 获取一个对象 */
@@ -162,17 +170,17 @@ public class RocksDBHelper implements InitPrint {
         if (bytes == null) {
             return null;
         }
-        return kryoPool.deserialize(bytes, clazz);
+        return Lazy.kryoPool.deserialize(bytes, clazz);
     }
 
     @SuppressWarnings("unchecked")
     public <K, V> Map<K, V> getMap(String key) {
-        return getObject(key, Map.class);
+        return getObject(key, HashMap.class);
     }
 
     @SuppressWarnings("unchecked")
     public <R> List<R> getList(String key) {
-        return getObject(key, List.class);
+        return getObject(key, ArrayList.class);
     }
 
     @SuppressWarnings("unchecked")

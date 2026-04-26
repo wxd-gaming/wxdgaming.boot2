@@ -33,6 +33,10 @@ public class VarTable {
         }
     }
 
+    public void removeAll() {
+        varTable.clear();
+    }
+
     public void setTable(String tableName, Map<Object, Object> value) {
         computeIfAbsent(tableName).putAll(value);
     }

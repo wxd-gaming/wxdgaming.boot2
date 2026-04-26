@@ -85,6 +85,7 @@
         <module>wxdgaming.logbus</module>
         <module>wxdgaming.logserver</module>
         <module>wxdgaming.boot2.starter.lua</module>
+        <module>wxdgaming.minitieba</module>
     </modules>
 
     <properties>

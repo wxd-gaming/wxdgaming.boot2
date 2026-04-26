@@ -32,6 +32,7 @@ B站 https://www.bilibili.com/list/316421251
 | game.server-script     | 游戏服务器脚本，业务逻辑模块                   |
 | logbus                 | 日志处理模块，用于上报日志                    |
 | logserver              | 日志服务，用户处理游戏内的日志，包括统计             |
+| minitieba              | 迷你贴吧系统                           |
 
 ### 完成情况
 #### 登录（模块：game.login）

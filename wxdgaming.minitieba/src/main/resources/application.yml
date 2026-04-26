@@ -1,0 +1,42 @@
+boot:
+  debug: true
+  gid: 1
+  sid: 1
+  name: "迷你贴吧"
+  jwtKey: "minitieba_jwt_secret_key_2026"
+  tokenExpireHours: 24
+
+db:
+  rocksdb:
+    path: ./data/minitieba
+
+core:
+  executor:
+    basic:
+      coreSize: 2
+      maxQueueSize: 10000
+    logic:
+      coreSize: 2
+      maxQueueSize: 50000
+    virtual:
+      coreSize: 100
+      maxQueueSize: 1500000
+
+server:
+  port: 18080
+  compression:
+    enabled: true
+    mime-types:
+      - "application/json"
+      - "text/html"
+      - "text/css"
+      - "text/javascript"
+      - "application/javascript"
+    min-response-size: 30720
+
+spring:
+  freemarker:
+    enabled: false
+  web:
+    resources:
+      static-locations: classpath:/public/,file:./upload/

@@ -2,8 +2,7 @@ package wxdgaming.boot2.core.util;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -217,6 +216,18 @@ public enum BytesUnit {
     },
     ;
 
+    private static Map<String, BytesUnit> BYTES_UNIT_MAP = Map.of(
+            B.name().toUpperCase(), B,
+            "K", KB,
+            KB.name().toUpperCase(), KB,
+            "M", MB,
+            MB.name().toUpperCase(), MB,
+            "G", GB,
+            GB.name().toUpperCase(), GB,
+            "T", TB,
+            TB.name().toUpperCase(), TB
+    );
+
     /**
      * 将配置的缓冲区大小字符串转换为字节数
      *
@@ -243,10 +254,7 @@ public enum BytesUnit {
         }
 
         long number = Double.valueOf(numberPart).longValue();
-        BytesUnit bytesUnit = Arrays.stream(BytesUnit.values())
-                .filter(unit -> Objects.equals(unit.name(), unitPart.get()))
-                .findFirst()
-                .orElse(null);
+        BytesUnit bytesUnit = BYTES_UNIT_MAP.get(unitPart.get());
         if (bytesUnit == null)
             throw new IllegalArgumentException("不支持的单位: " + unitPart);
         return bytesUnit.toBytes(number);

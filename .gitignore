@@ -40,3 +40,4 @@ build/
 rocksdb
 slog
 data-base/recharge-rocksdb
+data/minitieba
