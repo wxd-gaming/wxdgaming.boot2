@@ -60,6 +60,30 @@ public class UserController {
         return userService.updateNickname(username, nickname);
     }
 
+    /** 修改头像 - 需要登录 */
+    @RequestMapping("/updateAvatar")
+    public RunResult updateAvatar(@RequestBody Map<String, String> params,
+                                   HttpServletRequest request) {
+        String username = (String) request.getAttribute("currentUser");
+        if (username == null) {
+            return RunResult.fail("请先登录");
+        }
+        String avatar = params.get("avatar");
+        return userService.updateAvatar(username, avatar);
+    }
+
+    /** 修改签名 - 需要登录 */
+    @RequestMapping("/updateSignature")
+    public RunResult updateSignature(@RequestBody Map<String, String> params,
+                                      HttpServletRequest request) {
+        String username = (String) request.getAttribute("currentUser");
+        if (username == null) {
+            return RunResult.fail("请先登录");
+        }
+        String signature = params.get("signature");
+        return userService.updateSignature(username, signature);
+    }
+
     /** 获取用户公开信息 - 无需登录 */
     @RequestMapping("/public/info")
     public RunResult getUserInfo(@RequestParam String username) {

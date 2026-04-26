@@ -103,7 +103,8 @@ public class UserService {
         return RunResult.ok()
                 .fluentPut("token", token)
                 .fluentPut("username", user.getUsername())
-                .fluentPut("nickname", user.getNickname());
+                .fluentPut("nickname", user.getNickname())
+                .fluentPut("avatar", user.getAvatar());
     }
 
     /** 根据用户名获取用户 */
@@ -126,9 +127,13 @@ public class UserService {
             }
             String username = jsonToken.getString("username");
             String nickname = jsonToken.getString("nickname");
+            // 从数据库获取头像
+            User user = db.getObject(USER_PREFIX + username, User.class);
+            String avatar = user != null ? user.getAvatar() : null;
             return RunResult.ok()
                     .fluentPut("username", username)
-                    .fluentPut("nickname", nickname);
+                    .fluentPut("nickname", nickname)
+                    .fluentPut("avatar", avatar);
         } catch (IllegalArgumentException e) {
             return RunResult.fail("Token已过期");
         }
@@ -175,7 +180,42 @@ public class UserService {
         }
         return RunResult.ok()
                 .fluentPut("username", user.getUsername())
-                .fluentPut("nickname", displayName);
+                .fluentPut("nickname", displayName)
+                .fluentPut("avatar", user.getAvatar())
+                .fluentPut("signature", user.getSignature());
+    }
+
+    /** 修改头像 */
+    public RunResult updateAvatar(String username, String avatar) {
+        if (username == null || username.isBlank()) {
+            return RunResult.fail("用户名不能为空");
+        }
+        User user = db.getObject(USER_PREFIX + username, User.class);
+        if (user == null) {
+            return RunResult.fail("用户不存在");
+        }
+        user.setAvatar(avatar);
+        db.put(USER_PREFIX + username, user);
+        log.info("用户修改头像: username={}, avatar={}", username, avatar);
+        return RunResult.ok().fluentPut("avatar", avatar);
+    }
+
+    /** 修改签名 */
+    public RunResult updateSignature(String username, String signature) {
+        if (username == null || username.isBlank()) {
+            return RunResult.fail("用户名不能为空");
+        }
+        if (signature != null && signature.length() > 128) {
+            return RunResult.fail("签名不能超过128个字");
+        }
+        User user = db.getObject(USER_PREFIX + username, User.class);
+        if (user == null) {
+            return RunResult.fail("用户不存在");
+        }
+        user.setSignature(signature != null ? signature.trim() : null);
+        db.put(USER_PREFIX + username, user);
+        log.info("用户修改签名: username={}, signature={}", username, signature);
+        return RunResult.ok().fluentPut("signature", user.getSignature());
     }
 
 }

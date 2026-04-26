@@ -9,6 +9,7 @@ import wxdgaming.boot2.starter.batis.rocksdb.RocksDBHelper;
 import wxdgaming.minitieba.bean.Notice;
 import wxdgaming.minitieba.bean.Post;
 import wxdgaming.minitieba.bean.Reply;
+import wxdgaming.minitieba.bean.User;
 import wxdgaming.minitieba.bean.UserLike;
 
 import java.nio.charset.StandardCharsets;
@@ -29,6 +30,7 @@ public class PostService {
     private final RocksDBHelper db;
 
     private static final String POST_PREFIX = "post:";
+    private static final String USER_PREFIX = "user:";
     private static final String POST_INDEX_PREFIX = "post:idx:";
     private static final String USER_POST_PREFIX = "user:post:";
     private static final String USER_REPLY_PREFIX = "user:reply:";
@@ -174,6 +176,11 @@ public class PostService {
         long userPostId = nextUserPostId(username);
         Post post = new Post(id, author, username, content);
         post.setUserPostId(userPostId);
+        // 获取用户头像
+        User user = db.getObject(USER_PREFIX + username, User.class);
+        if (user != null) {
+            post.setAvatar(user.getAvatar());
+        }
         if (images != null) {
             post.setImages(images);
         }
@@ -241,12 +248,19 @@ public class PostService {
                                 BeanUtils.copyProperties(post, anonymousPost);
                                 anonymousPost.setAuthor("匿名用户");
                                 anonymousPost.setUsername(null);
+                                anonymousPost.setAvatar(null);
                                 post = anonymousPost;
+                            } else {
+                                // 非匿名帖子更新作者昵称为当前昵称和头像
+                                updatePostAuthor(post);
+                                updatePostAvatar(post);
                             }
                             // 设置当前用户的点赞状态
                             if (currentUser != null) {
                                 post.setLikeStatus(getUserLikeStatus(currentUser, postId));
                             }
+                            // 截断内容用于列表显示，最多128字
+                            truncateContent(post, 128);
                             posts.add(post);
                             collected++;
                         }
@@ -261,9 +275,36 @@ public class PostService {
         return posts;
     }
 
+    /** 截断帖子内容用于列表显示 */
+    private void truncateContent(Post post, int maxChars) {
+        if (post != null && post.getContent() != null && post.getContent().length() > maxChars) {
+            post.setContent(post.getContent().substring(0, maxChars) + "...");
+        }
+    }
+
     /** 获取帖子总数 */
     public int getPostCount() {
         return (int) db.getLongValue(POST_COUNT_KEY);
+    }
+
+    /** 更新帖子作者昵称为当前昵称 */
+    private void updatePostAuthor(Post post) {
+        if (post != null && post.getUsername() != null && !post.isAnonymous()) {
+            User user = db.getObject(USER_PREFIX + post.getUsername(), User.class);
+            if (user != null && user.getNickname() != null && !user.getNickname().isBlank()) {
+                post.setAuthor(user.getNickname());
+            }
+        }
+    }
+
+    /** 更新帖子作者头像为当前头像 */
+    private void updatePostAvatar(Post post) {
+        if (post != null && post.getUsername() != null && !post.isAnonymous()) {
+            User user = db.getObject(USER_PREFIX + post.getUsername(), User.class);
+            if (user != null && user.getAvatar() != null && !user.getAvatar().isBlank()) {
+                post.setAvatar(user.getAvatar());
+            }
+        }
     }
 
     /** 获取帖子详情 */
@@ -282,8 +323,12 @@ public class PostService {
             BeanUtils.copyProperties(post, anonymousPost);
             anonymousPost.setAuthor("匿名用户");
             anonymousPost.setUsername(null);
+            anonymousPost.setAvatar(null);
             return anonymousPost;
         }
+        // 更新作者昵称和头像为当前值
+        updatePostAuthor(post);
+        updatePostAvatar(post);
         return post;
     }
 
@@ -312,6 +357,11 @@ public class PostService {
         Reply reply = new Reply(replyId, postId, author, username, content);
         reply.setUserReplyId(userReplyId);
         reply.setAnonymous(anonymous);
+        // 获取用户头像
+        User user = db.getObject(USER_PREFIX + username, User.class);
+        if (user != null) {
+            reply.setAvatar(user.getAvatar());
+        }
         db.put(REPLY_PREFIX + replyId, reply);
 
         // 用户跟帖索引：user:reply:{username}:{倒序时间戳}:{replyId}
@@ -343,6 +393,26 @@ public class PostService {
         return createReply(postId, author, username, content, false);
     }
 
+    /** 更新回复作者昵称为当前昵称 */
+    private void updateReplyAuthor(Reply reply) {
+        if (reply != null && reply.getUsername() != null && !reply.isAnonymous()) {
+            User user = db.getObject(USER_PREFIX + reply.getUsername(), User.class);
+            if (user != null && user.getNickname() != null && !user.getNickname().isBlank()) {
+                reply.setAuthor(user.getNickname());
+            }
+        }
+    }
+
+    /** 更新回复作者头像为当前头像 */
+    private void updateReplyAvatar(Reply reply) {
+        if (reply != null && reply.getUsername() != null && !reply.isAnonymous()) {
+            User user = db.getObject(USER_PREFIX + reply.getUsername(), User.class);
+            if (user != null && user.getAvatar() != null && !user.getAvatar().isBlank()) {
+                reply.setAvatar(user.getAvatar());
+            }
+        }
+    }
+
     /** 获取帖子回复列表 */
     public List<Reply> listReplies(long postId) {
         List<Long> replyIndex = db.getList(REPLY_INDEX + postId);
@@ -358,6 +428,11 @@ public class PostService {
                 if (reply.isAnonymous()) {
                     reply.setAuthor("匿名用户");
                     reply.setUsername(null);
+                    reply.setAvatar(null);
+                } else {
+                    // 非匿名回复更新作者昵称和头像为当前值
+                    updateReplyAuthor(reply);
+                    updateReplyAvatar(reply);
                 }
                 replies.add(reply);
             }
@@ -462,6 +537,10 @@ public class PostService {
                     } else {
                         Post post = db.getObject(POST_PREFIX + postId, Post.class);
                         if (post != null) {
+                            // 更新作者昵称和头像为当前值
+                            updatePostAuthor(post);
+                            updatePostAvatar(post);
+                            truncateContent(post, 128);
                             posts.add(post);
                             collected++;
                         }
@@ -503,6 +582,9 @@ public class PostService {
                     } else {
                         Reply reply = db.getObject(REPLY_PREFIX + replyId, Reply.class);
                         if (reply != null) {
+                            // 更新作者昵称和头像为当前值
+                            updateReplyAuthor(reply);
+                            updateReplyAvatar(reply);
                             replies.add(reply);
                             collected++;
                         }
@@ -551,6 +633,26 @@ public class PostService {
         log.info("发送通知: noticeId={}, targetUser={}, fromUser={}, type={}, postId={}", noticeId, targetUser, fromUser, type, postId);
     }
 
+    /** 更新通知中的用户昵称 */
+    private void updateNoticeNicknames(Notice notice) {
+        if (notice != null && notice.getFromUser() != null) {
+            User user = db.getObject(USER_PREFIX + notice.getFromUser(), User.class);
+            if (user != null && user.getNickname() != null && !user.getNickname().isBlank()) {
+                notice.setFromNickname(user.getNickname());
+            }
+        }
+    }
+
+    /** 更新通知中的用户头像 */
+    private void updateNoticeAvatar(Notice notice) {
+        if (notice != null && notice.getFromUser() != null) {
+            User user = db.getObject(USER_PREFIX + notice.getFromUser(), User.class);
+            if (user != null && user.getAvatar() != null && !user.getAvatar().isBlank()) {
+                notice.setAvatar(user.getAvatar());
+            }
+        }
+    }
+
     /** 获取用户通知列表 */
     public List<Notice> listNotices(String username, int page, int size) {
         int offset = (page - 1) * size;
@@ -575,6 +677,9 @@ public class PostService {
                     } else {
                         Notice notice = db.getObject(NOTICE_PREFIX + noticeId, Notice.class);
                         if (notice != null) {
+                            // 更新通知中的用户昵称和头像
+                            updateNoticeNicknames(notice);
+                            updateNoticeAvatar(notice);
                             notices.add(notice);
                             collected++;
                         }

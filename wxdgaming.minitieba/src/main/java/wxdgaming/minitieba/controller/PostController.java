@@ -40,6 +40,14 @@ public class PostController {
         if (content == null || content.isBlank()) {
             return RunResult.fail("内容不能为空");
         }
+        if (content.length() > 300) {
+            return RunResult.fail("内容不能超过300个字");
+        }
+        // 过滤HTML和JS标签，防止注入攻击
+        content = filterHtml(content);
+        if (content.isBlank()) {
+            return RunResult.fail("内容不能为空");
+        }
         @SuppressWarnings("unchecked")
         List<String> images = (List<String>) params.get("images");
         String video = (String) params.get("video");
@@ -47,6 +55,22 @@ public class PostController {
         boolean privated = params.containsKey("privated") && Boolean.TRUE.equals(params.get("privated"));
         Post post = postService.createPost(author, username, content, images, video, anonymous, privated);
         return RunResult.ok().data(post);
+    }
+
+    /** 过滤HTML/JS标签，防止XSS注入 */
+    private String filterHtml(String content) {
+        if (content == null) return null;
+        // 移除script标签及其内容
+        content = content.replaceAll("(?i)<script[^>]*>[\\s\\S]*?</script>", "");
+        // 移除javascript:协议
+        content = content.replaceAll("(?i)javascript:", "");
+        // 移除onload/onerror等事件属性
+        content = content.replaceAll("(?i)\\s+on\\w+\\s*=", " ");
+        // 移除HTML标签
+        content = content.replaceAll("<[^>]+>", "");
+        // 移除多余的空白字符，保留换行
+        content = content.replaceAll("[ \\t]+", " ");
+        return content.trim();
     }
 
     /** 帖子列表 - 无需登录（登录后可见自己的私密帖子） */
@@ -95,6 +119,11 @@ public class PostController {
         long postId = Long.parseLong(params.get("postId").toString());
         String content = (String) params.get("content");
         if (content == null || content.isBlank()) {
+            return RunResult.fail("回复内容不能为空");
+        }
+        // 过滤HTML和JS标签，防止注入攻击
+        content = filterHtml(content);
+        if (content.isBlank()) {
             return RunResult.fail("回复内容不能为空");
         }
         boolean anonymous = params.containsKey("anonymous") && Boolean.TRUE.equals(params.get("anonymous"));

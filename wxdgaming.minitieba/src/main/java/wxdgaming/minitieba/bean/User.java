@@ -21,6 +21,10 @@ public class User {
     private String password;
     /** 昵称 */
     private String nickname;
+    /** 头像URL */
+    private String avatar;
+    /** 个性签名 */
+    private String signature;
     /** 注册时间 */
     private long createTime;
     /** 最后登录时间 */

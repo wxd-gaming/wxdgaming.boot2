@@ -23,6 +23,8 @@ public class Reply {
     private String author;
     /** 回复者用户名 */
     private String username;
+    /** 回复者头像 */
+    private String avatar;
     /** 用户跟帖序号 */
     private long userReplyId;
     /** 回复内容 */

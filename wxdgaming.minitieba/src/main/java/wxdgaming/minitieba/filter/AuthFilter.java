@@ -34,17 +34,8 @@ public class AuthFilter implements HandlerInterceptor, WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        InterceptorRegistration registration = registry.addInterceptor(this);
-        registration.addPathPatterns(
-                "/api/post/create",
-                "/api/post/reply",
-                "/api/post/like",
-                "/api/post/notices",
-                "/api/post/notices/read",
-                "/api/post/delete",
-                "/api/post/reply/delete",
-                "/api/file/upload"
-        );
+        registry.addInterceptor(this)
+                .addPathPatterns("/api/post/**", "/api/file/upload", "/api/user/updateNickname", "/api/user/updateAvatar", "/api/user/updateSignature");
     }
 
     @Override

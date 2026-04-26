@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>迷你贴吧</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260427">
-    <script src="js/app.js?v=20260427"></script>
+    <link rel="stylesheet" href="css/styles.css?v=20260428">
+    <script src="js/app.js?v=20260428"></script>
 </head>
 <body>
     <div class="header">
@@ -33,7 +33,7 @@
                 <h2>&#9997; 发布新帖</h2>
                 <div class="input-group">
                     <label>内容</label>
-                    <textarea id="contentInput" placeholder="分享你的想法..."></textarea>
+                    <textarea id="contentInput" placeholder="分享你的想法..." maxlength="300"></textarea>
                 </div>
                 <div class="input-group">
                     <label>&#128247; 图片（最多9张，已有视频时不可上传）</label>
@@ -139,6 +139,37 @@
     <!-- 图片查看器 -->
     <div class="image-viewer" id="imageViewer" onclick="closeViewer()">
         <img id="viewerImage" src="" />
+    </div>
+
+    <!-- 签名编辑弹窗 -->
+    <div class="modal-overlay" id="signatureModal">
+        <div class="modal" style="position:relative">
+            <div class="close-btn" onclick="closeSignatureModal()">&#10005;</div>
+            <h2>&#128221; 修改签名</h2>
+            <div class="input-group">
+                <textarea id="signatureInput" placeholder="说点什么吧..." maxlength="128" oninput="updateSignatureCharCount()"></textarea>
+                <div class="char-count"><span id="signatureCharCount">0</span>/128</div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="submitSignatureEdit()">保存</button>
+                <button class="btn btn-outline" onclick="closeSignatureModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 昵称编辑弹窗 -->
+    <div class="modal-overlay" id="nicknameModal">
+        <div class="modal" style="position:relative">
+            <div class="close-btn" onclick="closeNicknameModal()">&#10005;</div>
+            <h2>&#9998; 修改昵称</h2>
+            <div class="input-group">
+                <input type="text" id="nicknameInput" placeholder="请输入新昵称" maxlength="20" />
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="submitNicknameEdit()">保存</button>
+                <button class="btn btn-outline" onclick="closeNicknameModal()">取消</button>
+            </div>
+        </div>
     </div>
 
     <!-- Toast -->

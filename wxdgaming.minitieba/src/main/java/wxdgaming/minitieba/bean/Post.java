@@ -24,6 +24,8 @@ public class Post {
     private String author;
     /** 作者用户名 */
     private String username;
+    /** 作者头像 */
+    private String avatar;
     /** 用户发帖序号 */
     private long userPostId;
     /** 内容 */

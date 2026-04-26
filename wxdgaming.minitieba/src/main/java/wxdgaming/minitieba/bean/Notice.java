@@ -23,6 +23,8 @@ public class Notice {
     private String fromUser;
     /** 触发通知的用户昵称 */
     private String fromNickname;
+    /** 触发通知的用户头像 */
+    private String avatar;
     /** 通知类型: like(点赞), dislike(点踩), reply(回复) */
     private String type;
     /** 关联的帖子ID */

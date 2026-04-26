@@ -270,6 +270,9 @@ function getNickname() {
 function getUsername() {
     return localStorage.getItem('minitieba_username') || '';
 }
+function getAvatar() {
+    return localStorage.getItem('minitieba_avatar') || '';
+}
 
 function updateUserArea() {
     const area = document.getElementById('userArea');
@@ -279,7 +282,7 @@ function updateUserArea() {
 
     if (isLoggedIn()) {
         area.innerHTML =
-            '<span class="username" onclick="navigate(\'user\', getUsername())" style="cursor:pointer">' + escHtml(getNickname()) + '</span>' +
+            '<div class="header-avatar" onclick="navigate(\'user\', getUsername())">' + getAvatarHtml(getAvatar(), getNickname(), '') + '</div>' +
             '<button class="btn-header" onclick="navigate(\'create\')"><span class="btn-icon">&#9997;</span><span class="btn-text">发帖</span></button>' +
             '<button class="btn-header" onclick="navigate(\'user\', getUsername())"><span class="btn-icon">&#128100;</span><span class="btn-text">个人中心</span></button>' +
             '<button class="btn-header" id="noticeBtn" onclick="navigate(\'notices\')"><span class="btn-icon">&#128172;</span><span class="btn-text">消息</span><span id="noticeBadge" class="notice-badge" style="display:none">0</span></button>' +
@@ -320,6 +323,7 @@ async function doLogin() {
         setToken(res.token);
         localStorage.setItem('minitieba_username', res.username);
         localStorage.setItem('minitieba_nickname', res.nickname);
+        if (res.avatar) localStorage.setItem('minitieba_avatar', res.avatar);
         closeAuthModal();
         updateUserArea();
         showToast('登录成功');
@@ -394,6 +398,18 @@ function formatTime(ts) {
 function escHtml(str) {
     if (!str) return '';
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// 生成头像HTML
+function getAvatarHtml(avatar, name, sizeClass) {
+    if (!sizeClass) sizeClass = '';
+    if (avatar && avatar.startsWith('/')) {
+        return '<span class="user-avatar ' + sizeClass + '"><img src="' + escHtml(avatar) + '" alt="头像" onerror="this.parentElement.textContent=\'' + escHtml(name ? name.charAt(0) : '?') + '\'"></span>';
+    } else if (avatar) {
+        return '<span class="user-avatar ' + sizeClass + '"><img src="/api/file/get/' + escHtml(avatar) + '" alt="头像" onerror="this.parentElement.textContent=\'' + escHtml(name ? name.charAt(0) : '?') + '\'"></span>';
+    } else {
+        return '<span class="user-avatar ' + sizeClass + '">' + escHtml(name ? name.charAt(0).toUpperCase() : '?') + '</span>';
+    }
 }
 
 // ========== 文件上传 ==========
@@ -612,10 +628,12 @@ function removeVideo() {
 
 // ========== 发帖 ==========
 async function submitPost() {
-    const content = document.getElementById('contentInput').value.trim();
+    const contentInput = document.getElementById('contentInput');
+    const content = contentInput.value.trim();
     const anonymous = document.getElementById('anonymousCheck').checked;
     const privated = document.getElementById('privateCheck').checked;
     if (!content) { showToast('请输入内容'); return; }
+    if (content.length > 300) { showToast('内容不能超过300个字'); return; }
 
     const submitBtn = document.querySelector('.create-page .btn-primary');
     const originalText = submitBtn ? submitBtn.textContent : '';
@@ -794,7 +812,7 @@ function renderPostCard(post, showOwnStatus) {
     }
 
     return '<div class="post-card" onclick="navigate(\'detail\', ' + post.id + ')">' +
-        '<div><span class="post-author"' + authorClick + '>' + authorHtml + '</span><span class="post-time">' + formatTime(post.createTime) + '</span>' + statusHtml + deleteBtn + '</div>' +
+        '<div class="post-header"><span class="post-author"' + authorClick + '>' + getAvatarHtml(post.avatar, post.author, '') + authorHtml + '</span><span class="post-time">' + formatTime(post.createTime) + '</span>' + statusHtml + deleteBtn + '</div>' +
         '<div class="post-content">' + escHtml(contentPreview) + '</div>' +
         imagesHtml + videoHtml +
         '<div class="post-stats">' +
@@ -867,7 +885,7 @@ async function showDetail(postId) {
         const dislikeClass = likeStatus === 'dislike' ? 'active-dislike' : '';
 
         let html = '<div class="detail-post">' +
-            '<div><span class="post-author" style="font-size:16px;cursor:pointer" onclick="navigate(\'user\', \'' + encodeURIComponent(post.username || '') + '\')">' + escHtml(post.author) + '</span><span class="post-time">' + formatTime(post.createTime) + '</span></div>' +
+            '<div class="post-header"><span class="post-author" style="font-size:16px;cursor:pointer" onclick="navigate(\'user\', \'' + encodeURIComponent(post.username || '') + '\')">' + getAvatarHtml(post.avatar, post.author, '') + escHtml(post.author) + '</span><span class="post-time">' + formatTime(post.createTime) + '</span></div>' +
             '<div class="post-content" style="margin:14px 0">' + escHtml(post.content) + '</div>' +
             imagesHtml + videoHtml +
             '<div class="post-stats" style="margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f0">';
@@ -893,8 +911,8 @@ async function showDetail(postId) {
                     replyDeleteBtn = '<button class="btn-delete btn-delete-sm" onclick="deleteReply(' + r.id + ', ' + postId + ')">&#128465; 删除</button>';
                 }
                 return '<div class="reply-item">' +
-                    '<span class="reply-author" style="cursor:pointer" onclick="navigate(\'user\', \'' + encodeURIComponent(r.username || '') + '\')">' + escHtml(r.author) + '</span>' +
-                    '<span class="reply-time">' + formatTime(r.createTime) + '</span>' + replyDeleteBtn +
+                    '<div class="reply-header"><span class="reply-author" style="cursor:pointer" onclick="navigate(\'user\', \'' + encodeURIComponent(r.username || '') + '\')">' + getAvatarHtml(r.avatar, r.author, 'user-avatar-sm') + escHtml(r.author) + '</span>' +
+                    '<span class="reply-time">' + formatTime(r.createTime) + '</span>' + replyDeleteBtn + '</div>' +
                     '<div class="reply-content">' + escHtml(r.content) + '</div>' +
                 '</div>';
             }).join('');
@@ -1021,19 +1039,197 @@ async function showUserView(username) {
     document.getElementById('createView').classList.remove('active');
 
     const displayNameEl = document.getElementById('userProfile');
+    const isOwnProfile = isLoggedIn() && username === getUsername();
     displayNameEl.innerHTML =
-        '<div class="avatar">&#128100;</div>' +
-        '<div class="username" id="userDisplayName">' + escHtml(username) + '</div>';
+        '<div class="avatar-wrapper" id="avatarWrapper">' +
+        '<div class="avatar" id="userAvatarDisplay">&#128100;</div>' +
+        (isOwnProfile ? '<div class="avatar-edit-btn" onclick="document.getElementById(\'avatarInput\').click()">&#128247;</div>' : '') +
+        '</div>' +
+        '<div class="username" id="userDisplayName">' + escHtml(username) + '</div>' +
+        '<div class="user-signature" id="userSignature"></div>' +
+        (isOwnProfile ? '<div class="user-profile-actions"><button class="btn btn-outline btn-sm" onclick="showNicknameEdit()">&#9998; 修改昵称</button> <button class="btn btn-outline btn-sm" onclick="showSignatureEdit()">&#128221; 修改签名</button></div>' : '');
+
+    // 如果是自己的资料，添加头像上传input
+    if (isOwnProfile && !document.getElementById('avatarInput')) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.id = 'avatarInput';
+        input.accept = 'image/*';
+        input.style.display = 'none';
+        input.onchange = function() { uploadAvatar(this.files[0]); };
+        document.getElementById('userProfile').appendChild(input);
+    }
 
     try {
         const res = await api('/api/user/public/info?username=' + encodeURIComponent(username));
-        if (res.code === 1 && res.data) {
-            const displayName = res.data.nickname || res.data.username || username;
+        if (res.code === 1) {
+            const displayName = res.nickname || res.username || username;
             document.getElementById('userDisplayName').textContent = displayName;
+            if (res.avatar) {
+                updateUserAvatarDisplay(res.avatar);
+            }
+            // 显示签名
+            const signatureEl = document.getElementById('userSignature');
+            if (signatureEl) {
+                if (res.signature && res.signature.trim()) {
+                    signatureEl.textContent = '📋 ' + res.signature;
+                } else {
+                    signatureEl.textContent = '📋 该用户很懒什么都没留下';
+                }
+            }
         }
     } catch(e) {}
 
     switchUserTab('posts');
+}
+
+// 更新头像显示
+function updateUserAvatarDisplay(avatar) {
+    const avatarEl = document.getElementById('userAvatarDisplay');
+    if (avatarEl && avatar) {
+        avatarEl.innerHTML = '<img src="/api/file/get/' + escHtml(avatar) + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover" onerror="this.parentElement.innerHTML=\'&#128100;\'" />';
+    }
+}
+
+// 上传头像
+async function uploadAvatar(file) {
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+        showToast('头像不能超过2MB');
+        return;
+    }
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const token = getToken();
+        const res = await fetch('/api/file/upload', {
+            method: 'POST',
+            headers: { 'Authorization': token },
+            body: formData
+        });
+        const json = await res.json();
+        if (json.code === 1) {
+            const avatarKey = json.data;
+            // 更新头像到服务器
+            const updateRes = await api('/api/user/updateAvatar', 'POST', { avatar: avatarKey });
+            if (updateRes.code === 1) {
+                updateUserAvatarDisplay(avatarKey);
+                showToast('头像更新成功');
+            } else {
+                showToast(updateRes.msg || '头像更新失败');
+            }
+        } else {
+            showToast(json.msg || '上传失败');
+        }
+    } catch(e) {
+        showToast('头像上传失败');
+    }
+}
+
+// 显示昵称编辑
+function showNicknameEdit() {
+    const currentNickname = document.getElementById('userDisplayName').textContent;
+    document.getElementById('nicknameInput').value = currentNickname;
+    document.getElementById('nicknameModal').classList.add('active');
+    document.getElementById('nicknameInput').focus();
+}
+
+// 关闭昵称编辑弹窗
+function closeNicknameModal() {
+    document.getElementById('nicknameModal').classList.remove('active');
+}
+
+// 提交昵称编辑
+function submitNicknameEdit() {
+    const input = document.getElementById('nicknameInput');
+    const newNickname = input.value.trim();
+    const currentNickname = document.getElementById('userDisplayName').textContent;
+    if (newNickname && newNickname !== currentNickname) {
+        closeNicknameModal();
+        updateNickname(newNickname);
+    } else {
+        closeNicknameModal();
+    }
+}
+
+// 显示签名编辑
+function showSignatureEdit() {
+    let currentSignature = document.getElementById('userSignature').textContent || '';
+    // 移除 emoji 前缀
+    currentSignature = currentSignature.replace(/^📋\s*/, '');
+    // 移除"该用户很懒什么都没留下"
+    if (currentSignature === '该用户很懒什么都没留下') {
+        currentSignature = '';
+    }
+    const input = document.getElementById('signatureInput');
+    input.value = currentSignature;
+    updateSignatureCharCount();
+    document.getElementById('signatureModal').classList.add('active');
+    input.focus();
+}
+
+// 更新签名字数统计
+function updateSignatureCharCount() {
+    const input = document.getElementById('signatureInput');
+    const counter = document.getElementById('signatureCharCount');
+    const count = input.value.length;
+    counter.textContent = count;
+    counter.parentElement.classList.toggle('warn', count > 110);
+}
+
+// 关闭签名编辑弹窗
+function closeSignatureModal() {
+    document.getElementById('signatureModal').classList.remove('active');
+}
+
+// 提交签名编辑
+function submitSignatureEdit() {
+    const input = document.getElementById('signatureInput');
+    const newSignature = input.value.trim();
+    closeSignatureModal();
+    updateSignature(newSignature);
+}
+
+// 更新签名
+async function updateSignature(newSignature) {
+    if (newSignature && newSignature.length > 128) {
+        showToast('签名不能超过128个字');
+        return;
+    }
+    try {
+        const res = await api('/api/user/updateSignature', 'POST', { signature: newSignature });
+        if (res.code === 1) {
+            const signatureEl = document.getElementById('userSignature');
+            if (signatureEl) {
+                if (newSignature && newSignature.trim()) {
+                    signatureEl.textContent = '📋 ' + newSignature;
+                } else {
+                    signatureEl.textContent = '📋 该用户很懒什么都没留下';
+                }
+            }
+            showToast('签名修改成功');
+        } else {
+            showToast(res.msg || '修改失败');
+        }
+    } catch(e) {
+        showToast('签名修改失败');
+    }
+}
+
+// 更新昵称
+async function updateNickname(newNickname) {
+    try {
+        const res = await api('/api/user/updateNickname', 'POST', { nickname: newNickname });
+        if (res.code === 1) {
+            document.getElementById('userDisplayName').textContent = newNickname;
+            localStorage.setItem('nickname', newNickname);
+            showToast('昵称修改成功');
+        } else {
+            showToast(res.msg || '修改失败');
+        }
+    } catch(e) {
+        showToast('昵称修改失败');
+    }
 }
 
 function switchUserTab(tab) {
