@@ -5,6 +5,7 @@ import org.springframework.beans.BeanUtils;
 import org.rocksdb.RocksIterator;
 import org.springframework.stereotype.Service;
 import wxdgaming.boot2.core.lang.RunResult;
+import wxdgaming.boot2.core.util.SingletonLockUtil;
 import wxdgaming.boot2.starter.batis.rocksdb.RocksDBHelper;
 import wxdgaming.minitieba.bean.Notice;
 import wxdgaming.minitieba.bean.Post;
@@ -28,6 +29,9 @@ import java.util.List;
 public class PostService {
 
     private final RocksDBHelper db;
+    private final NoticeService noticeService;
+    private final FriendService friendService;
+    private final Object postCountLock = new Object();  // 发帖计数锁
 
     private static final String POST_PREFIX = "post:";
     private static final String USER_PREFIX = "user:";
@@ -35,7 +39,7 @@ public class PostService {
     private static final String USER_POST_PREFIX = "user:post:";
     private static final String USER_REPLY_PREFIX = "user:reply:";
     private static final String REPLY_PREFIX = "reply:";
-    private static final String REPLY_INDEX = "reply_index:";
+    private static final String REPLY_INDEX_PREFIX = "reply:idx:";  // 回复索引（替代List，按帖子ID+时间倒序）
     private static final String LIKE_PREFIX = "like:";
     private static final String POST_ID_GENERATOR = "post_id_generator";
     private static final String POST_COUNT_KEY = "post_count";
@@ -47,8 +51,10 @@ public class PostService {
     private static final String USER_NOTICE_COUNT_PREFIX = "user:notice:count:";
     private static final String USER_NOTICE_UNREAD_PREFIX = "user:notice:unread:";
 
-    public PostService(RocksDBHelper db) {
+    public PostService(RocksDBHelper db, NoticeService noticeService, FriendService friendService) {
         this.db = db;
+        this.noticeService = noticeService;
+        this.friendService = friendService;
         // 启动时修复旧数据（添加缺失的用户索引）
         fixOldData();
     }
@@ -170,8 +176,10 @@ public class PostService {
         return String.format("%s%d:%d", POST_INDEX_PREFIX, Long.MAX_VALUE - timestamp, postId);
     }
 
-    /** 发帖 */
-    public Post createPost(String author, String username, String content, List<String> images, String video, boolean anonymous, boolean privated) {
+    /** 发帖
+     * @param visibility 可见性: 0-无限制(公开), 1-仅好友可见, 2-仅自己可见(私密)
+     */
+    public Post createPost(String author, String username, String content, List<String> images, String video, boolean anonymous, int visibility) {
         long id = nextId();
         long userPostId = nextUserPostId(username);
         Post post = new Post(id, author, username, content);
@@ -186,7 +194,8 @@ public class PostService {
         }
         post.setVideo(video);
         post.setAnonymous(anonymous);
-        post.setPrivated(privated);
+        post.setVisibility(visibility);
+        post.setPrivated(visibility == 2); // 私密帖子标记
         long createTime = System.currentTimeMillis();
         post.setCreateTime(createTime);
         db.put(POST_PREFIX + id, post);
@@ -199,12 +208,14 @@ public class PostService {
         String userPostKey = USER_POST_PREFIX + username + ":" + (Long.MAX_VALUE - createTime) + ":" + id;
         db.put(userPostKey, id);
 
-        // 更新总数
-        long count = db.getLongValue(POST_COUNT_KEY) + 1;
-        db.put(POST_COUNT_KEY, count);
+        // 更新总数（加锁保护，防止并发丢失）
+        synchronized (postCountLock) {
+            long count = db.getLongValue(POST_COUNT_KEY) + 1;
+            db.put(POST_COUNT_KEY, count);
+        }
 
-        log.info("发帖成功: id={}, userPostId={}, author={}, username={}, anonymous={}, privated={}", 
-                id, userPostId, author, username, anonymous, privated);
+        log.info("发帖成功: id={}, userPostId={}, author={}, username={}, anonymous={}, visibility={}",
+                id, userPostId, author, username, anonymous, visibility);
         return post;
     }
 
@@ -234,16 +245,37 @@ public class PostService {
                     long postId = Long.parseLong(parts[parts.length - 1]);
                     Post post = db.getObject(POST_PREFIX + postId, Post.class);
                     if (post != null) {
-                        // 私密帖子只显示给作者本人
-                        if (post.isPrivated() && (currentUser == null || !currentUser.equals(post.getUsername()))) {
+                        String postAuthor = post.getUsername();
+
+                        // 检查黑名单：作者在当前用户黑名单中，则不显示
+                        if (currentUser != null && friendService.isBlacklisted(currentUser, postAuthor)) {
                             iterator.next();
                             continue;
                         }
+
+                        // 检查可见性
+                        int visibility = post.getVisibility();
+                        if (visibility == 2) { // 仅自己可见
+                            if (currentUser == null || !currentUser.equals(postAuthor)) {
+                                iterator.next();
+                                continue;
+                            }
+                        } else if (visibility == 1) { // 仅好友可见
+                            if (currentUser == null) {
+                                iterator.next();
+                                continue;
+                            }
+                            if (!currentUser.equals(postAuthor) && !friendService.isFriend(currentUser, postAuthor)) {
+                                iterator.next();
+                                continue;
+                            }
+                        }
+
                         if (skipped < offset) {
                             skipped++;
                         } else {
                             // 匿名帖子隐藏作者信息（创建脱敏副本，不修改原始对象）
-                            if (post.isAnonymous() && (currentUser == null || !currentUser.equals(post.getUsername()))) {
+                            if (post.isAnonymous() && (currentUser == null || !currentUser.equals(postAuthor))) {
                                 Post anonymousPost = new Post();
                                 BeanUtils.copyProperties(post, anonymousPost);
                                 anonymousPost.setAuthor("匿名用户");
@@ -313,12 +345,30 @@ public class PostService {
         if (post == null) {
             return null;
         }
-        // 私密帖子只显示给作者本人
-        if (post.isPrivated() && (currentUser == null || !currentUser.equals(post.getUsername()))) {
+        String postAuthor = post.getUsername();
+
+        // 检查黑名单
+        if (currentUser != null && friendService.isBlacklisted(currentUser, postAuthor)) {
             return null;
         }
+
+        // 检查可见性
+        int visibility = post.getVisibility();
+        if (visibility == 2) { // 仅自己可见
+            if (currentUser == null || !currentUser.equals(postAuthor)) {
+                return null;
+            }
+        } else if (visibility == 1) { // 仅好友可见
+            if (currentUser == null) {
+                return null;
+            }
+            if (!currentUser.equals(postAuthor) && !friendService.isFriend(currentUser, postAuthor)) {
+                return null;
+            }
+        }
+
         // 匿名帖子返回脱敏副本，不修改原始对象
-        if (post.isAnonymous() && (currentUser == null || !currentUser.equals(post.getUsername()))) {
+        if (post.isAnonymous() && (currentUser == null || !currentUser.equals(postAuthor))) {
             Post anonymousPost = new Post();
             BeanUtils.copyProperties(post, anonymousPost);
             anonymousPost.setAuthor("匿名用户");
@@ -369,21 +419,26 @@ public class PostService {
         String userReplyKey = USER_REPLY_PREFIX + username + ":" + (Long.MAX_VALUE - createTime) + ":" + replyId;
         db.put(userReplyKey, replyId);
 
-        rawPost.setReplyCount(rawPost.getReplyCount() + 1);
-        db.put(POST_PREFIX + postId, rawPost);
+        // 更新回复计数（用 SingletonLockUtil 按帖子ID加锁，防止并发丢失数据，5分钟无访问自动释放）
+        SingletonLockUtil.lockRunning(postId, () -> {
+            // 重新读取最新数据
+            Post lockPost = getPostRaw(postId);
+            if (lockPost == null) {
+                return;
+            }
+            lockPost.setReplyCount(lockPost.getReplyCount() + 1);
+            db.put(POST_PREFIX + postId, lockPost);
 
-        List<Long> replyIndex = db.getList(REPLY_INDEX + postId);
-        if (replyIndex == null) {
-            replyIndex = new ArrayList<>();
-        }
-        replyIndex.add(replyId);
-        db.put(REPLY_INDEX + postId, replyIndex);
+            // 用 RocksDB 二级索引替代 List（格式: reply:idx:{postId}:{倒序时间戳}:{replyId}）
+            String replyIndexKey = REPLY_INDEX_PREFIX + postId + ":" + (Long.MAX_VALUE - createTime) + ":" + replyId;
+            db.put(replyIndexKey, replyId);
+        });
 
         // 发送通知给帖子作者
         String postContent = rawPost.getContent().length() > 50 ? rawPost.getContent().substring(0, 50) : rawPost.getContent();
-        sendNotice(rawPost.getUsername(), username, author, "reply", postId, postContent, content);
+        noticeService.sendNotice(rawPost.getUsername(), username, author, "reply", postId, postContent, content);
 
-        log.info("回复成功: postId={}, replyId={}, userReplyId={}, author={}, anonymous={}", 
+        log.info("回复成功: postId={}, replyId={}, userReplyId={}, author={}, anonymous={}",
                 postId, replyId, userReplyId, author, anonymous);
         return reply;
     }
@@ -413,29 +468,44 @@ public class PostService {
         }
     }
 
-    /** 获取帖子回复列表 */
+    /** 获取帖子回复列表（使用 RocksDB 范围查询，不再用 List） */
     public List<Reply> listReplies(long postId) {
-        List<Long> replyIndex = db.getList(REPLY_INDEX + postId);
-        if (replyIndex == null || replyIndex.isEmpty()) {
-            return Collections.emptyList();
-        }
-
         List<Reply> replies = new ArrayList<>();
-        for (Long replyId : replyIndex) {
-            Reply reply = db.getObject(REPLY_PREFIX + replyId, Reply.class);
-            if (reply != null) {
-                // 匿名回复隐藏作者信息
-                if (reply.isAnonymous()) {
-                    reply.setAuthor("匿名用户");
-                    reply.setUsername(null);
-                    reply.setAvatar(null);
-                } else {
-                    // 非匿名回复更新作者昵称和头像为当前值
-                    updateReplyAuthor(reply);
-                    updateReplyAvatar(reply);
+
+        try (RocksIterator iterator = db.getDb().newIterator()) {
+            // 范围查询：reply:idx:{postId}:
+            String startKey = REPLY_INDEX_PREFIX + postId + ":";
+            iterator.seek(startKey.getBytes(StandardCharsets.UTF_8));
+
+            while (iterator.isValid()) {
+                String key = new String(iterator.key(), StandardCharsets.UTF_8);
+                // 检查是否还在当前帖子的键范围内
+                if (!key.startsWith(startKey)) {
+                    break;
                 }
-                replies.add(reply);
+                // 解析 replyId（格式: reply:idx:{postId}:{倒序时间戳}:{replyId}）
+                String[] parts = key.substring(startKey.length()).split(":");
+                if (parts.length >= 1) {
+                    long replyId = Long.parseLong(parts[parts.length - 1]);
+                    Reply reply = db.getObject(REPLY_PREFIX + replyId, Reply.class);
+                    if (reply != null) {
+                        // 匿名回复隐藏作者信息
+                        if (reply.isAnonymous()) {
+                            reply.setAuthor("匿名用户");
+                            reply.setUsername(null);
+                            reply.setAvatar(null);
+                        } else {
+                            // 非匿名回复更新作者昵称和头像为当前值
+                            updateReplyAuthor(reply);
+                            updateReplyAvatar(reply);
+                        }
+                        replies.add(reply);
+                    }
+                }
+                iterator.next();
             }
+        } catch (Exception e) {
+            log.error("遍历回复索引失败: postId={}", postId, e);
         }
         return replies;
     }
@@ -481,7 +551,7 @@ public class PostService {
                 }
                 action = "set";
                 // 切换时发送通知
-                sendNotice(rawPost.getUsername(), username, nickname, type, postId,
+                noticeService.sendNotice(rawPost.getUsername(), username, nickname, type, postId,
                         rawPost.getContent().length() > 50 ? rawPost.getContent().substring(0, 50) : rawPost.getContent(), null);
             }
         } else {
@@ -493,7 +563,7 @@ public class PostService {
             }
             action = "set";
             // 发送通知
-            sendNotice(rawPost.getUsername(), username, nickname, type, postId,
+            noticeService.sendNotice(rawPost.getUsername(), username, nickname, type, postId,
                     rawPost.getContent().length() > 50 ? rawPost.getContent().substring(0, 50) : rawPost.getContent(), null);
         }
 
@@ -599,121 +669,6 @@ public class PostService {
     }
 
     /** 生成通知ID */
-    private synchronized long nextNoticeId() {
-        long current = db.getLongValue(NOTICE_ID_GENERATOR);
-        long next = current + 1;
-        db.put(NOTICE_ID_GENERATOR, next);
-        return next;
-    }
-
-    /** 发送通知 */
-    private void sendNotice(String targetUser, String fromUser, String fromNickname, String type, long postId, String postContent, String replyContent) {
-        // 不能给自己发通知
-        if (targetUser.equals(fromUser)) {
-            return;
-        }
-        long noticeId = nextNoticeId();
-        Notice notice = new Notice(noticeId, targetUser, fromUser, fromNickname, type, postId);
-        notice.setPostContent(postContent);
-        notice.setReplyContent(replyContent);
-        notice.setCreateTime(System.currentTimeMillis());
-        notice.setReaded(false);
-
-        // 存储通知
-        db.put(NOTICE_PREFIX + noticeId, notice);
-
-        // 用户通知索引（按时间倒序）
-        String userNoticeKey = USER_NOTICE_INDEX_PREFIX + targetUser + ":" + (Long.MAX_VALUE - notice.getCreateTime()) + ":" + noticeId;
-        db.put(userNoticeKey, noticeId);
-
-        // 更新用户未读通知数
-        long unreadCount = db.getLongValue(USER_NOTICE_UNREAD_PREFIX + targetUser) + 1;
-        db.put(USER_NOTICE_UNREAD_PREFIX + targetUser, unreadCount);
-
-        log.info("发送通知: noticeId={}, targetUser={}, fromUser={}, type={}, postId={}", noticeId, targetUser, fromUser, type, postId);
-    }
-
-    /** 更新通知中的用户昵称 */
-    private void updateNoticeNicknames(Notice notice) {
-        if (notice != null && notice.getFromUser() != null) {
-            User user = db.getObject(USER_PREFIX + notice.getFromUser(), User.class);
-            if (user != null && user.getNickname() != null && !user.getNickname().isBlank()) {
-                notice.setFromNickname(user.getNickname());
-            }
-        }
-    }
-
-    /** 更新通知中的用户头像 */
-    private void updateNoticeAvatar(Notice notice) {
-        if (notice != null && notice.getFromUser() != null) {
-            User user = db.getObject(USER_PREFIX + notice.getFromUser(), User.class);
-            if (user != null && user.getAvatar() != null && !user.getAvatar().isBlank()) {
-                notice.setAvatar(user.getAvatar());
-            }
-        }
-    }
-
-    /** 获取用户通知列表 */
-    public List<Notice> listNotices(String username, int page, int size) {
-        int offset = (page - 1) * size;
-        String startKey = USER_NOTICE_INDEX_PREFIX + username + ":";
-
-        List<Notice> notices = new ArrayList<>();
-        int skipped = 0;
-        int collected = 0;
-
-        try (RocksIterator iterator = db.getDb().newIterator()) {
-            iterator.seek(startKey.getBytes(StandardCharsets.UTF_8));
-            while (iterator.isValid() && collected < size) {
-                String key = new String(iterator.key(), StandardCharsets.UTF_8);
-                if (!key.startsWith(startKey)) {
-                    break;
-                }
-                String[] parts = key.substring(startKey.length()).split(":");
-                if (parts.length >= 2) {
-                    long noticeId = Long.parseLong(parts[parts.length - 1]);
-                    if (skipped < offset) {
-                        skipped++;
-                    } else {
-                        Notice notice = db.getObject(NOTICE_PREFIX + noticeId, Notice.class);
-                        if (notice != null) {
-                            // 更新通知中的用户昵称和头像
-                            updateNoticeNicknames(notice);
-                            updateNoticeAvatar(notice);
-                            notices.add(notice);
-                            collected++;
-                        }
-                    }
-                }
-                iterator.next();
-            }
-        } catch (Exception e) {
-            log.error("遍历用户通知失败", e);
-        }
-        return notices;
-    }
-
-    /** 获取用户未读通知数 */
-    public long getUnreadNoticeCount(String username) {
-        return db.getLongValue(USER_NOTICE_UNREAD_PREFIX + username);
-    }
-
-    /** 标记通知为已读 */
-    public int markNoticesAsRead(String username) {
-        List<Notice> notices = listNotices(username, 1, 100);
-        int count = 0;
-        for (Notice notice : notices) {
-            if (!notice.isReaded()) {
-                notice.setReaded(true);
-                db.put(NOTICE_PREFIX + notice.getId(), notice);
-                count++;
-            }
-        }
-        // 重置未读数
-        db.put(USER_NOTICE_UNREAD_PREFIX + username, 0L);
-        return count;
-    }
-
     /** 删除帖子 - 需要验证是否是帖子的作者 */
     public RunResult deletePost(long postId, String username) {
         Post post = getPostRaw(postId);

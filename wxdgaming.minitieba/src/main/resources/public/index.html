@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>迷你贴吧</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260428">
-    <script src="js/app.js?v=20260428"></script>
+    <link rel="stylesheet" href="css/styles.css?v=20260431">
+    <script src="js/app.js?v=20260440"></script>
 </head>
 <body>
     <div class="header">
@@ -85,6 +85,13 @@
         <div class="user-view" id="userView">
             <div class="back-btn" onclick="history.back()">&#8592; 返回</div>
             <div class="user-profile" id="userProfile"></div>
+            <!-- 用户操作区域（查看他人主页时显示） -->
+            <div class="user-actions" id="userActions" style="display:none;margin-top:16px;margin-bottom:16px;padding:16px;background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08)">
+                <button class="btn btn-primary" id="btnAddFriend" onclick="sendFriendRequest()">&#128100; 加为好友</button>
+                <button class="btn btn-outline" id="btnRemoveFriend" onclick="removeFriend()" style="display:none">&#128683; 删除好友</button>
+                <button class="btn btn-outline" id="btnBlockUser" onclick="blockUser()">&#128683; 拉黑</button>
+                <button class="btn btn-outline" id="btnUnblockUser" onclick="unblockUser()" style="display:none">&#9989; 取消拉黑</button>
+            </div>
             <div class="user-tabs">
                 <div class="tab active" onclick="switchUserTab('posts')" id="tabPosts">发帖</div>
                 <div class="tab" onclick="switchUserTab('replies')" id="tabReplies">跟帖</div>
@@ -98,6 +105,19 @@
         <div class="notice-view" id="noticeView">
             <div class="back-btn" onclick="history.back()">&#8592; 返回</div>
             <div id="noticeList"></div>
+        </div>
+
+        <!-- 好友视图 -->
+        <div class="friend-view" id="friendView">
+            <div class="back-btn" onclick="history.back()">&#8592; 返回</div>
+            <div class="user-tabs">
+                <div class="tab active" onclick="switchFriendTab('friends')" id="tabFriends">好友列表</div>
+                <div class="tab" onclick="switchFriendTab('requests')" id="tabRequests">好友申请<span id="friendRequestBadge" class="notice-badge" style="display:none;margin-left:4px">0</span></div>
+                <div class="tab" onclick="switchFriendTab('blacklist')" id="tabBlacklist">黑名单</div>
+            </div>
+            <div id="friendListContent"></div>
+            <div id="friendRequestContent" style="display:none"></div>
+            <div id="blacklistContent" style="display:none"></div>
         </div>
     </div>
 

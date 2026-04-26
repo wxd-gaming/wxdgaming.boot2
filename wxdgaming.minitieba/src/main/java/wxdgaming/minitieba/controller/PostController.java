@@ -7,6 +7,7 @@ import wxdgaming.boot2.core.lang.RunResult;
 import wxdgaming.minitieba.bean.Notice;
 import wxdgaming.minitieba.bean.Post;
 import wxdgaming.minitieba.bean.Reply;
+import wxdgaming.minitieba.service.NoticeService;
 import wxdgaming.minitieba.service.PostService;
 
 import java.util.HashMap;
@@ -25,12 +26,16 @@ import java.util.Map;
 public class PostController {
 
     private final PostService postService;
+    private final NoticeService noticeService;
 
-    public PostController(PostService postService) {
+    public PostController(PostService postService, NoticeService noticeService) {
         this.postService = postService;
+        this.noticeService = noticeService;
     }
 
-    /** 发帖 - 需要登录 */
+    /** 发帖 - 需要登录
+     * visibility: 0-无限制(公开), 1-仅好友可见, 2-仅自己可见(私密)
+     */
     @RequestMapping("/create")
     public RunResult create(@RequestBody Map<String, Object> params, HttpServletRequest request) {
         String username = (String) request.getAttribute("currentUser");
@@ -52,8 +57,11 @@ public class PostController {
         List<String> images = (List<String>) params.get("images");
         String video = (String) params.get("video");
         boolean anonymous = params.containsKey("anonymous") && Boolean.TRUE.equals(params.get("anonymous"));
-        boolean privated = params.containsKey("privated") && Boolean.TRUE.equals(params.get("privated"));
-        Post post = postService.createPost(author, username, content, images, video, anonymous, privated);
+        int visibility = 0; // 默认公开
+        if (params.containsKey("visibility")) {
+            visibility = Integer.parseInt(params.get("visibility").toString());
+        }
+        Post post = postService.createPost(author, username, content, images, video, anonymous, visibility);
         return RunResult.ok().data(post);
     }
 
@@ -170,8 +178,8 @@ public class PostController {
         if (username == null) {
             return RunResult.fail("请先登录");
         }
-        List<Notice> notices = postService.listNotices(username, page, size);
-        long unreadCount = postService.getUnreadNoticeCount(username);
+        List<Notice> notices = noticeService.listNotices(username, page, size);
+        long unreadCount = noticeService.getUnreadNoticeCount(username);
         Map<String, Object> data = new HashMap<>();
         data.put("notices", notices);
         data.put("unreadCount", unreadCount);
@@ -185,7 +193,7 @@ public class PostController {
         if (username == null) {
             return RunResult.fail("请先登录");
         }
-        int count = postService.markNoticesAsRead(username);
+        int count = noticeService.markNoticesAsRead(username);
         return RunResult.ok().fluentPut("count", count);
     }
 

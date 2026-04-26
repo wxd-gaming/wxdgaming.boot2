@@ -83,6 +83,26 @@ public class RocksDBHelper implements InitPrint {
         return db.keyExists(key.getBytes(StandardCharsets.UTF_8));
     }
 
+    public boolean exits(byte[] key) {
+        return db.keyExists(key);
+    }
+
+    public void delete(String key) {
+        try {
+            db.delete(key.getBytes(StandardCharsets.UTF_8));
+        } catch (RocksDBException e) {
+            throw ExceptionUtils.asRuntimeException(e);
+        }
+    }
+
+    public void delete(byte[] key) {
+        try {
+            db.delete(key);
+        } catch (RocksDBException e) {
+            throw ExceptionUtils.asRuntimeException(e);
+        }
+    }
+
     /** 写入单个数据 */
     public void put(String key, Object value) {
         try {

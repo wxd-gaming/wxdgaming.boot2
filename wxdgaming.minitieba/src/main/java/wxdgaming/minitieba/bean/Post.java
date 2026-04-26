@@ -46,6 +46,8 @@ public class Post {
     private boolean anonymous;
     /** 是否私密（仅自己可见） */
     private boolean privated;
+    /** 可见性: 0-无限制(公开), 1-仅好友可见, 2-仅自己可见(私密) */
+    private int visibility;
     /** 当前用户点赞状态（none/like/dislike） - 仅用于前端展示 */
     private String likeStatus;
 
