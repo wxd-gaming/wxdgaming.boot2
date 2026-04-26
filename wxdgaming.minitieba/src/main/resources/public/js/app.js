@@ -1091,13 +1091,21 @@ function updateUserAvatarDisplay(avatar) {
     }
 }
 
-// 上传头像
+// 上传头像（后端会自动压缩大图片）
 async function uploadAvatar(file) {
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-        showToast('头像不能超过2MB');
+    if (file.size > 20 * 1024 * 1024) {
+        showToast('头像不能超过20MB');
         return;
     }
+
+    // 显示上传中效果
+    const avatarEl = document.getElementById('userAvatarDisplay');
+    const originalHtml = avatarEl ? avatarEl.innerHTML : '';
+    if (avatarEl) {
+        avatarEl.innerHTML = '<div class="avatar-uploading"><div class="avatar-spinner"></div></div>';
+    }
+
     try {
         const formData = new FormData();
         formData.append('file', file);
@@ -1117,12 +1125,15 @@ async function uploadAvatar(file) {
                 showToast('头像更新成功');
             } else {
                 showToast(updateRes.msg || '头像更新失败');
+                if (avatarEl) avatarEl.innerHTML = originalHtml;
             }
         } else {
             showToast(json.msg || '上传失败');
+            if (avatarEl) avatarEl.innerHTML = originalHtml;
         }
     } catch(e) {
         showToast('头像上传失败');
+        if (avatarEl) avatarEl.innerHTML = originalHtml;
     }
 }
 
@@ -1392,3 +1403,50 @@ if (document.readyState === 'loading') {
 } else {
     init();
 }
+
+// ========== 图片预览（大图查看）==========
+function showImagePreview(src) {
+    // 创建预览容器
+    const overlay = document.createElement('div');
+    overlay.id = 'imagePreviewOverlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:10000;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.cssText = 'max-width:90%;max-height:90%;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
+
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+
+    // 点击关闭
+    overlay.addEventListener('click', closeImagePreview);
+
+    // ESC 关闭
+    document.addEventListener('keydown', escCloseHandler);
+}
+
+function closeImagePreview() {
+    const overlay = document.getElementById('imagePreviewOverlay');
+    if (overlay) {
+        overlay.remove();
+    }
+    document.removeEventListener('keydown', escCloseHandler);
+}
+
+function escCloseHandler(e) {
+    if (e.key === 'Escape') {
+        closeImagePreview();
+    }
+}
+
+// 点击头像查看大图（用于非头像img元素）
+document.addEventListener('click', function(e) {
+    const target = e.target;
+    // 检查是否点击的是头像图片
+    if (target.tagName === 'IMG' && target.closest('.user-avatar')) {
+        const src = target.src;
+        if (src && !src.includes('data:image')) {
+            showImagePreview(src);
+        }
+    }
+});

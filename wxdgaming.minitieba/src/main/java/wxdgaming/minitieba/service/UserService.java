@@ -139,7 +139,7 @@ public class UserService {
         }
     }
 
-    /** 修改昵称 */
+    /** 修改昵称（每7天只能修改一次） */
     public RunResult updateNickname(String username, String newNickname) {
         if (username == null || username.isBlank()) {
             return RunResult.fail("用户名不能为空");
@@ -156,10 +156,20 @@ public class UserService {
             return RunResult.fail("用户不存在");
         }
 
+        // 检查昵称修改冷却期（7天）
+        long now = System.currentTimeMillis();
+        long cooldown = 7L * 24 * 60 * 60 * 1000; // 7天的毫秒数
+        long lastUpdate = user.getNicknameUpdateTime();
+        if (lastUpdate > 0 && (now - lastUpdate) < cooldown) {
+            long remainingDays = (cooldown - (now - lastUpdate)) / (24 * 60 * 60 * 1000) + 1;
+            return RunResult.fail("昵称每7天只能修改一次，还需等待" + remainingDays + "天");
+        }
+
         user.setNickname(newNickname);
+        user.setNicknameUpdateTime(now);
         db.put(USER_PREFIX + username, user);
 
-        log.info("用户修改昵称: username={}, oldNickname={}, newNickname={}", 
+        log.info("用户修改昵称: username={}, oldNickname={}, newNickname={}",
                 username, user.getNickname(), newNickname);
         return RunResult.ok().fluentPut("nickname", newNickname);
     }

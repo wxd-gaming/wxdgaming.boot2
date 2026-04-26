@@ -37,6 +37,12 @@ public class FileService {
     private static final int MAX_IMAGE_HEIGHT = 1080;
     /** 图片压缩质量 (0.0-1.0) */
     private static final float IMAGE_QUALITY = 0.85f;
+    /** 图片最大文件大小，超过此大小则强制压缩（2MB） */
+    private static final int MAX_IMAGE_SIZE = 2 * 1024 * 1024;
+    /** 头像压缩尺寸（正方形） */
+    private static final int AVATAR_SIZE = 200;
+    /** 头像压缩质量 */
+    private static final float AVATAR_QUALITY = 0.8f;
 
     /** 允许的图片扩展名 */
     private static final String[] ALLOWED_IMAGE_EXT = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"};
@@ -193,32 +199,39 @@ public class FileService {
             int originalWidth = originalImage.getWidth();
             int originalHeight = originalImage.getHeight();
 
-            // 如果图片已经在限制范围内，直接返回
-            if (originalWidth <= MAX_IMAGE_WIDTH && originalHeight <= MAX_IMAGE_HEIGHT) {
-                return compressToJpeg(imageData, ext, IMAGE_QUALITY);
-            }
-
             // 计算缩放比例
             double widthRatio = (double) MAX_IMAGE_WIDTH / originalWidth;
             double heightRatio = (double) MAX_IMAGE_HEIGHT / originalHeight;
             double ratio = Math.min(widthRatio, heightRatio);
 
-            int newWidth = (int) (originalWidth * ratio);
-            int newHeight = (int) (originalHeight * ratio);
+            int newWidth = originalWidth;
+            int newHeight = originalHeight;
+
+            // 如果图片超过限制尺寸或文件超过2MB，则进行压缩
+            boolean needResize = originalWidth > MAX_IMAGE_WIDTH || originalHeight > MAX_IMAGE_HEIGHT;
+            boolean needQualityCompress = imageData.length > MAX_IMAGE_SIZE;
+
+            if (needResize) {
+                newWidth = (int) (originalWidth * ratio);
+                newHeight = (int) (originalHeight * ratio);
+            }
+
+            // 如果尺寸在限制内但文件过大，也需要调整尺寸
+            if (!needResize && needQualityCompress) {
+                // 按比例缩小直到文件小于限制
+                double sizeRatio = Math.sqrt((double) MAX_IMAGE_SIZE / imageData.length);
+                newWidth = (int) (originalWidth * sizeRatio);
+                newHeight = (int) (originalHeight * sizeRatio);
+                needResize = true;
+            }
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-            String outputFormat = getImageFormat(ext);
-            Thumbnails.Builder<BufferedImage> builder = Thumbnails.of(originalImage)
-                    .size(newWidth, newHeight)
-                    .outputQuality(IMAGE_QUALITY);
-
-            if ("jpg".equalsIgnoreCase(outputFormat) || "jpeg".equalsIgnoreCase(outputFormat)) {
-                builder.outputFormat(outputFormat);
-            } else {
-                // 非JPEG格式统一转为JPEG以获得更好的压缩效果
-                builder.outputFormat("jpeg");
+            Thumbnails.Builder<BufferedImage> builder = Thumbnails.of(originalImage);
+            if (needResize) {
+                builder.size(newWidth, newHeight);
             }
+            builder.outputQuality(IMAGE_QUALITY).outputFormat("jpeg");
 
             builder.toOutputStream(baos);
             return baos.toByteArray();
@@ -226,51 +239,6 @@ public class FileService {
         } catch (IOException e) {
             log.error("图片压缩失败", e);
             return null;
-        }
-    }
-
-    /**
-     * 将图片压缩为 JPEG 格式
-     */
-    private byte[] compressToJpeg(byte[] imageData, String originalExt, float quality) {
-        try {
-            ByteArrayInputStream bais = new ByteArrayInputStream(imageData);
-            BufferedImage image = ImageIO.read(bais);
-            if (image == null) {
-                return null;
-            }
-
-            // 统一输出为 JPEG 格式
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            BufferedImage outputImage = new BufferedImage(
-                    image.getWidth(),
-                    image.getHeight(),
-                    BufferedImage.TYPE_INT_RGB
-            );
-            outputImage.getGraphics().drawImage(image, 0, 0, null);
-
-            ImageIO.write(outputImage, "jpeg", baos);
-            return baos.toByteArray();
-
-        } catch (IOException e) {
-            log.error("JPEG转换失败", e);
-            return null;
-        }
-    }
-
-    private String getImageFormat(String ext) {
-        switch (ext.toLowerCase()) {
-            case ".jpg":
-            case ".jpeg":
-                return "jpeg";
-            case ".png":
-                return "png";
-            case ".gif":
-                return "gif";
-            case ".webp":
-                return "webp";
-            default:
-                return "jpeg";
         }
     }
 

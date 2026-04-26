@@ -25,6 +25,8 @@ public class User {
     private String avatar;
     /** 个性签名 */
     private String signature;
+    /** 最后修改昵称时间 */
+    private long nicknameUpdateTime;
     /** 注册时间 */
     private long createTime;
     /** 最后登录时间 */
