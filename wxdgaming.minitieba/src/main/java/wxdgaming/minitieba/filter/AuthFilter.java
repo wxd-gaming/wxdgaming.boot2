@@ -41,6 +41,8 @@ public class AuthFilter implements HandlerInterceptor, WebMvcConfigurer {
                 "/api/post/like",
                 "/api/post/notices",
                 "/api/post/notices/read",
+                "/api/post/delete",
+                "/api/post/reply/delete",
                 "/api/file/upload"
         );
     }

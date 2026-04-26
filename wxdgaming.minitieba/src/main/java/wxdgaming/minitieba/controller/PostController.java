@@ -160,4 +160,24 @@ public class PostController {
         return RunResult.ok().fluentPut("count", count);
     }
 
+    /** 删除帖子 - 需要登录，只能删除自己的帖子 */
+    @RequestMapping("/delete")
+    public RunResult deletePost(@RequestParam long id, HttpServletRequest request) {
+        String username = (String) request.getAttribute("currentUser");
+        if (username == null) {
+            return RunResult.fail("请先登录");
+        }
+        return postService.deletePost(id, username);
+    }
+
+    /** 删除回复 - 需要登录，只能删除自己的回复 */
+    @RequestMapping("/reply/delete")
+    public RunResult deleteReply(@RequestParam long id, HttpServletRequest request) {
+        String username = (String) request.getAttribute("currentUser");
+        if (username == null) {
+            return RunResult.fail("请先登录");
+        }
+        return postService.deleteReply(id, username);
+    }
+
 }

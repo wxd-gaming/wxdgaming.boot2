@@ -23,26 +23,44 @@ body {
 .header h1 { font-size: 20px; font-weight: 600; }
 .header .user-area {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
+    align-items: stretch;
+    gap: 4px;
+    font-size: 12px;
 }
 .header .user-area .username {
     background: rgba(255,255,255,0.2);
     padding: 4px 12px;
     border-radius: 20px;
+    display: flex;
+    align-items: center;
 }
 .header .user-area .btn-header {
-    background: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.2);
     color: #fff;
     border: none;
-    padding: 4px 14px;
-    border-radius: 20px;
-    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 52px;
 }
-.header .user-area .btn-header:hover { background: rgba(255,255,255,0.4); }
+.header .user-area .btn-header .btn-icon {
+    font-size: 18px;
+    line-height: 1;
+}
+.header .user-area .btn-header .btn-text {
+    font-size: 11px;
+    line-height: 1.2;
+}
+.header .user-area .btn-header:hover { 
+    background: rgba(255,255,255,0.35); 
+    transform: scale(1.05);
+}
 
 /* 内容容器 */
 .container {
@@ -417,6 +435,42 @@ body {
 .reply-card .reply-post-link { font-size: 12px; color: #667eea; cursor: pointer; margin-top: 6px; }
 .reply-card .reply-post-link:hover { text-decoration: underline; }
 
+/* 删除按钮样式 */
+.btn-delete {
+    float: right;
+    background: #ff4757;
+    color: #fff;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-delete:hover {
+    background: #ff3344;
+}
+.btn-delete-sm {
+    padding: 2px 8px;
+    font-size: 11px;
+}
+
+/* 回复删除按钮定位 */
+.reply-item { position: relative; }
+.reply-item .btn-delete-sm {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+/* 帖子删除按钮定位 */
+.post-card > div { position: relative; }
+.post-card .btn-delete {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
 /* 消息视图 */
 .notice-view { display: none; }
 .notice-view.active { display: block; }
@@ -484,4 +538,37 @@ body {
     margin-top: 16px;
     padding-top: 16px;
     border-top: 1px solid #f0f0f0;
+}
+
+/* ========== 移动端响应式 ========== */
+@media screen and (max-width: 600px) {
+    /* 顶部导航优化 */
+    .header {
+        padding: 10px 12px;
+    }
+    .header h1 {
+        font-size: 16px;
+    }
+    .header .user-area {
+        gap: 2px;
+    }
+    .header .user-area .username {
+        display: none;
+    }
+    .header .user-area .btn-header {
+        padding: 6px 8px;
+        min-width: 48px;
+        border-radius: 8px;
+    }
+    .header .user-area .btn-header .btn-icon {
+        font-size: 16px;
+    }
+    .header .user-area .btn-header .btn-text {
+        font-size: 10px;
+    }
+    
+    /* 内容容器 */
+    .container {
+        padding: 8px;
+    }
 }

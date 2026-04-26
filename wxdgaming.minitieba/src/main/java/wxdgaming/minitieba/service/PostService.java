@@ -235,10 +235,13 @@ public class PostService {
                         if (skipped < offset) {
                             skipped++;
                         } else {
-                            // 匿名帖子隐藏作者信息
-                            if (post.isAnonymous()) {
-                                post.setAuthor("匿名用户");
-                                post.setUsername(null);
+                            // 匿名帖子隐藏作者信息（创建脱敏副本，不修改原始对象）
+                            if (post.isAnonymous() && (currentUser == null || !currentUser.equals(post.getUsername()))) {
+                                Post anonymousPost = new Post();
+                                BeanUtils.copyProperties(post, anonymousPost);
+                                anonymousPost.setAuthor("匿名用户");
+                                anonymousPost.setUsername(null);
+                                post = anonymousPost;
                             }
                             // 设置当前用户的点赞状态
                             if (currentUser != null) {
@@ -604,6 +607,63 @@ public class PostService {
         // 重置未读数
         db.put(USER_NOTICE_UNREAD_PREFIX + username, 0L);
         return count;
+    }
+
+    /** 删除帖子 - 需要验证是否是帖子的作者 */
+    public RunResult deletePost(long postId, String username) {
+        Post post = getPostRaw(postId);
+        if (post == null) {
+            return RunResult.fail("帖子不存在");
+        }
+        if (!username.equals(post.getUsername())) {
+            return RunResult.fail("只能删除自己的帖子");
+        }
+
+        // 删除帖子
+        try {
+            db.getDb().delete((POST_PREFIX + postId).getBytes(StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            log.error("删除帖子失败: postId={}", postId, e);
+            return RunResult.fail("删除失败");
+        }
+
+        // 更新帖子总数
+        long count = db.getLongValue(POST_COUNT_KEY) - 1;
+        db.put(POST_COUNT_KEY, Math.max(0, count));
+
+        log.info("删除帖子成功: postId={}, username={}", postId, username);
+        return RunResult.ok();
+    }
+
+    /** 删除回复 - 需要验证是否是回复的作者 */
+    public RunResult deleteReply(long replyId, String username) {
+        Reply reply = db.getObject(REPLY_PREFIX + replyId, Reply.class);
+        if (reply == null) {
+            return RunResult.fail("回复不存在");
+        }
+        if (!username.equals(reply.getUsername())) {
+            return RunResult.fail("只能删除自己的回复");
+        }
+
+        long postId = reply.getPostId();
+
+        // 删除回复
+        try {
+            db.getDb().delete((REPLY_PREFIX + replyId).getBytes(StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            log.error("删除回复失败: replyId={}", replyId, e);
+            return RunResult.fail("删除失败");
+        }
+
+        // 更新帖子的回复数
+        Post rawPost = getPostRaw(postId);
+        if (rawPost != null) {
+            rawPost.setReplyCount(Math.max(0, rawPost.getReplyCount() - 1));
+            db.put(POST_PREFIX + postId, rawPost);
+        }
+
+        log.info("删除回复成功: replyId={}, postId={}, username={}", replyId, postId, username);
+        return RunResult.ok();
     }
 
 }

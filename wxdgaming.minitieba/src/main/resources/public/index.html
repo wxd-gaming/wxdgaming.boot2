@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>迷你贴吧</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260426">
-    <script src="js/app.js?v=20260426"></script>
+    <link rel="stylesheet" href="css/styles.css?v=20260427">
+    <script src="js/app.js?v=20260427"></script>
 </head>
 <body>
     <div class="header">
-        <h1>&#128214; 迷你贴吧</h1>
+        <h1 onclick="navigate('list')" style="cursor:pointer">&#128214; 迷你贴吧</h1>
         <div class="user-area" id="userArea"></div>
     </div>
 
@@ -36,21 +36,21 @@
                     <textarea id="contentInput" placeholder="分享你的想法..."></textarea>
                 </div>
                 <div class="input-group">
-                    <label>图片</label>
+                    <label>&#128247; 图片（最多9张，已有视频时不可上传）</label>
                     <div class="form-actions">
-                        <label class="file-upload-btn">
+                        <label class="file-upload-btn" id="imageUploadBtn">
                             &#128247; 选择图片
-                            <input type="file" id="imageInput" accept="image/*" multiple onchange="uploadImages(this)" />
+                            <input type="file" id="imageInput" accept="image/*" multiple onchange="selectImages(this)" />
                         </label>
                     </div>
                     <div class="image-preview" id="imagePreview"></div>
                 </div>
                 <div class="input-group">
-                    <label>&#127909; 视频（可选，支持 mp4/webm/ogg，最大100MB）</label>
+                    <label>&#127909; 视频（最多1个，已有图片时不可上传，支持 mp4/webm/ogg，最大100MB）</label>
                     <div class="form-actions">
-                        <label class="file-upload-btn">
+                        <label class="file-upload-btn" id="videoUploadBtn">
                             &#127909; 选择视频
-                            <input type="file" id="videoInput" accept="video/*" onchange="uploadVideo(this)" />
+                            <input type="file" id="videoInput" accept="video/*" onchange="selectVideo(this)" />
                         </label>
                     </div>
                     <div class="image-preview" id="videoPreview"></div>
