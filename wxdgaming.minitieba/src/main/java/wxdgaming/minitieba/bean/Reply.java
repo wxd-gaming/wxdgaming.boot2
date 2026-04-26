@@ -33,6 +33,8 @@ public class Reply {
     private long createTime;
     /** 是否匿名 */
     private boolean anonymous;
+    /** 引用回复ID（0表示直接回复帖子） */
+    private long replyId;
 
     public Reply(long id, long postId, String author, String username, String content) {
         this.id = id;

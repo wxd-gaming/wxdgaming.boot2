@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>迷你贴吧</title>
     <link rel="stylesheet" href="css/styles.css?v=20260431">
-    <script src="js/app.js?v=20260440"></script>
+    <script src="js/app.js?v=20260445"></script>
 </head>
 <body>
     <div class="header">
@@ -95,9 +95,21 @@
             <div class="user-tabs">
                 <div class="tab active" onclick="switchUserTab('posts')" id="tabPosts">发帖</div>
                 <div class="tab" onclick="switchUserTab('replies')" id="tabReplies">跟帖</div>
+                <!-- 仅自己可见的好友标签 -->
+                <div class="tab" onclick="switchUserTab('friends')" id="tabUserFriends" style="display:none">好友</div>
             </div>
             <div id="userPostsList"></div>
             <div id="userRepliesList" style="display:none"></div>
+            <div id="userFriendsList" style="display:none">
+                <div class="user-sub-tabs">
+                    <div class="tab active" onclick="switchFriendSubTab('friends')" id="tabFriendList">好友列表</div>
+                    <div class="tab" onclick="switchFriendSubTab('requests')" id="tabFriendRequests">好友申请<span id="userFriendRequestBadge" class="notice-badge" style="display:none;margin-left:4px">0</span></div>
+                    <div class="tab" onclick="switchFriendSubTab('blacklist')" id="tabFriendBlacklist">黑名单</div>
+                </div>
+                <div id="userFriendListContent"></div>
+                <div id="userFriendRequestContent" style="display:none"></div>
+                <div id="userFriendBlacklistContent" style="display:none"></div>
+            </div>
             <div class="pagination" id="userPagination"></div>
         </div>
 

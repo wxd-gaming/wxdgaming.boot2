@@ -394,6 +394,10 @@ public class PostService {
 
     /** 回复帖子 */
     public Reply createReply(long postId, String author, String username, String content, boolean anonymous) {
+        return createReply(postId, author, username, content, anonymous, 0);
+    }
+
+    public Reply createReply(long postId, String author, String username, String content, boolean anonymous, long replyId) {
         // 获取原始帖子用于发送通知
         Post rawPost = getPostRaw(postId);
         if (rawPost == null) {
@@ -402,22 +406,23 @@ public class PostService {
 
         Post post = getPost(postId);
 
-        long replyId = nextId();
+        long newReplyId = nextId();
         long userReplyId = nextUserReplyId(username);
-        Reply reply = new Reply(replyId, postId, author, username, content);
+        Reply reply = new Reply(newReplyId, postId, author, username, content);
         reply.setUserReplyId(userReplyId);
         reply.setAnonymous(anonymous);
+        reply.setReplyId(replyId); // 设置引用回复ID
         // 获取用户头像
         User user = db.getObject(USER_PREFIX + username, User.class);
         if (user != null) {
             reply.setAvatar(user.getAvatar());
         }
-        db.put(REPLY_PREFIX + replyId, reply);
+        db.put(REPLY_PREFIX + newReplyId, reply);
 
         // 用户跟帖索引：user:reply:{username}:{倒序时间戳}:{replyId}
         long createTime = System.currentTimeMillis();
-        String userReplyKey = USER_REPLY_PREFIX + username + ":" + (Long.MAX_VALUE - createTime) + ":" + replyId;
-        db.put(userReplyKey, replyId);
+        String userReplyKey = USER_REPLY_PREFIX + username + ":" + (Long.MAX_VALUE - createTime) + ":" + newReplyId;
+        db.put(userReplyKey, newReplyId);
 
         // 更新回复计数（用 SingletonLockUtil 按帖子ID加锁，防止并发丢失数据，5分钟无访问自动释放）
         SingletonLockUtil.lockRunning(postId, () -> {
@@ -430,8 +435,8 @@ public class PostService {
             db.put(POST_PREFIX + postId, lockPost);
 
             // 用 RocksDB 二级索引替代 List（格式: reply:idx:{postId}:{倒序时间戳}:{replyId}）
-            String replyIndexKey = REPLY_INDEX_PREFIX + postId + ":" + (Long.MAX_VALUE - createTime) + ":" + replyId;
-            db.put(replyIndexKey, replyId);
+            String replyIndexKey = REPLY_INDEX_PREFIX + postId + ":" + (Long.MAX_VALUE - createTime) + ":" + newReplyId;
+            db.put(replyIndexKey, newReplyId);
         });
 
         // 发送通知给帖子作者
@@ -439,7 +444,7 @@ public class PostService {
         noticeService.sendNotice(rawPost.getUsername(), username, author, "reply", postId, postContent, content);
 
         log.info("回复成功: postId={}, replyId={}, userReplyId={}, author={}, anonymous={}",
-                postId, replyId, userReplyId, author, anonymous);
+                postId, newReplyId, userReplyId, author, anonymous);
         return reply;
     }
 

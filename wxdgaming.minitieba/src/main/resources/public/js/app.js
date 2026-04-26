@@ -904,6 +904,21 @@ async function showDetail(postId) {
 
         html += '<div class="reply-section"><h3>&#128172; 回复 (' + replies.length + ')</h3>';
 
+        // 回复输入框放在帖子下方，回复列表上方
+        if (isLoggedIn()) {
+            html += '<div class="reply-form" id="replyForm">' +
+                '<div id="replyQuote" style="display:none;padding:8px;background:#f5f5f5;border-radius:6px;margin-bottom:8px;font-size:13px;color:#666">' +
+                    '<span id="replyQuoteText"></span>' +
+                    '<span style="cursor:pointer;margin-left:8px;color:#999" onclick="cancelReplyQuote()">&#10005; 取消</span>' +
+                '</div>' +
+                '<textarea id="replyInput" placeholder="写下你的回复..." rows="3" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;resize:vertical;font-size:14px;font-family:inherit;"></textarea>' +
+                '<label style="font-size:12px;color:#666"><input type="checkbox" id="replyAnonymous" /> 匿名回复</label>' +
+                '<button class="btn btn-primary btn-sm" onclick="submitReply(' + postId + ')">回复</button>' +
+            '</div>';
+        } else {
+            html += '<div style="text-align:center;padding:12px;color:#999;font-size:13px"><a onclick="showAuthModal()" style="color:#667eea;cursor:pointer">登录</a>后可回复</div>';
+        }
+
         if (replies.length === 0) {
             html += '<div class="empty-state" style="padding:20px"><p>暂无回复，来说点什么吧</p></div>';
         } else {
@@ -913,22 +928,20 @@ async function showDetail(postId) {
                 if (isLoggedIn() && r.username === getUsername()) {
                     replyDeleteBtn = '<button class="btn-delete btn-delete-sm" onclick="deleteReply(' + r.id + ', ' + postId + ')">&#128465; 删除</button>';
                 }
+                // 如果有引用回复，显示引用内容
+                let quoteHtml = '';
+                if (r.replyId && r.replyId > 0) {
+                    quoteHtml = '<div class="reply-quote" style="padding:6px 8px;background:#f5f5f5;border-left:3px solid #667eea;font-size:12px;color:#666;margin-bottom:6px;border-radius:0 4px 4px 0">' +
+                        '引用回复 #' + r.replyId + '</div>';
+                }
                 return '<div class="reply-item">' +
                     '<div class="reply-header"><span class="reply-author" style="cursor:pointer" onclick="navigate(\'user\', \'' + encodeURIComponent(r.username || '') + '\')">' + getAvatarHtml(r.avatar, r.author, 'user-avatar-sm') + escHtml(r.author) + '</span>' +
                     '<span class="reply-time">' + formatTime(r.createTime) + '</span>' + replyDeleteBtn + '</div>' +
+                    quoteHtml +
                     '<div class="reply-content">' + escHtml(r.content) + '</div>' +
+                    '<div class="reply-action" style="font-size:12px;color:#999;margin-top:4px;cursor:pointer" onclick="quoteReply(' + r.id + ', \'' + escHtml(r.author) + '\', \'' + escHtml(r.content.substring(0, 50)) + '\')">&#128172; 回复</div>' +
                 '</div>';
             }).join('');
-        }
-
-        if (isLoggedIn()) {
-            html += '<div class="reply-form">' +
-                '<input type="text" id="replyInput" placeholder="写下你的回复..." />' +
-                '<label style="font-size:12px;color:#666"><input type="checkbox" id="replyAnonymous" /> 匿名回复</label>' +
-                '<button class="btn btn-primary btn-sm" onclick="submitReply(' + postId + ')">回复</button>' +
-            '</div>';
-        } else {
-            html += '<div style="text-align:center;padding:12px;color:#999;font-size:13px"><a onclick="showAuthModal()" style="color:#667eea;cursor:pointer">登录</a>后可回复</div>';
         }
 
         html += '</div>';
@@ -975,14 +988,44 @@ async function toggleLikeInList(postId, type) {
 }
 
 // ========== 提交回复 ==========
+let replyQuoteId = 0; // 引用回复的ID
+
+function quoteReply(replyId, author, content) {
+    replyQuoteId = replyId;
+    const quoteDiv = document.getElementById('replyQuote');
+    const quoteText = document.getElementById('replyQuoteText');
+    if (quoteDiv && quoteText) {
+        quoteDiv.style.display = 'block';
+        quoteText.textContent = '回复 ' + author + '：' + content + '...';
+    }
+    // 焦点移到输入框
+    const input = document.getElementById('replyInput');
+    if (input) input.focus();
+}
+
+function cancelReplyQuote() {
+    replyQuoteId = 0;
+    const quoteDiv = document.getElementById('replyQuote');
+    if (quoteDiv) quoteDiv.style.display = 'none';
+}
+
 async function submitReply(postId) {
     const input = document.getElementById('replyInput');
     const content = input.value.trim();
     const anonymous = document.getElementById('replyAnonymous').checked;
     if (!content) { showToast('请输入回复内容'); return; }
+    
+    const data = { postId, content, anonymous };
+    if (replyQuoteId > 0) {
+        data.replyId = replyQuoteId; // 添加引用回复ID
+    }
+    
     try {
-        const res = await api('/api/post/reply', 'POST', { postId, content, anonymous });
+        const res = await api('/api/post/reply', 'POST', data);
         if (res.code === 1) {
+            replyQuoteId = 0; // 重置引用
+            const quoteDiv = document.getElementById('replyQuote');
+            if (quoteDiv) quoteDiv.style.display = 'none';
             showDetail(postId);
         } else {
             showToast(res.msg || '回复失败');
@@ -1052,7 +1095,7 @@ async function showUserView(username) {
         '</div>' +
         '<div class="username" id="userDisplayName">' + escHtml(username) + '</div>' +
         '<div class="user-signature" id="userSignature"></div>' +
-        (isOwnProfile ? '<div class="user-profile-actions"><button class="btn btn-outline btn-sm" onclick="showNicknameEdit()">&#9998; 修改昵称</button> <button class="btn btn-outline btn-sm" onclick="showSignatureEdit()">&#128221; 修改签名</button> <button class="btn btn-outline btn-sm" onclick="navigate(\'friends\')">&#129309; 好友<span id="friendBadge" class="notice-badge" style="display:none;margin-left:4px">0</span></button> <button class="btn btn-outline btn-sm" onclick="doLogout()" style="color:#ff4757;border-color:#ff4757">&#128682; 退出登录</button></div>' : '');
+        (isOwnProfile ? '<div class="user-profile-actions"><button class="btn btn-outline btn-sm" onclick="showNicknameEdit()">&#9998; 修改昵称</button> <button class="btn btn-outline btn-sm" onclick="showSignatureEdit()">&#128221; 修改签名</button> <button class="btn btn-outline btn-sm" onclick="doLogout()" style="color:#ff4757;border-color:#ff4757">&#128682; 退出登录</button></div>' : '');
 
     // 如果是自己的资料，添加头像上传input
     if (isOwnProfile && !document.getElementById('avatarInput')) {
@@ -1099,6 +1142,9 @@ async function showUserView(username) {
         if (userRepliesList) userRepliesList.style.display = 'none';
         if (userPagination) userPagination.style.display = 'block';
         if (userActions) userActions.style.display = 'none';
+        // 显示好友标签
+        const tabUserFriends = document.getElementById('tabUserFriends');
+        if (tabUserFriends) tabUserFriends.style.display = '';
         switchUserTab('posts');
     } else {
         // 查看他人的主页：显示标签页、帖子列表和操作按钮
@@ -1106,6 +1152,9 @@ async function showUserView(username) {
         if (userPostsList) userPostsList.style.display = 'block';
         if (userRepliesList) userRepliesList.style.display = 'none';
         if (userPagination) userPagination.style.display = 'block';
+        // 隐藏好友标签
+        const tabUserFriends = document.getElementById('tabUserFriends');
+        if (tabUserFriends) tabUserFriends.style.display = 'none';
         switchUserTab('posts');
         updateUserActions(username);
     }
@@ -1276,10 +1325,196 @@ function switchUserTab(tab) {
     userCurrentPage = 1;
     document.getElementById('tabPosts').classList.toggle('active', tab === 'posts');
     document.getElementById('tabReplies').classList.toggle('active', tab === 'replies');
+    const tabUserFriends = document.getElementById('tabUserFriends');
+    if (tabUserFriends) tabUserFriends.classList.toggle('active', tab === 'friends');
     document.getElementById('userPostsList').style.display = tab === 'posts' ? '' : 'none';
     document.getElementById('userRepliesList').style.display = tab === 'replies' ? '' : 'none';
+    const userFriendsList = document.getElementById('userFriendsList');
+    if (userFriendsList) userFriendsList.style.display = tab === 'friends' ? '' : 'none';
     document.getElementById('userPagination').innerHTML = '';
-    loadUserContent();
+    
+    if (tab === 'friends') {
+        loadUserFriendList();
+    } else {
+        loadUserContent();
+    }
+}
+
+let currentFriendSubTab = 'friends';
+
+function switchFriendSubTab(tab) {
+    currentFriendSubTab = tab;
+    document.getElementById('tabFriendList').classList.toggle('active', tab === 'friends');
+    document.getElementById('tabFriendRequests').classList.toggle('active', tab === 'requests');
+    document.getElementById('tabFriendBlacklist').classList.toggle('active', tab === 'blacklist');
+    document.getElementById('userFriendListContent').style.display = tab === 'friends' ? '' : 'none';
+    document.getElementById('userFriendRequestContent').style.display = tab === 'requests' ? '' : 'none';
+    document.getElementById('userFriendBlacklistContent').style.display = tab === 'blacklist' ? '' : 'none';
+
+    if (tab === 'friends') {
+        loadUserFriendList();
+    } else if (tab === 'requests') {
+        loadUserFriendRequests();
+    } else if (tab === 'blacklist') {
+        loadUserBlacklist();
+    }
+}
+
+async function loadUserFriendList() {
+    const username = currentUserName;
+    if (!username) return;
+    
+    const container = document.getElementById('userFriendListContent');
+    if (!container) return;
+    
+    try {
+        const res = await api('/api/friend/list?username=' + encodeURIComponent(username));
+        if (res.code !== 1) {
+            container.innerHTML = '<div class="empty-state"><div class="emoji">&#128100;</div><p>加载好友列表失败</p></div>';
+            return;
+        }
+        
+        const friends = res.data || [];
+        if (friends.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="emoji">&#128100;</div><p>暂无好友，快去添加吧！</p></div>';
+            return;
+        }
+        
+        // 获取每个好友的详细信息
+        const friendDetails = [];
+        for (const friendUsername of friends) {
+            try {
+                const userRes = await api('/api/user/public/info?username=' + encodeURIComponent(friendUsername));
+                if (userRes.code === 1) {
+                    friendDetails.push({
+                        username: userRes.username || friendUsername,
+                        nickname: userRes.nickname || friendUsername,
+                        avatar: userRes.avatar || ''
+                    });
+                } else {
+                    friendDetails.push({ username: friendUsername, avatar: '', nickname: friendUsername });
+                }
+            } catch(e) {
+                friendDetails.push({ username: friendUsername, avatar: '', nickname: friendUsername });
+            }
+        }
+        
+        container.innerHTML = friendDetails.map(r =>
+            '<div class="friend-item">' +
+                '<div class="friend-info" onclick="navigate(\'user\', \'' + encodeURIComponent(r.username) + '\')">' +
+                    getAvatarHtml(r.avatar, r.nickname || r.username, 'user-avatar-sm') +
+                    '<span class="friend-name">' + escHtml(r.nickname || r.username) + '</span>' +
+                '</div>' +
+                '<div class="friend-actions">' +
+                    '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();removeFriendDirect(\'' + escHtml(r.username) + '\')">删除</button>' +
+                    '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();blockUserFromList(\'' + escHtml(r.username) + '\')">拉黑</button>' +
+                '</div>' +
+            '</div>'
+        ).join('');
+    } catch(e) {
+        console.error('加载好友列表失败:', e);
+        container.innerHTML = '<div class="empty-state"><div class="emoji">&#128100;</div><p>加载好友列表失败</p></div>';
+    }
+}
+
+async function loadUserFriendRequests() {
+    const username = currentUserName;
+    if (!username) return;
+    
+    const container = document.getElementById('userFriendRequestContent');
+    if (!container) return;
+    
+    try {
+        const res = await api('/api/friend/requests?username=' + encodeURIComponent(username));
+        if (res.code !== 1) {
+            container.innerHTML = '<div class="empty-state"><div class="emoji">&#128140;</div><p>加载好友申请失败</p></div>';
+            return;
+        }
+        
+        const requests = res.data || [];
+        const pendingRequests = requests.filter(r => r.status === 'pending');
+        
+        if (pendingRequests.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="emoji">&#128140;</div><p>暂无好友申请</p></div>';
+            return;
+        }
+        
+        container.innerHTML = pendingRequests.map(r =>
+            '<div class="friend-request-item">' +
+                '<div class="request-info" onclick="navigate(\'user\', \'' + encodeURIComponent(r.fromUser) + '\')">' +
+                    getAvatarHtml(r.fromAvatar, r.fromNickname || r.fromUser, 'user-avatar-sm') +
+                    '<div class="request-detail">' +
+                        '<span class="request-name">' + escHtml(r.fromNickname || r.fromUser) + '</span>' +
+                        '<span class="request-time">' + formatTime(r.createTime) + '</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="request-actions">' +
+                    '<button class="btn btn-primary btn-sm" onclick="handleFriendRequest(' + r.id + ', true)">同意</button>' +
+                    '<button class="btn btn-outline btn-sm" onclick="handleFriendRequest(' + r.id + ', false)">拒绝</button>' +
+                '</div>' +
+            '</div>'
+        ).join('');
+    } catch(e) {
+        console.error('加载好友申请失败:', e);
+        container.innerHTML = '<div class="empty-state"><div class="emoji">&#128140;</div><p>加载好友申请失败</p></div>';
+    }
+}
+
+async function loadUserBlacklist() {
+    const username = currentUserName;
+    if (!username) return;
+    
+    const container = document.getElementById('userFriendBlacklistContent');
+    if (!container) return;
+    
+    try {
+        const res = await api('/api/friend/blacklist?username=' + encodeURIComponent(username));
+        if (res.code !== 1) {
+            container.innerHTML = '<div class="empty-state"><div class="emoji">&#128075;</div><p>加载黑名单失败</p></div>';
+            return;
+        }
+        
+        const blacklist = res.data || [];
+        if (blacklist.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="emoji">&#128075;</div><p>黑名单为空</p></div>';
+            return;
+        }
+        
+        // 获取每个拉黑用户的详细信息
+        const userDetails = [];
+        for (const blockedUsername of blacklist) {
+            try {
+                const userRes = await api('/api/user/public/info?username=' + encodeURIComponent(blockedUsername));
+                if (userRes.code === 1) {
+                    userDetails.push({
+                        username: userRes.username || blockedUsername,
+                        nickname: userRes.nickname || blockedUsername,
+                        avatar: userRes.avatar || ''
+                    });
+                } else {
+                    userDetails.push({ username: blockedUsername, avatar: '', nickname: blockedUsername });
+                }
+            } catch(e) {
+                userDetails.push({ username: blockedUsername, avatar: '', nickname: blockedUsername });
+            }
+        }
+        
+        container.innerHTML = userDetails.map(r => {
+            const displayName = (r.nickname && r.nickname.trim()) ? r.nickname : r.username;
+            return '<div class="friend-item">' +
+                '<div class="friend-info" onclick="navigate(\'user\', \'' + encodeURIComponent(r.username) + '\')">' +
+                    getAvatarHtml(r.avatar, displayName, 'user-avatar-sm') +
+                    '<span class="friend-name">' + escHtml(displayName) + '</span>' +
+                '</div>' +
+                '<div class="friend-actions">' +
+                    '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();unblockUserDirect(\'' + escHtml(r.username) + '\')">取消拉黑</button>' +
+                '</div>' +
+            '</div>';
+        }).join('');
+    } catch(e) {
+        console.error('加载黑名单失败:', e);
+        container.innerHTML = '<div class="empty-state"><div class="emoji">&#128075;</div><p>加载黑名单失败</p></div>';
+    }
 }
 
 async function loadUserContent() {

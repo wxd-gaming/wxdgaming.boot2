@@ -374,8 +374,9 @@ body {
 .reply-item .reply-time { font-size: 12px; color: #999; }
 .reply-item .btn-delete-sm { margin-left: auto; }
 .reply-item .reply-content { font-size: 14px; margin-top: 6px; line-height: 1.5; white-space: pre-wrap; }
-.reply-form { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-.reply-form input {
+.reply-form { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: flex-start; }
+.reply-form input,
+.reply-form textarea {
     flex: 1;
     min-width: 150px;
     padding: 10px;
@@ -383,8 +384,10 @@ body {
     border-radius: 8px;
     font-size: 14px;
     outline: none;
+    font-family: inherit;
 }
-.reply-form input:focus { border-color: #667eea; }
+.reply-form input:focus,
+.reply-form textarea:focus { border-color: #667eea; }
 .reply-form label { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #666; }
 
 /* 空状态 */
@@ -521,6 +524,24 @@ body {
     transition: all 0.2s;
 }
 .user-tabs .tab.active { color: #667eea; border-bottom-color: #667eea; }
+.user-sub-tabs {
+    display: flex;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+.user-sub-tabs .tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #666;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+.user-sub-tabs .tab.active { color: #667eea; border-bottom-color: #667eea; background: #fff; }
 .reply-card {
     background: #fff;
     border-radius: 12px;

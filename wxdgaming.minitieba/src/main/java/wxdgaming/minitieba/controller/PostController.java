@@ -135,7 +135,15 @@ public class PostController {
             return RunResult.fail("回复内容不能为空");
         }
         boolean anonymous = params.containsKey("anonymous") && Boolean.TRUE.equals(params.get("anonymous"));
-        Reply reply = postService.createReply(postId, author, username, content, anonymous);
+        long replyId = 0;
+        if (params.containsKey("replyId")) {
+            try {
+                replyId = Long.parseLong(params.get("replyId").toString());
+            } catch (Exception e) {
+                replyId = 0;
+            }
+        }
+        Reply reply = postService.createReply(postId, author, username, content, anonymous, replyId);
         if (reply == null) {
             return RunResult.fail("帖子不存在");
         }
