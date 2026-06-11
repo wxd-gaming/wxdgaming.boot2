@@ -1,5 +1,6 @@
 package executor4;
 
+import java.util.List;
 import java.util.concurrent.*;
 
 /**
@@ -35,6 +36,26 @@ public class ExecutorDriverService implements Executor {
 
     public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
         return scheduledExecutorService.schedule(command, delay, unit);
+    }
+
+    public void shutdown() {
+        scheduledExecutorService.shutdown();
+    }
+
+    public List<Runnable> shutdownNow() {
+        return scheduledExecutorService.shutdownNow();
+    }
+
+    public boolean isShutdown() {
+        return scheduledExecutorService.isShutdown();
+    }
+
+    public boolean isTerminated() {
+        return scheduledExecutorService.isTerminated();
+    }
+
+    public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+        return scheduledExecutorService.awaitTermination(timeout, unit);
     }
 
     @Override
