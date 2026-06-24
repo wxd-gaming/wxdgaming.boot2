@@ -11,3 +11,4 @@ public interface FutureProxy {
     public void cancel();
 
 }
+

@@ -67,13 +67,14 @@ public class RemoteRun {
     }
 
     @Test
+    public void remoteGroovy() throws Exception {
+        executeGroovy("/groovy/ss.groovy");
+    }
+
+    @Test
     public void remoteRun() throws Exception {
         execute(ExecGM.class, new JSONObject().fluentPut("cc", "1"));
     }
 
-    @Test
-    public void remoteGroovy() throws Exception {
-        executeGroovy("/groovy/ss.groovy");
-    }
 
 }

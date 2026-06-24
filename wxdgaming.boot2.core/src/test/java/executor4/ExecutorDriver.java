@@ -38,34 +38,17 @@ public class ExecutorDriver implements Executor, Runnable {
     }
 
     public CompletableFuture<?> submit(Runnable task) {
-        Executor currentExecutor = ExecutorFactory.currentExecutor();
-        CompletableFuture<?> future = new CompletableFuture<>();
-        RunnableWrapper runnable = new RunnableWrapper(() -> {
-            try {
-                task.run();
-                currentExecutor.execute(() -> future.complete(null));
-            } catch (Exception e) {
-                currentExecutor.execute(() -> future.completeExceptionally(e));
-            }
-        }, false);
-        execute(runnable);
-        return future;
+        RunnableFuture runnableFuture = new RunnableFuture(task, false);
+        runnableFuture.initStackTrace(0, 1);
+        execute(runnableFuture);
+        return runnableFuture;
     }
 
     public <U> CompletableFuture<U> submit(Supplier<U> task) {
-        Executor currentExecutor = ExecutorFactory.currentExecutor();
-        CompletableFuture<U> future = new CompletableFuture<>();
-        RunnableWrapper runnable = new RunnableWrapper(() -> {
-            try {
-                U u = task.get();
-                currentExecutor.execute(() -> future.complete(u));
-            } catch (Exception e) {
-                currentExecutor.execute(() -> future.completeExceptionally(e));
-            }
-        }, false);
-        runnable.initStackTrace(0, 1);
-        execute(runnable);
-        return future;
+        SupplierFuture<U> supplierFuture = new SupplierFuture<>(task, false);
+        supplierFuture.initStackTrace(0, 1);
+        execute(supplierFuture);
+        return supplierFuture;
     }
 
     public FutureProxy schedule(Runnable command, long delay, TimeUnit unit) {
